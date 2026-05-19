@@ -661,6 +661,137 @@ All 57 affected tests still pass; `tsc -b --noEmit` clean.
 
 ---
 
+## Checkpoint 9 — Desktop Phase 2.5 LITE: keychain-backed offline session ✅
+
+Original plan: `docs/superpowers/plans/2026-05-19-electrobun-desktop-phase-2.5-consumer-migration.md`
+(consumer migration of ~86 files to `usePlatform()` / `getPlatformImpls()`).
+
+**Scope decision.** The full plan ships across ~6–8 PRs of mechanical
+consumer migration. The ICT4D demo only needs the desktop binary to
+survive a "quit → go offline → relaunch → still signed in → still
+queryable" loop. This checkpoint ships the **minimum** to deliver that
+loop, plus the platform foundation so the full consumer migration can
+land later as isolated PRs without re-doing infrastructure.
+
+### What shipped
+
+**Platform foundation (web + desktop):**
+
+- `src/config/platform/platformRegistry.ts` — module-level
+  `getPlatformImpls()` / `setPlatformImpls()` so plain TS modules under
+  `src/clients/` reach the same impls `usePlatform()` returns. Throws
+  loudly when read before `PlatformProvider` mounts (4 unit tests).
+- `src/config/platform/PlatformProvider.tsx` — publishes the resolved
+  impls into the registry on mount via `setPlatformImpls`.
+- `src/config/platform/createWebDuckDbClient.ts` — replaced throw-stub
+  with a real wrapper around the legacy `DuckDbClient` singleton.
+  Forwards `runRawQuery`, `runStructuredQuery`, `loadFromUpload` to
+  duckdb-wasm. Throws with a migration pointer for legacy-only
+  features (`returnType: "parquet"`, shared `conn`, named-template
+  params) so a future consumer migration surfaces the gap loudly
+  instead of silently falling through.
+- `src/config/platform/createWebDatasetBlobStore.ts` — replaced
+  throw-stub with a Dexie-backed implementation. Supports the
+  canonical `workspaces/<wsId>/datasets/<dsId>/data.parquet` key
+  against `AvaDexie.DB.LocalDataset`. Rejects malformed keys.
+
+**Desktop offline-session polyfill (`src/clients/AuthClient.ts`):**
+
+- When `isDesktop()` is true, `getCurrentSession` / `signIn` /
+  `signOut` / `onAuthStateChange` route through
+  `getPlatformImpls().authProvider` (the keychain-backed
+  `DesktopAuthProvider` from Phase 2). Web behavior is byte-identical.
+- Synthesises Supabase-shaped `User` / `Session` objects from the
+  leaner platform `Session` so existing consumers (`useAuth`,
+  `signin.tsx`, route guards) see no shape change.
+- The wider `AuthClient` surface — `requestPasswordResetEmail`,
+  `updatePassword`, `updateEmail`, `register` — stays on Supabase JS
+  even on desktop. Those flows require network and aren't on the
+  offline path.
+- 4 desktop-polyfill unit tests in `src/clients/AuthClient.test.ts`.
+
+**Bun-main: cached access token for offline-restart**
+(`apps/desktop/main/ipc/registerAuthHandlers/registerAuthHandlers.ts`):
+
+- Sign-in / refresh now write a JSON `{accessToken,
+  accessTokenExpiresAt, userId, email}` payload to the keychain at
+  `com.avandarlabs.desktop / supabase-cached-session`, in addition to
+  the existing refresh-token entry.
+- `getSession` falls back to the cached payload when the refresh
+  exchange fails (network down, Supabase unreachable, etc.) and
+  returns the session with `mode: "offline-cached"`. The webview
+  treats the user as signed in; local-only paths (SQLite reads via
+  IPC, duckdb-wasm queries against Dexie-cached parquets) work
+  normally; any Supabase-direct call still fails as it would offline.
+- `signOut` deletes both the refresh-token and cached-session entries.
+
+**Bun-main: post-signin snapshot bootstrap** (`apps/desktop/main/index.ts`):
+
+- `registerAuthHandlers` accepts an `onAuthenticated(accessToken)`
+  hook. After a successful sign-in, the desktop main process calls
+  `bootstrapSnapshotIfNeeded` against Supabase REST to populate every
+  `SYNCABLE_TABLES` entry into the local SQLite mirror.
+- Removes the previous dependency on the `AVA_DEV_ACCESS_TOKEN` env
+  var for first-launch data population.
+- Idempotent — subsequent sign-ins skip tables that already have rows.
+
+### Demo flow this unlocks
+
+1. Online, fresh keychain: `pnpm dev:desktop`, sign in. Bun-main logs
+   `[snapshot-bootstrap] inserted N rows` per syncable table.
+2. Browse to one dataset so its parquet caches into Dexie. (IndexedDB
+   persists in Electrobun's WKWebView container.)
+3. Cmd+Q, turn WiFi off, relaunch `pnpm dev:desktop`. Session restored
+   from the cached keychain payload (`mode: "offline-cached"`).
+   Workspace list / dataset list render from local SQLite via the
+   `createRdbCrudClient → createSqliteCrudClient` IPC path already
+   wired by Phase 2. Open dataset → duckdb-wasm queries against the
+   Dexie-cached parquet.
+4. Keychain Access shows two entries under `com.avandarlabs.desktop`:
+   `supabase-refresh-token` and `supabase-cached-session`.
+
+### What is explicitly NOT in this checkpoint
+
+These are part of the full Phase 2.5 plan, deferred:
+
+- **Consumer migration of ~80 files to `usePlatform()` /
+  `getPlatformImpls()`.** Tasks 5/6/7/8 of the original plan. Not
+  needed for the demo because the legacy Dexie + duckdb-wasm paths
+  already work offline once cached. Track as a follow-up; each
+  domain (auth / duckdb / dataset blob / serverApi) can ship as
+  its own ~5-file batch PR.
+- **ESLint `no-restricted-imports` guardrail** (Task 4 sub-step).
+  Would block the unmigrated consumers from building today; add it
+  after the consumer migration lands.
+- **IPC bridge runtime verification** (Task 1). The bridge in
+  `apps/desktop/main/ipc/createElectrobunIpcTransport/` has not been
+  end-to-end booted in this session. If sign-in fails on desktop with
+  an IPC error, that's the first place to look.
+- **Phase 2 acceptance checklist** (Task 9). Cold-`userDataDir` test
+  requires interactive boot; verifiable only by running through the
+  demo flow above.
+
+### Verification
+
+- 8 new unit tests pass (4 `platformRegistry`, 4 `AuthClient` desktop
+  polyfill).
+- All 79 existing desktop tests still pass (`pnpm test:desktop`).
+- `pnpm type-check` clean for the changed files. The 4 pre-existing
+  `feat/ict4d-demo` test failures (`ManualUploadView`,
+  `GoogleSheetsImportView`, `useLoadManualUploadFile`,
+  `DashboardEditorView`) are unaffected — confirmed present on
+  `feat/ict4d-demo` before this checkpoint.
+- `pnpm lint` clean on the touched files (one pre-existing
+  react-refresh advisory on `PlatformProvider.tsx`'s co-located
+  `usePlatform` export).
+
+### Demo doc
+
+User-facing demo runbook lives at
+`docs/demo-features/desktop-offline-session.md`.
+
+---
+
 ## What to do next (recommended order)
 
 1. **Smoke-test the merge.** Spin up the app locally and exercise:

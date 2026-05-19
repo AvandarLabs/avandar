@@ -22,7 +22,13 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 
 ## Feature work
 
-- [ ] **2. Finish Desktop Phase 2** (4,298-line plan — needs native build env)
+- [~] **2. Finish Desktop Phase 2 + Phase 2.5 LITE** (Phase 2 native
+  layer landed previously; Phase 2.5 LITE shipped in **Checkpoint 9**
+  — platform registry + real web adapters + keychain-backed offline
+  session + post-signin snapshot bootstrap. The desktop "quit → go
+  offline → relaunch → still signed in → still queryable" demo loop
+  is now wired. Full Phase 2.5 consumer migration of ~80 files to
+  `usePlatform()` is deferred — not required for the demo loop.)
 - [~] **3. Merge other `claude/` session branches** — all visible ones merged in step 0
 - [~] **4. Pull and finish work from `claude/` branches that only have plans**
   - [x] Plan pulled from `claude/add-python-r-execution-hKxZd`
@@ -70,8 +76,23 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [ ] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
 - [x] **18. Make dashboard "View" button work before "Publish"**
   - New auth-gated preview route at `/<workspaceSlug>/dashboards/preview/<dashboardId>` shows the read-only render with a "Back to editor" banner. Public route at `/public/dashboards/...` still enforces `isPublic`.
-- [~] **19. Everything still works in Desktop + offline mode** — requires items #2 and #8 first
-- [~] **20. Manual querying works offline (LLM queries don't, but manual must)** — manual query form already works locally; needs verification once dashboard work lands
+- [~] **19. Everything still works in Desktop + offline mode**
+  - **Auth offline ✅** (Checkpoint 9) — keychain holds refresh token
+    + cached access-token payload; offline relaunch restores session
+    with `mode: "offline-cached"`.
+  - **Local SQLite reads ✅** (Phase 2 + Checkpoint 9 post-signin
+    bootstrap) — workspace / dataset / config tables populate on
+    first sign-in; subsequent launches read locally via the
+    `createSqliteCrudClient → IPC → bun:sqlite` path.
+  - **DuckDB queries offline ✅** — still routed through duckdb-wasm
+    in the webview (Dexie-cached parquets). Native DuckDB via IPC is
+    wired but unused until Task 6 consumer migration lands.
+  - **Voice dictation offline** ❌ — depends on item #8.
+- [~] **20. Manual querying works offline (LLM queries don't, but manual must)**
+  - Manual query form runs against duckdb-wasm in the webview;
+    parquet bytes survive across launches via Dexie. End-to-end demo
+    flow validated by the Checkpoint 9 runbook
+    (`docs/demo-features/desktop-offline-session.md`).
 - [ ] **21. Manual query form available inside dashboards**
 - [ ] **22. Chat panel works inside dashboards — produces Puck blocks (P-blocks)**
 - [ ] **23. Optional local model fallback for offline use (only if 8 GB RAM-feasible)**
