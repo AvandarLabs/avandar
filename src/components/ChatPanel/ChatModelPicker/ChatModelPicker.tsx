@@ -1,4 +1,6 @@
-import { makeSelectOptions, Select } from "@ui";
+import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
+import { IconCheck, IconSparkles } from "@tabler/icons-react";
+import { Tooltip } from "@ui";
 import { useEffect, useMemo, useState } from "react";
 import {
   readStoredChatModelId,
@@ -8,22 +10,33 @@ import {
 import { useChatModels } from "@/components/ChatPanel/useChatModels";
 import { useRegisterChatModelContext } from "@/components/ChatPanel/useRegisterChatModelContext";
 import css from "./ChatModelPicker.module.css";
-import type { SelectData } from "@ui";
+import type { ChatModelOption } from "$/types/chat.types";
 
 type Props = {
   disabled?: boolean;
 };
 
 /**
- * Model picker for the chat panel. Loads models from OpenRouter, registers
- * the selection with assistant-ui ModelContext, and persists the choice in
- * localStorage.
+ * Compact model picker for the chat composer. Shows a small "Model" control;
+ * the active model name appears in a tooltip. Clicking opens a searchable,
+ * grouped catalog.
  */
 export function ChatModelPicker({
   disabled = false,
 }: Props): JSX.Element | null {
   const { groups, models, isLoading, isError } = useChatModels();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
+  const [search, setSearch] = useState("");
+
+  const combobox = useCombobox({
+    onDropdownClose: () => {
+      combobox.resetSelectedOption();
+      setSearch("");
+    },
+    onDropdownOpen: () => {
+      combobox.selectFirstOption();
+    },
+  });
 
   const resolvedModelId = useMemo(() => {
     if (models.length === 0) {
@@ -35,6 +48,15 @@ export function ChatModelPicker({
     });
   }, [models, selectedModelId]);
 
+  const selectedModel = useMemo((): ChatModelOption | undefined => {
+    if (!resolvedModelId) {
+      return undefined;
+    }
+    return models.find((model) => {
+      return model.id === resolvedModelId;
+    });
+  }, [models, resolvedModelId]);
+
   useEffect(() => {
     if (!resolvedModelId) {
       return;
@@ -44,40 +66,116 @@ export function ChatModelPicker({
 
   useRegisterChatModelContext(resolvedModelId);
 
-  const selectData = useMemo((): SelectData<string> => {
-    return groups.map((entry) => {
-      return {
-        group: entry.group,
-        items: makeSelectOptions(entry.models, {
-          valueKey: "id",
-          labelKey: "name",
-        }),
-      };
-    });
-  }, [groups]);
+  const filteredGroups = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) {
+      return groups;
+    }
+    return groups
+      .map((entry) => {
+        const groupMatches = entry.group.toLowerCase().includes(query);
+        const matchingModels = entry.models.filter((model) => {
+          if (groupMatches) {
+            return true;
+          }
+          return (
+            model.name.toLowerCase().includes(query) ||
+            model.id.toLowerCase().includes(query)
+          );
+        });
+        return { ...entry, models: matchingModels };
+      })
+      .filter((entry) => {
+        return entry.models.length > 0;
+      });
+  }, [groups, search]);
+
+  const tooltipLabel =
+    isLoading ? "Loading models..."
+    : selectedModel ? `Using ${selectedModel.name}`
+    : "Choose a model";
+
+  const isTriggerDisabled = disabled || isLoading || !resolvedModelId;
 
   if (isError) {
     return null;
   }
 
   return (
-    <div className={css.root}>
-      <Select
-        className={css.select}
-        size="xs"
-        searchable
-        disabled={disabled || isLoading || !resolvedModelId}
-        data={selectData}
-        value={resolvedModelId ?? null}
-        placeholder={isLoading ? "Loading models catalog..." : "Select a model"}
-        onChange={(modelId) => {
-          if (modelId) {
-            setSelectedModelId(modelId);
-          }
-        }}
-        comboboxProps={{ withinPortal: true }}
-        aria-label="Chat model"
-      />
-    </div>
+    <Combobox
+      store={combobox}
+      width={300}
+      position="top-start"
+      withinPortal
+      onOptionSubmit={(modelId) => {
+        setSelectedModelId(modelId);
+        combobox.closeDropdown();
+      }}
+    >
+      <Tooltip label={tooltipLabel} disabled={combobox.dropdownOpened}>
+        <Combobox.Target>
+          <Button
+            type="button"
+            variant="subtle"
+            color="neutral"
+            size="compact-sm"
+            className={css.trigger}
+            disabled={isTriggerDisabled}
+            aria-label="Choose chat model"
+            leftSection={<IconSparkles size={14} />}
+            onClick={() => {
+              combobox.toggleDropdown();
+            }}
+          >
+            Model
+          </Button>
+        </Combobox.Target>
+      </Tooltip>
+
+      <Combobox.Dropdown className={css.dropdown}>
+        <Combobox.Search
+          value={search}
+          onChange={(event) => {
+            setSearch(event.currentTarget.value);
+            combobox.updateSelectedOptionIndex();
+          }}
+          placeholder="Search models"
+          aria-label="Search models"
+        />
+        <Combobox.Options className={css.options}>
+          {filteredGroups.length > 0 ?
+            filteredGroups.map((entry) => {
+              return (
+                <Combobox.Group label={entry.group} key={entry.group}>
+                  {entry.models.map((model) => {
+                    const isSelected = model.id === resolvedModelId;
+                    return (
+                      <Combobox.Option
+                        value={model.id}
+                        key={model.id}
+                        active={isSelected}
+                      >
+                        <Group gap="xs" wrap="nowrap" justify="space-between">
+                          <Text size="sm" className={css.optionLabel}>
+                            {model.name}
+                          </Text>
+                          {isSelected ?
+                            <IconCheck
+                              size={14}
+                              className={css.selectedIcon}
+                              aria-hidden
+                            />
+                          : null}
+                        </Group>
+                      </Combobox.Option>
+                    );
+                  })}
+                </Combobox.Group>
+              );
+            })
+          : <Combobox.Empty>No models match your search</Combobox.Empty>}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   );
 }

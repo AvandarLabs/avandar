@@ -11,8 +11,8 @@ export function Composer(): JSX.Element {
 
   return (
     <div className={css.composerContainer}>
-      <ChatModelPicker disabled={disabled} />
       <ComposerPrimitive.Root className={css.composer}>
+        <ChatModelPicker disabled={disabled} />
         <ComposerPrimitive.Input
           className={css.composerInput}
           placeholder={

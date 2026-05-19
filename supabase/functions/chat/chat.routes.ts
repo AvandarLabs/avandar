@@ -9,7 +9,7 @@ import {
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
-import { curateOpenRouterModels } from "$/lib/chat/curateOpenRouterModels.ts";
+import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
 import type {
   ChatAPI,
@@ -17,7 +17,7 @@ import type {
   ChatModelsResponse,
   ChatResponse,
 } from "@sbfn/chat/chat.types.ts";
-import type { OpenRouterModelInput } from "$/lib/chat/curateOpenRouterModels.ts";
+import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {

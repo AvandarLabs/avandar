@@ -32,7 +32,7 @@ export type ChatAPI = APITypeDef<
         body: {
           messages: ChatClientMessage[];
           context: ChatPageContext;
-          model?: string;
+          model: string | undefined;
         };
         returnType: ChatResponse;
       };

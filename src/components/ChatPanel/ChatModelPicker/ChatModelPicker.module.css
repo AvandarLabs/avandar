@@ -1,7 +1,25 @@
-.root {
-  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-xs);
+.trigger {
+  flex-shrink: 0;
+  font-weight: 500;
 }
 
-.select {
-  width: 100%;
+.dropdown {
+  padding: var(--mantine-spacing-xs);
+}
+
+.options {
+  max-height: 280px;
+}
+
+.optionLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedIcon {
+  color: var(--mantine-color-primary-6);
+  flex-shrink: 0;
 }
