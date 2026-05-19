@@ -5,10 +5,10 @@ import { resolveMigrationsDir } from "./config/resolveMigrationsDir/resolveMigra
 import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
-import { createDuckDbService } from "./services/DuckDb";
-import { loadMigrationsFromDir } from "./services/loadMigrations";
-import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap";
-import { openSqliteDatabase, runMigrations } from "./services/Sqlite";
+import { createDuckDbService } from "./services/createDuckDbService/createDuckDbService";
+import { loadMigrationsFromDir } from "./services/loadMigrations/loadMigrations";
+import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap/SnapshotBootstrap";
+import { openSqliteDatabase, runMigrations } from "./services/SqliteService/Sqlite";
 import { createSupabaseRestClient } from "./services/SupabaseRest";
 
 const APP_NAME = "Avandar";

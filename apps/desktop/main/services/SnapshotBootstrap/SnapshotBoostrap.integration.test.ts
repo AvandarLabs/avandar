@@ -2,9 +2,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
-import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap.ts";
-import { openSqliteDatabase, runMigrations } from "./Sqlite.ts";
-import type { SupabaseRestClient } from "./SupabaseRest.ts";
+import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap";
+import { openSqliteDatabase, runMigrations } from "../SqliteService/Sqlite";
+import type { SupabaseRestClient } from "../SupabaseRest";
 
 function makeRest(
   responsesByTable: Record<string, ReadonlyArray<Record<string, unknown>>>,

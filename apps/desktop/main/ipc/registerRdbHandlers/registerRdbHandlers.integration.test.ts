@@ -2,14 +2,14 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
-import { openSqliteDatabase } from "../services/Sqlite.ts";
-import { registerRdbHandlers } from "./rdb.ts";
-import { createIpcServer } from "./server.ts";
+import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts";
+import { openSqliteDatabase } from "../../services/SqliteService/Sqlite";
+import { createIpcServer } from "../createIpcServer/createIpcServer";
+import { registerRdbHandlers } from "./registerRdbHandlers";
 import type {
   ReplyEnvelope,
   RequestEnvelope,
-} from "$/platform/ipc/envelopes.ts";
+} from "$/platform/ipc/envelopes";
 
 type FakeTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;
@@ -46,7 +46,7 @@ async function callHandler<TReq>(
   const repliesBefore = transport.replies.length;
   listeners[0]!(envelope);
   // server replies via Promise microtask
-  await new Promise((r) => setTimeout(r, 0));
+  await new Promise((r) => {return setTimeout(r, 0)});
   expect(transport.replies.length).toBe(repliesBefore + 1);
   return transport.replies[repliesBefore]!.message;
 }
@@ -80,7 +80,10 @@ describe("registerRdbHandlers", () => {
 
     expect(reply.ok).toBe(true);
     if (reply.ok) {
-      const result = reply.result as { changes: number; lastInsertRowid: number };
+      const result = reply.result as {
+        changes: number;
+        lastInsertRowid: number;
+      };
       expect(result.changes).toBe(1);
       expect(result.lastInsertRowid).toBe(1);
     }
@@ -103,7 +106,9 @@ describe("registerRdbHandlers", () => {
 
     expect(reply.ok).toBe(true);
     if (reply.ok) {
-      const result = reply.result as { rows: Array<{ id: number; name: string }> };
+      const result = reply.result as {
+        rows: Array<{ id: number; name: string }>;
+      };
       expect(result.rows).toEqual([{ id: 2, name: "b" }]);
     }
     db.close();
@@ -131,7 +136,7 @@ describe("registerRdbHandlers", () => {
     const rows = db
       .query<{ name: string }, []>("select name from widgets order by id")
       .all();
-    expect(rows.map((r) => r.name)).toEqual(["a", "b"]);
+    expect(rows.map((r) => {return r.name})).toEqual(["a", "b"]);
     db.close();
   });
 

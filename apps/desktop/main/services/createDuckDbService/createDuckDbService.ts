@@ -25,7 +25,7 @@ import duckdb from "duckdb";
 export type DuckDbService = {
   runRawQuery<TRow>(
     sql: string,
-    params: ReadonlyArray<unknown>,
+    params: readonly unknown[],
   ): Promise<TRow[]>;
   close(): Promise<void>;
 };
@@ -50,7 +50,7 @@ export function createDuckDbService(filePath: string): DuckDbService {
 
   const runRawQuery = <TRow>(
     sql: string,
-    params: ReadonlyArray<unknown>,
+    params: readonly unknown[],
   ): Promise<TRow[]> => {
     return new Promise((resolve, reject) => {
       const callback = (err: Error | null, rows: TRow[]): void => {

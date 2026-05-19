@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveMigrationsDir } from "./resolveMigrationsDir.ts";
+import { resolveMigrationsDir } from "./resolveMigrationsDir";
 
 describe("resolveMigrationsDir", () => {
   it("returns the dev-source migrations dir in development mode", () => {

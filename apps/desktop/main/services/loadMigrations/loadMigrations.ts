@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import type { Migration } from "../Sqlite.ts";
+import type { Migration } from "../SqliteService/Sqlite";
 
 /**
  * Suffix the migration generator stamps onto every emitted file. Picked
@@ -21,7 +21,7 @@ const MIGRATION_FILE_SUFFIX = ".gen.sql";
  * @param dir - Absolute path to a directory of generated migrations.
  * @returns The migration list, ready to pass to `runMigrations`.
  */
-export function loadMigrationsFromDir(dir: string): ReadonlyArray<Migration> {
+export function loadMigrationsFromDir(dir: string): readonly Migration[] {
   const entries = readdirSync(dir);
   const files = entries
     .filter((name) => {

@@ -1,7 +1,7 @@
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract";
 import { describe, expect, it, vi } from "vitest";
-import { createIpcServer } from "./server";
-import type { IpcTransport } from "./server";
+import { createIpcServer } from "./createIpcServer";
+import type { IpcTransport } from "./createIpcServer";
 import type { RequestEnvelope } from "$/platform/ipc/envelopes";
 
 function makeFakeTransport(): {

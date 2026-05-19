@@ -1,6 +1,6 @@
-import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
-import type { AvaSqliteDatabase } from "../../services/SqliteService/Sqlite.ts";
-import type { IpcServer } from "../createIpcServer/createIpcServer.ts";
+import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts";
+import type { AvaSqliteDatabase } from "../../services/SqliteService/Sqlite";
+import type { IpcServer } from "../createIpcServer/createIpcServer";
 import type { SQLQueryBindings } from "bun:sqlite";
 
 /*

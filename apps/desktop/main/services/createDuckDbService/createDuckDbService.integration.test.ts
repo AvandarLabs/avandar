@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { createDuckDbService } from "./DuckDb.ts";
+import { createDuckDbService } from "./createDuckDbService";
 
 /*
  * G2.12 — Native DuckDB happy path + parity. Runs against the real `duckdb`
@@ -88,7 +88,7 @@ describe("DuckDb service", () => {
       );
 
       const golden = Object.fromEntries(
-        rows.map((row) => [row.column_name, row.column_type]),
+        rows.map((row) => {return [row.column_name, row.column_type]}),
       );
 
       expect(golden).toEqual({
