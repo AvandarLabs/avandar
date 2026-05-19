@@ -282,4 +282,46 @@ export default [
   {
     ignores: ["shared/types/database.types.ts"],
   },
+  /**
+   * Enforce that all data crossing the LLM boundary goes through
+   * `src/lib/privacy/crossBoundary.tsx`. The ack-token issuance and the
+   * pending-acks queue are the load-bearing pieces of the consent
+   * pipeline — importing them anywhere else lets a caller forge a token
+   * or drop the queue check. The spec calls this the "single chokepoint
+   * for data crossing the LLM boundary."
+   *
+   * Adding a new caller for `issueAckToken` or `registerAck`? Don't. Add
+   * a new context to `CrossBoundaryContext` and route through
+   * `crossBoundary` instead.
+   */
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/lib/privacy/crossBoundary.tsx",
+      "src/lib/privacy/sessionSecret.ts",
+      "src/lib/privacy/pendingAcks.ts",
+      "src/lib/privacy/**/*.test.ts",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/lib/privacy/sessionSecret",
+              importNames: ["issueAckToken"],
+              message:
+                "Privacy chokepoint: ack tokens must only be minted inside crossBoundary.tsx. Route your call through crossBoundary() instead.",
+            },
+            {
+              name: "@/lib/privacy/pendingAcks",
+              importNames: ["registerAck"],
+              message:
+                "Privacy chokepoint: pending acks must only be registered inside crossBoundary.tsx. Route your call through crossBoundary() instead.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

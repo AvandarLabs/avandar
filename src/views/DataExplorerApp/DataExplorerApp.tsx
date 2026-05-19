@@ -24,6 +24,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
+import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
@@ -389,6 +390,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           </Button>
         </Group>
         <GeneratedPromptBadge />
+        <PlanFlowView />
         <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

@@ -1,15 +1,18 @@
 import {
+  Alert,
   Button,
   Checkbox,
+  Code,
   Group,
+  Loader,
   Paper,
   Radio,
   Stack,
   Text,
   Textarea,
 } from "@mantine/core";
-import { IconHelp } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { IconAlertCircle, IconHelp } from "@tabler/icons-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
 /**
@@ -24,14 +27,29 @@ import type { ChatClarifyRequest } from "$/types/chat.types";
  *   - Enter submits
  *   - Escape triggers "Let AI decide"
  */
+export type DiscoveryResolver = (args: {
+  query: string;
+  column: string;
+}) => Promise<{ values: string[] } | { error: string }>;
+
 export type ClarificationCardProps = {
   request: ChatClarifyRequest;
   onAnswer: (answer: string | string[] | null) => void;
+  /**
+   * Phase 2 — required when the response shape is `discovery`. The
+   * frontend resolves the LLM-emitted DuckDB query into a list of
+   * dropdown options. Resolves with `{ values }` on success or
+   * `{ error }` on failure. Receiver is also responsible for
+   * routing the user's eventual selection through `crossBoundary`
+   * — this component just calls `onAnswer` with the picked value(s).
+   */
+  resolveDiscovery?: DiscoveryResolver;
 };
 
 export function ClarificationCard({
   request,
   onAnswer,
+  resolveDiscovery,
 }: ClarificationCardProps): JSX.Element {
   const { question, rationale, responseShape, turnNumber } = request;
 
@@ -65,27 +83,50 @@ export function ClarificationCard({
           </Stack>
         </Group>
 
-        {responseShape.kind === "free_text" ?
-          <FreeTextBody
-            placeholder={responseShape.placeholder}
-            onSubmit={(answer) => {
-              return onAnswer(answer);
-            }}
-            onSkip={() => {
-              return onAnswer(null);
-            }}
-          />
-        : <FixedOptionsBody
-            options={responseShape.options}
-            multi={responseShape.multi}
-            onSubmit={(answer) => {
-              return onAnswer(answer);
-            }}
-            onSkip={() => {
-              return onAnswer(null);
-            }}
-          />
-        }
+        {(() => {
+          if (responseShape.kind === "free_text") {
+            return (
+              <FreeTextBody
+                placeholder={responseShape.placeholder}
+                onSubmit={(answer) => {
+                  return onAnswer(answer);
+                }}
+                onSkip={() => {
+                  return onAnswer(null);
+                }}
+              />
+            );
+          }
+          if (responseShape.kind === "fixed_options") {
+            return (
+              <FixedOptionsBody
+                options={responseShape.options}
+                multi={responseShape.multi}
+                onSubmit={(answer) => {
+                  return onAnswer(answer);
+                }}
+                onSkip={() => {
+                  return onAnswer(null);
+                }}
+              />
+            );
+          }
+          // discovery
+          return (
+            <DiscoveryBody
+              query={responseShape.query}
+              column={responseShape.column}
+              multi={responseShape.multi}
+              resolveDiscovery={resolveDiscovery}
+              onSubmit={(answer) => {
+                return onAnswer(answer);
+              }}
+              onSkip={() => {
+                return onAnswer(null);
+              }}
+            />
+          );
+        })()}
       </Stack>
     </Paper>
   );
@@ -236,5 +277,125 @@ function FixedOptionsBody({
         </Button>
       </Group>
     </Stack>
+  );
+}
+
+type DiscoveryState =
+  | { kind: "loading" }
+  | { kind: "ready"; values: string[] }
+  | { kind: "error"; error: string };
+
+function DiscoveryBody({
+  query,
+  column,
+  multi,
+  resolveDiscovery,
+  onSubmit,
+  onSkip,
+}: {
+  query: string;
+  column: string;
+  multi: boolean;
+  resolveDiscovery: DiscoveryResolver | undefined;
+  onSubmit: (answer: string | string[]) => void;
+  onSkip: () => void;
+}): JSX.Element {
+  const [state, setState] = useState<DiscoveryState>({ kind: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function run(): Promise<void> {
+      if (!resolveDiscovery) {
+        setState({
+          kind: "error",
+          error: "Discovery is not available in this context.",
+        });
+        return;
+      }
+      try {
+        const result = await resolveDiscovery({ query, column });
+        if (cancelled) {
+          return;
+        }
+        if ("error" in result) {
+          setState({ kind: "error", error: result.error });
+        } else {
+          setState({ kind: "ready", values: result.values });
+        }
+      } catch (e) {
+        if (cancelled) {
+          return;
+        }
+        setState({
+          kind: "error",
+          error: e instanceof Error ? e.message : "Query failed.",
+        });
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [query, column, resolveDiscovery]);
+
+  const queryPreview = useMemo(() => {
+    return query.length > 200 ? `${query.slice(0, 200)}…` : query;
+  }, [query]);
+
+  if (state.kind === "loading") {
+    return (
+      <Group gap="xs">
+        <Loader size="xs" />
+        <Text size="xs" c="dimmed">
+          Looking up values in {column}…
+        </Text>
+      </Group>
+    );
+  }
+  if (state.kind === "error") {
+    return (
+      <Stack gap="xs">
+        <Alert
+          icon={<IconAlertCircle size={14} />}
+          color="red"
+          variant="light"
+          radius="sm"
+          p="xs"
+        >
+          <Text size="xs">{state.error}</Text>
+          <Code block fz="xs" mt={4}>
+            {queryPreview}
+          </Code>
+        </Alert>
+        <Group justify="flex-end" gap="xs">
+          <Button variant="subtle" color="neutral" size="xs" onClick={onSkip}>
+            Let AI decide
+          </Button>
+        </Group>
+      </Stack>
+    );
+  }
+  if (state.values.length === 0) {
+    return (
+      <Stack gap="xs">
+        <Text size="xs" c="dimmed">
+          No values were returned from {column}.
+        </Text>
+        <Group justify="flex-end" gap="xs">
+          <Button variant="subtle" color="neutral" size="xs" onClick={onSkip}>
+            Let AI decide
+          </Button>
+        </Group>
+      </Stack>
+    );
+  }
+
+  return (
+    <FixedOptionsBody
+      options={state.values}
+      multi={multi}
+      onSubmit={onSubmit}
+      onSkip={onSkip}
+    />
   );
 }
