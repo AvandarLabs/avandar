@@ -1,35 +1,30 @@
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { formatDate } from "@utils";
 import { useMemo } from "react";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
-import type { CurveType } from "$/models/vizs/CurveType";
+import type { LineChartSeries } from "@mantine/charts";
+import type { LineSeries } from "$/models/vizs/SeriesConfig";
+import type { LineProps } from "recharts";
 
-type Props = XYChartProps & {
-  withLegend?: boolean;
-  curveType?: CurveType;
-  color?: string;
-};
+type Props = XYChartProps;
 
 export function LineChart({
   data,
   xAxisKey,
-  yAxisKey,
+  series,
   height = 500,
   dateColumns,
   dateFormat = "YYYY-MM-DD",
   timezone,
   withLegend = false,
-  curveType = "monotone",
-  color,
+  chartStyle,
 }: Props): JSX.Element {
-  const series = useMemo(() => {
-    return [{ name: yAxisKey, ...(color ? { color } : {}) }];
-  }, [yAxisKey, color]);
-
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
 
-  const xAxisProps = useMemo(() => {
+  const baseXAxisProps = useMemo(() => {
     if (!isDateAxis) {
       return { padding: X_AXIS_PADDING };
     }
@@ -52,16 +47,61 @@ export function LineChart({
     };
   }, [isDateAxis, dateFormat, timezone]);
 
+  const styleProps = useMemo(() => {
+    return applyChartStyle(chartStyle, baseXAxisProps);
+  }, [chartStyle, baseXAxisProps]);
+
+  const allLines = useMemo(() => {
+    return series.every((s) => {
+      return s.renderAs === "line";
+    });
+  }, [series]);
+
+  if (!allLines) {
+    return renderXYComposite({
+      data,
+      xAxisKey,
+      series,
+      height,
+      withLegend,
+      tooltipProps,
+      styleProps,
+    });
+  }
+
+  const lineSeries = series as readonly LineSeries[];
   return (
     <MantineLineChart
       h={height}
       data={data}
       dataKey={xAxisKey}
-      series={series}
-      xAxisProps={xAxisProps}
-      tooltipProps={tooltipProps}
       withLegend={withLegend}
-      curveType={curveType}
+      tooltipProps={tooltipProps}
+      series={lineSeries.map((s): LineChartSeries => {
+        return {
+          name: s.key,
+          label: s.label,
+          color: s.color,
+          curveType: s.curveType,
+        };
+      })}
+      lineProps={(s): Partial<Omit<LineProps, "ref">> => {
+        const found = lineSeries.find((ls) => {
+          return ls.key === s.name;
+        });
+        if (found === undefined) {
+          return {};
+        }
+        const overrides: Partial<Omit<LineProps, "ref">> = {};
+        if (found.strokeWidth !== undefined) {
+          overrides.strokeWidth = found.strokeWidth;
+        }
+        if (found.withDots !== undefined) {
+          overrides.dot = found.withDots;
+        }
+        return overrides;
+      }}
+      {...styleProps}
     />
   );
 }

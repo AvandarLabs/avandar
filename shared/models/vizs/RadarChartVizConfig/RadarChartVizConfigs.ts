@@ -1,5 +1,5 @@
-import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery.ts";
-import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult.ts";
+import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
+import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -11,6 +11,11 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  ErasedVizSettingDescriptors,
+  VizSettingDescriptors,
+} from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -18,70 +23,152 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const LEGEND_POSITION_OPTIONS = [
+  { value: "top", label: "Top" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+  { value: "right", label: "Right" },
+] as const;
+
+const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
+  chart: [
+    {
+      key: "withLegend",
+      label: "Show legend",
+      group: "Legend",
+      control: { kind: "switch" },
+    },
+    {
+      key: "chartStyle.legend.position",
+      label: "Legend position",
+      group: "Legend",
+      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
+    },
+  ],
+  series: [
+    {
+      key: "color",
+      appliesTo: "radar",
+      composable: true,
+      label: "Color",
+      group: "Style",
+      control: { kind: "color" },
+    },
+    {
+      key: "label",
+      appliesTo: "radar",
+      composable: true,
+      label: "Series label",
+      group: "Identity",
+      control: { kind: "text", placeholder: "Defaults to column name" },
+    },
+    {
+      key: "strokeWidth",
+      appliesTo: "radar",
+      composable: true,
+      label: "Stroke width",
+      group: "Style",
+      control: { kind: "number", min: 0, max: 8, step: 1, unit: "px" },
+    },
+    {
+      key: "fillOpacity",
+      appliesTo: "radar",
+      composable: true,
+      label: "Fill opacity",
+      group: "Style",
+      control: { kind: "number", min: 0, max: 1, step: 0.05 },
+    },
+  ],
+};
+
 export const RadarChartVizConfigs = {
   vizType: "radar",
   displayName: "Radar Chart",
+  descriptors: descriptors as unknown as ErasedVizSettingDescriptors,
 
-  /** Create an empty radar chart config. */
   makeEmptyConfig: (): RadarChartVizConfig => {
-    return { vizType: "radar", nameKey: undefined, valueKey: undefined };
+    return {
+      vizType: "radar",
+      nameKey: undefined,
+      series: [],
+      withLegend: true,
+    };
   },
 
-  /**
-   * Hydrate a radar chart viz config from a query config.
-   */
   hydrateFromQuery: (
     vizConfig: RadarChartVizConfig,
     query: PartialStructuredQuery,
   ): RadarChartVizConfig => {
-    return hydratePieFromQuery(vizConfig, query);
+    return hydrateRadarSeriesFromQuery(vizConfig, query);
   },
 
-  /**
-   * Hydrate `nameKey` and `valueKey` from query result column metadata.
-   */
   hydrateFromQueryResult: (
     vizConfig: RadarChartVizConfig,
     columns: readonly QueryResultColumn[],
   ): RadarChartVizConfig => {
-    return hydratePieFromQueryResult(vizConfig, columns);
+    return hydrateRadarSeriesFromQueryResult(vizConfig, columns);
   },
 
-  /**
-   * Convert a radar chart config to a new viz type.
-   */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: RadarChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { nameKey, valueKey } = vizConfig;
-    const xyAxes = { xAxisKey: nameKey, yAxisKey: valueKey };
-    const pieAxes = { nameKey, valueKey };
+    const { nameKey, series, withLegend, chartStyle } = vizConfig;
+    const firstSeries = series[0];
+    const xyFromFirst = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
+      if (firstSeries === undefined) {
+        return [];
+      }
+      const common = {
+        key: firstSeries.key,
+        color: firstSeries.color,
+        label: firstSeries.label,
+      };
+      if (renderAs === "area") {
+        return [{ renderAs, ...common, fillOpacity: 0.6 }];
+      }
+      return [{ renderAs, ...common }];
+    };
+    const pieAxes = { nameKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
       .with("table", (vizType): TableVizConfig => {
         return { vizType };
       })
       .with("bar", (vizType): BarChartVizConfig => {
-        return { vizType, ...xyAxes, withLegend: true };
+        return {
+          vizType,
+          xAxisKey: nameKey,
+          series: xyFromFirst("bar"),
+          layout: "group",
+          withLegend: withLegend ?? true,
+          chartStyle,
+        };
       })
       .with("line", (vizType): LineChartVizConfig => {
         return {
           vizType,
-          ...xyAxes,
-          withLegend: true,
-          curveType: "monotone",
+          xAxisKey: nameKey,
+          series: xyFromFirst("line"),
+          withLegend: withLegend ?? true,
+          chartStyle,
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
         return {
           vizType,
-          ...xyAxes,
-          withLegend: true,
-          curveType: "monotone",
+          xAxisKey: nameKey,
+          series: xyFromFirst("area"),
+          layout: "default",
+          withLegend: withLegend ?? true,
+          chartStyle,
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, ...xyAxes };
+        return {
+          vizType,
+          xAxisKey: nameKey,
+          yAxisKey: firstSeries?.key,
+        };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -99,7 +186,12 @@ export const RadarChartVizConfigs = {
         return vizConfig;
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, ...xyAxes, sizeKey: undefined };
+        return {
+          vizType,
+          xAxisKey: nameKey,
+          yAxisKey: firstSeries?.key,
+          sizeKey: undefined,
+        };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

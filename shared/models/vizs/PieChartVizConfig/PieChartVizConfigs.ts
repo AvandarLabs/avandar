@@ -1,5 +1,6 @@
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery.ts";
 import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult.ts";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -11,6 +12,7 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -21,8 +23,8 @@ import type {
 export const PieChartVizConfigs = {
   vizType: "pie",
   displayName: "Pie Chart",
+  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
 
-  /** Create an empty pie chart config. */
   makeEmptyConfig: (): PieChartVizConfig => {
     return {
       vizType: "pie",
@@ -34,9 +36,6 @@ export const PieChartVizConfigs = {
     };
   },
 
-  /**
-   * Hydrate a pie chart viz config from a query config.
-   */
   hydrateFromQuery: (
     vizConfig: PieChartVizConfig,
     query: PartialStructuredQuery,
@@ -44,9 +43,6 @@ export const PieChartVizConfigs = {
     return hydratePieFromQuery(vizConfig, query);
   },
 
-  /**
-   * Hydrate `nameKey` and `valueKey` from query result column metadata.
-   */
   hydrateFromQueryResult: (
     vizConfig: PieChartVizConfig,
     columns: readonly QueryResultColumn[],
@@ -54,53 +50,75 @@ export const PieChartVizConfigs = {
     return hydratePieFromQueryResult(vizConfig, columns);
   },
 
-  /**
-   * Convert a pie chart config to a new viz type.
-   */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: PieChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { nameKey, valueKey } = vizConfig;
-    const xyAxes = { xAxisKey: nameKey, yAxisKey: valueKey };
-    const pieAxes = { nameKey, valueKey };
+    const { nameKey, valueKey, seriesColors } = vizConfig;
+    const seriesColor: string | undefined =
+      valueKey !== undefined ? seriesColors?.[valueKey] : undefined;
+    const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
+      if (valueKey === undefined) {
+        return [];
+      }
+      if (renderAs === "area") {
+        return [
+          { renderAs, key: valueKey, color: seriesColor, fillOpacity: 0.6 },
+        ];
+      }
+      return [{ renderAs, key: valueKey, color: seriesColor }];
+    };
     return match<VizType>(newVizType)
       .with("table", (vizType): TableVizConfig => {
         return { vizType };
       })
       .with("bar", (vizType): BarChartVizConfig => {
-        return { vizType, ...xyAxes, withLegend: true };
+        return {
+          vizType,
+          xAxisKey: nameKey,
+          series: xySeries("bar"),
+          layout: "group",
+          withLegend: true,
+        };
       })
       .with("line", (vizType): LineChartVizConfig => {
         return {
           vizType,
-          ...xyAxes,
+          xAxisKey: nameKey,
+          series: xySeries("line"),
           withLegend: true,
-          curveType: "monotone",
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
         return {
           vizType,
-          ...xyAxes,
+          xAxisKey: nameKey,
+          series: xySeries("area"),
+          layout: "default",
           withLegend: true,
-          curveType: "monotone",
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, ...xyAxes };
+        return { vizType, xAxisKey: nameKey, yAxisKey: valueKey };
       })
       .with("pie", (): PieChartVizConfig => {
         return vizConfig;
       })
       .with("funnel", (vizType): FunnelChartVizConfig => {
-        return { vizType, ...pieAxes };
+        return { vizType, nameKey, valueKey };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        return { vizType, ...pieAxes };
+        const radarSeries: RadarSeries[] =
+          valueKey === undefined ? [] : [{ key: valueKey, color: seriesColor }];
+        return { vizType, nameKey, series: radarSeries, withLegend: true };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, ...xyAxes, sizeKey: undefined };
+        return {
+          vizType,
+          xAxisKey: nameKey,
+          yAxisKey: valueKey,
+          sizeKey: undefined,
+        };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

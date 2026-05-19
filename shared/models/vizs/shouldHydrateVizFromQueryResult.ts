@@ -1,5 +1,6 @@
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
@@ -14,12 +15,13 @@ type Options = {
  * Whether the app should run `hydrateFromQueryResult` for the current viz.
  *
  * True when structured `hydrateFromQuery` cannot reliably drive axes: raw
- * SQL path, no structured columns, axis keys missing from the result, or no
- * overlap between structured derived column names and result names.
+ * SQL path, no structured columns, axis or series keys missing from the
+ * result, or no overlap between structured derived column names and result
+ * names.
  *
- * **2B:** When all primary axis keys are set and each name still appears in
- * the result, returns false so we do not re-invoke result hydration on every
- * refetch (manual axis choices preserved across identical schemas).
+ * **2B:** When every primary key already appears in the result, returns
+ * false so we do not re-invoke result hydration on every refetch (manual
+ * axis choices preserved across identical schemas).
  *
  * Table viz returns false (no axis keys to infer here).
  */
@@ -30,13 +32,13 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return false;
   }
 
-  const { key1, key2 } = _getPrimaryAxisKeys(vizConfig);
+  const keys = _getKeysToValidate(vizConfig);
 
   if (
-    key1 !== undefined &&
-    key2 !== undefined &&
-    resultColumnNames.has(key1) &&
-    resultColumnNames.has(key2)
+    keys.length > 0 &&
+    keys.every((k) => {
+      return resultColumnNames.has(k);
+    })
   ) {
     return false;
   }
@@ -49,11 +51,11 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return true;
   }
 
-  if (key1 !== undefined && !resultColumnNames.has(key1)) {
-    return true;
-  }
-
-  if (key2 !== undefined && !resultColumnNames.has(key2)) {
+  if (
+    keys.some((k) => {
+      return !resultColumnNames.has(k);
+    })
+  ) {
     return true;
   }
 
@@ -70,27 +72,69 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
 }
 
 /**
- * Returns the two "primary" axis keys for a given viz config.
- * - Pie-like (pie, funnel, radar): nameKey + valueKey
- * - All others: xAxisKey + yAxisKey
+ * Returns the list of column keys that drive each viz type's primary
+ * data binding. For series-array hosts (bar / line / area / radar) the
+ * x or name axis plus every series key is included.
  */
-function _getPrimaryAxisKeys(vizConfig: VizConfig): {
-  key1: string | undefined;
-  key2: string | undefined;
-} {
+function _getKeysToValidate(vizConfig: VizConfig): string[] {
   const vt = vizConfig.vizType;
 
-  if (vt === "pie" || vt === "funnel" || vt === "radar") {
+  if (vt === "pie" || vt === "funnel") {
     const pv = vizConfig as {
       nameKey: string | undefined;
       valueKey: string | undefined;
     };
-    return { key1: pv.nameKey, key2: pv.valueKey };
+    const keys: string[] = [];
+    if (pv.nameKey !== undefined) {
+      keys.push(pv.nameKey);
+    }
+    if (pv.valueKey !== undefined) {
+      keys.push(pv.valueKey);
+    }
+    return keys;
   }
 
+  if (vt === "radar") {
+    const rv = vizConfig as {
+      nameKey: string | undefined;
+      series: readonly RadarSeries[];
+    };
+    const keys: string[] = [];
+    if (rv.nameKey !== undefined) {
+      keys.push(rv.nameKey);
+    }
+    for (const s of rv.series) {
+      keys.push(s.key);
+    }
+    return keys;
+  }
+
+  if (vt === "bar" || vt === "line" || vt === "area") {
+    const xy = vizConfig as {
+      xAxisKey: string | undefined;
+      series: readonly XYSeries[];
+    };
+    const keys: string[] = [];
+    if (xy.xAxisKey !== undefined) {
+      keys.push(xy.xAxisKey);
+    }
+    for (const s of xy.series) {
+      keys.push(s.key);
+    }
+    return keys;
+  }
+
+  // scatter and bubble
   const xy = vizConfig as {
     xAxisKey: string | undefined;
     yAxisKey: string | undefined;
   };
-  return { key1: xy.xAxisKey, key2: xy.yAxisKey };
+  const keys: string[] = [];
+  if (xy.xAxisKey !== undefined) {
+    keys.push(xy.xAxisKey);
+  }
+  if (xy.yAxisKey !== undefined) {
+    keys.push(xy.yAxisKey);
+  }
+  return keys;
 }

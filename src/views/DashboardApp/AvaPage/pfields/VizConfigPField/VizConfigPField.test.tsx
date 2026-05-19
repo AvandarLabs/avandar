@@ -87,15 +87,13 @@ describe("VizConfigPField", () => {
       value: {
         vizType: "bar",
         xAxisKey: undefined,
-        yAxisKey: undefined,
+        series: [],
+        layout: "group",
         withLegend: true,
       },
     });
     expect(
-      screen.getByRole("combobox", { name: /X Axis/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("combobox", { name: /Y Axis/i }),
+      screen.getByRole("combobox", { name: /X axis/i }),
     ).toBeInTheDocument();
   });
 
@@ -104,15 +102,17 @@ describe("VizConfigPField", () => {
       value: {
         vizType: "bar",
         xAxisKey: undefined,
-        yAxisKey: undefined,
+        series: [],
+        layout: "group",
         withLegend: true,
       },
     });
-    pickMantineSelectOption(/X Axis/i, "category");
+    pickMantineSelectOption(/X axis/i, "category");
     expect(onChange).toHaveBeenCalledWith({
       vizType: "bar",
       xAxisKey: "category",
-      yAxisKey: undefined,
+      series: [],
+      layout: "group",
       withLegend: true,
     });
   });

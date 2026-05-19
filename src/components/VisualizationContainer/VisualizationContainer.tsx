@@ -2,7 +2,14 @@ import { Box, Flex, List, Text } from "@mantine/core";
 import { Callout, DangerText } from "@ui";
 import { objectValues, prop, UnknownDataFrame } from "@utils";
 import { match } from "ts-pattern";
-import { flattenError, object, prettifyError, string } from "zod";
+import {
+  array,
+  flattenError,
+  looseObject,
+  object,
+  prettifyError,
+  string,
+} from "zod";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
@@ -32,19 +39,11 @@ type Props = {
   vizConfig: VizConfig;
 };
 
-// Reusable XY schema "blocks"
 const XAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
         "You haven't chosen an X axis"
       : "Invalid X axis selected";
-  },
-});
-const YAxisKeySchema = string({
-  error: (issue) => {
-    return issue.input === undefined ?
-        "You haven't chosen a Y axis"
-      : "Invalid Y axis selected";
   },
 });
 const NameKeySchema = string({
@@ -68,25 +67,24 @@ const SizeKeySchema = string({
       : "Invalid size column selected";
   },
 });
-
-const BarChartConfigSchema = object({
-  xAxisKey: XAxisKeySchema,
-  yAxisKey: YAxisKeySchema,
+const SeriesArraySchema = array(looseObject({ key: string() })).min(1, {
+  error: "You haven't added any series",
 });
 
-const LineChartConfigSchema = object({
+const XYSeriesConfigSchema = object({
   xAxisKey: XAxisKeySchema,
-  yAxisKey: YAxisKeySchema,
-});
-
-const AreaChartConfigSchema = object({
-  xAxisKey: XAxisKeySchema,
-  yAxisKey: YAxisKeySchema,
+  series: SeriesArraySchema,
 });
 
 const ScatterPlotConfigSchema = object({
   xAxisKey: XAxisKeySchema,
-  yAxisKey: YAxisKeySchema,
+  yAxisKey: string({
+    error: (issue) => {
+      return issue.input === undefined ?
+          "You haven't chosen a Y axis"
+        : "Invalid Y axis selected";
+    },
+  }),
 });
 
 const PieChartConfigSchema = object({
@@ -101,12 +99,18 @@ const FunnelChartConfigSchema = object({
 
 const RadarChartConfigSchema = object({
   nameKey: NameKeySchema,
-  valueKey: ValueKeySchema,
+  series: SeriesArraySchema,
 });
 
 const BubbleChartConfigSchema = object({
   xAxisKey: XAxisKeySchema,
-  yAxisKey: YAxisKeySchema,
+  yAxisKey: string({
+    error: (issue) => {
+      return issue.input === undefined ?
+          "You haven't chosen a Y axis"
+        : "Invalid Y axis selected";
+    },
+  }),
   sizeKey: SizeKeySchema,
 });
 
@@ -142,7 +146,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = BarChartConfigSchema.safeParse(config);
+      } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%">
@@ -150,52 +154,23 @@ export function VisualizationContainer({
               data={limitedData}
               height={700}
               dateColumns={dateColumns}
+              xAxisKey={validConfig.xAxisKey}
+              series={config.series}
+              layout={config.layout}
               withLegend={config.withLegend}
-              color={config.color}
-              {...validConfig}
+              chartStyle={config.chartStyle}
             />
           </Box>
         );
       }
-
-      const errors = flattenError(error).fieldErrors;
-      const errorMessages = objectValues(errors).flat();
-      const errorBlock = (
-        <List size="xl">
-          {errorMessages.map((errMsg) => {
-            return (
-              <List.Item key={errMsg}>
-                <Text display="flex" size="xl">
-                  {errMsg}
-                </Text>
-              </List.Item>
-            );
-          })}
-        </List>
-      );
-
-      const summaryMessage =
-        errors.xAxisKey || errors.yAxisKey ?
-          "The bar chart cannot be displayed because there are missing axes."
-        : "The bar chart cannot be displayed.";
-      return (
-        <Callout.Error
-          title="Cannot display bar chart"
-          message={summaryMessage}
-          w="fit-content"
-          mt="-20rem"
-        >
-          {errorBlock}
-        </Callout.Error>
-      );
+      return _renderError("bar chart", error);
     })
     .with({ vizType: "line" }, (config) => {
       const {
         success,
         data: validConfig,
         error,
-      } = LineChartConfigSchema.safeParse(config);
-
+      } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%">
@@ -203,10 +178,10 @@ export function VisualizationContainer({
               data={limitedData}
               height={700}
               dateColumns={dateColumns}
+              xAxisKey={validConfig.xAxisKey}
+              series={config.series}
               withLegend={config.withLegend}
-              curveType={config.curveType}
-              color={config.color}
-              {...validConfig}
+              chartStyle={config.chartStyle}
             />
           </Box>
         );
@@ -218,8 +193,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = AreaChartConfigSchema.safeParse(config);
-
+      } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%">
@@ -227,10 +201,11 @@ export function VisualizationContainer({
               data={limitedData}
               height={700}
               dateColumns={dateColumns}
+              xAxisKey={validConfig.xAxisKey}
+              series={config.series}
+              layout={config.layout}
               withLegend={config.withLegend}
-              curveType={config.curveType}
-              color={config.color}
-              {...validConfig}
+              chartStyle={config.chartStyle}
             />
           </Box>
         );
@@ -243,7 +218,6 @@ export function VisualizationContainer({
         data: validConfig,
         error,
       } = ScatterPlotConfigSchema.safeParse(config);
-
       if (success) {
         return (
           <ScatterChart data={limitedData} height={700} {...validConfig} />
@@ -257,7 +231,6 @@ export function VisualizationContainer({
         data: validConfig,
         error,
       } = PieChartConfigSchema.safeParse(config);
-
       if (success) {
         return (
           <PieChart
@@ -279,7 +252,6 @@ export function VisualizationContainer({
         data: validConfig,
         error,
       } = FunnelChartConfigSchema.safeParse(config);
-
       if (success) {
         return (
           <FunnelChart
@@ -298,14 +270,14 @@ export function VisualizationContainer({
         data: validConfig,
         error,
       } = RadarChartConfigSchema.safeParse(config);
-
       if (success) {
         return (
           <RadarChart
             data={limitedData}
             nameKey={validConfig.nameKey}
-            valueKey={validConfig.valueKey}
-            color={config.color}
+            series={config.series}
+            withLegend={config.withLegend}
+            chartStyle={config.chartStyle}
           />
         );
       }
@@ -317,7 +289,6 @@ export function VisualizationContainer({
         data: validConfig,
         error,
       } = BubbleChartConfigSchema.safeParse(config);
-
       if (success) {
         return (
           <BubbleChart
@@ -337,5 +308,44 @@ export function VisualizationContainer({
     <Flex h="100%" w="100%" justify="center" align="center">
       {viz}
     </Flex>
+  );
+}
+
+function _renderError(
+  chartName: string,
+  error: Parameters<typeof flattenError>[0],
+): JSX.Element {
+  const errors = flattenError(error).fieldErrors as Record<
+    string,
+    readonly string[] | undefined
+  >;
+  const errorMessages = objectValues(errors).flat();
+  const errorBlock = (
+    <List size="xl">
+      {errorMessages.map((errMsg) => {
+        return (
+          <List.Item key={errMsg}>
+            <Text display="flex" size="xl">
+              {errMsg}
+            </Text>
+          </List.Item>
+        );
+      })}
+    </List>
+  );
+
+  const summaryMessage =
+    errors.xAxisKey || errors.series ?
+      `The ${chartName} cannot be displayed because there are missing axes or series.`
+    : `The ${chartName} cannot be displayed.`;
+  return (
+    <Callout.Error
+      title={`Cannot display ${chartName}`}
+      message={summaryMessage}
+      w="fit-content"
+      mt="-20rem"
+    >
+      {errorBlock}
+    </Callout.Error>
   );
 }

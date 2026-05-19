@@ -1,5 +1,6 @@
-import { hydrateXYFromQuery } from "$/models/vizs/hydrateXYFromQuery.ts";
-import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult.ts";
+import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
+import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
+import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -11,6 +12,15 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
+import type {
+  AreaSeries,
+  RadarSeries,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig.ts";
+import type {
+  ErasedVizSettingDescriptors,
+  VizSettingDescriptors,
+} from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -18,66 +28,234 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const CURVE_TYPE_OPTIONS = [
+  { value: "monotone", label: "Smooth" },
+  { value: "linear", label: "Straight" },
+  { value: "natural", label: "Natural" },
+  { value: "step", label: "Step" },
+] as const;
+
+const AREA_LAYOUT_OPTIONS = [
+  { value: "default", label: "Overlapping" },
+  { value: "stacked", label: "Stacked" },
+  { value: "percent", label: "100% stacked" },
+  { value: "split", label: "Split (+/-)" },
+] as const;
+
+const LEGEND_POSITION_OPTIONS = [
+  { value: "top", label: "Top" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+  { value: "right", label: "Right" },
+] as const;
+
+const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
+  chart: [
+    {
+      key: "layout",
+      label: "Area layout",
+      group: "Layout",
+      control: { kind: "segmented", options: AREA_LAYOUT_OPTIONS },
+    },
+    {
+      key: "withLegend",
+      label: "Show legend",
+      group: "Legend",
+      control: { kind: "switch" },
+    },
+    {
+      key: "chartStyle.legend.position",
+      label: "Legend position",
+      group: "Legend",
+      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
+    },
+    {
+      key: "chartStyle.xAxis.label",
+      label: "X axis label",
+      group: "X axis",
+      control: { kind: "text" },
+    },
+    {
+      key: "chartStyle.xAxis.labelColor",
+      label: "X axis label color",
+      group: "X axis",
+      control: { kind: "color" },
+    },
+    {
+      key: "chartStyle.xAxis.tickColor",
+      label: "X axis tick color",
+      group: "X axis",
+      control: { kind: "color" },
+    },
+    {
+      key: "chartStyle.xAxis.hide",
+      label: "Hide X axis",
+      group: "X axis",
+      control: { kind: "switch" },
+    },
+    {
+      key: "chartStyle.yAxis.label",
+      label: "Y axis label",
+      group: "Y axis",
+      control: { kind: "text" },
+    },
+    {
+      key: "chartStyle.yAxis.labelColor",
+      label: "Y axis label color",
+      group: "Y axis",
+      control: { kind: "color" },
+    },
+    {
+      key: "chartStyle.yAxis.tickColor",
+      label: "Y axis tick color",
+      group: "Y axis",
+      control: { kind: "color" },
+    },
+    {
+      key: "chartStyle.yAxis.hide",
+      label: "Hide Y axis",
+      group: "Y axis",
+      control: { kind: "switch" },
+    },
+    {
+      key: "chartStyle.grid.color",
+      label: "Gridline color",
+      group: "Grid",
+      control: { kind: "color" },
+    },
+    {
+      key: "chartStyle.grid.horizontal",
+      label: "Horizontal gridlines",
+      group: "Grid",
+      control: { kind: "switch" },
+    },
+    {
+      key: "chartStyle.grid.vertical",
+      label: "Vertical gridlines",
+      group: "Grid",
+      control: { kind: "switch" },
+    },
+  ],
+  series: [
+    {
+      key: "color",
+      appliesTo: "area",
+      composable: true,
+      label: "Color",
+      group: "Style",
+      control: { kind: "color" },
+    },
+    {
+      key: "label",
+      appliesTo: "area",
+      composable: true,
+      label: "Series label",
+      group: "Identity",
+      control: { kind: "text", placeholder: "Defaults to column name" },
+    },
+    {
+      key: "curveType",
+      appliesTo: "area",
+      composable: true,
+      label: "Curve",
+      group: "Style",
+      control: { kind: "segmented", options: CURVE_TYPE_OPTIONS },
+    },
+    {
+      key: "strokeWidth",
+      appliesTo: "area",
+      composable: true,
+      label: "Stroke width",
+      group: "Style",
+      control: { kind: "number", min: 0, max: 8, step: 1, unit: "px" },
+    },
+    {
+      key: "fillOpacity",
+      appliesTo: "area",
+      composable: true,
+      label: "Fill opacity",
+      group: "Style",
+      control: { kind: "number", min: 0, max: 1, step: 0.05 },
+    },
+    {
+      key: "withDots",
+      appliesTo: "area",
+      composable: true,
+      label: "Show dots",
+      group: "Style",
+      control: { kind: "switch" },
+    },
+  ],
+};
+
 export const AreaChartVizConfigs = {
   vizType: "area",
   displayName: "Area Chart",
+  descriptors: descriptors as unknown as ErasedVizSettingDescriptors,
 
-  /** Create an empty area chart config. */
   makeEmptyConfig: (): AreaChartVizConfig => {
     return {
       vizType: "area",
       xAxisKey: undefined,
-      yAxisKey: undefined,
+      series: [],
+      layout: "default",
       withLegend: true,
-      curveType: "monotone",
     };
   },
 
-  /**
-   * Hydrate an area chart viz config from a query config.
-   */
   hydrateFromQuery: (
     vizConfig: AreaChartVizConfig,
     query: PartialStructuredQuery,
   ): AreaChartVizConfig => {
-    return hydrateXYFromQuery(vizConfig, query);
+    return hydrateXYSeriesFromQuery(vizConfig, query, "area");
   },
 
-  /**
-   * Hydrate axis keys from query result columns when they are undefined.
-   */
   hydrateFromQueryResult: (
     vizConfig: AreaChartVizConfig,
     columns: readonly QueryResultColumn[],
   ): AreaChartVizConfig => {
-    return hydrateXYFromQueryResult(vizConfig, columns, "line");
+    return hydrateXYSeriesFromQueryResult(vizConfig, columns, "area");
   },
 
-  /**
-   * Convert an area chart config to a new viz type.
-   */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: AreaChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, yAxisKey, withLegend, curveType } = vizConfig;
-    const xyAxes = { xAxisKey, yAxisKey };
-    const pieAxes = { nameKey: xAxisKey, valueKey: yAxisKey };
+    const { xAxisKey, series, withLegend, chartStyle } = vizConfig;
+    const firstSeries = series[0];
+    const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
       .with("table", (vizType): TableVizConfig => {
         return { vizType };
       })
       .with("bar", (vizType): BarChartVizConfig => {
-        return { vizType, ...xyAxes, withLegend };
+        return {
+          vizType,
+          xAxisKey,
+          series: series.map((s) => {
+            return convertSeriesRenderAs(s, "bar");
+          }) as XYSeries[],
+          layout: "group",
+          withLegend,
+          chartStyle,
+        };
       })
       .with("line", (vizType): LineChartVizConfig => {
-        return { vizType, ...xyAxes, withLegend, curveType };
+        return {
+          vizType,
+          xAxisKey,
+          series: series.map((s) => {
+            return convertSeriesRenderAs(s, "line");
+          }) as XYSeries[],
+          withLegend,
+          chartStyle,
+        };
       })
       .with("area", (): AreaChartVizConfig => {
         return vizConfig;
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, ...xyAxes };
+        return { vizType, xAxisKey, yAxisKey: firstSeries?.key };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -92,10 +270,25 @@ export const AreaChartVizConfigs = {
         return { vizType, ...pieAxes };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        return { vizType, ...pieAxes };
+        const radarSeries: RadarSeries[] =
+          firstSeries ?
+            [
+              {
+                key: firstSeries.key,
+                label: firstSeries.label,
+                color: firstSeries.color,
+              },
+            ]
+          : [];
+        return { vizType, nameKey: xAxisKey, series: radarSeries };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, ...xyAxes, sizeKey: undefined };
+        return {
+          vizType,
+          xAxisKey,
+          yAxisKey: firstSeries?.key,
+          sizeKey: undefined,
+        };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

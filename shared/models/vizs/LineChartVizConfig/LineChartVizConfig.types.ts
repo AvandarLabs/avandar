@@ -1,30 +1,32 @@
-import type { CurveType } from "$/models/vizs/CurveType.ts";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.ts";
+import type { XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
+/**
+ * Configuration for a line chart. Each series carries its own
+ * `curveType`, `strokeWidth`, and so on; the host config holds canvas
+ * styling and the shared X axis.
+ */
 export type LineChartVizConfig = {
   vizType: "line";
 
   /**
-   * The key of the column to use for the X axis. This is a column name,
-   * not an ID.
+   * The key of the column to use for the X axis. This is a column
+   * name, not an ID.
    *
    * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
    */
   xAxisKey: string | undefined;
 
   /**
-   * The key of the column to use for the Y axis. This is a column name,
-   * not an ID.
-   *
-   * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
+   * One entry per rendered series. Each series carries its own `key`
+   * (column name), `renderAs` (line by default — bar / area allowed),
+   * `color`, `curveType`, and other mark-level settings.
    */
-  yAxisKey: string | undefined;
+  series: XYSeries[];
 
   /** Show the chart legend when `true`. */
   withLegend: boolean;
 
-  /** Curve interpolation style. Defaults to `"monotone"`. */
-  curveType: CurveType;
-
-  /** Optional CSS color override for the data series (e.g. `"#ff0000"`). */
-  color?: string;
+  /** Canvas-level styling (axes, grid, legend position). */
+  chartStyle?: ChartStyle;
 };
