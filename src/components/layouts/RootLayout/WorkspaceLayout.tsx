@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { AppDropzone } from "@/components/AppDropzone/AppDropzone";
 import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
@@ -95,16 +96,18 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   return (
     <DataExplorerStateManager.Provider>
       <ChatPanelProvider>
-        <AppShell
-          title={workspace.name}
-          currentWorkspace={workspace}
-          profileLink={profileLink}
-          navbarLinks={mainNavBarLinks}
-          utilityLinks={utilityNavBarLinks}
-          spotlightActions={spotlightActions}
-        >
-          {children}
-        </AppShell>
+        <AppDropzone>
+          <AppShell
+            title={workspace.name}
+            currentWorkspace={workspace}
+            profileLink={profileLink}
+            navbarLinks={mainNavBarLinks}
+            utilityLinks={utilityNavBarLinks}
+            spotlightActions={spotlightActions}
+          >
+            {children}
+          </AppShell>
+        </AppDropzone>
       </ChatPanelProvider>
     </DataExplorerStateManager.Provider>
   );
