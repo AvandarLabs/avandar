@@ -1,7 +1,8 @@
-import Dexie, { type Table } from "dexie";
 import { uuid } from "$/lib/uuid";
+import Dexie from "dexie";
 import type { ConsentModalMode } from "@/components/Privacy/ConsentModal/ConsentModal";
 import type { CrossBoundaryContext } from "@/lib/privacy/crossBoundary";
+import type { Table } from "dexie";
 
 /**
  * Dexie-backed audit log of every consent decision the user made.
@@ -120,8 +121,7 @@ export async function recordConsentDecision(
     valueCount: input.valueCount ?? 0,
     contentLengthChars: input.contentLengthChars ?? null,
     warningShown,
-    warningDismissed:
-      input.decision === "cancelled" ? warningShown : [],
+    warningDismissed: input.decision === "cancelled" ? warningShown : [],
     suggestionUsed:
       input.decision === "used_suggestion" ? true
       : warningShown.includes("bias") ? false
@@ -138,7 +138,7 @@ export async function recordConsentDecision(
   } catch (e) {
     // Never block a consent decision on audit-log failure. The user's
     // approval still takes effect; we just lose the entry.
-    // eslint-disable-next-line no-console
+     
     console.warn("[privacy] consent audit write failed:", e);
   }
 }
@@ -157,10 +157,9 @@ export async function listConsentLog(
   options: ConsentLogQueryOptions = {},
 ): Promise<ConsentAuditEntry[]> {
   const since =
-    options.sinceTimestamp ??
-    Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
+    options.sinceTimestamp ?? Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
-  let query = db.consent.where("timestamp").above(since);
+  const query = db.consent.where("timestamp").above(since);
 
   const rows = await query.reverse().sortBy("timestamp");
   return rows.filter((entry) => {

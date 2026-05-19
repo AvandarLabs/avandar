@@ -208,8 +208,7 @@ export function ConsentModal({
 
           <Stack gap={4}>
             <Text size="sm" fw={500}>
-              To confirm, type{" "}
-              <Code>{MEDICAL_CONFIRMATION_PHRASE}</Code> below:
+              To confirm, type <Code>{MEDICAL_CONFIRMATION_PHRASE}</Code> below:
             </Text>
             <TextInput
               value={confirmationPhrase}
@@ -240,8 +239,8 @@ export function ConsentModal({
             title="Personal data + biased framing detected"
           >
             <Text size="sm">
-              We detected both potential personal information and language
-              that may bias the AI&apos;s answer. Review both below.
+              We detected both potential personal information and language that
+              may bias the AI&apos;s answer. Review both below.
             </Text>
           </Alert>
 
@@ -370,10 +369,12 @@ export function ConsentModal({
           Cancel
         </Button>
 
-        {(mode === "bias_nudge" || mode === "composite") &&
-        bias &&
-        bias.length > 0 &&
-        bias[0]?.suggestion ?
+        {(
+          (mode === "bias_nudge" || mode === "composite") &&
+          bias &&
+          bias.length > 0 &&
+          bias[0]?.suggestion
+        ) ?
           <Button
             variant="outline"
             color="blue"
@@ -389,7 +390,8 @@ export function ConsentModal({
         <Button
           color={
             mode === "medical_strict" ? "red"
-            : mode === "pii_warning" || mode === "composite" ? "red"
+            : mode === "pii_warning" || mode === "composite" ?
+              "red"
             : "primary"
           }
           disabled={sendDisabled}

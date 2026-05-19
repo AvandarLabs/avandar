@@ -118,9 +118,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
             }}
           />
         : <Tabs
-            tabIds={
-              ["general", "users", "roles", "tags", "privacy"] as const
-            }
+            tabIds={["general", "users", "roles", "tags", "privacy"] as const}
             renderTabHeader={{
               general: "General",
               users: "Members",

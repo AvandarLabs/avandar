@@ -65,9 +65,7 @@ describe("isRowDataMessage", () => {
 
   it("flags non-empty arrays as row data", () => {
     expect(isRowDataMessage("[1, 2, 3]").isRowData).toBe(true);
-    expect(
-      isRowDataMessage('[{"id": 1}, {"id": 2}]').isRowData,
-    ).toBe(true);
+    expect(isRowDataMessage('[{"id": 1}, {"id": 2}]').isRowData).toBe(true);
   });
 
   it("treats empty arrays as safe", () => {
@@ -76,29 +74,23 @@ describe("isRowDataMessage", () => {
 
   it("treats known-safe-key objects as safe", () => {
     expect(isRowDataMessage('{"status": "ok"}').isRowData).toBe(false);
+    expect(isRowDataMessage('{"errors": ["a", "b"]}').isRowData).toBe(false);
     expect(
-      isRowDataMessage('{"errors": ["a", "b"]}').isRowData,
-    ).toBe(false);
-    expect(
-      isRowDataMessage(
-        '{"schema": [{"name": "id", "type": "int"}]}',
-      ).isRowData,
+      isRowDataMessage('{"schema": [{"name": "id", "type": "int"}]}').isRowData,
     ).toBe(false);
   });
 
   it("flags objects with non-safe keys as row data", () => {
     expect(isRowDataMessage('{"name": "Jane"}').isRowData).toBe(true);
-    expect(
-      isRowDataMessage('{"email": "x@y.com"}').isRowData,
-    ).toBe(true);
+    expect(isRowDataMessage('{"email": "x@y.com"}').isRowData).toBe(true);
   });
 
   it("flags mixed objects (some safe + some unknown keys) as row data", () => {
     // Even though `status` is known-safe, the presence of `name`
     // means we treat this as row data — prefer false positives.
-    expect(
-      isRowDataMessage('{"status": "ok", "name": "Jane"}').isRowData,
-    ).toBe(true);
+    expect(isRowDataMessage('{"status": "ok", "name": "Jane"}').isRowData).toBe(
+      true,
+    );
   });
 
   it("treats empty objects as safe", () => {

@@ -13,14 +13,14 @@ import {
 import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
   clearConsentLog,
   consentLogToCsv,
   listConsentLog,
-  type ConsentAuditEntry,
 } from "@/lib/privacy/consentAuditLog";
+import type { ConsentAuditEntry } from "@/lib/privacy/consentAuditLog";
 
 type FilterValue = "all" | ConsentAuditEntry["decision"];
 
@@ -55,14 +55,14 @@ export function PrivacyLogTab(): JSX.Element {
   const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
   const [filter, setFilter] = useState<FilterValue>("all");
 
-  const load = async (): Promise<void> => {
+  const load = useCallback(async (): Promise<void> => {
     const rows = await listConsentLog({ workspaceId: workspace.id });
     setEntries(rows);
-  };
+  }, [workspace.id]);
 
   useEffect(() => {
     void load();
-  }, [workspace.id]);
+  }, [load]);
 
   const filtered = useMemo(() => {
     if (!entries) {
@@ -122,9 +122,9 @@ export function PrivacyLogTab(): JSX.Element {
       <Stack gap={4}>
         <Title order={4}>Privacy log</Title>
         <Text size="sm" c="dimmed">
-          A local record of every time you approved (or cancelled) sending
-          data to an AI provider in this workspace. Last 90 days, stored on
-          this device only.
+          A local record of every time you approved (or cancelled) sending data
+          to an AI provider in this workspace. Last 90 days, stored on this
+          device only.
         </Text>
       </Stack>
 
@@ -172,8 +172,7 @@ export function PrivacyLogTab(): JSX.Element {
       {filtered && filtered.length === 0 ?
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
-            No entries yet. The log fills in as the chat panel asks for
-            consent.
+            No entries yet. The log fills in as the chat panel asks for consent.
           </Text>
         </Card>
       : <Table striped withTableBorder>
@@ -233,8 +232,10 @@ export function PrivacyLogTab(): JSX.Element {
                           </Badge>
                         );
                       })}
-                      {entry.detectedPii.length === 0 &&
-                      entry.detectedBias.length === 0 ?
+                      {(
+                        entry.detectedPii.length === 0 &&
+                        entry.detectedBias.length === 0
+                      ) ?
                         <Text size="xs" c="dimmed">
                           (clean)
                         </Text>

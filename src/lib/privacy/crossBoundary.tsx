@@ -2,12 +2,9 @@ import { modals } from "@mantine/modals";
 import { ConsentModal } from "@/components/Privacy/ConsentModal/ConsentModal";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordConsentDecision } from "@/lib/privacy/consentAuditLog";
-import { detectPii } from "@/lib/privacy/piiDetector";
 import { registerAck } from "@/lib/privacy/pendingAcks";
-import {
-  hashTextPayload,
-  issueAckToken,
-} from "@/lib/privacy/sessionSecret";
+import { detectPii } from "@/lib/privacy/piiDetector";
+import { hashTextPayload, issueAckToken } from "@/lib/privacy/sessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
@@ -160,8 +157,7 @@ export async function crossBoundary(
       }),
       sourceColumn: req.sourceColumn,
       isMedical: pii.isMedical,
-      typedConfirmationCorrect:
-        mode === "medical_strict" ? false : null,
+      typedConfirmationCorrect: mode === "medical_strict" ? false : null,
     });
     return { approved: false, reason: "cancelled" };
   }
@@ -190,8 +186,7 @@ export async function crossBoundary(
     }),
     sourceColumn: req.sourceColumn,
     isMedical: pii.isMedical,
-    typedConfirmationCorrect:
-      mode === "medical_strict" ? true : null,
+    typedConfirmationCorrect: mode === "medical_strict" ? true : null,
   });
 
   return {
@@ -312,4 +307,3 @@ function _openModal(args: {
     });
   });
 }
-

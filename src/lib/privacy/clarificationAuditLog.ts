@@ -1,6 +1,7 @@
-import Dexie, { type Table } from "dexie";
 import { uuid } from "$/lib/uuid";
+import Dexie from "dexie";
 import type { ChatClarifyRequest } from "$/types/chat.types";
+import type { Table } from "dexie";
 
 /**
  * Per-clarification telemetry per the chat-interactive-workflows spec
@@ -22,10 +23,7 @@ export type ClarificationAuditEntry = {
   threadId: string | null;
   timestamp: number;
   turnNumber: 1 | 2 | 3;
-  responseShape:
-    | "free_text"
-    | "fixed_options_single"
-    | "fixed_options_multi";
+  responseShape: "free_text" | "fixed_options_single" | "fixed_options_multi";
   questionLengthChars: number;
   rationaleProvided: boolean;
   optionsCount: number | null;
@@ -108,7 +106,7 @@ export async function recordShown(args: {
       patternLocale: PATTERN_LOCALE,
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.warn("[privacy] clarification audit write failed:", e);
   }
   return id;
@@ -128,7 +126,7 @@ export async function recordOutcome(args: {
       timeToAnswerMs: elapsed,
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.warn("[privacy] clarification audit outcome write failed:", e);
   }
 }

@@ -81,10 +81,7 @@ type OpenRouterToolCall = {
  * this from generic bad-request errors.
  */
 function _rejectUnapprovedTransfer(detail: string): never {
-  throw new AvaHTTPError(
-    `UNAPPROVED_DATA_TRANSFER: ${detail}`,
-    BAD_REQUEST,
-  );
+  throw new AvaHTTPError(`UNAPPROVED_DATA_TRANSFER: ${detail}`, BAD_REQUEST);
 }
 
 function _arrayBufferToBase64(buf: ArrayBuffer): string {
@@ -365,12 +362,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
       })
       .action(async ({ pathParams, body, supabaseClient, user }) => {
         const { workspaceId } = pathParams;
-        const {
-          messages,
-          context,
-          model: requestedModel,
-          consentAcks,
-        } = body;
+        const { messages, context, model: requestedModel, consentAcks } = body;
         const model = _resolveChatModel(requestedModel);
 
         // Verify any consent acks BEFORE we burn an LLM call. Each ack
