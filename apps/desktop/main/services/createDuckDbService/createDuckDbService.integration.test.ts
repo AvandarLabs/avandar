@@ -88,7 +88,9 @@ describe("DuckDb service", () => {
       );
 
       const golden = Object.fromEntries(
-        rows.map((row) => {return [row.column_name, row.column_type]}),
+        rows.map((row) => {
+          return [row.column_name, row.column_type];
+        }),
       );
 
       expect(golden).toEqual({

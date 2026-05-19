@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
-import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap";
 import { openSqliteDatabase, runMigrations } from "../SqliteService/Sqlite";
+import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap";
 import type { SupabaseRestClient } from "../SupabaseRest";
 
 function makeRest(
@@ -114,14 +114,11 @@ describe("bootstrapSnapshotIfNeeded", () => {
     runMigrations(db, [
       {
         name: "001.sql",
-        sql:
-          "create table dashboards (id text primary key, config text not null);",
+        sql: "create table dashboards (id text primary key, config text not null);",
       },
     ]);
     const { rest } = makeRest({
-      dashboards: [
-        { id: "d1", config: { layout: "grid", widgets: [1, 2] } },
-      ],
+      dashboards: [{ id: "d1", config: { layout: "grid", widgets: [1, 2] } }],
     });
 
     await bootstrapSnapshotIfNeeded({
@@ -168,7 +165,10 @@ describe("bootstrapSnapshotIfNeeded", () => {
     });
 
     const rows = db
-      .query<{ id: string; ok: number }, []>("select id, ok from flags order by id")
+      .query<
+        { id: string; ok: number },
+        []
+      >("select id, ok from flags order by id")
       .all();
     expect(rows).toEqual([
       { id: "x", ok: 1 },

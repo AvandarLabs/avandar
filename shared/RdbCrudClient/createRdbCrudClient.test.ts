@@ -1,8 +1,8 @@
 import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fakeDbClient } = vi.hoisted(() => {
   return {

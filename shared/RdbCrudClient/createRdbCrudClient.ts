@@ -3,11 +3,11 @@ import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupa
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
-import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type {
   AnySupabaseCrudModelSpec,
   SupabaseCrudClient,
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
+import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type { EmptyObject } from "type-fest";
 
 /**

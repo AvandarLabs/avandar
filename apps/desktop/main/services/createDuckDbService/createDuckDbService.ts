@@ -23,10 +23,7 @@ import duckdb from "duckdb";
  * the sole consumer for now.
  */
 export type DuckDbService = {
-  runRawQuery<TRow>(
-    sql: string,
-    params: readonly unknown[],
-  ): Promise<TRow[]>;
+  runRawQuery<TRow>(sql: string, params: readonly unknown[]): Promise<TRow[]>;
   close(): Promise<void>;
 };
 

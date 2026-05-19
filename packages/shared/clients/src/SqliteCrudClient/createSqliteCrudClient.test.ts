@@ -1,15 +1,15 @@
+import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { __setIpcBridgeForTests } from "$/platform/ipc/client.ts";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { createSqliteCrudClient } from "./createSqliteCrudClient.ts";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   ReplyEnvelope,
   RequestEnvelope,
 } from "$/platform/ipc/envelopes.ts";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 /*
  * A fake IPC bridge for unit testing. Each `send` looks up the
@@ -99,9 +99,15 @@ const widgetParsers: ModelCrudParserRegistry<WidgetModelSpec> =
   makeParserRegistry<WidgetModelSpec>().build({
     modelName: "Widget",
     DBReadSchema: WidgetDBReadSchema,
-    fromDBReadToModelRead: (r) => r,
-    fromModelInsertToDBInsert: (m) => m as WidgetModelSpec["DBInsert"],
-    fromModelUpdateToDBUpdate: (m) => m,
+    fromDBReadToModelRead: (r) => {
+      return r;
+    },
+    fromModelInsertToDBInsert: (m) => {
+      return m as WidgetModelSpec["DBInsert"];
+    },
+    fromModelUpdateToDBUpdate: (m) => {
+      return m;
+    },
   });
 
 const fakeSupabase = {} as SupabaseClient;
@@ -309,14 +315,20 @@ describe("createSqliteCrudClient", () => {
           id: z.string(),
           config: z.string(),
         }),
-        fromDBReadToModelRead: (r) => r,
-        fromModelInsertToDBInsert: (m) =>
-          ({ config: JSON.stringify(m.config) }) as JsonModelSpec["DBInsert"],
-        fromModelUpdateToDBUpdate: (m) =>
-          ({
+        fromDBReadToModelRead: (r) => {
+          return r;
+        },
+        fromModelInsertToDBInsert: (m) => {
+          return {
+            config: JSON.stringify(m.config),
+          } as JsonModelSpec["DBInsert"];
+        },
+        fromModelUpdateToDBUpdate: (m) => {
+          return {
             config:
               m.config !== undefined ? JSON.stringify(m.config) : undefined,
-          }) as JsonModelSpec["DBUpdate"],
+          } as JsonModelSpec["DBUpdate"];
+        },
       });
 
     let received: Record<string, unknown> | undefined;
@@ -381,7 +393,9 @@ describe("createSqliteCrudClient", () => {
       data: { name: "renamed" },
     });
     expect(result).toEqual({ id: "x1", name: "renamed", color: "red" });
-    expect(received?.sql).toMatch(/update "widgets" set "name" = \? where "id" = \?/);
+    expect(received?.sql).toMatch(
+      /update "widgets" set "name" = \? where "id" = \?/,
+    );
     expect(received?.params).toEqual(["renamed", "x1"]);
   });
 
@@ -405,9 +419,7 @@ describe("createSqliteCrudClient", () => {
     });
     const client = makeClient();
     await client.bulkDelete({ ids: ["x1", "x2", "x3"] });
-    expect(received?.sql).toBe(
-      'delete from "widgets" where "id" in (?, ?, ?)',
-    );
+    expect(received?.sql).toBe('delete from "widgets" where "id" in (?, ?, ?)');
     expect(received?.params).toEqual(["x1", "x2", "x3"]);
   });
 

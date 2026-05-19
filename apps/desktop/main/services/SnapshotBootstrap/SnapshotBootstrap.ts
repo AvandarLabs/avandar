@@ -109,7 +109,11 @@ function _listLocalTables(db: AvaSqliteDatabase): Set<string> {
       []
     >("select name from sqlite_master where type='table'")
     .all();
-  return new Set(rows.map((row) => {return row.name}));
+  return new Set(
+    rows.map((row) => {
+      return row.name;
+    }),
+  );
 }
 
 function _readRowCount(db: AvaSqliteDatabase, table: string): number {
@@ -143,13 +147,23 @@ function _insertRowsTransactionally(
   // dense shape (every row carries every column).
   const cols = Object.keys(rows[0]!);
   const colsClause = cols.map(_quoteIdent).join(", ");
-  const placeholders = cols.map(() => {return "?"}).join(", ");
+  const placeholders = cols
+    .map(() => {
+      return "?";
+    })
+    .join(", ");
   const sql = `insert into ${_quoteIdent(table)} (${colsClause}) values (${placeholders})`;
   const stmt = db.prepare(sql);
 
   const tx = db.transaction((batch: ReadonlyArray<Record<string, unknown>>) => {
     batch.forEach((row) => {
-      stmt.run(..._bindValues(cols.map((col) => {return row[col] ?? null})));
+      stmt.run(
+        ..._bindValues(
+          cols.map((col) => {
+            return row[col] ?? null;
+          }),
+        ),
+      );
     });
   });
   tx(rows);

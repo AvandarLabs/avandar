@@ -1,15 +1,12 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { openSqliteDatabase } from "../../services/SqliteService/Sqlite";
 import { createIpcServer } from "../createIpcServer/createIpcServer";
 import { registerRdbHandlers } from "./registerRdbHandlers";
-import type {
-  ReplyEnvelope,
-  RequestEnvelope,
-} from "$/platform/ipc/envelopes";
+import type { ReplyEnvelope, RequestEnvelope } from "$/platform/ipc/envelopes";
 
 type FakeTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;
@@ -42,11 +39,16 @@ async function callHandler<TReq>(
 ): Promise<ReplyEnvelope> {
   const listeners = transport.channels.get(contractName) ?? [];
   expect(listeners.length).toBe(1);
-  const envelope: RequestEnvelope = { id: `req-${Date.now()}`, payload: request };
+  const envelope: RequestEnvelope = {
+    id: `req-${Date.now()}`,
+    payload: request,
+  };
   const repliesBefore = transport.replies.length;
   listeners[0]!(envelope);
   // server replies via Promise microtask
-  await new Promise((r) => {return setTimeout(r, 0)});
+  await new Promise((r) => {
+    return setTimeout(r, 0);
+  });
   expect(transport.replies.length).toBe(repliesBefore + 1);
   return transport.replies[repliesBefore]!.message;
 }
@@ -136,7 +138,11 @@ describe("registerRdbHandlers", () => {
     const rows = db
       .query<{ name: string }, []>("select name from widgets order by id")
       .all();
-    expect(rows.map((r) => {return r.name})).toEqual(["a", "b"]);
+    expect(
+      rows.map((r) => {
+        return r.name;
+      }),
+    ).toEqual(["a", "b"]);
     db.close();
   });
 

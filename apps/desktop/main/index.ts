@@ -8,7 +8,10 @@ import { getUserDataDir } from "./platform/getUserDataDir";
 import { createDuckDbService } from "./services/createDuckDbService/createDuckDbService";
 import { loadMigrationsFromDir } from "./services/loadMigrations/loadMigrations";
 import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap/SnapshotBootstrap";
-import { openSqliteDatabase, runMigrations } from "./services/SqliteService/Sqlite";
+import {
+  openSqliteDatabase,
+  runMigrations,
+} from "./services/SqliteService/Sqlite";
 import { createSupabaseRestClient } from "./services/SupabaseRest";
 
 const APP_NAME = "Avandar";

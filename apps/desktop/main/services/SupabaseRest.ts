@@ -41,8 +41,7 @@ export function createSupabaseRestClient(
   overrides: Readonly<CreateSupabaseRestClientOverrides> = {},
 ): SupabaseRestClient {
   const url = overrides.url ?? process.env.VITE_SUPABASE_API_URL ?? "";
-  const anonKey =
-    overrides.anonKey ?? process.env.VITE_SUPABASE_ANON_KEY ?? "";
+  const anonKey = overrides.anonKey ?? process.env.VITE_SUPABASE_ANON_KEY ?? "";
   const pageSize = overrides.pageSize ?? 1000;
 
   if (!url || !anonKey) {

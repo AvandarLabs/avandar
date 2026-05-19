@@ -41,7 +41,9 @@ describe("Sqlite", () => {
       .get();
     expect(journal?.journal_mode).toBe("wal");
 
-    const fk = db.query<{ foreign_keys: number }, []>("pragma foreign_keys;").get();
+    const fk = db
+      .query<{ foreign_keys: number }, []>("pragma foreign_keys;")
+      .get();
     expect(fk?.foreign_keys).toBe(1);
 
     db.close();
@@ -137,10 +139,7 @@ describe("Sqlite", () => {
     expect(tables).toEqual([]);
 
     const applied = db
-      .query<
-        { name: string },
-        []
-      >("select name from _schema_migrations")
+      .query<{ name: string }, []>("select name from _schema_migrations")
       .all();
     expect(applied).toEqual([]);
 
@@ -192,9 +191,7 @@ describe("Sqlite", () => {
       .query<
         { name: string },
         []
-      >(
-        "select name from sqlite_master where type='table' and name='_schema_migrations'",
-      )
+      >("select name from sqlite_master where type='table' and name='_schema_migrations'")
       .all();
     expect(tables).toEqual([{ name: "_schema_migrations" }]);
 
