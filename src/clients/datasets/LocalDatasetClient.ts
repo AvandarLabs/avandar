@@ -61,20 +61,19 @@ export const LocalDatasetClient = createUsableServiceClient(
           const logger = config.logger.appendName("storeLocalExcel");
           logger.log("Storing Excel locally", params);
           const { datasetId, xlsxParseOptions, workspaceId, userId } = params;
+          // loadXlsx now streams read_xlsx → parquet directly and returns
+          // the parquet bytes alongside the schema. No separate export
+          // step (and no intermediate materialized DuckDB TABLE) is
+          // needed.
           const loadResult = await DuckDbClient.loadXlsx({
             tableName: datasetId,
             ...xlsxParseOptions,
           });
-          const parquetData = await DuckDbClient.exportTableAsParquet(
-            loadResult.tableName,
-          );
 
-          // now that the data is in DuckDB memory, lets add an entry to
-          // IndexedDB to track it in persisted local storage.
           await LocalDatasetClient.insert({
             data: {
               datasetId: datasetId,
-              parquetData: parquetData,
+              parquetData: loadResult.parquetData,
               workspaceId: workspaceId,
               userId: userId,
             },
@@ -94,21 +93,20 @@ export const LocalDatasetClient = createUsableServiceClient(
           const logger = config.logger.appendName("insertCSV");
           logger.log("Storing CSV locally", params);
           const { datasetId, csvParseOptions, workspaceId, userId } = params;
+          // loadCsv now streams read_csv → parquet directly and returns
+          // the parquet bytes alongside the schema and parse errors. No
+          // separate export step (and no intermediate materialized
+          // DuckDB TABLE) is needed, so peak memory during import scales
+          // with the output parquet size, not the input CSV size.
           const loadResult = await DuckDbClient.loadCsv({
             tableName: datasetId,
             ...csvParseOptions,
           });
 
-          const parquetData = await DuckDbClient.exportTableAsParquet(
-            loadResult.tableName,
-          );
-
-          // now that the data is in DuckDB memory, lets add an entry to
-          // IndexedDB to track it in persisted local storage.
           await LocalDatasetClient.insert({
             data: {
               datasetId: datasetId,
-              parquetData: parquetData,
+              parquetData: loadResult.parquetData,
               workspaceId: workspaceId,
               userId: userId,
             },

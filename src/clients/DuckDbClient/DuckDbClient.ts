@@ -671,22 +671,30 @@ class DuckDbClientImpl {
       dateFormat,
       timestampFormat,
     } = options;
+
+    // Stage the CSV under a distinct MEMFS name so the final VIEW can take
+    // `tableName`. Same story for the transcoded parquet — it lives under a
+    // temp name only as long as it takes to copy the bytes out into a JS
+    // Blob and re-register it via the parquet path.
+    const csvStagingFile = `${tableName}__loadCsv_src`;
+    const parquetStagingFile = `${tableName}__loadCsv_pq`;
+
     const conn = await this.#connect();
     let loadResults: DuckDbLoadCsvResult;
     try {
-      // If the dataset already exists, we drop it and then recreate it.
-      // Loading a CSV will ALWAYS overwrite existing data.
+      // Loading a CSV always overwrites existing data under this tableName.
       await this.dropTableViewAndFile(tableName);
 
-      // drop reject_scans and reject_errors tables, if they exist,
-      // so we can start fresh
+      // Drop reject_scans / reject_errors so this run starts clean. They
+      // get repopulated by the `read_csv(..., store_rejects=true)` call
+      // inside the COPY below.
       await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
       await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
 
       await this.#registerCSVFile(
         "file" in options ?
-          { tableName, file: options.file }
-        : { tableName, fileText: options.fileText },
+          { tableName: csvStagingFile, file: options.file }
+        : { tableName: csvStagingFile, fileText: options.fileText },
       );
 
       const cleanCommentChar =
@@ -698,12 +706,18 @@ class DuckDbClientImpl {
 
       Logger.log("columns specified", { columns });
 
-      // Insert the CSV file as a VIEW (low-memory interactive querying).
+      // Stream the CSV directly to a parquet file in MEMFS. No DuckDB TABLE
+      // is materialized along the way: rows flow read_csv → row-group
+      // encoder → parquet writer, then the encoder buffer is released. Peak
+      // memory is bounded by one row group + the accumulated parquet bytes
+      // (typically 5-20x smaller than the CSV for tabular data), not by
+      // the input CSV size. This is the change that lets 1+ GB CSV
+      // uploads complete without OOM-ing the tab.
       await this.runRawQuery(
-        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+        `COPY (
           SELECT *
           FROM read_csv(
-            '$tableName$',
+            '$csvFile$',
             auto_detect=true,
             encoding='utf-8',
             store_rejects=true,
@@ -729,26 +743,28 @@ class DuckDbClientImpl {
                   .join(",")}}`
               : ""
             }
-          )`,
+          )
+        ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
         {
           conn,
           params: {
-            tableName,
+            csvFile: csvStagingFile,
+            pqFile: parquetStagingFile,
           },
         },
       );
 
-      // get the parsing errors
+      // get the parsing errors (reject_scans is keyed by the source file
+      // path, which is the staging name we passed to read_csv)
       let rejectedScans: DuckDbScan[] = [];
       let rejectedRows: DuckDbRejectedRow[] = [];
       const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
-        `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
-        { conn, params: { tableName } },
+        `SELECT * FROM reject_scans WHERE file_path='$csvFile$'`,
+        { conn, params: { csvFile: csvStagingFile } },
       );
       rejectedScans = rejectedScansResult.data;
 
       if (isNonEmptyArray(rejectedScans)) {
-        // if there are scans, then let's see if there are any rejected rows
         const fileId = rejectedScans[0].file_id;
         const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
           `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
@@ -757,11 +773,30 @@ class DuckDbClientImpl {
         rejectedRows = rejectedRowsResult.data;
       }
 
-      this.#logger.log("Successfully loaded CSV into DuckDB!");
+      // Pull the parquet bytes out of MEMFS into a JS Blob, then drop the
+      // MEMFS-side files so the WASM heap reclaims them. The Blob is the
+      // canonical artifact we hand back to the caller for IndexedDB
+      // storage.
+      const db = await this.#getDB();
+      const parquetBuffer = (await db.copyFileToBuffer(
+        parquetStagingFile,
+      )) as Uint8Array<ArrayBuffer>;
+      const parquetData = new Blob([parquetBuffer], {
+        type: MIMEType.APPLICATION_PARQUET,
+      });
+      await db.dropFile(csvStagingFile);
+      await db.dropFile(parquetStagingFile);
 
-      // now let's collect all information we need to return
+      // Re-load the dataset from the freshly produced parquet. This
+      // creates a VIEW named `tableName` on top of the parquet bytes, so
+      // every subsequent query (preview, summary, exploration) goes
+      // through the columnar read path with projection / LIMIT pushdown.
+      await this.loadParquet({ tableName, blob: parquetData });
+
       const tableColumns = await this.getTableSchema(tableName);
       Logger.log("tableColumns", { tableColumns });
+      // For parquet-backed views DuckDB reads the row count from the
+      // footer; this is a constant-time metadata lookup, not a full scan.
       const csvRowCount = await this.getTableRowCount(tableName);
       const csvErrors = {
         rejectedScans,
@@ -791,6 +826,8 @@ class DuckDbClientImpl {
             tableColumns,
           });
 
+      this.#logger.log("Successfully transcoded CSV into parquet!");
+
       loadResults = {
         id: uuid(),
         type: "csv",
@@ -801,6 +838,7 @@ class DuckDbClientImpl {
         errors: csvErrors,
         numRejectedRows: csvErrors.rejectedRows.length,
         csvSniff: csvSniffResult,
+        parquetData,
       };
     } finally {
       await this.#closeConnection(conn);
@@ -825,6 +863,14 @@ class DuckDbClientImpl {
   ): Promise<DuckDbLoadXlsxResult> {
     const { tableName, sheet } = options;
     const hasHeader = options.hasHeader ?? true;
+
+    // Stage the XLSX under a distinct MEMFS name so the final VIEW can take
+    // `tableName`. The transcoded parquet lives under a temp name only as
+    // long as it takes to copy the bytes out into a JS Blob and re-register
+    // it via the parquet path.
+    const xlsxStagingFile = `${tableName}__loadXlsx_src`;
+    const parquetStagingFile = `${tableName}__loadXlsx_pq`;
+
     const conn = await this.#connect();
     let loadResults: DuckDbLoadXlsxResult;
 
@@ -833,30 +879,58 @@ class DuckDbClientImpl {
       if ("file" in options) {
         _assertXlsxFileReadable(options.file);
         await this.#registerXlsxFile({
-          tableName,
+          tableName: xlsxStagingFile,
           file: options.file,
         });
       } else {
         await this.#registerXlsxFile({
-          tableName,
+          tableName: xlsxStagingFile,
           fileBytes: options.fileBytes,
         });
       }
 
+      // Stream the sheet directly to a parquet file in MEMFS. Same idea as
+      // `loadCsv`: no DuckDB TABLE is materialized; rows flow read_xlsx →
+      // row-group encoder → parquet writer. XLSX itself is less
+      // stream-friendly than CSV (the format requires a full sheet-XML
+      // parse), but we still avoid keeping the resulting table resident in
+      // the WASM heap, and the output parquet replaces the workbook as
+      // the source of truth for every subsequent query.
       await this.runRawQuery(
-        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+        `COPY (
           SELECT * FROM read_xlsx(
-            '$tableName$'
+            '$xlsxFile$'
             , header = ${hasHeader}
             ${sheet ? `, sheet = '${_escapeSqlSingleQuotedLiteral(sheet)}'` : ""}
-          )`,
+          )
+        ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
         {
           conn,
-          params: { tableName },
+          params: {
+            xlsxFile: xlsxStagingFile,
+            pqFile: parquetStagingFile,
+          },
         },
       );
 
-      this.#logger.log("Successfully loaded XLSX into DuckDB!");
+      // Pull the parquet bytes out of MEMFS into a JS Blob, then drop the
+      // MEMFS-side files so the WASM heap reclaims them.
+      const db = await this.#getDB();
+      const parquetBuffer = (await db.copyFileToBuffer(
+        parquetStagingFile,
+      )) as Uint8Array<ArrayBuffer>;
+      const parquetData = new Blob([parquetBuffer], {
+        type: MIMEType.APPLICATION_PARQUET,
+      });
+      await db.dropFile(xlsxStagingFile);
+      await db.dropFile(parquetStagingFile);
+
+      // Re-load from the freshly produced parquet. Creates a VIEW named
+      // `tableName` on top of the parquet bytes; future queries go through
+      // the columnar read path with projection / LIMIT pushdown.
+      await this.loadParquet({ tableName, blob: parquetData });
+
+      this.#logger.log("Successfully transcoded XLSX into parquet!");
 
       const tableColumns = await this.getTableSchema(tableName);
       const rowCount = await this.getTableRowCount(tableName);
@@ -869,6 +943,7 @@ class DuckDbClientImpl {
         numRows: rowCount,
         columns: tableColumns,
         sheet,
+        parquetData,
       };
     } finally {
       await this.#closeConnection(conn);
