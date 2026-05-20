@@ -289,7 +289,8 @@ test.describe("chat interactive workflows", () => {
         (node as { click: () => void }).click();
       });
 
-      // Both steps should eventually succeed after approval (auto-run is default)
+      // Both steps should eventually succeed after approval (auto-run is
+      // default)
       await expect(
         page.getByText("All steps succeeded.", { exact: false }),
       ).toBeVisible({ timeout: LONG_WAIT });
