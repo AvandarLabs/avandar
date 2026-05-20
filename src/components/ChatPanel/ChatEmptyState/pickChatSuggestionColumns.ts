@@ -4,10 +4,58 @@ import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetC
 
 const ENUM_LIKE_DISTINCT_MAX = 10;
 
+/** Identifier column names excluded from group-by and average suggestions. */
+const IDENTIFIER_EXACT_NAMES = new Set(["id", "uuid", "uid"]);
+
+/** Numeric columns whose names indicate averaging is not meaningful. */
+const NON_AVERAGEABLE_EXACT_NAMES = new Set([
+  "year",
+  "index",
+  "idx",
+  "version",
+  "zip",
+  "ssn",
+  "code",
+  "count",
+  "sequence",
+  "seq",
+]);
+
+/**
+ * Substrings in a normalized column name that suggest a numeric field is a
+ * code or identifier, not a quantity to average.
+ */
+const NON_AVERAGEABLE_NAME_SUBSTRINGS = [
+  "phone",
+  "telephone",
+  "mobile",
+  "cellphone",
+  "cell_phone",
+  "fax",
+  "ssn",
+  "social_security",
+  "socialsecurity",
+  "zipcode",
+  "zip_code",
+  "postal",
+  "postcode",
+  "account_number",
+  "routing_number",
+  "credit_card",
+  "card_number",
+  "iban",
+  "swift",
+  "license_number",
+  "plate_number",
+  "latitude",
+  "longitude",
+  "birth_year",
+  "fiscal_year",
+] as const;
+
 /** Column names that are rarely useful as GROUP BY dimensions. */
 const NON_GROUPABLE_EXACT_NAMES = new Set([
-  "id",
-  "uuid",
+  ...IDENTIFIER_EXACT_NAMES,
   "guid",
   "pk",
   "rowid",
@@ -29,16 +77,50 @@ const NON_GROUPABLE_EXACT_NAMES = new Set([
 
 type ColumnMeta = Pick<DatasetColumnRead, "name" | "dataType" | "columnIdx">;
 
+function _normalizeColumnName(columnName: string): string {
+  return columnName.trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+/**
+ * True when the column name is exactly `id`, `uuid`, or `uid` (any casing).
+ * Applies regardless of whether the column is stored as text or numeric.
+ */
+export function isIdentifierColumnName(columnName: string): boolean {
+  return IDENTIFIER_EXACT_NAMES.has(_normalizeColumnName(columnName));
+}
+
 /**
  * Returns whether a column name is unlikely to be a meaningful group-by
  * dimension (identifiers, audit fields, etc.).
  */
 export function isNonGroupableColumnName(columnName: string): boolean {
-  const normalized = columnName.trim().toLowerCase().replace(/\s+/g, "_");
+  const normalized = _normalizeColumnName(columnName);
   if (NON_GROUPABLE_EXACT_NAMES.has(normalized)) {
     return true;
   }
   return normalized.endsWith("_id");
+}
+
+/**
+ * True when a numeric column name suggests values are codes or identifiers
+ * (phone, SSN, zip, etc.) rather than quantities where an average is useful.
+ */
+export function isNonAverageableColumnName(columnName: string): boolean {
+  if (isIdentifierColumnName(columnName)) {
+    return true;
+  }
+
+  const normalized = _normalizeColumnName(columnName);
+  if (NON_AVERAGEABLE_EXACT_NAMES.has(normalized)) {
+    return true;
+  }
+  if (normalized.endsWith("_year") || normalized.endsWith("_code")) {
+    return true;
+  }
+
+  return NON_AVERAGEABLE_NAME_SUBSTRINGS.some((fragment) => {
+    return normalized.includes(fragment);
+  });
 }
 
 function _sortByColumnIdx(
@@ -65,8 +147,14 @@ function _textColumns(columns: readonly ColumnMeta[]): readonly ColumnMeta[] {
 export function pickGroupByColumn(
   columns: readonly ColumnMeta[],
   cachedSummariesByName?: ReadonlyMap<string, ColumnSummary>,
+  options?: { excludeColumnNames?: readonly string[] },
 ): string | undefined {
-  const textColumns = _textColumns(columns);
+  const excluded = new Set(
+    (options?.excludeColumnNames ?? []).map(_normalizeColumnName),
+  );
+  const textColumns = _textColumns(columns).filter((column) => {
+    return !excluded.has(_normalizeColumnName(column.name));
+  });
   if (textColumns.length === 0) {
     return undefined;
   }
@@ -112,7 +200,10 @@ export function pickAverageColumn(
   columns: readonly ColumnMeta[],
 ): string | undefined {
   const numericColumns = _sortByColumnIdx(columns).filter((column) => {
-    return AvaDataTypeModule.isNumeric(column.dataType);
+    return (
+      AvaDataTypeModule.isNumeric(column.dataType) &&
+      !isNonAverageableColumnName(column.name)
+    );
   });
   return numericColumns[0]?.name;
 }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  isIdentifierColumnName,
+  isNonAverageableColumnName,
   isNonGroupableColumnName,
   pickAverageColumn,
   pickGroupByColumn,
@@ -31,10 +33,24 @@ function _textSummary(
   };
 }
 
+describe("isIdentifierColumnName", () => {
+  it("matches id, uuid, and uid exactly (case insensitive)", () => {
+    expect(isIdentifierColumnName("ID")).toBe(true);
+    expect(isIdentifierColumnName("uuid")).toBe(true);
+    expect(isIdentifierColumnName("UID")).toBe(true);
+  });
+
+  it("does not match compound or suffixed names", () => {
+    expect(isIdentifierColumnName("user_id")).toBe(false);
+    expect(isIdentifierColumnName("uuid_v2")).toBe(false);
+  });
+});
+
 describe("isNonGroupableColumnName", () => {
   it("treats common identifier and audit columns as non-groupable", () => {
     expect(isNonGroupableColumnName("id")).toBe(true);
     expect(isNonGroupableColumnName("UUID")).toBe(true);
+    expect(isNonGroupableColumnName("UID")).toBe(true);
     expect(isNonGroupableColumnName("user_id")).toBe(true);
     expect(isNonGroupableColumnName("created_at")).toBe(true);
   });
@@ -61,7 +77,8 @@ describe("pickGroupByColumn", () => {
     const columns = [
       _col("id", "varchar", 0),
       _col("uuid", "varchar", 1),
-      _col("category", "varchar", 2),
+      _col("UID", "varchar", 2),
+      _col("category", "varchar", 3),
     ];
     expect(pickGroupByColumn(columns)).toBe("category");
   });
@@ -95,6 +112,34 @@ describe("pickGroupByColumn", () => {
   it("returns undefined when there are no text columns", () => {
     expect(pickGroupByColumn([_col("amount", "double", 0)])).toBeUndefined();
   });
+
+  it("excludes already-used group-by columns when picking a second dimension", () => {
+    const columns = [
+      _col("region", "varchar", 0),
+      _col("category", "varchar", 1),
+      _col("status", "varchar", 2),
+    ];
+    expect(
+      pickGroupByColumn(columns, undefined, {
+        excludeColumnNames: ["region"],
+      }),
+    ).toBe("category");
+  });
+});
+
+describe("isNonAverageableColumnName", () => {
+  it("treats phone, SSN, and postal columns as non-averageable", () => {
+    expect(isNonAverageableColumnName("phone_number")).toBe(true);
+    expect(isNonAverageableColumnName("SSN")).toBe(true);
+    expect(isNonAverageableColumnName("zip_code")).toBe(true);
+    expect(isNonAverageableColumnName("customer_mobile")).toBe(true);
+  });
+
+  it("allows typical measure columns", () => {
+    expect(isNonAverageableColumnName("amount")).toBe(false);
+    expect(isNonAverageableColumnName("revenue")).toBe(false);
+    expect(isNonAverageableColumnName("quantity")).toBe(false);
+  });
 });
 
 describe("pickAverageColumn", () => {
@@ -109,5 +154,34 @@ describe("pickAverageColumn", () => {
 
   it("returns undefined when there are no numeric columns", () => {
     expect(pickAverageColumn([_col("name", "varchar", 0)])).toBeUndefined();
+  });
+
+  it("skips identifier columns even when stored as numeric types", () => {
+    const columns = [
+      _col("ID", "bigint", 0),
+      _col("UUID", "double", 1),
+      _col("UID", "bigint", 2),
+      _col("amount", "double", 3),
+    ];
+    expect(pickAverageColumn(columns)).toBe("amount");
+  });
+
+  it("skips phone and SSN columns stored as numeric types", () => {
+    const columns = [
+      _col("phone", "bigint", 0),
+      _col("ssn", "double", 1),
+      _col("zip", "bigint", 2),
+      _col("total_amount", "double", 3),
+    ];
+    expect(pickAverageColumn(columns)).toBe("total_amount");
+  });
+
+  it("returns undefined when every numeric column is non-averageable", () => {
+    const columns = [
+      _col("id", "bigint", 0),
+      _col("phone_number", "double", 1),
+      _col("zip_code", "bigint", 2),
+    ];
+    expect(pickAverageColumn(columns)).toBeUndefined();
   });
 });
