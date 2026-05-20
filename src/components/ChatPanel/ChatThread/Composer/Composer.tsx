@@ -10,6 +10,8 @@ import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDo
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
+import { VoiceInputButtonWhisperCpp } from "@/components/ChatPanel/VoiceInputButtonWhisperCpp/VoiceInputButtonWhisperCpp";
+import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudChat";
 import { useIsVoicePromptAvailable } from "@/lib/voice/useIsVoicePromptAvailable";
 import css from "./Composer.module.css";
@@ -25,6 +27,8 @@ export function Composer(): JSX.Element {
   });
 
   const context = useChatPageContext();
+  const platform = usePlatformInfo();
+  const isDesktopPlatform = platform === "desktop";
   const { t } = useLingui();
   const offlineBlocksCloudChat = useOfflineBlocksCloudChat();
   const { isAvailable: isVoicePromptAvailable, isChecking: isVoiceChecking } =
@@ -62,6 +66,9 @@ export function Composer(): JSX.Element {
         <Group gap="xs">
           <OfflineChatDownloadControl disabled={!isChatEnabled} />
           <VoiceInputButton disabled={voiceDisabled} />
+          {!isDesktopPlatform ?
+            <VoiceInputButtonWhisperCpp disabled={voiceDisabled} />
+          : null}
           <ChatModelPicker disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon

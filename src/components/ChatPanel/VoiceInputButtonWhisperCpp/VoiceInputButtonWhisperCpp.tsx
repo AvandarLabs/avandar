@@ -27,8 +27,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
-import { useDownloadedVoiceModels } from "@/lib/voice/useDownloadedVoiceModels";
-import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
+import { useDownloadedWhisperCppVoiceModels } from "@/lib/voiceWhisperCpp/useDownloadedWhisperCppVoiceModels";
+import { useWhisperCppVoiceModelManager } from "@/lib/voiceWhisperCpp/useWhisperCppVoiceModelManager";
 import {
   hasStoredVoiceLanguage,
   readStoredVoiceLanguage,
@@ -42,11 +42,11 @@ import {
   VOICE_MODELS,
   voiceLanguageForLocale,
 } from "@/lib/voice/voiceModels";
-import css from "./VoiceInputButton.module.css";
+import css from "./VoiceInputButtonWhisperCpp.module.css";
 import type { AudioRecorder } from "@/lib/voice/audioCapture";
 import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
 
-const MODEL_STORAGE_KEY = "avandar.voice.modelId";
+const MODEL_STORAGE_KEY = "avandar.voice.whisperCpp.modelId";
 
 function readStoredModelId(): VoiceModelId {
   try {
@@ -116,13 +116,14 @@ function VoiceModelSelectOption({
  *      yet (so the user explicitly opts into the large download), or
  *   2. Starts microphone capture immediately if a model is available.
  *
- * When recording stops, the audio is transcribed locally via the
- * `VoiceModelManager` singleton and the result is pushed into the
- * composer through `useComposerRuntime().setText`.
+ * Parallel whisper.cpp WASM + worker pipeline (compare with the transformers
+ * mic beside it). Transcription runs off the main thread.
  */
-export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
+export function VoiceInputButtonWhisperCpp({
+  disabled = false,
+}: Props): JSX.Element {
   const composerRuntime = useComposerRuntime();
-  const manager = useVoiceModelManager();
+  const manager = useWhisperCppVoiceModelManager();
   const platform = usePlatformInfo();
   const isDesktopPlatform = platform === "desktop";
   const workspace = useCurrentWorkspace();
@@ -140,7 +141,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     hasAnyDownloaded: hasAnyModelDownloaded,
     isSelectedModelDownloaded: isModelReady,
     refresh: refreshDownloadState,
-  } = useDownloadedVoiceModels({ selectedModelId });
+  } = useDownloadedWhisperCppVoiceModels({ selectedModelId });
   const [deletingModelId, setDeletingModelId] = useState<VoiceModelId | null>(
     null,
   );
@@ -338,7 +339,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       try {
         await manager.releaseLoadedPipeline();
       } catch {
-        // Best-effort: free renderer RAM for chat / DuckDB.
+        // Best-effort: free worker WASM heap for chat / DuckDB.
       }
     }
   }, [composerRuntime, language, manager, selectedModelId, t]);
@@ -373,8 +374,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const tooltipLabel =
     isRecording ? t`Stop and transcribe`
     : isTranscribing ? t`Transcribing…`
-    : isModelReady ? t`Speak (local voice-to-text)`
-    : t`Set up voice prompting`;
+    : isModelReady ? t`Speak (whisper.cpp WASM)`
+    : t`Set up whisper.cpp voice`;
 
   const RecordIcon = isRecording ? IconPlayerStop : IconMicrophone;
   const selectedModel = findVoiceModel(selectedModelId);
@@ -405,12 +406,15 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             shadow="md"
           >
             <Popover.Target>
-              <Tooltip label={t`Voice settings`} disabled={isSettingsOpen}>
+              <Tooltip
+                label={t`Whisper.cpp voice settings`}
+                disabled={isSettingsOpen}
+              >
                 <ActionIcon
                   variant="subtle"
-                  color="neutral"
+                  color="teal"
                   size="md"
-                  aria-label={t`Voice settings`}
+                  aria-label={t`Whisper.cpp voice settings`}
                   onClick={toggleSettings}
                   disabled={settingsDisabled}
                   className={css.button}
@@ -427,7 +431,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             >
               <Stack gap="sm">
                 <Text size="sm" fw={500}>
-                  <Trans>Voice prompting</Trans>
+                  <Trans>Whisper.cpp voice (WASM)</Trans>
                 </Text>
                 <Stack gap="xs">
                   <Select
@@ -551,7 +555,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         <Tooltip label={tooltipLabel}>
           <ActionIcon
             variant={isRecording ? "filled" : "subtle"}
-            color={isRecording ? "danger" : "neutral"}
+            color={isRecording ? "danger" : "teal"}
             size="md"
             aria-label={tooltipLabel}
             onClick={() => {
@@ -571,16 +575,16 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         onClose={() => {
           setIsPromptOpen(false);
         }}
-        title={t`Enable voice prompting`}
+        title={t`Enable whisper.cpp voice`}
         centered
         size="md"
       >
         <Stack gap="md">
           <Text size="sm">
             <Trans>
-              Voice prompts run entirely on your device. To dictate, we need to
-              download a Whisper model from Hugging Face once. The download runs
-              in the background; progress appears in the bottom-left corner.
+              This mic uses whisper.cpp in WebAssembly (worker thread). We
+              download a ggml model from Hugging Face once. Progress appears in
+              the bottom-left corner.
             </Trans>
           </Text>
 

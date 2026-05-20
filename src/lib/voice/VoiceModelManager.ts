@@ -189,6 +189,10 @@ export class VoiceModelManager implements IVoiceModelManager {
   }
 
   private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
+    const { getWhisperCppVoiceModelManager } = await import(
+      "@/lib/voiceWhisperCpp/whisperCppVoiceModelManagerFactory"
+    );
+    await getWhisperCppVoiceModelManager().releaseLoadedPipeline();
     await this.configureEnvOnce();
     const model = findVoiceModel(id);
     const alreadyOnDevice = await this.isModelDownloaded(id);

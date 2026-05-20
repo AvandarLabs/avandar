@@ -122,6 +122,7 @@
     "@tanstack/react-router": "^1.114.27",
     "@tanstack/react-virtual": "^3.13.8",
     "@testing-library/jest-dom": "^6.6.3",
+    "@timur00kh/whisper.wasm": "0.1.0-canary.52de4c5",
     "@tiptap/core": "^3.23.4",
     "@tiptap/extension-highlight": "^3.23.4",
     "@tiptap/extension-link": "^3.23.4",

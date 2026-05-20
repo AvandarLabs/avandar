@@ -71,3 +71,19 @@
 .loadingNote {
   margin-top: var(--mantine-spacing-xs);
 }
+
+.rootWhisperCpp {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-teal-3);
+  border-radius: var(--mantine-radius-md);
+  bottom: 200px;
+  box-shadow: var(--mantine-shadow-md);
+  left: 16px;
+  max-height: min(50vh, 360px);
+  max-width: 360px;
+  min-width: 280px;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-sm);
+  position: fixed;
+  z-index: 200;
+}
