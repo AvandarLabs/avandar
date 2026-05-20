@@ -64,3 +64,34 @@ export async function expectNativeFreeSubscription(options: {
   expect(row?.polar_product_id).toBeNull();
   return row!.id;
 }
+
+/**
+ * Asserts a workspace subscription row has Polar fields after paid checkout.
+ */
+export async function expectPaidPolarSubscription(options: {
+  supabaseAdminClient: AvaSupabaseDBClient;
+  workspaceSlug: string;
+  expectedFeaturePlanType?: string;
+  expectedInternalId?: string;
+}): Promise<{
+  id: string;
+  polar_subscription_id: string;
+}> {
+  const row = await getSubscriptionRowForWorkspaceSlug(options);
+  expect(row).not.toBeNull();
+  expect(row?.polar_subscription_id).not.toBeNull();
+  expect(row?.polar_product_id).not.toBeNull();
+
+  if (options.expectedFeaturePlanType) {
+    expect(row?.feature_plan_type).toBe(options.expectedFeaturePlanType);
+  }
+
+  if (options.expectedInternalId) {
+    expect(row?.id).toBe(options.expectedInternalId);
+  }
+
+  return {
+    id: row!.id,
+    polar_subscription_id: row!.polar_subscription_id!,
+  };
+}

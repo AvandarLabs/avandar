@@ -1,12 +1,17 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { expectNativeFreeSubscription } from "./helpers/subscriptionAssertions";
+import { bestEffortRevokePolarSubscriptionForWorkspace } from "./helpers/polarSandbox";
+import {
+  expectNativeFreeSubscription,
+  expectPaidPolarSubscription,
+} from "./helpers/subscriptionAssertions";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
+import { syncPaidSubscriptionForE2EHybrid } from "./helpers/syncPaidSubscriptionForE2EHybrid";
 import { LONG_WAIT } from "./helpers/timeouts";
 import {
   beginPolarCheckoutWait,
   createWorkspaceViaNavbar,
-  finishPolarCheckoutWait,
+  finishHybridPolarPaidCheckout,
   getBillingPlanModal,
   selectPlanFromBillingModal,
   selectPlanFromSettingsBilling,
@@ -15,6 +20,7 @@ import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLife
 
 const FREE_PLAN_HEADING = "Avandar Free";
 const STARTER_PLAN_HEADING = "Avandar Starter";
+const STARTER_FEATURE_PLAN_TYPE = "basic";
 
 test.describe("workspace billing", () => {
   test("creates a native free subscription from the billing modal", async ({
@@ -90,11 +96,10 @@ test.describe("workspace billing", () => {
     }
   });
 
-  test("redirects new workspaces to Polar checkout for a paid plan", async ({
+  test("completes Polar checkout for a new paid workspace", async ({
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
     const uniqueSuffix = Date.now().toString(36);
     const workspaceName = `E2E Org ${uniqueSuffix}`;
     const workspaceSlug = `e2e-org-${uniqueSuffix}`;
@@ -125,10 +130,32 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      await finishPolarCheckoutWait(polarWait);
+      const checkoutParams = await finishHybridPolarPaidCheckout({
+        page,
+        ...polarWait,
+      });
+
+      const admin = createSupabaseAdminClient();
+      await syncPaidSubscriptionForE2EHybrid({
+        supabaseAdminClient: admin,
+        workspaceId: checkoutParams.workspaceId,
+        userId: checkoutParams.userId,
+        polarProductId: checkoutParams.productId,
+        featurePlanType: STARTER_FEATURE_PLAN_TYPE,
+      });
+
+      await expectPaidPolarSubscription({
+        supabaseAdminClient: admin,
+        workspaceSlug,
+        expectedFeaturePlanType: STARTER_FEATURE_PLAN_TYPE,
+      });
     } finally {
       try {
         const admin = createSupabaseAdminClient();
+        await bestEffortRevokePolarSubscriptionForWorkspace({
+          supabaseAdminClient: admin,
+          workspaceSlug,
+        });
         await deleteUserOwnedWorkspaceTreeBySlug({
           supabaseAdminClient: admin,
           slug: workspaceSlug,
@@ -144,11 +171,10 @@ test.describe("workspace billing", () => {
     }
   });
 
-  test("redirects native free workspaces to Polar checkout when upgrading", async ({
+  test("upgrades a native free workspace to paid via Polar checkout", async ({
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
     const uniqueSuffix = Date.now().toString(36);
     const workspaceName = `E2E Org ${uniqueSuffix}`;
     const workspaceSlug = `e2e-org-${uniqueSuffix}`;
@@ -191,7 +217,7 @@ test.describe("workspace billing", () => {
       });
 
       const admin = createSupabaseAdminClient();
-      await expectNativeFreeSubscription({
+      const nativeFreeId = await expectNativeFreeSubscription({
         supabaseAdminClient: admin,
         workspaceSlug,
       });
@@ -206,13 +232,33 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      await finishPolarCheckoutWait({
+      const checkoutParams = await finishHybridPolarPaidCheckout({
+        page,
         ...polarWait,
         expectMissingPolarSubscriptionId: true,
+      });
+
+      await syncPaidSubscriptionForE2EHybrid({
+        supabaseAdminClient: admin,
+        workspaceId: checkoutParams.workspaceId,
+        userId: checkoutParams.userId,
+        polarProductId: checkoutParams.productId,
+        featurePlanType: STARTER_FEATURE_PLAN_TYPE,
+      });
+
+      await expectPaidPolarSubscription({
+        supabaseAdminClient: admin,
+        workspaceSlug,
+        expectedFeaturePlanType: STARTER_FEATURE_PLAN_TYPE,
+        expectedInternalId: nativeFreeId,
       });
     } finally {
       try {
         const admin = createSupabaseAdminClient();
+        await bestEffortRevokePolarSubscriptionForWorkspace({
+          supabaseAdminClient: admin,
+          workspaceSlug,
+        });
         await deleteUserOwnedWorkspaceTreeBySlug({
           supabaseAdminClient: admin,
           slug: workspaceSlug,
