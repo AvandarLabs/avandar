@@ -10,6 +10,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import puckConfigCss from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig.module.css";
 import { Paper } from "@ui";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
@@ -599,6 +600,7 @@ export function getDashboardPuckConfig(options: {
             }}
           >
             <Stack
+              className={puckConfigCss.dashboardBlockStack}
               mx="auto"
               w={
                 effectiveContainerMaxWidth.unit === "%" ?

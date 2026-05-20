@@ -25,6 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
+import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
@@ -47,6 +48,7 @@ import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerU
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { ChatPlan } from "$/types/chat.types";
 
 const QUERY_DETAILS_WIDTH = 380;
 const SETTINGS_WIDTH = 340;
@@ -89,6 +91,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
+  const planState = PlanStateManager.useState();
   const [
     isOpenDatasetDrawerOpen,
     { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
@@ -390,6 +393,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   if (!state.rawSQL) {
                     return;
                   }
+                  const planSnapshot: ChatPlan | null =
+                    planState.isVisible && planState.nodes.length > 0 ?
+                      {
+                        rootMessage: planState.rootMessage,
+                        steps: planState.nodes.map((n) => {
+                          return {
+                            id: n.id,
+                            description: n.description,
+                            type: n.type,
+                            code: n.code,
+                            inputs: n.inputs,
+                            predictedSchema: n.predictedSchema,
+                            ...(n.defaultViz ?
+                              { defaultViz: n.defaultViz }
+                            : {}),
+                          };
+                        }),
+                      }
+                    : null;
                   const modalId = modals.open({
                     title: t`Save as new dataset`,
                     size: "xl",
@@ -399,6 +421,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                         columns={queryResultColumns}
                         dateColumns={dateColumns}
                         rawSQL={state.rawSQL}
+                        planSnapshot={planSnapshot}
                         onSaveSuccess={() => {
                           modals.close(modalId);
                         }}

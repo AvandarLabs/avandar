@@ -7,7 +7,6 @@ import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -19,6 +18,13 @@ type Props = {
   columns: readonly QueryResultColumn[];
   dateColumns: ReadonlySet<string>;
   rawSQL: string;
+  /**
+   * Snapshot of the current multi-step analytic plan, if any, captured by
+   * the caller while still inside the `PlanStateManager` provider tree.
+   * Mantine modals portal outside the provider, so the snapshot must be
+   * read upstream and passed in. `null` for one-shot SQL saves.
+   */
+  planSnapshot: ChatPlan | null;
   onSaveSuccess: () => void;
 };
 
@@ -27,32 +33,11 @@ export function SaveAsNewDatasetForm({
   columns,
   dateColumns,
   rawSQL,
+  planSnapshot,
   onSaveSuccess,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  // If a multi-step analytic plan produced this save, capture it onto
-  // the new virtual dataset so reopening the dataset rehydrates the
-  // canvas with every intermediate step. One-shot SQL saves leave
-  // this as `null` and the dataset opens normally.
-  const planState = PlanStateManager.useState();
-  const planSnapshot: ChatPlan | null =
-    planState.isVisible && planState.nodes.length > 0 ?
-      {
-        rootMessage: planState.rootMessage,
-        steps: planState.nodes.map((n) => {
-          return {
-            id: n.id,
-            description: n.description,
-            type: n.type,
-            code: n.code,
-            inputs: n.inputs,
-            predictedSchema: n.predictedSchema,
-            ...(n.defaultViz ? { defaultViz: n.defaultViz } : {}),
-          };
-        }),
-      }
-    : null;
   const [saveNewDataset, isSavingNewDataset] =
     DatasetClient.useInsertVirtualDataset({
       queryToInvalidate: DatasetClient.QueryKeys.getAll(),

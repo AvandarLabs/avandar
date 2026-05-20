@@ -3,6 +3,7 @@ export {
   APP_SHELL_MAIN_Z_INDEX,
   FLOATING_PANEL_Z_INDEX,
   MODAL_ROOT_Z_INDEX,
+  POPOVER_Z_INDEX,
   Theme,
   ThemeColors,
   cssVariablesResolver,

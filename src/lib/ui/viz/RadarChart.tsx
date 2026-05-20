@@ -8,7 +8,7 @@ type Props = {
   data: UnknownDataFrame;
   nameKey: string;
   series: readonly RadarSeries[];
-  height?: number;
+  height?: number | string;
   withLegend?: boolean;
   chartStyle?: ChartStyle;
 };

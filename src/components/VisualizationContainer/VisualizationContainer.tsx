@@ -151,10 +151,10 @@ export function VisualizationContainer({
       } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%">
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
             <BarChart
               data={limitedData}
-              height={700}
+              height="100%"
               dateColumns={dateColumns}
               xAxisKey={validConfig.xAxisKey}
               series={config.series}
@@ -175,10 +175,10 @@ export function VisualizationContainer({
       } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%">
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
             <LineChart
               data={limitedData}
-              height={700}
+              height="100%"
               dateColumns={dateColumns}
               xAxisKey={validConfig.xAxisKey}
               series={config.series}
@@ -198,10 +198,10 @@ export function VisualizationContainer({
       } = XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%">
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
             <AreaChart
               data={limitedData}
-              height={700}
+              height="100%"
               dateColumns={dateColumns}
               xAxisKey={validConfig.xAxisKey}
               series={config.series}
@@ -222,7 +222,9 @@ export function VisualizationContainer({
       } = ScatterPlotConfigSchema.safeParse(config);
       if (success) {
         return (
-          <ScatterChart data={limitedData} height={700} {...validConfig} />
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+            <ScatterChart data={limitedData} height="100%" {...validConfig} />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -235,15 +237,17 @@ export function VisualizationContainer({
       } = PieChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <PieChart
-            data={limitedData}
-            nameKey={validConfig.nameKey}
-            valueKey={validConfig.valueKey}
-            isDonut={config.isDonut}
-            withLabels={config.withLabels}
-            labelsType={config.labelsType}
-            seriesColors={config.seriesColors}
-          />
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+            <PieChart
+              data={limitedData}
+              nameKey={validConfig.nameKey}
+              valueKey={validConfig.valueKey}
+              isDonut={config.isDonut}
+              withLabels={config.withLabels}
+              labelsType={config.labelsType}
+              seriesColors={config.seriesColors}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -256,12 +260,14 @@ export function VisualizationContainer({
       } = FunnelChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <FunnelChart
-            data={limitedData}
-            nameKey={validConfig.nameKey}
-            valueKey={validConfig.valueKey}
-            seriesColors={config.seriesColors}
-          />
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+            <FunnelChart
+              data={limitedData}
+              nameKey={validConfig.nameKey}
+              valueKey={validConfig.valueKey}
+              seriesColors={config.seriesColors}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -274,13 +280,15 @@ export function VisualizationContainer({
       } = RadarChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <RadarChart
-            data={limitedData}
-            nameKey={validConfig.nameKey}
-            series={config.series}
-            withLegend={config.withLegend}
-            chartStyle={config.chartStyle}
-          />
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+            <RadarChart
+              data={limitedData}
+              nameKey={validConfig.nameKey}
+              series={config.series}
+              withLegend={config.withLegend}
+              chartStyle={config.chartStyle}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -293,13 +301,15 @@ export function VisualizationContainer({
       } = BubbleChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <BubbleChart
-            data={limitedData}
-            height={700}
-            xAxisKey={validConfig.xAxisKey}
-            yAxisKey={validConfig.yAxisKey}
-            sizeKey={validConfig.sizeKey}
-          />
+          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+            <BubbleChart
+              data={limitedData}
+              height="100%"
+              xAxisKey={validConfig.xAxisKey}
+              yAxisKey={validConfig.yAxisKey}
+              sizeKey={validConfig.sizeKey}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;

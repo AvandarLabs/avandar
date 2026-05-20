@@ -1,0 +1,10 @@
+/*
+ * Puck renders the root DropZone as a plain block container with no gap
+ * between its children. Without this rule, every PBlock (table tile, chart
+ * tile, etc.) would butt directly against the next one. The selector targets
+ * Puck's internal class for any DropZone with at least one child, so the
+ * spacing applies to all dashboards uniformly regardless of layout.
+ */
+.dashboardBlockStack [class*="_DropZone--hasChildren"] > * + * {
+  margin-top: var(--mantine-spacing-md);
+}

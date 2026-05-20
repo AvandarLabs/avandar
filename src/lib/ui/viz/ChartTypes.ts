@@ -12,7 +12,7 @@ export type XYChartProps = {
   data: UnknownDataFrame;
   xAxisKey: string;
   series: readonly XYSeries[];
-  height: number;
+  height: number | string;
   withLegend?: boolean;
   chartStyle?: ChartStyle;
 
