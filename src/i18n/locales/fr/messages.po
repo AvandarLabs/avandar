@@ -13,8 +13,40 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "No columns detected for this dataset. Falling back to all columns."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Sort by"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
+msgid "Dashboard name"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+msgid "Run a query to see results."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Start (e.g. 2024-01-01)"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+msgid "Open dataset"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Search datasets..."
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
@@ -29,12 +61,40 @@ msgstr ""
 msgid "Source URL"
 msgstr ""
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Type"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Excel files"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "Enter your question or instructions in natural language to generate a SQL query"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Query"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Row filters"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Could not load the dataset's SQL query."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -43,6 +103,19 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Open"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Aggregations"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "Save and re-run query"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
@@ -54,8 +127,29 @@ msgstr ""
 msgid "Data Sources"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Export annotated PDF"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Manage sharing"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+msgid "The table visualization has no extra settings."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Monospace headlines"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "← Back"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -71,6 +165,19 @@ msgstr ""
 msgid "No datasets added yet"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "Add columns to the query above to start defining filters."
+msgstr ""
+
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Average"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Open data"
 msgstr ""
@@ -87,8 +194,22 @@ msgstr ""
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Keep SQL as-is"
+msgstr ""
+
+#. placeholder {0}: formatDashboardDate(dashboard.updatedAt, t)
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+msgid "Updated {0}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "This dataset has no description."
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+msgid "Saved datasets"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -99,6 +220,14 @@ msgstr ""
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
 msgstr ""
 
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Save as new dataset"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Single select"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing — {eta} remaining"
 msgstr ""
@@ -106,6 +235,19 @@ msgstr ""
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Dataset saved."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+msgid "Publish dashboard"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
+msgid "Container max width"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -124,12 +266,29 @@ msgstr ""
 msgid "Range"
 msgstr ""
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "CSV"
+msgstr ""
+
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Permanently delete <0>{0}</0>?"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace Name"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Your dashboard is published at:"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Name"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -140,8 +299,29 @@ msgstr ""
 msgid "User groups"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Column name in SQL"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Couldn't export PDF"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Label"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Create a dashboard"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
@@ -152,8 +332,24 @@ msgstr ""
 msgid "One standard deviation around the mean"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Custom"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "All columns"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+msgid "Filters for this chart"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Undo"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -165,9 +361,23 @@ msgstr ""
 msgid "Excel file"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Couldn't capture the dashboard for annotation."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
+msgid "Contains…"
+msgstr ""
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
+msgstr ""
+
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Delete — {0}"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -186,10 +396,19 @@ msgstr ""
 msgid "decimal"
 msgstr ""
 
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Group by"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Please select a file to import"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Select a data source"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
 msgstr ""
@@ -203,8 +422,24 @@ msgstr ""
 msgid "Parsed {0} rows"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Default value (optional)"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Your user profile is not loaded yet. Please retry."
+msgstr ""
+
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Sum"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Generating…"
 msgstr ""
 
 #. placeholder {0}: dataset.name
@@ -214,6 +449,27 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
+msgid "Configure this filter: set its id, label, and column name in the side panel."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Formal"
+msgstr ""
+
+#. placeholder {0}: planSnapshot.steps.length
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Overwrite SQL with form changes"
 msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -233,6 +489,14 @@ msgstr ""
 msgid "Untitled dataset"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Scans to:"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "Manual"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
 msgstr ""
@@ -241,58 +505,222 @@ msgstr ""
 msgid "Connect to Google Sheets"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
+msgid "Data Visualization"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Max"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Descending"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Failed to save dataset: {0}"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "PDF downloaded."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+msgid "Generate a query to configure this visualization."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "Annotate, then export"
+msgstr ""
+
+#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+msgid "Show SQL"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+msgid "Dataset name is required"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Narrowest"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Graphite"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "not in"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Custom selection"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a description for this dataset"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Cancel"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "You do not have access to this dashboard"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Data scope"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "to"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Annotation text:"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Result size"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search open data catalog"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Ocean"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Dataset deleted."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "None"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Publish"
+msgstr ""
+
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Manual form shows an approximation"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Your dashboard will be published to:"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Data source"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "description"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Min"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
+msgid "Local filters (viewer-editable, this chart only)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "e.g. cholera-outbreak-2024"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "This dashboard is private. This dashboard has not been made publicly viewable."
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Derived"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Default values, comma-separated or JSON array"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "is not null"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
+msgid "Create dashboard & save"
 msgstr ""
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
@@ -302,8 +730,57 @@ msgstr ""
 msgid "Most common value: <0>{0}</0> ({1} rows, {2}%)."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "Dashboard saved successfully!"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Back to editor"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Couldn't capture dashboard"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Capturing dashboard…"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "+ Add row filter"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Values"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "CSVs"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "QR code"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "is null"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Failed to save to dashboard: {0}"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Rose"
 msgstr ""
 
 #. placeholder {0}: dataset.name
@@ -311,13 +788,39 @@ msgstr ""
 msgid "Are you sure you want to delete {0}?"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
+msgid "Delete dashboard?"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
+#: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
+msgid "Loading datasets..."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
+#: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
+msgid "No fields"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Export"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Preview:"
 msgstr ""
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
+msgstr ""
+
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Re-run query"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
@@ -328,12 +831,26 @@ msgstr ""
 msgid "No values to summarize."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "Dashboard not ready"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Apply every global filter on the dashboard."
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Save to dashboard"
 msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
@@ -345,16 +862,37 @@ msgstr ""
 msgid "No file selected"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "See all shared items"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Some published datasets could not be loaded. Please try again later."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
+msgid "Manual Query"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Create your first dashboard to track key metrics and insights."
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Are you sure you want to delete this dataset? This action cannot be undone."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Avandar (default)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
 msgstr ""
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
@@ -363,6 +901,7 @@ msgstr ""
 msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
 msgstr ""
@@ -371,12 +910,26 @@ msgstr ""
 msgid "coverage"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Generated SQL"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Maximum rows to return"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Failed to delete dataset"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "License"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Date range"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -389,6 +942,10 @@ msgstr ""
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr ""
 
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Run an AI query first."
+msgstr ""
+
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
@@ -398,16 +955,48 @@ msgstr ""
 msgid "Parsed {formattedNumRows} rows successfully"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Label, e.g. Region"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Column name (must match SQL)"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "Generate Query"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "No frequency data available."
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "We'll add this visualization to your new dashboard."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Number range"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Columns"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Overwrite SQL?"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Unable to load dashboard"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -427,13 +1016,33 @@ msgstr ""
 msgid "Timestamp format"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+msgid "View"
+msgstr ""
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "{0} deleted successfully"
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Open dashboard"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "End (e.g. 2024-12-31)"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
 msgid "No datasets match your search."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "in"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Export PDF"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -444,8 +1053,44 @@ msgstr ""
 msgid "Make dataset offline-only?"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Color"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Select column to sort by"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "You can view this dataset because it was shared with you."
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+msgid "Create new dashboard"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Forest"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Save your changes first — the PDF reflects the saved dashboard."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Not yet published. Public viewers will not see this."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Select columns"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+msgid "You cannot publish while there are unsaved changes. Save first."
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Pick a dashboard, or create a new one."
 msgstr ""
 
 #. placeholder {0}: selectedGoogleAccount.google_email
@@ -461,12 +1106,24 @@ msgstr ""
 msgid "Dataset added"
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
+msgid "Back to dashboards"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "Most common"
 msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Options (comma-separated, for select modes)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -477,8 +1134,45 @@ msgstr ""
 msgid "min"
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
+msgid "You don't have any dashboards yet."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Tool"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+msgid "Error saving dataset: {0}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
+msgid "Dashboard deleted successfully!"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Custom URL"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Preparing data for the visualizations…"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Direction"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+msgid "Dataset saved successfully!"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "No saved datasets found."
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -486,12 +1180,63 @@ msgstr ""
 msgid "Delete Dataset"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "SQL"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "All"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "System sans"
+msgstr ""
+
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Select aggregation"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Multi select"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Unable to load dashboard datasets"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "No description has been added yet."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
 msgstr ""
 
+#. placeholder {0}: error.message
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Failed to create dashboard: {0}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "kind"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Dashboard share settings updated."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Ignore all global filters — this visualization is unfiltered."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Sketch"
 msgstr ""
 
 #. placeholder {0}: savedDataset.name
@@ -501,6 +1246,10 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Please fix the highlighted fields."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "between"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -516,6 +1265,19 @@ msgstr ""
 msgid "Allow syncing"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Ascending"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Enter values; press Enter after each"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
+msgstr ""
+
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -526,8 +1288,29 @@ msgstr ""
 msgid "Process data again"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "Export as PDF"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Filter"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
+msgid "This cannot be undone."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Reset"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "does not contain"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -538,8 +1321,21 @@ msgstr ""
 msgid "Upload"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Select columns to query"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+msgid "No dashboards match “{searchQuery}”."
+msgstr ""
+
+#. placeholder {0}: roughness.toFixed(1)
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Roughness ({0})"
 msgstr ""
 
 #. placeholder {0}: meta.columns.length
@@ -548,16 +1344,45 @@ msgstr ""
 msgid "{0} columns · {1} rows"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Edit query"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Data Explorer"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now synced online"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Copied!"
 msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Custom URL path"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Dashboard snapshot"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Query Details"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Remove row filter"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -572,12 +1397,20 @@ msgstr ""
 msgid "An error occurred while saving the dataset"
 msgstr ""
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+msgid "Import dataset"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Only workspace settings administrators can open workspace settings."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Pick which global filters apply to this visualization."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -602,8 +1435,21 @@ msgstr ""
 msgid "Privacy log"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig.tsx
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Visualization Settings"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
+msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "This dashboard doesn't reference any datasets — nothing to publish."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -614,6 +1460,12 @@ msgstr ""
 msgid "Billing"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
+msgid "Visualization Type"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
@@ -627,6 +1479,14 @@ msgstr ""
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig.tsx
+msgid "Global filters"
+msgstr ""
+
+#: src/views/DataExplorerApp/useDataQuery.tsx
+msgid "Public queries are not supported for structured queries. Use raw SQL instead."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "CSV file"
 msgstr ""
@@ -635,8 +1495,13 @@ msgstr ""
 msgid "Updating dataset"
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset Name"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Copy share link"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -647,16 +1512,41 @@ msgstr ""
 msgid "Make offline-only"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Custom URL is available"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Contains (free-text)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Loading dashboard datasets"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Dashboard published!"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Added to \"{dashboardName}\""
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "There was an error while trying to authenticate with Google Sheets."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Loading datasets…"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -667,9 +1557,38 @@ msgstr ""
 msgid "Access denied"
 msgstr ""
 
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Created \"{dashboardName}\""
+msgstr ""
+
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+msgid "Enter dataset name"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+msgid "Unsaved changes will not appear in preview. Save first."
+msgstr ""
+
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Save — {0}"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Just what's queried"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Could not generate QR code"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Could not publish dashboard"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
@@ -684,6 +1603,8 @@ msgstr ""
 msgid "Service"
 msgstr ""
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Google Sheets"
 msgstr ""
@@ -693,12 +1614,27 @@ msgstr ""
 msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "queried"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Error saving dataset"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "Save"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Default value"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Multi-select"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -712,6 +1648,10 @@ msgstr ""
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Custom URL (optional)"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "The workspace name was saved successfully."
 msgstr ""
@@ -720,17 +1660,62 @@ msgstr ""
 msgid "dataset name"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Freehand"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Permanent link (use for QR codes)"
+msgstr ""
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+msgid "You can view this dashboard because it was shared with you."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+msgid "Published"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Filters (Where)"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Single-select"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Text contains"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Share link"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Using your custom URL. The permanent UUID link below also still works."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Amber"
+msgstr ""
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Excel"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -741,8 +1726,29 @@ msgstr ""
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+msgid "Try again."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+msgid "contains"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Add filter"
+msgstr ""
+
+#. placeholder {0}: dataset.name
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Filter id (stable)"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
@@ -757,6 +1763,14 @@ msgstr ""
 msgid "Number of columns"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Profiles"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Update & republish"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -766,20 +1780,66 @@ msgstr ""
 msgid "Could not read file"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+msgid "Dashboards"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+msgid "Prompt"
+msgstr ""
+
+#: src/views/DataExplorerApp/AggregationSelect.tsx
+msgid "Count"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Select all"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Only what's queried (recommended)"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Previewing this dashboard"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Column"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Remove local filter"
+msgstr ""
+
+#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+msgid "From your prompt:"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Anyone with this link can view the dashboard."
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -794,8 +1854,20 @@ msgstr ""
 msgid "Dataset saved"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Text"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Select sort order"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+msgid "Search dashboards"
 msgstr ""
 
 #. placeholder {0}: selectedDocument.name
@@ -812,8 +1884,25 @@ msgstr ""
 msgid "Sync online?"
 msgstr ""
 
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+msgid "Add a prompt and generate SQL to configure this visualization."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Copy link"
+msgstr ""
+
+#. placeholder {0}: dataset.name
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Delete {0}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "You have not created any dashboards"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
@@ -832,6 +1921,7 @@ msgstr ""
 msgid "Distinct values"
 msgstr ""
 
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
 msgstr ""
@@ -840,16 +1930,95 @@ msgstr ""
 msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Stroke ({strokeWidth}px)"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+msgid "Editorial serif"
+msgstr ""
+
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+msgid "Untitled dashboard"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+msgid "Limit"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Fix these issues before saving"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Clear all"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Close"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "This dashboard is published publicly."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Share"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Whole dataset"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Some"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Arrow"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+msgid "Values, comma-separated"
 msgstr ""
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "+{0} more values tied at {1} rows"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+msgid "Loose"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Download PNG"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Show QR code"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+msgid "Mode"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Failed to delete dataset: {0}"
 msgstr ""
