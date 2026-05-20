@@ -20,8 +20,9 @@ describe("hydrateScatterSeriesFromQueryResult", () => {
     expect(out).toBe(cfg);
   });
 
-  it("prunes a series whose xKey is no longer in columns and re-seeds from one numeric", () => {
-    // xKey "gone" is missing; "y" is numeric so seeding produces { xKey: "y", key: "y" }
+  it("prunes a series whose xKey is missing and re-seeds from one numeric", () => {
+    // xKey "gone" missing; "y" is numeric =>
+    // seeding produces { xKey: "y", key: "y" }
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
@@ -33,8 +34,9 @@ describe("hydrateScatterSeriesFromQueryResult", () => {
     expect(out.series[0]).toMatchObject({ xKey: "y", key: "y" });
   });
 
-  it("prunes a series whose key (Y) is no longer in columns and re-seeds from one numeric", () => {
-    // key "gone" is missing; "x" is numeric so seeding produces { xKey: "x", key: "x" }
+  it("prunes a series whose key (Y) is missing and re-seeds from one numeric", () => {
+    // key "gone" missing; "x" is numeric =>
+    // seeding produces { xKey: "x", key: "x" }
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
