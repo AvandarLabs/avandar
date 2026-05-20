@@ -1,5 +1,5 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
-import { notifyError, FileUploadForm  } from "@ui";
+import { FileUploadForm, notifyError } from "@ui";
 import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -105,8 +105,8 @@ export function ManualUploadView(props: Props): JSX.Element {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}
           isProcessing={isLoadingFile}
-          onRequestDataReparse={async () => {
-            if (!DatasetSource.isManuallyUploadable(parseOptions)) {
+          onRequestDataReparse={async (parseOptionsFromForm) => {
+            if (!DatasetSource.isManuallyUploadable(parseOptionsFromForm)) {
               // this should never happen in this code path
               return;
             }
@@ -115,7 +115,7 @@ export function ManualUploadView(props: Props): JSX.Element {
               file: uploadedFile,
               datasetIdToDrop: datasetId,
               newDatasetId: uuid() as Dataset.Id,
-              parseOptions,
+              parseOptions: parseOptionsFromForm,
             });
           }}
         />

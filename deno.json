@@ -43,5 +43,6 @@
     "noUnusedParameters": true,
     "strict": true,
     "types": ["react", "react/jsx-runtime"]
-  }
+  },
+  "lock": false
 }
