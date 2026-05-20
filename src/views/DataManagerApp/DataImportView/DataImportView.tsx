@@ -20,10 +20,12 @@ export function DataImportView(): JSX.Element {
 
   // we should check if the user is allowed to add more datasets based on their
   // subscription plan
+  const subscriptionId = workspace.subscription?.id;
+
   const [canAddDatasets] = useQuery({
     queryKey: [
       "subscriptionPermission",
-      workspace.subscription?.polarSubscriptionId,
+      subscriptionId,
       "permissions",
       "can_add_datasets",
     ],
@@ -31,12 +33,12 @@ export function DataImportView(): JSX.Element {
       return await APIClient.get({
         route: "subscriptions/:subscriptionId/permissions/:permissionType",
         pathParams: {
-          subscriptionId: workspace.subscription?.polarSubscriptionId ?? "",
+          subscriptionId: subscriptionId ?? "",
           permissionType: "can_add_datasets",
         },
       });
     },
-    enabled: !!workspace.subscription?.polarSubscriptionId,
+    enabled: subscriptionId !== undefined,
   });
 
   const isAddAllowed =
