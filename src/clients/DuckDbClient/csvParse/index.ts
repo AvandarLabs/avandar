@@ -16,6 +16,7 @@ export {
   isRecoverableCsvParseError,
   mergeSniffCsvRowIntoParseOptions,
   normalizeDuckDbCsvOptionToken,
+  normalizeNewlineDelimiterForDuckDb,
   optionalTrimmedCsvFormat,
   refineCsvParseOptionsAfterFailure,
   shouldRetryCsvParse,

@@ -1,13 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
-import { Callout, notifyError } from "@ui";
+import { Callout, notifyError, Tooltip } from "@ui";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import {
   CsvFileLoadResult,
   XlsxFileLoadResult,
@@ -206,6 +207,9 @@ export function DatasetImportForm({
     onAfterSave,
     onSaveSuccess,
   });
+  const offline = useOfflineGate(
+    t`Importing a new dataset requires an internet connection.`,
+  );
 
   const previewRows = useMemo(() => {
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
@@ -408,9 +412,16 @@ export function DatasetImportForm({
           </Callout>
         : null}
 
-        <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
-          <Trans>Save Dataset</Trans>
-        </Button>
+        <Tooltip label={offline.tooltip} disabled={!offline.isBlocked}>
+          <Button
+            loading={isSavePending}
+            type="submit"
+            disabled={disableSubmit || offline.isBlocked}
+            aria-disabled={disableSubmit || offline.isBlocked}
+          >
+            <Trans>Save Dataset</Trans>
+          </Button>
+        </Tooltip>
       </Stack>
     </form>
   );

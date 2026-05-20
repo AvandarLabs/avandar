@@ -32,6 +32,7 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { formatOfflineQueryError } from "@/lib/offline/formatOfflineQueryError";
 import {
   hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
@@ -191,9 +192,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   useEffect(() => {
     const message =
       dataQuery.isError ?
-        dataQuery.error instanceof Error ?
+        (formatOfflineQueryError(dataQuery.error) ??
+        (dataQuery.error instanceof Error ?
           dataQuery.error.message
-        : String(dataQuery.error)
+        : String(dataQuery.error)))
       : undefined;
     if (message !== state.lastQueryError) {
       dispatch.setLastQueryError(message);

@@ -1,11 +1,14 @@
 import { Trans } from "@lingui/react/macro";
 import {
+  Badge,
   Box,
   BoxProps,
+  Group,
   Loader,
   NavLinkProps,
   ScrollArea,
   Text,
+  Tooltip,
   useMantineTheme,
 } from "@mantine/core";
 import { NavLinkList } from "@ui";
@@ -14,6 +17,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -27,9 +31,17 @@ function makeDatasetLink(options: {
   datasetId: Dataset.Id;
   datasetName: string;
   style?: NavLinkProps["style"];
-  label?: string;
+  label?: NavLinkProps["label"];
+  showOfflineBadge?: boolean;
 }): NavLinkProps & { key: string } {
-  const { workspaceSlug, datasetId, datasetName, style, label } = options;
+  const {
+    workspaceSlug,
+    datasetId,
+    datasetName,
+    style,
+    label,
+    showOfflineBadge,
+  } = options;
   const link = {
     ...AppLinks.dataManagerDatasetView({
       workspaceSlug,
@@ -37,11 +49,31 @@ function makeDatasetLink(options: {
       datasetName,
     }),
     style,
+    label:
+      label ??
+      (showOfflineBadge ?
+        <Group gap="xs" wrap="nowrap" justify="space-between">
+          <Text size="sm" lineClamp={1}>
+            {datasetName}
+          </Text>
+          <Tooltip
+            label={
+              <Trans>
+                Available offline: parquet cached on this device
+              </Trans>
+            }
+          >
+            <Badge size="xs" color="teal" variant="light">
+              <Trans>Offline</Trans>
+            </Badge>
+          </Tooltip>
+        </Group>
+      : datasetName),
     // Surface the async-import lifecycle on each dataset entry. The
     // indicator self-hides when the row is `parseStatus === "ready"`.
     rightSection: <DatasetParseStatusIndicator datasetId={datasetId} />,
   };
-  return label ? { ...link, label } : link;
+  return link;
 }
 
 export function DatasetNavbar({
@@ -50,6 +82,7 @@ export function DatasetNavbar({
   ...boxProps
 }: Props): JSX.Element {
   const { slug: workspaceSlug } = useCurrentWorkspace();
+  const localDatasetIds = useLocalDatasetIds();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -70,12 +103,13 @@ export function DatasetNavbar({
           datasetId: dataset.id,
           datasetName: dataset.name,
           style: borderStyle,
+          showOfflineBadge: localDatasetIds.has(dataset.id),
         });
       });
     });
 
     return datasetLinks;
-  }, [datasets, borderStyle, workspaceSlug]);
+  }, [datasets, borderStyle, localDatasetIds, workspaceSlug]);
 
   const elements = {
     emptyList() {

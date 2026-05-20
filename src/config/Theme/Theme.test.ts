@@ -4,14 +4,18 @@ import {
   APP_CHROME_Z_INDEX,
   APP_SHELL_MAIN_Z_INDEX,
   MODAL_ROOT_Z_INDEX,
+  NOTIFICATIONS_Z_INDEX,
+  POPOVER_Z_INDEX,
   Theme,
 } from "@/config/Theme";
 import { NEUTRAL_SHADES } from "../../../shared/config/Theme";
 
 describe("Theme modal stacking", () => {
-  it("orders app shell → chrome → modal so modals always cover toolbars", () => {
+  it("orders app shell → chrome → modal → popover → notifications", () => {
     expect(APP_CHROME_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
     expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_CHROME_Z_INDEX);
+    expect(POPOVER_Z_INDEX).toBeGreaterThan(MODAL_ROOT_Z_INDEX);
+    expect(NOTIFICATIONS_Z_INDEX).toBeGreaterThan(POPOVER_Z_INDEX);
   });
 
   it("registers Modal defaults on the theme", () => {

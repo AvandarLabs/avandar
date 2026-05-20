@@ -10,6 +10,7 @@ import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDo
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
+import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudChat";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
@@ -24,13 +25,18 @@ export function Composer(): JSX.Element {
 
   const context = useChatPageContext();
   const { t } = useLingui();
+  const offlineBlocksCloudChat = useOfflineBlocksCloudChat();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
-  const disabled = !isChatEnabled;
+  const disabled = !isChatEnabled || offlineBlocksCloudChat;
 
   const placeholder =
-    context.app === "dashboards" ? t`Ask me to add a chart to this dashboard...`
-    : context.app === "data-explorer" ? t`Ask about your data...`
+    offlineBlocksCloudChat ?
+      t`Download an offline chat model (cloud icon) to ask questions while offline.`
+    : context.app === "dashboards" ?
+      t`Ask me to add a chart to this dashboard...`
+    : context.app === "data-explorer" ?
+      t`Ask about your data...`
     : t`Chat is enabled in Data Explorer and Dashboards`;
 
   return (
@@ -50,7 +56,7 @@ export function Composer(): JSX.Element {
           unstable_focusOnThreadSwitched={false}
         />
         <Group gap="xs">
-          <OfflineChatDownloadControl disabled={disabled} />
+          <OfflineChatDownloadControl disabled={!isChatEnabled} />
           <VoiceInputButton disabled={disabled} />
           <ChatModelPicker disabled={disabled} />
           <ComposerPrimitive.Send asChild>

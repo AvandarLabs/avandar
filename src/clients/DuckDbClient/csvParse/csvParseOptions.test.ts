@@ -4,6 +4,7 @@ import {
   createCsvParseOptionsFromUserHints,
   isDuckDbEmptyToken,
   mergeSniffCsvRowIntoParseOptions,
+  normalizeNewlineDelimiterForDuckDb,
   optionalTrimmedCsvFormat,
   refineCsvParseOptionsAfterFailure,
   shouldRetryCsvParse,
@@ -124,7 +125,25 @@ describe("mergeSniffCsvRowIntoParseOptions", () => {
   });
 });
 
+describe("normalizeNewlineDelimiterForDuckDb", () => {
+  it("maps actual LF to DuckDB escape and treats empty as null", () => {
+    expect(normalizeNewlineDelimiterForDuckDb("\n")).toBe("\\n");
+    expect(normalizeNewlineDelimiterForDuckDb("\r\n")).toBe("\\r\\n");
+    expect(normalizeNewlineDelimiterForDuckDb("(empty)")).toBeNull();
+    expect(normalizeNewlineDelimiterForDuckDb(null)).toBeNull();
+  });
+});
+
 describe("buildReadCsvArgList", () => {
+  it("omits new_line when newline is null", () => {
+    const args = buildReadCsvArgList({
+      mode: "load",
+      parseOptions: createCsvParseOptionsFromUserHints({}),
+    });
+
+    expect(args.some((arg) => arg.startsWith("new_line="))).toBe(false);
+  });
+
   it("omits dateformat when format is null", () => {
     const args = buildReadCsvArgList({
       mode: "load",

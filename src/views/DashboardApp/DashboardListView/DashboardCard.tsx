@@ -1,17 +1,24 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
+type DashboardOfflineStatus = "full" | "partial" | "none";
+
 type Props = {
   dashboard: Dashboard.T;
+  offlineStatus?: DashboardOfflineStatus;
   onClick?: () => void;
 };
 
-export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
+export function DashboardCard({
+  dashboard,
+  offlineStatus = "none",
+  onClick,
+}: Props): JSX.Element {
   const { t } = useLingui();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -65,9 +72,21 @@ export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
           </Group>
         </Group>
 
-        <Text c="dimmed" size="xs">
-          <Trans>Updated {formatDashboardDate(dashboard.updatedAt, t)}</Trans>
-        </Text>
+        <Group gap="xs">
+          {offlineStatus === "full" ?
+            <Badge size="xs" color="teal" variant="light">
+              <Trans>Offline ready</Trans>
+            </Badge>
+          : null}
+          {offlineStatus === "partial" ?
+            <Badge size="xs" color="yellow" variant="light">
+              <Trans>Partially offline</Trans>
+            </Badge>
+          : null}
+          <Text c="dimmed" size="xs">
+            <Trans>Updated {formatDashboardDate(dashboard.updatedAt, t)}</Trans>
+          </Text>
+        </Group>
       </Stack>
     </Card>
   );

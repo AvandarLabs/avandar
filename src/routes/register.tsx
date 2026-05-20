@@ -1,6 +1,7 @@
 import { useBoolean, useMutation } from "@hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+  Alert,
   Anchor,
   Box,
   Button,
@@ -28,6 +29,7 @@ import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -51,6 +53,7 @@ const IS_REGISTRATION_DISABLED = isFlagEnabled(
 const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
+  const isOnline = useIsOnline();
   const searchParams = Route.useSearch();
   const { t } = useLingui();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
@@ -144,7 +147,7 @@ function RegisterPage() {
   });
 
   const onFormSubmit = registrationForm.onSubmit(async (values) => {
-    if (isRegistrationPending) {
+    if (!isOnline || isRegistrationPending) {
       return;
     }
     sendRegistrationRequest(values);
@@ -339,6 +342,13 @@ function RegisterPage() {
               >
                 <form onSubmit={onFormSubmit}>
                   <Stack>
+                    {!isOnline ?
+                      <Alert color="yellow" variant="light">
+                        <Trans>
+                          Registration requires an internet connection.
+                        </Trans>
+                      </Alert>
+                    : null}
                     <TextInput
                       key={registrationForm.key("email")}
                       label={t`Email`}
@@ -383,7 +393,8 @@ function RegisterPage() {
                         disabled={
                           isRegistrationPending ||
                           isRegistrationSuccess ||
-                          IS_REGISTRATION_DISABLED
+                          IS_REGISTRATION_DISABLED ||
+                          !isOnline
                         }
                       >
                         <Trans>Register</Trans>

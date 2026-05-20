@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -29,12 +30,18 @@ export function PublishDashboardButton({
   hasUnsavedChanges,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const isDisabled: boolean = !dashboard || hasUnsavedChanges;
+  const offline = useOfflineGate(t`Publishing requires an internet connection.`);
+  const isDisabled: boolean =
+    !dashboard || hasUnsavedChanges || offline.isBlocked;
 
   return (
     <Tooltip
-      label={t`You cannot publish while there are unsaved changes. Save first.`}
-      disabled={!hasUnsavedChanges}
+      label={
+        offline.isBlocked ?
+          offline.tooltip
+        : t`You cannot publish while there are unsaved changes. Save first.`
+      }
+      disabled={!hasUnsavedChanges && !offline.isBlocked}
     >
       <Button
         size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
@@ -44,6 +51,10 @@ export function PublishDashboardButton({
         data-disabled={isDisabled || undefined}
         aria-disabled={isDisabled || undefined}
         onClick={(event) => {
+          if (offline.isBlocked) {
+            event.preventDefault();
+            return;
+          }
           if (!dashboard) {
             event.preventDefault();
             notifyDevAlert("Dashboard is not loaded yet.");

@@ -38,7 +38,8 @@ export type CsvParseResolvedOptions = {
   delimiter: string;
   quoteChar: string | null;
   escapeChar: string | null;
-  newlineDelimiter: string;
+  /** DuckDB `new_line` escape (`\\n`, `\\r\\n`) or `null` to omit and auto-detect. */
+  newlineDelimiter: string | null;
   commentChar: string | null;
   hasHeader: boolean;
   dateFormat: string | null;
@@ -99,6 +100,53 @@ export function normalizeDuckDbCsvOptionToken(
   }
 
   return value;
+}
+
+/**
+ * Converts sniff / user newline values into DuckDB `new_line` literals.
+ * Actual control characters (LF/CR) must not be embedded in SQL strings.
+ */
+export function normalizeNewlineDelimiterForDuckDb(
+  value: string | null | undefined,
+): string | null {
+  if (value == null) {
+    return null;
+  }
+
+  // Check control characters before `trim()` — `"\n".trim()` is empty.
+  if (value === "\r\n") {
+    return "\\r\\n";
+  }
+
+  if (value === "\n") {
+    return "\\n";
+  }
+
+  if (value === "\r") {
+    return "\\r";
+  }
+
+  if (isDuckDbEmptyToken(value)) {
+    return null;
+  }
+
+  if (value === "\\r\\n" || value === "\\n" || value === "\\r") {
+    return value;
+  }
+
+  if (value.includes("\r\n")) {
+    return "\\r\\n";
+  }
+
+  if (value.includes("\n")) {
+    return "\\n";
+  }
+
+  if (value.includes("\r")) {
+    return "\\r";
+  }
+
+  return value.length > 0 ? value : null;
 }
 
 /**
@@ -172,7 +220,9 @@ export function createCsvParseOptionsFromUserHints(
     delimiter: hints.delimiter ?? ",",
     quoteChar: normalizeDuckDbCsvOptionToken(hints.quoteChar),
     escapeChar: normalizeDuckDbCsvOptionToken(hints.escapeChar),
-    newlineDelimiter: hints.newlineDelimiter ?? "\n",
+    newlineDelimiter: normalizeNewlineDelimiterForDuckDb(
+      hints.newlineDelimiter,
+    ),
     commentChar: normalizeDuckDbCsvOptionToken(hints.commentChar),
     hasHeader: hints.hasHeader ?? true,
     dateFormat: optionalTrimmedCsvFormat(hints.dateFormat),
@@ -204,10 +254,11 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
       userHints.escapeChar != null ?
         normalizeDuckDbCsvOptionToken(userHints.escapeChar)
       : normalizeDuckDbCsvOptionToken(sniffRow.Escape),
-    newlineDelimiter:
+    newlineDelimiter: normalizeNewlineDelimiterForDuckDb(
       userHints.newlineDelimiter ??
-      sniffRow.NewLineDelimiter ??
-      base.newlineDelimiter,
+        sniffRow.NewLineDelimiter ??
+        base.newlineDelimiter,
+    ),
     commentChar:
       userHints.commentChar != null ?
         normalizeDuckDbCsvOptionToken(userHints.commentChar)
@@ -328,7 +379,9 @@ export function buildReadCsvArgList(options: {
     escapeChar != null ?
       `escape='${_escapeSqlSingleQuotedLiteral(escapeChar)}'`
     : "",
-    `new_line='${_escapeSqlSingleQuotedLiteral(newlineDelimiter)}'`,
+    newlineDelimiter != null ?
+      `new_line='${_escapeSqlSingleQuotedLiteral(newlineDelimiter)}'`
+    : "",
     commentChar != null ?
       `comment='${_escapeSqlSingleQuotedLiteral(commentChar)}'`
     : "",
@@ -385,7 +438,7 @@ export function buildSniffCsvConstraintArgs(
     );
   }
 
-  if (parseOptions.newlineDelimiter) {
+  if (parseOptions.newlineDelimiter != null) {
     args.push(
       `new_line='${_escapeSqlSingleQuotedLiteral(parseOptions.newlineDelimiter)}'`,
     );
@@ -427,7 +480,7 @@ export function buildDuckDbCsvSniffResultFromSniffRow(options: {
     Delimiter: parseOptions.delimiter,
     Quote: parseOptions.quoteChar ?? "",
     Escape: parseOptions.escapeChar ?? "",
-    NewLineDelimiter: parseOptions.newlineDelimiter,
+    NewLineDelimiter: parseOptions.newlineDelimiter ?? "",
     Comment: parseOptions.commentChar ?? "",
     SkipRows: parseOptions.numRowsToSkip,
     HasHeader: parseOptions.hasHeader,
@@ -486,7 +539,7 @@ export function buildDuckDbCsvSniffResultFromResolved(options: {
     Delimiter: parseOptions.delimiter,
     Quote: parseOptions.quoteChar ?? "",
     Escape: parseOptions.escapeChar ?? "",
-    NewLineDelimiter: parseOptions.newlineDelimiter,
+    NewLineDelimiter: parseOptions.newlineDelimiter ?? "",
     Comment: parseOptions.commentChar ?? "",
     SkipRows: parseOptions.numRowsToSkip,
     HasHeader: parseOptions.hasHeader,

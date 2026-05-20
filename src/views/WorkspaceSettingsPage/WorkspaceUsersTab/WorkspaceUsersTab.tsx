@@ -21,6 +21,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
@@ -66,6 +67,9 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   });
 
   const loadingSeats = pendingInvitesLoading || workspaceUsersLoading;
+  const offline = useOfflineGate(
+    t`Sending invites requires an internet connection.`,
+  );
   const openInviteModal = useWorkspaceInviteModal({
     numberOfSeats:
       loadingSeats ? undefined : pendingInvites.length + workspaceUsers.length,
@@ -205,7 +209,10 @@ export function WorkspaceUsersTab(): JSX.Element | null {
             </Text>
           : <Box />}
           {isAdmin ?
-            <Button disabled={loadingSeats} onClick={openInviteModal}>
+            <Button
+              disabled={loadingSeats || offline.isBlocked}
+              onClick={offline.guard(openInviteModal)}
+            >
               <Trans>Invite member</Trans>
             </Button>
           : null}

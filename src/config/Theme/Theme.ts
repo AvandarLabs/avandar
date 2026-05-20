@@ -100,6 +100,13 @@ export const FLOATING_PANEL_Z_INDEX = 250;
  */
 export const POPOVER_Z_INDEX = 500;
 
+/**
+ * Toast / notification z-index. Above modals, popovers, and full-screen
+ * drop overlays so parse errors stay visible. The notifications container
+ * uses `pointer-events: none` so only toasts capture clicks.
+ */
+export const NOTIFICATIONS_Z_INDEX = 10_000;
+
 const interactiveTransition = AnimationTheme.transition.interactive;
 
 const COMBOBOX_DEFAULT_PROPS = {
@@ -462,6 +469,7 @@ export const Theme = createTheme({
       appChrome: APP_CHROME_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
       popover: POPOVER_Z_INDEX,
+      notifications: NOTIFICATIONS_Z_INDEX,
     },
     elevation: ElevationTheme,
     borders: BorderTheme,
@@ -502,6 +510,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
     "--mantine-z-index-popover": String(theme.other.zIndex.popover),
+    "--mantine-z-index-notifications": String(theme.other.zIndex.notifications),
 
     "--ava-animation-duration-instant": AnimationTheme.duration.instant,
     "--ava-animation-duration-fast": AnimationTheme.duration.fast,

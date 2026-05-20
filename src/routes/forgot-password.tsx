@@ -1,12 +1,13 @@
 import { useMutation } from "@hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Stack, TextInput } from "@mantine/core";
+import { Alert, Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/forgot-password")({
  * and a password reset link will be sent to their email.
  */
 function ForgotPasswordPage() {
+  const isOnline = useIsOnline();
   const { t } = useLingui();
   const [sendResetPasswordRequest, isResetPasswordPending] = useMutation({
     mutationFn: async (values: { email: string }) => {
@@ -55,7 +57,7 @@ function ForgotPasswordPage() {
   });
 
   const onFormSubmit = form.onSubmit(async (values) => {
-    if (isResetPasswordPending) {
+    if (!isOnline || isResetPasswordPending) {
       return;
     }
     sendResetPasswordRequest(values);
@@ -68,6 +70,13 @@ function ForgotPasswordPage() {
     >
       <form onSubmit={onFormSubmit}>
         <Stack>
+          {!isOnline ?
+            <Alert color="yellow" variant="light">
+              <Trans>
+                Password reset requires an internet connection.
+              </Trans>
+            </Alert>
+          : null}
           <TextInput
             label={t`Email`}
             name="email"
@@ -84,7 +93,7 @@ function ForgotPasswordPage() {
               className="flex-1"
               loading={isResetPasswordPending}
               type="submit"
-              disabled={isResetPasswordPending}
+              disabled={isResetPasswordPending || !isOnline}
             >
               <Trans>Reset password</Trans>
             </Button>
