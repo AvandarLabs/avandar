@@ -88,8 +88,8 @@ export function WorkspaceMemberPermissionsEditor({
   return (
     <Stack gap="lg">
       <Text size="sm" c="dimmed">
-        Choose a workspace preset or customize per app. Tags control dataset and
-        dashboard access intersections.
+        Choose a workspace preset or customize per app. User groups control
+        dataset and dashboard access intersections.
       </Text>
       <WorkspaceAppRoleMatrixForm
         rolesMatrix={matrix}
@@ -106,8 +106,8 @@ export function WorkspaceMemberPermissionsEditor({
         disabled={isSaving}
       />
       <MultiSelect
-        label="Tags"
-        placeholder="Pick tags for this member"
+        label="User groups"
+        placeholder="Pick user groups for this member"
         data={userGroups.map((group: UserGroupRow) => {
           return { value: group.id, label: group.name };
         })}

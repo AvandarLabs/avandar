@@ -6,6 +6,7 @@ type FloatingPanelStoredPosition = {
 };
 
 type DataExplorerPanelPreference = {
+  opened?: boolean;
   collapsed?: boolean;
   position?: FloatingPanelStoredPosition;
 };
@@ -16,21 +17,13 @@ export type DataExplorerPanelPreferences = Partial<{
 }>;
 
 /**
- * Local storage key prefix for Data Explorer floating panel preferences.
- * The full key is `${PREFIX}:${tabId}` so each browser tab gets its own
- * isolated slot and tabs do not leak positions to one another.
+ * Session-storage key for Data Explorer floating-panel preferences.
+ * `sessionStorage` is automatically scoped to a single browser tab and is
+ * cleared when the tab is closed, while persisting across page refreshes —
+ * which is exactly the lifetime we want for these positions.
  */
-export const DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY_PREFIX =
+export const DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY =
   "ava.data-explorer.panel-preferences" as const;
-
-/**
- * Builds the localStorage key for a given tab id.
- */
-export function buildDataExplorerPanelPreferencesStorageKey(
-  tabId: string,
-): string {
-  return `${DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY_PREFIX}:${tabId}`;
-}
 
 function _sanitizePosition(
   value: unknown,
@@ -68,26 +61,31 @@ function _sanitizePreference(
   }
 
   const pref = value as Record<string, unknown>;
+  const opened = typeof pref.opened === "boolean" ? pref.opened : undefined;
   const collapsed =
     typeof pref.collapsed === "boolean" ? pref.collapsed : undefined;
   const position = _sanitizePosition(pref.position);
 
-  if (collapsed === undefined && position === undefined) {
+  if (
+    opened === undefined &&
+    collapsed === undefined &&
+    position === undefined
+  ) {
     return undefined;
   }
 
-  return { collapsed, position };
+  return { opened, collapsed, position };
 }
 
 /**
- * Reads persisted Data Explorer floating-panel preferences for a given tab.
+ * Reads persisted Data Explorer floating-panel preferences for the current
+ * browser tab. Reads from `sessionStorage`, so positions persist across
+ * refreshes but are wiped when the tab is closed.
  */
-export function readDataExplorerPanelPreferences(
-  tabId: string,
-): DataExplorerPanelPreferences {
+export function readDataExplorerPanelPreferences(): DataExplorerPanelPreferences {
   try {
-    const raw = window.localStorage.getItem(
-      buildDataExplorerPanelPreferencesStorageKey(tabId),
+    const raw = window.sessionStorage.getItem(
+      DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
     );
     if (!raw) {
       return {};
@@ -103,32 +101,17 @@ export function readDataExplorerPanelPreferences(
 }
 
 /**
- * Writes Data Explorer floating-panel preferences for a given tab.
+ * Writes Data Explorer floating-panel preferences for the current browser tab.
  */
 export function writeDataExplorerPanelPreferences(
-  tabId: string,
   preferences: DataExplorerPanelPreferences,
 ): void {
   try {
-    window.localStorage.setItem(
-      buildDataExplorerPanelPreferencesStorageKey(tabId),
+    window.sessionStorage.setItem(
+      DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
       JSON.stringify(preferences),
     );
   } catch {
     // Storage may be unavailable. The UI can still work in memory.
-  }
-}
-
-/**
- * Removes the persisted preferences for the given tab id. Called when the
- * tab is closing so we don't accumulate stale entries across sessions.
- */
-export function clearDataExplorerPanelPreferences(tabId: string): void {
-  try {
-    window.localStorage.removeItem(
-      buildDataExplorerPanelPreferencesStorageKey(tabId),
-    );
-  } catch {
-    // Storage may be unavailable. Nothing else we can do.
   }
 }

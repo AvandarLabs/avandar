@@ -2,6 +2,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { resourceTypeLabel } from "@/components/permissions/ShareResourceModal/shareCopy";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
@@ -27,12 +28,13 @@ export function ShareResourceButton({
 
   const canManageShares = effectiveRole === "admin";
   const isDisabled = !resourceId || isLoadingRole || !canManageShares;
+  const resourceLabel = resourceTypeLabel(resourceType);
 
   return (
     <Tooltip
       label={
         canManageShares || isLoadingRole ?
-          "Share this resource"
+          `Share this ${resourceLabel}`
         : "You need admin access on this resource to manage sharing."
       }
     >

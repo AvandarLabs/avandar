@@ -20,7 +20,7 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { notifyError, notifySuccess, Tooltip } from "@ui";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
@@ -39,11 +39,9 @@ import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/Query
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import {
-  clearDataExplorerPanelPreferences,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
-import { useDataExplorerTabId } from "@/views/DataExplorerApp/useDataExplorerTabId";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
@@ -59,6 +57,10 @@ const SETTINGS_WIDTH = 340;
  */
 const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
 const SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
+
+/** Defaults applied when there is no saved per-tab preference. */
+const DEFAULT_QUERY_DETAILS_OPENED = true;
+const DEFAULT_SETTINGS_OPENED = false;
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
@@ -89,55 +91,47 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     isOpenDatasetDrawerOpen,
     { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
   ] = useDisclosure(false);
-  const tabId = useDataExplorerTabId();
   const [panelPreferences, setPanelPreferences] =
     useState<DataExplorerPanelPreferences>(() => {
-      return readDataExplorerPanelPreferences(tabId);
+      return readDataExplorerPanelPreferences();
     });
-  const hasSavedQueryDetailsPreference =
-    panelPreferences.queryDetails !== undefined;
 
-  const [isQueryDetailsOpened, setQueryDetailsOpened] = useState(() => {
-    return !hasSavedQueryDetailsPreference;
-  });
-  const [isSettingsOpened, setSettingsOpened] = useState(false);
+  const isQueryDetailsOpened =
+    panelPreferences.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
+  const isSettingsOpened =
+    panelPreferences.settings?.opened ?? DEFAULT_SETTINGS_OPENED;
   const isQueryDetailsCollapsed =
     panelPreferences.queryDetails?.collapsed ?? false;
   const isSettingsCollapsed = panelPreferences.settings?.collapsed ?? false;
 
-  useEffect(() => {
-    if (hasSavedQueryDetailsPreference) {
-      return;
-    }
-
-    setPanelPreferences((prev) => {
-      if (prev.queryDetails !== undefined) {
-        return prev;
-      }
-
-      return _updatePanelPreferences(prev, "queryDetails", {
-        collapsed: false,
-        position: QUERY_DETAILS_INITIAL_POSITION,
+  const setQueryDetailsOpened = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)): void => {
+      setPanelPreferences((prev) => {
+        const current =
+          prev.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
+        const resolved = typeof next === "function" ? next(current) : next;
+        return _updatePanelPreferences(prev, "queryDetails", {
+          opened: resolved,
+        });
       });
-    });
-  }, [hasSavedQueryDetailsPreference]);
+    },
+    [],
+  );
+
+  const setSettingsOpened = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)): void => {
+      setPanelPreferences((prev) => {
+        const current = prev.settings?.opened ?? DEFAULT_SETTINGS_OPENED;
+        const resolved = typeof next === "function" ? next(current) : next;
+        return _updatePanelPreferences(prev, "settings", { opened: resolved });
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
-    writeDataExplorerPanelPreferences(tabId, panelPreferences);
-  }, [tabId, panelPreferences]);
-
-  // Wipe persisted panel positions when the browser tab closes so the next
-  // session starts from the default stacked layout. We don't want one tab's
-  // dragged layout bleeding into a new tab session.
-  useEffect(() => {
-    const handleUnload = (): void => {
-      clearDataExplorerPanelPreferences(tabId);
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-    };
-  }, [tabId]);
+    writeDataExplorerPanelPreferences(panelPreferences);
+  }, [panelPreferences]);
 
   useDataExplorerURLSync({ urlSearch, navigate });
 

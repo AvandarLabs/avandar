@@ -40,7 +40,7 @@ export function WorkspaceTagsTab(): JSX.Element {
 
   const [saveGroup, isSaving] = PermissionsClient.useSaveUserGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Tag saved" });
+      notifySuccess({ title: "User group saved" });
       setEditorOpen(false);
     },
     onError: (error: Error) => {
@@ -51,7 +51,7 @@ export function WorkspaceTagsTab(): JSX.Element {
 
   const [deleteGroup] = PermissionsClient.useDeleteUserGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Tag deleted" });
+      notifySuccess({ title: "User group deleted" });
     },
     onError: (error: Error) => {
       notifyError({ title: "Delete failed", message: error.message });
@@ -91,13 +91,14 @@ export function WorkspaceTagsTab(): JSX.Element {
       <LoadingOverlay visible={groupsLoading} />
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={4}>Tags</Title>
+          <Title order={4}>User groups</Title>
           <Button size="xs" onClick={openCreate}>
-            New tag
+            New user group
           </Button>
         </Group>
         <Text size="sm" c="dimmed">
-          Tags label members and resources for intersection-based access.
+          Create groups for your workspace members. Datasets and dashboards can
+          be configured to only share with (or restrict) certain user groups.
         </Text>
         {groups.map((userGroupRow: UserGroupRow) => {
           return (
@@ -117,7 +118,7 @@ export function WorkspaceTagsTab(): JSX.Element {
                 <IconEdit
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Edit tag"
+                  aria-label="Edit user group"
                   onClick={() => {
                     openEdit(userGroupRow);
                   }}
@@ -125,12 +126,12 @@ export function WorkspaceTagsTab(): JSX.Element {
                 <IconTrash
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Delete tag"
+                  aria-label="Delete user group"
                   onClick={() => {
                     modals.openConfirmModal({
-                      title: "Delete tag",
+                      title: "Delete user group",
                       children:
-                        "This removes the tag from members and resources that use it.",
+                        "This removes the user group from members and resources that use it.",
                       labels: { confirm: "Delete", cancel: "Cancel" },
                       confirmProps: { color: "red" },
                       onConfirm: () => {
@@ -152,7 +153,7 @@ export function WorkspaceTagsTab(): JSX.Element {
         onClose={() => {
           setEditorOpen(false);
         }}
-        title={editing ? "Edit tag" : "New tag"}
+        title={editing ? "Edit user group" : "New user group"}
       >
         <Stack gap="md">
           <TextInput

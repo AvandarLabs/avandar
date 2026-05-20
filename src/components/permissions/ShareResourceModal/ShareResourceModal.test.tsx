@@ -110,7 +110,7 @@ describe("ShareResourceModal", () => {
     const comboboxes = screen.getAllByRole("combobox");
     expect(
       comboboxes.some((el) => {
-        return el.getAttribute("aria-label") === "Add people, groups, or tags";
+        return el.getAttribute("aria-label") === "Add people or user groups";
       }),
     ).toBe(true);
     // Owner row shows as a non-removable badge.

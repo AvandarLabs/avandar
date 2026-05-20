@@ -78,7 +78,7 @@ test.describe("Share resource modal", () => {
 
       // Anchor on the unified Add combobox and the "General access" select.
       await expect(
-        page.getByRole("combobox", { name: "Add people, groups, or tags" }),
+        page.getByRole("combobox", { name: "Add people or user groups" }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
       await expect(
         page.getByRole("combobox", { name: "General access" }),

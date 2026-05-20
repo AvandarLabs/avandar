@@ -109,7 +109,7 @@ export const WorkspaceInviteModalFields = forwardRef<
         }}
       />
       <MultiSelect
-        label="Tags for invitee"
+        label="User groups for invitee"
         placeholder="Optional"
         data={userGroups.map((g) => {
           return { value: g.id, label: g.name };

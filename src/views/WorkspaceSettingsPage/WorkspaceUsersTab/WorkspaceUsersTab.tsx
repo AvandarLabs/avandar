@@ -204,7 +204,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
           <Table.Thead>
             <Table.Tr>
               <Table.Th w="280px">Name</Table.Th>
-              <Table.Th>Role & tags</Table.Th>
+              <Table.Th>Role & user groups</Table.Th>
               {isAdmin ?
                 <Table.Th w="120px" />
               : null}

@@ -40,9 +40,9 @@ export function appForResource(type: ResourceType): AppType {
  * reviews only need to touch one file.
  */
 export const SHARE_COPY = {
-  addPlaceholder: "Search by name or tag",
+  addPlaceholder: "Search by name or user group",
   addHelper:
-    "Add a member or a tag to grant access. Use General access below to share more broadly.",
+    "Add a member or a user group to grant access. Use General access below to share more broadly.",
   generalAccessHelper:
     "Controls the default for the rest of the workspace. People without app access still need a direct share above.",
   restrictedOptionTooltip: (resource: string): string => {
@@ -69,6 +69,6 @@ export const SHARE_COPY = {
       return `This ${resource} is currently only accessible to its owner.`;
     },
     noMembersOrTags:
-      "No members or tags yet. Invite members or create tags in Workspace settings.",
+      "No members or user groups yet. Invite members or create user groups in Workspace settings.",
   },
 } as const;
