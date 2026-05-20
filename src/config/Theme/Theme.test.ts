@@ -39,7 +39,14 @@ describe("Theme design tokens", () => {
   it("registers interactive transitions on primary components", () => {
     expect(Theme.components?.Button).toBeDefined();
     expect(Theme.components?.Paper?.defaultProps?.withBorder).toBe(true);
-    expect(Theme.components?.Modal?.defaultProps?.overlayProps?.blur).toBe(0);
+    expect(Theme.components?.Modal?.defaultProps?.radius).toBe("xl");
+    expect(
+      Theme.components?.Modal?.defaultProps?.overlayProps?.style
+        ?.backdropFilter,
+    ).toBe("var(--ava-overlay-backdrop-filter)");
+    expect(
+      Theme.components?.Modal?.defaultProps?.transitionProps?.duration,
+    ).toBe(380);
   });
 
   it("uses a visible palette border for outline buttons", () => {

@@ -114,15 +114,32 @@ export function ChatEmptyState(): JSX.Element {
         })
       : new Map();
 
-    const groupByColumn =
-      pickGroupByColumn(columns, cachedSummaries) ?? "category";
-    const averageColumn = pickAverageColumn(columns) ?? "value";
+    const pickedGroupBy = pickGroupByColumn(columns, cachedSummaries);
+    const groupByColumn = pickedGroupBy ?? "category";
+    const averageColumn = pickAverageColumn(columns);
 
-    return [
+    const prompts = [
       t`Show the first 20 rows of ${datasetName}`,
       t`Count rows in ${datasetName} by ${groupByColumn}`,
-      t`What is the average ${averageColumn} in ${datasetName}?`,
     ];
+
+    if (averageColumn) {
+      prompts.push(t`What is the average ${averageColumn} in ${datasetName}?`);
+    } else {
+      const secondGroupBy =
+        pickGroupByColumn(columns, cachedSummaries, {
+          excludeColumnNames: pickedGroupBy ? [pickedGroupBy] : [],
+        }) ?? groupByColumn;
+      if (secondGroupBy === groupByColumn) {
+        prompts.push(
+          t`What are the distinct values of ${groupByColumn} in ${datasetName}?`,
+        );
+      } else {
+        prompts.push(t`Count rows in ${datasetName} by ${secondGroupBy}`);
+      }
+    }
+
+    return prompts;
   }, [
     context.app,
     datasetColumns,
@@ -187,10 +204,10 @@ export function ChatEmptyState(): JSX.Element {
           <Text size="xs" c="neutral.6" tt="uppercase" fw={600}>
             <Trans>Try one of these</Trans>
           </Text>
-          {suggestions.map((prompt) => {
+          {suggestions.map((prompt, index) => {
             return (
               <Button
-                key={prompt}
+                key={`suggestion-${index}`}
                 variant="default"
                 size="xs"
                 justify="flex-start"

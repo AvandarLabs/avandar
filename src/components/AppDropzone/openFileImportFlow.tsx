@@ -22,7 +22,7 @@ export function openFileImportFlow(
     labels: { confirm: t`Import`, cancel: t`Cancel` },
     centered: true,
     children: (
-      <Stack>
+      <Stack mt="md">
         <Text>
           {t`Do you want to import "${file.name}" as a new dataset?`}
         </Text>
