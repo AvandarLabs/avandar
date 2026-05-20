@@ -284,6 +284,38 @@ describe("VoiceModelManager", () => {
     ).toBeNull();
   });
 
+  it("releaseLoadedPipeline drops the in-memory pipeline without deleting cache", async () => {
+    const cache = createInMemoryCache();
+    const modelPrefix = "https://huggingface.co/Xenova/whisper-tiny/";
+    cache.entries.set(`${modelPrefix}model.onnx`, new ArrayBuffer(8));
+
+    const pipelineFn = vi.fn().mockResolvedValue({ text: "hi" });
+    const buildPipeline = vi.fn().mockResolvedValue(pipelineFn);
+
+    window.localStorage.setItem(
+      "avandar.voice.downloadedModels",
+      JSON.stringify({ "whisper-tiny": true }),
+    );
+
+    const manager = __TEST_ONLY.createManagerForTest(
+      {
+        loadPipeline: async () => {
+          return buildPipeline;
+        },
+        configureEnv: async () => {
+          return undefined;
+        },
+      },
+      cache,
+    );
+
+    await manager.ensureModelLoaded("whisper-tiny");
+    await manager.releaseLoadedPipeline();
+
+    expect(manager.getStatus()).toEqual({ kind: "idle" });
+    expect(await manager.isModelDownloaded("whisper-tiny")).toBe(true);
+  });
+
   it("deleteModel clears the cache marker and unloads the in-memory pipeline", async () => {
     const cache = createInMemoryCache();
     const modelPrefix = "https://huggingface.co/Xenova/whisper-tiny/";

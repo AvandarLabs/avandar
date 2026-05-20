@@ -22,10 +22,20 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse";
+import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
+import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
+import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
+import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
+import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
+import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
+import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
+import type { User } from "$/models/User/User";
 import type {
   ChatClarifyRequest,
   ChatClientMessage,
+  ChatResponse,
   ConsentAck,
 } from "$/types/chat.types";
 
@@ -84,6 +94,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
   const workspaceIdRef = useRef(workspace.id);
   workspaceIdRef.current = workspace.id;
+
+  const workspaceRef = useRef(workspace);
+  workspaceRef.current = workspace;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -183,33 +196,14 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           });
         }
 
-        const response = await APIClient.post({
-          route: "chat/:workspaceId/messages",
-          pathParams: { workspaceId },
-          body: {
-            messages: apiMessages,
-            context: currentPageContext,
-            model,
-            ...(consentAcks.length > 0 ? { consentAcks } : {}),
-          },
-        });
-
-        let sqlApplied = false;
-        if (response.generatedSql) {
+        const reviewAndApplySql = async (sql: string): Promise<boolean> => {
           const assumptionReview = reviewGeneratedSqlAssumptions({
-            sql: response.generatedSql.sql,
+            sql,
             messages: apiMessages,
           });
-
           if (assumptionReview.needsApproval) {
             if (!currentUser) {
-              const assistantParts: Array<{ type: "text"; text: string }> = [
-                {
-                  type: "text",
-                  text: `${response.assistantText}\n\n(SQL was not applied. Sign in to approve filter values.)`,
-                },
-              ];
-              return { content: assistantParts };
+              return false;
             }
             const consent = await crossBoundary({
               values: assumptionReview.unapprovedValues,
@@ -222,21 +216,16 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               explicitConsentRequired: assumptionReview.assumptionCapReached,
             });
             if (!consent.approved) {
-              const assistantParts: Array<{ type: "text"; text: string }> = [
-                {
-                  type: "text",
-                  text: `${response.assistantText}\n\n(SQL was not applied. Approve the assumed filter values to run this query.)`,
-                },
-              ];
-              return { content: assistantParts };
+              return false;
             }
           }
-
-          dataExplorerDispatch.setRawSql(response.generatedSql.sql);
-          dataExplorerDispatch.setNlPrompt(response.generatedSql.prompt);
-          sqlApplied = true;
+          const prompt =
+            [...apiMessages].reverse().find((message) => {return message.role === "user"})
+              ?.content ?? "";
+          dataExplorerDispatch.setRawSql(sql);
+          dataExplorerDispatch.setNlPrompt(prompt);
           try {
-            const mapping = parseSqlRef.current(response.generatedSql.sql);
+            const mapping = parseSqlRef.current(sql);
             dataExplorerDispatch.applySqlMapping({
               query: mapping.query,
               isFullyMapped: mapping.isFullyMapped,
@@ -250,85 +239,147 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             workspaceId,
             app: "data_explorer",
           });
-        }
+          return true;
+        };
 
-        if (response.dashboardBlock) {
-          dashboardEditorDispatch.queuePendingBlock({
-            pendingId: crypto.randomUUID(),
-            block: buildPendingDashboardBlock(response.dashboardBlock),
-          });
-          void logAnalyticsEvent({
-            event: "dashboard.block_added_via_chat",
-            workspaceId,
-            app: "dashboards",
-            payload: {
-              blockKind: response.dashboardBlock.kind,
-              ...(response.dashboardBlock.kind === "DataViz" ?
-                { vizType: response.dashboardBlock.vizType }
-              : {}),
-              dashboardId: currentPageContext.dashboardId,
+        const applyResponse = async (
+          response: ChatResponse,
+        ): Promise<ChatModelRunResult> => {
+          let sqlApplied = false;
+          if (response.generatedSql) {
+            sqlApplied = await reviewAndApplySql(response.generatedSql.sql);
+            if (
+              response.generatedSql &&
+              !sqlApplied &&
+              assumptionNeedsSignInOrApproval(response, apiMessages)
+            ) {
+              return {
+                content: [
+                  {
+                    type: "text",
+                    text: buildSqlNotAppliedAssistantText(
+                      response.assistantText,
+                      currentUser ?? undefined,
+                    ),
+                  },
+                ],
+              };
+            }
+          }
+
+          return applyChatTurnResponse({
+            response,
+            sqlApplied,
+            handlers: {
+              queueDashboardBlock: (block) => {
+                dashboardEditorDispatch.queuePendingBlock({
+                  pendingId: crypto.randomUUID(),
+                  block: buildPendingDashboardBlock(block),
+                });
+                void logAnalyticsEvent({
+                  event: "dashboard.block_added_via_chat",
+                  workspaceId,
+                  app: "dashboards",
+                  payload: {
+                    blockKind: block.kind,
+                    ...(block.kind === "DataViz" ?
+                      { vizType: block.vizType }
+                    : {}),
+                    dashboardId: currentPageContext.dashboardId,
+                  },
+                });
+              },
+              loadPlan: (plan) => {
+                const prior = planStateRef.current;
+                if (prior.nodes.length > 0) {
+                  void dropPlanTempViews({
+                    planId: prior.planId ?? undefined,
+                    nodes: prior.nodes,
+                  });
+                }
+                planDispatch.loadPlan(plan);
+              },
+              setPendingClarification:
+                chatPanelDispatch.setPendingClarification,
+              recordClarificationShown: async (clarification) => {
+                const questionBias = detectBias(clarification.question);
+                if (questionBias.hits.length > 0) {
+                  console.warn(
+                    "[chat] LLM clarification trips bias detector — passing through for v1:",
+                    questionBias.hits.map((hit) => {return hit.label}),
+                  );
+                }
+                return recordShown({
+                  workspaceId,
+                  request: clarification,
+                });
+              },
             },
           });
-        }
+        };
 
-        if (response.plan && response.plan.steps.length > 0) {
-          // A new plan replaces any prior one. Drop the old temp views
-          // AND the IndexedDB materialisation so DuckDB / storage don't
-          // accumulate stale `step_*` data across plans.
-          const prior = planStateRef.current;
-          if (prior.nodes.length > 0) {
-            void dropPlanTempViews({
-              planId: prior.planId ?? undefined,
-              nodes: prior.nodes,
-            });
+        const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+          if (!hasAnyDownloadedLocalChatModel()) {
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: "You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.",
+                },
+              ],
+            };
           }
-          planDispatch.loadPlan(response.plan);
-        }
+          const offlineResult = await runOfflineChatTurn({
+            workspace: workspaceRef.current,
+            pageContext: currentPageContext,
+            messages: apiMessages,
+            navigatorOnLine: navigator.onLine,
+            executeSql:
+              currentPageContext.app === "data-explorer" ?
+                tryExecuteOfflineSql
+              : undefined,
+          });
+          return applyResponse({
+            assistantText: offlineResult.assistantText,
+            generatedSql: offlineResult.generatedSql,
+            clarification: offlineResult.clarification,
+          });
+        };
 
-        // The backend may attach a `clarify` tool call. We surface it in the
-        // panel state so the `ClarificationCard` can render above the
-        // composer. The model's `assistantText` is the question itself in
-        // that case — we don't double up.
-        if (response.clarification) {
-          // Run the bias detector on the LLM-generated question; if it
-          // trips, we log but pass through. The silent-reprompt loop is
-          // a Phase 1 polish item tracked in CHECKPOINTS.
-          const questionBias = detectBias(response.clarification.question);
-          if (questionBias.hits.length > 0) {
-            console.warn(
-              "[chat] LLM clarification trips bias detector — passing through for v1:",
-              questionBias.hits.map((h) => {
-                return h.label;
-              }),
-            );
+        if (isOfflineChatEnabled()) {
+          const mode = resolveOfflineChatMode({
+            navigatorOnLine: navigator.onLine,
+          });
+          if (mode.kind === "local") {
+            return runOfflineTurn();
           }
-          // Telemetry: record the "shown" event. The PendingClarificationBlock
-          // settles it with the outcome when the user answers.
-          const auditId = await recordShown({
-            workspaceId,
-            request: response.clarification,
-          });
-          chatPanelDispatch.setPendingClarification({
-            ...response.clarification,
-            // We attach the audit id on the request object so the
-            // outcome handler can update the same row.
-            auditId,
-          } as ChatClarifyRequestWithAudit);
-        } else {
-          chatPanelDispatch.setPendingClarification(undefined);
         }
 
-        const assistantParts: Array<{ type: "text"; text: string }> = [
-          { type: "text", text: response.assistantText },
-        ];
-        if (response.generatedSql && sqlApplied) {
-          assistantParts.push({
-            type: "text",
-            text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
+        try {
+          const response = await APIClient.post({
+            route: "chat/:workspaceId/messages",
+            pathParams: { workspaceId },
+            body: {
+              messages: apiMessages,
+              context: currentPageContext,
+              model,
+              ...(consentAcks.length > 0 ? { consentAcks } : {}),
+            },
           });
+          return applyResponse(response);
+        } catch (error) {
+          const mode = resolveOfflineChatMode({
+            navigatorOnLine: navigator.onLine,
+            chatPostFailed: isNetworkChatFailure(error),
+          });
+          if (mode.kind === "offer_local_fallback") {
+            const accepted = await offerOfflineChatFallback();
+            if (accepted) {
+              return runOfflineTurn();
+            }
+          }
+          throw error;
         }
-
-        return { content: assistantParts };
       },
     };
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
@@ -340,4 +391,29 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   ]);
 
   return useLocalRuntime(adapter);
+}
+
+function assumptionNeedsSignInOrApproval(
+  response: ChatResponse,
+  messages: readonly ChatClientMessage[],
+): boolean {
+  if (!response.generatedSql) {
+    return false;
+  }
+  const assumptionReview = reviewGeneratedSqlAssumptions({
+    sql: response.generatedSql.sql,
+    messages,
+  });
+  return assumptionReview.needsApproval;
+}
+
+function buildSqlNotAppliedAssistantText(
+  assistantText: string,
+  user: User.T | undefined,
+): string {
+  const suffix =
+    user ?
+      "SQL was not applied. Approve the assumed filter values to run this query."
+    : "SQL was not applied. Sign in to approve filter values.";
+  return `${assistantText}\n\n(${suffix})`;
 }

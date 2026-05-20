@@ -7,6 +7,7 @@ import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatMode
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
+import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import css from "./Composer.module.css";
 
@@ -47,6 +48,7 @@ export function Composer(): JSX.Element {
           unstable_focusOnThreadSwitched={false}
         />
         <Group gap="xs">
+          <OfflineChatDownloadControl disabled={disabled} />
           <VoiceInputButton disabled={disabled} />
           <ChatModelPicker disabled={disabled} />
           <ComposerPrimitive.Send asChild>

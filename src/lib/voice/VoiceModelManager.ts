@@ -234,6 +234,19 @@ export class VoiceModelManager implements IVoiceModelManager {
   }
 
   /**
+   * Drops the in-memory ASR pipeline so another heavy runtime (offline chat)
+   * can use GPU/WASM heap. Cached weights on disk are kept.
+   */
+  async releaseLoadedPipeline(): Promise<void> {
+    this.pipelinePromise = null;
+    this.loadedModelId = null;
+    this.loadInFlight.clear();
+    if (this.status.kind !== "idle") {
+      this.setStatus({ kind: "idle" });
+    }
+  }
+
+  /**
    * Removes cached weights for `id` and clears the downloaded marker. If the
    * model was loaded in memory, drops the pipeline so the next transcription
    * re-downloads.
