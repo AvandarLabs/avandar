@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Locator, Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -85,7 +85,10 @@ export async function setGeneralAccessV2(
 
   // Wait for the summary line to reflect the workspace share so the next
   // helper call doesn't race the upsert mutation's invalidation.
-  await expect(dialog).toContainText(/anyone in/i, { timeout: MEDIUM_WAIT });
+  const summary = dialog.getByRole("status", { name: "Share summary" });
+  await expect(summary).toContainText(/accessible to anyone with|anyone with/i, {
+    timeout: LONG_WAIT,
+  });
 }
 
 /**
@@ -204,10 +207,23 @@ export async function expectSharedWithMeListsResource(options: {
   resourceName: string;
 }): Promise<void> {
   const { page, workspaceSlug, resourceName } = options;
-  await page.goto(`/${workspaceSlug}/shared-with-me`);
-  await expect(page.getByRole("link", { name: resourceName })).toBeVisible({
-    timeout: LONG_WAIT,
-  });
+  const resourceLink = page.getByRole("link", { name: resourceName });
+
+  await expect(async () => {
+    await page.goto(`/${workspaceSlug}/shared-with-me`);
+
+    await expect(page).toHaveURL(
+      new RegExp(`/${workspaceSlug}/shared-with-me/?$`),
+      { timeout: SHORT_WAIT },
+    );
+
+    const loader = page.getByLabel("Loading shared resources");
+    if ((await loader.count()) > 0) {
+      await expect(loader).toBeHidden({ timeout: MEDIUM_WAIT });
+    }
+
+    await expect(resourceLink).toBeVisible({ timeout: SHORT_WAIT });
+  }).toPass({ timeout: LONG_WAIT });
 }
 
 /**

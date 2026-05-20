@@ -9,6 +9,22 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
 const isCI = !!process.env.CI;
 
 /**
+ * Ensures e2e runs with flags required by share-modal and shared-with-me specs.
+ * Merges with any flags already present in `.env.development`.
+ */
+function mergeE2eFeatureFlags(): string {
+  const existing = (process.env.VITE_FEATURE_FLAGS ?? "")
+    .split(",")
+    .map((part) => {
+      return part.trim();
+    })
+    .filter(Boolean);
+  return [...new Set([...existing, "enable-shared-with-me"])].join(",");
+}
+
+const e2eFeatureFlags = mergeE2eFeatureFlags();
+
+/**
  * Per-test ceiling:
  * - 45s locally so failures surface quickly
  * - 90s in CI for noisier infra
@@ -40,6 +56,9 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    env: {
+      VITE_FEATURE_FLAGS: e2eFeatureFlags,
+    },
   },
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",

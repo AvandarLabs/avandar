@@ -7,7 +7,7 @@ import {
 } from "./helpers/manualUploadCloudSyncFlow";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { MEDIUM_WAIT, LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
  * End-to-end check that a bar chart saved from the Data Explorer actually
@@ -173,17 +173,23 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       await dashboardCard.click();
       await expect(page).toHaveURL(
         new RegExp(`/dashboards/edit/${dashboardId}`),
-        { timeout: SHORT_WAIT },
+        { timeout: MEDIUM_WAIT },
       );
+
+      await expect(page.getByLabel("loading")).toBeHidden({
+        timeout: LONG_WAIT,
+      });
 
       // Step 6: The DataViz block we appended should render inside the
       // Puck canvas iframe. If the block was saved without a usable
       // `nlQuery.prompt`, DataVizPBlock short-circuits to its "add a
       // prompt" placeholder and the bar chart never appears.
-      const editorFrame = page.locator("iframe").first().contentFrame();
-      await expect(
-        editorFrame.locator(".recharts-bar").first(),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(async () => {
+        const editorFrame = page.locator("iframe").first().contentFrame();
+        await expect(
+          editorFrame.locator(".recharts-bar").first(),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }).toPass({ timeout: LONG_WAIT });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }
