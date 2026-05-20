@@ -55,19 +55,6 @@ describe("hydrateXYFromQueryResult", () => {
     expect(out.xAxisKey).toBe("b");
   });
 
-  it("uses two numerics for scatter X and Y", () => {
-    const out = hydrateXYFromQueryResult(
-      { ...empty },
-      cols([
-        { name: "xval", dataType: "double" },
-        { name: "yval", dataType: "double" },
-      ]),
-      "scatter",
-    );
-    expect(out.yAxisKey).toBe("xval");
-    expect(out.xAxisKey).toBe("yval");
-  });
-
   it("does not overwrite preset axis keys", () => {
     const out = hydrateXYFromQueryResult(
       { xAxisKey: "custom_x", yAxisKey: "custom_y" },

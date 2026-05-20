@@ -52,16 +52,30 @@ describe("hydratePieFromQueryResult", () => {
     expect(out.nameKey).toBe("b");
   });
 
-  it("does not overwrite preset keys", () => {
+  it("preserves preset keys that still exist in the columns", () => {
     const out = hydratePieFromQueryResult(
       { nameKey: "custom_name", valueKey: "custom_value" },
       cols([
         { name: "cat", dataType: "varchar" },
         { name: "num", dataType: "double" },
+        { name: "custom_name", dataType: "varchar" },
+        { name: "custom_value", dataType: "double" },
       ]),
     );
     expect(out.nameKey).toBe("custom_name");
     expect(out.valueKey).toBe("custom_value");
+  });
+
+  it("prunes preset keys that no longer exist in the columns and reseeds", () => {
+    const out = hydratePieFromQueryResult(
+      { nameKey: "old_name", valueKey: "old_value" },
+      cols([
+        { name: "cat", dataType: "varchar" },
+        { name: "num", dataType: "double" },
+      ]),
+    );
+    expect(out.valueKey).toBe("num");
+    expect(out.nameKey).toBe("cat");
   });
 
   it("returns unchanged when columns is empty", () => {

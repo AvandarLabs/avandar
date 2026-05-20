@@ -1,6 +1,11 @@
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  BubbleSeries,
+  RadarSeries,
+  ScatterSeries,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
@@ -124,17 +129,20 @@ function _getKeysToValidate(vizConfig: VizConfig): string[] {
     return keys;
   }
 
-  // scatter and bubble
-  const xy = vizConfig as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
-  const keys: string[] = [];
-  if (xy.xAxisKey !== undefined) {
-    keys.push(xy.xAxisKey);
+  if (vt === "scatter") {
+    const sv = vizConfig as { series: readonly ScatterSeries[] };
+    const keys: string[] = [];
+    for (const s of sv.series) {
+      keys.push(s.xKey, s.key);
+    }
+    return keys;
   }
-  if (xy.yAxisKey !== undefined) {
-    keys.push(xy.yAxisKey);
+
+  // bubble
+  const bv = vizConfig as { series: readonly BubbleSeries[] };
+  const keys: string[] = [];
+  for (const s of bv.series) {
+    keys.push(s.xKey, s.key, s.sizeKey);
   }
   return keys;
 }

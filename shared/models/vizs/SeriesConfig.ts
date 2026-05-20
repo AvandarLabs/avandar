@@ -118,6 +118,30 @@ export type RadarSeries = {
 };
 
 /**
+ * A scatter series — each carries its own X and Y columns since
+ * scatter plots pair points, unlike bar/line/area which share an X
+ * axis across all series.
+ */
+export type ScatterSeries = {
+  /** Column name supplying the Y values. */
+  key: string;
+  /** Column name supplying the X values. */
+  xKey: string;
+  /** Optional override for the series label shown in legend/tooltip. */
+  label?: string;
+  /** Optional CSS color override. */
+  color?: string;
+};
+
+/**
+ * A bubble series — like ScatterSeries plus a third column for radius.
+ */
+export type BubbleSeries = ScatterSeries & {
+  /** Column name supplying the bubble size (radius). */
+  sizeKey: string;
+};
+
+/**
  * Convert an XY series from one mark type to another, preserving
  * fields that are common across mark types (`key`, `label`, `color`)
  * and resetting mark-specific fields to type-appropriate defaults.

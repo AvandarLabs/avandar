@@ -8,9 +8,13 @@ type RadarSeriesConfig = {
 };
 
 /**
- * Hydrate radar config from query result column metadata: seed first
- * numeric column as a series and pick the first non-series column
- * (prefer text/temporal) as the name axis.
+ * Reconcile a radar config against current query columns: prune any
+ * `nameKey` or `series[i].key` that references a column the query no
+ * longer returns, then seed sensible defaults. The first numeric
+ * column becomes the first series; the first non-series text/temporal
+ * column becomes the name axis. Goal: a config that always renders
+ * something useful when columns change, never references a missing
+ * column.
  */
 export function hydrateRadarSeriesFromQueryResult<
   VConfig extends RadarSeriesConfig,
@@ -18,8 +22,15 @@ export function hydrateRadarSeriesFromQueryResult<
   if (columns.length === 0) {
     return currVizConfig;
   }
+  const colNames = new Set(
+    columns.map((c) => {
+      return c.name;
+    }),
+  );
 
-  let nextSeries: RadarSeries[] = [...currVizConfig.series];
+  let nextSeries: RadarSeries[] = currVizConfig.series.filter((s) => {
+    return colNames.has(s.key);
+  });
 
   if (nextSeries.length === 0) {
     const firstNumeric = columns.find((c) => {
@@ -30,7 +41,10 @@ export function hydrateRadarSeriesFromQueryResult<
     }
   }
 
-  let nextNameKey = currVizConfig.nameKey;
+  let nextNameKey =
+    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
+      currVizConfig.nameKey
+    : undefined;
   if (nextNameKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {

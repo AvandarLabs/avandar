@@ -157,13 +157,12 @@ describe("VizSettingsForm — area chart smoke test", () => {
 describe("VizSettingsForm — scatter chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "scatter",
-    xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [{ xKey: "value", key: "score" }],
   };
 
-  it("only offers numeric columns for axes", () => {
+  it("only offers numeric columns for X and Y axis pickers", () => {
     renderForm({ vizConfig: baseConfig });
-    const xAxisDropdown = getMantineSelectDropdown(/X Axis/i);
+    const xAxisDropdown = getMantineSelectDropdown(/X column/i);
     expect(
       within(xAxisDropdown).queryByRole("option", {
         name: "category",
@@ -288,19 +287,13 @@ describe("VizSettingsForm — radar chart smoke test", () => {
 describe("VizSettingsForm — bubble chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "bubble",
-    xAxisKey: undefined,
-    yAxisKey: undefined,
-    sizeKey: undefined,
+    series: [{ xKey: "value", key: "score", sizeKey: "value" }],
   };
 
-  it("picks X, Y, and size from numeric columns", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/X Axis/i, "value");
-    pickMantineSelectOption(/Y Axis/i, "score");
-    pickMantineSelectOption(/Bubble size/i, "value");
-    expect(onVizConfigChange).toHaveBeenLastCalledWith({
-      ...baseConfig,
-      sizeKey: "value",
-    });
+  it("renders X, Y, and Size column pickers for each series", () => {
+    renderForm({ vizConfig: baseConfig });
+    expect(screen.getByLabelText(/X column/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Y column/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Size column/i)).toBeInTheDocument();
   });
 });

@@ -90,12 +90,14 @@ vi.mock("@/lib/ui/viz/AreaChart", () => {
 
 vi.mock("@/lib/ui/viz/ScatterChart", () => {
   return {
-    ScatterChart: (props: { xAxisKey?: string; yAxisKey?: string }) => {
+    ScatterChart: (props: {
+      series?: ReadonlyArray<{ xKey: string; key: string }>;
+    }) => {
       return (
         <div
           data-testid="scatter-chart"
-          data-x={props.xAxisKey}
-          data-y={props.yAxisKey}
+          data-x={props.series?.[0]?.xKey}
+          data-y={props.series?.[0]?.key}
         />
       );
     },
@@ -150,16 +152,14 @@ vi.mock("@/lib/ui/viz/RadarChart", () => {
 vi.mock("@/lib/ui/viz/BubbleChart", () => {
   return {
     BubbleChart: (props: {
-      xAxisKey?: string;
-      yAxisKey?: string;
-      sizeKey?: string;
+      series?: ReadonlyArray<{ xKey: string; key: string; sizeKey: string }>;
     }) => {
       return (
         <div
           data-testid="bubble-chart"
-          data-x={props.xAxisKey}
-          data-y={props.yAxisKey}
-          data-size={props.sizeKey}
+          data-x={props.series?.[0]?.xKey}
+          data-y={props.series?.[0]?.key}
+          data-size={props.series?.[0]?.sizeKey}
         />
       );
     },
@@ -263,8 +263,7 @@ describe("VisualizationContainer", () => {
   it("renders the scatter chart with the chosen axes", () => {
     renderViz({
       vizType: "scatter",
-      xAxisKey: "value",
-      yAxisKey: "score",
+      series: [{ xKey: "value", key: "score" }],
     });
     const scatter = screen.getByTestId("scatter-chart");
     expect(scatter).toHaveAttribute("data-x", "value");
@@ -311,9 +310,7 @@ describe("VisualizationContainer", () => {
   it("renders the bubble chart with the chosen axes and size", () => {
     renderViz({
       vizType: "bubble",
-      xAxisKey: "value",
-      yAxisKey: "score",
-      sizeKey: "value",
+      series: [{ xKey: "value", key: "score", sizeKey: "value" }],
     });
     const bubble = screen.getByTestId("bubble-chart");
     expect(bubble).toHaveAttribute("data-x", "value");
