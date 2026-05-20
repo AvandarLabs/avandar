@@ -1,28 +1,29 @@
 /**
- * Translate missing Lingui catalog entries using an LLM.
+ * Translate missing Lingui catalog entries using the OpenAI Chat Completions
+ * API.
  *
- * Reads each locale's `messages.po` file under `src/i18n/locales/`, finds
- * `msgstr` entries that are still empty (i.e. untranslated), batches them
- * up, and asks the LLM to translate them into the target language. The
- * model returns a JSON object keyed by `msgid` so the script can write
- * each translation back into the catalog without re-ordering or losing
- * comments.
+ * Reads each target locale's `messages.po` file under `src/i18n/locales/`,
+ * finds `msgstr` entries that are still empty (untranslated), optionally
+ * narrows to a scope (subset of source files referenced by the entry's
+ * `#:` comments), batches the strings, and asks an OpenAI model to
+ * translate them. The model returns a JSON object keyed by msgid so we
+ * can write each translation back into the catalog without re-ordering
+ * or losing comments.
  *
- * Usage:
- *   pnpm i18n:translate-llm                # translate all non-source locales
- *   pnpm i18n:translate-llm -- fr es       # translate just FR + ES
- *   pnpm i18n:translate-llm -- --dry-run   # don't write, just print
+ * Run `pnpm i18n:translate-llm --help` to see the full CLI usage.
  *
  * Env:
- *   OPEN_ROUTER_API_KEY   required (re-uses the same key the chat
- *                         backend uses, see supabase/functions/chat).
- *   I18N_LLM_MODEL        optional, defaults to anthropic/claude-sonnet-4.5
+ *   OPENAI_API_KEY  required. Loaded from .env.development (and, as a
+ *                   fallback for compatibility with the Supabase edge
+ *                   convention, .env.development.edge).
+ *   I18N_LLM_MODEL  optional. Defaults to `gpt-4o-mini`.
  */
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import dotenv from "dotenv";
 
 const PROJECT_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -31,11 +32,14 @@ const PROJECT_ROOT = path.resolve(
 );
 const LOCALES_DIR = path.join(PROJECT_ROOT, "src", "i18n", "locales");
 const SOURCE_LOCALE = "en";
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.5";
+const DEFAULT_MODEL = "gpt-4o-mini";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-// Locale code -> human label used in the prompt. Keep in sync with
-// `src/i18n/locales.ts`.
-const TARGET_LOCALE_NAMES: Record<string, string> = {
+/**
+ * Locale code → human label used in the prompt. Keep in sync with
+ * `src/i18n/locales.ts` and the `locales` array in `lingui.config.ts`.
+ */
+export const TARGET_LOCALE_NAMES: Record<string, string> = {
   es: "Spanish (Latin American, formal but warm)",
   pt: "Portuguese (Brazilian, formal but warm)",
   fr: "French (formal but warm)",
@@ -45,7 +49,7 @@ const TARGET_LOCALE_NAMES: Record<string, string> = {
   "zh-Hant": "Traditional Chinese (Taiwan conventions)",
 };
 
-type PoEntry = {
+export type PoEntry = {
   /** Comment block + msgid header preceding the msgstr line. */
   header: string;
   msgid: string;
@@ -53,11 +57,24 @@ type PoEntry = {
   msgstr: string;
 };
 
-type ParsedPo = {
+export type ParsedPo = {
   /** PO file preamble (the metadata block at the top). */
   preamble: string;
   entries: PoEntry[];
 };
+
+export type CliOptions = {
+  help: boolean;
+  all: boolean;
+  dryRun: boolean;
+  scopes: string[];
+  locales: string[];
+  model: string | undefined;
+};
+
+export type ParseArgsResult =
+  | { ok: true; options: CliOptions }
+  | { ok: false; error: string };
 
 function unescapePoString(s: string): string {
   return s
@@ -79,10 +96,7 @@ function escapePoString(s: string): string {
 function readMessageValue(
   lines: string[],
   startIdx: number,
-): {
-  value: string;
-  consumed: number;
-} {
+): { value: string; consumed: number } {
   const first = lines[startIdx] ?? "";
   const match = first.match(/^(?:msgid|msgstr)\s+"(.*)"\s*$/);
   if (!match) return { value: "", consumed: 1 };
@@ -97,24 +111,25 @@ function readMessageValue(
   return { value: unescapePoString(parts.join("")), consumed: i - startIdx };
 }
 
-/** Minimal PO parser sufficient for Lingui-generated catalogs. */
-function parsePo(text: string): ParsedPo {
+/**
+ * Minimal PO parser sufficient for Lingui-generated catalogs.
+ *
+ * @param text Raw text of the .po file.
+ * @returns Parsed structure with `preamble` (metadata block kept as-is)
+ *   and `entries` (each `header` retains the original comments + msgid
+ *   lines so we can filter by `#: source/path` references).
+ */
+export function parsePo(text: string): ParsedPo {
   const lines = text.split("\n");
-  // Preamble: the first msgid is empty (`msgid ""`) and its msgstr holds
-  // the metadata. We keep that block untouched.
   let i = 0;
   while (i < lines.length && !lines[i]!.startsWith("msgid ")) i++;
-  // First msgid is the metadata header.
   const preambleStart = 0;
-  // Find the start of the next entry (a blank line followed by a comment
-  // or another msgid).
   let cursor = i;
-  // Walk past the header msgid + its multiline msgstr.
   cursor += readMessageValue(lines, cursor).consumed;
-  while (cursor < lines.length && !lines[cursor]!.startsWith("msgstr "))
+  while (cursor < lines.length && !lines[cursor]!.startsWith("msgstr ")) {
     cursor++;
+  }
   cursor += readMessageValue(lines, cursor).consumed;
-  // Skip trailing blank lines.
   while (cursor < lines.length && lines[cursor] === "") cursor++;
   const preamble = lines.slice(preambleStart, cursor).join("\n");
 
@@ -138,7 +153,6 @@ function parsePo(text: string): ParsedPo {
       );
       cursor += mstrConsumed;
       entries.push({ header: headerWithMsgid, msgid, msgstr });
-      // Skip blank line(s) between entries.
       while (cursor < lines.length && lines[cursor] === "") cursor++;
       blockStart = cursor;
     } else {
@@ -148,7 +162,10 @@ function parsePo(text: string): ParsedPo {
   return { preamble, entries };
 }
 
-function serializePo(parsed: ParsedPo): string {
+/**
+ * Serialize a parsed PO structure back to text.
+ */
+export function serializePo(parsed: ParsedPo): string {
   const blocks: string[] = [parsed.preamble];
   for (const entry of parsed.entries) {
     const msgstrSerialized = `msgstr "${escapePoString(entry.msgstr)}"`;
@@ -157,16 +174,183 @@ function serializePo(parsed: ParsedPo): string {
   return blocks.join("\n\n") + "\n";
 }
 
+/**
+ * Returns true if the entry's `#: ...` source-file reference comments
+ * contain any of the given scope substrings. An empty `scopes` array
+ * matches everything (no filtering).
+ *
+ * @param entry The PO entry whose header carries `#:` reference comments
+ *   pointing at the source file(s) the msgid was extracted from.
+ * @param scopes Substrings to match against those reference paths. Match
+ *   is case-sensitive and substring-based, e.g. `WorkspaceSettingsPage`
+ *   matches `src/views/WorkspaceSettingsPage/...`.
+ */
+export function entryMatchesScope(entry: PoEntry, scopes: string[]): boolean {
+  if (scopes.length === 0) return true;
+  const refLines = entry.header
+    .split("\n")
+    .filter((l) => {
+      return l.startsWith("#:");
+    });
+  if (refLines.length === 0) return false;
+  const refsText = refLines.join("\n");
+  return scopes.some((s) => {
+    return refsText.includes(s);
+  });
+}
+
+/**
+ * Returns the human-readable help text for the CLI. Exported so tests
+ * can assert on it without invoking the script.
+ */
+export function buildHelpText(): string {
+  return [
+    "Usage: pnpm i18n:translate-llm [options]",
+    "",
+    "Translate missing Lingui catalog entries into one or more locales using",
+    "the OpenAI Chat Completions API. Reads .po files from src/i18n/locales/,",
+    "fills empty msgstr entries, and writes the updated catalogs back.",
+    "",
+    "Required env (loaded automatically from .env.development; falls back to",
+    ".env.development.edge for compatibility with the Supabase edge convention):",
+    "  OPENAI_API_KEY    Your OpenAI API key.",
+    "",
+    "Optional env:",
+    "  I18N_LLM_MODEL    OpenAI model to use. Defaults to gpt-4o-mini.",
+    "",
+    "Options:",
+    "  -h, --help              Show this help and exit.",
+    "      --all               Translate every empty msgstr in every non-source",
+    "                          locale. Cannot be combined with --scope or",
+    "                          --locale.",
+    "      --scope <pattern>   Only translate entries whose #: source-file",
+    "                          reference contains <pattern>. Repeatable, and",
+    "                          can also be a comma-separated list. Examples:",
+    "                            --scope WorkspaceSettingsPage",
+    "                            --scope src/views/Settings,src/components/Foo",
+    "      --locale <code>     Target locale (e.g. es, pt, fr, sw, ar,",
+    "                          zh-Hans, zh-Hant). Repeatable, and can also be",
+    "                          a comma-separated list. Defaults to every",
+    "                          non-source locale when omitted with --all.",
+    "      --model <name>      Override the OpenAI model. Same as setting",
+    "                          I18N_LLM_MODEL.",
+    "      --dry-run           Translate but don't write changes to disk.",
+    "",
+    "Examples:",
+    "  # Translate ONLY the Workspace Settings page, ONLY into Spanish.",
+    "  pnpm i18n:translate-llm --scope WorkspaceSettingsPage --locale es",
+    "",
+    "  # Translate every empty msgstr in every locale (full run).",
+    "  pnpm i18n:translate-llm --all",
+    "",
+    "  # Dry-run Spanish translations for two scopes without writing.",
+    "  pnpm i18n:translate-llm \\",
+    "      --scope WorkspaceSettingsPage --scope src/views/Dashboard \\",
+    "      --locale es --dry-run",
+    "",
+  ].join("\n");
+}
+
+/**
+ * Parse the script's CLI arguments. Pure function — does not read env or
+ * touch the filesystem, so it can be tested directly.
+ *
+ * @param argv The argv slice (i.e. without `node` / script path). Pass
+ *   `process.argv.slice(2)` from the entrypoint.
+ */
+export function parseArgs(argv: string[]): ParseArgsResult {
+  const options: CliOptions = {
+    help: false,
+    all: false,
+    dryRun: false,
+    scopes: [],
+    locales: [],
+    model: undefined,
+  };
+
+  const splitList = (s: string): string[] => {
+    return s
+      .split(",")
+      .map((p) => {
+        return p.trim();
+      })
+      .filter((p) => {
+        return p.length > 0;
+      });
+  };
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (arg === "-h" || arg === "--help") {
+      options.help = true;
+    } else if (arg === "--all") {
+      options.all = true;
+    } else if (arg === "--dry-run") {
+      options.dryRun = true;
+    } else if (arg === "--scope") {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith("-")) {
+        return { ok: false, error: "--scope requires a value" };
+      }
+      options.scopes.push(...splitList(next));
+      i++;
+    } else if (arg.startsWith("--scope=")) {
+      options.scopes.push(...splitList(arg.slice("--scope=".length)));
+    } else if (arg === "--locale") {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith("-")) {
+        return { ok: false, error: "--locale requires a value" };
+      }
+      options.locales.push(...splitList(next));
+      i++;
+    } else if (arg.startsWith("--locale=")) {
+      options.locales.push(...splitList(arg.slice("--locale=".length)));
+    } else if (arg === "--model") {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith("-")) {
+        return { ok: false, error: "--model requires a value" };
+      }
+      options.model = next;
+      i++;
+    } else if (arg.startsWith("--model=")) {
+      options.model = arg.slice("--model=".length);
+    } else {
+      return { ok: false, error: `Unknown argument: ${arg}` };
+    }
+  }
+
+  if (
+    options.all &&
+    (options.scopes.length > 0 || options.locales.length > 0)
+  ) {
+    return {
+      ok: false,
+      error: "--all cannot be combined with --scope or --locale",
+    };
+  }
+
+  return { ok: true, options };
+}
+
 type TranslationBatch = Record<string, string>;
 
-async function translateBatch(args: {
+/**
+ * Call OpenAI Chat Completions and return a `msgid -> translation` map.
+ *
+ * Exported so tests can stub it out via dependency injection without
+ * needing to monkey-patch `globalThis.fetch`.
+ */
+export async function translateBatch(args: {
   locale: string;
   localeLabel: string;
   entries: Array<{ id: string; source: string }>;
   apiKey: string;
   model: string;
+  /** Allows tests to inject a custom fetch. Defaults to `globalThis.fetch`. */
+  fetchImpl?: typeof fetch;
 }): Promise<TranslationBatch> {
   const { locale, localeLabel, entries, apiKey, model } = args;
+  const fetchImpl = args.fetchImpl ?? globalThis.fetch;
   const systemPrompt = [
     `You are a professional software UI translator.`,
     `You translate short UI strings from English (en) into ${localeLabel} (${locale}).`,
@@ -186,32 +370,27 @@ async function translateBatch(args: {
     strings: entries,
   };
 
-  const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://avandar.dev",
-        "X-Title": "Avandar i18n translation script",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: JSON.stringify(userPayload) },
-        ],
-      }),
+  const response = await fetchImpl(OPENAI_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      model,
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: JSON.stringify(userPayload) },
+      ],
+    }),
+  });
 
   if (!response.ok) {
     const body = await response.text();
     throw new Error(
-      `OpenRouter request failed (${response.status}): ${body.slice(0, 400)}`,
+      `OpenAI request failed (${response.status}): ${body.slice(0, 400)}`,
     );
   }
   const json = (await response.json()) as {
@@ -219,7 +398,7 @@ async function translateBatch(args: {
   };
   const content = json.choices?.[0]?.message?.content;
   if (!content) {
-    throw new Error("OpenRouter response missing choices[0].message.content");
+    throw new Error("OpenAI response missing choices[0].message.content");
   }
   let parsed: unknown;
   try {
@@ -239,13 +418,22 @@ async function translateBatch(args: {
   return out;
 }
 
-async function processLocale(args: {
+/**
+ * Translate a single locale: read its .po file, find empty msgstr entries
+ * matching the scope filter, hit OpenAI, and write the catalog back.
+ *
+ * @returns `translated` (count actually filled) and `remaining` (count
+ *   still empty within the scope).
+ */
+export async function processLocale(args: {
   locale: string;
   apiKey: string;
   model: string;
   dryRun: boolean;
+  scopes: string[];
+  fetchImpl?: typeof fetch;
 }): Promise<{ translated: number; remaining: number }> {
-  const { locale, apiKey, model, dryRun } = args;
+  const { locale, apiKey, model, dryRun, scopes } = args;
   const localeLabel = TARGET_LOCALE_NAMES[locale];
   if (!localeLabel) {
     console.warn(`  · no label registered for ${locale}, skipping`);
@@ -261,10 +449,12 @@ async function processLocale(args: {
   }
   const parsed = parsePo(raw);
   const missing = parsed.entries.filter((e) => {
-    return e.msgstr.trim() === "";
+    return e.msgstr.trim() === "" && entryMatchesScope(e, scopes);
   });
+  const scopeNote =
+    scopes.length > 0 ? ` (scopes: ${scopes.join(", ")})` : "";
   console.log(
-    `\n[${locale}] ${missing.length} missing of ${parsed.entries.length} entries`,
+    `\n[${locale}] ${missing.length} missing of ${parsed.entries.length} entries${scopeNote}`,
   );
   if (missing.length === 0) return { translated: 0, remaining: 0 };
 
@@ -273,10 +463,7 @@ async function processLocale(args: {
   for (let i = 0; i < missing.length; i += BATCH_SIZE) {
     batches.push(
       missing.slice(i, i + BATCH_SIZE).map((e, idx) => {
-        return {
-          id: `m${i + idx}`,
-          source: e.msgid,
-        };
+        return { id: `m${i + idx}`, source: e.msgid };
       }),
     );
   }
@@ -293,6 +480,7 @@ async function processLocale(args: {
       entries: batch,
       apiKey,
       model,
+      fetchImpl: args.fetchImpl,
     });
     for (const [idx, item] of batch.entries()) {
       const absoluteIdx = batchIdx * BATCH_SIZE + idx;
@@ -316,22 +504,63 @@ async function processLocale(args: {
   return { translated: translatedCount, remaining: stillMissing };
 }
 
-async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  const dryRun = args.includes("--dry-run");
-  const explicitLocales = args.filter((a) => {
-    return !a.startsWith("--");
-  });
+/**
+ * Load env vars from .env.development and .env.development.edge (the
+ * latter holds the OpenAI key in our Supabase edge-function convention).
+ * Already-set vars on `process.env` win over file values so callers can
+ * still override on the command line.
+ */
+export function loadEnvFiles(): void {
+  for (const file of [".env.development", ".env.development.edge"]) {
+    dotenv.config({ path: path.join(PROJECT_ROOT, file), override: false });
+  }
+}
 
-  const apiKey = process.env.OPEN_ROUTER_API_KEY;
+async function main(): Promise<void> {
+  const argv = process.argv.slice(2);
+
+  // Print help when invoked with no arguments so humans and LLMs can
+  // discover the script's options without having to read the source.
+  if (argv.length === 0) {
+    console.log(buildHelpText());
+    process.exit(0);
+  }
+
+  const result = parseArgs(argv);
+  if (!result.ok) {
+    console.error(`Error: ${result.error}\n`);
+    console.error(buildHelpText());
+    process.exit(2);
+  }
+  const options = result.options;
+  if (options.help) {
+    console.log(buildHelpText());
+    process.exit(0);
+  }
+
+  if (
+    !options.all &&
+    options.scopes.length === 0 &&
+    options.locales.length === 0
+  ) {
+    console.error(
+      "Error: pass --all, or narrow with --scope and/or --locale.\n",
+    );
+    console.error(buildHelpText());
+    process.exit(2);
+  }
+
+  loadEnvFiles();
+
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     console.error(
-      "OPEN_ROUTER_API_KEY is not set. Export it (or put it in " +
+      "OPENAI_API_KEY is not set. Add it to .env.development (or " +
         ".env.development.edge) before running this script.",
     );
     process.exit(1);
   }
-  const model = process.env.I18N_LLM_MODEL || DEFAULT_MODEL;
+  const model = options.model ?? process.env.I18N_LLM_MODEL ?? DEFAULT_MODEL;
 
   const dirEntries = await fs.readdir(LOCALES_DIR, { withFileTypes: true });
   const allLocales = dirEntries
@@ -345,21 +574,40 @@ async function main(): Promise<void> {
       return l !== SOURCE_LOCALE;
     });
 
-  const targetLocales =
-    explicitLocales.length > 0 ?
-      explicitLocales.filter((l) => {
-        return allLocales.includes(l);
-      })
-    : allLocales;
+  let targetLocales: string[];
+  if (options.locales.length > 0) {
+    const unknown = options.locales.filter((l) => {
+      return !allLocales.includes(l);
+    });
+    if (unknown.length > 0) {
+      console.error(
+        `Error: unknown locale(s): ${unknown.join(", ")}. Available: ${allLocales.join(", ")}`,
+      );
+      process.exit(2);
+    }
+    targetLocales = options.locales;
+  } else {
+    targetLocales = allLocales;
+  }
 
+  const scopeNote =
+    options.scopes.length > 0 ?
+      ` scoped to [${options.scopes.join(", ")}]`
+    : "";
   console.log(
-    `Translating into: ${targetLocales.join(", ")} via model ${model}` +
-      (dryRun ? " (dry-run)" : ""),
+    `Translating into: ${targetLocales.join(", ")} via model ${model}${scopeNote}` +
+      (options.dryRun ? " (dry-run)" : ""),
   );
 
   for (const locale of targetLocales) {
     try {
-      await processLocale({ locale, apiKey, model, dryRun });
+      await processLocale({
+        locale,
+        apiKey,
+        model,
+        dryRun: options.dryRun,
+        scopes: options.scopes,
+      });
     } catch (err) {
       console.error(`  · ${locale} failed:`, err);
     }
@@ -369,4 +617,9 @@ async function main(): Promise<void> {
   );
 }
 
-void main();
+// Skip the auto-run when imported under Vitest (so tests can pull in the
+// pure helpers without spinning up the CLI). Vitest sets `VITEST=true`
+// for every worker.
+if (!process.env.VITEST) {
+  void main();
+}
