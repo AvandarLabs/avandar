@@ -35,8 +35,7 @@ export function Composer(): JSX.Element {
       t`Download an offline chat model (cloud icon) to ask questions while offline.`
     : context.app === "dashboards" ?
       t`Ask me to add a chart to this dashboard...`
-    : context.app === "data-explorer" ?
-      t`Ask about your data...`
+    : context.app === "data-explorer" ? t`Ask about your data...`
     : t`Chat is enabled in Data Explorer and Dashboards`;
 
   return (

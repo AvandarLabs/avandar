@@ -4,9 +4,9 @@ import { del, get, set } from "idb-keyval";
 const STORE_KEY = "avandar-react-query-cache";
 
 const idbStorage = {
-  getItem: async (key: string) => (await get(key)) ?? null,
-  setItem: (key: string, value: string) => set(key, value),
-  removeItem: (key: string) => del(key),
+  getItem: async (key: string) => {return (await get(key)) ?? null},
+  setItem: (key: string, value: string) => {return set(key, value)},
+  removeItem: (key: string) => {return del(key)},
 };
 
 export const queryPersister = createAsyncStoragePersister({

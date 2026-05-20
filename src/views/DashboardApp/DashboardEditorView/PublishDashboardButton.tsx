@@ -30,7 +30,9 @@ export function PublishDashboardButton({
   hasUnsavedChanges,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const offline = useOfflineGate(t`Publishing requires an internet connection.`);
+  const offline = useOfflineGate(
+    t`Publishing requires an internet connection.`,
+  );
   const isDisabled: boolean =
     !dashboard || hasUnsavedChanges || offline.isBlocked;
 

@@ -1,6 +1,6 @@
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 /**
  * True when the browser is offline and cloud chat is unavailable: either

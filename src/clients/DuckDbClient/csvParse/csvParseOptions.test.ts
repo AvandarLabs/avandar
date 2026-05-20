@@ -141,7 +141,7 @@ describe("buildReadCsvArgList", () => {
       parseOptions: createCsvParseOptionsFromUserHints({}),
     });
 
-    expect(args.some((arg) => arg.startsWith("new_line="))).toBe(false);
+    expect(args.some((arg) => {return arg.startsWith("new_line=")})).toBe(false);
   });
 
   it("omits dateformat when format is null", () => {
@@ -154,8 +154,8 @@ describe("buildReadCsvArgList", () => {
       },
     });
 
-    expect(args.some((arg) => arg.startsWith("dateformat="))).toBe(false);
-    expect(args.some((arg) => arg.startsWith("timestampformat="))).toBe(false);
+    expect(args.some((arg) => {return arg.startsWith("dateformat=")})).toBe(false);
+    expect(args.some((arg) => {return arg.startsWith("timestampformat=")})).toBe(false);
     expect(args).toContain("strict_mode=true");
   });
 });

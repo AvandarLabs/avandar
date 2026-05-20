@@ -72,9 +72,7 @@ function ForgotPasswordPage() {
         <Stack>
           {!isOnline ?
             <Alert color="yellow" variant="light">
-              <Trans>
-                Password reset requires an internet connection.
-              </Trans>
+              <Trans>Password reset requires an internet connection.</Trans>
             </Alert>
           : null}
           <TextInput

@@ -8,7 +8,7 @@ export const AvaQueryClient = new QueryClient({
       refetchOnReconnect: false,
       refetchOnMount: true,
       staleTime: () =>
-        getIsOnline() ? 6 * 60 * 1000 : Number.POSITIVE_INFINITY,
+        {return getIsOnline() ? 6 * 60 * 1000 : Number.POSITIVE_INFINITY},
       gcTime: 24 * 60 * 60 * 1000,
       retry: (failureCount: number) => {
         if (!getIsOnline()) {

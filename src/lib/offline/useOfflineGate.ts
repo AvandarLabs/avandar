@@ -20,12 +20,12 @@ export function useOfflineGate(
     isBlocked: !isOnline,
     tooltip: reason,
     guard: ((fn) =>
-      ((...args) => {
+      {return ((...args) => {
         if (!navigator.onLine) {
           notifyError(reason);
           return undefined;
         }
         return fn(...args);
-      }) as typeof fn) as Gate["guard"],
+      }) as typeof fn}) as Gate["guard"],
   };
 }

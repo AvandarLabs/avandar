@@ -69,9 +69,7 @@ export function OpenDataCatalogEntryDetail({
 
           <Tooltip
             label={
-              offline.isBlocked ?
-                offline.tooltip
-              : t`Add to your workspace`
+              offline.isBlocked ? offline.tooltip : t`Add to your workspace`
             }
           >
             <ActionIcon

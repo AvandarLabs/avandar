@@ -58,9 +58,7 @@ function makeDatasetLink(options: {
           </Text>
           <Tooltip
             label={
-              <Trans>
-                Available offline: parquet cached on this device
-              </Trans>
+              <Trans>Available offline: parquet cached on this device</Trans>
             }
           >
             <Badge size="xs" color="teal" variant="light">

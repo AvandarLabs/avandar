@@ -1,9 +1,9 @@
-import { Alert } from "@mantine/core";
 import { Trans } from "@lingui/react/macro";
+import { Alert } from "@mantine/core";
 import { IconWifiOff } from "@tabler/icons-react";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 export function OfflineBanner(): JSX.Element | null {
   const isOnline = useIsOnline();
@@ -23,14 +23,14 @@ export function OfflineBanner(): JSX.Element | null {
     >
       {hasLocalChat ?
         <Trans>
-          You are offline. Cached datasets and dashboards stay available.
-          Cloud chat and imports are paused; you can still ask data questions
-          with your downloaded offline model.
+          You are offline. Cached datasets and dashboards stay available. Cloud
+          chat and imports are paused; you can still ask data questions with
+          your downloaded offline model.
         </Trans>
       : <Trans>
           You are offline. The app is in read-only mode: cached datasets and
-          dashboards are available, but new imports, cloud chat, and sharing
-          are paused until you reconnect.
+          dashboards are available, but new imports, cloud chat, and sharing are
+          paused until you reconnect.
         </Trans>
       }
     </Alert>

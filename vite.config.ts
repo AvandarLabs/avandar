@@ -48,8 +48,8 @@ export default defineConfig(({ mode }) => {
                   [
                     {
                       urlPattern: ({ url }: { url: URL }) =>
-                        url.origin === supabaseApiUrl &&
-                        url.pathname.startsWith("/rest/"),
+                        {return url.origin === supabaseApiUrl &&
+                        url.pathname.startsWith("/rest/")},
                       handler: "NetworkFirst" as const,
                       options: {
                         cacheName: "supabase-rest",
@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => {
                 : []),
                 {
                   urlPattern: ({ url }: { url: URL }) =>
-                    url.pathname.startsWith("/storage/v1/object"),
+                    {return url.pathname.startsWith("/storage/v1/object")},
                   handler: "NetworkOnly" as const,
                 },
               ],

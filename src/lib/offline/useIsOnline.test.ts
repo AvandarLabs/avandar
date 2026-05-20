@@ -9,13 +9,13 @@ describe("useIsOnline", () => {
 
   it("returns true when navigator.onLine is true", () => {
     vi.stubGlobal("navigator", { onLine: true });
-    const { result } = renderHook(() => useIsOnline());
+    const { result } = renderHook(() => {return useIsOnline()});
     expect(result.current).toBe(true);
   });
 
   it("returns false when navigator.onLine is false", () => {
     vi.stubGlobal("navigator", { onLine: false });
-    const { result } = renderHook(() => useIsOnline());
+    const { result } = renderHook(() => {return useIsOnline()});
     expect(result.current).toBe(false);
   });
 });
