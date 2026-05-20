@@ -21,7 +21,8 @@ describe("hydrateBubbleSeriesFromQueryResult", () => {
   });
 
   it("prunes a series whose xKey is missing and re-seeds from two numerics", () => {
-    // xKey "gone" missing; "y" and "s" remain => seeds { xKey:"y", key:"s", sizeKey:"s" }
+    // xKey "gone" missing; "y" and "s" remain =>
+    // seeds { xKey:"y", key:"s", sizeKey:"s" }
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
