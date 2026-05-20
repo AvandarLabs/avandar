@@ -2,11 +2,15 @@
  * Capture-to-PDF helpers used by the Export PDF flow.
  *
  * The dashboard is rendered into an off-screen container via
- * `<PuckPageRender>`. We use `html2canvas` to snapshot that container into a
- * single tall canvas, then split it across portrait letter-size PDF pages
+ * `<PuckPageRender>`. We snapshot that container into a single tall canvas
+ * via `html-to-image` — which renders through an SVG `<foreignObject>`, so
+ * the browser itself handles modern CSS. ag-grid v35 emits `color(srgb …)`
+ * for table border colors, which the older `html2canvas` parser cannot read;
+ * letting the browser render the clone sidesteps that limitation entirely.
+ * The single snapshot is then split across portrait letter-size PDF pages
  * with `jspdf`.
  */
-import html2canvas from "html2canvas";
+import { toCanvas } from "html-to-image";
 import jsPDF from "jspdf";
 
 const PDF_WIDTH_PT = 612; // 8.5" * 72
@@ -57,16 +61,29 @@ export async function captureAndDownloadPdf(
 export async function snapshotElement(
   element: HTMLElement,
 ): Promise<HTMLCanvasElement> {
-  return await html2canvas(element, {
+  return await toCanvas(element, {
+    width: element.scrollWidth,
+    height: element.scrollHeight,
+    pixelRatio: 2,
+    cacheBust: true,
     backgroundColor: "#ffffff",
-    scale: 2,
-    useCORS: true,
-    logging: false,
-    // Lift the off-screen element into the layout origin for measurement.
-    // We don't actually move it on screen; html2canvas computes layout
-    // from the source position automatically.
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight,
+    // Embedding cross-origin web font CSS (Google Fonts, Featurebase) trips a
+    // SecurityError reading `cssRules` and adds noticeable latency. The
+    // dashboard chrome falls back to system fonts inside the SVG cleanly.
+    skipFonts: true,
+    // The source element is positioned off-screen with
+    // `position: fixed; left: -10000px` (see ExportPdfModal). html-to-image
+    // renders the clone inside an SVG `<foreignObject>` which honours that
+    // positioning — the clone slides 10000px left of the SVG canvas and the
+    // output comes back blank (and the annotation flow falls back to its
+    // "Couldn't capture the dashboard" error). Neutralise the offscreen
+    // positioning on the cloned root so it lays out at the SVG origin.
+    style: {
+      position: "static",
+      top: "auto",
+      left: "auto",
+      transform: "none",
+    },
   });
 }
 
