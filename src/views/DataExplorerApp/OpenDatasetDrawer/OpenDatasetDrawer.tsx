@@ -7,7 +7,24 @@ import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDra
 import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
 import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { MantineTransition } from "@mantine/core";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+type DrawerPosition = "left" | "right" | "top" | "bottom";
+
+/**
+ * Slide transitions that match each anchor edge. A bottom-anchored drawer
+ * should slide upward into view; a right-anchored drawer should slide
+ * leftward; and so on. Mantine derives a sensible default from `position`
+ * but our `@ui` Drawer wrapper can swallow it, so we set it explicitly.
+ */
+const SLIDE_TRANSITION_BY_POSITION: Record<DrawerPosition, MantineTransition> =
+  {
+    bottom: "slide-up",
+    top: "slide-down",
+    left: "slide-right",
+    right: "slide-left",
+  };
 
 type Props = {
   opened: boolean;
@@ -20,9 +37,15 @@ type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
 
   /**
-   * Height of the drawer expressed as a CSS length (e.g. `"40%"`, `480`, or
-   * `"30rem"`). Because the drawer slides up from the bottom, `size` controls
-   * vertical extent rather than width. Defaults to `"40%"`.
+   * Edge the drawer anchors to. Controls both the slide direction and which
+   * dimension `size` applies to. Defaults to `"bottom"`.
+   */
+  position?: DrawerPosition;
+
+  /**
+   * Length along the axis perpendicular to the anchored edge (height for
+   * top/bottom, width for left/right). Accepts any CSS length, e.g. `"40%"`,
+   * `480`, or `"30rem"`. Defaults to `"40%"`.
    */
   size?: number | string;
 
@@ -36,16 +59,17 @@ type Props = {
 };
 
 /**
- * The Data Explorer's "Open" drawer. Slides up from the bottom of the canvas
- * and is scoped to the app's main layout so it does not cover the side
- * navbar or chat panel Aside. When `withOverlay` is false the canvas behind
- * the drawer stays interactive — focus is not trapped, body scroll is not
- * locked, and clicking outside does not dismiss the drawer.
+ * The Data Explorer's "Open" drawer. Defaults to sliding up from the bottom
+ * of the canvas and is scoped to the app's main layout so it does not cover
+ * the side navbar or chat panel Aside. When `withOverlay` is false the
+ * canvas behind the drawer stays interactive — focus is not trapped, body
+ * scroll is not locked, and clicking outside does not dismiss the drawer.
  */
 export function OpenDatasetDrawer({
   opened,
   onClose,
   onOpen,
+  position = "bottom",
   size = "40%",
   withOverlay = false,
 }: Props): JSX.Element {
@@ -67,13 +91,16 @@ export function OpenDatasetDrawer({
       onClose={onClose}
       keepMounted={false}
       boundary={`#${APP_SHELL_MAIN_ID}`}
-      position="bottom"
+      position={position}
       size={size}
       withOverlay={withOverlay}
       lockScroll={withOverlay}
       trapFocus={withOverlay}
       closeOnClickOutside={withOverlay}
       zIndex={MODAL_ROOT_Z_INDEX}
+      transitionProps={{
+        transition: SLIDE_TRANSITION_BY_POSITION[position],
+      }}
       styles={{
         // When the overlay is off, the inner flex container still spans the
         // boundary and would swallow clicks targeted at the canvas above the
@@ -82,8 +109,12 @@ export function OpenDatasetDrawer({
         // clicks pass through to the rest of the page.
         inner: withOverlay ? undefined : { pointerEvents: "none" },
         content: {
-          borderLeft: "none",
-          borderTop: "1px solid var(--ava-border-default)",
+          // The shared Drawer wrapper paints a left border for right-anchored
+          // drawers. Replace it with the border that hugs the anchored edge.
+          borderLeft: position === "right" ? undefined : "none",
+          borderRight: position === "left" ? "1px solid var(--ava-border-default)" : undefined,
+          borderTop: position === "bottom" ? "1px solid var(--ava-border-default)" : undefined,
+          borderBottom: position === "top" ? "1px solid var(--ava-border-default)" : undefined,
           ...(withOverlay ? null : { pointerEvents: "auto" }),
         },
       }}
