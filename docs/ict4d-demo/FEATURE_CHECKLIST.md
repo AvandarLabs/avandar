@@ -116,8 +116,8 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
     - [ ] Cross-cutting - System prompt versioning with prompt-version label round-tripped to client
     - [ ] Cross-cutting - avandarlabs.com privacy page copy (sandboxing + PII + bias detection)
     - [ ] Cross-cutting - Spanish + French bias patterns themselves (currently stubs pending social-sector advisor review)
-- [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
-- [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
+- [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer + Dashboards. Supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`.)
+- [x] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer + Dashboards. Knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards reuse the same `ManualQueryForm` + `useSqlToStructuredQuery` infra via a per-block `useDashboardManualQueryState` hook in `NLQueryPField`.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
 - [x] **8. Multilingual voice dictation in chat panel (Whisper, 6 languages, web + desktop)**
   - **Web** uses `@huggingface/transformers` (ONNX). Mic icon next to the model picker; first click prompts to download a Whisper model from Hugging Face. Model weights stream into an IndexedDB-backed cache (no OPFS). A floating bottom-left progress indicator shows `Downloading <model> for voice prompting` with %; toast appears on success. Subsequent clicks record from the mic, run Whisper locally, and inject the transcript into the composer. Web build offers tiny / base / small.
@@ -179,11 +179,28 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
     until Task 6 consumer migration lands.
   - **Voice dictation offline ✅** — desktop path via `smart-whisper`
     (`registerVoiceHandlers` + `createWhisperService`); web path via item #8.
+  - Remaining gaps tracked under item #2 (Desktop Phase 2 finishing).
 - [~] **20. Manual querying works offline (LLM queries don't, but manual must)**
   - Manual query form runs against duckdb-wasm in the webview; parquet bytes
     survive across launches via Dexie. End-to-end demo flow validated by the
     desktop offline runbook (`docs/demo-features/desktop-offline-session.md`).
-- [ ] **21. Manual query form available inside dashboards**
+  - Re-verify once dashboard manual-query work (#21) is exercised end-to-end.
+- [x] **21. Manual query form available inside dashboards**
+  - The DataViz block's right-side `NLQueryPField` is now three tabs:
+    `Prompt` (existing AI flow), `Manual` (full structured query form —
+    data source, columns, aggregations, filters, sort), and `SQL`
+    (existing read-only/editable view).
+  - The Manual tab reuses `ManualQueryForm` from the Data Explorer
+    (refactored to a controlled component) and a per-block
+    `useDashboardManualQueryState` hook that holds the structured query
+    in local state, regenerates SQL via `structuredQueryToSQL` on every
+    form change, and writes it back to `nlQuery.rawSql`.
+  - When external SQL changes (e.g. an AI generation lands), the hook
+    re-derives the structured query via the shared
+    `useSqlToStructuredQuery` parser and surfaces the same lossy-mapping
+    warnings + overwrite-confirmation flow the Data Explorer ships.
+  - No schema changes: the structured query is ephemeral local state,
+    re-derived from `rawSql`.
 - [x] **22. Chat panel works inside dashboards — produces Puck blocks (P-blocks)**
   - New `addDashboardBlock` chat tool registered when on the dashboards surface.
   - New `DashboardEditorStateManager` queues blocks emitted by the chat panel; the editor view drains them on render.

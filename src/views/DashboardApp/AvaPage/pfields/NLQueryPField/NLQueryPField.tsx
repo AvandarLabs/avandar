@@ -1,9 +1,22 @@
-import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
+import {
+  Alert,
+  Button,
+  Fieldset,
+  Group,
+  List,
+  Paper,
+  Stack,
+  Text,
+  Textarea,
+} from "@mantine/core";
+import { IconAlertTriangle } from "@tabler/icons-react";
+import { Tabs, TextareaForm } from "@ui";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { TextareaForm } from "@ui";
 import { mantineColorVar } from "@/lib/utils/browser/css";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
+import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type NLQuery = {
@@ -42,7 +55,6 @@ type Props = AvaPageFieldProps<NLQuery>;
 
 export function NLQueryPField({ value, onChange }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
-  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
     onSuccess: (sql, mutationVars) => {
@@ -61,8 +73,84 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
   });
   const { prompt, rawSql } = value;
 
+  const manualState = useDashboardManualQueryState({
+    rawSql,
+    onRawSqlChange: (nextSql) => {
+      onChange({ ...value, rawSql: nextSql });
+    },
+  });
+
   return (
-    <Stack gap="sm">
+    <Tabs
+      indicatorVariant="floating"
+      tabIds={["prompt", "manual-query", "sql"] as const}
+      renderTabHeader={{
+        prompt: "Prompt",
+        "manual-query": "Manual",
+        sql: "SQL",
+      }}
+      px="xs"
+      py="sm"
+      renderTabPanel={{
+        prompt: () => {
+          return (
+            <PromptTabPanel
+              prompt={prompt}
+              isRunningQuery={isRunningQuery}
+              onSubmitPrompt={(promptStr) => {
+                onChange({ ...value, prompt: promptStr });
+                if (promptStr) {
+                  generateAndRunQuery({ prompt: promptStr });
+                }
+              }}
+            />
+          );
+        },
+        "manual-query": () => {
+          if (!manualState.isParserReady) {
+            return (
+              <Text size="sm" c="dimmed" px="sm">
+                Loading datasets…
+              </Text>
+            );
+          }
+          return (
+            <ManualQueryForm
+              query={manualState.query}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              handlers={manualState.handlers}
+              withinPortal
+            />
+          );
+        },
+        sql: () => {
+          return (
+            <SqlTabPanel
+              rawSql={rawSql}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              sqlSyncWarnings={manualState.sqlSyncWarnings}
+              onSubmitSql={(nextSql) => {
+                onChange({ ...value, rawSql: nextSql });
+              }}
+            />
+          );
+        },
+      }}
+    />
+  );
+}
+
+function PromptTabPanel({
+  prompt,
+  isRunningQuery,
+  onSubmitPrompt,
+}: {
+  prompt: string;
+  isRunningQuery: boolean;
+  onSubmitPrompt: (prompt: string) => void;
+}): JSX.Element {
+  return (
+    <Stack gap="sm" px="sm">
       <TextareaForm
         asField
         defaultValue={prompt}
@@ -78,17 +166,48 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
           },
         }}
         onSubmit={(promptStr) => {
-          const trimmedPrompt = promptStr.trim();
-          onChange({
-            ...value,
-            prompt: trimmedPrompt,
-          });
-          if (trimmedPrompt) {
-            generateAndRunQuery({ prompt: trimmedPrompt });
-          }
+          onSubmitPrompt(promptStr.trim());
         }}
       />
+    </Stack>
+  );
+}
 
+function SqlTabPanel({
+  rawSql,
+  isStructuredQueryInSync,
+  sqlSyncWarnings,
+  onSubmitSql,
+}: {
+  rawSql: string;
+  isStructuredQueryInSync: boolean;
+  sqlSyncWarnings: readonly string[];
+  onSubmitSql: (nextSql: string) => void;
+}): JSX.Element {
+  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
+
+  return (
+    <Stack gap="sm" px="sm">
+      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
+        <Alert
+          icon={<IconAlertTriangle size={16} />}
+          color="yellow"
+          variant="light"
+          title="Manual form shows an approximation"
+          data-testid="sql-sync-warning"
+        >
+          <Text size="xs" mb="xs">
+            Parts of this SQL could not be represented in the Manual form. The
+            form shows a best-effort approximation; the SQL above is what
+            actually runs.
+          </Text>
+          <List size="xs" spacing={2}>
+            {sqlSyncWarnings.map((reason) => {
+              return <List.Item key={reason}>{reason}</List.Item>;
+            })}
+          </List>
+        </Alert>
+      : null}
       <Fieldset
         legend={
           <Group justify="space-between" style={{ width: "100%" }}>
@@ -135,10 +254,7 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
               onSubmit={(newRawSQL) => {
                 const trimmedSQL = newRawSQL.trim();
                 setIsEditSQLMode(false);
-                onChange({
-                  ...value,
-                  rawSql: trimmedSQL,
-                });
+                onSubmitSql(trimmedSQL);
               }}
               onCancel={() => {
                 setIsEditSQLMode(false);
