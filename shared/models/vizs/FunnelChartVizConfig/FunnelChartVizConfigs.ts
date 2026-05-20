@@ -92,7 +92,11 @@ export const FunnelChartVizConfigs = {
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, xAxisKey: nameKey, yAxisKey: valueKey };
+        const scatterSeries =
+          nameKey !== undefined && valueKey !== undefined ?
+            [{ xKey: nameKey, key: valueKey }]
+          : [];
+        return { vizType, series: scatterSeries };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -113,12 +117,11 @@ export const FunnelChartVizConfigs = {
         return { vizType, nameKey, series: radarSeries, withLegend: true };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return {
-          vizType,
-          xAxisKey: nameKey,
-          yAxisKey: valueKey,
-          sizeKey: undefined,
-        };
+        const bubbleSeries =
+          nameKey !== undefined && valueKey !== undefined ?
+            [{ xKey: nameKey, key: valueKey, sizeKey: valueKey }]
+          : [];
+        return { vizType, series: bubbleSeries };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

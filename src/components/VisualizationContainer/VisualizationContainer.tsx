@@ -70,22 +70,8 @@ function _useVizConfigSchemas() {
           : t`Invalid value column selected`;
       },
     });
-    const SizeKeySchema = string({
-      error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a size column`
-          : t`Invalid size column selected`;
-      },
-    });
     const SeriesArraySchema = array(looseObject({ key: string() })).min(1, {
       error: t`You haven't added any series`,
-    });
-    const YAxisKeySchema = string({
-      error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a Y axis`
-          : t`Invalid Y axis selected`;
-      },
     });
 
     return {
@@ -94,8 +80,9 @@ function _useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       ScatterPlotConfigSchema: object({
-        xAxisKey: XAxisKeySchema,
-        yAxisKey: YAxisKeySchema,
+        series: array(
+          object({ key: string().min(1), xKey: string().min(1) }),
+        ).min(1, { error: t`Add at least one X / Y series` }),
       }),
       PieChartConfigSchema: object({
         nameKey: NameKeySchema,
@@ -110,9 +97,13 @@ function _useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       BubbleChartConfigSchema: object({
-        xAxisKey: XAxisKeySchema,
-        yAxisKey: YAxisKeySchema,
-        sizeKey: SizeKeySchema,
+        series: array(
+          object({
+            key: string().min(1),
+            xKey: string().min(1),
+            sizeKey: string().min(1),
+          }),
+        ).min(1, { error: t`Add at least one X / Y / Size series` }),
       }),
     };
   }, [t]);
@@ -232,8 +223,7 @@ export function VisualizationContainer({
             <ScatterChart
               data={limitedData}
               height="100%"
-              xAxisKey={validConfig.xAxisKey}
-              yAxisKey={validConfig.yAxisKey}
+              series={validConfig.series}
             />
           </Box>
         );
@@ -316,9 +306,7 @@ export function VisualizationContainer({
             <BubbleChart
               data={limitedData}
               height="100%"
-              xAxisKey={validConfig.xAxisKey}
-              yAxisKey={validConfig.yAxisKey}
-              sizeKey={validConfig.sizeKey}
+              series={validConfig.series}
             />
           </Box>
         );

@@ -272,7 +272,7 @@ describe("AvaPageDataMigration - v3", () => {
     });
   });
 
-  it("passes pie / funnel / scatter / bubble through unchanged in shape", () => {
+  it("upgrades scatter to series-array shape", () => {
     const upgraded = AvaPageDataMigrationV3.upgrade(
       v2Dashboard(
         {
@@ -288,8 +288,7 @@ describe("AvaPageDataMigration - v3", () => {
       | undefined;
     expect(dataViz?.props.vizConfig).toEqual({
       vizType: "scatter",
-      xAxisKey: "x",
-      yAxisKey: "y",
+      series: [{ xKey: "x", key: "y" }],
     });
   });
 });

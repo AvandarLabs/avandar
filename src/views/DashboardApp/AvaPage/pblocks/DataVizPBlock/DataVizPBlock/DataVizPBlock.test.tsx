@@ -203,8 +203,7 @@ describe("DataVizPBlock", () => {
       vizType: "scatter",
       vizConfig: {
         vizType: "scatter",
-        xAxisKey: "value",
-        yAxisKey: "score",
+        series: [{ xKey: "value", key: "score" }],
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -275,9 +274,7 @@ describe("DataVizPBlock", () => {
       vizType: "bubble",
       vizConfig: {
         vizType: "bubble",
-        xAxisKey: "value",
-        yAxisKey: "score",
-        sizeKey: "value",
+        series: [{ xKey: "value", key: "score", sizeKey: "value" }],
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(

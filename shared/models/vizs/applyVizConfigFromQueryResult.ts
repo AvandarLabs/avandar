@@ -2,7 +2,12 @@ import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizF
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  BubbleSeries,
+  RadarSeries,
+  ScatterSeries,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
@@ -66,16 +71,19 @@ export function isVizConfigEqualForQueryResultSync(
     return ax.xAxisKey === bx.xAxisKey && _sameSeriesKeys(ax.series, bx.series);
   }
 
-  const ax = a as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
-  const bx = b as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
+  if (vt === "scatter") {
+    const as_ = a as { series: readonly ScatterSeries[] };
+    const bs_ = b as { series: readonly ScatterSeries[] };
+    return _sameSeriesKeys(as_.series, bs_.series);
+  }
 
-  return ax.xAxisKey === bx.xAxisKey && ax.yAxisKey === bx.yAxisKey;
+  if (vt === "bubble") {
+    const as_ = a as { series: readonly BubbleSeries[] };
+    const bs_ = b as { series: readonly BubbleSeries[] };
+    return _sameSeriesKeys(as_.series, bs_.series);
+  }
+
+  return false;
 }
 
 function _sameSeriesKeys(
@@ -219,23 +227,35 @@ function _clearStaleAxisKeys(
     return { config: cleared, didChange };
   }
 
-  // scatter and bubble (still use yAxisKey)
-  const xy = vizConfig as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
-  let cleared: VizConfig = vizConfig;
-  let didChange = false;
-
-  if (xy.xAxisKey !== undefined && !resultColumnNames.has(xy.xAxisKey)) {
-    cleared = { ...cleared, xAxisKey: undefined } as VizConfig;
-    didChange = true;
+  // scatter and bubble now use series arrays
+  if (vt === "scatter") {
+    const sv = vizConfig as { series: readonly ScatterSeries[] };
+    const filtered = sv.series.filter((s) => {
+      return resultColumnNames.has(s.xKey) && resultColumnNames.has(s.key);
+    });
+    if (filtered.length !== sv.series.length) {
+      return {
+        config: { ...vizConfig, series: filtered } as VizConfig,
+        didChange: true,
+      };
+    }
+    return { config: vizConfig, didChange: false };
   }
 
-  if (xy.yAxisKey !== undefined && !resultColumnNames.has(xy.yAxisKey)) {
-    cleared = { ...cleared, yAxisKey: undefined } as VizConfig;
-    didChange = true;
+  // bubble
+  const bv = vizConfig as { series: readonly BubbleSeries[] };
+  const filtered = bv.series.filter((s) => {
+    return (
+      resultColumnNames.has(s.xKey) &&
+      resultColumnNames.has(s.key) &&
+      resultColumnNames.has(s.sizeKey)
+    );
+  });
+  if (filtered.length !== bv.series.length) {
+    return {
+      config: { ...vizConfig, series: filtered } as VizConfig,
+      didChange: true,
+    };
   }
-
-  return { config: cleared, didChange };
+  return { config: vizConfig, didChange: false };
 }

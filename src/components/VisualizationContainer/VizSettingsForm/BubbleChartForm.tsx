@@ -1,10 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { useMemo } from "react";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import { Stack } from "@mantine/core";
+import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];
@@ -12,70 +10,20 @@ type Props = {
   onConfigChange: (newConfig: BubbleChartVizConfig) => void;
 };
 
-export function BubbleChartForm({
-  fields,
-  config,
-  onConfigChange,
-}: Props): JSX.Element {
-  const { t } = useLingui();
-  const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
-      { valueKey: "name", labelKey: "name" },
-    );
-  }, [fields]);
-
-  const { xAxisKey, yAxisKey, sizeKey } = config;
-
+/**
+ * Settings form for the multi-series bubble chart. Delegates series
+ * management to `BubbleSeriesFieldset`.
+ */
+export function BubbleChartForm({ fields, config, onConfigChange }: Props): JSX.Element {
   return (
-    <>
-      <Select
-        allowDeselect
-        data={numericFieldOptions}
-        label={t`X Axis (numeric)`}
-        value={xAxisKey}
-        disabled={numericFieldOptions.length === 0}
-        placeholder={
-          numericFieldOptions.length === 0 ?
-            t`There are no numeric columns`
-          : t`Select a column`
-        }
-        onChange={(field) => {
-          onConfigChange({ ...config, xAxisKey: field ?? undefined });
+    <Stack gap="sm">
+      <BubbleSeriesFieldset
+        fields={fields}
+        series={config.series}
+        onChange={(next: BubbleSeries[]) => {
+          onConfigChange({ ...config, series: next });
         }}
       />
-
-      <Select
-        allowDeselect
-        data={numericFieldOptions}
-        label={t`Y Axis (numeric)`}
-        value={yAxisKey}
-        disabled={numericFieldOptions.length === 0}
-        placeholder={
-          numericFieldOptions.length === 0 ?
-            t`There are no numeric columns`
-          : t`Select a column`
-        }
-        onChange={(field) => {
-          onConfigChange({ ...config, yAxisKey: field ?? undefined });
-        }}
-      />
-
-      <Select
-        allowDeselect
-        data={numericFieldOptions}
-        label={t`Bubble size (numeric)`}
-        value={sizeKey}
-        disabled={numericFieldOptions.length === 0}
-        placeholder={
-          numericFieldOptions.length === 0 ?
-            t`There are no numeric columns`
-          : t`Select a column`
-        }
-        onChange={(field) => {
-          onConfigChange({ ...config, sizeKey: field ?? undefined });
-        }}
-      />
-    </>
+    </Stack>
   );
 }

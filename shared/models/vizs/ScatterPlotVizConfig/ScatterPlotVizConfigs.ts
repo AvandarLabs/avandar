@@ -1,5 +1,5 @@
-import { hydrateXYFromQuery } from "$/models/vizs/hydrateXYFromQuery.ts";
-import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult.ts";
+import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrateScatterSeriesFromQuery.ts";
+import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult.ts";
 import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -12,7 +12,11 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
-import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  BubbleSeries,
+  RadarSeries,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -25,29 +29,46 @@ export const ScatterPlotVizConfigs = {
   displayName: "Scatter Plot",
   descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
 
+  /** Create an empty scatter plot config. */
   makeEmptyConfig: (): ScatterPlotVizConfig => {
-    return { vizType: "scatter", xAxisKey: undefined, yAxisKey: undefined };
+    return { vizType: "scatter", series: [] };
   },
 
+  /**
+   * Hydrate a scatter config from a structured query's column list.
+   * Prunes series referencing missing columns; seeds from the first two
+   * numeric columns when the series array is empty.
+   */
   hydrateFromQuery: (
     vizConfig: ScatterPlotVizConfig,
     query: PartialStructuredQuery,
   ): ScatterPlotVizConfig => {
-    return hydrateXYFromQuery(vizConfig, query);
+    return hydrateScatterSeriesFromQuery(vizConfig, query);
   },
 
+  /**
+   * Hydrate a scatter config from query result columns.
+   * Prunes series referencing missing columns; seeds from the first two
+   * numeric columns when the series array is empty.
+   */
   hydrateFromQueryResult: (
     vizConfig: ScatterPlotVizConfig,
     columns: readonly QueryResultColumn[],
   ): ScatterPlotVizConfig => {
-    return hydrateXYFromQueryResult(vizConfig, columns, "scatter");
+    return hydrateScatterSeriesFromQueryResult(vizConfig, columns);
   },
 
+  /**
+   * Convert a scatter config to any other viz type.
+   */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: ScatterPlotVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, yAxisKey } = vizConfig;
+    const firstSeries = vizConfig.series[0];
+    const xAxisKey = firstSeries?.xKey;
+    const yAxisKey = firstSeries?.key;
+
     const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
       if (yAxisKey === undefined) {
         return [];
@@ -57,6 +78,7 @@ export const ScatterPlotVizConfigs = {
       }
       return [{ renderAs, key: yAxisKey }];
     };
+
     return match<VizType>(newVizType)
       .with("table", (vizType): TableVizConfig => {
         return { vizType };
@@ -114,7 +136,10 @@ export const ScatterPlotVizConfigs = {
         };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, xAxisKey, yAxisKey, sizeKey: undefined };
+        const bubbleSeries: BubbleSeries[] = vizConfig.series.map((s) => {
+          return { xKey: s.xKey, key: s.key, sizeKey: s.key, label: s.label, color: s.color };
+        });
+        return { vizType, series: bubbleSeries };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

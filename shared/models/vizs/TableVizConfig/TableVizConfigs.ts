@@ -71,7 +71,7 @@ export const TableVizConfigs = {
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, xAxisKey: undefined, yAxisKey: undefined };
+        return { vizType, series: [] };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -95,12 +95,7 @@ export const TableVizConfigs = {
         };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return {
-          vizType,
-          xAxisKey: undefined,
-          yAxisKey: undefined,
-          sizeKey: undefined,
-        };
+        return { vizType, series: [] };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

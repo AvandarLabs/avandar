@@ -157,8 +157,10 @@ function _upgradeVizConfig(v2: V2_VizConfig): VizConfig {
     case "scatter":
       return {
         vizType: "scatter",
-        xAxisKey: v2.xAxisKey,
-        yAxisKey: v2.yAxisKey,
+        series:
+          v2.xAxisKey !== undefined && v2.yAxisKey !== undefined ?
+            [{ xKey: v2.xAxisKey, key: v2.yAxisKey }]
+          : [],
       };
     case "pie":
       return {
@@ -190,9 +192,16 @@ function _upgradeVizConfig(v2: V2_VizConfig): VizConfig {
     case "bubble":
       return {
         vizType: "bubble",
-        xAxisKey: v2.xAxisKey,
-        yAxisKey: v2.yAxisKey,
-        sizeKey: v2.sizeKey,
+        series:
+          v2.xAxisKey !== undefined && v2.yAxisKey !== undefined ?
+            [
+              {
+                xKey: v2.xAxisKey,
+                key: v2.yAxisKey,
+                sizeKey: v2.sizeKey ?? v2.yAxisKey,
+              },
+            ]
+          : [],
       };
   }
 }
@@ -239,12 +248,14 @@ function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
         color: first?.color,
       };
     }
-    case "scatter":
+    case "scatter": {
+      const first = curr.series[0];
       return {
         vizType: "scatter",
-        xAxisKey: curr.xAxisKey,
-        yAxisKey: curr.yAxisKey,
+        xAxisKey: first?.xKey,
+        yAxisKey: first?.key,
       };
+    }
     case "pie":
       return {
         vizType: "pie",
@@ -271,12 +282,14 @@ function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
         color: first?.color,
       };
     }
-    case "bubble":
+    case "bubble": {
+      const first = curr.series[0];
       return {
         vizType: "bubble",
-        xAxisKey: curr.xAxisKey,
-        yAxisKey: curr.yAxisKey,
-        sizeKey: curr.sizeKey,
+        xAxisKey: first?.xKey,
+        yAxisKey: first?.key,
+        sizeKey: first?.sizeKey,
       };
+    }
   }
 }
