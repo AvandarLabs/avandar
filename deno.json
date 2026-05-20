@@ -1,19 +1,5 @@
 {
-  "__comment": "This is the Deno config for the local repo. It is used only to make Deno type checking work locally. It is not loaded into Supabase edge functions",
-  "workspace": [
-    "./supabase/functions/_shared",
-    "./supabase/functions/google-auth",
-    "./supabase/functions/google-auth-callback",
-    "./supabase/functions/google-sheets",
-    "./supabase/functions/healthz",
-    "./supabase/functions/polar-public",
-    "./supabase/functions/queries",
-    "./supabase/functions/subscriptions",
-    "./supabase/functions/waitlist",
-    "./supabase/functions/workspaces",
-    "./supabase/functions/support",
-    "./supabase/functions/chat"
-  ],
+  "__comment": "Local Deno/VS Code config only. Supabase edge bundler also reads this file: shared/ resolves here, so npm imports must match supabase/functions/*/deno.json. Do not add a workspace array — it breaks Supabase Preview.",
   "imports": {
     "$/": "./shared/",
     "@sbfn/": "./supabase/functions/",
@@ -22,7 +8,19 @@
     "@models/": "./packages/shared/models/src/",
     "@modules/": "./packages/shared/modules/src/",
     "@utils/": "./packages/shared/utils/src/",
-    "jose": "jsr:@panva/jose@6"
+    "@react-email/components": "npm:@react-email/components@0",
+    "@react-email/render": "npm:@react-email/render@1",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
+    "@upstash/redis": "npm:@upstash/redis@1",
+    "google-auth-library": "npm:google-auth-library@10",
+    "googleapis": "npm:googleapis@154",
+    "jose": "jsr:@panva/jose@6",
+    "react": "npm:react@19",
+    "resend": "npm:resend@6",
+    "ts-pattern": "npm:ts-pattern@5",
+    "type-fest": "npm:type-fest@5",
+    "zod": "npm:zod@4"
   },
   "compilerOptions": {
     "experimentalDecorators": true,
