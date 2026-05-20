@@ -6,8 +6,8 @@ import {
   shouldCloseBillingSetupModal,
   shouldOpenBillingSetupModal,
 } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/workspaceBillingSetup";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
 /**
  * Hook to ensure that the workspace has a billing setup.
@@ -45,9 +45,7 @@ export function useEnsureWorkspaceBilling(): void {
               </Text>
             ),
             size: "100%",
-            children: (
-              <WorkspaceBillingView hideTitle workspace={workspace} />
-            ),
+            children: <WorkspaceBillingView hideTitle workspace={workspace} />,
             styles: {
               content: {
                 height: "100%",

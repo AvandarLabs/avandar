@@ -185,9 +185,9 @@ async function _findPaymentFrame(page: Page): Promise<Frame> {
  */
 export async function assertPolarCheckoutPageReady(page: Page): Promise<void> {
   await expect(page).toHaveURL(/polar\./i, { timeout: LONG_WAIT });
-  await expect(
-    page.getByRole("textbox", { name: /^email$/i }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  await expect(page.getByRole("textbox", { name: /^email$/i })).toBeVisible({
+    timeout: LONG_WAIT,
+  });
 
   await expect(async () => {
     await _findPaymentFrame(page);
@@ -195,7 +195,8 @@ export async function assertPolarCheckoutPageReady(page: Page): Promise<void> {
 }
 
 /**
- * Fills Stripe card and cardholder fields on Polar checkout (no billing address).
+ * Fills Stripe card and cardholder fields on Polar checkout
+ * (no billing address).
  */
 export async function fillPolarStripeCardFieldsOnly(page: Page): Promise<void> {
   let paymentFrame: Frame;
@@ -213,15 +214,15 @@ export async function fillPolarStripeCardFieldsOnly(page: Page): Promise<void> {
     .getByRole("textbox", { name: /security code|cvc/i })
     .pressSequentially(STRIPE_TEST_CVC, { delay: 30 });
 
-  await page.getByRole("textbox", { name: /cardholder name/i }).fill(
-    "E2E Tester",
-  );
+  await page
+    .getByRole("textbox", { name: /cardholder name/i })
+    .fill("E2E Tester");
 }
 
 /**
  * Hybrid Polar paid checkout for e2e.
  *
- * ROADBLOCK: Polar sandbox billing address fields use Radix comboboxes (country,
+ * ROADBLOCK: Polar sandbox billing address uses Radix comboboxes (country,
  * province/state) that Playwright cannot drive reliably. Geo defaults vary per
  * run (Country placeholder, Canada+Province only, or US street fields with
  * Canada still selected). Hidden `<select>` updates desync the visible UI;

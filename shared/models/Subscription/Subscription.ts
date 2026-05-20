@@ -10,7 +10,7 @@ import type {
 export { SubscriptionModule as Subscription } from "$/models/Subscription/SubscriptionModule.ts";
 export namespace Subscription {
   export type T = SubscriptionRead;
-  /** Polar subscription id (path params for Polar-backed subscription routes). */
+  /** Polar subscription id (Polar-backed subscription route params). */
   export type Id = SubscriptionId;
   /** Supabase `subscriptions.id` primary key. */
   export type RowId = SubscriptionRowId;

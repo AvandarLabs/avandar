@@ -78,7 +78,9 @@ create table public.subscriptions (
   -- this should be kept in sync with the number of paid seats.
   -- Use `null` to indicate unlimited.
   max_shareable_dashboards_allowed integer,
-  constraint subscriptions_polar_subscription_id_key unique (polar_subscription_id)
+  constraint subscriptions_polar_subscription_id_key unique (
+    polar_subscription_id
+  )
 );
 
 -- Indexes to improve performance

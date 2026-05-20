@@ -25,9 +25,7 @@ export async function getSubscriptionRowForWorkspaceSlug(options: {
       .maybeSingle();
 
   if (workspaceError) {
-    throw new Error(
-      `[e2e] workspace lookup failed: ${workspaceError.message}`,
-    );
+    throw new Error(`[e2e] workspace lookup failed: ${workspaceError.message}`);
   }
 
   if (!workspaceRow) {

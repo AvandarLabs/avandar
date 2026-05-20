@@ -1,8 +1,8 @@
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { UserId } from "$/models/User/User.types.ts";
-import type { UUID } from "@utils/types/common.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
+import type { UUID } from "@utils/types/common.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 type SubscriptionPermissionOptions = {

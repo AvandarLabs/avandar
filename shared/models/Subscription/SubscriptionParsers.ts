@@ -13,7 +13,6 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
-import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type {
   PolarCustomerId,
   PolarProductId,
@@ -21,6 +20,7 @@ import type {
   SubscriptionRead,
   SubscriptionRowId,
 } from "$/models/Subscription/Subscription.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { SetOptional } from "type-fest";

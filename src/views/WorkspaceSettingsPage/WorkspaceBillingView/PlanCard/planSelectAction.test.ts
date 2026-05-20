@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
-import type {
-  SubscriptionPlan,
-} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UUID } from "@utils/types/common.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 const FREE_PLAN = {
   priceType: "free",

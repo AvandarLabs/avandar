@@ -177,40 +177,44 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
       .querySchema({
         returnURL: z.url(),
       })
-      .action(async ({ pathParams, queryParams, supabaseAdminClient, user }) => {
-        if (pathParams.userId !== user.id) {
-          throw new AvaHTTPError(
-            "Cannot open the billing portal for another user.",
-            FORBIDDEN,
+      .action(
+        async ({ pathParams, queryParams, supabaseAdminClient, user }) => {
+          if (pathParams.userId !== user.id) {
+            throw new AvaHTTPError(
+              "Cannot open the billing portal for another user.",
+              FORBIDDEN,
+            );
+          }
+
+          // first check if the user has a subscription
+          const { data: subscriptions } = await supabaseAdminClient
+            .from("subscriptions")
+            .select("polar_subscription_id, polar_customer_id")
+            .eq("subscription_owner_id", pathParams.userId);
+          if (!subscriptions || subscriptions.length === 0) {
+            return { success: false };
+          }
+
+          const subscriptionWithPolarCustomer = subscriptions.find(
+            (subscriptionRow) => {
+              return subscriptionRow.polar_customer_id != null;
+            },
           );
-        }
 
-        // first check if the user has a subscription
-        const { data: subscriptions } = await supabaseAdminClient
-          .from("subscriptions")
-          .select("polar_subscription_id, polar_customer_id")
-          .eq("subscription_owner_id", pathParams.userId);
-        if (!subscriptions || subscriptions.length === 0) {
-          return { success: false };
-        }
+          if (subscriptionWithPolarCustomer === undefined) {
+            return { success: false };
+          }
 
-        const subscriptionWithPolarCustomer = subscriptions.find(
-          (subscriptionRow) => subscriptionRow.polar_customer_id != null,
-        );
-
-        if (subscriptionWithPolarCustomer === undefined) {
-          return { success: false };
-        }
-
-        const customerSession = await PolarClient.createCustomerSessions({
-          customerId: subscriptionWithPolarCustomer.polar_customer_id,
-          returnURL: queryParams.returnURL,
-        });
-        return {
-          success: true,
-          customerPortalURL: customerSession.customerPortalUrl,
-        };
-      }),
+          const customerSession = await PolarClient.createCustomerSessions({
+            customerId: subscriptionWithPolarCustomer.polar_customer_id,
+            returnURL: queryParams.returnURL,
+          });
+          return {
+            success: true,
+            customerPortalURL: customerSession.customerPortalUrl,
+          };
+        },
+      ),
   },
 
   "/:subscriptionId/permissions/:permissionType": {

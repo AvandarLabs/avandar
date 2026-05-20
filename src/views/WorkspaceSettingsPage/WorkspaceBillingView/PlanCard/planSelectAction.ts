@@ -1,6 +1,6 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 export type PlanSelectAction =
   | { type: "create_native_free" }
@@ -16,14 +16,11 @@ export function resolvePlanSelectAction(options: {
   currentSubscribedPlan: SubscriptionPlan | undefined;
   selectedPlan: SubscriptionPlan;
 }): PlanSelectAction {
-  const { currentSubscription, currentSubscribedPlan, selectedPlan } =
-    options;
+  const { currentSubscription, currentSubscribedPlan, selectedPlan } = options;
 
   if (selectedPlan.priceType === "free") {
     if (
-      SubscriptionModule.shouldCreateNativeFreeSubscription(
-        currentSubscription,
-      )
+      SubscriptionModule.shouldCreateNativeFreeSubscription(currentSubscription)
     ) {
       return { type: "create_native_free" };
     }

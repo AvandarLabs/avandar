@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveFeaturePlanTypeForWorkspace } from "@/hooks/workspaces/resolveFeaturePlanTypeForWorkspace";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { UUID } from "@utils/types/common.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},

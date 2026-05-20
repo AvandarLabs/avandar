@@ -174,7 +174,9 @@ function AppShellComponent({
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
-          {currentWorkspace ? <ChatPanel /> : null}
+          {currentWorkspace ?
+            <ChatPanel />
+          : null}
         </MantineAppShell.Aside>
       </MantineAppShell>
 

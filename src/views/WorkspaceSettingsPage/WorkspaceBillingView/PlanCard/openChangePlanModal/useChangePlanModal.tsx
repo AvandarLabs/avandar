@@ -6,11 +6,11 @@ import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
-import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
-import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
+import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
+import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -123,10 +123,8 @@ export function useChangePlanModal(): (
       ),
       labels: {
         confirm:
-          newPlan.priceType === "custom" ?
-            "Go to billing portal"
-          : isNativeFreeDowngrade ?
-            "Switch to Free plan"
+          newPlan.priceType === "custom" ? "Go to billing portal"
+          : isNativeFreeDowngrade ? "Switch to Free plan"
           : "Update subscription",
         cancel: "Cancel",
       },

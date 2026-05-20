@@ -1,6 +1,8 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
-import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+import type {
+  FeaturePlanType,
+  SubscriptionRead,
+} from "$/models/Subscription/Subscription.types";
 
 export type ResolvedFeaturePlanType =
   | { type: "plan"; featurePlanType: FeaturePlanType }

@@ -1,6 +1,6 @@
 import { useQuery } from "@hooks";
 import { Container, Stack, Title } from "@mantine/core";
-import { Tabs, Paper  } from "@ui";
+import { Paper, Tabs } from "@ui";
 import { where } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { APIClient } from "@/clients/APIClient";

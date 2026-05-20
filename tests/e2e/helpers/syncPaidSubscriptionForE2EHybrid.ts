@@ -62,9 +62,7 @@ export async function syncPaidSubscriptionForE2EHybrid(
     .maybeSingle();
 
   if (lookupError) {
-    throw new Error(
-      `[e2e] subscription lookup failed: ${lookupError.message}`,
-    );
+    throw new Error(`[e2e] subscription lookup failed: ${lookupError.message}`);
   }
 
   if (
@@ -96,9 +94,7 @@ export async function syncPaidSubscriptionForE2EHybrid(
     .insert(polarFields);
 
   if (insertError) {
-    throw new Error(
-      `[e2e] subscription insert failed: ${insertError.message}`,
-    );
+    throw new Error(`[e2e] subscription insert failed: ${insertError.message}`);
   }
 
   return { polarSubscriptionId };

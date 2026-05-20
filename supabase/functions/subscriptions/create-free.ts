@@ -1,7 +1,7 @@
-import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
-import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { CONFLICT, FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
+import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 
@@ -31,7 +31,9 @@ export const CreateFreeSubscription = POST("/create-free")
 
     const { data: existingSubscription } = await supabaseAdminClient
       .from("subscriptions")
-      .select("id, polar_subscription_id, subscription_status, feature_plan_type")
+      .select(
+        "id, polar_subscription_id, subscription_status, feature_plan_type",
+      )
       .eq("workspace_id", workspaceId)
       .maybeSingle()
       .throwOnError();

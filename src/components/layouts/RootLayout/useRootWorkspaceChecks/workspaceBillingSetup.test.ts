@@ -3,8 +3,8 @@ import {
   shouldCloseBillingSetupModal,
   shouldOpenBillingSetupModal,
 } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/workspaceBillingSetup";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { UUID } from "@utils/types/common.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},

@@ -2,10 +2,10 @@ import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { match } from "ts-pattern";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
 import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
 import { useSubscriptionPlans } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
@@ -22,10 +22,7 @@ type Props = {
 export function WorkspaceBillingView(props: Props): JSX.Element {
   if (props.workspace) {
     return (
-      <WorkspaceBillingViewContent
-        {...props}
-        workspace={props.workspace}
-      />
+      <WorkspaceBillingViewContent {...props} workspace={props.workspace} />
     );
   }
 

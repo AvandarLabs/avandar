@@ -86,9 +86,12 @@ export async function setGeneralAccessV2(
   // Wait for the summary line to reflect the workspace share so the next
   // helper call doesn't race the upsert mutation's invalidation.
   const summary = dialog.getByRole("status", { name: "Share summary" });
-  await expect(summary).toContainText(/accessible to anyone with|anyone with/i, {
-    timeout: LONG_WAIT,
-  });
+  await expect(summary).toContainText(
+    /accessible to anyone with|anyone with/i,
+    {
+      timeout: LONG_WAIT,
+    },
+  );
 }
 
 /**

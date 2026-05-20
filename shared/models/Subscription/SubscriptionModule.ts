@@ -131,9 +131,7 @@ export const SubscriptionModule = {
     subscription:
       | Pick<
           SubscriptionRead,
-          | "polarSubscriptionId"
-          | "featurePlanType"
-          | "subscriptionStatus"
+          "polarSubscriptionId" | "featurePlanType" | "subscriptionStatus"
         >
       | undefined,
   ): boolean => {

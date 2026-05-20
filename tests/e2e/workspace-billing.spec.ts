@@ -1,13 +1,13 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { bestEffortRevokePolarSubscriptionForWorkspace } from "./helpers/polarSandbox";
+import { seedCanceledSubscriptionForWorkspace } from "./helpers/seedCanceledSubscriptionForWorkspace";
 import {
   expectNativeFreeSubscription,
   expectPaidPolarSubscription,
 } from "./helpers/subscriptionAssertions";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { syncPaidSubscriptionForE2EHybrid } from "./helpers/syncPaidSubscriptionForE2EHybrid";
-import { seedCanceledSubscriptionForWorkspace } from "./helpers/seedCanceledSubscriptionForWorkspace";
 import { LONG_WAIT } from "./helpers/timeouts";
 import {
   beginPolarCheckoutWait,
@@ -363,10 +363,11 @@ test.describe("workspace billing", () => {
         planHeading: FREE_PLAN_HEADING,
       });
 
-      await expect(page.getByRole("dialog").getByText(CHANGE_PLAN_MODAL_PATTERN))
-        .toBeVisible({
-          timeout: LONG_WAIT,
-        });
+      await expect(
+        page.getByRole("dialog").getByText(CHANGE_PLAN_MODAL_PATTERN),
+      ).toBeVisible({
+        timeout: LONG_WAIT,
+      });
       expect(createFreeCalled).toBe(false);
     } finally {
       try {

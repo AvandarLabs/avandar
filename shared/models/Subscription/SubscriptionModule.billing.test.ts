@@ -1,7 +1,7 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
 import { describe, expect, it } from "vitest";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { UUID } from "@utils/types/common.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},
@@ -108,8 +108,7 @@ describe("SubscriptionModule billing lifecycle", () => {
 
   it("builds native free DB fields with null Polar columns", () => {
     const fields = SubscriptionModule.buildNativeFreeFieldsForDB({
-      workspaceId:
-        "00000000-0000-4000-8000-000000000002" as UUID<"Workspace">,
+      workspaceId: "00000000-0000-4000-8000-000000000002" as UUID<"Workspace">,
       subscriptionOwnerId:
         "00000000-0000-4000-8000-000000000003" as SubscriptionRead["subscriptionOwnerId"],
       startedAt: "2026-01-01T00:00:00.000Z",
@@ -123,18 +122,16 @@ describe("SubscriptionModule billing lifecycle", () => {
 
   it("treats only active and trialing statuses as entitled", () => {
     expect(SubscriptionModule.isEntitlementActiveStatus("active")).toBe(true);
-    expect(SubscriptionModule.isEntitlementActiveStatus("trialing")).toBe(
-      true,
-    );
+    expect(SubscriptionModule.isEntitlementActiveStatus("trialing")).toBe(true);
     expect(SubscriptionModule.isEntitlementActiveStatus("canceled")).toBe(
       false,
     );
   });
 
   it("prompts billing setup when subscription is missing or inactive", () => {
-    expect(
-      SubscriptionModule.shouldPromptForBillingSetup(undefined),
-    ).toBe(true);
+    expect(SubscriptionModule.shouldPromptForBillingSetup(undefined)).toBe(
+      true,
+    );
     expect(
       SubscriptionModule.shouldPromptForBillingSetup(
         _subscription({ subscriptionStatus: "canceled" }),

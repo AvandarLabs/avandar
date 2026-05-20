@@ -111,17 +111,15 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         .match(/dashboards\/edit\/([0-9a-f-]{36})/i);
       const dashboardId = dashboardEditUrlMatch?.[1];
       if (!dashboardId) {
-        throw new Error(
-          `Could not parse dashboard id from URL: ${page.url()}`,
-        );
+        throw new Error(`Could not parse dashboard id from URL: ${page.url()}`);
       }
       createdDashboardIds.push(dashboardId);
 
       // Save the empty dashboard (header has a Save button in the editor).
       await page.getByRole("button", { name: /^save$/i }).click();
-      await expect(
-        page.getByText(/dashboard saved successfully/i),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(page.getByText(/dashboard saved successfully/i)).toBeVisible(
+        { timeout: MEDIUM_WAIT },
+      );
 
       const { error: renameError } = await admin
         .from("dashboards")
@@ -167,15 +165,13 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       await vizTypeSelect.scrollIntoViewIfNeeded();
       await vizTypeSelect.click();
       await page.getByRole("option", { name: /^bar chart$/i }).click();
-      await expect(
-        page.locator(".recharts-bar").first(),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(page.locator(".recharts-bar").first()).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
 
       // Step 5: Open Save -> Save to dashboard, pick the dashboard we made.
       await page.getByRole("button", { name: /^save$/i }).click();
-      await page
-        .getByRole("menuitem", { name: /save to dashboard/i })
-        .click();
+      await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
@@ -183,9 +179,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         .getByRole("option", { name: TARGET_DASHBOARD_NAME })
         .click();
 
-      await page
-        .getByRole("button", { name: /^save to dashboard$/i })
-        .click();
+      await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
       // Toast confirms the save hit the database. We navigate via the
       // sidebar (instead of the toast link) because Mantine notifications
@@ -221,9 +215,9 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       // prompt" placeholder and the bar chart never appears.
       await expect(async () => {
         const editorFrame = page.locator("iframe").first().contentFrame();
-        await expect(
-          editorFrame.locator(".recharts-bar").first(),
-        ).toBeVisible({ timeout: SHORT_WAIT });
+        await expect(editorFrame.locator(".recharts-bar").first()).toBeVisible({
+          timeout: SHORT_WAIT,
+        });
       }).toPass({ timeout: LONG_WAIT });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });

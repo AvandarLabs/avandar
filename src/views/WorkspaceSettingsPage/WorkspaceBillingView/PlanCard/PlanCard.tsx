@@ -1,3 +1,4 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Badge,
   Button,
@@ -8,21 +9,21 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { useMutation } from "@hooks/useMutation/useMutation";
 import { useRouter } from "@tanstack/react-router";
-import { notifyExpiredSession, notifyError, notifySuccess } from "@ui";
+import { notifyError, notifyExpiredSession, notifySuccess } from "@ui";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { UserClient } from "@/clients/UserClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
-import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
 import css from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
+import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
 import { PlanSwitch } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
@@ -30,7 +31,6 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import type {
   FreePlanVariants,
   FreeSubscriptionPlanGroup,
@@ -92,8 +92,7 @@ function getInitialSelectedVariant(
   }
 
   const isMonthlyPlan =
-    planGroup.monthlyPlan.polarProductId ===
-    currentSubscribedPolarProductId;
+    planGroup.monthlyPlan.polarProductId === currentSubscribedPolarProductId;
   return isMonthlyPlan ? "month" : "year";
 }
 
