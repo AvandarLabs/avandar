@@ -175,10 +175,7 @@ export default [
      */
     files: ["apps/desktop/**/*.{ts,tsx}"],
     rules: {
-      "import-x/no-unresolved": [
-        "error",
-        { ignore: ["^bun:", "^duckdb$"] },
-      ],
+      "import-x/no-unresolved": ["error", { ignore: ["^bun:", "^duckdb$"] }],
     },
   },
   {
