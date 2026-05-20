@@ -16,6 +16,7 @@ import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { VoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator";
+import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { AppLink } from "@/config/AppLinks";
@@ -162,7 +163,7 @@ function AppShellComponent({
           withBorder={false}
           style={
             isMobileViewSize ?
-              { zIndex: 300, marginTop: -40, height: "100%" }
+              { zIndex: APP_CHROME_Z_INDEX, marginTop: -40, height: "100%" }
             : undefined
           }
         >

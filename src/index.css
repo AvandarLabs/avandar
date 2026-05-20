@@ -65,6 +65,7 @@ button {
 
   /* z-indexes */
   --mantine-z-index-app-shell-main: ;
+  --mantine-z-index-app-chrome: ;
   --mantine-z-index-modal: ;
 
   /* other colors */

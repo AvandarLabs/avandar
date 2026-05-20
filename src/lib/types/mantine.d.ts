@@ -32,6 +32,7 @@ declare module "@mantine/core" {
 
     zIndex: {
       appShellMain: number;
+      appChrome: number;
       modal: number;
     };
 
