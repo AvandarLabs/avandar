@@ -1,0 +1,54 @@
+.root {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+}
+
+.root :global(.cm-editor) {
+  background: transparent;
+}
+
+.root :global(.cm-scroller) {
+  min-height: inherit;
+}
+
+.root :global(.cm-content) {
+  padding: var(--mantine-spacing-sm);
+}
+
+.rootReadOnly {
+  background: transparent;
+  border: none;
+}
+
+.rootReadOnly :global(.cm-content) {
+  padding: 0;
+}
+
+:global(.sqlPill) {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  font-family: var(--mantine-font-family);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0 var(--mantine-spacing-xs);
+  margin: 0 1px;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+:global(.sqlPill--dataset) {
+  background: var(--mantine-color-primary-1);
+  color: var(--mantine-color-primary-9);
+  border: 1px solid var(--mantine-color-primary-3);
+}
+
+:global(.sqlPill--column) {
+  background: var(--mantine-color-gray-1);
+  color: var(--mantine-color-gray-9);
+  border: 1px solid var(--mantine-color-gray-4);
+}

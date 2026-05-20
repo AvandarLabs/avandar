@@ -1,14 +1,8 @@
 import { Trans } from "@lingui/react/macro";
-import {
-  Code,
-  Group,
-  Popover,
-  ScrollArea,
-  Stack,
-  Text,
-  UnstyledButton,
-} from "@mantine/core";
+import { Group, Popover, ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
+import { SqlEditor } from "@/components/SqlEditor";
+import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./GeneratedPromptBadge.module.css";
 
@@ -21,6 +15,7 @@ import css from "./GeneratedPromptBadge.module.css";
  */
 export function GeneratedPromptBadge(): JSX.Element | null {
   const { nlPrompt, rawSQL } = DataExplorerStateManager.useState();
+  const { catalog } = useSqlDisplayCatalog();
 
   if (!nlPrompt) {
     return null;
@@ -65,9 +60,13 @@ export function GeneratedPromptBadge(): JSX.Element | null {
                 <Trans>Generated SQL</Trans>
               </Text>
               <ScrollArea.Autosize mah={280}>
-                <Code block fz="xs">
-                  {rawSQL}
-                </Code>
+                <SqlEditor
+                  value={rawSQL}
+                  onChange={() => {}}
+                  catalog={catalog}
+                  readOnly
+                  minRows={4}
+                />
               </ScrollArea.Autosize>
             </Stack>
           </Popover.Dropdown>

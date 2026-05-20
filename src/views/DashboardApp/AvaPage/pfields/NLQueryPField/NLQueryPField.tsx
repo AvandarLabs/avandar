@@ -8,10 +8,11 @@ import {
   Paper,
   Stack,
   Text,
-  Textarea,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { Tabs, TextareaForm } from "@ui";
+import { Tabs } from "@ui";
+import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
+import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { mantineColorVar } from "@/lib/utils/browser/css";
@@ -189,6 +190,7 @@ function SqlTabPanel({
 }): JSX.Element {
   const { t } = useLingui();
   const [isEditSQLMode, setIsEditSQLMode] = useState(false);
+  const { catalog } = useSqlDisplayCatalog();
 
   return (
     <Stack gap="sm" px="sm">
@@ -237,32 +239,14 @@ function SqlTabPanel({
       >
         <Stack gap="sm">
           {isEditSQLMode ?
-            <TextareaForm
-              // use the rawSQL as the key to force the textarea form to
-              // re-initialize when we re-run a query, so we can properly
-              // detect dirty state
-              key={rawSql}
-              asField
-              defaultValue={rawSql}
-              minRows={6}
-              autosize
-              showSubmitButton={true}
-              showCancelButton={true}
+            <SqlQueryEditPanel
+              initialSql={rawSql}
+              catalog={catalog}
               submitButtonLabel={t`Save and re-run query`}
               cancelButtonLabel={t`Cancel`}
-              isSubmitting={false}
-              styles={{
-                input: {
-                  fontFamily: "monospace",
-                },
-              }}
-              validateOnChange={true}
-              required={true}
-              disabledUntilDirty={true}
               onSubmit={(newRawSQL) => {
-                const trimmedSQL = newRawSQL.trim();
                 setIsEditSQLMode(false);
-                onSubmitSql(trimmedSQL);
+                onSubmitSql(newRawSQL);
               }}
               onCancel={() => {
                 setIsEditSQLMode(false);
@@ -275,19 +259,12 @@ function SqlTabPanel({
                 border: `1px solid ${mantineColorVar("gray.3")}`,
               }}
             >
-              <Textarea
+              <SqlEditor
                 value={rawSql}
+                onChange={() => {}}
+                catalog={catalog}
                 readOnly
                 minRows={6}
-                autosize
-                styles={{
-                  input: {
-                    fontFamily: "monospace",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    padding: 0,
-                  },
-                }}
               />
             </Paper>
           }
