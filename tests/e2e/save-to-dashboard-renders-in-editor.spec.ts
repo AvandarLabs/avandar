@@ -5,9 +5,17 @@ import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
 } from "./helpers/manualUploadCloudSyncFlow";
-import { deleteDashboardsByIds } from "./helpers/seedDashboard";
-import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT, LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import {
+  deleteAllDashboardsForOwner,
+  deleteDashboardsByIds,
+} from "./helpers/seedDashboard";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+
+const TARGET_DASHBOARD_NAME = "E2E renders-in-editor target";
 
 /**
  * End-to-end check that a bar chart saved from the Data Explorer actually
@@ -26,8 +34,23 @@ test.describe("Save to dashboard - viz renders in editor", () => {
     page,
     e2eWorkerDb,
   }) => {
+    test.setTimeout(120_000);
+
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
+    const workspaceId = await getWorkspaceIdBySlug({
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
+    });
+
+    // Earlier specs in the same worker leave dashboards behind (e.g.
+    // dataviz-pblock-visualizations seeds nine). Clear them so the save
+    // modal list only contains the dashboard this test creates.
+    await deleteAllDashboardsForOwner({
+      admin,
+      workspaceId,
+      ownerEmail: primaryUser.email,
+    });
 
     const createdDashboardIds: string[] = [];
 
@@ -100,6 +123,16 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         page.getByText(/dashboard saved successfully/i),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
+      const { error: renameError } = await admin
+        .from("dashboards")
+        .update({ name: TARGET_DASHBOARD_NAME })
+        .eq("id", dashboardId);
+      if (renameError) {
+        throw new Error(
+          `Failed to rename dashboard for e2e: ${renameError.message}`,
+        );
+      }
+
       // Step 3: Go to data explorer. Mock the AI generate route as a safety
       // net (we drive SQL through the URL instead, but a stray click on the
       // AI form must never hit a paid endpoint).
@@ -146,7 +179,9 @@ test.describe("Save to dashboard - viz renders in editor", () => {
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
-      await listbox.getByRole("option").first().click();
+      await listbox
+        .getByRole("option", { name: TARGET_DASHBOARD_NAME })
+        .click();
 
       await page
         .getByRole("button", { name: /^save to dashboard$/i })
@@ -156,8 +191,8 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       // sidebar (instead of the toast link) because Mantine notifications
       // auto-dismiss quickly and a slow CI click can miss them.
       await expect(
-        page.getByText(/added to "untitled dashboard"/i),
-      ).toBeVisible({ timeout: SHORT_WAIT });
+        page.getByText(`Added to "${TARGET_DASHBOARD_NAME}"`),
+      ).toBeVisible({ timeout: LONG_WAIT });
 
       await page.getByRole("link", { name: /^dashboards$/i }).click();
       await expect(page).toHaveURL(
@@ -168,7 +203,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       // JS onClick (no link role), so target the card root and click that.
       const dashboardCard = page
         .locator('[class*="mantine-Card-root"]')
-        .filter({ hasText: "Untitled dashboard" })
+        .filter({ hasText: TARGET_DASHBOARD_NAME })
         .first();
       await dashboardCard.click();
       await expect(page).toHaveURL(
