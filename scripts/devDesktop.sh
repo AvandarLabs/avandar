@@ -33,9 +33,21 @@ vite_ready() {
     "${VITE_URL}/" 2>/dev/null
 }
 
+if [ ! -f "${ROOT_DIR}/.env.development" ]; then
+  echo "[dev:desktop] .env.development not found at ${ROOT_DIR}/.env.development — run 'pnpm env:reset' first." >&2
+  exit 1
+fi
+
+# Electrobun launches with CWD=apps/desktop, so Bun won't auto-load the
+# repo-root .env.development. We inject it explicitly via dotenv-cli so
+# the bun-main process sees VITE_SUPABASE_API_URL / VITE_SUPABASE_ANON_KEY
+# (the desktop auth IPC handler hits the Supabase REST endpoint directly
+# and needs them at sign-in time).
+DESKTOP_CMD=(pnpm dotenv -e .env.development -- pnpm --filter @avandar/desktop dev)
+
 if vite_ready; then
   echo "[dev:desktop] Vite already serving on ${VITE_URL} — reusing it (skipping pnpm dev)"
-  exec pnpm --filter @avandar/desktop dev
+  exec "${DESKTOP_CMD[@]}"
 fi
 
 echo "[dev:desktop] No dev server on ${VITE_URL} — starting pnpm dev in the background"
@@ -82,4 +94,4 @@ while ! vite_ready; do
 done
 
 echo "[dev:desktop] Vite is up after ${elapsed}s — launching Electrobun."
-pnpm --filter @avandar/desktop dev
+"${DESKTOP_CMD[@]}"
