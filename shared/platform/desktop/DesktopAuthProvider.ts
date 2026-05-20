@@ -14,14 +14,14 @@
  * isn't on the design's risk register.
  */
 
-import { callIpc } from "$/platform/ipc/client";
-import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts";
+import { callIpc } from "$/platform/ipc/client.ts";
+import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts.ts";
 import type {
   AuthCredentials,
   AuthProvider,
   Session,
   Unsubscribe,
-} from "$/platform/types/AuthProvider.types";
+} from "$/platform/types/AuthProvider.types.ts";
 
 const listeners = new Set<(session: Session | null) => void>();
 

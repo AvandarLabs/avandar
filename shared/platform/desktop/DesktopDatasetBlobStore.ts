@@ -1,7 +1,8 @@
 /*
  * Webview-side adapter that satisfies the platform-agnostic
  * `DatasetBlobStore` interface by routing every call through the
- * Bun-main blob IPC handlers (`apps/desktop/main/ipc/registerDatasetBlobHandlers/`).
+ * Bun-main blob IPC handlers
+ * (`apps/desktop/main/ipc/registerDatasetBlobHandlers/`).
  *
  * Ships in isolation for now: no React code imports it yet. Soon, the
  * `PlatformProvider` + `usePlatform()` plumbing will pick this adapter
@@ -15,13 +16,13 @@
  * uploads.
  */
 
-import { callIpc } from "$/platform/ipc/client";
-import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts";
+import { callIpc } from "$/platform/ipc/client.ts";
+import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 import type {
   DatasetBlobKey,
   DatasetBlobStat,
   DatasetBlobStore,
-} from "$/platform/types/DatasetBlobStore.types";
+} from "$/platform/types/DatasetBlobStore.types.ts";
 
 async function _readStreamToUint8Array(
   stream: ReadableStream<Uint8Array>,

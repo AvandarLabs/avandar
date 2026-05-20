@@ -156,7 +156,8 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         { timeout: SHORT_WAIT },
       );
 
-      // Step 6: Confirm the saved Puck block includes the bar chart config and SQL.
+      // Step 6: Confirm the saved Puck block includes the bar chart
+      // config and SQL.
       // Iframe rendering for explorer-saved blocks is covered by
       // `dataviz-pblock-visualizations.spec.ts`; this spec focuses on the
       // save-to-dashboard integration path under the 45s local budget.

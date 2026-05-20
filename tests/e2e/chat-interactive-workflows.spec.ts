@@ -162,12 +162,12 @@ test.describe("chat interactive workflows", () => {
     // Choose "North" and confirm. The chat Aside clips overflow, so Playwright
     // cannot scroll the radio into the viewport; dispatch the click in-page.
     await page.getByRole("radio", { name: "North" }).evaluate((node) => {
-      (node as HTMLInputElement).click();
+      (node as { click: () => void }).click();
     });
     const confirmButton = page.getByRole("button", { name: /^confirm$/i });
     await expect(confirmButton).toBeEnabled({ timeout: SHORT_WAIT });
     await confirmButton.evaluate((node) => {
-      (node as HTMLButtonElement).click();
+      (node as { click: () => void }).click();
     });
 
     // The next assistant turn fires; "Here is the SQL." appears

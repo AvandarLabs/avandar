@@ -129,7 +129,7 @@ function PlanFlowCanvas(): JSX.Element {
         workspaceId: workspace.id,
       });
     },
-    [planId, dispatch],
+    [planId, dispatch, workspace.id],
   );
 
   // Auto-run on first load when runMode === 'auto'. Key off the planId

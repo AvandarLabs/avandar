@@ -55,7 +55,7 @@ export type FileSystemDatasetBlobStore = {
   getBytes(key: string): Promise<Uint8Array>;
   delete(key: string): Promise<void>;
   exists(key: string): Promise<boolean>;
-  list(prefix: string): Promise<ReadonlyArray<string>>;
+  list(prefix: string): Promise<readonly string[]>;
   stat(key: string): Promise<FileSystemBlobStat | null>;
 };
 
@@ -68,7 +68,11 @@ function _assertSafeKey(key: string): void {
     throw new Error("Invalid dataset blob key: empty string");
   }
   const segments = key.split(/[/\\]/);
-  if (segments.some((s) => s === "..")) {
+  if (
+    segments.some((segment) => {
+      return segment === "..";
+    })
+  ) {
     throw new Error(`Invalid dataset blob key (path traversal): ${key}`);
   }
   if (key.startsWith("/") || /^[A-Za-z]:[/\\]/.test(key)) {

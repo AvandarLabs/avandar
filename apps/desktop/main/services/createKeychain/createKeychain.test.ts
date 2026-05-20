@@ -17,7 +17,7 @@ import type { KeychainSpawner } from "./createKeychain";
  */
 
 type SpawnCall = {
-  argv: ReadonlyArray<string>;
+  argv: readonly string[];
   stdinWrites: string[];
   stdinEnded: boolean;
 };
@@ -33,7 +33,7 @@ function makeFakeSpawn(result: FakeChildResult): {
   calls: SpawnCall[];
 } {
   const calls: SpawnCall[] = [];
-  const spawn = ((argv: ReadonlyArray<string>, _options: unknown) => {
+  const spawn = ((argv: readonly string[], _options: unknown) => {
     const call: SpawnCall = { argv, stdinWrites: [], stdinEnded: false };
     calls.push(call);
 

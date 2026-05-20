@@ -74,7 +74,7 @@ export function createKeychain(spawn?: KeychainSpawner): Keychain {
   }
   const spawnFn = spawn;
   async function run(
-    argv: ReadonlyArray<string>,
+    argv: readonly string[],
     stdinPayload?: string,
   ): Promise<KeychainCommandResult> {
     const child = spawnFn([SECURITY_BIN, ...argv], {

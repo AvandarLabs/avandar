@@ -107,7 +107,7 @@ export async function executePlanStep(args: {
     ): Promise<{
       actualSchema: Array<{ name: string; type: string }>;
       rowCount: number;
-      previewRows: Record<string, unknown>[];
+      previewRows: Array<Record<string, unknown>>;
     }> => {
       await DuckDbClient.runRawQuery(wrappedSql, { conn });
       const previewQuery = `SELECT * FROM "${viewName}" LIMIT ${PREVIEW_ROW_CAP}`;

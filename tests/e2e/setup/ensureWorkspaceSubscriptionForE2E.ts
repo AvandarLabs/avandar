@@ -3,7 +3,10 @@ import { deterministicUuid } from "../helpers/deterministicUuid";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 
-/** Legacy shared ids that collided across worker workspaces (PK is polar_subscription_id). */
+/**
+ * Legacy shared ids that collided across worker workspaces
+ * (PK is polar_subscription_id).
+ */
 const LEGACY_E2E_FAKE_POLAR_SUBSCRIPTION_ID =
   "00000000-0000-4000-8000-000000000001";
 

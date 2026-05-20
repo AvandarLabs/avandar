@@ -229,7 +229,10 @@ export function serializeStateToURL(
   return params;
 }
 
-/** Clears every known explorer search key so TanStack Router drops stale params. */
+/**
+ * Clears every known explorer search key so TanStack Router drops stale
+ * params.
+ */
 export const EMPTY_EXPLORER_URL_SEARCH: DataExplorerURLSearch = {
   ds: undefined,
   cols: undefined,

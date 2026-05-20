@@ -77,8 +77,13 @@ export function PlatformProvider({
  * {@link PlatformProvider}. Throws when called outside a provider so
  * the mistake is loud at first render.
  *
+ * The fast-refresh lint rule expects component-only exports from files
+ * that also export React components. This hook is intentionally paired
+ * with the provider in the same module, so suppress that warning here.
+ *
  * @returns The {@link PlatformImpls} resolved at provider mount time.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePlatform(): PlatformImpls {
   const ctx = useContext(PlatformContext);
   if (ctx === null) {

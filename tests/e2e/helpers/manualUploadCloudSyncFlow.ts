@@ -76,6 +76,8 @@ export async function ensureCloudStorageCheckedAndSaveDataset(options: {
 
   await page.getByRole("button", { name: "Save Dataset" }).click();
   await expect
-    .poll(() => metaUrl.test(page.url()), { timeout: navigationTimeout })
+    .poll(() => {
+      return metaUrl.test(page.url());
+    }, { timeout: navigationTimeout })
     .toBe(true);
 }

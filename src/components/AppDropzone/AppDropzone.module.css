@@ -17,24 +17,6 @@
   padding: 0;
 }
 
-/*
- * Mantine sets pointer-events: none on the hidden full-screen wrapper, but the
- * inner Dropzone still defaults to auto and intercepts clicks across the app.
- */
-.fullScreen .root {
-  pointer-events: none;
-}
-
-.fullScreen[style*="opacity: 1"] .root,
-.fullScreen[style*="opacity:1"] .root {
-  pointer-events: all;
-}
-
-/*
- * Strip Mantine's default dashed border, opaque background, and inner
- * padding from the inner dropzone so the overlay backdrop shows
- * through and only the floating card draws attention.
- */
 .root {
   align-items: center;
   background-color: transparent !important;
@@ -43,6 +25,20 @@
   flex: 1;
   justify-content: center;
   padding: 0;
+}
+
+/*
+ * Mantine sets pointer-events: none on the hidden full-screen wrapper,
+ * but the inner Dropzone still defaults to auto and intercepts clicks
+ * across the app.
+ */
+.fullScreen .root {
+  pointer-events: none;
+}
+
+.fullScreen[style*="opacity: 1"] .root,
+.fullScreen[style*="opacity:1"] .root {
+  pointer-events: all;
 }
 
 /*
