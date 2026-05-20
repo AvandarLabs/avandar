@@ -1,3 +1,7 @@
+.controls {
+  flex-shrink: 0;
+}
+
 .button {
   flex-shrink: 0;
 }

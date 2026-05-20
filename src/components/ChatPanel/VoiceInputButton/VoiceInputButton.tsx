@@ -1,15 +1,21 @@
 import { useComposerRuntime } from "@assistant-ui/react";
+import { useBoolean } from "@hooks";
 import {
   ActionIcon,
   Button,
   Group,
   Modal,
+  Popover,
   Select,
   Stack,
   Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconMicrophone, IconMicrophoneOff } from "@tabler/icons-react";
+import {
+  IconMicrophone,
+  IconMicrophoneOff,
+  IconSettings,
+} from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -47,6 +53,51 @@ type Props = {
   disabled?: boolean;
 };
 
+type VoiceModelSelectOptionProps = {
+  option: { value: string; label: string; disabled?: boolean };
+  checked?: boolean;
+  isDesktopPlatform: boolean;
+};
+
+function VoiceModelSelectOption({
+  option,
+  checked,
+  isDesktopPlatform,
+}: VoiceModelSelectOptionProps): JSX.Element {
+  const model = VOICE_MODELS.find((entry) => {
+    return entry.id === option.value;
+  });
+  const disabledForWeb = model?.desktopOnly === true && !isDesktopPlatform;
+  if (!disabledForWeb) {
+    return (
+      <Group justify="space-between" w="100%" wrap="nowrap">
+        <Text size="sm">{option.label}</Text>
+        {checked ?
+          <Text size="xs" c="primary">
+            Selected
+          </Text>
+        : null}
+      </Group>
+    );
+  }
+  return (
+    <Tooltip
+      label="These are too big for web and are only available on Avandar Desktop"
+      position="right"
+      withinPortal
+    >
+      <Group justify="space-between" w="100%" wrap="nowrap">
+        <Text size="sm" c="neutral.5">
+          {option.label}
+        </Text>
+        <Text size="xs" c="neutral.6">
+          Desktop only
+        </Text>
+      </Group>
+    </Tooltip>
+  );
+}
+
 /**
  * Microphone button rendered in the chat composer. Tapping it either:
  *   1. Opens a confirmation modal if no voice model has been downloaded
@@ -73,6 +124,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   });
   const [isModelReady, setIsModelReady] = useState(false);
   const [isPromptOpen, setIsPromptOpen] = useState(false);
+  const [isSettingsOpen, , closeSettings, toggleSettings] = useBoolean(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const recorderRef = useRef<AudioRecorder | null>(null);
@@ -121,6 +173,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
   const handleConfirmDownload = useCallback(async () => {
     setIsPromptOpen(false);
+    closeSettings();
     try {
       await manager.ensureModelLoaded(selectedModelId);
       setIsModelReady(true);
@@ -140,7 +193,19 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         color: "danger",
       });
     }
-  }, [manager, selectedModelId]);
+  }, [closeSettings, manager, selectedModelId]);
+
+  const modelSelectData = VOICE_MODELS.map((model) => {
+    return {
+      value: model.id,
+      label: `${model.displayName} (~${model.approxSizeMb} MB)`,
+      disabled: model.desktopOnly && !isDesktopPlatform,
+    };
+  });
+
+  const languageSelectData = VOICE_LANGUAGES.map((lang) => {
+    return { value: lang.code, label: lang.label };
+  });
 
   const startRecording = useCallback(async () => {
     try {
@@ -221,24 +286,109 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const Icon = isRecording ? IconMicrophoneOff : IconMicrophone;
   const selectedModel = findVoiceModel(selectedModelId);
 
+  const controlsDisabled = disabled || isTranscribing || isRecording;
+
   return (
     <>
-      <Tooltip label={tooltipLabel}>
-        <ActionIcon
-          variant={isRecording ? "filled" : "subtle"}
-          color={isRecording ? "danger" : "neutral"}
-          size="md"
-          aria-label={tooltipLabel}
-          onClick={() => {
-            void handleClick();
-          }}
-          disabled={disabled || isTranscribing}
-          loading={isTranscribing}
-          className={clsx(css.button, isRecording && css.recording)}
+      <Group gap={4} wrap="nowrap" className={css.controls}>
+        <Popover
+          opened={isSettingsOpen}
+          onChange={toggleSettings}
+          onDismiss={closeSettings}
+          position="top-end"
+          width={300}
+          withinPortal
+          shadow="md"
         >
-          <Icon size={16} />
-        </ActionIcon>
-      </Tooltip>
+          <Popover.Target>
+            <Tooltip label="Voice settings" disabled={isSettingsOpen}>
+              <ActionIcon
+                variant="subtle"
+                color="neutral"
+                size="md"
+                aria-label="Voice settings"
+                onClick={toggleSettings}
+                disabled={controlsDisabled}
+                className={css.button}
+              >
+                <IconSettings size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Popover.Target>
+          <Popover.Dropdown p="sm">
+            <Stack gap="sm">
+              <Text size="sm" fw={500}>
+                Voice prompting
+              </Text>
+              <Select
+                label="Model"
+                description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
+                value={selectedModelId}
+                onChange={(value) => {
+                  if (value) {
+                    setSelectedModelId(value as VoiceModelId);
+                  }
+                }}
+                data={modelSelectData}
+                comboboxProps={{ withinPortal: true }}
+                renderOption={({ option, checked }) => {
+                  return (
+                    <VoiceModelSelectOption
+                      option={option}
+                      checked={checked}
+                      isDesktopPlatform={isDesktopPlatform}
+                    />
+                  );
+                }}
+              />
+              <Select
+                label="Language"
+                description="Used when transcribing; does not change the model download."
+                value={language}
+                onChange={(value) => {
+                  if (value) {
+                    setLanguage(value as VoiceLanguageCode);
+                  }
+                }}
+                data={languageSelectData}
+                comboboxProps={{ withinPortal: true }}
+              />
+              {isModelReady ?
+                <Text size="xs" c="neutral.6">
+                  {selectedModel.displayName} is ready on this device.
+                </Text>
+              : <Button
+                  variant="light"
+                  color="primary"
+                  size="compact-sm"
+                  onClick={() => {
+                    void handleConfirmDownload();
+                  }}
+                >
+                  Download &amp; enable
+                </Button>
+              }
+            </Stack>
+          </Popover.Dropdown>
+        </Popover>
+
+        <Tooltip label={tooltipLabel}>
+          <ActionIcon
+            variant={isRecording ? "filled" : "subtle"}
+            color={isRecording ? "danger" : "neutral"}
+            size="md"
+            aria-label={tooltipLabel}
+            onClick={() => {
+              void handleClick();
+            }}
+            disabled={controlsDisabled}
+            loading={isTranscribing}
+            className={clsx(css.button, isRecording && css.recording)}
+          >
+            <Icon size={16} />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
 
       <Modal
         opened={isPromptOpen}
@@ -252,77 +402,11 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         <Stack gap="md">
           <Text size="sm">
             Voice prompts run entirely on your device. To dictate, we need to
-            download a Whisper model from Hugging Face once. The download
-            happens in the background and the indicator in the bottom-left
-            corner shows progress.
+            download {selectedModel.displayName} (~{selectedModel.approxSizeMb}{" "}
+            MB) from Hugging Face once. Adjust the model or language anytime from
+            the gear icon next to the microphone. The download runs in the
+            background; progress appears in the bottom-left corner.
           </Text>
-
-          <Select
-            label="Model"
-            description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
-            value={selectedModelId}
-            onChange={(value) => {
-              if (value) {
-                setSelectedModelId(value as VoiceModelId);
-              }
-            }}
-            data={VOICE_MODELS.map((model) => {
-              return {
-                value: model.id,
-                label: `${model.displayName} (~${model.approxSizeMb} MB)`,
-                disabled: model.desktopOnly && !isDesktopPlatform,
-              };
-            })}
-            renderOption={({ option, checked }) => {
-              const model = VOICE_MODELS.find((m) => {
-                return m.id === option.value;
-              });
-              const disabledForWeb =
-                model?.desktopOnly === true && !isDesktopPlatform;
-              if (!disabledForWeb) {
-                return (
-                  <Group justify="space-between" w="100%" wrap="nowrap">
-                    <Text size="sm">{option.label}</Text>
-                    {checked ?
-                      <Text size="xs" c="primary">
-                        Selected
-                      </Text>
-                    : null}
-                  </Group>
-                );
-              }
-              return (
-                <Tooltip
-                  label="These are too big for web and are only available on Avandar Desktop"
-                  position="right"
-                  withinPortal
-                >
-                  <Group justify="space-between" w="100%" wrap="nowrap">
-                    <Text size="sm" c="neutral.5">
-                      {option.label}
-                    </Text>
-                    <Text size="xs" c="neutral.6">
-                      Desktop only
-                    </Text>
-                  </Group>
-                </Tooltip>
-              );
-            }}
-          />
-
-          <Select
-            label="Language"
-            description="Whisper supports many languages; auto-detect handles mixed input."
-            value={language}
-            onChange={(value) => {
-              if (value) {
-                setLanguage(value as VoiceLanguageCode);
-              }
-            }}
-            data={VOICE_LANGUAGES.map((lang) => {
-              return { value: lang.code, label: lang.label };
-            })}
-          />
 
           <Group justify="flex-end" gap="sm">
             <Button
