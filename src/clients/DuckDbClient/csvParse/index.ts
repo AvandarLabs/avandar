@@ -6,6 +6,13 @@ export {
   REJECTED_ROW_STORAGE_LIMIT,
 } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 export {
+  applyQuoteProbeToParseOptions,
+  CSV_QUOTE_PROBE_CHUNK_SIZE,
+  CSV_QUOTE_PROBE_OFFSET_FRACTIONS,
+  inferQuoteCharFromSniffAndProbeTexts,
+  inferQuoteCharWhenSniffReportsEmpty,
+} from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
+export {
   buildDuckDbCsvSniffResultFromRejectScan,
   buildDuckDbCsvSniffResultFromResolved,
   buildDuckDbCsvSniffResultFromSniffRow,
@@ -19,6 +26,7 @@ export {
   normalizeNewlineDelimiterForDuckDb,
   optionalTrimmedCsvFormat,
   refineCsvParseOptionsAfterFailure,
+  resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
   type CsvParseResolvedOptions,
   type CsvParseUserHints,

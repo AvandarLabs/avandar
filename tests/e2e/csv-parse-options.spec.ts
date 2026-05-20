@@ -46,9 +46,9 @@ const COLUMN_NAMES_AFTER_SKIP_1 = [
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
   await skipInput.click();
-  await skipInput.press("ControlOrMeta+a");
-  await skipInput.pressSequentially(String(value));
-  await skipInput.press("Tab");
+  await skipInput.fill(String(value));
+  await skipInput.blur();
+  await expect(skipInput).toHaveValue(String(value), { timeout: SHORT_WAIT });
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {

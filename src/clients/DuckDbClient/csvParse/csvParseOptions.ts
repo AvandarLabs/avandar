@@ -38,7 +38,7 @@ export type CsvParseResolvedOptions = {
   delimiter: string;
   quoteChar: string | null;
   escapeChar: string | null;
-  /** DuckDB `new_line` escape (`\\n`, `\\r\\n`) or `null` to omit and auto-detect. */
+  /** DuckDB `new_line` (`\\n`, `\\r\\n`) or `null` to auto-detect. */
   newlineDelimiter: string | null;
   commentChar: string | null;
   hasHeader: boolean;
@@ -47,6 +47,8 @@ export type CsvParseResolvedOptions = {
   columns: ReadonlyArray<
     readonly [columnName: string, columnType: DuckDbDataType]
   >;
+  /** Phase B strict casting; relaxed when sniff column types reject all rows. */
+  strictMode: boolean;
 };
 
 /** Row shape returned by DuckDB `sniff_csv`. */
@@ -228,11 +230,12 @@ export function createCsvParseOptionsFromUserHints(
     dateFormat: optionalTrimmedCsvFormat(hints.dateFormat),
     timestampFormat: optionalTrimmedCsvFormat(hints.timestampFormat),
     columns: hints.columns ? [...hints.columns] : [],
+    strictMode: true,
   };
 }
 
 /**
- * Merges a DuckDB `sniff_csv` row into resolved options (user hints win when set).
+ * Merges `sniff_csv` into resolved options (user hints win when set).
  */
 export function mergeSniffCsvRowIntoParseOptions(options: {
   base: CsvParseResolvedOptions;
@@ -276,6 +279,7 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
       userHints.columns && userHints.columns.length > 0 ? [...userHints.columns]
       : sniffColumns.length > 0 ? sniffColumns
       : base.columns,
+    strictMode: base.strictMode,
   };
 }
 
@@ -308,8 +312,45 @@ export function refineCsvParseOptionsAfterFailure(options: {
 }
 
 /**
- * Whether another parse attempt may fix the outcome (e.g. enabling `"` quote).
+ * Next parse options when strict Phase B wrote an empty staging parquet.
+ * Order: enable quotes (late-quote files), relax strict casting, drop sniff
+ * column types so DuckDB can load rows (common on large typed CSVs in wasm).
  */
+export function resolveParseOptionsAfterEmptyStagingLoad(options: {
+  parseOptions: CsvParseResolvedOptions;
+  stagingRowCount: number;
+}): CsvParseResolvedOptions | null {
+  const { parseOptions, stagingRowCount } = options;
+
+  if (stagingRowCount > 0) {
+    return null;
+  }
+
+  if (parseOptions.quoteChar == null) {
+    return {
+      ...parseOptions,
+      quoteChar: DEFAULT_CSV_QUOTE_CHAR,
+      escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
+    };
+  }
+
+  if (parseOptions.strictMode) {
+    return {
+      ...parseOptions,
+      strictMode: false,
+    };
+  }
+
+  if (parseOptions.columns.length > 0) {
+    return {
+      ...parseOptions,
+      columns: [],
+    };
+  }
+
+  return null;
+}
+
 export function shouldRetryCsvParse(options: {
   attemptIndex: number;
   maxAttempts: number;
@@ -404,7 +445,9 @@ export function buildReadCsvArgList(options: {
     "rejects_scan='reject_scans'",
     "rejects_table='reject_errors'",
     `rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-    mode === "load" ? "strict_mode=true" : "strict_mode=false",
+    mode === "load" ?
+      `strict_mode=${parseOptions.strictMode ? "true" : "false"}`
+    : "strict_mode=false",
   ];
 
   return args.filter((arg) => {
@@ -413,7 +456,7 @@ export function buildReadCsvArgList(options: {
 }
 
 /**
- * Optional `sniff_csv` constraints from resolved options (for re-sniff on retry).
+ * `sniff_csv` constraint args from resolved options (re-sniff on retry).
  */
 export function buildSniffCsvConstraintArgs(
   parseOptions: CsvParseResolvedOptions,
@@ -517,6 +560,7 @@ export function buildDuckDbCsvSniffResultFromRejectScan(options: {
     columns: parsedColumns.map((col) => {
       return [col.name, col.type] as const;
     }),
+    strictMode: true,
   };
 
   return buildDuckDbCsvSniffResultFromResolved({

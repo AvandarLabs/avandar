@@ -16,6 +16,7 @@ import { Navbar } from "@/components/AppShell/Navbar/Navbar";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
 import { VoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator";
 import { VoiceModelLoadingNotification } from "@/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
@@ -217,6 +218,7 @@ function AppShellComponent({
 
       <VoiceModelDownloadIndicator />
       <VoiceModelLoadingNotification />
+      <OfflineChatDownloadIndicator />
     </>
   );
 }

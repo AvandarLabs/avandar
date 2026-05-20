@@ -40,6 +40,7 @@ Random other features we should consider:
 - Allow multiple tabs in desktop
 - Allow multiple tabs in Chrome - multiple analysis tabs and dashboard tabs.
 - + button on tables to quickly add a new column with a calculation
+- allow user to select if they want R, python, or another language (typescript?)
 
 Avandar review:
 

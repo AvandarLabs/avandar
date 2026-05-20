@@ -7,6 +7,7 @@ import {
   normalizeNewlineDelimiterForDuckDb,
   optionalTrimmedCsvFormat,
   refineCsvParseOptionsAfterFailure,
+  resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
 } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -60,6 +61,54 @@ describe("refineCsvParseOptionsAfterFailure", () => {
     });
 
     expect(refined).toEqual(base);
+  });
+});
+
+describe("resolveParseOptionsAfterEmptyStagingLoad", () => {
+  it("enables quote when staging parquet has zero rows and sniff omitted quote", () => {
+    const base = createCsvParseOptionsFromUserHints({});
+    const next = resolveParseOptionsAfterEmptyStagingLoad({
+      parseOptions: base,
+      stagingRowCount: 0,
+    });
+
+    expect(next?.quoteChar).toBe('"');
+    expect(next?.escapeChar).toBe('"');
+  });
+
+  it("returns null when staging already has rows", () => {
+    const base = createCsvParseOptionsFromUserHints({ quoteChar: '"' });
+    expect(
+      resolveParseOptionsAfterEmptyStagingLoad({
+        parseOptions: base,
+        stagingRowCount: 100,
+      }),
+    ).toBeNull();
+  });
+
+  it("relaxes strict mode when quote is set but staging is still empty", () => {
+    const base = createCsvParseOptionsFromUserHints({ quoteChar: '"' });
+    const next = resolveParseOptionsAfterEmptyStagingLoad({
+      parseOptions: base,
+      stagingRowCount: 0,
+    });
+
+    expect(next?.strictMode).toBe(false);
+    expect(next?.quoteChar).toBe('"');
+  });
+
+  it("clears sniffed columns after relaxed strict still yields zero rows", () => {
+    const base = {
+      ...createCsvParseOptionsFromUserHints({ quoteChar: '"' }),
+      strictMode: false,
+      columns: [["a", "VARCHAR"]] as const,
+    };
+    const next = resolveParseOptionsAfterEmptyStagingLoad({
+      parseOptions: base,
+      stagingRowCount: 0,
+    });
+
+    expect(next?.columns).toEqual([]);
   });
 });
 
@@ -141,7 +190,11 @@ describe("buildReadCsvArgList", () => {
       parseOptions: createCsvParseOptionsFromUserHints({}),
     });
 
-    expect(args.some((arg) => {return arg.startsWith("new_line=")})).toBe(false);
+    expect(
+      args.some((arg) => {
+        return arg.startsWith("new_line=");
+      }),
+    ).toBe(false);
   });
 
   it("omits dateformat when format is null", () => {
@@ -154,8 +207,16 @@ describe("buildReadCsvArgList", () => {
       },
     });
 
-    expect(args.some((arg) => {return arg.startsWith("dateformat=")})).toBe(false);
-    expect(args.some((arg) => {return arg.startsWith("timestampformat=")})).toBe(false);
+    expect(
+      args.some((arg) => {
+        return arg.startsWith("dateformat=");
+      }),
+    ).toBe(false);
+    expect(
+      args.some((arg) => {
+        return arg.startsWith("timestampformat=");
+      }),
+    ).toBe(false);
     expect(args).toContain("strict_mode=true");
   });
 });

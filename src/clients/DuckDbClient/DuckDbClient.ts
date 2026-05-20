@@ -20,6 +20,7 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import {
+  applyQuoteProbeToParseOptions,
   buildDuckDbCsvSniffResultFromRejectScan,
   buildDuckDbCsvSniffResultFromResolved,
   buildDuckDbCsvSniffResultFromSniffRow,
@@ -33,6 +34,7 @@ import {
   MAX_CSV_PARSE_ATTEMPTS,
   mergeSniffCsvRowIntoParseOptions,
   refineCsvParseOptionsAfterFailure,
+  resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
 } from "@/clients/DuckDbClient/csvParse";
 import {
@@ -166,11 +168,14 @@ async function _sniffCsvWithDuckDb(options: {
   stagingFile: string;
   userHints: CsvParseUserHints;
   parseOptions: ReturnType<typeof createCsvParseOptionsFromUserHints>;
+  /** When set, probes the file for `"` if sniff reports no quote char. */
+  file?: File;
 }): Promise<{
   parseOptions: ReturnType<typeof mergeSniffCsvRowIntoParseOptions>;
   sniffRow: DuckDbSniffCsvRow | undefined;
 }> {
-  const { runRawQuery, conn, stagingFile, userHints, parseOptions } = options;
+  const { runRawQuery, conn, stagingFile, userHints, parseOptions, file } =
+    options;
   const sniffArgs = [
     ...buildSniffCsvConstraintArgs(parseOptions),
     `sample_size=${CSV_SNIFF_SAMPLE_SIZE}`,
@@ -185,12 +190,22 @@ async function _sniffCsvWithDuckDb(options: {
     return { parseOptions, sniffRow: undefined };
   }
 
+  let mergedParseOptions = mergeSniffCsvRowIntoParseOptions({
+    base: parseOptions,
+    sniffRow,
+    userHints,
+  });
+
+  if (file) {
+    mergedParseOptions = await applyQuoteProbeToParseOptions({
+      file,
+      sniffQuoteToken: sniffRow.Quote,
+      parseOptions: mergedParseOptions,
+    });
+  }
+
   return {
-    parseOptions: mergeSniffCsvRowIntoParseOptions({
-      base: parseOptions,
-      sniffRow,
-      userHints,
-    }),
+    parseOptions: mergedParseOptions,
     sniffRow,
   };
 }
@@ -638,6 +653,7 @@ class DuckDbClientImpl {
         stagingFile,
         userHints,
         parseOptions: baseParseOptions,
+        file: options.file,
       });
 
       const readCsvArgs = buildReadCsvArgList({
@@ -719,6 +735,7 @@ class DuckDbClientImpl {
           stagingFile: csvStagingFile,
           userHints,
           parseOptions,
+          file: "file" in options ? options.file : undefined,
         });
         parseOptions = sniffed.parseOptions;
         lastSniffRow = sniffed.sniffRow;
@@ -759,6 +776,27 @@ class DuckDbClientImpl {
           }
 
           throw error;
+        }
+
+        const stagingRowCountResult = await this.runRawQuery<{ c: bigint }>(
+          `SELECT count(*)::BIGINT as c FROM read_parquet('$pqFile$')`,
+          { conn, params: { pqFile: parquetStagingFile } },
+        );
+        const stagingRowCount = Number(stagingRowCountResult.data[0]?.c ?? 0);
+        const parseOptionsAfterEmptyStaging =
+          resolveParseOptionsAfterEmptyStagingLoad({
+            parseOptions,
+            stagingRowCount,
+          });
+
+        if (
+          parseOptionsAfterEmptyStaging &&
+          attempt < MAX_CSV_PARSE_ATTEMPTS - 1
+        ) {
+          parseOptions = parseOptionsAfterEmptyStaging;
+          const dbForRetry = await this.#getDB();
+          await dbForRetry.dropFile(parquetStagingFile);
+          continue;
         }
 
         const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
@@ -813,6 +851,11 @@ class DuckDbClientImpl {
       const tableColumns = await this.getTableSchema(tableName);
       Logger.log("tableColumns", { tableColumns });
       const csvRowCount = await this.getTableRowCount(tableName);
+      if (csvRowCount === 0) {
+        throw new Error(
+          "CSV load produced zero rows. The file may use quotes or column types that differ from the sniff sample.",
+        );
+      }
       const csvErrors = {
         rejectedScans,
         rejectedRows,

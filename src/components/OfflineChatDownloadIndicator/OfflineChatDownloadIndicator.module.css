@@ -1,0 +1,42 @@
+.root {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-radius: var(--mantine-radius-md);
+  bottom: 16px;
+  box-shadow: var(--mantine-shadow-md);
+  max-width: 360px;
+  min-width: 280px;
+  padding: var(--mantine-spacing-sm);
+  position: fixed;
+  right: 16px;
+  z-index: 200;
+}
+
+.titleRow {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: space-between;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+.title {
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.warning {
+  line-height: 1.35;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+.statusText {
+  color: var(--mantine-color-neutral-6);
+  line-height: 1.35;
+  margin-top: var(--mantine-spacing-xs);
+}
