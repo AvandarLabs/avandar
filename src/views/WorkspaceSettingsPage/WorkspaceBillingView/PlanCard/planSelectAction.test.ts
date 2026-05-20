@@ -1,45 +1,40 @@
 import { describe, expect, it } from "vitest";
+import {
+  BasicPlanConfig,
+  FreePlanConfig,
+} from "$/config/FeaturePlansConfig";
 import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UUID } from "@utils/types/common.types";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
-const FREE_PLAN = {
+const FREE_PLAN: SubscriptionPlan = {
   priceType: "free",
   polarProductId: "free-product-id",
   isArchived: false,
   description: "",
   planFullName: "Avandar Free",
-  planBaseName: "Avandar Free",
   featurePlan: {
     type: "free",
-    metadata: {
-      featurePlanName: "Avandar Free",
-      isRecommendedPlan: false,
-      features: [],
-    },
+    metadata: FreePlanConfig,
   },
-} as const satisfies SubscriptionPlan;
+};
 
-const STARTER_PLAN = {
+const STARTER_PLAN: SubscriptionPlan = {
   priceType: "seat_based",
   polarProductId: "starter-product-id",
   planInterval: "year",
   isArchived: false,
   description: "",
   planFullName: "Avandar Starter (Annual)",
-  planBaseName: "Avandar Starter",
+  pricePerSeat: 12_000,
   normalizedPricePerSeatPerMonth: 10,
   priceCurrency: "usd",
   featurePlan: {
     type: "basic",
-    metadata: {
-      featurePlanName: "Avandar Starter",
-      isRecommendedPlan: true,
-      features: [],
-    },
+    metadata: BasicPlanConfig,
   },
-} as const satisfies SubscriptionPlan;
+};
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},

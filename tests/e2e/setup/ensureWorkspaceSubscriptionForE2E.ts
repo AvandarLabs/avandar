@@ -1,6 +1,8 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
+import type { UserId } from "$/models/User/User.types";
 import type { TablesInsert } from "../../../shared/types/database.types";
+import type { UUID } from "@utils/types/common.types";
 
 /**
  * Ensures the workspace has a native free `subscriptions` row (no Polar).
@@ -48,8 +50,8 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
 
   const insertRow: TablesInsert<"subscriptions"> = {
     ...SubscriptionModule.buildNativeFreeFieldsForDB({
-      workspaceId: workspaceRow.id,
-      subscriptionOwnerId: workspaceRow.owner_id,
+      workspaceId: workspaceRow.id as UUID<"Workspace">,
+      subscriptionOwnerId: workspaceRow.owner_id as UserId,
       startedAt,
     }),
   };
