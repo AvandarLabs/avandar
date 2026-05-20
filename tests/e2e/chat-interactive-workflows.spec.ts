@@ -1,19 +1,21 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
-} from "./helpers/constants";
-import {
   getChatComposerInput,
   openChatPanelIfClosed,
 } from "./helpers/chatPanelFlow";
+import {
+  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  CALIFORNIA_CSV_PATH,
+} from "./helpers/constants";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
@@ -180,100 +182,116 @@ test.describe("chat interactive workflows", () => {
     page,
     e2eWorkerDb,
   }) => {
-    await signInWithEmailPassword(page, {
-      email: e2eWorkerDb.primaryUser.email,
-      password: e2eWorkerDb.primaryUser.password,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
+    const admin = createSupabaseAdminClient();
+    let datasetId = "";
 
-    await uploadCsvAndOpenChat({
-      page,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    await ensureCloudStorageCheckedAndSaveDataset({
-      page,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    const datasetId = parseDatasetIdFromDataManagerUrl({
-      url: page.url(),
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    if (!datasetId) {
-      throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-    }
+    try {
+      await signInWithEmailPassword(page, {
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
 
-    await mountMockChat({
-      page,
-      responder: () => {
-        return {
-          assistantText:
-            "Filter to confirmed cases, then aggregate by date, then plot.",
-          plan: {
-            rootMessage:
+      await uploadCsvAndOpenChat({
+        page,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      await ensureCloudStorageCheckedAndSaveDataset({
+        page,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      const parsedDatasetId = parseDatasetIdFromDataManagerUrl({
+        url: page.url(),
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      if (!parsedDatasetId) {
+        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
+      }
+      datasetId = parsedDatasetId;
+
+      await mountMockChat({
+        page,
+        responder: () => {
+          return {
+            assistantText:
               "Filter to confirmed cases, then aggregate by date, then plot.",
-            steps: [
-              {
-                id: "filter_rows",
-                description: "Keep only confirmed cases",
-                type: "sql",
-                code: `SELECT * FROM "${datasetId}" LIMIT 50`,
-                inputs: [],
-                predictedSchema: [
-                  { name: "Province_State", type: "varchar" },
-                ],
-              },
-              {
-                id: "aggregate",
-                description: "Aggregate by day",
-                type: "sql",
-                code: `SELECT COUNT(*)::INTEGER AS "y" FROM "step_filter_rows"`,
-                inputs: ["filter_rows"],
-                predictedSchema: [{ name: "y", type: "integer" }],
-              },
-            ],
-          },
-        };
-      },
-    });
-    await pollUntilCloudDatasetToggleShowsOnline(page);
-    await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
-    await dismissBlockingOverlays(page);
-    await page.getByRole("button", { name: /^open$/i }).click();
-    const openDrawer = page.getByRole("dialog", { name: /open dataset/i });
-    await openDrawer
-      .getByRole("row")
-      .filter({ hasText: "california-covid-sample.csv" })
-      .getByRole("button", { name: /^open$/i })
-      .click();
-    await dismissBlockingOverlays(page);
-    await expect
-      .poll(
-        async () => {
-          return page
-            .getByRole("columnheader", { name: "Province_State", exact: true })
-            .isVisible();
+            plan: {
+              rootMessage:
+                "Filter to confirmed cases, then aggregate by date, then plot.",
+              steps: [
+                {
+                  id: "filter_rows",
+                  description: "Keep only confirmed cases",
+                  type: "sql",
+                  code: `SELECT * FROM "${datasetId}" LIMIT 50`,
+                  inputs: [],
+                  predictedSchema: [
+                    { name: "Province_State", type: "varchar" },
+                  ],
+                },
+                {
+                  id: "aggregate",
+                  description: "Aggregate by day",
+                  type: "sql",
+                  code: `SELECT COUNT(*)::INTEGER AS "y" FROM "step_filter_rows"`,
+                  inputs: ["filter_rows"],
+                  predictedSchema: [{ name: "y", type: "integer" }],
+                },
+              ],
+            },
+          };
         },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
+      });
+      await pollUntilCloudDatasetToggleShowsOnline(page);
+      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
+      await dismissBlockingOverlays(page);
+      await page.getByRole("button", { name: /^open$/i }).click();
+      const openDrawer = page.getByRole("dialog", { name: /open dataset/i });
+      await openDrawer
+        .getByRole("row")
+        .filter({ hasText: "california-covid-sample.csv" })
+        .getByRole("button", { name: /^open$/i })
+        .click();
+      await dismissBlockingOverlays(page);
+      await expect
+        .poll(
+          async () => {
+            return page
+              .getByRole("columnheader", {
+                name: "Province_State",
+                exact: true,
+              })
+              .isVisible();
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
 
-    await openChatPanelIfClosed(page);
+      await openChatPanelIfClosed(page);
 
-    const composer = getChatComposerInput(page);
-    await composer.fill("Break this analysis into steps");
-    await composer.press("Enter");
+      const composer = getChatComposerInput(page);
+      await composer.fill("Break this analysis into steps");
+      await composer.press("Enter");
 
-    // The plan view renders with the root message + two step cards
-    await expect(page.getByText("Analytic plan")).toBeVisible({
-      timeout: MEDIUM_WAIT,
-    });
-    await expect(page.getByText("Keep only confirmed cases")).toBeVisible();
-    await expect(page.getByText("Aggregate by day")).toBeVisible();
+      // The plan view renders with the root message + two step cards
+      await expect(page.getByText("Analytic plan")).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
+      await expect(page.getByText("Keep only confirmed cases")).toBeVisible();
+      await expect(page.getByText("Aggregate by day")).toBeVisible();
 
-    // Both steps should eventually succeed (auto-run is the default)
-    await expect(
-      page.getByText("All steps succeeded.", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
+      // Both steps should eventually succeed (auto-run is the default)
+      await expect(
+        page.getByText("All steps succeeded.", { exact: false }),
+      ).toBeVisible({ timeout: LONG_WAIT });
+    } finally {
+      if (datasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId,
+        });
+      }
+    }
   });
 });
 // Keep the import to silence "unused" complaints if a future fixture

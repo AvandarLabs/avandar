@@ -18,9 +18,9 @@ import type { infer as ZodInfer, ZodObject, ZodType } from "npm:zod@4";
 export type ValidBodySchema = AnyZodType | Record<string, AnyZodType>;
 export type InferBody<T extends ValidBodySchema> =
   T extends AnyZodType ? ZodInfer<T>
-  : {
+  : MakeOptionalIfUndefined<{
       [K in keyof T]: ZodInfer<T[K]>;
-    };
+    }>;
 /**
  * A valid query value schema must always be a string input (or null/undefined)
  * but it can be transformed to any type.

@@ -14,6 +14,46 @@ function shareDialog(page: Page): Locator {
 }
 
 /**
+ * Waits until every role combobox in the share dialog has closed so a prior
+ * Mantine dropdown or share mutation cannot steal focus from the next pick.
+ */
+async function waitForShareModalRoleComboboxesSettled(
+  page: Page,
+): Promise<void> {
+  await expect(
+    page.locator('[data-combobox-option="true"]').filter({ visible: true }),
+  ).toHaveCount(0, { timeout: MEDIUM_WAIT });
+}
+
+/**
+ * Picks a role from a Mantine Select combobox. Options are scoped to the
+ * dropdown referenced by `aria-controls` so we do not click a stale option
+ * from another role select on the modal.
+ */
+async function selectRoleFromCombobox(
+  page: Page,
+  combobox: Locator,
+  role: RoleLevel,
+): Promise<void> {
+  const rolePattern = new RegExp(`^${role}$`, "i");
+
+  await combobox.click();
+
+  const controlsId = await combobox.getAttribute("aria-controls");
+  const option =
+    controlsId ?
+      page.locator(`#${controlsId}`).getByRole("option", { name: rolePattern })
+    : page
+        .getByRole("listbox")
+        .last()
+        .getByRole("option", { name: rolePattern });
+
+  await expect(option).toBeVisible({ timeout: MEDIUM_WAIT });
+  await option.click();
+  await expect(option).toBeHidden({ timeout: MEDIUM_WAIT });
+}
+
+/**
  * Opens the new Drive-style share modal by clicking the dataset's `Share`
  * button and waiting for the unified Add combobox to render. Use this from
  * the dataset meta page (`/{slug}/data-manager/{datasetId}`). The page-
@@ -78,17 +118,20 @@ export async function setGeneralAccessV2(
     name: "Role for everyone in the workspace",
   });
   await expect(roleSelect).toBeVisible({ timeout: MEDIUM_WAIT });
-  await roleSelect.click();
-  await page
-    .getByRole("option", { name: new RegExp(`^${workspaceRole}$`, "i") })
-    .click();
+  await selectRoleFromCombobox(page, roleSelect, workspaceRole);
 
   // Wait for the summary line to reflect the workspace share so the next
   // helper call doesn't race the upsert mutation's invalidation.
-  await expect(dialog).toContainText(
-    /accessible to anyone with|anyone with/i,
-    { timeout: MEDIUM_WAIT },
-  );
+  await expect(dialog).toContainText(/accessible to anyone with|anyone with/i, {
+    timeout: MEDIUM_WAIT,
+  });
+
+  const workspaceRoleLabel =
+    workspaceRole.charAt(0).toUpperCase() + workspaceRole.slice(1);
+  await expect(roleSelect).toHaveValue(workspaceRoleLabel, {
+    timeout: MEDIUM_WAIT,
+  });
+  await waitForShareModalRoleComboboxesSettled(page);
 }
 
 /**
@@ -114,15 +157,11 @@ export async function addShareV2(options: {
   await page.getByRole("option", { name: principalLabel }).click();
 
   if (role !== "viewer") {
+    await waitForShareModalRoleComboboxesSettled(page);
     const roleSelect = dialog.getByRole("combobox", {
       name: "Role for new share",
     });
-    await roleSelect.click();
-    const option = page
-      .getByRole("option", { name: new RegExp(`^${role}$`, "i") })
-      .first();
-    await expect(option).toBeVisible({ timeout: MEDIUM_WAIT });
-    await option.click();
+    await selectRoleFromCombobox(page, roleSelect, role);
   }
 
   await dialog.getByRole("button", { name: "Share", exact: true }).click();

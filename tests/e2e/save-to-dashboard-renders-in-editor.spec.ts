@@ -2,6 +2,7 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -35,6 +36,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
 
     const createdDashboardIds: string[] = [];
+    let datasetId = "";
 
     try {
       // Step 1: Sign in and upload the California COVID xlsx so the data
@@ -67,13 +69,14 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         navigationTimeout: MEDIUM_WAIT,
       });
 
-      const datasetId = parseDatasetIdFromDataManagerUrl({
+      const parsedDatasetId = parseDatasetIdFromDataManagerUrl({
         url: page.url(),
         workspaceSlug,
       });
-      if (!datasetId) {
+      if (!parsedDatasetId) {
         throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
       }
+      datasetId = parsedDatasetId;
       await pollUntilCloudDatasetToggleShowsOnline(page);
 
       // Step 2: Seed an empty dashboard with a unique name so the save modal
@@ -181,6 +184,12 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         .toBe(true);
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
+      if (datasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId,
+        });
+      }
     }
   });
 });

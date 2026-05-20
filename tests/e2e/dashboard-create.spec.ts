@@ -1,5 +1,7 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { deleteDashboardsByIds } from "./helpers/seedDashboard";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT } from "./helpers/timeouts";
 
 test.describe("Dashboards — create via UI", () => {
@@ -8,23 +10,39 @@ test.describe("Dashboards — create via UI", () => {
     e2eWorkerDb,
   }) => {
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
+    const admin = createSupabaseAdminClient();
+    let createdDashboardId = "";
 
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
+    try {
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
 
-    await page.goto(`/${workspaceSlug}/dashboards`);
+      await page.goto(`/${workspaceSlug}/dashboards`);
 
-    await page
-      .getByRole("button", { name: "Create a dashboard" })
-      .first()
-      .click();
+      await page
+        .getByRole("button", { name: "Create a dashboard" })
+        .first()
+        .click();
 
-    await expect(page).toHaveURL(
-      new RegExp(`/${workspaceSlug}/dashboards/edit/`),
-      { timeout: LONG_WAIT },
-    );
+      await expect(page).toHaveURL(
+        new RegExp(`/${workspaceSlug}/dashboards/edit/`),
+        { timeout: LONG_WAIT },
+      );
+
+      const dashboardIdMatch = page
+        .url()
+        .match(new RegExp(`/${workspaceSlug}/dashboards/edit/([^/?]+)`));
+      createdDashboardId = dashboardIdMatch?.[1] ?? "";
+    } finally {
+      if (createdDashboardId) {
+        await deleteDashboardsByIds({
+          admin,
+          dashboardIds: [createdDashboardId],
+        });
+      }
+    }
   });
 });

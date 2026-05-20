@@ -51,7 +51,7 @@ export type ChatAPI = APITypeDef<
         body: {
           messages: ChatClientMessage[];
           context: ChatPageContext;
-          model: string | undefined;
+          model?: string;
           consentAcks?: ConsentAck[];
         };
         returnType: ChatResponse;
@@ -64,7 +64,7 @@ export type ChatAPI = APITypeDef<
         };
         body: {
           driftReport: SchemaDriftReport;
-          model: string | undefined;
+          model?: string;
         };
         returnType: RegeneratePlanResponse;
       };

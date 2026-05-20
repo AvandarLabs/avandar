@@ -43,8 +43,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E v2 direct user share";
@@ -107,8 +105,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E v2 restricted";
@@ -160,8 +156,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
     const datasetName = "E2E v2 intersection on";
@@ -279,8 +273,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
     const datasetName = "E2E v2 intersection off";
@@ -390,8 +382,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const { admin, workspaceId } = e2eViewerMembership;
     const datasetName = "E2E v2 summary mixed";
@@ -476,8 +466,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
     const datasetName = "E2E v2 shared with me";
@@ -551,8 +539,6 @@ test.describe("Share modal v2: Drive-style flows", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E v2 owner row";
