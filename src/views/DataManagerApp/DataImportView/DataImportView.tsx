@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Container, Stack, Title } from "@mantine/core";
 import { Paper } from "@ui";
+import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
@@ -9,6 +10,7 @@ import { useCanAddDataset } from "@/views/DataManagerApp/DataImportView/useCanAd
 export function DataImportView(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const isAddAllowed = useCanAddDataset();
+  const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
 
   return (
     <Container pt="xxl">
@@ -24,18 +26,20 @@ export function DataImportView(): JSX.Element {
       {
         // We did a backend check to see if the user is allowed to add more
         // datasets. If they're not, then we show a modal asking them to
-        // upgrade. If we don't show this modal, we should still do a backend
-        // check when the user tries to add a new dataset. This is to avoid
-        // race conditions where multiple users in the workspace might be
-        // adding datasets at the same time.
-        isAddAllowed ? null : (
-          <DatasetLimitReachedModal
-            subscription={workspace.subscription}
-            workspaceSlug={workspace.slug}
-            isOpened={!isAddAllowed}
-          />
-        )
+        // upgrade. The modal is dismissable so the user can continue using
+        // the workspace (and switch workspaces) — uploads are still blocked
+        // via the disabled state in DataImportTabs. We still do a backend
+        // check when the user tries to add a new dataset to avoid race
+        // conditions where multiple users in the workspace might be adding
+        // datasets at the same time.
       }
+      <DatasetLimitReachedModal
+        subscription={workspace.subscription}
+        isOpened={!isAddAllowed && !isLimitModalDismissed}
+        onClose={() => {
+          setIsLimitModalDismissed(true);
+        }}
+      />
     </Container>
   );
 }
