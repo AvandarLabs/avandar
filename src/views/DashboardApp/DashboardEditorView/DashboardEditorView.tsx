@@ -15,6 +15,7 @@ import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/ut
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DashboardChatPendingBlocksSync } from "@/views/DashboardApp/DashboardEditorView/DashboardChatPendingBlocksSync";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import {
@@ -192,6 +193,7 @@ export function DashboardEditorView({
                     <DashboardChatPendingBlocksSync />
                     <SaveDashboardButton onSave={onSave} />
                     <ShareResourceButton
+                      size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
                       resourceName={dashboardTitle}
                       resourceType="dashboard"
                       resourceId={dashboard.id}

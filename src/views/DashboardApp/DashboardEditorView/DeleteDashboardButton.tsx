@@ -5,6 +5,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyDevAlert, notifySuccess } from "@ui";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
@@ -37,6 +38,7 @@ export function DeleteDashboardButton({
 
   return (
     <Button
+      size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
       variant="light"
       color="danger"
       leftSection={<IconTrash size={16} />}

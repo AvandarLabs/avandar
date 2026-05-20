@@ -8,3 +8,8 @@
 .dashboardBlockStack [class*="_DropZone--hasChildren"] > * + * {
   margin-top: var(--mantine-spacing-md);
 }
+
+/* Puck header toolbar: default 16px gap is too wide for many actions */
+:global([class*="_PuckHeader-tools"]) {
+  gap: var(--mantine-spacing-xs);
+}

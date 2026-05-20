@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -36,6 +37,7 @@ export function PublishDashboardButton({
       disabled={!hasUnsavedChanges}
     >
       <Button
+        size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
         variant={dashboard?.isPublic ? "filled" : "outline"}
         color={dashboard?.isPublic ? "teal" : undefined}
         leftSection={<IconWorld size={16} />}

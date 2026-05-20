@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Tooltip } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
@@ -34,6 +35,7 @@ export function ViewDashboardButton({
       disabled={!hasUnsavedChanges}
     >
       <Button
+        size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
         variant="light"
         leftSection={<IconEye size={16} />}
         disabled={!dashboardId}

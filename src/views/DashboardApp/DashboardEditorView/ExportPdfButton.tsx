@@ -4,6 +4,7 @@ import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -34,6 +35,7 @@ export function ExportPdfButton({
       disabled={!hasUnsavedChanges}
     >
       <Button
+        size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
         variant="default"
         leftSection={<IconFileExport size={16} />}
         data-disabled={isDisabled || undefined}

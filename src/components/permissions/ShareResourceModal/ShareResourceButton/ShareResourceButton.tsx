@@ -6,11 +6,13 @@ import { resourceTypeLabel } from "@/components/permissions/ShareResourceModal/s
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { ButtonProps } from "@mantine/core";
 
 type Props = {
   resourceName: string;
   resourceType: ResourceType;
   resourceId: string | undefined;
+  size?: ButtonProps["size"];
 };
 
 /**
@@ -20,6 +22,7 @@ export function ShareResourceButton({
   resourceName,
   resourceType,
   resourceId,
+  size,
 }: Props): JSX.Element {
   const [effectiveRole, isLoadingRole] = useResourceRole({
     resourceType,
@@ -39,6 +42,7 @@ export function ShareResourceButton({
       }
     >
       <Button
+        size={size}
         variant="default"
         leftSection={<IconShare size={16} />}
         data-disabled={isDisabled || undefined}

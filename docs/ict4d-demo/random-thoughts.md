@@ -37,6 +37,8 @@ Random other features we should consider:
   How do we handle voice models? If same user, diff workspace, use same choice. If different user: we skip downloading online bc we can use the cached model, but they
   are still expected to pick a model bc they might want a different default.
 - I think somewhere i had named a ts file with kebab case? Fix that. Only directories should be kebab case. Files should be camelCase or PascalCase always.
+- Allow multiple tabs in desktop
+- Allow multiple tabs in Chrome - multiple analysis tabs and dashboard tabs.
 
 Avandar review:
 
