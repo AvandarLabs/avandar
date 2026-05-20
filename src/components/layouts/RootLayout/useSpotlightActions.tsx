@@ -3,7 +3,11 @@ import {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
-import { IconDatabase, IconTrash } from "@tabler/icons-react";
+import {
+  IconDatabase,
+  IconListDetails,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { notifySuccess } from "@ui";
 import { useMemo } from "react";
@@ -47,6 +51,27 @@ export function useSpotlightActions(
       },
     );
   }, [router, workspaceSlug]);
+
+  const utilityActions = useMemo((): SpotlightActionData[] => {
+    return [
+      {
+        id: "show-background-jobs",
+        label: "Show background jobs",
+        description: "View all running and recent background jobs",
+        leftSection: <IconListDetails size={24} stroke={1.5} />,
+        onClick: async () => {
+          const { BackgroundJobsView } = await import(
+            "@/components/spotlight-modals/BackgroundJobsView/BackgroundJobsView"
+          );
+          modals.open({
+            title: "Background jobs",
+            children: <BackgroundJobsView />,
+            size: "lg",
+          });
+        },
+      },
+    ];
+  }, []);
 
   const devActions = useMemo(() => {
     if (import.meta.env.DEV) {
@@ -132,6 +157,6 @@ export function useSpotlightActions(
   }, []);
 
   return useMemo(() => {
-    return [...navigationActions, ...devActions];
-  }, [navigationActions, devActions]);
+    return [...navigationActions, ...utilityActions, ...devActions];
+  }, [navigationActions, utilityActions, devActions]);
 }

@@ -1,3 +1,4 @@
+import { BackgroundJobs } from "@background-jobs";
 import {
   clearCachedFilesForPrefix,
   createVoiceModelCache,
@@ -106,6 +107,14 @@ export class VoiceModelManager implements IVoiceModelManager {
 
   private envConfigured = false;
 
+  /**
+   * Active background-job id while a model download is in flight. We
+   * keep it here so progress events from the transformers callback can
+   * route into the BackgroundJobs store without having to thread the id
+   * through the loader API.
+   */
+  private activeDownloadJobId: string | null = null;
+
   private readonly cache: VoiceModelCache;
 
   private readonly deps: ManagerDependencies;
@@ -174,6 +183,22 @@ export class VoiceModelManager implements IVoiceModelManager {
       progressPercent: -1,
     });
 
+    const job = BackgroundJobs.register({
+      id: `voice-model-download:${id}`,
+      type: "voice-model-download",
+      label: `Downloading voice model "${model.id}"`,
+      description: "Fetching weights into the local cache",
+      metadata: { modelId: id },
+      successToast: {
+        title: "Voice model ready",
+        message: `"${model.id}" is downloaded and ready to use.`,
+      },
+      failureToast: {
+        title: "Voice model failed to download",
+      },
+    });
+    this.activeDownloadJobId = job.id;
+
     const pipelineFn = await this.deps.loadPipeline();
     this.pipelinePromise = pipelineFn(
       "automatic-speech-recognition",
@@ -190,17 +215,22 @@ export class VoiceModelManager implements IVoiceModelManager {
       this.loadedModelId = id;
       markVoiceModelDownloaded(id);
       this.setStatus({ kind: "ready", modelId: id });
+      BackgroundJobs.markCompleted(job.id);
+      this.activeDownloadJobId = null;
     } catch (error) {
       this.pipelinePromise = null;
       this.loadedModelId = null;
       // Best-effort: clear any partial cache so retry isn't poisoned.
       await clearCachedFilesForPrefix(modelCachePrefix(model));
+      const message =
+        error instanceof Error ? error.message : "Failed to load voice model";
       this.setStatus({
         kind: "error",
         modelId: id,
-        message:
-          error instanceof Error ? error.message : "Failed to load voice model",
+        message,
       });
+      BackgroundJobs.markFailed(job.id, message);
+      this.activeDownloadJobId = null;
       throw error;
     }
   }
@@ -270,6 +300,12 @@ export class VoiceModelManager implements IVoiceModelManager {
         progressPercent,
         currentFile: event.file,
       });
+      if (this.activeDownloadJobId && progressPercent >= 0) {
+        BackgroundJobs.updateProgress(
+          this.activeDownloadJobId,
+          progressPercent,
+        );
+      }
     } else if (event.status === "done" || event.status === "ready") {
       this.setStatus({
         kind: "downloading",
@@ -277,6 +313,9 @@ export class VoiceModelManager implements IVoiceModelManager {
         progressPercent: 99,
         currentFile: event.file,
       });
+      if (this.activeDownloadJobId) {
+        BackgroundJobs.updateProgress(this.activeDownloadJobId, 99);
+      }
     }
   }
 

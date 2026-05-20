@@ -52,6 +52,7 @@ pnpm test:logger
 pnpm test:clients
 pnpm test:models
 pnpm test:hooks
+pnpm test:background-jobs
 pnpm test:ui
 pnpm test:db
 

@@ -23,6 +23,7 @@
     "test:dev-fanout-server": "pnpm --filter @avandar/dev-fanout-server test",
     "test:pipeline-server": "pnpm --filter @avandar/pipeline-server test",
     "test:frontend": "vitest run --exclude \"apps/**\" --exclude \"packages/**\" --exclude \"shared/lib/**\"",
+    "test:background-jobs": "pnpm --filter @avandar/background-jobs test",
     "test:hooks": "pnpm --filter @avandar/hooks test",
     "test:logger": "pnpm --filter @avandar/logger test",
     "test:models": "pnpm --filter @avandar/models test",

@@ -44,6 +44,8 @@ export default defineConfig(({ mode }) => {
         "@utils": "/packages/shared/utils/src",
         "@ui": "/packages/web/ui/src",
         "@hooks": "/packages/web/hooks/src",
+        "@background-jobs/ui": "/packages/web/background-jobs/src/ui",
+        "@background-jobs": "/packages/web/background-jobs/src",
         "@sbfn": "/supabase/functions",
       },
     },

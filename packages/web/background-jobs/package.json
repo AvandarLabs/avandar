@@ -1,0 +1,37 @@
+{
+  "name": "@avandar/background-jobs",
+  "version": "0.1.0",
+  "description": "A library for tracking long-running background jobs in Avandar. Decoupled from app business logic.",
+  "license": "CPAL-1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui": "./src/ui/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dexie": "^4.0.11"
+  },
+  "peerDependencies": {
+    "@mantine/core": "^9.2.0",
+    "@tabler/icons-react": "^3.31.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@mantine/core": "^9.2.0",
+    "@tabler/icons-react": "^3.31.0",
+    "@testing-library/react": "^16.3.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

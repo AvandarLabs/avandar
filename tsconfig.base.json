@@ -47,6 +47,9 @@
       "@ui/*": ["./packages/web/ui/src/*"],
       "@hooks": ["./packages/web/hooks/src/index.ts"],
       "@hooks/*": ["./packages/web/hooks/src/*"],
+      "@background-jobs": ["./packages/web/background-jobs/src/index.ts"],
+      "@background-jobs/ui": ["./packages/web/background-jobs/src/ui/index.ts"],
+      "@background-jobs/*": ["./packages/web/background-jobs/src/*"],
 
       /* Apps */
       "@ava-cli/*": ["./apps/ava-cli/src/*"],

@@ -29,6 +29,11 @@ function _getWebPackageVitestAliases(rootDir: string): Record<string, string> {
   return {
     "@ui": resolve(rootDir, "packages/web/ui/src"),
     "@hooks": resolve(rootDir, "packages/web/hooks/src"),
+    "@background-jobs/ui": resolve(
+      rootDir,
+      "packages/web/background-jobs/src/ui",
+    ),
+    "@background-jobs": resolve(rootDir, "packages/web/background-jobs/src"),
   };
 }
 

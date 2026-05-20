@@ -1,4 +1,5 @@
-import { notifyError, notifySuccess, notifyWarning } from "@ui";
+import { BackgroundJobs } from "@background-jobs";
+import { notifyWarning } from "@ui";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
@@ -209,6 +210,25 @@ async function _runPhaseB(params: {
   });
   ImportJobsManager.startJob({ datasetId, sourceFileSize, startedAt });
 
+  // Background-jobs registration so the job appears in the
+  // "Show background jobs" modal and so terminal toasts are surfaced
+  // by the jobs architecture rather than inline notify calls.
+  const backgroundJob = BackgroundJobs.register({
+    id: `dataset-parse:${datasetId}`,
+    type: "dataset-parse",
+    label: `Importing "${sourceFileName}"`,
+    description: "Transcoding source file to parquet",
+    metadata: { datasetId, sourceFileSize },
+    successToast: {
+      title: "Dataset ready",
+      message: `"${sourceFileName}" finished processing and is ready to use.`,
+    },
+    failureToast: {
+      title: "Dataset failed to process",
+      message: `"${sourceFileName}" could not be parsed.`,
+    },
+  });
+
   try {
     const result =
       params.source.kind === "csv" ?
@@ -241,11 +261,8 @@ async function _runPhaseB(params: {
     });
 
     ImportJobsManager.markSucceeded(datasetId);
+    BackgroundJobs.markCompleted(backgroundJob.id);
 
-    notifySuccess({
-      title: "Dataset ready",
-      message: `"${sourceFileName}" finished processing and is ready to use.`,
-    });
     if (changedCount > 0) {
       notifyWarning({
         title: "Column types updated",
@@ -270,10 +287,7 @@ async function _runPhaseB(params: {
       parseFailedReason: message,
     });
     ImportJobsManager.markFailed(datasetId, message);
-    notifyError({
-      title: "Dataset failed to process",
-      message: `"${sourceFileName}" could not be parsed: ${message}`,
-    });
+    BackgroundJobs.markFailed(backgroundJob.id, message);
     setTimeout(() => {
       ImportJobsManager.clearJob(datasetId);
     }, 2000);

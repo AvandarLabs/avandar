@@ -1,4 +1,4 @@
-import { notifyError } from "@ui";
+import { BackgroundJobs } from "@background-jobs";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { MIMEType } from "@utils";
@@ -230,6 +230,22 @@ export async function startDatasetUpload(options: {
 
   const parquetBlob = localDataset.parquetData;
 
+  const backgroundJob = BackgroundJobs.register({
+    id: `dataset-upload:${datasetId}`,
+    type: "dataset-upload",
+    label: `Syncing dataset to cloud`,
+    description: `Uploading ${Math.round(parquetBlob.size / 1024)} KB to cloud storage`,
+    progress: 0,
+    metadata: { datasetId, totalBytes: parquetBlob.size },
+    successToast: {
+      title: "Dataset synced",
+      message: "Dataset has been uploaded to the cloud.",
+    },
+    failureToast: {
+      title: "Unable to sync dataset online",
+    },
+  });
+
   const makeUploadPromise = async (): Promise<void> => {
     try {
       await _uploadDatasetToSupabase({
@@ -237,15 +253,13 @@ export async function startDatasetUpload(options: {
         parquetBlob,
         sourceType,
       });
+      BackgroundJobs.markCompleted(backgroundJob.id);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
 
       DatasetUploadProgressStore.markError(datasetId, errorMessage);
-      notifyError({
-        title: "Unable to sync dataset online",
-        message: errorMessage,
-      });
+      BackgroundJobs.markFailed(backgroundJob.id, errorMessage);
       throw error;
     } finally {
       DatasetUploadProgressStore.removeUpload(datasetId);
