@@ -11,7 +11,7 @@
  * VoiceContracts.getStatus} for progress.
  */
 
-import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
+import { VoiceContracts } from "../../../../../shared/platform/ipc/contracts/VoiceContracts";
 import type { WhisperService } from "../../services/createWhisperService/createWhisperService";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 
