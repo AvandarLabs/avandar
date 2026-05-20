@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {
@@ -38,6 +39,10 @@ export function OpenDataCatalogEntryDetail({
   isLoadingColumnMetadata,
   onAddToWorkspace,
 }: Props): JSX.Element {
+  const offline = useOfflineGate(
+    "Adding a dataset from the catalog requires an internet connection.",
+  );
+
   if (!entry) {
     return (
       <Stack align="center" justify="center" mih={200} gap="xs">
@@ -61,15 +66,24 @@ export function OpenDataCatalogEntryDetail({
             {entry.displayName}
           </Title>
 
-          <Tooltip label="Add to your workspace">
+          <Tooltip
+            label={
+              offline.isBlocked ? offline.tooltip : "Add to your workspace"
+            }
+          >
             <ActionIcon
               aria-label="Add dataset to workspace"
               color="primary"
               variant="filled"
               size="lg"
               loading={isAdding || isLoadingColumnMetadata}
-              disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
-              onClick={onAddToWorkspace}
+              disabled={
+                !isAddAllowed ||
+                isAdding ||
+                isLoadingColumnMetadata ||
+                offline.isBlocked
+              }
+              onClick={offline.guard(onAddToWorkspace)}
             >
               <IconPlus size={20} />
             </ActionIcon>

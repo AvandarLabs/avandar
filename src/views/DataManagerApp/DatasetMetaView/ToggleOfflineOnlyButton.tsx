@@ -10,6 +10,7 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
@@ -27,6 +28,9 @@ export function ToggleOfflineOnlyButton({
   dataSource,
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
+  const offline = useOfflineGate(
+    "Changing offline-only status requires an internet connection.",
+  );
   const sourceType = DatasetSource.getSourceType(dataSource);
 
   const [makeOfflineOnly, isMakeOfflinePending] = useMutation({
@@ -70,7 +74,7 @@ export function ToggleOfflineOnlyButton({
   const isUploadPending = useIsDatasetUploadInProgress(dataSource.datasetId);
   const uploadPercent = useUploadPercent(dataSource.datasetId);
 
-  const onClick = () => {
+  const onClick = offline.guard(() => {
     const isPending = isMakeOfflinePending || isUploadPending;
 
     if (isPending) {
@@ -111,7 +115,7 @@ export function ToggleOfflineOnlyButton({
         }
       },
     });
-  };
+  });
 
   const isPending = isMakeOfflinePending || isUploadPending;
 
@@ -129,7 +133,7 @@ export function ToggleOfflineOnlyButton({
         aria-label={
           isInCloudStorage ? "Make offline-only" : "Allow online syncing"
         }
-        disabled={isPending}
+        disabled={isPending || offline.isBlocked}
         onClick={onClick}
       >
         {isUploadPending ?

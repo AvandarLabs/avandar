@@ -1,18 +1,22 @@
 import {
+  Badge,
   Box,
   BoxProps,
+  Group,
   Loader,
   NavLinkProps,
   ScrollArea,
   Text,
+  Tooltip,
   useMantineTheme,
 } from "@mantine/core";
+import { NavLinkList } from "@ui";
 import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@ui";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
@@ -25,9 +29,17 @@ function makeDatasetLink(options: {
   datasetId: Dataset.Id;
   datasetName: string;
   style?: NavLinkProps["style"];
-  label?: string;
+  label?: NavLinkProps["label"];
+  showOfflineBadge?: boolean;
 }): NavLinkProps & { key: string } {
-  const { workspaceSlug, datasetId, datasetName, style, label } = options;
+  const {
+    workspaceSlug,
+    datasetId,
+    datasetName,
+    style,
+    label,
+    showOfflineBadge,
+  } = options;
   const link = {
     ...AppLinks.dataManagerDatasetView({
       workspaceSlug,
@@ -35,8 +47,22 @@ function makeDatasetLink(options: {
       datasetName,
     }),
     style,
+    label:
+      label ??
+      (showOfflineBadge ?
+        <Group gap="xs" wrap="nowrap" justify="space-between">
+          <Text size="sm" lineClamp={1}>
+            {datasetName}
+          </Text>
+          <Tooltip label="Available offline: parquet cached on this device">
+            <Badge size="xs" color="teal" variant="light">
+              Offline
+            </Badge>
+          </Tooltip>
+        </Group>
+      : datasetName),
   };
-  return label ? { ...link, label } : link;
+  return link;
 }
 
 export function DatasetNavbar({
@@ -45,6 +71,7 @@ export function DatasetNavbar({
   ...boxProps
 }: Props): JSX.Element {
   const { slug: workspaceSlug } = useCurrentWorkspace();
+  const localDatasetIds = useLocalDatasetIds();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -65,12 +92,13 @@ export function DatasetNavbar({
           datasetId: dataset.id,
           datasetName: dataset.name,
           style: borderStyle,
+          showOfflineBadge: localDatasetIds.has(dataset.id),
         });
       });
     });
 
     return datasetLinks;
-  }, [datasets, borderStyle, workspaceSlug]);
+  }, [datasets, borderStyle, workspaceSlug, localDatasetIds]);
 
   const elements = {
     emptyList() {

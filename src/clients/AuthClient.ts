@@ -171,6 +171,7 @@ function createAuthClient(): AuthClient {
       if (error) {
         throw error;
       }
+      _self.isManuallySignedOut = false;
       return data;
     },
 

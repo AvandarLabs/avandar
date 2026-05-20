@@ -32,7 +32,15 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
 
     getSession();
 
-    const subscription = AuthClient.onAuthStateChange((_event, newSession) => {
+    const subscription = AuthClient.onAuthStateChange((event, newSession) => {
+      if (
+        event === "SIGNED_OUT" &&
+        !AuthClient.isManuallySignedOut() &&
+        !navigator.onLine
+      ) {
+        return;
+      }
+
       if (newSession?.user) {
         const currentLocation = router.state.location;
         const searchParams = new URLSearchParams(currentLocation.search);

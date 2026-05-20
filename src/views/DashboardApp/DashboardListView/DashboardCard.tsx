@@ -1,16 +1,23 @@
-import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
+type DashboardOfflineStatus = "full" | "partial" | "none";
+
 type Props = {
   dashboard: Dashboard.T;
+  offlineStatus?: DashboardOfflineStatus;
   onClick?: () => void;
 };
 
-export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
+export function DashboardCard({
+  dashboard,
+  offlineStatus = "none",
+  onClick,
+}: Props): JSX.Element {
   const [isHovered, setIsHovered] = useState(false);
 
   const onMouseEnter = () => {
@@ -61,9 +68,21 @@ export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
           </Group>
         </Group>
 
-        <Text c="dimmed" size="xs">
-          Updated {formatDashboardDate(dashboard.updatedAt)}
-        </Text>
+        <Group gap="xs">
+          {offlineStatus === "full" ?
+            <Badge size="xs" color="teal" variant="light">
+              Offline ready
+            </Badge>
+          : null}
+          {offlineStatus === "partial" ?
+            <Badge size="xs" color="yellow" variant="light">
+              Partially offline
+            </Badge>
+          : null}
+          <Text c="dimmed" size="xs">
+            Updated {formatDashboardDate(dashboard.updatedAt)}
+          </Text>
+        </Group>
       </Stack>
     </Card>
   );

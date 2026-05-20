@@ -1,5 +1,6 @@
+import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { makeSelectOptions, Select } from "@ui";
+import { makeSelectOptions, Select, Tooltip } from "@ui";
 import { makeBucketMap, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
@@ -7,7 +8,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   QueryDataSource,
   QueryDataSourceId,
@@ -22,10 +26,6 @@ type Props = {
 /**
  * A select component for selecting a data source, which can be
  * a dataset or an entity config.
- *
- * This component loads the list of datasets and entity configs on its own.
- * This component supports controlled and uncontrolled behavior and can be used
- * with `useForm`.
  */
 export function QueryDataSourceSelect({
   defaultValue,
@@ -42,6 +42,8 @@ export function QueryDataSourceSelect({
     });
 
   const workspace = useCurrentWorkspace();
+  const isOnline = useIsOnline();
+  const localDatasetIds = useLocalDatasetIds();
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -53,8 +55,6 @@ export function QueryDataSourceSelect({
   }, [datasets, entityConfigs]);
 
   useOnBecomesDefined(dataSources, (dsources) => {
-    // if the current value is contained in the datasource list, then
-    // we don't have to trigger any change
     if (
       dsources.some((ds) => {
         return ds.id === currentDataSource?.id;
@@ -67,52 +67,68 @@ export function QueryDataSourceSelect({
     setCurrentDataSource(firstDataSource ?? null);
   });
 
+  const unqueryableOfflineIds = useMemo(() => {
+    if (isOnline) {
+      return new Set<QueryDataSourceId>();
+    }
+    const ids = new Set<QueryDataSourceId>();
+    for (const dataset of datasets ?? []) {
+      if (!localDatasetIds.has(dataset.id as DatasetId)) {
+        ids.add(dataset.id as QueryDataSourceId);
+      }
+    }
+    return ids;
+  }, [datasets, isOnline, localDatasetIds]);
+
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {
+    const buildDatasetOptions = (
+      bucketValues: Array<{ id: QueryDataSourceId; name: string }>,
+    ) => {
+      return bucketValues.map((dataset) => {
+        const isUnqueryableOffline = unqueryableOfflineIds.has(dataset.id);
+        return {
+          value: dataset.id,
+          label: dataset.name,
+          disabled: isUnqueryableOffline,
+        };
+      });
+    };
+
     const datasetBucketsByType = makeBucketMap(datasets ?? [], {
       key: "sourceType",
     });
 
-    // if there is only what dataset type and no entity configs, we
-    // can just show a flat list
     if (
       datasetBucketsByType.size === 1 &&
       (!entityConfigs || entityConfigs.length === 0)
     ) {
-      return makeSelectOptions(datasets ?? [], {
-        valueKey: "id",
-        labelKey: "name",
-      });
+      return buildDatasetOptions(
+        (datasets ?? []).map((dataset) => {
+          return { id: dataset.id as QueryDataSourceId, name: dataset.name };
+        }),
+      );
     }
 
-    // if we have more than 1 bucket that means we need to group things
     const groups: Array<SelectOptionGroup<QueryDataSourceId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
-        .with("csv_file", () => {
-          return "CSVs";
-        })
-        .with("google_sheets", () => {
-          return "Google Sheets";
-        })
-        .with("virtual", () => {
-          return "Derived Dataset";
-        })
-        .with("open_data", () => {
-          return "Open Data";
-        })
-        .with("xlsx_file", () => {
-          return "Excel files";
-        })
-        .exhaustive(() => {
-          return undefined;
-        });
+        .with("csv_file", () => "CSVs")
+        .with("google_sheets", () => "Google Sheets")
+        .with("virtual", () => "Derived Dataset")
+        .with("open_data", () => "Open Data")
+        .with("xlsx_file", () => "Excel files")
+        .exhaustive(() => undefined);
       if (bucketName) {
         groups.push({
           group: bucketName,
-          items: makeSelectOptions(bucketValues, {
-            valueKey: "id",
-            labelKey: "name",
-          }),
+          items: buildDatasetOptions(
+            bucketValues.map((dataset) => {
+              return {
+                id: dataset.id as QueryDataSourceId,
+                name: dataset.name,
+              };
+            }),
+          ),
         });
       }
     });
@@ -126,7 +142,7 @@ export function QueryDataSourceSelect({
         }),
       },
     ];
-  }, [datasets, entityConfigs]);
+  }, [datasets, entityConfigs, unqueryableOfflineIds]);
 
   const onDataSourceChange = (newDataSourceId: QueryDataSourceId | null) => {
     const newDataSource =
@@ -143,6 +159,18 @@ export function QueryDataSourceSelect({
       placeholder="Select a data source"
       value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
+      renderOption={({ option }) => (
+        <Group justify="space-between" wrap="nowrap">
+          <Text size="sm">{option.label}</Text>
+          {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
+            <Tooltip label="Not available offline. Open this dataset while online to cache it.">
+              <Badge size="xs" color="red" variant="light">
+                Not offline
+              </Badge>
+            </Tooltip>
+          : null}
+        </Group>
+      )}
       {...selectProps}
     />
   );

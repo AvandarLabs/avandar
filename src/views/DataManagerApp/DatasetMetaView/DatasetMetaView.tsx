@@ -1,5 +1,6 @@
 import {
   Alert,
+  Badge,
   Box,
   Button,
   Container,
@@ -8,6 +9,7 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -31,6 +33,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DataSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DataSummaryView";
@@ -47,6 +50,8 @@ type Props = {
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const localDatasetIds = useLocalDatasetIds();
+  const isCachedOffline = localDatasetIds.has(dataset.id);
   const [appRoles] = useUserAppRoles();
   // True when the user has no data_sources app role; in that case the dataset
   // is visible only through a resource share. We surface this with a soft
@@ -178,6 +183,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   lh="var(--mantine-h2-line-height)"
                 />
               </Box>
+              {isCachedOffline ?
+                <Tooltip label="Available offline: parquet cached on this device">
+                  <Badge size="sm" color="teal" variant="light">
+                    Offline
+                  </Badge>
+                </Tooltip>
+              : null}
 
               {(
                 // only show the button if the source dataset has an

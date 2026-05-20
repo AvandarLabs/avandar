@@ -1,5 +1,6 @@
 import { useBoolean, useMutation } from "@hooks";
 import {
+  Alert,
   Anchor,
   Box,
   Button,
@@ -20,13 +21,14 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -50,6 +52,7 @@ const IS_REGISTRATION_DISABLED = isFlagEnabled(
 const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
+  const isOnline = useIsOnline();
   const searchParams = Route.useSearch();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
     !IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED,
@@ -142,7 +145,7 @@ function RegisterPage() {
   });
 
   const onFormSubmit = registrationForm.onSubmit(async (values) => {
-    if (isRegistrationPending) {
+    if (!isOnline || isRegistrationPending) {
       return;
     }
     sendRegistrationRequest(values);
@@ -323,6 +326,11 @@ function RegisterPage() {
               >
                 <form onSubmit={onFormSubmit}>
                   <Stack>
+                    {!isOnline ?
+                      <Alert color="yellow" variant="light">
+                        Registration requires an internet connection.
+                      </Alert>
+                    : null}
                     <TextInput
                       key={registrationForm.key("email")}
                       label="Email"
@@ -367,7 +375,8 @@ function RegisterPage() {
                         disabled={
                           isRegistrationPending ||
                           isRegistrationSuccess ||
-                          IS_REGISTRATION_DISABLED
+                          IS_REGISTRATION_DISABLED ||
+                          !isOnline
                         }
                       >
                         Register

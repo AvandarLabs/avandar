@@ -3,6 +3,7 @@ import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { notifyDevAlert, notifySuccess, Tooltip } from "@ui";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
@@ -27,12 +28,18 @@ export function PublishDashboardButton({
     },
   });
 
-  const isDisabled: boolean = !dashboardId || hasUnsavedChanges;
+  const offline = useOfflineGate("Publishing requires an internet connection.");
+  const isDisabled: boolean =
+    !dashboardId || hasUnsavedChanges || offline.isBlocked;
 
   return (
     <Tooltip
-      label="You cannot publish while there are unsaved changes. Save first."
-      disabled={!hasUnsavedChanges}
+      label={
+        offline.isBlocked ?
+          offline.tooltip
+        : "You cannot publish while there are unsaved changes. Save first."
+      }
+      disabled={!hasUnsavedChanges && !offline.isBlocked}
     >
       <Button
         variant="outline"
@@ -41,6 +48,10 @@ export function PublishDashboardButton({
         data-disabled={isDisabled || undefined}
         aria-disabled={isDisabled || undefined}
         onClick={(event) => {
+          if (offline.isBlocked) {
+            event.preventDefault();
+            return;
+          }
           if (!dashboardId) {
             event.preventDefault();
             notifyDevAlert("Dashboard is not loaded yet.");

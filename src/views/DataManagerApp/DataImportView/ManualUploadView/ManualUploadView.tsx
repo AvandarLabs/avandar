@@ -1,10 +1,11 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
-import { notifyError, FileUploadForm  } from "@ui";
+import { FileUploadForm, notifyError } from "@ui";
 import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import {
   DatasetImportForm,
   ManualUploadDataSourceMetadata,
@@ -43,6 +44,7 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
 }
 
 export function ManualUploadView(props: Props): JSX.Element {
+  const isOnline = useIsOnline();
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const {
     dataSourceMetadata,
@@ -142,14 +144,16 @@ export function ManualUploadView(props: Props): JSX.Element {
 
         {elements.importForm()}
 
-        <ManualUploadDropzone
-          onRequestFileParse={(file) => {
-            onRequestFileParse({
-              file,
-              newDatasetId: uuid() as Dataset.Id,
-            });
-          }}
-        />
+        {isOnline ?
+          <ManualUploadDropzone
+            onRequestFileParse={(file) => {
+              onRequestFileParse({
+                file,
+                newDatasetId: uuid() as Dataset.Id,
+              });
+            }}
+          />
+        : null}
       </Stack>
     </Box>
   );

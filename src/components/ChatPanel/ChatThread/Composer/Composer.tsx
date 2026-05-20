@@ -3,11 +3,13 @@ import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
   const context = useChatPageContext();
-  const disabled = context.app !== "data-explorer";
+  const offline = useOfflineGate("Chat requires an internet connection.");
+  const disabled = context.app !== "data-explorer" || offline.isBlocked;
 
   return (
     <div className={css.composerContainer}>

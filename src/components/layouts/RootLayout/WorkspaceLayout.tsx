@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
+import { OfflineBanner } from "@/components/OfflineBanner/OfflineBanner";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
@@ -95,6 +96,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   return (
     <DataExplorerStateManager.Provider>
       <ChatPanelProvider>
+        <OfflineBanner />
         <AppShell
           title={workspace.name}
           currentWorkspace={workspace}
