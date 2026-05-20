@@ -13,16 +13,47 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type {
   PolarCustomerId,
   PolarProductId,
   SubscriptionId,
-  SubscriptionModel,
   SubscriptionRead,
   SubscriptionRowId,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { SetOptional } from "type-fest";
+
+export type SubscriptionModel = SupabaseCrudModelSpec<
+  {
+    tableName: "subscriptions";
+    modelName: "Subscription";
+    modelPrimaryKeyType: SubscriptionRowId;
+    modelTypes: {
+      Read: SubscriptionRead;
+      Insert: SetOptional<
+        SubscriptionRead,
+        | "createdAt"
+        | "currentPeriodEnd"
+        | "currentPeriodStart"
+        | "endedAt"
+        | "endsAt"
+        | "id"
+        | "polarCustomerEmail"
+        | "polarCustomerId"
+        | "polarProductId"
+        | "polarSubscriptionId"
+        | "startedAt"
+        | "updatedAt"
+      >;
+      Update: Partial<SubscriptionRead>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
 
 const DBReadSchema = z.object({
   id: z.uuid(),

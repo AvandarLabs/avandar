@@ -38,7 +38,9 @@ export function useEnsureWorkspaceBilling(): void {
               </Text>
             ),
             size: "100%",
-            children: <WorkspaceBillingView hideTitle />,
+            children: (
+              <WorkspaceBillingView hideTitle workspace={workspace} />
+            ),
             styles: {
               content: {
                 height: "100%",
@@ -56,6 +58,7 @@ export function useEnsureWorkspaceBilling(): void {
     // close it
     if (subscription && modalId) {
       modals.close(modalId);
+      setModalId(undefined);
     }
-  }, [subscription, isInCheckoutRoute, modalId]);
+  }, [subscription, isInCheckoutRoute, modalId, workspace]);
 }

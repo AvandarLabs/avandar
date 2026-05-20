@@ -7,12 +7,14 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import { useRouter } from "@tanstack/react-router";
 import { notifyExpiredSession, notifySuccess } from "@ui";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { UserClient } from "@/clients/UserClient";
 import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
@@ -25,8 +27,6 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import type {
   FreePlanVariants,
@@ -37,7 +37,10 @@ import type {
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-type Props =
+type Props = {
+  workspaceId: Workspace.Id;
+  workspaceSlug: string;
+} & (
   | {
       type: "free";
       planGroup: FreeSubscriptionPlanGroup;
@@ -51,7 +54,8 @@ type Props =
       currentSubscription: Workspace.WithSubscription["subscription"];
       currentSubscribedPlan?: SubscriptionPlan;
       defaultVariant: PaidPlanVariants;
-    };
+    }
+);
 
 function getInitialSelectedVariant(
   options: Props,
@@ -84,25 +88,33 @@ function getInitialSelectedVariant(
     return defaultVariant;
   }
 
-  return planGroup.monthlyPlan.polarProductId === currentSubscribedPolarProductId ?
-      "month"
-    : "year";
+  const isMonthlyPlan =
+    planGroup.monthlyPlan.polarProductId ===
+    currentSubscribedPolarProductId;
+  return isMonthlyPlan ? "month" : "year";
 }
 
 export function PlanCard(props: Props): JSX.Element {
-  const { type, planGroup, currentSubscription, currentSubscribedPlan } = props;
+  const {
+    type,
+    planGroup,
+    currentSubscription,
+    currentSubscribedPlan,
+    workspaceId,
+    workspaceSlug,
+  } = props;
   const router = useRouter();
-  const workspace = useCurrentWorkspace();
-  const [userProfile] = useCurrentUserProfile();
+  const [userProfile] = UserClient.useGetProfile({ workspaceId });
   const [selectedVariant, setSelectedVariant] = useState<
     FreePlanVariants | PaidPlanVariants
   >(getInitialSelectedVariant(props));
   const openChangePlanModal = useChangePlanModal();
   const [createFreeSub, isCreatingFreeSub] = useMutation({
     mutationFn: async () => {
-      await createFreeSubscription({ workspaceId: workspace.id });
+      await createFreeSubscription({ workspaceId });
     },
     onSuccess: () => {
+      modals.closeAll();
       notifySuccess("You're on the Free plan");
     },
     queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
@@ -134,11 +146,11 @@ export function PlanCard(props: Props): JSX.Element {
   const isRecommended = planGroup.featurePlan.metadata.isRecommendedPlan;
 
   const onSelectPlan = async () => {
-    if (!userProfile || !workspace) {
+    if (!userProfile) {
       notifyExpiredSession();
       return;
     }
-    const { userId, workspaceId, email } = userProfile;
+    const { userId, email } = userProfile;
 
     if (selectedPlan.priceType === "free") {
       createFreeSub();
@@ -156,7 +168,7 @@ export function PlanCard(props: Props): JSX.Element {
       const currentURL = getCurrentURL();
       const successURL = router.buildLocation({
         to: "/$workspaceSlug/checkout",
-        params: { workspaceSlug: workspace.slug },
+        params: { workspaceSlug },
         search: { success: true },
       });
 
@@ -318,7 +330,10 @@ function _isCurrentSubscribedPlan(options: {
 }): boolean {
   const { currentSubscription, currentSubscribedPlan, selectedPlan } = options;
 
-  if (currentSubscribedPlan === undefined || currentSubscription === undefined) {
+  if (
+    currentSubscribedPlan === undefined ||
+    currentSubscription === undefined
+  ) {
     return false;
   }
 

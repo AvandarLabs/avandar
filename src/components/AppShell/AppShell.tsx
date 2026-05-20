@@ -174,7 +174,7 @@ function AppShellComponent({
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
-          <ChatPanel />
+          {currentWorkspace ? <ChatPanel /> : null}
         </MantineAppShell.Aside>
       </MantineAppShell>
 
@@ -194,7 +194,9 @@ function AppShellComponent({
 export function AppShell(props: Props): JSX.Element {
   return (
     <AppShellStateManager.Provider>
-      <AppShellComponent {...props} />
+      <ChatPanelStateManager.Provider>
+        <AppShellComponent {...props} />
+      </ChatPanelStateManager.Provider>
     </AppShellStateManager.Provider>
   );
 }
