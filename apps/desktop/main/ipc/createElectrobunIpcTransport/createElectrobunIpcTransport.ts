@@ -54,8 +54,12 @@ export function createElectrobunIpcTransport(view: BrowserView): IpcTransport {
 
   // Receive every message name without pre-declaring it in a schema.
   rpc.addMessageListener("*", (name: string, payload: unknown) => {
+    console.log(`[ipc] bun-main received "${name}"`);
     const handlers = listeners.get(name);
     if (handlers === undefined) {
+      console.warn(
+        `[ipc] bun-main has no handler registered for "${name}" — dropping message`,
+      );
       return;
     }
     for (const handler of handlers) {
@@ -75,6 +79,7 @@ export function createElectrobunIpcTransport(view: BrowserView): IpcTransport {
        * lazily on dynamic property access (returns a sender function
        * for any name). The cast forces TS to acknowledge that.
        */
+      console.log(`[ipc] bun-main sending "${channel}"`);
       const sender = rpc.send[channel] as
         | ((payload: unknown) => void)
         | undefined;
