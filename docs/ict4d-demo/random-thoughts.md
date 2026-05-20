@@ -33,3 +33,13 @@ Random other features we should consider:
 - Harden all our indexedDB storage and session storage to also ALWAYS include user ids and workspace ids to make sure we are namespacing them correctly.
   How do we handle voice models? If same user, diff workspace, use same choice. If different user: we skip downloading online bc we can use the cached model, but they
   are still expected to pick a model bc they might want a different default.
+- I think somewhere i had named a ts file with kebab case? Fix that. Only directories should be kebab case. Files should be camelCase or PascalCase always.
+
+Avandar review:
+
+- Detect unnecessary timeout increases in Playwright.
+- Switch to oxlint and oxfmt.
+  - Create oxlint and oxfmt plugins for my very opinionated rules so that LLMs have no choice but to follow them.
+- Harden the file and directory structure rules. Enforce directories whenever we have two co-named files.
+- No nulls. Switch to undefined.
+- Have a phase on library usage, so they replace things with our utils where necessary. Ideally this can be an oxfmt or oxlint plugin.
