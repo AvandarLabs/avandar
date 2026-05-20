@@ -121,7 +121,7 @@ if [ "$NGROK_AVAILABLE" = true ]; then
     --prefix-colors "blue,green,yellow" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite" \
+    "vite --host 127.0.0.1 --port 5173" \
     "pnpm fns:serve" \
     "$NGROK_COMMAND"
 else
@@ -130,6 +130,6 @@ else
     --prefix-colors "blue,green" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite" \
+    "vite --host 127.0.0.1 --port 5173" \
     "pnpm fns:serve"
 fi

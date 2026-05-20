@@ -74,11 +74,8 @@ export async function ensureCloudStorageCheckedAndSaveDataset(options: {
   const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const metaUrl = new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
 
-  await Promise.all([
-    page.waitForURL(metaUrl, {
-      timeout: navigationTimeout,
-      waitUntil: "commit",
-    }),
-    page.getByRole("button", { name: "Save Dataset" }).click(),
-  ]);
+  await page.getByRole("button", { name: "Save Dataset" }).click();
+  await expect
+    .poll(() => metaUrl.test(page.url()), { timeout: navigationTimeout })
+    .toBe(true);
 }

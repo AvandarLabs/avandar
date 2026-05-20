@@ -69,3 +69,4 @@ etl-output/
 
 # Large generated test files for memory/perf benchmarking (do not commit)
 tests/data/large/
+.claude/worktrees

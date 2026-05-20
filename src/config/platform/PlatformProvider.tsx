@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { isDesktop } from "$/platform/isDesktop";
 import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { DesktopDatasetBlobStore } from "$/platform/desktop/DesktopDatasetBlobStore";
 import { DesktopDuckDbClient } from "$/platform/desktop/DesktopDuckDbClient";
+import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import type { AuthProvider } from "$/platform/types/AuthProvider.types";
 import type { DatasetBlobStore } from "$/platform/types/DatasetBlobStore.types";
 import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
@@ -42,8 +42,10 @@ export function PlatformProvider({
 }: {
   children: ReactNode;
 }): JSX.Element {
+  const platformType = usePlatformInfo();
+
   const impls = useMemo<PlatformImpls>(() => {
-    const resolved: PlatformImpls = isDesktop() ?
+    const resolved: PlatformImpls = platformType === "desktop" ?
       {
         duckDb: DesktopDuckDbClient,
         authProvider: DesktopAuthProvider,
@@ -61,7 +63,7 @@ export function PlatformProvider({
     // populated registry.
     setPlatformImpls(resolved);
     return resolved;
-  }, []);
+  }, [platformType]);
 
   return (
     <PlatformContext.Provider value={impls}>

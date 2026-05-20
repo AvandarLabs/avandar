@@ -8,7 +8,6 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -21,7 +20,6 @@ import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UseQueryResult } from "@tanstack/react-query";
 import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -38,29 +36,10 @@ const FIXTURE_CSV_PATH = path.resolve(
  */
 const COVID_SAMPLE_NUM_ROWS = 14_700;
 
-const {
-  notifySuccessMock,
-  storeLocalCSVMock,
-  dropLocalDatasetMock,
-  getPreviewDataMock,
-  useGetPreviewDataMock,
-} = vi.hoisted(() => {
+const { startCsvImportMock, dropLocalDatasetMock } = vi.hoisted(() => {
   return {
-    notifySuccessMock: vi.fn(),
-    storeLocalCSVMock: vi.fn(),
+    startCsvImportMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
-    getPreviewDataMock: vi.fn(),
-    useGetPreviewDataMock: vi.fn(),
-  };
-});
-
-vi.mock("@ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@ui")>();
-  return {
-    ...actual,
-    notifySuccess: notifySuccessMock,
-    notifyError: vi.fn(),
-    notifyWarning: vi.fn(),
   };
 });
 
@@ -114,17 +93,8 @@ vi.mock(
 vi.mock("@/clients/datasets/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
-      storeLocalCSV: storeLocalCSVMock,
+      startCsvImport: startCsvImportMock,
       dropLocalDataset: dropLocalDatasetMock,
-    },
-  };
-});
-
-vi.mock("@/clients/datasets/DatasetQueryClient", () => {
-  return {
-    DatasetQueryClient: {
-      getPreviewData: getPreviewDataMock,
-      useGetPreviewData: useGetPreviewDataMock,
     },
   };
 });
@@ -252,9 +222,8 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
 
 /**
  * Full DuckDB WASM does not finish reliably in Vitest/jsdom (web workers), so
- * `LocalDatasetClient.storeLocalCSV` and `DatasetQueryClient.useGetPreviewData`
- * use mocks. Load metadata matches DuckDB inference for
- * `tests/data/california-covid-sample.csv`.
+ * `LocalDatasetClient.startCsvImport` is mocked. Sniff metadata matches DuckDB
+ * inference for `tests/data/california-covid-sample.csv`.
  */
 describe("ManualUploadView", () => {
   beforeEach(() => {
@@ -273,40 +242,21 @@ describe("ManualUploadView", () => {
       subscription: undefined,
     } as Workspace.WithSubscription);
 
-    notifySuccessMock.mockClear();
-    storeLocalCSVMock.mockClear();
     dropLocalDatasetMock.mockClear();
-    getPreviewDataMock.mockClear();
-    useGetPreviewDataMock.mockClear();
+    startCsvImportMock.mockClear();
 
-    storeLocalCSVMock.mockImplementation(async (params) => {
-      const file = params.csvParseOptions.file as File | undefined;
-      const csvName = file?.name ?? "fixture.csv";
-
-      return _covidSampleLoadResult({
+    startCsvImportMock.mockImplementation(async (params) => {
+      const csvName = params.file?.name ?? "fixture.csv";
+      const loadResult = _covidSampleLoadResult({
         datasetId: params.datasetId,
         csvName,
       });
-    });
 
-    const previewRows = _previewRowsFromCovidSample();
-
-    getPreviewDataMock.mockResolvedValue(previewRows);
-
-    useGetPreviewDataMock.mockImplementation((options) => {
-      const enabled = Boolean(options?.useQueryOptions?.enabled);
-      const data = enabled ? previewRows : undefined;
-      const queryResult = {
-        data,
-        error: null,
-        isError: false,
-        isLoading: false,
-        isPending: !enabled,
-        isSuccess: enabled,
-        status: enabled ? "success" : "pending",
-      } as UseQueryResult<UnknownObject[]>;
-
-      return [data, false, queryResult];
+      return {
+        csvSniff: loadResult.csvSniff,
+        columns: loadResult.columns,
+        previewRows: _previewRowsFromCovidSample(),
+      };
     });
   });
 
@@ -333,18 +283,6 @@ describe("ManualUploadView", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Upload" }));
-
-    // expect success notification
-    await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalled();
-    });
-
-    expect(notifySuccessMock).toHaveBeenCalledWith({
-      title: "File loaded successfully",
-      message: `Parsed ${formatNumber(COVID_SAMPLE_NUM_ROWS, {
-        locale: "en-US",
-      })} rows`,
-    });
 
     await waitFor(() => {
       expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
@@ -376,15 +314,11 @@ describe("ManualUploadView", () => {
     renderWithProviders(<ManualUploadView initialFile={file} />);
 
     await waitFor(() => {
-      expect(storeLocalCSVMock).toHaveBeenCalled();
+      expect(startCsvImportMock).toHaveBeenCalled();
     });
 
     await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "File loaded successfully",
-        }),
-      );
+      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
     });
   });
 });

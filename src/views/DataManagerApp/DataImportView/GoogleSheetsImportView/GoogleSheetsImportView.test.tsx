@@ -43,7 +43,7 @@ const COVID_SAMPLE_NUM_ROWS = 14_700;
 
 const {
   notifySuccessMock,
-  storeLocalCSVMock,
+  startCsvImportMock,
   dropLocalDatasetMock,
   useGetPreviewDataMock,
   googlePickerHarness,
@@ -63,7 +63,7 @@ const {
 
   return {
     notifySuccessMock: vi.fn(),
-    storeLocalCSVMock: vi.fn(),
+    startCsvImportMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
     useGetPreviewDataMock: vi.fn(),
     googlePickerHarness: harness,
@@ -146,7 +146,7 @@ vi.mock(
 vi.mock("@/clients/datasets/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
-      storeLocalCSV: storeLocalCSVMock,
+      startCsvImport: startCsvImportMock,
       dropLocalDataset: dropLocalDatasetMock,
     },
   };
@@ -356,7 +356,7 @@ describe("GoogleSheetsImportView", () => {
     } as Workspace.WithSubscription);
 
     notifySuccessMock.mockClear();
-    storeLocalCSVMock.mockClear();
+    startCsvImportMock.mockClear();
     dropLocalDatasetMock.mockClear();
     useGetPreviewDataMock.mockClear();
     googlePickerHarness.pickerSetVisible.mockClear();
@@ -377,14 +377,20 @@ describe("GoogleSheetsImportView", () => {
       throw new Error(`Unexpected APIClient.get route: ${String(opts.route)}`);
     }) as typeof APIClient.get);
 
-    storeLocalCSVMock.mockImplementation(async (params) => {
-      return _covidSampleLoadResult({
+    const previewRows = _previewRowsFromCovidSample();
+
+    startCsvImportMock.mockImplementation(async (params) => {
+      const loadResult = _covidSampleLoadResult({
         csvName: "california-covid-sample",
         datasetId: params.datasetId,
       });
-    });
 
-    const previewRows = _previewRowsFromCovidSample();
+      return {
+        csvSniff: loadResult.csvSniff,
+        columns: loadResult.columns,
+        previewRows,
+      };
+    });
 
     useGetPreviewDataMock.mockReturnValue([previewRows]);
   });
@@ -405,7 +411,7 @@ describe("GoogleSheetsImportView", () => {
 
     expect(notifySuccessMock).toHaveBeenCalledWith({
       title: "File loaded successfully",
-      message: `Parsed ${formatNumber(COVID_SAMPLE_NUM_ROWS, {
+      message: `Parsed ${formatNumber(_previewRowsFromCovidSample().length, {
         locale: "en-US",
       })} rows`,
     });

@@ -30,7 +30,7 @@ const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
   | "development"
   | "production";
 
-const viteDevUrl = process.env.AVA_VITE_DEV_URL ?? "http://localhost:5173";
+const viteDevUrl = process.env.AVA_VITE_DEV_URL ?? "http://127.0.0.1:5173";
 
 const bundledIndexPath =
   process.env.AVA_BUNDLED_INDEX_PATH ??

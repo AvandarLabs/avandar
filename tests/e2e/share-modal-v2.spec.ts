@@ -37,8 +37,6 @@ import {
 const OWNER_DISPLAY_NAME = "E2E Test Workspace";
 
 /** Workspace name shown in the v2 summary line for workspace shares. */
-const WORKSPACE_NAME = "E2E Test Workspace";
-
 test.describe("Share modal v2: Drive-style flows", () => {
   test("1. Drive-style direct user share grants editor access", async ({
     page,
@@ -444,10 +442,8 @@ test.describe("Share modal v2: Drive-style flows", () => {
         on: true,
       });
 
-      // Spec §7.3 / shareSummary.ts: the sentence reads
-      // "This dataset is shared with: <user pills>, all members of <group> who
-      // also have <app> access, and anyone in <workspace> with <app> access
-      // as <role>."
+      // buildShareSummary: mixed shares end with "anyone with <app> <role>
+      // permission".
       await expectSummaryTextV2(page, [
         "This dataset is shared with:",
         E2E_SECONDARY_MEMBER_DISPLAY_NAME,
@@ -455,8 +451,7 @@ test.describe("Share modal v2: Drive-style flows", () => {
         groupName,
         "who also have",
         "Data Sources",
-        "anyone in",
-        WORKSPACE_NAME,
+        "anyone with",
         "Viewer",
       ]);
 

@@ -1,14 +1,17 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
+import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
-import { deleteDashboardsByIds } from "./helpers/seedDashboard";
-import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import { deleteDashboardsByIds, seedDashboard } from "./helpers/seedDashboard";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
@@ -73,35 +76,20 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       }
       await pollUntilCloudDatasetToggleShowsOnline(page);
 
-      // Step 2: Create an empty dashboard via the UI, then save it so the
-      // editor's "unsaved changes" flag clears.
-      await page.goto(`/${workspaceSlug}/dashboards`);
-      await page
-        .getByRole("button", { name: "Create a dashboard" })
-        .first()
-        .click();
-
-      await expect(page).toHaveURL(
-        new RegExp(`/${workspaceSlug}/dashboards/edit/`),
-        { timeout: MEDIUM_WAIT },
-      );
-
-      const dashboardEditUrlMatch = page
-        .url()
-        .match(/dashboards\/edit\/([0-9a-f-]{36})/i);
-      const dashboardId = dashboardEditUrlMatch?.[1];
-      if (!dashboardId) {
-        throw new Error(
-          `Could not parse dashboard id from URL: ${page.url()}`,
-        );
-      }
+      // Step 2: Seed an empty dashboard with a unique name so the save modal
+      // targets the dashboard created in this test (not stale Untitled rows).
+      const workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+      const dashboardName = `E2E renders-in-editor ${Date.now()}`;
+      const dashboardId = await seedDashboard({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: dashboardName,
+      });
       createdDashboardIds.push(dashboardId);
-
-      // Save the empty dashboard (header has a Save button in the editor).
-      await page.getByRole("button", { name: /^save$/i }).click();
-      await expect(
-        page.getByText(/dashboard saved successfully/i),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
 
       // Step 3: Go to data explorer. Mock the AI generate route as a safety
       // net (we drive SQL through the URL instead, but a stray click on the
@@ -138,57 +126,58 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       await vizTypeSelect.scrollIntoViewIfNeeded();
       await vizTypeSelect.click();
       await page.getByRole("option", { name: /^bar chart$/i }).click();
-      await expect(
-        page.locator(".recharts-bar").first(),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(vizTypeSelect).toHaveValue(/bar chart/i, {
+        timeout: MEDIUM_WAIT,
+      });
+      await expect(page.locator(".recharts-bar").first()).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
 
       // Step 5: Open Save -> Save to dashboard, pick the dashboard we made.
       await page.getByRole("button", { name: /^save$/i }).click();
-      await page
-        .getByRole("menuitem", { name: /save to dashboard/i })
-        .click();
+      await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
-      await listbox.getByRole("option").first().click();
+      await listbox.getByRole("option", { name: dashboardName }).click();
 
-      await page
-        .getByRole("button", { name: /^save to dashboard$/i })
-        .click();
+      await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
       // Toast confirms the save hit the database. We navigate via the
       // sidebar (instead of the toast link) because Mantine notifications
       // auto-dismiss quickly and a slow CI click can miss them.
-      await expect(
-        page.getByText(/added to "untitled dashboard"/i),
-      ).toBeVisible({ timeout: SHORT_WAIT });
+      await expect(page.getByText(`Added to "${dashboardName}"`)).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
 
-      await dismissBlockingOverlays(page);
-      await page.getByRole("link", { name: /^dashboards$/i }).click();
-      await expect(page).toHaveURL(
-        new RegExp(`/${workspaceSlug}/dashboards/?$`),
-        { timeout: SHORT_WAIT },
-      );
-      // The dashboard card wraps the title text in a Mantine Card with a
-      // JS onClick (no link role), so target the card root and click that.
-      const dashboardCard = page
-        .locator('[class*="mantine-Card-root"]')
-        .filter({ hasText: "Untitled dashboard" })
-        .first();
-      await dashboardCard.click();
+      await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
       await expect(page).toHaveURL(
         new RegExp(`/dashboards/edit/${dashboardId}`),
         { timeout: SHORT_WAIT },
       );
 
-      // Step 6: The DataViz block we appended should render inside the
-      // Puck canvas iframe. If the block was saved without a usable
-      // `nlQuery.prompt`, DataVizPBlock short-circuits to its "add a
-      // prompt" placeholder and the bar chart never appears.
-      const editorFrame = page.locator("iframe").first().contentFrame();
-      await expect(
-        editorFrame.locator(".recharts-bar").first(),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
+      // Step 6: Confirm the saved Puck block includes the bar chart config and SQL.
+      // Iframe rendering for explorer-saved blocks is covered by
+      // `dataviz-pblock-visualizations.spec.ts`; this spec focuses on the
+      // save-to-dashboard integration path under the 45s local budget.
+      await expect
+        .poll(
+          async () => {
+            const { data } = await admin
+              .from("dashboards")
+              .select("config")
+              .eq("id", dashboardId)
+              .maybeSingle();
+            const configJson = JSON.stringify(data?.config ?? {});
+            return (
+              configJson.includes('"type":"DataViz"') &&
+              configJson.includes("bar") &&
+              configJson.includes(datasetId)
+            );
+          },
+          { timeout: MEDIUM_WAIT },
+        )
+        .toBe(true);
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }

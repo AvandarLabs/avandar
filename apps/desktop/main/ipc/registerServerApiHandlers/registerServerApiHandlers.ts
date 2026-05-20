@@ -1,4 +1,4 @@
-import { ServerApiContracts } from "$/platform/ipc/contracts/ServerApiContracts";
+import { ServerApiContracts } from "../../../../../shared/platform/ipc/contracts/ServerApiContracts";
 import type { AuthState } from "../registerAuthHandlers/registerAuthHandlers";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 

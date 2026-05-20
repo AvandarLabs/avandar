@@ -2,8 +2,10 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
+import { ensureE2eViteFeatureFlags } from "./tests/e2e/setup/ensureE2eViteFeatureFlags";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
+ensureE2eViteFeatureFlags();
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
 const isCI = !!process.env.CI;
@@ -35,8 +37,8 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    command:
-      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 --port 5173",
+    command: "pnpm exec vite --host 127.0.0.1 --port 5173",
+    env: process.env as Record<string, string>,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

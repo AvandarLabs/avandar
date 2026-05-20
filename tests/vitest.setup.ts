@@ -1,7 +1,16 @@
+import path from "node:path";
 import "@testing-library/jest-dom";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { cleanup } from "@testing-library/react";
+import dotenv from "dotenv";
 import { afterEach, expect } from "vitest";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
+
+// Local `.env.development` may enable product feature flags that change which
+// components mount in tests (for example FeedbackButton). E2E injects flags
+// via `ensureE2eViteFeatureFlags` instead.
+delete process.env.VITE_FEATURE_FLAGS;
 
 const noop = (): void => {
   return;

@@ -16,7 +16,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
 VITE_PORT="${AVA_VITE_DEV_PORT:-5173}"
-VITE_URL="http://localhost:${VITE_PORT}"
+VITE_URL="http://127.0.0.1:${VITE_PORT}"
 
 export AVA_DESKTOP_MODE="${AVA_DESKTOP_MODE:-development}"
 export AVA_VITE_DEV_URL="${AVA_VITE_DEV_URL:-${VITE_URL}}"

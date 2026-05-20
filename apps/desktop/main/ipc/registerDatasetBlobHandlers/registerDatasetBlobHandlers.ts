@@ -1,4 +1,4 @@
-import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts";
+import { DatasetBlobContracts } from "../../../../../shared/platform/ipc/contracts/DatasetBlobContracts";
 import type { FileSystemDatasetBlobStore } from "../../services/createFileSystemDatasetBlobStore/createFileSystemDatasetBlobStore";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 

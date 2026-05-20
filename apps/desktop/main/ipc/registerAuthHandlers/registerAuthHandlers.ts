@@ -1,4 +1,4 @@
-import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts";
+import { AuthContracts } from "../../../../../shared/platform/ipc/contracts/AuthContracts";
 import type { Keychain } from "../../services/createKeychain/createKeychain";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 
@@ -289,4 +289,3 @@ export function registerAuthHandlers(
     return { refreshed: true };
   });
 }
-

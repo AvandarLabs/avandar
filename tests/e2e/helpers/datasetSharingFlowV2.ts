@@ -85,7 +85,10 @@ export async function setGeneralAccessV2(
 
   // Wait for the summary line to reflect the workspace share so the next
   // helper call doesn't race the upsert mutation's invalidation.
-  await expect(dialog).toContainText(/anyone in/i, { timeout: MEDIUM_WAIT });
+  await expect(dialog).toContainText(
+    /accessible to anyone with|anyone with/i,
+    { timeout: MEDIUM_WAIT },
+  );
 }
 
 /**

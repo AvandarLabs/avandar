@@ -117,15 +117,15 @@ tests/e2e/
 
 ### Verifying Phase 1 (clarification)
 
-Ask an ambiguous question like *"show me the best regions"*. The chat
+Ask an ambiguous question like _"show me the best regions"_. The chat
 will show a `ClarificationCard` above the composer asking what "best"
 means, with either free-text or fixed options. Submitting falls through
 to `generateSql`.
 
 ### Verifying Phase 2 (discovery)
 
-Ask *"show me cases for the most-recent indicators"* or *"filter to
-poverty-related indicators"*. The model can emit a `discovery` shape
+Ask _"show me cases for the most-recent indicators"_ or _"filter to
+poverty-related indicators"_. The model can emit a `discovery` shape
 clarification with a `SELECT DISTINCT "indicator" ...` query. The
 dropdown is populated client-side; pick one or more values, the
 selection routes through the consent modal (clean mode), and the
@@ -133,8 +133,8 @@ follow-up turn answers using the chosen value(s).
 
 ### Verifying Phase 3 (plans)
 
-Ask *"break this into 3 steps: filter to confirmed cases, aggregate by
-date, then plot"*. The model emits a `proposePlan` tool call; the
+Ask _"break this into 3 steps: filter to confirmed cases, aggregate by
+date, then plot"_. The model emits a `proposePlan` tool call; the
 Data Explorer renders the `PlanFlowView` above the canvas with one card
 per step. Each step auto-runs in DuckDB-WASM; clicking "Open on canvas"
 loads the step's result into the existing visualization.
