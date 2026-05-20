@@ -235,6 +235,19 @@ describe("VoiceInputButton", () => {
     });
   });
 
+  it("renders a voice settings button to the left of the microphone", async () => {
+    isModelDownloadedMock.mockResolvedValueOnce(false);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    expect(
+      await screen.findByRole("button", { name: /voice settings/i }),
+    ).toBeInTheDocument();
+  });
+
   it("defaults the language picker to the workspace locale", async () => {
     workspaceLocaleRef.current = "es";
     isModelDownloadedMock.mockResolvedValueOnce(false);
@@ -246,16 +259,13 @@ describe("VoiceInputButton", () => {
 
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole("button", {
-          name: /set up voice prompting/i,
-        }),
+        await screen.findByRole("button", { name: /voice settings/i }),
       );
     });
 
-    expect(
-      await screen.findByText(/enable voice prompting/i),
-    ).toBeInTheDocument();
-    const languageInput = screen.getByRole("combobox", { name: /language/i });
+    const languageInput = await screen.findByRole("combobox", {
+      name: /language/i,
+    });
     expect((languageInput as HTMLInputElement).value).toBe("Español");
   });
 
@@ -270,16 +280,13 @@ describe("VoiceInputButton", () => {
 
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole("button", {
-          name: /set up voice prompting/i,
-        }),
+        await screen.findByRole("button", { name: /voice settings/i }),
       );
     });
 
-    expect(
-      await screen.findByText(/enable voice prompting/i),
-    ).toBeInTheDocument();
-    const languageInput = screen.getByRole("combobox", { name: /language/i });
+    const languageInput = await screen.findByRole("combobox", {
+      name: /language/i,
+    });
     expect((languageInput as HTMLInputElement).value).toBe("Auto-detect");
   });
 
