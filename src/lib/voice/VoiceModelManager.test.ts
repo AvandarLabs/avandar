@@ -142,7 +142,17 @@ describe("VoiceModelManager", () => {
 
     expect(manager.getStatus()).toMatchObject({
       kind: "downloading",
-      progressPercent: 50,
+      files: [
+        expect.objectContaining({
+          fileName: "model.onnx",
+          progressPercent: 50,
+          state: "downloading",
+        }),
+        expect.objectContaining({
+          fileName: "tokenizer.json",
+          state: "downloading",
+        }),
+      ],
     });
 
     releaseAsrPipeline(asrPipeline);

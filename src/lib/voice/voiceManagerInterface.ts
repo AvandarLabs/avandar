@@ -5,16 +5,22 @@
  * branching inside the components themselves.
  */
 
+import type { VoiceDownloadFileEntry } from "./voiceDownloadProgress";
 import type { VoiceLanguageCode, VoiceModelId } from "./voiceModels";
+
+export type { VoiceDownloadFileEntry } from "./voiceDownloadProgress";
 
 export type VoiceManagerStatus =
   | { kind: "idle" }
   | {
       kind: "downloading";
       modelId: VoiceModelId;
-      /** 0–100. -1 means "indeterminate / starting". */
-      progressPercent: number;
-      currentFile?: string;
+      /**
+       * `files`: one row per HF asset (web) or weight file (desktop).
+       * `loading`: all assets are on disk; the runtime is warming up.
+       */
+      phase: "files" | "loading";
+      files: readonly VoiceDownloadFileEntry[];
     }
   | { kind: "ready"; modelId: VoiceModelId }
   | { kind: "transcribing"; modelId: VoiceModelId }
@@ -28,27 +34,6 @@ export function isSameVoiceManagerStatus(
   right: VoiceManagerStatus,
 ): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
-}
-
-/**
- * Keeps download progress monotonic and never drops back to indeterminate (-1)
- * once a numeric percent has been reported (e.g. between HF asset files).
- */
-export function mergeDownloadingProgressPercent(
-  previous: VoiceManagerStatus,
-  modelId: VoiceModelId,
-  nextPercent: number,
-): number {
-  const previousPercent =
-    previous.kind === "downloading" && previous.modelId === modelId ?
-      previous.progressPercent
-    : -1;
-  if (nextPercent < 0) {
-    return previousPercent >= 0 ? previousPercent : -1;
-  }
-  return previousPercent >= 0 ?
-      Math.max(previousPercent, nextPercent)
-    : nextPercent;
 }
 
 export type IVoiceModelManager = {

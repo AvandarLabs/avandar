@@ -19,6 +19,10 @@
  */
 
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
+import {
+  createDownloadingStatus,
+  downloadingStatusFromDesktopSnapshot,
+} from "./voiceDownloadProgress";
 import { isSameVoiceManagerStatus } from "./voiceManagerInterface";
 import type {
   IVoiceModelManager,
@@ -42,12 +46,12 @@ function adaptServiceStatus(raw: VoiceServiceStatus): VoiceManagerStatus {
     case "idle":
       return { kind: "idle" };
     case "downloading":
-      return {
-        kind: "downloading",
-        modelId: raw.modelId as VoiceModelId,
-        progressPercent: raw.progressPercent,
-        currentFile: raw.currentFile,
-      };
+      return downloadingStatusFromDesktopSnapshot(
+        raw.modelId as VoiceModelId,
+        raw.progressPercent,
+        raw.currentFile,
+        { kind: "idle" },
+      );
     case "ready":
       return { kind: "ready", modelId: raw.modelId as VoiceModelId };
     case "transcribing":
@@ -160,7 +164,7 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
 
   private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
     if (this.status.kind !== "downloading" || this.status.modelId !== id) {
-      this.setStatus({ kind: "downloading", modelId: id, progressPercent: -1 });
+      this.setStatus(createDownloadingStatus(id));
     }
     await this.callIpc(VoiceContracts.downloadModel, { modelId: id });
 
@@ -205,7 +209,15 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
             VoiceContracts.getStatus,
             {},
           );
-          const next = adaptServiceStatus(raw);
+          const next =
+            raw.kind === "downloading" ?
+              downloadingStatusFromDesktopSnapshot(
+                raw.modelId as VoiceModelId,
+                raw.progressPercent,
+                raw.currentFile,
+                this.status,
+              )
+            : adaptServiceStatus(raw);
           this.setStatus(next);
 
           if (next.kind === "ready" && next.modelId === modelId) {

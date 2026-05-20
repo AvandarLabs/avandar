@@ -1,7 +1,8 @@
 import {
-  isSameVoiceManagerStatus,
-  mergeDownloadingProgressPercent,
-} from "./voiceManagerInterface";
+  applyTransformersProgressEvent,
+  createDownloadingStatus,
+} from "./voiceDownloadProgress";
+import { isSameVoiceManagerStatus } from "./voiceManagerInterface";
 import {
   clearCachedFilesForPrefix,
   createVoiceModelCache,
@@ -191,11 +192,7 @@ export class VoiceModelManager implements IVoiceModelManager {
     await this.configureEnvOnce();
     const model = findVoiceModel(id);
 
-    this.setStatus({
-      kind: "downloading",
-      modelId: id,
-      progressPercent: -1,
-    });
+    this.setStatus(createDownloadingStatus(id));
 
     const pipelineFn = await this.deps.loadPipeline();
     this.pipelinePromise = pipelineFn(
@@ -313,33 +310,7 @@ export class VoiceModelManager implements IVoiceModelManager {
     if (this.status.kind !== "downloading" || this.status.modelId !== modelId) {
       return;
     }
-    if (event.status === "progress") {
-      const rawPercent =
-        typeof event.progress === "number" ? Math.min(99, event.progress) : -1;
-      const progressPercent = mergeDownloadingProgressPercent(
-        this.status,
-        modelId,
-        rawPercent,
-      );
-      this.setStatus({
-        kind: "downloading",
-        modelId,
-        progressPercent,
-        currentFile: event.file,
-      });
-    } else if (event.status === "done" || event.status === "ready") {
-      const progressPercent = mergeDownloadingProgressPercent(
-        this.status,
-        modelId,
-        99,
-      );
-      this.setStatus({
-        kind: "downloading",
-        modelId,
-        progressPercent,
-        currentFile: event.file,
-      });
-    }
+    this.setStatus(applyTransformersProgressEvent(this.status, event));
   }
 
   private setStatus(next: VoiceManagerStatus): void {

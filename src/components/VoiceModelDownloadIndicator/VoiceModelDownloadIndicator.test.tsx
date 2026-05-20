@@ -39,12 +39,23 @@ describe("VoiceModelDownloadIndicator", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("shows the model name and the percent label while downloading", () => {
+  it("shows one progress row per file and the tab-close warning", () => {
     mockStatus = {
       kind: "downloading",
       modelId: "whisper-base",
-      progressPercent: 42,
-      currentFile: "ggml-base.bin",
+      phase: "files",
+      files: [
+        {
+          fileName: "model.onnx",
+          progressPercent: 100,
+          state: "complete",
+        },
+        {
+          fileName: "tokenizer.json",
+          progressPercent: 42,
+          state: "downloading",
+        },
+      ],
     };
     render(
       <AvandarUiProvider>
@@ -55,19 +66,32 @@ describe("VoiceModelDownloadIndicator", () => {
     expect(
       screen.getByText(/Whisper Base \(multilingual\)/i),
     ).toBeInTheDocument();
-    expect(screen.getByText("42%")).toBeInTheDocument();
-    expect(screen.getByText(/ggml-base.bin/)).toBeInTheDocument();
-    // The aria-live region exposes the tooltip label for screen readers.
-    expect(screen.getByRole("status").getAttribute("aria-label")).toMatch(
-      /Downloading .* for voice prompting/i,
-    );
+    expect(screen.getByText("71%")).toBeInTheDocument();
+    expect(screen.getByText("model.onnx")).toBeInTheDocument();
+    expect(screen.getByText("tokenizer.json")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Do not refresh or close this tab/i),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")).toHaveLength(2);
   });
 
-  it("shows a 'Starting…' label when percent is indeterminate", () => {
+  it("shows a loading note when assets are fetched but the runtime is still starting", () => {
     mockStatus = {
       kind: "downloading",
       modelId: "whisper-tiny",
-      progressPercent: -1,
+      phase: "loading",
+      files: [
+        {
+          fileName: "model.onnx",
+          progressPercent: 100,
+          state: "complete",
+        },
+        {
+          fileName: "Loading into memory…",
+          progressPercent: 0,
+          state: "downloading",
+        },
+      ],
     };
     render(
       <AvandarUiProvider>
@@ -75,38 +99,7 @@ describe("VoiceModelDownloadIndicator", () => {
       </AvandarUiProvider>,
     );
 
-    expect(
-      screen.getByText(/Preparing local voice model/i),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Starting…")).toBeInTheDocument();
-  });
-
-  it("keeps a single determinate progress bar when percent updates", () => {
-    mockStatus = {
-      kind: "downloading",
-      modelId: "whisper-tiny",
-      progressPercent: -1,
-    };
-    const { rerender } = render(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
-    );
-
-    mockStatus = {
-      kind: "downloading",
-      modelId: "whisper-tiny",
-      progressPercent: 42,
-      currentFile: "model.onnx",
-    };
-    rerender(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
-    );
-
-    expect(screen.getByText("42%")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
-    expect(screen.queryByText("Starting…")).not.toBeInTheDocument();
+    expect(screen.getByText(/Finishing setup/i)).toBeInTheDocument();
+    expect(screen.getByText("Loading into memory…")).toBeInTheDocument();
   });
 });
