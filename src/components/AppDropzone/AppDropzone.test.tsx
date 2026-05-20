@@ -1,6 +1,8 @@
+import { I18nProvider } from "@lingui/react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { i18n } from "@/i18n/i18n";
 import { AppDropzone } from "./AppDropzone";
 import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 
@@ -18,9 +20,11 @@ describe("AppDropzone", () => {
   it("renders its children", () => {
     render(
       <AvandarUiProvider>
-        <AppDropzone>
-          <div data-testid="dropzone-child">child content</div>
-        </AppDropzone>
+        <I18nProvider i18n={i18n}>
+          <AppDropzone>
+            <div data-testid="dropzone-child">child content</div>
+          </AppDropzone>
+        </I18nProvider>
       </AvandarUiProvider>,
     );
 
@@ -32,22 +36,16 @@ describe("AppDropzone", () => {
   it("delegates the drop handler to openFileImportFlow", () => {
     openFileImportFlowMock.mockClear();
     const file = new File(["a"], "test.csv", { type: "text/csv" });
-    const tFn = ((strings: TemplateStringsArray) => {
-      return strings.join("");
-    }) as unknown as Parameters<typeof onAppDropzoneDrop>[1];
 
-    onAppDropzoneDrop([file], tFn);
+    onAppDropzoneDrop([file]);
 
-    expect(openFileImportFlowMock).toHaveBeenCalledWith(file, tFn);
+    expect(openFileImportFlowMock).toHaveBeenCalledWith(file);
   });
 
   it("does not call openFileImportFlow when the drop has no files", () => {
     openFileImportFlowMock.mockClear();
-    const tFn = ((strings: TemplateStringsArray) => {
-      return strings.join("");
-    }) as unknown as Parameters<typeof onAppDropzoneDrop>[1];
 
-    onAppDropzoneDrop([], tFn);
+    onAppDropzoneDrop([]);
 
     expect(openFileImportFlowMock).not.toHaveBeenCalled();
   });

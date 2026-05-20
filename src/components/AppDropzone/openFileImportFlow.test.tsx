@@ -1,7 +1,10 @@
+import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
+import { i18n } from "@/i18n/i18n";
 import { openFileImportFlow } from "./openFileImportFlow";
 import type { ReactElement } from "react";
 
@@ -41,20 +44,25 @@ vi.mock(
 );
 
 function TriggerButton({ file }: { file: File }): ReactElement {
-  const tFn = ((strings: TemplateStringsArray, ...values: unknown[]) => {
-    return strings.reduce((acc, str, i) => {
-      return acc + str + (values[i] ?? "");
-    }, "");
-  }) as unknown as Parameters<typeof openFileImportFlow>[1];
   return (
     <button
       type="button"
       onClick={() => {
-        return openFileImportFlow(file, tFn);
+        return openFileImportFlow(file);
       }}
     >
       open
     </button>
+  );
+}
+
+function renderImportFlowUi(ui: ReactElement): void {
+  render(
+    <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>{ui}</ModalsProvider>
+      </I18nProvider>
+    </AvandarUiProvider>,
   );
 }
 
@@ -66,16 +74,13 @@ describe("openFileImportFlow", () => {
   it("shows a confirm dialog asking whether to import the dropped file", async () => {
     const file = _createCsvFile("california.csv");
 
-    render(
-      <AvandarUiProvider>
-        <ModalsProvider>
-          <TriggerButton file={file} />
-        </ModalsProvider>
-      </AvandarUiProvider>,
-    );
+    renderImportFlowUi(<TriggerButton file={file} />);
 
     fireEvent.click(screen.getByText("open"));
 
+    expect(
+      await screen.findByRole("heading", { name: /Import this file/i }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole("button", { name: /^import$/i }),
     ).toBeInTheDocument();
@@ -89,13 +94,7 @@ describe("openFileImportFlow", () => {
     const file = _createCsvFile("california.csv");
     manualUploadViewMock.mockClear();
 
-    render(
-      <AvandarUiProvider>
-        <ModalsProvider>
-          <TriggerButton file={file} />
-        </ModalsProvider>
-      </AvandarUiProvider>,
-    );
+    renderImportFlowUi(<TriggerButton file={file} />);
 
     fireEvent.click(screen.getByText("open"));
     fireEvent.click(await screen.findByRole("button", { name: /^import$/i }));
@@ -117,13 +116,7 @@ describe("openFileImportFlow", () => {
   it("does not open the import modal when the user cancels the confirm dialog", async () => {
     const file = _createCsvFile();
 
-    render(
-      <AvandarUiProvider>
-        <ModalsProvider>
-          <TriggerButton file={file} />
-        </ModalsProvider>
-      </AvandarUiProvider>,
-    );
+    renderImportFlowUi(<TriggerButton file={file} />);
 
     fireEvent.click(screen.getByText("open"));
     fireEvent.click(await screen.findByRole("button", { name: /^cancel$/i }));
@@ -138,13 +131,7 @@ describe("openFileImportFlow", () => {
   it("closes the import modal when the ManualUploadView fires onAfterSave", async () => {
     const file = _createCsvFile();
 
-    render(
-      <AvandarUiProvider>
-        <ModalsProvider>
-          <TriggerButton file={file} />
-        </ModalsProvider>
-      </AvandarUiProvider>,
-    );
+    renderImportFlowUi(<TriggerButton file={file} />);
 
     fireEvent.click(screen.getByText("open"));
     fireEvent.click(await screen.findByRole("button", { name: /^import$/i }));

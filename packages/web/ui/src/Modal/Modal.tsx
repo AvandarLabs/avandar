@@ -50,6 +50,11 @@ export function Modal({
         },
         header: {
           borderBottom: "1px solid var(--ava-border-default)",
+          minHeight: "unset",
+          padding: "var(--mantine-spacing-sm) var(--mantine-spacing-md)",
+        },
+        body: {
+          paddingTop: "var(--mantine-spacing-md)",
         },
         title: {
           fontWeight: 600,

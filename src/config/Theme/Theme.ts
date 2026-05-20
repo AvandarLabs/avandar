@@ -240,6 +240,12 @@ export const Theme = createTheme({
         },
         header: {
           borderBottom: "1px solid var(--ava-border-default)",
+          minHeight: "unset",
+          padding: "var(--mantine-spacing-sm) var(--mantine-spacing-md)",
+        },
+        body: {
+          // Mantine zeroes body padding-top when a header is present; restore gap below the divider.
+          paddingTop: "var(--mantine-spacing-md)",
         },
         title: {
           fontWeight: 600,

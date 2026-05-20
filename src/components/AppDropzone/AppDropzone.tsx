@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
@@ -28,14 +28,13 @@ type Props = { children: ReactNode };
  * un-blur transition every time a drag enters the window.
  */
 export function AppDropzone({ children }: Props): JSX.Element {
-  const { t } = useLingui();
   return (
     <>
       {children}
       <Dropzone.FullScreen
         accept={ACCEPTED_MIME_TYPES}
         onDrop={(files) => {
-          return onAppDropzoneDrop(files, t);
+          return onAppDropzoneDrop(files);
         }}
         classNames={{
           fullScreen: classes.fullScreen,
