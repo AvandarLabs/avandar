@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Tooltip } from "@mantine/core";
 import {
   IconBrandGoogle,
@@ -18,6 +19,7 @@ export function SourceBadge({
   sourceName?: string;
   size?: number;
 }): JSX.Element | null {
+  const { t } = useLingui();
   if (!sourceType) return null;
 
   const { Icon, tooltip } = match(sourceType)
@@ -26,7 +28,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconFileTypeCsv>) => {
           return <IconFileTypeCsv {...props} color="#666" />;
         },
-        tooltip: "From CSV",
+        tooltip: t`From CSV`,
       };
     })
     .with("xlsx_file", () => {
@@ -34,7 +36,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconFileTypeXls>) => {
           return <IconFileTypeXls {...props} color="#666" />;
         },
-        tooltip: "From Excel",
+        tooltip: t`From Excel`,
       };
     })
     .with("google_sheets", () => {
@@ -42,7 +44,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconBrandGoogle>) => {
           return <IconBrandGoogle {...props} color="#34a853" />;
         },
-        tooltip: "From Google Sheets",
+        tooltip: t`From Google Sheets`,
       };
     })
     .with("virtual", () => {
@@ -50,7 +52,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconTable>) => {
           return <IconTable {...props} color="#999" />;
         },
-        tooltip: "From derived dataset",
+        tooltip: t`From derived dataset`,
       };
     })
     .with("open_data", () => {
@@ -58,7 +60,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconWorld>) => {
           return <IconWorld {...props} color="#0072ce" />;
         },
-        tooltip: "From Open Data",
+        tooltip: t`From Open Data`,
       };
     })
     .exhaustive(() => {
@@ -66,7 +68,7 @@ export function SourceBadge({
         Icon: (props: React.ComponentProps<typeof IconTable>) => {
           return <IconTable {...props} color="#999" />;
         },
-        tooltip: "From dataset",
+        tooltip: t`From dataset`,
       };
     });
 

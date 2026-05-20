@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box, Button, FileInput, Group } from "@mantine/core";
 import { isArray, MIMEType } from "@utils";
 import { useRef, useState } from "react";
@@ -56,10 +57,12 @@ export function FileUploadForm({
   accept,
   onSubmit,
   isSubmitting = false,
-  submitButtonLabel = "Upload",
+  submitButtonLabel,
   fullWidth,
   ...fileInputProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedSubmitLabel = submitButtonLabel ?? t`Upload`;
   const form = useForm<FileUploadForm>({
     initialValues: {
       file: null,
@@ -115,7 +118,7 @@ export function FileUploadForm({
             loading={isSubmitting}
             disabled={form.getValues().file === null || isSubmitted}
           >
-            {submitButtonLabel}
+            {resolvedSubmitLabel}
           </Button>
         </Box>
       </Group>

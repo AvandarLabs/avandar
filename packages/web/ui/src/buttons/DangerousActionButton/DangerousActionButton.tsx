@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
@@ -19,23 +20,29 @@ type Props = {
 
 const trashIcon = <IconTrash size="1rem" />;
 
-const DEFAULT_CONFIRM_PROPS = {
-  title: "Confirm Action",
-  message:
-    "Are you sure you want to proceed with this action? This cannot be undone.",
-  confirmLabel: "Confirm",
-  cancelLabel: "Cancel",
-  onConfirm: noop,
-};
-
+/**
+ * A red button that asks for confirmation before triggering a destructive
+ * action. The default confirmation modal uses translated default copy; pass
+ * `confirmModalProps` to override any of the strings.
+ */
 export function DangerousActionButton({
   label,
   asIcon = false,
   icon = trashIcon,
-  confirmModalProps = DEFAULT_CONFIRM_PROPS,
+  confirmModalProps,
   loading = false,
 }: Props): JSX.Element {
-  const modalProps = { ...DEFAULT_CONFIRM_PROPS, ...confirmModalProps };
+  const { t } = useLingui();
+
+  const defaultConfirmProps = {
+    title: t`Confirm Action`,
+    message: t`Are you sure you want to proceed with this action? This cannot be undone.`,
+    confirmLabel: t`Confirm`,
+    cancelLabel: t`Cancel`,
+    onConfirm: noop,
+  };
+
+  const modalProps = { ...defaultConfirmProps, ...confirmModalProps };
 
   const onClick = () => {
     const modalId = modals.openConfirmModal({

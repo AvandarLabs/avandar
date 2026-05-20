@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { ObjectDescriptionList, Paper  } from "@ui";
 import {
@@ -145,6 +146,7 @@ type FieldValueMetadata = {
 };
 
 export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
+  const { t } = useLingui();
   const [hydratedEntity, isLoadingHydratedEntity] = useHydratedEntity({
     entityConfig,
     entity,
@@ -156,7 +158,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
       hydratedEntity.fieldValues ?
         makeObject(hydratedEntity.fieldValues, {
           keyFn: (fieldValue) => {
-            return fieldValue.fieldName ?? "Loading...";
+            return fieldValue.fieldName ?? t`Loading...`;
           },
           valueFn: (fieldValue) => {
             return {
@@ -169,7 +171,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
       : undefined;
 
     return [omit(hydratedEntity, "fieldValues"), fieldValuesRecord];
-  }, [hydratedEntity]);
+  }, [hydratedEntity, t]);
 
   return (
     <Container pt="xxl">
@@ -200,7 +202,9 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
               ]}
             />
 
-            <Title order={4}>Data</Title>
+            <Title order={4}>
+              <Trans>Data</Trans>
+            </Title>
             {fieldValues === undefined ?
               <Loader />
             : <ObjectDescriptionList

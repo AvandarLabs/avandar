@@ -1,4 +1,5 @@
 import { useBoolean, useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Anchor,
   Box,
@@ -51,6 +52,7 @@ const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
   const searchParams = Route.useSearch();
+  const { t } = useLingui();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
     !IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED,
   );
@@ -78,12 +80,12 @@ function RegisterPage() {
           email: variables.email,
         });
         notifySuccess({
-          title: "Your waitlist code has been verified",
-          message: "Please choose a password to complete your registration",
+          title: t`Your waitlist code has been verified`,
+          message: t`Please choose a password to complete your registration`,
         });
         showRegistrationForm();
       } else {
-        notifyError("This is an invalid waitlist code");
+        notifyError(t`This is an invalid waitlist code`);
       }
     },
   });
@@ -110,8 +112,8 @@ function RegisterPage() {
     onSuccess: () => {
       setIsRegistrationSuccess(true);
       notifySuccess({
-        title: "Please check your email",
-        message: "A confirmation email has been sent to your email address.",
+        title: t`Please check your email`,
+        message: t`A confirmation email has been sent to your email address.`,
       });
       // Navigation is driven by useAuth's onAuthStateChange. When signUp
       // creates a session, onAuthStateChange fires, invalidates the workspace
@@ -132,10 +134,10 @@ function RegisterPage() {
       confirmPassword: "",
     },
     validate: {
-      email: isEmail("Invalid email address"),
+      email: isEmail(t`Invalid email address`),
       confirmPassword: (value: string, formValues: { password: string }) => {
         return value !== formValues.password ?
-            "Passwords do not match"
+            t`Passwords do not match`
           : undefined;
       },
     },
@@ -214,19 +216,25 @@ function RegisterPage() {
                 }}
               >
                 <Stack>
-                  <Title order={3}>Thank you for your interest!</Title>
+                  <Title order={3}>
+                    <Trans>Thank you for your interest!</Trans>
+                  </Title>
                   <Text>
-                    While Avandar is in beta, we are only allowing registration
-                    if you are on our waitlist and have received a sign-up code
-                    in your email.
+                    <Trans>
+                      While Avandar is in beta, we are only allowing
+                      registration if you are on our waitlist and have received
+                      a sign-up code in your email.
+                    </Trans>
                   </Text>
                   {WAITLIST_URL ?
                     <Text>
-                      {elements.waitlistLink("Sign up for our waitlist")} to be
-                      notified when it's your turn to register! If you are
-                      already on our waitlist and have not received a sign-up
-                      code, we appreciate your patience. You will receive a
-                      sign-up code soon. We promise!
+                      <Trans>
+                        {elements.waitlistLink(t`Sign up for our waitlist`)} to
+                        be notified when it's your turn to register! If you are
+                        already on our waitlist and have not received a sign-up
+                        code, we appreciate your patience. You will receive a
+                        sign-up code soon. We promise!
+                      </Trans>
                     </Text>
                   : null}
                   <Divider mb="sm" />
@@ -263,25 +271,33 @@ function RegisterPage() {
     disabledRegistrationNotice: () => {
       return (
         <Stack>
-          <Title order={3}>Thank you for your interest!</Title>
+          <Title order={3}>
+            <Trans>Thank you for your interest!</Trans>
+          </Title>
           <Text>
-            However, we are not allowing new registrations at the moment.
+            <Trans>
+              However, we are not allowing new registrations at the moment.
+            </Trans>
           </Text>
           <Text>
-            Please{" "}
-            <Anchor
-              href={`mailto:${INFO_EMAIL}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              email us
-            </Anchor>{" "}
-            if you would like early access.
+            <Trans>
+              Please{" "}
+              <Anchor
+                href={`mailto:${INFO_EMAIL}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                email us
+              </Anchor>{" "}
+              if you would like early access.
+            </Trans>
           </Text>
           {WAITLIST_URL ?
             <Text>
-              Or {elements.waitlistLink("sign up for our waitlist")} to be
-              notified when our public launch is ready.
+              <Trans>
+                Or {elements.waitlistLink(t`sign up for our waitlist`)} to be
+                notified when our public launch is ready.
+              </Trans>
             </Text>
           : null}
           <Divider mb="sm" />
@@ -292,8 +308,8 @@ function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Create a new account"
-      subtitle="Start your journey with us"
+      title={t`Create a new account`}
+      subtitle={t`Start your journey with us`}
       footer={<AuthFooter />}
     >
       {IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED ?
@@ -325,7 +341,7 @@ function RegisterPage() {
                   <Stack>
                     <TextInput
                       key={registrationForm.key("email")}
-                      label="Email"
+                      label={t`Email`}
                       name="email"
                       type="email"
                       required
@@ -341,7 +357,7 @@ function RegisterPage() {
                     />
                     <PasswordInput
                       key={registrationForm.key("password")}
-                      label="Password"
+                      label={t`Password`}
                       name="password"
                       type="password"
                       required
@@ -350,7 +366,7 @@ function RegisterPage() {
                     />
                     <PasswordInput
                       key={registrationForm.key("confirmPassword")}
-                      label="Confirm Password"
+                      label={t`Confirm Password`}
                       name="confirmPassword"
                       type="password"
                       required
@@ -370,14 +386,16 @@ function RegisterPage() {
                           IS_REGISTRATION_DISABLED
                         }
                       >
-                        Register
+                        <Trans>Register</Trans>
                       </Button>
                     </Group>
 
                     {isRegistrationSuccess ?
                       <Text mt="lg" c="green">
-                        Please check your email for a confirmation link. It may
-                        take a few minutes to arrive.
+                        <Trans>
+                          Please check your email for a confirmation link. It
+                          may take a few minutes to arrive.
+                        </Trans>
                       </Text>
                     : null}
                   </Stack>

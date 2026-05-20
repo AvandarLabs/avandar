@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { SHARE_COPY } from "./shareCopy";
+import { useShareCopy } from "./shareCopy";
 import { SharePrincipalRow } from "./SharePrincipalRow/SharePrincipalRow";
 import type {
   ResourceShareRow,
@@ -36,10 +36,11 @@ export function SharePrincipalList({
   onToggleRequiresAppAccess,
   onRemove,
 }: Props): JSX.Element {
+  const shareCopy = useShareCopy();
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {SHARE_COPY.peopleWithAccessHeading}
+        {shareCopy.peopleWithAccessHeading}
       </Text>
       {shares.map((share) => {
         return (

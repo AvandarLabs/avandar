@@ -1,9 +1,9 @@
 import { Box, SegmentedControl } from "@mantine/core";
 import {
-  FREE_CHOICES,
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
-  PAID_CHOICES,
+  useFreeChoices,
+  usePaidChoices,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
 import type {
   FreePlanVariants,
@@ -36,12 +36,14 @@ export function PlanSwitch({
   onChange,
   withHighlight = false,
 }: Props): JSX.Element {
-  const choices = type === "free" ? FREE_CHOICES : PAID_CHOICES;
+  const freeChoices = useFreeChoices();
+  const paidChoices = usePaidChoices();
+  const choices = type === "free" ? freeChoices : paidChoices;
   const segmentedControl = (
     <SegmentedControl
       fullWidth
       value={value}
-      data={choices}
+      data={[...choices]}
       onChange={(choice) => {
         if (type === "free" && isValidFreePlanVariant(choice)) {
           onChange(choice);

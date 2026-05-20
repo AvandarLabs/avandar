@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
@@ -37,6 +38,7 @@ export function VizSettingsForm({
   onVizConfigChange,
   onVizTypeChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
     return {
       label: VizConfigs.getDisplayName(vizType),
@@ -49,7 +51,7 @@ export function VizSettingsForm({
       <Select
         allowDeselect={false}
         data={vizTypeOptions}
-        label="Visualization Type"
+        label={t`Visualization Type`}
         value={vizConfig.vizType}
         onChange={(selectedVizType) => {
           if (selectedVizType) {

@@ -1,4 +1,5 @@
 import { useBoolean } from "@hooks/useBoolean/useBoolean";
+import { Trans } from "@lingui/react/macro";
 import { Button, Group, Table } from "@mantine/core";
 import { StringKeyOf } from "@utils/types/utilities.types";
 import { useState } from "react";
@@ -59,7 +60,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    Save
+                    <Trans>Save</Trans>
                   </Button>
                   <Button
                     size="compact-sm"
@@ -70,7 +71,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
                 </Group>
               </Table.Td>

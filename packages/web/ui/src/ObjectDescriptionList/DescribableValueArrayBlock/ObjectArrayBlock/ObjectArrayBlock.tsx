@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { List, Table, Text } from "@mantine/core";
 import { objectKeys } from "@utils/objects/objectKeys";
 import { StringKeyOf } from "@utils/types/utilities.types";
@@ -172,9 +173,12 @@ export function ObjectArrayBlock<
     );
   });
 
+  const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>... and {values.length - valuesToRender.length} more</Text>
+      <Text>
+        <Trans>... and {remainingCount} more</Trans>
+      </Text>
     : null;
 
   return (

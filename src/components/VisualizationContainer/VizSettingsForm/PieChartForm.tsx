@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ColorInput, Divider, Switch } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
@@ -21,6 +22,7 @@ export function PieChartForm({
   data,
   onConfigChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
   }, [fields]);
@@ -47,8 +49,8 @@ export function PieChartForm({
   }, [data, config.nameKey]);
 
   const labelsTypeOptions = [
-    { label: "Value", value: "value" },
-    { label: "Percent", value: "percent" },
+    { label: t`Value`, value: "value" },
+    { label: t`Percent`, value: "percent" },
   ];
 
   const { nameKey, valueKey, isDonut, withLabels, labelsType } = config;
@@ -58,13 +60,13 @@ export function PieChartForm({
       <Select
         allowDeselect
         data={fieldOptions}
-        label="Name column"
+        label={t`Name column`}
         value={nameKey}
         disabled={fieldOptions.length === 0}
         placeholder={
           fieldOptions.length === 0 ?
-            "No columns are available"
-          : "Select a column"
+            t`No columns are available`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, nameKey: field ?? undefined });
@@ -74,13 +76,13 @@ export function PieChartForm({
       <Select
         allowDeselect
         data={numericFieldOptions}
-        label="Value column"
+        label={t`Value column`}
         value={valueKey}
         disabled={numericFieldOptions.length === 0}
         placeholder={
           numericFieldOptions.length === 0 ?
-            "There are no numeric columns"
-          : "Select a column"
+            t`There are no numeric columns`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, valueKey: field ?? undefined });
@@ -88,7 +90,7 @@ export function PieChartForm({
       />
 
       <Switch
-        label="Donut style"
+        label={t`Donut style`}
         checked={isDonut}
         mt="sm"
         onChange={(event) => {
@@ -97,7 +99,7 @@ export function PieChartForm({
       />
 
       <Switch
-        label="Show labels"
+        label={t`Show labels`}
         checked={withLabels}
         mt="sm"
         onChange={(event) => {
@@ -112,7 +114,7 @@ export function PieChartForm({
         <Select
           allowDeselect={false}
           data={labelsTypeOptions}
-          label="Label type"
+          label={t`Label type`}
           value={labelsType}
           mt="xs"
           onChange={(value) => {
@@ -125,7 +127,7 @@ export function PieChartForm({
 
       {sliceNames.length > 0 ?
         <>
-          <Divider label="Slice colors" mt="sm" mb="xs" />
+          <Divider label={t`Slice colors`} mt="sm" mb="xs" />
           {sliceNames.map((name) => {
             return (
               <ColorInput

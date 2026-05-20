@@ -1,6 +1,7 @@
 import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
+import type { useLingui } from "@lingui/react/macro";
 
 /**
  * Starts the app-wide "import a file" flow.
@@ -12,21 +13,24 @@ import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUp
  * page. When the import is saved, the modal closes itself; on cancel,
  * the user is left exactly where they were.
  */
-export function openFileImportFlow(file: File): void {
+export function openFileImportFlow(
+  file: File,
+  t: ReturnType<typeof useLingui>["t"],
+): void {
   modals.openConfirmModal({
-    title: "Import this file?",
-    labels: { confirm: "Import", cancel: "Cancel" },
+    title: t`Import this file?`,
+    labels: { confirm: t`Import`, cancel: t`Cancel` },
     centered: true,
     children: (
       <Stack>
         <Text>
-          Do you want to import &quot;{file.name}&quot; as a new dataset?
+          {t`Do you want to import "${file.name}" as a new dataset?`}
         </Text>
       </Stack>
     ),
     onConfirm: () => {
       const importModalId = modals.open({
-        title: "Import data",
+        title: t`Import data`,
         size: "90%",
         styles: {
           content: { height: "90%" },

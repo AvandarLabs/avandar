@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import {
   IconLayoutSidebarLeftCollapse,
@@ -10,19 +11,22 @@ import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager
  * Toggle icon to control the navbar
  */
 export function NavbarDesktopToggle(): JSX.Element {
+  const { t } = useLingui();
   const [{ isDesktopNavbarCollapsed }, dispatch] =
     AppShellStateManager.useContext();
 
   return (
     <Tooltip
-      label={isDesktopNavbarCollapsed ? "Open sidebar" : "Close sidebar"}
+      label={isDesktopNavbarCollapsed ? t`Open sidebar` : t`Close sidebar`}
     >
       <ActionIcon
         variant="subtle"
         size="md"
         color="neutral"
         onClick={dispatch.toggleDesktopNavbar}
-        aria-label="Close sidebar"
+        aria-label={
+          isDesktopNavbarCollapsed ? t`Open sidebar` : t`Close sidebar`
+        }
         // only visible in sizes larger than mobile
         visibleFrom="sm"
       >

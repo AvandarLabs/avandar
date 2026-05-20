@@ -14,6 +14,23 @@ msgstr ""
 "Plural-Forms: \n"
 
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "Changes to your payment method can be made in your"
+msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "What is the average value in {name}?"
+msgstr "ما هي القيمة المتوسطة في {name}؟"
+
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+msgid "Close chat panel"
+msgstr "إغلاق لوحة الدردشة"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "ID field is required"
+msgstr "حقل المعرف مطلوب"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
 msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
@@ -25,6 +42,10 @@ msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة م
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "ترتيب حسب"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Remove field"
+msgstr "إزالة الحقل"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Dashboard name"
@@ -46,13 +67,72 @@ msgstr "ابدأ (مثل 2024-01-01)"
 msgid "Open dataset"
 msgstr "فتح مجموعة البيانات"
 
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Value column"
+msgstr "عمود القيمة"
+
+#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
+msgid "There are no queried numeric fields"
+msgstr "لا توجد حقول رقمية مستعلم عنها"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Monthly"
+msgstr "شهري"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Remove access for {name}."
+msgstr "إزالة الوصول لـ {name}."
+
+#: src/routes/forgot-password.tsx
+msgid "Check your email for a password reset link"
+msgstr "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Invite member"
+msgstr "دعوة عضو"
+
+#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
+#: src/routes/register.tsx
+msgid "Or {0} to be notified when our public launch is ready."
+msgstr "أو {0} لتكون مُنبهًا عندما يصبح إطلاقنا العام جاهزًا."
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "بحث في مجموعات البيانات..."
 
+#: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
+msgid "The dataset failed to load. Please try again later or reach out to support."
+msgstr "فشل تحميل مجموعة البيانات. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
+
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "Choose chat model"
+msgstr "اختر نموذج الدردشة"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
 msgstr "الأكثر حداثة"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "PII detected:"
+msgstr "تم الكشف عن معلومات شخصية:"
+
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "{0} downloaded. Tap the mic to start dictating."
+msgstr "{0} تم تنزيله. اضغط على الميكروفون لبدء الإملاء."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Title field is required"
+msgstr "حقل العنوان مطلوب"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Invite a member"
+msgstr "دعوة عضو"
+
+#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+msgid "Ask Avandar"
+msgstr "اسأل أفاندار"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "An error occurred while loading the file"
@@ -69,6 +149,14 @@ msgstr "النوع"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "السماح بالمزامنة عبر الإنترنت"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Discovery is not available in this context."
+msgstr "الاكتشاف غير متاح في هذا السياق."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it on the canvas."
+msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله على اللوحة."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
@@ -90,6 +178,10 @@ msgstr "استعلام"
 msgid "Row filters"
 msgstr "فلاتر الصفوف"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Profile Description"
+msgstr "وصف الملف الشخصي"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "تحميل Excel"
@@ -98,13 +190,50 @@ msgstr "تحميل Excel"
 msgid "Could not load the dataset's SQL query."
 msgstr "لم يتمكن من تحميل استعلام SQL لمجموعة البيانات."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Avandar"
+msgstr "أفاندار"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Please check your email for a confirmation link."
+msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
+
+#: src/components/FloatingPanel/FloatingPanel.tsx
+msgid "Expand"
+msgstr "توسيع"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
 msgstr "ملاحظات"
 
+#: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
+msgid "Datasets"
+msgstr "مجموعات البيانات"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Custom role"
+msgstr "دور مخصص"
+
+#: src/routes/signin.tsx
+msgid "Create account"
+msgstr "إنشاء حساب"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "لا يمكن إضافة مجموعة بيانات"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Members still assigned to this group must be moved first."
+msgstr "يجب نقل الأعضاء المعينين لهذه المجموعة أولاً."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "Delete failed"
+msgstr "فشل الحذف"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Reject"
+msgstr "رفض"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -115,16 +244,41 @@ msgstr "فتح"
 msgid "Aggregations"
 msgstr "التجميعات"
 
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+msgid "No"
+msgstr "لا"
+
+#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Select a field"
+msgstr "اختر حقلًا"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "When"
+msgstr "متى"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Save and re-run query"
 msgstr "احفظ وأعد تشغيل الاستعلام"
+
+#. placeholder {0}: updated.displayName
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Saved as \"{0}\"."
+msgstr "تم الحفظ كـ \"{0}\"."
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From Excel"
+msgstr "من إكسل"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Unknown error"
 msgstr "خطأ غير معروف"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "مصادر البيانات"
 
@@ -141,9 +295,32 @@ msgstr "تحميل ملف"
 msgid "Manage sharing"
 msgstr "إدارة المشاركة"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Privacy log cleared."
+msgstr "تم مسح سجل الخصوصية."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Export CSV"
+msgstr "تصدير CSV"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "For more control over your subscription, you can manage your subscription in your"
+msgstr "للحصول على مزيد من التحكم في اشتراكك، يمكنك إدارة اشتراكك في"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
+msgid "Free"
+msgstr "مجاني"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "The table visualization has no extra settings."
 msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "About you"
+msgstr "حولك"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -153,9 +330,17 @@ msgstr "عناوين أحادية المسافة"
 msgid "← Back"
 msgstr "← العودة"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
+msgstr "سجل محلي لكل سؤال توضيحي طرحه الذكاء الاصطناعي في هذه المساحة العمل. يتم تخزين البيانات الوصفية فقط — وليس نص السؤال أو إجابتك."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
 msgstr "تم رفض {numRejectedRows} صفوف"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Allow multiple values"
+msgstr "السماح بقيم متعددة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
@@ -178,6 +363,10 @@ msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط
 msgid "Add columns to the query above to start defining filters."
 msgstr "أضف أعمدة إلى الاستعلام أعلاه لبدء تعريف الفلاتر."
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Only allow one value"
+msgstr "السماح بقيمة واحدة فقط"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "متوسط"
@@ -191,6 +380,31 @@ msgstr "فتح البيانات"
 msgid "stddev"
 msgstr "الانحراف المعياري"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Get a count of how many values there are"
+msgstr "احصل على عدد القيم الموجودة"
+
+#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+msgid "Something else…"
+msgstr "شيء آخر…"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Changing plan to {newPlanName} ({newPlanSubType})"
+msgstr "تغيير الخطة إلى {newPlanName} ({newPlanSubType})"
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Waiting…"
+msgstr "في الانتظار…"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Use suggestion"
+msgstr "استخدام الاقتراح"
+
+#. placeholder {0}: entityConfig.name
+#: src/views/EntityManagerApp/EntityNavbar.tsx
+msgid "{0} Manager"
+msgstr "{0} مدير"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
 msgstr "تحتوي الورقة على صف رأس"
@@ -199,9 +413,25 @@ msgstr "تحتوي الورقة على صف رأس"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة العمل الخاصة بك."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data Explorer</0>."
+msgstr "الدردشة مفعلة في مستكشف البيانات ولوحات المعلومات. <0>فتح مستكشف البيانات</0>."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Role group updated"
+msgstr "تم تحديث مجموعة الأدوار"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "No matches"
+msgstr "لا توجد تطابقات"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "احتفظ بـ SQL كما هو"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Remove User"
+msgstr "إزالة المستخدم"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, t)
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
@@ -217,6 +447,27 @@ msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
 msgid "This dataset has no description."
 msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Symbol size"
+msgstr "حجم الرمز"
+
+#. placeholder {0}: user.email
+#: src/routes/update-password.tsx
+msgid "Updating password for {0}"
+msgstr "تحديث كلمة المرور لـ {0}"
+
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "Column info"
+msgstr "معلومات العمود"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Plan step input"
+msgstr "مدخل خطوة الخطة"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "I understand this data will be sent to the AI provider"
+msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود الذكاء الاصطناعي"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
@@ -225,13 +476,37 @@ msgstr "مجموعات البيانات المحفوظة"
 #~ msgid "Roles"
 #~ msgstr ""
 
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "PDF (multi-page)"
+msgstr "PDF (صفحات متعددة)"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
 msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية لإضافة مجموعة بيانات الكتالوج هذه."
 
+#: src/routes/register.tsx
+msgid "Please check your email for a confirmation link. It may take a few minutes to arrive."
+msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق وصوله بضع دقائق."
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Share “{resourceName}”"
+msgstr "مشاركة “{resourceName}”"
+
+#: src/routes/signin.tsx
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save as new dataset"
 msgstr "احفظ كمجموعة بيانات جديدة"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From derived dataset"
+msgstr "من مجموعة البيانات المشتقة"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice model download failed"
+msgstr "فشل تحميل نموذج الصوت"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
@@ -241,14 +516,37 @@ msgstr "اختيار فردي"
 msgid "Processing — {eta} remaining"
 msgstr "جارٍ المعالجة — {eta} المتبقية"
 
+#: src/routes/register.tsx
+msgid "However, we are not allowing new registrations at the moment."
+msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في الوقت الحالي."
+
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
 msgstr "هذه هي الصفوف الأولى {0} من مجموعة بياناتك. تحقق من صحة البيانات. إذا لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
 
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+msgid "This field cannot be empty"
+msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
+
+#: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
+msgid "Oops!"
+msgstr "عذرًا!"
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Dataset saved."
 msgstr "تم حفظ مجموعة البيانات."
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "There are no numeric columns"
+msgstr "لا توجد أعمدة عددية"
+
+#: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
+msgid "Discovery query failed."
+msgstr "فشل استعلام الاكتشاف."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "Publish dashboard"
@@ -258,6 +556,22 @@ msgstr "نشر لوحة المعلومات"
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 msgid "Container max width"
 msgstr "عرض الحاوية الأقصى"
+
+#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+msgid "Close sidebar"
+msgstr "إغلاق الشريط الجانبي"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Unknown user"
+msgstr "مستخدم غير معروف"
+
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+msgid "Remove access for {displayName}"
+msgstr "إزالة الوصول لـ {displayName}"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Seat limit reached"
+msgstr "تم الوصول إلى حد المقاعد"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
@@ -275,14 +589,30 @@ msgstr "البيانات الوصفية"
 msgid "Range"
 msgstr "النطاق"
 
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "Close branch"
+msgstr "إغلاق الفرع"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Preset"
+msgstr "إعداد مسبق"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Permanently delete <0>{0}</0>?"
 msgstr "هل تريد حذف <0>{0}</0> بشكل دائم؟"
+
+#: src/routes/_auth/(no-workspace)/index.tsx
+msgid "Welcome to your first workspace"
+msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة بك"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
+msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أدناه للمشاركة بشكل أوسع."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -297,28 +627,92 @@ msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Name"
 msgstr "الاسم"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Your question contains language that may bias the AI's answer."
+msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة الذكاء الاصطناعي."
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
 #~ msgstr ""
 
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Close chat (⌘/)"
+msgstr "إغلاق الدردشة (⌘/)"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Create failed"
+msgstr "فشل الإنشاء"
+
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "Failed"
+msgstr "فشل"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Delete role group"
+msgstr "حذف مجموعة الأدوار"
+
+#: src/routes/forgot-password.tsx
+msgid "Enter your email to get a reset link"
+msgstr "أدخل بريدك الإلكتروني للحصول على رابط إعادة تعيين"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Approved"
+msgstr "موافق"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "Loading plans..."
+msgstr "جارٍ تحميل الخطط..."
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "User groups"
 msgstr "مجموعات المستخدمين"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Type your answer…"
+msgstr "اكتب إجابتك..."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
 msgstr "يجعل النشر هذه اللوحة مرئية لأي شخص لديه الرابط — لا حاجة لحساب Avandar. يتم نسخ مجموعات البيانات المشار إليها بواسطة اللوحة إلى التخزين العام عند النشر."
 
+#: src/routes/forgot-password.tsx
+msgid "Password reset failed"
+msgstr "فشل إعادة تعيين كلمة المرور"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "New role group"
+msgstr "مجموعة أدوار جديدة"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Download & enable"
+msgstr "تحميل وتفعيل"
+
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "تأكيد"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+msgid "is equal to..."
+msgstr "يساوي..."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Some data should come from existing datasets"
+msgstr "يجب أن تأتي بعض البيانات من مجموعات البيانات الموجودة"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -333,6 +727,10 @@ msgstr "التسمية"
 msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
 
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
+msgstr "تم رفض الخطة. اطلب من الدردشة اقتراح خطة مختلفة، أو أغلق هذه اللوحة."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "مفقود"
@@ -341,9 +739,55 @@ msgstr "مفقود"
 msgid "One standard deviation around the mean"
 msgstr "انحراف معياري واحد حول المتوسط"
 
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Name column"
+msgstr "عمود الاسم"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Invalid name column selected"
+msgstr "تم اختيار عمود اسم غير صالح"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "مخصص"
+
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "{0} was deleted from this device."
+msgstr "{0} تم حذفه من هذا الجهاز."
+
+#: src/routes/_auth/(no-workspace)/index.tsx
+msgid "It's time to create your first workspace. Don't think for too long—you can always change these later!"
+msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك دائمًا تغيير هذه لاحقًا!"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/register.tsx
+#: src/routes/signin.tsx
+#: src/routes/update-password.tsx
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
+msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
+msgstr "الدعوة التي تحاول قبولها غير صالحة. يرجى الاتصال بمالك مساحة العمل للحصول على دعوة جديدة."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Enter a description for this profile type"
+msgstr "أدخل وصفًا لهذا النوع من الملف الشخصي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "(Annual billing)"
+msgstr "(الفوترة السنوية)"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Remove member"
+msgstr "إزالة عضو"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Welcome back"
+msgstr "مرحبًا بعودتك"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -353,13 +797,47 @@ msgstr "جميع الأعمدة"
 msgid "Data Summary"
 msgstr "ملخص البيانات"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "This {resource} is currently only accessible to its owner."
+msgstr "هذه {resource} متاحة حاليًا فقط لمالكها."
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Detected:"
+msgstr "تم الكشف عن:"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
+msgid "/month"
+msgstr "/شهر"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 msgid "Filters for this chart"
 msgstr "الفلاتر لهذا الرسم البياني"
 
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Branch from here"
+msgstr "فرع من هنا"
+
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "Skipped"
+msgstr "تم تخطيه"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Query failed."
+msgstr "فشل الاستعلام."
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "تراجع"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Branch from \"{truncated}\""
+msgstr "فرع من \"{truncated}\""
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
+msgid "Permissions saved"
+msgstr "تم حفظ الأذونات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -374,15 +852,43 @@ msgstr "ملف Excel"
 msgid "Couldn't capture the dashboard for annotation."
 msgstr "لم نتمكن من التقاط لوحة المعلومات للتعليق."
 
+#: src/routes/_auth/$workspaceSlug/checkout.tsx
+msgid "It may take a few minutes for your subscription to take effect."
+msgstr "قد يستغرق الأمر بضع دقائق لتفعيل اشتراكك."
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Continue as-is"
+msgstr "استمر كما هو"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Contains…"
 msgstr "يحتوي على…"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Global Editor"
+msgstr "المحرر العالمي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Manage seats in billing portal →"
+msgstr "إدارة المقاعد في بوابة الفوترة →"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
+msgid "You save {discount}% compared to monthly billing"
+msgstr "أنت توفر {discount}% مقارنة بالفوترة الشهرية"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Built-in presets"
+msgstr "الإعدادات المدمجة"
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" الآن في مساحة العمل الخاصة بك."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Profile fields"
+msgstr "حقول الملف الشخصي"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -393,9 +899,21 @@ msgstr "حذف — {0}"
 msgid "Select a dataset from the list to view its metadata."
 msgstr "اختر مجموعة بيانات من القائمة لعرض بياناتها الوصفية."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "Choose a plan that works best for your workspace."
+msgstr "اختر خطة تناسب مساحة العمل الخاصة بك بشكل أفضل."
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
 msgstr "كتالوج البيانات المفتوحة العامة لا يزال في <0/><1/>نحن نضيف المزيد من مجموعات البيانات المفتوحة كما يخبرنا المستخدمون بالمجموعات التي يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، <2>أخبرنا</2>!"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Erase"
+msgstr "مسح"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Health information detected"
+msgstr "تم الكشف عن معلومات صحية"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset deleted successfully"
@@ -412,6 +930,10 @@ msgstr "تجميع بواسطة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Please select a file to import"
 msgstr "يرجى اختيار ملف للاستيراد"
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Role for everyone in the workspace"
+msgstr "دور للجميع في مساحة العمل"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
@@ -431,9 +953,29 @@ msgstr "إضافة مجموعة بيانات جديدة"
 msgid "Parsed {0} rows"
 msgstr "تم تحليل {0} صفوف"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
+msgid "Email address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Enter a name for the field"
+msgstr "أدخل اسمًا للحقل"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "Select Plan"
+msgstr "اختر خطة"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Color {c}"
+msgstr "اللون {c}"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "القيمة الافتراضية (اختياري)"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Zoom in"
+msgstr "تكبير"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -443,6 +985,18 @@ msgstr "لم يتم تحميل ملف تعريف المستخدم الخاص ب�
 msgid "Sum"
 msgstr "مجموع"
 
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Sync data!"
+msgstr "مزامنة البيانات!"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice settings"
+msgstr "إعدادات الصوت"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Used when transcribing; does not change the model download."
+msgstr "يستخدم عند النسخ؛ لا يغير تحميل النموذج."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
 msgstr "متوسط"
@@ -451,14 +1005,30 @@ msgstr "متوسط"
 msgid "Generating…"
 msgstr "يتم الإنشاء…"
 
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+msgid "Are you sure you want to proceed with this action? This cannot be undone."
+msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "This is the unique ID of your organization used in URLs."
+msgstr "هذا هو المعرف الفريد لمؤسستك المستخدم في عناوين URL."
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Previewing data for {0}"
 msgstr "معاينة البيانات لـ {0}"
 
+#: src/routes/update-password.tsx
+msgid "You can start using your new password now"
+msgstr "يمكنك البدء في استخدام كلمة المرور الجديدة الآن"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
 msgstr "نوع الملف غير مدعوم"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Are you sure you want to remove this user from the workspace?"
+msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side panel."
@@ -468,14 +1038,49 @@ msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته�
 msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
 msgstr "تحتوي SQL الحالية على أجزاء لا يمكن للنموذج تمثيلها. الاستمرار سيؤدي إلى الكتابة فوق تلك SQL بواحدة تم إنشاؤها من النموذج. لا يمكن التراجع عن ذلك (ما لم تقم بإعادة تشغيل طلب الدردشة السابق)."
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Select the columns you want in this {entityConfigName}"
+msgstr "اختر الأعمدة التي تريدها في هذا {entityConfigName}"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Formal"
 msgstr "رسمي"
+
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+msgid "This field"
+msgstr "هذا الحقل"
+
+#. placeholder {0}: member.displayName
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
+msgid "Edit access for {0}"
+msgstr "تحرير الوصول لـ {0}"
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Complete"
+msgstr "مكتمل"
+
+#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
+#: src/routes/register.tsx
+msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
+msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل قريبًا. نعدك!"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Bias detected:"
+msgstr "تم الكشف عن تحيز:"
 
 #. placeholder {0}: planSnapshot.steps.length
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
 msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث يمكن إعادة فتحه على اللوحة."
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "The name other members see in {workspaceName}."
+msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Suggested:"
+msgstr "مقترح:"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
@@ -485,30 +1090,103 @@ msgstr "استبدال SQL بتغييرات النموذج"
 msgid "Dataset did not match the expected schema"
 msgstr "لم تتطابق مجموعة البيانات مع المخطط المتوقع"
 
+#: src/components/AppShell/Navbar/Navbar.tsx
+msgid "Sign Out"
+msgstr "تسجيل الخروج"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Analytic plan"
+msgstr "خطة تحليلية"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Unknown group"
+msgstr "مجموعة غير معروفة"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File was partially loaded"
 msgstr "تم تحميل الملف جزئيًا"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "Payment Methods"
+msgstr "طرق الدفع"
+
+#. placeholder {0}: selectedModel.description
+#. placeholder {1}: selectedModel.approxSizeMb
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "{0} (~{1} MB)"
+msgstr "{0} (~{1} ميغابايت)"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "No values were returned from {column}. Describe what you need instead."
+msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاجه بدلاً من ذلك."
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
 msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط <2>{avg}</2>{0}"
 
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "No columns are available"
+msgstr "لا توجد أعمدة متاحة"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "مجموعة بيانات بلا عنوان"
+
+#. placeholder {0}: entry.turnNumber
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "{0} / 3"
+msgstr "{0} / 3"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
 msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخرى قيد العمل وسيكون متاحًا قريبًا جدًا. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها وتحتاج إلى الاتصال بها، <0>يرجى إخبارنا حتى نتمكن من إعطائها الأولوية</0>."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
+msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
+
+#. placeholder {0}: b.parentStepId
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "from step {0}"
+msgstr "من الخطوة {0}"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "المسح إلى:"
 
+#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
+msgid "Ask me to add a chart to this dashboard..."
+msgstr "اطلب مني إضافة مخطط إلى هذه اللوحة..."
+
+#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+msgid "Not implemented yet"
+msgstr "لم يتم تنفيذه بعد"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
+msgid "Type or paste an email below. Your workspace will be billed per member."
+msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه. سيتم فرض رسوم على مساحة العمل لكل عضو."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Used suggestion"
+msgstr "اقتراح مستخدم"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
 msgstr "يدوي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "or"
+msgstr "أو"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Restriction update failed"
+msgstr "فشل تحديث القيود"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Use the Data Explorer to analyze your datasets, create visualizations, and discover insights from your data."
+msgstr "استخدم مستكشف البيانات لتحليل مجموعات البيانات الخاصة بك، وإنشاء تصورات، واكتشاف رؤى من بياناتك."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
@@ -518,9 +1196,23 @@ msgstr "الأدوار والأذونات"
 msgid "Connect to Google Sheets"
 msgstr "الاتصال بـ Google Sheets"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Stop and transcribe"
+msgstr "توقف ونسخ"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
-msgid "Data Visualization"
-msgstr "تصوير البيانات"
+#~ msgid "Data Visualization"
+#~ msgstr "تصوير البيانات"
+
+#: src/components/buttons/FeedbackButton/FeedbackButton.tsx
+msgid "Report a bug"
+msgstr "الإبلاغ عن خطأ"
+
+#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+msgid "No entity selected"
+msgstr "لم يتم اختيار أي كيان"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -530,10 +1222,26 @@ msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها ع
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
 msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "No speech detected"
+msgstr "لم يتم الكشف عن أي كلام"
+
+#: src/routes/register.tsx
+msgid "Please <0>email us</0> if you would like early access."
+msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول المبكر."
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Step"
+msgstr "خطوة"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "الأقصى"
+
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "Ready"
+msgstr "جاهز"
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
@@ -543,11 +1251,26 @@ msgstr "استيراد البيانات"
 msgid "Descending"
 msgstr "تنازلي"
 
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Category axis"
+msgstr "محور الفئة"
+
+#: src/components/AppShell/AppShell.tsx
+msgid "Nothing found..."
+msgstr "لم يتم العثور على شيء..."
+
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+msgid "{keyboardShortcut} to save"
+msgstr "{keyboardShortcut} للحفظ"
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
 msgstr "حذف"
 
@@ -556,25 +1279,71 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Query form"
+msgstr "نموذج الاستعلام"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
 msgstr "تم تنزيل PDF."
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Workspace ID"
+msgstr "معرّف مساحة العمل"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Select a column"
+msgstr "اختر عمودًا"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Annotate, then export"
 msgstr "قم بالتعليق، ثم التصدير"
+
+#. placeholder {0}: BUILTIN_ROLE_GROUP_NAMES.globalAdmin
+#. placeholder {1}: BUILTIN_ROLE_GROUP_NAMES.globalEditor
+#. placeholder {2}: BUILTIN_ROLE_GROUP_NAMES.globalViewer
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "{0}, {1}, and {2} are fixed for every workspace."
+msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
+
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "Plan branches"
+msgstr "فروع الخطة"
 
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 msgid "Show SQL"
 msgstr "عرض SQL"
 
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "Search models"
+msgstr "بحث عن النماذج"
+
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Cannot sync this entity"
+msgstr "لا يمكن مزامنة هذا الكيان"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Remove series"
+msgstr "إزالة السلاسل"
+
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset name is required"
 msgstr "اسم مجموعة البيانات مطلوب"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Allow new {pluralEntityConfigName} to be created manually"
+msgstr "السماح بإنشاء {pluralEntityConfigName} جديدة يدويًا"
+
+#: src/routes/update-password.tsx
+msgid "Password updated successfully"
+msgstr "تم تحديث كلمة المرور بنجاح"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -588,6 +1357,10 @@ msgstr "جرافيت"
 msgid "not in"
 msgstr "ليس في"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
+msgstr "{usedSeats} من {maxSeats} مقعد مستخدم · {remainingSeats} متبقي"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "أدخل اسمًا لهذه المجموعة من البيانات"
@@ -600,6 +1373,21 @@ msgstr "اختيار مخصص"
 msgid "Enter a description for this dataset"
 msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Fields to be manually entered"
+msgstr "حقول يجب إدخالها يدويًا"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "your dataset"
+msgstr "مجموعة البيانات الخاصة بك"
+
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -612,6 +1400,14 @@ msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -631,13 +1427,45 @@ msgstr "نطاق البيانات"
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
+#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
+msgid "Delete annotation"
+msgstr "حذف التعليق"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "إلى"
 
+#: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
+msgid "Create new profile type"
+msgstr "إنشاء نوع ملف تعريف جديد"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Done"
+msgstr "تم"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Add Field"
+msgstr "إضافة حقل"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "نص التعليق:"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't chosen an X axis"
+msgstr "لم تختار محور X"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+msgid "and is also equal to..."
+msgstr "ويساوي أيضًا..."
+
+#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+msgid "Profile failed to load"
+msgstr "فشل تحميل الملف الشخصي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
+msgstr "أنت حاليًا على خطة <0>{currentFeaturePlanName}</0>."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Result size"
@@ -647,9 +1475,25 @@ msgstr "حجم النتيجة"
 msgid "Search open data catalog"
 msgstr "ابحث في كتالوج البيانات المفتوحة"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the billing portal.<0/>The button below will take you there."
+msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط من خلال بوابة الفوترة.<0/>سيأخذك الزر أدناه إلى هناك."
+
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Delete entity"
+msgstr "حذف الكيان"
+
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+msgid "Empty text"
+msgstr "نص فارغ"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "المحيط"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "You are about to change your subscription plan to:"
+msgstr "أنت على وشك تغيير خطة اشتراكك إلى:"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -659,6 +1503,18 @@ msgstr "تم حذف مجموعة البيانات."
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
 msgstr "اسم الورقة"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "We will use those columns to merge datasets into a single {entityConfigName}."
+msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {entityConfigName} واحدة."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Transcribing…"
+msgstr "يتم النسخ..."
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Go to Data Explorer"
+msgstr "اذهب إلى مستكشف البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
@@ -670,17 +1526,43 @@ msgstr "قم بالتمرير لأعلى إلى الحقول أعلاه، أو �
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "None"
 msgstr "لا شيء"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "You'll be asked to confirm your current password."
+msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Publish"
 msgstr "نشر"
 
+#. placeholder {0}: selectedModel.name
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "Using {0}"
+msgstr "باستخدام {0}"
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
 msgstr "لا يوجد SQL حتى الآن. اسأل Avandar سؤالاً أو قم ببناء استعلام في علامة التبويب اليدوية لإنشاء SQL."
+
+#: src/components/forms/AvaForm/AvaForm.tsx
+msgid "Received a non-string value for a text field"
+msgstr "تم استلام قيمة غير نصية لحقل نصي"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Tell us about where the {singularEntityConfigName} data should come from..."
+msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
+
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Delete Entity"
+msgstr "حذف الكيان"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Personal data + biased framing detected"
+msgstr "تم الكشف عن بيانات شخصية + تأطير متحيز"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -691,9 +1573,33 @@ msgstr "تظهر النموذج اليدوي تقريبًا"
 msgid "Your dashboard will be published to:"
 msgstr "سيتم نشر لوحتك إلى:"
 
+#: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
+msgid "You do not have permission to open {appLabel} in this workspace."
+msgstr "ليس لديك إذن لفتح {appLabel} في هذه المساحة العمل."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Build a chart in chat"
+msgstr "إنشاء مخطط في الدردشة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Additional seats required"
+msgstr "مقاعد إضافية مطلوبة"
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Finishing setup — almost ready."
+msgstr "إنهاء الإعداد - يكاد يكون جاهزًا."
+
+#: packages/web/ui/src/buttons/EditButton.tsx
+msgid "Edit"
+msgstr "تعديل"
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
 msgstr "مصدر البيانات"
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "No dataset selected"
+msgstr "لم يتم اختيار مجموعة بيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "description"
@@ -704,13 +1610,25 @@ msgstr "الوصف"
 msgid "Min"
 msgstr "الأدنى"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Outcome"
+msgstr "النتيجة"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "مرشحات محلية (يمكن للمشاهد تعديلها، هذه الرسم البياني فقط)"
 
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Invalid X axis selected"
+msgstr "تم اختيار محور X غير صالح"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
+
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+msgid "Collection {collectionNumber}"
+msgstr "المجموعة {collectionNumber}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
@@ -724,9 +1642,26 @@ msgstr "هذه اللوحة خاصة. لم يتم جعل هذه اللوحة ق�
 msgid "Derived"
 msgstr "مشتق"
 
+#. placeholder {0}: columns.length
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "{0} columns were detected. Review the column info below to make sure they are correct."
+msgstr "{0} أعمدة تم الكشف عنها. راجع معلومات الأعمدة أدناه للتأكد من صحتها."
+
+#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+msgid "Active"
+msgstr "نشط"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "القيم الافتراضية، مفصولة بفواصل أو مصفوفة JSON"
+
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+msgid "Confirm Action"
+msgstr "تأكيد الإجراء"
+
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "Data Preview"
+msgstr "معاينة البيانات"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
@@ -735,6 +1670,18 @@ msgstr "ليس فارغًا"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Create dashboard & save"
 msgstr "إنشاء لوحة & حفظ"
+
+#: src/components/GISApp/DataMap/MapStylePicker.tsx
+msgid "Theme"
+msgstr "السمة"
+
+#: src/routes/register.tsx
+msgid "Register"
+msgstr "تسجيل"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
+msgstr "اطلب مني إضافة مخطط إلى لوحة المعلومات هذه. سأختار نوع التصور، وأكتب SQL، وأضع كتلة على الصفحة."
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: top.count.toLocaleString()
@@ -747,13 +1694,57 @@ msgstr "القيمة الأكثر شيوعًا: <0>{0}</0> ({1} صفوف، {2}%)
 msgid "Dashboard saved successfully!"
 msgstr "تم حفظ اللوحة بنجاح!"
 
+#: src/components/GISApp/DataMap/GeometryDrawer.tsx
+msgid "N/A"
+msgstr "غير متوفر"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Zoom out"
+msgstr "تكبير"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Global Admin"
+msgstr "مدير عالمي"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't chosen a size column"
+msgstr "لم تختار عمود الحجم"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Invalid size column selected"
+msgstr "تم اختيار عمود حجم غير صالح"
+
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+msgid "There are no values"
+msgstr "لا توجد قيم"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Clarification {turnNumber} of 3"
+msgstr "توضيح {turnNumber} من 3"
+
+#: src/components/GISApp/DataMap/GeometryDrawer.tsx
+msgid "Data Point"
+msgstr "نقطة البيانات"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
 msgstr "العودة إلى المحرر"
 
+#: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
+msgid "You do not have permission to open this part of the workspace."
+msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة العمل."
+
+#: src/routes/register.tsx
+msgid "Please check your email"
+msgstr "يرجى التحقق من بريدك الإلكتروني"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
 msgstr "لم يتمكن من التقاط اللوحة"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "PNG image"
+msgstr "صورة PNG"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
@@ -763,13 +1754,45 @@ msgstr "جارٍ معالجة مجموعة البيانات…"
 msgid "Capturing dashboard…"
 msgstr "جارٍ التقاط اللوحة…"
 
+#: src/routes/register.tsx
+msgid "This is an invalid waitlist code"
+msgstr "هذا رمز قائمة الانتظار غير صالح"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Field Name"
+msgstr "اسم الحقل"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "+ Add row filter"
 msgstr "+ إضافة فلتر صف"
 
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Consider rephrasing"
+msgstr "فكر في إعادة صياغة"
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+msgid "Add people or user groups"
+msgstr "إضافة أشخاص أو مجموعات مستخدمين"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
 msgstr "القيم"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Unable to download the voice model."
+msgstr "غير قادر على تنزيل نموذج الصوت."
+
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "(untitled branch)"
+msgstr "(فرع بلا عنوان)"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "About your workspace"
+msgstr "حول مساحة العمل الخاصة بك"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Could not remove voice model"
+msgstr "تعذر إزالة نموذج الصوت"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
@@ -779,31 +1802,83 @@ msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية
 msgid "CSVs"
 msgstr "CSV"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "Plan Features:"
+msgstr "ميزات الخطة:"
+
+#: src/routes/register.tsx
+msgid "Start your journey with us"
+msgstr "ابدأ رحلتك معنا"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "رمز الاستجابة السريعة"
 
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+msgid "Role"
+msgstr "الدور"
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is null"
 msgstr "فارغ"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Invite sent"
+msgstr "تم إرسال الدعوة"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to save to dashboard: {0}"
 msgstr "فشل في الحفظ إلى اللوحة: {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Custom role groups"
+msgstr "مجموعات الأدوار المخصصة"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Rose"
 msgstr "وردة"
 
 #. placeholder {0}: dataset.name
+#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
+msgid "Save failed"
+msgstr "فشل الحفظ"
+
+#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
+msgid "Chat is enabled in Data Explorer and Dashboards"
+msgstr "الدردشة مفعلة في مستكشف البيانات ولوحات المعلومات"
+
+#: src/routes/forgot-password.tsx
+#: src/routes/signin.tsx
+msgid "Forgot your password?"
+msgstr "نسيت كلمة المرور؟"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Bar"
+msgstr "شريط"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "حذف اللوحة؟"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Change password"
+msgstr "تغيير كلمة المرور"
+
+#: src/routes/_auth/$workspaceSlug/checkout.tsx
+msgid "Checkout Successful!"
+msgstr "تمت عملية الدفع بنجاح!"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Answered"
+msgstr "تم الرد"
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
@@ -819,13 +1894,28 @@ msgstr "لا توجد حقول"
 msgid "Failed to update workspace name"
 msgstr "فشل في تحديث اسم مساحة العمل"
 
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "تصدير"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
+msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة بك. يمكن تكوين مجموعات البيانات ولوحات المعلومات لمشاركة فقط مع (أو تقييد) مجموعات مستخدمين معينة."
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "معاينة:"
+
+#. placeholder {0}: state.nodes.length
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
+msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة — هذا الكثير من SQL. فكر فيما إذا كانت خطوة Python أو R ستعبر عن ذلك بشكل أنظف. يمكنك الموافقة كما هي. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
+
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
+msgid "Select your plan"
+msgstr "اختر خطتك"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -840,6 +1930,10 @@ msgstr "إعادة تشغيل الاستعلام"
 msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
 msgstr "اختر اللغة المستخدمة في هذه المساحة. اللغات من اليمين إلى اليسار تعكس التخطيط تلقائيًا."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "No plans available."
+msgstr "لا توجد خطط متاحة."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "لا توجد قيم للتلخيص."
@@ -848,9 +1942,45 @@ msgstr "لا توجد قيم للتلخيص."
 msgid "Dashboard not ready"
 msgstr "اللوحة غير جاهزة"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
+msgid "Pay monthly"
+msgstr "الدفع شهريًا"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Re-run"
+msgstr "إعادة التشغيل"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Redo"
+msgstr "إعادة"
+
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "Choose a model"
+msgstr "اختر نموذجًا"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Personal data detected"
+msgstr "تم اكتشاف بيانات شخصية"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "تطبيق كل فلتر عالمي على اللوحة."
+
+#: src/components/FloatingPanel/FloatingPanel.tsx
+msgid "Collapse"
+msgstr "طي"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Cap reached"
+msgstr "تم الوصول إلى الحد"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Go to billing portal"
+msgstr "اذهب إلى بوابة الفوترة"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Clear log"
+msgstr "مسح السجل"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -859,6 +1989,18 @@ msgstr "تحميل CSV"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
+
+#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+msgid "Data"
+msgstr "البيانات"
+
+#: src/components/layouts/AuthLayout/BackToLoginLink.tsx
+msgid "Back to the login page"
+msgstr "العودة إلى صفحة تسجيل الدخول"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Controls the default for the rest of the workspace. People without app access still need a direct share above."
+msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة العمل. الأشخاص الذين ليس لديهم وصول إلى التطبيق لا يزالون بحاجة إلى مشاركة مباشرة أعلاه."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -870,9 +2012,20 @@ msgstr "حفظ إلى اللوحة"
 #~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
 #~ msgstr ""
 
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Label type"
+msgstr "نوع التسمية"
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
 msgstr "لا يوجد ملف محدد"
+
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/forms/AvaForm/AvaForm.tsx
+#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+msgid "Submit"
+msgstr "إرسال"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -883,6 +2036,10 @@ msgstr "عرض جميع العناصر المشتركة"
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة أخرى لاحقًا."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Send invite"
+msgstr "إرسال الدعوة"
+
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
 msgid "Manual Query"
 msgstr "استعلام يدوي"
@@ -890,6 +2047,18 @@ msgstr "استعلام يدوي"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
 msgstr "مجموعة البيانات الآن متاحة فقط في وضع عدم الاتصال"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Fields that come from datasets"
+msgstr "الحقول التي تأتي من مجموعات البيانات"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "This is where you select which columns from which datasets should be added into this {entityConfigName}."
+msgstr "هنا تختار الأعمدة من مجموعات البيانات التي يجب إضافتها إلى هذا {entityConfigName}."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Create"
+msgstr "إنشاء"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -899,6 +2068,14 @@ msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع
 msgid "Are you sure you want to delete this dataset? This action cannot be undone."
 msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا الإجراء."
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Symbol size column must be numeric."
+msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
+
+#: src/views/SharedWithMeView/SharedWithMeView.tsx
+msgid "Loading shared resources"
+msgstr "تحميل الموارد المشتركة"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "افاندر (افتراضي)"
@@ -907,20 +2084,60 @@ msgstr "افاندر (افتراضي)"
 msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
 msgstr "{numCols, plural, one {سيتم نشر # عمود:} other {سيتم نشر # أعمدة:}}"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
+msgid "Type or paste an email below."
+msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice prompting"
+msgstr "تحفيز الصوت"
+
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
 msgstr "مكرر بشكل كبير: <0>{0}</0> يظهر في <1>{1}%</1> من الصفوف."
 
+#: src/components/AppShell/Logo.tsx
+msgid "Logo"
+msgstr "الشعار"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Decision"
+msgstr "قرار"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Update failed"
+msgstr "فشل التحديث"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
 msgstr "عودة"
 
+#: src/routes/_auth/$workspaceSlug/checkout.tsx
+msgid "Continue to your workspace"
+msgstr "تابع إلى مساحة العمل الخاصة بك"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Choose the maximum value"
+msgstr "اختر القيمة القصوى"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "The workspace you are trying to access either does not exist or you do not have access to it."
+msgstr "المساحة التي تحاول الوصول إليها إما غير موجودة أو ليس لديك حق الوصول إليها."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
+msgid "Pay yearly"
+msgstr "ادفع سنويًا"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "coverage"
 msgstr "التغطية"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Clarification answer"
+msgstr "إجابة توضيحية"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
@@ -932,6 +2149,18 @@ msgstr "SQL المُولد"
 msgid "Maximum rows to return"
 msgstr "الحد الأقصى لعدد الصفوف للعودة"
 
+#: src/routes/update-password.tsx
+msgid "Password update failed"
+msgstr "فشل تحديث كلمة المرور"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
+msgstr "فشل خطوة. انقر على العقدة الحمراء لإعادة المحاولة، أو استخدم إعادة التشغيل للبدء من الأعلى."
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Anyone in {app}"
+msgstr "أي شخص في {app}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Failed to delete dataset"
 msgstr "فشل في حذف مجموعة البيانات"
@@ -940,9 +2169,21 @@ msgstr "فشل في حذف مجموعة البيانات"
 msgid "License"
 msgstr "الرخصة"
 
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Describe your answer…"
+msgstr "صف إجابتك…"
+
+#: src/components/AppDropzone/AppDropzone.tsx
+msgid "Drop to import"
+msgstr "اسحب للاستيراد"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Date range"
 msgstr "نطاق التاريخ"
+
+#: src/routes/register.tsx
+msgid "sign up for our waitlist"
+msgstr "اشترك في قائمة الانتظار الخاصة بنا"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -953,6 +2194,10 @@ msgstr "إضافة مجموعة البيانات إلى مساحة العمل"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "فريد إلى حد كبير: <0>{0}</0> قيم مميزة عبر <1>{1}</1> صفوف."
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Run step"
+msgstr "تشغيل الخطوة"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
@@ -978,6 +2223,10 @@ msgstr "اختر ملف"
 msgid "Column name (must match SQL)"
 msgstr "اسم العمود (يجب أن يتطابق مع SQL)"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
+msgstr "{usedSeats} من {maxSeats} مقاعد مستخدمة · {remainingSeats} متبقية"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Generate Query"
 msgstr "توليد استعلام"
@@ -989,6 +2238,10 @@ msgstr "لا توجد بيانات تكرارية متاحة."
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Starting…"
+msgstr "جارٍ البدء…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Number range"
@@ -1014,10 +2267,26 @@ msgstr "غير قادر على تحميل لوحة التحكم"
 msgid "Connectors"
 msgstr "الموصلات"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Seats purchased successfully"
+msgstr "تم شراء المقاعد بنجاح"
+
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Open chat (⌘/)"
+msgstr "فتح الدردشة (⌘/)"
+
 #. placeholder {0}: displayedEntries.length
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "الفهرس ({0})"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Send"
+msgstr "إرسال"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Generated SQL assumptions"
+msgstr "افتراضيات SQL المولدة"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -1031,14 +2300,34 @@ msgstr "تنسيق الطابع الزمني"
 msgid "View"
 msgstr "عرض"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Remove failed"
+msgstr "إزالة فاشلة"
+
+#. placeholder {0}: step.actualSchema.length
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid " · {0} cols"
+msgstr " · {0} أعمدة"
+
 #. placeholder {0}: dataset.name
+#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} تم حذفه بنجاح"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Open dashboard"
 msgstr "فتح لوحة التحكم"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From dataset"
+msgstr "من مجموعة البيانات"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "A profile can consist of columns that come from different datasets."
+msgstr "يمكن أن يتكون الملف الشخصي من أعمدة تأتي من مجموعات بيانات مختلفة."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "End (e.g. 2024-12-31)"
@@ -1064,9 +2353,44 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "Root plan"
+msgstr "الخطة الجذرية"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "لون"
+
+#. placeholder {0}: entityConfig.name
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Finished syncing {0} data"
+msgstr "تم الانتهاء من مزامنة {0} بيانات"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+msgid "Select column"
+msgstr "اختر العمود"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Pick one or more"
+msgstr "اختر واحدًا أو أكثر"
+
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "Column Name"
+msgstr "اسم العمود"
+
+#: src/views/SharedWithMeView/SharedWithMeView.tsx
+msgid "Nothing has been shared with you here."
+msgstr "لم يتم مشاركة أي شيء معك هنا."
+
+#: src/routes/forgot-password.tsx
+msgid "Sent password reset email"
+msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Redo (Ctrl+Shift+Z)"
+msgstr "إعادة (Ctrl+Shift+Z)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
@@ -1080,9 +2404,26 @@ msgstr "يمكنك عرض مجموعة البيانات هذه لأنها تمت
 msgid "Create new dashboard"
 msgstr "إنشاء لوحة تحكم جديدة"
 
+#: src/components/AppShell/Navbar/Navbar.tsx
+msgid "Create Workspace"
+msgstr "إنشاء مساحة عمل"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Forest"
 msgstr "غابة"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "Allow manual edit"
+msgstr "السماح بالتعديل اليدوي"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Whisper supports many languages; auto-detect handles mixed input."
+msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال المختلط."
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Series"
+msgstr "سلسلة"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first — the PDF reflects the saved dashboard."
@@ -1092,6 +2433,52 @@ msgstr "احفظ تغييراتك أولاً - ملف PDF يعكس لوحة ال
 msgid "Not yet published. Public viewers will not see this."
 msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون العامون من رؤية هذا."
 
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+msgid "The entity failed to load. Please try again later or reach out to support."
+msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "We didn't catch anything — try again a bit closer to the mic."
+msgstr "لم نلتقط أي شيء — حاول مرة أخرى بالقرب من الميكروفون."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Purchase {seatsToAdd} seat"
+msgstr "شراء {seatsToAdd} مقعد"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Open on canvas"
+msgstr "فتح على اللوحة"
+
+#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+msgid "The profile manager page failed to load. Please try again later or reach out to support."
+msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
+msgstr "هل تريد حذف جميع قرارات الموافقة بشكل دائم على هذا الجهاز؟ لا يمكن التراجع عن هذا الإجراء، وسجل الأجهزة الأخرى غير متأثر."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Let AI decide (legacy)"
+msgstr "دع الذكاء الاصطناعي يقرر (الإصدار القديم)"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "New field"
+msgstr "حقل جديد"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "Workspace created successfully!"
+msgstr "تم إنشاء مساحة العمل بنجاح!"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Clarifications"
+msgstr "توضيحات"
+
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "Entity deleted"
+msgstr "تم حذف الكيان"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns"
 msgstr "اختر الأعمدة"
@@ -1100,22 +2487,83 @@ msgstr "اختر الأعمدة"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Latitude column"
+msgstr "عمود خط العرض"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
 msgstr "اختر لوحة تحكم، أو أنشئ واحدة جديدة."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Get a sum of the values"
+msgstr "احصل على مجموع القيم"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Type your answer..."
+msgstr "اكتب إجابتك..."
+
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+msgid "Yes"
+msgstr "نعم"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Clear privacy log"
+msgstr "مسح سجل الخصوصية"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Consent"
+msgstr "موافقة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "Edit user group"
+msgstr "تعديل مجموعة المستخدمين"
+
+#: src/components/layouts/AuthLayout/AuthFooter.tsx
+msgid "Privacy Policy"
+msgstr "سياسة الخصوصية"
+
+#: src/components/AppShell/Navbar/Navbar.tsx
+msgid "Sign out failed"
+msgstr "فشل تسجيل الخروج"
 
 #. placeholder {0}: selectedGoogleAccount.google_email
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "لقد اتصلت بنجاح بـ {0}"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Choose the most frequent value"
+msgstr "اختر القيمة الأكثر تكرارًا"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
 msgstr "تنسيق التاريخ"
 
+#: src/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine.tsx
+msgid "Share summary"
+msgstr "مشاركة الملخص"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
 msgstr "تمت إضافة مجموعة البيانات"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
+msgid "Optional"
+msgstr "اختياري"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "App"
+msgstr "تطبيق"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
+msgid "/month (paid yearly)"
+msgstr "/شهر (مدفوع سنويًا)"
+
+#: src/components/FloatingPanel/FloatingPanel.tsx
+msgid "Close {title}"
+msgstr "إغلاق {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -1125,13 +2573,39 @@ msgstr "العودة إلى لوحات التحكم"
 msgid "Most common"
 msgstr "الأكثر شيوعًا"
 
+#: src/routes/register.tsx
+#: src/routes/update-password.tsx
+msgid "Passwords do not match"
+msgstr "كلمات المرور غير متطابقة"
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Select longitude column"
+msgstr "اختر عمود خط الطول"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
 msgstr "تم تحميل مجموعة البيانات بنجاح"
 
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "I have legal authority to share this data with the AI provider"
+msgstr "لدي السلطة القانونية لمشاركة هذه البيانات مع مزود الذكاء الاصطناعي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "No custom groups yet."
+msgstr "لا توجد مجموعات مخصصة بعد."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+msgid "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan for unlimited seats."
+msgstr "مساحة العمل الخاصة بك على الخطة المجانية، التي تدعم حتى مقعدين. لدعوة المزيد من أعضاء الفريق، قم بالترقية إلى خطة مدفوعة لمقاعد غير محدودة."
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "خيارات (مفصولة بفواصل، لوضع الاختيار)"
+
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Owner"
+msgstr "مالك"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
@@ -1141,6 +2615,15 @@ msgstr "لا تتغير أبدًا، لذا تظل رموز QR المطبوعة 
 msgid "Number of rows to skip"
 msgstr "عدد الصفوف التي سيتم تخطيها"
 
+#: src/components/badges/SourceBadge.tsx
+msgid "From CSV"
+msgstr "من CSV"
+
+#. placeholder {0}: step.rowCount ?? 0
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "{0} rows{colCountSuffix}"
+msgstr "{0} صفوف{colCountSuffix}"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "دقيقة"
@@ -1149,9 +2632,49 @@ msgstr "دقيقة"
 msgid "You don't have any dashboards yet."
 msgstr "ليس لديك أي لوحات تحكم بعد."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "No clarifications yet. The log fills in as the chat asks clarifying questions."
+msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طرح الدردشة لأسئلة توضيحية."
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Preparing download…"
+msgstr "جارٍ إعداد التنزيل…"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "أداة"
+
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "Running…"
+msgstr "جارٍ التشغيل…"
+
+#: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
+msgid "Ask a workspace settings administrator to update your roles."
+msgstr "اطلب من مسؤول إعدادات مساحة العمل تحديث أدوارك."
+
+#. placeholder {0}: sourcedDataset?.name
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+msgid "For dataset <0>{0}</0>, choose the column to use as the {entityConfigName} ID"
+msgstr "بالنسبة لمجموعة البيانات <0>{0}</0>، اختر العمود الذي سيتم استخدامه كمعرف {entityConfigName}"
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Viewer"
+msgstr "عارض"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Pick one"
+msgstr "اختر واحدًا"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+msgid "No fields have been added"
+msgstr "لم تتم إضافة أي حقول"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Context"
+msgstr "سياق"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -1162,21 +2685,70 @@ msgstr "خطأ في حفظ مجموعة البيانات: {0}"
 msgid "Raw metadata (JSON)"
 msgstr "البيانات الوصفية الخام (JSON)"
 
+#. placeholder {0}: previewRows.length
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "These are the first {0} rows of your dataset."
+msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيانات الخاصة بك."
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Select symbol size column"
+msgstr "اختر عمود حجم الرمز"
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
 msgstr "تم حذف لوحة التحكم بنجاح!"
+
+#: src/components/forms/CreateWorkspaceForm.tsx
+msgid "The name you want other team members to see."
+msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL"
 msgstr "عنوان URL مخصص"
 
+#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
+msgid "Ask about your data..."
+msgstr "اسأل عن بياناتك..."
+
+#: src/components/GISApp/DataMap/MapStylePicker.tsx
+msgid "Theme picker"
+msgstr "اختيار السمة"
+
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Do not refresh or close this tab — the download will be canceled."
+msgstr "لا تقم بتحديث أو إغلاق هذه الصفحة - سيتم إلغاء التنزيل."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Desktop only"
+msgstr "لأجهزة الكمبيوتر فقط"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "تحضير البيانات للتصورات…"
 
+#: src/components/forms/AvaForm/AvaForm.tsx
+msgid "Received a non-string value for a select field"
+msgstr "تم استلام قيمة غير نصية لحقل تحديد"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Time to answer"
+msgstr "وقت الرد"
+
+#: src/routes/register.tsx
+msgid "Create a new account"
+msgstr "إنشاء حساب جديد"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Direction"
 msgstr "الاتجاه"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Edited"
+msgstr "تم التعديل"
+
+#: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+msgid "Assistant is typing"
+msgstr "المساعد يكتب"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
@@ -1186,10 +2758,36 @@ msgstr "تم حفظ مجموعة البيانات بنجاح!"
 msgid "No saved datasets found."
 msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Every workspace member who can open the {app} app gets this role on this {resource}, in addition to whatever's listed above."
+msgstr "كل عضو في مساحة العمل يمكنه فتح تطبيق {app} يحصل على هذا الدور في {resource}، بالإضافة إلى ما هو مدرج أعلاه."
+
+#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+msgid "Please select an entity from the left sidebar, or create a new one."
+msgstr "يرجى اختيار كيان من الشريط الجانبي الأيسر، أو إنشاء واحد جديد."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Detected"
+msgstr "تم الكشف"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "حذف مجموعة البيانات"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Add series"
+msgstr "إضافة سلسلة"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Download"
+msgstr "تنزيل"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "No members or user groups yet. Invite members or create user groups in Workspace settings."
+msgstr "لا يوجد أعضاء أو مجموعات مستخدمين حتى الآن. قم بدعوة الأعضاء أو إنشاء مجموعات مستخدمين في إعدادات مساحة العمل."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "SQL"
@@ -1199,23 +2797,61 @@ msgstr "SQL"
 msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
 msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة للأعمدة المحددة)."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Turn"
+msgstr "تحويل"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a table of the top 10 rows of {target}"
+msgstr "إضافة جدول لأعلى 10 صفوف من {target}"
+
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+msgid "Empty"
+msgstr "فارغ"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "الكل"
 
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+msgid "{fieldName} must be at least {minLength} characters long"
+msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} حرفًا"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "System sans"
 msgstr "نظام بدون"
+
+#. placeholder {0}: props.name
+#: packages/web/ui/src/buttons/EditButton.tsx
+msgid "Edit {0}"
+msgstr "تعديل {0}"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
+msgstr "لقد اكتشفنا معلومات شخصية محتملة ولغة قد تؤثر على إجابة الذكاء الاصطناعي. راجع كلاهما أدناه."
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
 msgstr "اختر التجميع"
 
+#: src/routes/register.tsx
+msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
+msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "You wrote:"
+msgstr "لقد كتبت:"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "تحديد متعدد"
+
+#: src/routes/register.tsx
+msgid "Sign up for our waitlist"
+msgstr "سجل في قائمة الانتظار الخاصة بنا"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -1224,6 +2860,14 @@ msgstr "غير قادر على تحميل مجموعات بيانات لوحة �
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "No description has been added yet."
 msgstr "لم يتم إضافة أي وصف بعد."
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Share failed"
+msgstr "فشل المشاركة"
+
+#: src/routes/register.tsx
+msgid "Your waitlist code has been verified"
+msgstr "تم التحقق من رمز قائمة الانتظار الخاصة بك"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -1250,10 +2894,19 @@ msgstr "تجاهل جميع الفلاتر العالمية — هذه التص�
 msgid "Sketch"
 msgstr "رسم تخطيطي"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice model ready"
+msgstr "نموذج الصوت جاهز"
+
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset \"{0}\" saved successfully"
 msgstr "تم حفظ مجموعة البيانات \"{0}\" بنجاح"
+
+#. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "{0}s"
+msgstr "{0}ثانية"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Please fix the highlighted fields."
@@ -1263,10 +2916,26 @@ msgstr "يرجى إصلاح الحقول المميزة."
 msgid "between"
 msgstr "بين"
 
+#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+msgid "Inactive"
+msgstr "غير نشط"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Some data should be manually entered"
+msgstr "يجب إدخال بعض البيانات يدويًا"
+
+#: src/components/buttons/FeedbackButton/FeedbackButton.tsx
+msgid "Request a feature"
+msgstr "طلب ميزة"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "الوصف"
+
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "Loading models..."
+msgstr "جارٍ تحميل النماذج..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -1276,18 +2945,51 @@ msgstr "تكرار التحديث"
 msgid "Allow syncing"
 msgstr "السماح بالمزامنة"
 
+#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Sticky note"
+msgstr "ملاحظة لاصقة"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "تصاعدي"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask about your data"
+msgstr "اسأل عن بياناتك"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Enter values; press Enter after each"
 msgstr "أدخل القيم؛ اضغط على Enter بعد كل واحدة"
 
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't added any series"
+msgstr "لم تقم بإضافة أي سلاسل"
+
+#. placeholder {0}: userProfile.displayName
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Welcome back, {0}"
+msgstr "مرحبًا بعودتك، {0}"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Change"
+msgstr "تغيير"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Looking up values in {column}…"
+msgstr "جارٍ البحث عن القيم في {column}…"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/forgot-password.tsx
+#: src/routes/register.tsx
+#: src/routes/signin.tsx
+msgid "Email"
+msgstr "البريد الإلكتروني"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
@@ -1303,6 +3005,11 @@ msgstr "معالجة البيانات مرة أخرى"
 msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
 
+#: src/components/FloatingPanel/FloatingPanel.tsx
+msgid "Collapse panel"
+msgstr "طي اللوحة"
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter"
 msgstr "تصفية"
@@ -1311,14 +3018,46 @@ msgstr "تصفية"
 msgid "This cannot be undone."
 msgstr "لا يمكن التراجع عن هذا."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Show the first 20 rows of {name}"
+msgstr "عرض أول 20 صفًا من {name}"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Approve and run"
+msgstr "الموافقة والتشغيل"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Could not access the microphone."
+msgstr "لم يتمكن من الوصول إلى الميكروفون."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "يجب أن يكون اسم مجموعة البيانات مكونًا من حرفين على الأقل."
+
+#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+msgid "Open sidebar"
+msgstr "فتح الشريط الجانبي"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Upload dataset"
+msgstr "رفع مجموعة البيانات"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
 msgstr "إعادة تعيين"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Enter a name for this profile type"
+msgstr "أدخل اسمًا لهذا النوع من الملف الشخصي"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Area"
+msgstr "المنطقة"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "No fields have been configured yet"
+msgstr "لم يتم تكوين أي حقول بعد"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "does not contain"
@@ -1328,17 +3067,54 @@ msgstr "لا يحتوي على"
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Add column as a field"
+msgstr "إضافة عمود كحقل"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
+msgstr "يبدو أن هذه البيانات تحتوي على معلومات صحية أو معلومات عن المرضى. قد يكون لإرسالها إلى مزود الذكاء الاصطناعي آثار قانونية وأخلاقية (HIPAA، GDPR، إلخ)."
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Get started by exploring your workspace or uploading your first dataset."
+msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو رفع أول مجموعة بيانات لك."
+
+#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+msgid "Share this {resourceLabel}"
+msgstr "شارك هذا {resourceLabel}"
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Select latitude column"
+msgstr "حدد عمود خط العرض"
+
+#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+msgid "Bubble size (numeric)"
+msgstr "حجم الفقاعة (رقمي)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
 msgstr "اختر الأعمدة للاستعلام"
 
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Donut style"
+msgstr "أسلوب الدونات"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
 msgstr "تم رفض أكثر من 1000 صف"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Update subscription"
+msgstr "تحديث الاشتراك"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Get an average of the values"
+msgstr "احصل على متوسط القيم"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -1355,34 +3131,103 @@ msgstr "خشونة ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} أعمدة · {1} صفوف"
 
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Undo (Ctrl+Z)"
+msgstr "تراجع (Ctrl+Z)"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "User removed"
+msgstr "تمت إزالة المستخدم"
+
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+msgid "Limit {displayName} to app access"
+msgstr "تقييد {displayName} للوصول إلى التطبيق"
+
+#: src/routes/register.tsx
+#: src/routes/update-password.tsx
+msgid "Confirm Password"
+msgstr "تأكيد كلمة المرور"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Edit query"
 msgstr "تحرير الاستعلام"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "مستكشف البيانات"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "{formattedPrice}/seat"
+msgstr "{formattedPrice}/مقعد"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Display name"
+msgstr "اسم العرض"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now synced online"
 msgstr "تم مزامنة مجموعة البيانات الآن عبر الإنترنت"
 
+#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+msgid "Your session has expired"
+msgstr "انتهت جلستك"
+
+#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
+msgid "Send message"
+msgstr "إرسال رسالة"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Copied!"
 msgstr "تم النسخ!"
+
+#: src/routes/register.tsx
+msgid "A confirmation email has been sent to your email address."
+msgstr "تم إرسال بريد إلكتروني للتأكيد إلى عنوان بريدك الإلكتروني."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
 msgstr "احتفظ بمجموعة البيانات"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Global Viewer"
+msgstr "عارض عالمي"
+
+#: src/components/AppShell/Navbar/Navbar.tsx
+msgid "Create a new workspace. You can always edit it later."
+msgstr "إنشاء مساحة عمل جديدة. يمكنك دائمًا تعديلها لاحقًا."
+
+#: src/routes/_auth/$workspaceSlug/checkout.tsx
+msgid "Your checkout was successful!"
+msgstr "تمت عملية الدفع بنجاح!"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Import spreadsheets, connect to Google Sheets, or add data from other sources to start analyzing your information."
+msgstr "استورد جداول البيانات، اتصل بـ Google Sheets، أو أضف بيانات من مصادر أخرى لبدء تحليل معلوماتك."
+
+#. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
+#. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Send <0>{0}</0> value{1} to the AI?"
+msgstr "هل تريد إرسال قيمة <0>{0}</0> {1} إلى الذكاء الاصطناعي؟"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL path"
 msgstr "مسار URL مخصص"
 
+#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+msgid "Please log in again to continue."
+msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
 msgstr "المتوسط"
+
+#: src/routes/update-password.tsx
+msgid "Update password"
+msgstr "تحديث كلمة المرور"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Dashboard snapshot"
@@ -1392,6 +3237,14 @@ msgstr "لقطة لوحة التحكم"
 msgid "Query Details"
 msgstr "تفاصيل الاستعلام"
 
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Your name"
+msgstr "اسمك"
+
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Open chat panel"
+msgstr "فتح لوحة الدردشة"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Remove row filter"
 msgstr "إزالة فلتر الصف"
@@ -1400,9 +3253,17 @@ msgstr "إزالة فلتر الصف"
 msgid "Dataset deleted"
 msgstr "تم حذف مجموعة البيانات"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Discovery clarification"
+msgstr "توضيح الاكتشاف"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Can't save dataset"
 msgstr "لا يمكن حفظ مجموعة البيانات"
+
+#: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
+msgid "That query failed. Please fix the SQL and try again."
+msgstr "فشلت هذه الاستعلام. يرجى إصلاح SQL والمحاولة مرة أخرى."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -1442,6 +3303,7 @@ msgstr "فشل تحميل الملف"
 msgid "There was an error on update: {0}"
 msgstr "حدث خطأ أثناء التحديث: {0}"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "سجل الخصوصية"
@@ -1455,6 +3317,10 @@ msgstr "إعدادات التصويرية"
 msgid "Data processing failed"
 msgstr "فشل معالجة البيانات"
 
+#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+msgid "This feature is not implemented yet."
+msgstr "لم يتم تنفيذ هذه الميزة بعد."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
 msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في أي وقت."
@@ -1467,10 +3333,16 @@ msgstr "لا تشير هذه اللوحة إلى أي مجموعات بيانا�
 msgid "This dataset can be stored in the cloud. "
 msgstr "يمكن تخزين مجموعة البيانات هذه في السحابة."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Billing"
 msgstr "الفوترة"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "Profile Name"
+msgstr "اسم الملف الشخصي"
+
+#: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "نوع التصويرية"
@@ -1481,6 +3353,18 @@ msgstr "نوع التصويرية"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "حذف مجموعة البيانات"
+
+#: packages/web/ui/src/notifications/notify.ts
+msgid "Warning"
+msgstr "تحذير"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
+msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة على الوصول فقط إذا كان لديهم بالفعل وصول إلى {app} في مساحة العمل. عند الإيقاف، يحصل كل عضو في المجموعة على الوصول هنا، حتى لو لم يكن بإمكانهم عادةً فتح {app}."
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Auto"
+msgstr "تلقائي"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -1499,6 +3383,10 @@ msgstr "هذه مجموعة البيانات متاحة فقط عند عدم ا�
 msgid "Global filters"
 msgstr "الفلاتر العالمية"
 
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+msgid "Role for {displayName}"
+msgstr "الدور لـ {displayName}"
+
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL instead."
 msgstr "لا تدعم الاستعلامات العامة الاستعلامات المنظمة. استخدم SQL الخام بدلاً من ذلك."
@@ -1510,6 +3398,10 @@ msgstr "ملف CSV"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Updating dataset"
 msgstr "تحديث مجموعة البيانات"
+
+#: src/routes/forgot-password.tsx
+msgid "Reset password"
+msgstr "إعادة تعيين كلمة المرور"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -1524,6 +3416,18 @@ msgstr "نسخ رابط المشاركة"
 msgid "Canonical URLs"
 msgstr "عناوين URL القياسية"
 
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Render as"
+msgstr "عرض كـ"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Line"
+msgstr "خط"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Unable to delete the voice model from cache."
+msgstr "غير قادر على حذف نموذج الصوت من الذاكرة المؤقتة."
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "اجعلها متاحة فقط عند عدم الاتصال"
@@ -1536,9 +3440,17 @@ msgstr "رابط مخصص متاح"
 msgid "Number of rows"
 msgstr "عدد الصفوف"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Restricted"
+msgstr "مقيد"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Contains (free-text)"
 msgstr "يحتوي على (نص حر)"
+
+#: src/components/buttons/FeedbackButton/FeedbackButton.tsx
+msgid "Send feedback"
+msgstr "إرسال ملاحظات"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Loading dashboard datasets"
@@ -1548,27 +3460,60 @@ msgstr "جارٍ تحميل مجموعات بيانات اللوحة"
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "اختر ملف Excel أو CSV من جهاز الكمبيوتر الخاص بك للاستيراد"
 
+#: src/routes/register.tsx
+msgid "Please choose a password to complete your registration"
+msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
+
+#: src/views/SharedWithMeView/SharedWithMeView.tsx
+msgid "Shared with me"
+msgstr "مشارك معي"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a bar chart of {target} grouped by category"
+msgstr "إضافة مخطط شريطي لـ {target} مجمع حسب الفئة"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "تمت الإضافة إلى \"{dashboardName}\""
 
+#: src/routes/signin.tsx
+msgid "Welcome back!"
+msgstr "مرحبًا بعودتك!"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "حدث خطأ أثناء محاولة المصادقة مع جوجل شيتس."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "The owner always has admin access. To change owner, use the {resource} settings."
+msgstr "المالك لديه دائمًا وصول إداري. لتغيير المالك، استخدم إعدادات {resource}."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "active"
+msgstr "نشط"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Choose the first value we see"
+msgstr "اختر القيمة الأولى التي نراها"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "تمت معالجة البيانات بنجاح"
 
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Pen"
+msgstr "قلم"
+
+#: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "تم رفض الوصول"
@@ -1577,23 +3522,109 @@ msgstr "تم رفض الوصول"
 msgid "Created \"{dashboardName}\""
 msgstr "تم إنشاء \"{dashboardName}\""
 
+#. placeholder {0}: state.singularEntityConfigName
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "If each {0} can only have one {fieldName} value, check this box."
+msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {fieldName}، حدد هذا المربع."
+
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
 msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength} حرفًا (الحالي: {0})."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Number of seats to add"
+msgstr "عدد المقاعد للإضافة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Pay What You Want"
+msgstr "ادفع ما تريد"
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "Please select a dataset from the left sidebar, or create a new one."
+msgstr "يرجى اختيار مجموعة بيانات من الشريط الجانبي الأيسر، أو إنشاء واحدة جديدة."
+
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+msgid "Limit to app access"
+msgstr "تحديد وصول التطبيق"
+
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "This name only applies in {workspaceName}. Your other workspaces keep their own."
+msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى بأسمائها الخاصة."
+
+#. placeholder {0}: model.displayName
+#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
+msgid "Downloading {0} for voice prompting"
+msgstr "تحميل {0} لتوجيه الصوت"
+
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Model"
+msgstr "نموذج"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
 msgstr "لن تظهر التغييرات غير المحفوظة في المعاينة. احفظ أولاً."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace does not have a valid subscription."
+msgstr "لا تحتوي هذه المساحة على اشتراك صالح."
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "All decisions"
+msgstr "جميع القرارات"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Speak (local voice-to-text)"
+msgstr "تحدث (تحويل الصوت إلى نص محلي)"
+
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Show labels"
+msgstr "عرض التسميات"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "X axis"
+msgstr "محور X"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "User group deleted"
+msgstr "تم حذف مجموعة المستخدمين"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "(Monthly billing)"
+msgstr "(الفوترة الشهرية)"
+
+#: src/routes/signin.tsx
+msgid "Don't have an account yet?"
+msgstr "لا تمتلك حسابًا بعد؟"
+
+#: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
+msgid "Dataset failed to load"
+msgstr "فشل تحميل مجموعة البيانات"
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save — {0}"
 msgstr "احفظ — {0}"
+
+#: packages/web/ui/src/notifications/notify.ts
+msgid "Error"
+msgstr "خطأ"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Send answer"
+msgstr "إرسال الإجابة"
+
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+msgid "... and {remainingCount} more"
+msgstr "... و {remainingCount} المزيد"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Just what's queried"
@@ -1603,21 +3634,75 @@ msgstr "فقط ما تم استعلامه"
 msgid "Could not generate QR code"
 msgstr "تعذر إنشاء رمز الاستجابة السريعة"
 
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+msgid "No fields or dataset are configured."
+msgstr "لا توجد حقول أو مجموعة بيانات مكونة."
+
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Percent"
+msgstr "نسبة مئوية"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "bar chart"
+msgstr "مخطط شريطي"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From Open Data"
+msgstr "من بيانات مفتوحة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "Name required"
+msgstr "الاسم مطلوب"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "User group saved"
+msgstr "تم حفظ مجموعة المستخدمين"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Could not publish dashboard"
 msgstr "تعذر نشر لوحة التحكم"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice model removed"
+msgstr "تمت إزالة نموذج الصوت"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Suggested rewrite:"
+msgstr "إعادة كتابة مقترحة:"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a spreadsheet"
 msgstr "قم بتحميل جدول بيانات"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
+msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال بـ {SUPPORT_EMAIL}"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google sheets connector is disabled while this feature is under maintenance."
 msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Remove"
+msgstr "إزالة"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "الخدمة"
+
+#: src/views/EntityManagerApp/EntityNavbar.tsx
+msgid "Nothing more to load"
+msgstr "لا يوجد المزيد لتحميله"
+
+#. placeholder {0}: workspace.name
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Manage how you appear in {0} and the account you use to sign in."
+msgstr "إدارة كيفية ظهورك في {0} والحساب الذي تستخدمه لتسجيل الدخول."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "People with access"
+msgstr "الأشخاص الذين لديهم وصول"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
@@ -1630,24 +3715,70 @@ msgstr "جداول بيانات Google"
 msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
 msgstr "لن يتم تخزين مجموعة البيانات هذه عبر الإنترنت ويمكن الوصول إليها فقط طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
+msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم في الزاوية السفلى اليسرى."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Edit permissions"
+msgstr "تحرير الأذونات"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "queried"
 msgstr "تم الاستعلام"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Chat message"
+msgstr "رسالة الدردشة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Error saving dataset"
 msgstr "خطأ في حفظ مجموعة البيانات"
 
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/routes/_auth/$workspaceSlug/profile.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
 msgstr "احفظ"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From Google Sheets"
+msgstr "من Google Sheets"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Subscription updated successfully"
+msgstr "تم تحديث الاشتراك بنجاح"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "القيمة الافتراضية"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "No numeric columns available to add to this series."
+msgstr "لا توجد أعمدة رقمية متاحة لإضافتها إلى هذه السلسلة."
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't chosen a name column"
+msgstr "لم تختار عمود الاسم"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+msgid "You need admin access on this resource to manage sharing."
+msgstr "تحتاج إلى وصول إداري على هذا المورد لإدارة المشاركة."
+
+#. placeholder {0}: state.singularEntityConfigName
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "If there are multiple {fieldName} values for one {0}, then..."
+msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد {0}، فـ..."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Select rule (e.g. most frequent)"
+msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Multi-select"
@@ -1664,6 +3795,10 @@ msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "يغطي <0>{0}</0>، من <1>{1}</1> إلى <2>{2}</2>."
 
+#: src/views/EntityManagerApp/EntityNavbar.tsx
+msgid "Loading more..."
+msgstr "تحميل المزيد..."
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL (optional)"
 msgstr "رابط مخصص (اختياري)"
@@ -1676,6 +3811,14 @@ msgstr "تم حفظ اسم مساحة العمل بنجاح."
 msgid "dataset name"
 msgstr "اسم مجموعة البيانات"
 
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Email address updated"
+msgstr "تم تحديث عنوان البريد الإلكتروني"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "These are too big for web and are only available on Avandar Desktop"
+msgstr "هذه كبيرة جدًا للويب ومتاحة فقط على Avandar Desktop"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
 msgstr "رسم حر"
@@ -1685,13 +3828,33 @@ msgid "Permanent link (use for QR codes)"
 msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "الإعدادات"
 
+#: src/components/AppShell/Navbar/Navbar.tsx
+msgid "Switch Workspace"
+msgstr "تبديل مساحة العمل"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Export canvas"
+msgstr "تصدير اللوحة"
+
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
+msgid "Pick user groups for this member"
+msgstr "اختر مجموعات المستخدمين لهذا العضو"
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Admin"
+msgstr "مدير"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "Published"
@@ -1705,21 +3868,72 @@ msgstr "الفلاتر (أين)"
 msgid "Single-select"
 msgstr "تحديد فردي"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "(clean)"
+msgstr "(نظيف)"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Loading sharing settings…"
+msgstr "جارٍ تحميل إعدادات المشاركة…"
+
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
 msgstr "مساحتك على خطة مجانية، التي تدعم حتى 5 مجموعات بيانات. قم بالترقية إلى خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحتك."
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Editor"
+msgstr "محرر"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the people and groups listed above can access this {resource}."
+msgstr "يمكن فقط للأشخاص والمجموعات المذكورة أعلاه الوصول إلى هذا {resource}."
+
+#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
+msgid "Pending"
+msgstr "معلق"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "المنظمة"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
+msgid "billing portal."
+msgstr "بوابة الفوترة."
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't chosen a value column"
+msgstr "لم تختار عمود القيمة"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Text contains"
 msgstr "النص يحتوي على"
 
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
+msgstr "لتأكيد، اكتب <0>{MEDICAL_CONFIRMATION_PHRASE}</0> أدناه:"
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+msgid "Role for new share"
+msgstr "الدور للمشاركة الجديدة"
+
+#: src/components/FloatingPanel/FloatingPanel.tsx
+msgid "Expand panel"
+msgstr "توسيع اللوحة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Purchase {seatsToAdd} seats"
+msgstr "شراء {seatsToAdd} مقاعد"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Share link"
 msgstr "رابط المشاركة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "Current Plan"
+msgstr "الخطة الحالية"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
@@ -1730,13 +3944,37 @@ msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUI
 msgid "No rows were read successfully"
 msgstr "لم تتم قراءة أي صفوف بنجاح"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "New user group"
+msgstr "مجموعة مستخدمين جديدة"
+
+#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+msgid "None of the above"
+msgstr "لا شيء مما سبق"
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Amber"
 msgstr "كهرماني"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Enable voice prompting"
+msgstr "تفعيل التوجيه الصوتي"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Configure how to join datasets"
+msgstr "تكوين كيفية الانضمام إلى مجموعات البيانات"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Excel"
 msgstr "إكسل"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "Dataset columns"
+msgstr "أعمدة مجموعة البيانات"
+
+#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
+msgid "Branches"
+msgstr "الفروع"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
@@ -1746,9 +3984,18 @@ msgstr "ستكون مجموعة البيانات هذه متاحة فقط في �
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنترنت. انقر لجعلها متاحة فقط في وضع عدم الاتصال."
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
+msgid "X Axis (numeric)"
+msgstr "المحور السيني (رقمي)"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
 msgstr "حاول مرة أخرى."
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+msgid "We should join data into the same {entityConfigName} when…"
+msgstr "يجب علينا دمج البيانات في نفس {entityConfigName} عندما..."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "contains"
@@ -1757,6 +4004,11 @@ msgstr "يحتوي على"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "إضافة فلتر"
+
+#: src/components/AppShell/Navbar/Navbar.tsx
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Profile"
+msgstr "الملف الشخصي"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -1767,21 +4019,49 @@ msgstr "هل أنت متأكد أنك تريد حذف <0>{0}</0> بشكل دائ
 msgid "Column outline"
 msgstr "مخطط العمود"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."
+msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. المشاهد = قراءة فقط، المحرر = تعديل المحتوى، المسؤول = التحكم الكامل بما في ذلك المشاركة."
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
 msgstr "معرف الفلتر (ثابت)"
+
+#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+msgid "No columns available"
+msgstr "لا توجد أعمدة متاحة"
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+msgid "Pan"
+msgstr "تحريك"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
 msgstr "غير قادر على جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال"
 
+#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+msgid "Enter comment"
+msgstr "أدخل تعليق"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "No entries yet. The log fills in as the chat panel asks for consent."
+msgstr "لا توجد إدخالات حتى الآن. يتم ملء السجل مع طلب موافقة لوحة الدردشة."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset name"
 msgstr "اسم مجموعة البيانات"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Source column"
+msgstr "عمود المصدر"
+
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of columns"
 msgstr "عدد الأعمدة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Edit role group"
+msgstr "تحرير مجموعة الأدوار"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
@@ -1791,23 +4071,77 @@ msgstr "الملفات الشخصية"
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Count rows in {name} by category"
+msgstr "عد الصفوف في {name} حسب الفئة"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Cancelled"
+msgstr "تم الإلغاء"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Role group created"
+msgstr "تم إنشاء مجموعة الأدوار"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Failed to update display name"
+msgstr "فشل في تحديث اسم العرض"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
 msgstr "اللغة"
 
+#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+msgid "Close panel (⌘/)"
+msgstr "إغلاق اللوحة (⌘/)"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
+msgid "Y Axis (numeric)"
+msgstr "المحور الصادي (رقمي)"
+
+#: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
+msgid "Regenerate with the error"
+msgstr "إعادة التوليد مع الخطأ"
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
 msgstr "تعذر قراءة الملف"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
+msgid "Pay what you want"
+msgstr "ادفع ما تريد"
+
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Remove {0}"
+msgstr "إزالة {0}"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/SharedWithMeView/SharedDashboardSection/SharedDashboardSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "لوحات المعلومات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
 msgstr "عدد صحيح"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Transcription failed"
+msgstr "فشل النسخ"
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Symbol color"
+msgstr "لون الرمز"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+msgid "Custom clarification answer"
+msgstr "إجابة توضيحية مخصصة"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -1823,10 +4157,31 @@ msgstr "المطالبة"
 msgid "Count"
 msgstr "العدد"
 
+#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
+msgid "Some datasets are missing data"
+msgstr "بعض مجموعات البيانات تفتقر إلى البيانات"
+
+#: src/components/badges/BetaBadge/BetaBadge.tsx
+msgid "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
+msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل بعض الميزات كما هو متوقع وقد لا تزال قيد الإنشاء. نقدر صبرك وملاحظاتك بينما نعمل على تحسين المنتج."
+
+#: src/routes/register.tsx
+msgid "Thank you for your interest!"
+msgstr "شكرًا لاهتمامك!"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
 msgstr "عام"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
+msgid "User groups for invitee"
+msgstr "مجموعات المستخدمين للمدعوين"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "Recommended"
+msgstr "موصى به"
+
+#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Select all"
 msgstr "تحديد الكل"
@@ -1835,10 +4190,23 @@ msgstr "تحديد الكل"
 msgid "Only what's queried (recommended)"
 msgstr "فقط ما تم استعلامه (موصى به)"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+msgid "What field should be used as a {singularEntityConfigName}'s name?"
+msgstr "ما الحقل الذي يجب استخدامه كاسم لـ {singularEntityConfigName}؟"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
 msgstr "معاينة لوحة المعلومات هذه"
 
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+msgid "No value"
+msgstr "لا قيمة"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Shape"
+msgstr "شكل"
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
 msgstr "الأعضاء"
@@ -1847,10 +4215,27 @@ msgstr "الأعضاء"
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
 msgstr "رابط قصير وسهل التذكر للنشرات والتقارير وأكواد QR. أي شيء تكتبه يتم تحويله تلقائيًا إلى تنسيق kebab."
 
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Value"
+msgstr "قيمة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You are currently subscribed to this plan."
+msgstr "أنت مشترك حاليًا في هذه الخطة."
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Upload a dataset"
+msgstr "تحميل مجموعة بيانات"
+
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Invalid column type"
+msgstr "نوع العمود غير صالح"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
 msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
 
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "عمود"
@@ -1858,6 +4243,14 @@ msgstr "عمود"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Remove local filter"
 msgstr "إزالة الفلتر المحلي"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "This removes the user group from members and resources that use it."
+msgstr "هذا يزيل مجموعة المستخدمين من الأعضاء والموارد التي تستخدمها."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Microphone access denied"
+msgstr "تم رفض الوصول إلى الميكروفون"
 
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 msgid "From your prompt:"
@@ -1875,13 +4268,42 @@ msgstr "فاصل"
 msgid "File loaded successfully"
 msgstr "تم تحميل الملف بنجاح"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Try one of these"
+msgstr "جرّب أحد هذه"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Invalid value column selected"
+msgstr "تم اختيار عمود قيمة غير صالح"
+
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "No columns have been added yet."
+msgstr "لم يتم إضافة أي أعمدة بعد."
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Display name updated"
+msgstr "تم تحديث اسم العرض"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
+msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
+msgstr "اختر إعداد مسبق لمساحة العمل أو خصصه لكل تطبيق. تتحكم مجموعات المستخدمين في تقاطعات الوصول إلى مجموعة البيانات ولوحة المعلومات."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "تم حفظ مجموعة البيانات"
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
+msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها لتحديد {entityConfigName} بشكل فريد."
+
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "نص"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+msgid "Role group deleted"
+msgstr "تم حذف مجموعة الدور"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
@@ -1895,19 +4317,94 @@ msgstr "حفظ مجموعة البيانات"
 msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
 
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Invalid Y axis selected"
+msgstr "تم اختيار محور Y غير صالح"
+
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: src/routes/forgot-password.tsx
+#: src/routes/register.tsx
+msgid "Invalid email address"
+msgstr "عنوان البريد الإلكتروني غير صالح"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "All steps succeeded. Click any node to open it on the canvas."
+msgstr "نجحت جميع الخطوات. انقر على أي عقدة لفتحها على اللوحة."
+
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "المستند المحدد: {0}"
+
+#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+msgid "Activity"
+msgstr "النشاط"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "No workspace was found"
+msgstr "لم يتم العثور على مساحة عمل"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
 msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعمدة أدناه للتأكد من صحتها. إذا لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة أخرى."
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
+msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مقاعدها {totalSeats}."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Could not transcribe your audio."
+msgstr "لم يتمكن من نسخ صوتك."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
+msgid "{formattedPriceToDisplay}/seat"
+msgstr "{formattedPriceToDisplay}/مقعد"
+
+#: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
+msgid "That query failed"
+msgstr "فشلت هذه الاستعلام"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Explore your data"
+msgstr "استكشف بياناتك"
+
+#: src/routes/forgot-password.tsx
+msgid "Enter your email address"
+msgstr "أدخل عنوان بريدك الإلكتروني"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+msgid "Delete user group"
+msgstr "احذف مجموعة المستخدمين"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a line chart showing trends in {target} over time"
+msgstr "أضف مخطط خطي يظهر الاتجاهات في {target} مع مرور الوقت"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Downloaded on this device"
+msgstr "تم تنزيله على هذا الجهاز"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "مزامنة عبر الإنترنت؟"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Neutral failure"
+msgstr "فشل محايد"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Please try again or reach out to support."
+msgstr "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "General access"
+msgstr "الوصول العام"
+
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "Review and approve the plan"
+msgstr "راجع ووافق على الخطة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -1922,13 +4419,38 @@ msgstr "نسخ الرابط"
 msgid "Delete {0}"
 msgstr "حذف {0}"
 
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+msgid "Slice colors"
+msgstr "قطع الألوان"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
+msgid "Save changes"
+msgstr "احفظ التغييرات"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
 msgstr "فشل تحميل ورقة Google"
 
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "Type the confirmation phrase"
+msgstr "اكتب عبارة التأكيد"
+
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "You have not created any dashboards"
 msgstr "لم تقم بإنشاء أي لوحات معلومات"
+
+#: src/components/badges/BetaBadge/BetaBadge.tsx
+msgid "Beta"
+msgstr "بيتا"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Search by name or user group"
+msgstr "ابحث بالاسم أو مجموعة المستخدمين"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Failed to update email"
+msgstr "فشل في تحديث البريد الإلكتروني"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -1946,10 +4468,18 @@ msgstr "تم الوصول إلى حد مجموعة البيانات"
 msgid "Distinct values"
 msgstr "قيم مميزة"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
+msgid "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
+msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيير هذه الخطة. سيتم تحديث اشتراكك وفقًا لذلك."
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
 msgstr "مجموعة بيانات مشتقة"
+
+#: src/components/AppShell/AppShell.tsx
+msgid "Search..."
+msgstr "ابحث..."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
@@ -1958,6 +4488,26 @@ msgstr "يرجى إلقاء نظرة على البيانات والتأكد من
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Stroke ({strokeWidth}px)"
 msgstr "سمك الخط ({strokeWidth}px)"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Annual"
+msgstr "سنوي"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
+msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء الاصطناعي وقد يسجل الطلب."
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Selected"
+msgstr "محدد"
+
+#: src/components/AppDropzone/AppDropzone.tsx
+msgid "CSV or Excel file"
+msgstr "ملف CSV أو Excel"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "End transcription"
+msgstr "إنهاء النسخ"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -1979,23 +4529,56 @@ msgstr "قم بإصلاح هذه المشكلات قبل الحفظ"
 msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
 msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا أيضًا."
 
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
+msgid "Hello DateValueItem"
+msgstr "مرحبًا DateValueItem"
+
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
+#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+msgid "Entity failed to load"
+msgstr "فشل تحميل الكيان"
+
+#: src/routes/_auth/$workspaceSlug/profile.tsx
+msgid "Used to sign in to your account."
+msgstr "يستخدم لتسجيل الدخول إلى حسابك."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Role & user groups"
+msgstr "الدور ومجموعات المستخدمين"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Clear all"
 msgstr "مسح الكل"
 
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+#: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
 msgstr "إغلاق"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
+msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} مقعد."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "مشارك معك"
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+msgid "Longitude column"
+msgstr "عمود الطول"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
 
+#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Share"
 msgstr "مشاركة"
@@ -2004,10 +4587,20 @@ msgstr "مشاركة"
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
+#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+msgid "Invalid date"
+msgstr "تاريخ غير صالح"
+
+#. placeholder {0}: state.nodes.length
+#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
+msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
+msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "بعض"
 
+#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "سهم"
@@ -2015,6 +4608,10 @@ msgstr "سهم"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Values, comma-separated"
 msgstr "قيم، مفصولة بفواصل"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "You haven't chosen a Y axis"
+msgstr "لم تختار محور Y"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
@@ -2025,6 +4622,30 @@ msgstr "+{0} قيم إضافية مرتبطة بـ {1} صفوف"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "فضفاض"
+
+#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
+msgid "Annotation text"
+msgstr "نص التعليق"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
+msgstr "ترقية الخطة إلى {newPlanName} ({newPlanSubType})"
+
+#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+msgid "No models match your search"
+msgstr "لا توجد نماذج تطابق بحثك"
+
+#: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
+msgid "Recommended next steps"
+msgstr "الخطوات التالية الموصى بها"
+
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+msgid "From column: <0>{columnName}</0>"
+msgstr "من العمود: <0>{columnName}</0>"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Set up voice prompting"
+msgstr "إعداد التوجيه الصوتي"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"
@@ -2038,9 +4659,17 @@ msgstr "عرض رمز QR"
 msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
 msgstr "بشكل افتراضي، نستخدم رابط دائم يعتمد على UUID. أضف مسارًا مخصصًا أدناه للحصول على عنوان URL أجمل."
 
+#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+msgid "Choose the minimum value"
+msgstr "اختر القيمة الدنيا"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Mode"
 msgstr "وضع"
+
+#: packages/web/ui/src/notifications/notify.ts
+msgid "Success"
+msgstr "نجاح"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerApp.tsx

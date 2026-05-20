@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -95,6 +96,7 @@ export function FloatingPanel({
   openOriginRef,
   children,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const panelRef = useRef<HTMLDivElement>(null);
   const usesMorphTransition = openOriginRef != null;
   // Mantine's `useFloatingWindow` lists `onPositionChange` and each
@@ -202,26 +204,29 @@ export function FloatingPanel({
             </Text>
           </Group>
           <Group gap={2} wrap="nowrap" className={css.actions}>
-            <Tooltip label={collapsed ? "Expand" : "Collapse"} openDelay={400}>
+            <Tooltip
+              label={collapsed ? t`Expand` : t`Collapse`}
+              openDelay={400}
+            >
               <ActionIcon
                 variant="subtle"
                 size="sm"
                 color="neutral"
                 onClick={onToggleCollapse}
-                aria-label={collapsed ? "Expand panel" : "Collapse panel"}
+                aria-label={collapsed ? t`Expand panel` : t`Collapse panel`}
               >
                 {collapsed ?
                   <IconChevronDown size={14} />
                 : <IconChevronUp size={14} />}
               </ActionIcon>
             </Tooltip>
-            <Tooltip label="Close" openDelay={400}>
+            <Tooltip label={t`Close`} openDelay={400}>
               <ActionIcon
                 variant="subtle"
                 size="sm"
                 color="neutral"
                 onClick={onClose}
-                aria-label={`Close ${title}`}
+                aria-label={t`Close ${title}`}
               >
                 <IconX size={14} />
               </ActionIcon>

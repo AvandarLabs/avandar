@@ -1,4 +1,5 @@
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
@@ -20,6 +21,7 @@ export function ChatPanel(): JSX.Element {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
   const context = useChatPageContext();
+  const { t } = useLingui();
   const disabled =
     context.app !== "data-explorer" && context.app !== "dashboards";
 
@@ -35,16 +37,16 @@ export function ChatPanel(): JSX.Element {
           <Group gap="xs">
             <IconSparkles size={16} color="var(--mantine-color-primary-6)" />
             <Text size="sm" fw={600} c="neutral.9">
-              Ask Avandar
+              <Trans>Ask Avandar</Trans>
             </Text>
           </Group>
-          <Tooltip label="Close panel (⌘/)">
+          <Tooltip label={t`Close panel (⌘/)`}>
             <ActionIcon
               variant="subtle"
               size="sm"
               color="neutral"
               onClick={dispatch.close}
-              aria-label="Close chat panel"
+              aria-label={t`Close chat panel`}
             >
               <IconX size={16} />
             </ActionIcon>

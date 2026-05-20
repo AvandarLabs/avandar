@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ColorInput, Divider } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
@@ -21,6 +22,7 @@ export function FunnelChartForm({
   data,
   onConfigChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
   }, [fields]);
@@ -53,13 +55,13 @@ export function FunnelChartForm({
       <Select
         allowDeselect
         data={fieldOptions}
-        label="Name column"
+        label={t`Name column`}
         value={nameKey}
         disabled={fieldOptions.length === 0}
         placeholder={
           fieldOptions.length === 0 ?
-            "No columns are available"
-          : "Select a column"
+            t`No columns are available`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, nameKey: field ?? undefined });
@@ -69,13 +71,13 @@ export function FunnelChartForm({
       <Select
         allowDeselect
         data={numericFieldOptions}
-        label="Value column"
+        label={t`Value column`}
         value={valueKey}
         disabled={numericFieldOptions.length === 0}
         placeholder={
           numericFieldOptions.length === 0 ?
-            "There are no numeric columns"
-          : "Select a column"
+            t`There are no numeric columns`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, valueKey: field ?? undefined });
@@ -84,7 +86,7 @@ export function FunnelChartForm({
 
       {sliceNames.length > 0 ?
         <>
-          <Divider label="Slice colors" mt="sm" mb="xs" />
+          <Divider label={t`Slice colors`} mt="sm" mb="xs" />
           {sliceNames.map((name) => {
             return (
               <ColorInput

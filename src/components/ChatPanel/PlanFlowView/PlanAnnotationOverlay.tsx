@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import { useViewport } from "@xyflow/react";
@@ -43,6 +44,7 @@ export function PlanAnnotationOverlay({
   const state = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
   const viewport = useViewport();
+  const { t } = useLingui();
 
   const annotations = useMemo(() => {
     return Object.values(state.annotations).filter((a) => {
@@ -105,7 +107,7 @@ export function PlanAnnotationOverlay({
       }
       const [x, y] = screenToCanvas(e.clientX, e.clientY);
       if (tool === "text") {
-        const text = window.prompt("Annotation text");
+        const text = window.prompt(t`Annotation text`);
         if (text && text.trim().length > 0) {
           const annotation: Omit<
             TextAnnotation,
@@ -122,7 +124,7 @@ export function PlanAnnotationOverlay({
           dispatch.addAnnotation({ annotation });
         }
       } else if (tool === "sticky") {
-        const text = window.prompt("Sticky note");
+        const text = window.prompt(t`Sticky note`);
         if (text && text.trim().length > 0) {
           const annotation: Omit<
             StickyAnnotation,
@@ -146,7 +148,7 @@ export function PlanAnnotationOverlay({
         (e.target as Element).setPointerCapture(e.pointerId);
       }
     },
-    [state.activeTool, planId, screenToCanvas, dispatch],
+    [state.activeTool, planId, screenToCanvas, dispatch, t],
   );
 
   const onPointerMove = useCallback(
@@ -390,6 +392,7 @@ function AnnotationRenderer({
 }
 
 function DeleteHandle({ onDelete }: { onDelete: () => void }): JSX.Element {
+  const { t } = useLingui();
   return (
     <ActionIcon
       size="xs"
@@ -404,7 +407,7 @@ function DeleteHandle({ onDelete }: { onDelete: () => void }): JSX.Element {
         e.stopPropagation();
         onDelete();
       }}
-      aria-label="Delete annotation"
+      aria-label={t`Delete annotation`}
     >
       <IconX size={10} />
     </ActionIcon>

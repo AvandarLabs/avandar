@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   BoxProps,
   Flex,
@@ -25,6 +26,7 @@ export function EntityNavbar({
   entityConfig,
   ...boxProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
@@ -107,7 +109,8 @@ export function EntityNavbar({
       if (isLoaderRow) {
         return {
           style,
-          loadingText: hasNextPage ? "Loading more..." : "Nothing more to load",
+          loadingText:
+            hasNextPage ? t`Loading more...` : t`Nothing more to load`,
         };
       }
 
@@ -133,12 +136,13 @@ export function EntityNavbar({
     borderStyle,
     hasNextPage,
     workspace.slug,
+    t,
   ]);
 
   return (
     <Flex bg="neutral.1" pt="lg" direction="column" {...boxProps}>
       <Title pl="sm" order={3} pb="sm">
-        {entityConfig.name} Manager
+        <Trans>{entityConfig.name} Manager</Trans>
       </Title>
 
       <ScrollArea viewportRef={parentRef} flex={1} mih={0}>

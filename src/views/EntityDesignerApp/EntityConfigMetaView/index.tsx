@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -41,6 +42,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
 };
 
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [sendDelete, isDeletePending] = EntityConfigClient.useDelete({
@@ -76,17 +78,17 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   });
                   setIsGeneratingEntities(false);
 
-                  notifySuccess(`Finished syncing ${entityConfig.name} data`);
+                  notifySuccess(t`Finished syncing ${entityConfig.name} data`);
                 } else {
                   notifications.show({
-                    title: "Cannot sync this entity",
-                    message: "No fields or dataset are configured.",
+                    title: t`Cannot sync this entity`,
+                    message: t`No fields or dataset are configured.`,
                     color: "red",
                   });
                 }
               }}
             >
-              Sync data!
+              <Trans>Sync data!</Trans>
             </Button>
           </Group>
           <Text>{entityConfig.description}</Text>
@@ -101,13 +103,15 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
             color="danger"
             onClick={() => {
               modals.openConfirmModal({
-                title: "Delete entity",
+                title: t`Delete entity`,
                 children: (
                   <Text>
-                    Are you sure you want to delete {entityConfig.name}?
+                    <Trans>
+                      Are you sure you want to delete {entityConfig.name}?
+                    </Trans>
                   </Text>
                 ),
-                labels: { confirm: "Delete", cancel: "Cancel" },
+                labels: { confirm: t`Delete`, cancel: t`Cancel` },
                 confirmProps: {
                   color: "danger",
                   loading: isDeletePending,
@@ -123,8 +127,8 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                         navigate(AppLinks.entityDesignerHome(workspace.slug));
 
                         notifications.show({
-                          title: "Entity deleted",
-                          message: `${entityConfig.name} deleted successfully`,
+                          title: t`Entity deleted`,
+                          message: t`${entityConfig.name} deleted successfully`,
                           color: "green",
                         });
                       },
@@ -134,7 +138,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
               });
             }}
           >
-            Delete Entity
+            <Trans>Delete Entity</Trans>
           </Button>
         </Stack>
       </Paper>

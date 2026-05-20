@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
@@ -82,11 +83,13 @@ export function EditableDisplayText({
   onCancel,
   isSaving = false,
   disabled = false,
-  emptyDisplayText = "Empty",
+  emptyDisplayText,
   isSaveDisabled = false,
   displayTextProps,
   ...passThroughProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedEmptyDisplayText = emptyDisplayText ?? t`Empty`;
   const [isEditing, setIsEditing] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -174,7 +177,7 @@ export function EditableDisplayText({
     useCheckTruncatedText<HTMLParagraphElement>([
       value,
       hasText,
-      emptyDisplayText,
+      resolvedEmptyDisplayText,
       passThroughProps.textarea,
     ]);
 
@@ -277,7 +280,7 @@ export function EditableDisplayText({
             disabled={disabled || isSaveDisabled}
           >
             <Group gap="xxs" align="bottom">
-              Save
+              <Trans>Save</Trans>
               <Text span size="xs" c="primary.6">
                 {keyboardShortcutSymbol}
               </Text>
@@ -289,10 +292,10 @@ export function EditableDisplayText({
             onClick={onCancelClick}
             disabled={disabled || isSaving}
           >
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Text size="xs" c="dimmed">
-            {keyboardShortcut} to save
+            <Trans>{keyboardShortcut} to save</Trans>
           </Text>
         </Group>
       </Box>
@@ -308,14 +311,14 @@ export function EditableDisplayText({
           fs={hasText ? undefined : "italic"}
           {...displayTextProps}
         >
-          {hasText ? value : emptyDisplayText}
+          {hasText ? value : resolvedEmptyDisplayText}
         </Text>
         <EditButton onClick={onStartEditing} disabled={disabled} name={name} />
       </Group>
     );
   }
 
-  const labelForTooltip = hasText ? value : emptyDisplayText;
+  const labelForTooltip = hasText ? value : resolvedEmptyDisplayText;
 
   return (
     <Group gap="xxs" align="center" wrap="nowrap" w="100%" miw={0}>
@@ -336,7 +339,7 @@ export function EditableDisplayText({
             fs={hasText ? undefined : "italic"}
             {...displayTextProps}
           >
-            {hasText ? value : emptyDisplayText}
+            {hasText ? value : resolvedEmptyDisplayText}
           </Text>
         </Tooltip>
       </Box>

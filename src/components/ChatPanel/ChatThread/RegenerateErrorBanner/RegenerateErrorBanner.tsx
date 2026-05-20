@@ -1,4 +1,5 @@
 import { useThreadRuntime } from "@assistant-ui/react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -19,6 +20,7 @@ export function RegenerateErrorBanner(): JSX.Element | null {
   const { lastQueryError, rawSQL } = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const threadRuntime = useThreadRuntime();
+  const { t } = useLingui();
 
   if (!lastQueryError || !rawSQL) {
     return null;
@@ -34,7 +36,7 @@ export function RegenerateErrorBanner(): JSX.Element | null {
         />
         <Stack gap={2} className={css.messageColumn}>
           <Text size="xs" fw={600} c="danger.9">
-            That query failed
+            <Trans>That query failed</Trans>
           </Text>
           <Text size="xs" c="neutral.7" className={css.errorText}>
             {lastQueryError}
@@ -56,13 +58,13 @@ export function RegenerateErrorBanner(): JSX.Element | null {
               content: [
                 {
                   type: "text",
-                  text: "That query failed. Please fix the SQL and try again.",
+                  text: t`That query failed. Please fix the SQL and try again.`,
                 },
               ],
             });
           }}
         >
-          Regenerate with the error
+          <Trans>Regenerate with the error</Trans>
         </Button>
       </Group>
     </Stack>

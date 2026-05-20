@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Button,
@@ -14,10 +15,10 @@ import {
 import { IconAlertCircle, IconHelp } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  _useClarificationNoneOfAboveLabel,
+  _useClarificationSomethingElseLabel,
   CLARIFICATION_NONE_OF_ABOVE,
-  CLARIFICATION_NONE_OF_ABOVE_LABEL,
   CLARIFICATION_SOMETHING_ELSE,
-  CLARIFICATION_SOMETHING_ELSE_LABEL,
 } from "./clarificationAnswer";
 import type { ClarificationSubmitAnswer } from "./clarificationAnswer";
 import type { ChatClarifyRequest } from "$/types/chat.types";
@@ -74,7 +75,7 @@ export function ClarificationCard({
               </Text>
             : null}
             <Text size="xs" c="dimmed">
-              Clarification {turnNumber} of 3
+              <Trans>Clarification {turnNumber} of 3</Trans>
             </Text>
           </Stack>
         </Group>
@@ -123,6 +124,7 @@ function FreeTextBody({
 }): JSX.Element {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLTextAreaElement>(null);
+  const { t } = useLingui();
 
   useEffect(() => {
     ref.current?.focus();
@@ -139,7 +141,7 @@ function FreeTextBody({
     <Stack gap="xs">
       <Textarea
         ref={ref}
-        placeholder={placeholder ?? "Type your answer..."}
+        placeholder={placeholder ?? t`Type your answer...`}
         autosize
         minRows={1}
         maxRows={4}
@@ -156,7 +158,7 @@ function FreeTextBody({
       />
       <Group justify="flex-end" gap="xs">
         <Button size="xs" onClick={submit} disabled={value.trim().length === 0}>
-          Send answer
+          <Trans>Send answer</Trans>
         </Button>
       </Group>
     </Stack>
@@ -175,6 +177,9 @@ function FixedOptionsBody({
   const [single, setSingle] = useState<string | null>(null);
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [customText, setCustomText] = useState("");
+  const { t } = useLingui();
+  const noneOfAboveLabel = _useClarificationNoneOfAboveLabel();
+  const somethingElseLabel = _useClarificationSomethingElseLabel();
 
   const isSomethingElseSelected =
     multi ?
@@ -245,7 +250,7 @@ function FixedOptionsBody({
           <Checkbox.Group
             value={multiSelected}
             onChange={handleMultiChange}
-            aria-label="Pick one or more"
+            aria-label={t`Pick one or more`}
           >
             <Stack gap={4}>
               {options.map((opt) => {
@@ -253,7 +258,7 @@ function FixedOptionsBody({
               })}
               <Checkbox
                 value={CLARIFICATION_SOMETHING_ELSE}
-                label={CLARIFICATION_SOMETHING_ELSE_LABEL}
+                label={somethingElseLabel}
               />
             </Stack>
           </Checkbox.Group>
@@ -265,14 +270,14 @@ function FixedOptionsBody({
                 setMultiSelected([...options]);
               }}
             >
-              Select all
+              <Trans>Select all</Trans>
             </Button>
           : null}
         </>
       : <Radio.Group
           value={single}
           onChange={handleSingleChange}
-          aria-label="Pick one"
+          aria-label={t`Pick one`}
         >
           <Stack gap={4}>
             {options.map((opt) => {
@@ -280,11 +285,11 @@ function FixedOptionsBody({
             })}
             <Radio
               value={CLARIFICATION_SOMETHING_ELSE}
-              label={CLARIFICATION_SOMETHING_ELSE_LABEL}
+              label={somethingElseLabel}
             />
             <Radio
               value={CLARIFICATION_NONE_OF_ABOVE}
-              label={CLARIFICATION_NONE_OF_ABOVE_LABEL}
+              label={noneOfAboveLabel}
             />
           </Stack>
         </Radio.Group>
@@ -292,7 +297,7 @@ function FixedOptionsBody({
 
       {isSomethingElseSelected ?
         <Textarea
-          placeholder="Describe your answer…"
+          placeholder={t`Describe your answer…`}
           autosize
           minRows={1}
           maxRows={4}
@@ -300,7 +305,7 @@ function FixedOptionsBody({
           onChange={(e) => {
             return setCustomText(e.currentTarget.value);
           }}
-          aria-label="Custom clarification answer"
+          aria-label={t`Custom clarification answer`}
         />
       : null}
 
@@ -315,11 +320,11 @@ function FixedOptionsBody({
             }}
             disabled={isSomethingElseSelected}
           >
-            {CLARIFICATION_NONE_OF_ABOVE_LABEL}
+            {noneOfAboveLabel}
           </Button>
         : null}
         <Button size="xs" onClick={submit} disabled={!canSubmit}>
-          Confirm
+          <Trans>Confirm</Trans>
         </Button>
       </Group>
     </Stack>
@@ -346,6 +351,7 @@ function DiscoveryBody({
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 }): JSX.Element {
   const [state, setState] = useState<DiscoveryState>({ kind: "loading" });
+  const { t } = useLingui();
 
   useEffect(() => {
     let cancelled = false;
@@ -353,7 +359,7 @@ function DiscoveryBody({
       if (!resolveDiscovery) {
         setState({
           kind: "error",
-          error: "Discovery is not available in this context.",
+          error: t`Discovery is not available in this context.`,
         });
         return;
       }
@@ -375,7 +381,7 @@ function DiscoveryBody({
         }
         setState({
           kind: "error",
-          error: e instanceof Error ? e.message : "Query failed.",
+          error: e instanceof Error ? e.message : t`Query failed.`,
         });
       }
     }
@@ -383,7 +389,7 @@ function DiscoveryBody({
     return () => {
       cancelled = true;
     };
-  }, [query, column, resolveDiscovery]);
+  }, [query, column, resolveDiscovery, t]);
 
   const queryPreview = useMemo(() => {
     return query.length > 200 ? `${query.slice(0, 200)}…` : query;
@@ -394,7 +400,7 @@ function DiscoveryBody({
       <Group gap="xs">
         <Loader size="xs" />
         <Text size="xs" c="dimmed">
-          Looking up values in {column}…
+          <Trans>Looking up values in {column}…</Trans>
         </Text>
       </Group>
     );
@@ -422,7 +428,10 @@ function DiscoveryBody({
     return (
       <Stack gap="xs">
         <Text size="xs" c="dimmed">
-          No values were returned from {column}. Describe what you need instead.
+          <Trans>
+            No values were returned from {column}. Describe what you need
+            instead.
+          </Trans>
         </Text>
         <DiscoveryCustomFallback onSubmit={onSubmit} />
       </Stack>
@@ -443,9 +452,10 @@ function DiscoveryCustomFallback({
 }: {
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   return (
     <FreeTextBody
-      placeholder="Type your answer…"
+      placeholder={t`Type your answer…`}
       onSubmit={(text) => {
         onSubmit({ kind: "custom", text });
       }}

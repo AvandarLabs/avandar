@@ -1,4 +1,5 @@
 import { ComposerPrimitive } from "@assistant-ui/react";
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
@@ -21,14 +22,16 @@ export function Composer(): JSX.Element {
   });
 
   const context = useChatPageContext();
+  const { t } = useLingui();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
   const disabled = !isChatEnabled;
 
   const placeholder =
-    context.app === "dashboards" ? "Ask me to add a chart to this dashboard..."
-    : context.app === "data-explorer" ? "Ask about your data..."
-    : "Chat is enabled in Data Explorer and Dashboards";
+    context.app === "dashboards" ?
+      t`Ask me to add a chart to this dashboard...`
+    : context.app === "data-explorer" ? t`Ask about your data...`
+    : t`Chat is enabled in Data Explorer and Dashboards`;
 
   return (
     <div ref={panelRef} className={css.composerContainer}>
@@ -54,7 +57,7 @@ export function Composer(): JSX.Element {
               variant="filled"
               color="primary"
               size="md"
-              aria-label="Send message"
+              aria-label={t`Send message`}
               disabled={disabled}
               className={css.composerSend}
             >

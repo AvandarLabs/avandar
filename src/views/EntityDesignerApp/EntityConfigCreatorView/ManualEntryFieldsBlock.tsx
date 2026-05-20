@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Button,
@@ -25,6 +26,7 @@ export function ManualEntryFieldsBlock({
   entityConfigForm,
   entityConfigId,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const { manualEntryFields } = entityConfigForm.getValues();
 
   const fieldRows = manualEntryFields.map((field, idx) => {
@@ -39,8 +41,8 @@ export function ManualEntryFieldsBlock({
           <TextInput
             key={fieldKeys.name}
             required
-            label="Field Name"
-            placeholder="Enter a name for the field"
+            label={t`Field Name`}
+            placeholder={t`Enter a name for the field`}
             flex={1}
             {...fieldInputProps.name()}
             onChange={(e) => {
@@ -65,12 +67,12 @@ export function ManualEntryFieldsBlock({
         <Group>
           <Checkbox
             key={fieldKeys.allowManualEdit}
-            label="Allow manual edit"
+            label={t`Allow manual edit`}
             {...fieldInputProps.allowManualEdit({ type: "checkbox" })}
           />
           <Checkbox
             key={fieldKeys.isArray}
-            label="Allow multiple values"
+            label={t`Allow multiple values`}
             {...fieldInputProps.isArray({ type: "checkbox" })}
           />
         </Group>
@@ -79,13 +81,15 @@ export function ManualEntryFieldsBlock({
   });
 
   return (
-    <Fieldset legend="Fields to be manually entered">
+    <Fieldset legend={t`Fields to be manually entered`}>
       <Stack>
         {entityConfigForm.errors.fields ?
           <Text c="danger">{entityConfigForm.errors.fields}</Text>
         : <>
             {fieldRows.length === 0 ?
-              <Text c="gray">No fields have been added</Text>
+              <Text c="gray">
+                <Trans>No fields have been added</Trans>
+              </Text>
             : fieldRows}
           </>
         }
@@ -96,13 +100,13 @@ export function ManualEntryFieldsBlock({
               "manualEntryFields",
               makeDefaultManualEntryField({
                 entityConfigId,
-                name: "New field",
+                name: t`New field`,
               }),
             );
             entityConfigForm.clearFieldError("fields");
           }}
         >
-          Add Field
+          <Trans>Add Field</Trans>
         </Button>
       </Stack>
     </Fieldset>

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Badge, Box, Group, Stack, Text } from "@mantine/core";
 import {
   IconAlertTriangle,
@@ -21,13 +22,24 @@ const STATUS_COLOR: Record<PlanStepStatus, string> = {
   skipped: "yellow",
 };
 
-const STATUS_LABEL: Record<PlanStepStatus, string> = {
-  pending: "Pending",
-  running: "Running…",
-  succeeded: "Ready",
-  failed: "Failed",
-  skipped: "Skipped",
-};
+/**
+ * Returns the localized label shown on a plan step's status badge.
+ */
+function _useStatusLabel(status: PlanStepStatus): string {
+  const { t } = useLingui();
+  switch (status) {
+    case "pending":
+      return t`Pending`;
+    case "running":
+      return t`Running…`;
+    case "succeeded":
+      return t`Ready`;
+    case "failed":
+      return t`Failed`;
+    case "skipped":
+      return t`Skipped`;
+  }
+}
 
 function StatusIcon({ status }: { status: PlanStepStatus }): JSX.Element {
   switch (status) {
@@ -78,6 +90,12 @@ export type PlanStepNodeData = {
 export function PlanStepNode(props: NodeProps): JSX.Element {
   const data = props.data as PlanStepNodeData;
   const { step, index, isFocused } = data;
+  const { t } = useLingui();
+  const statusLabel = _useStatusLabel(step.status);
+  const colCountSuffix =
+    step.actualSchema && step.actualSchema.length > 0 ?
+      t` · ${step.actualSchema.length} cols`
+    : "";
   return (
     <Box
       style={{
@@ -112,7 +130,7 @@ export function PlanStepNode(props: NodeProps): JSX.Element {
             <StatusIcon status={step.status} />
           </Group>
           <Badge size="xs" variant="light" color={STATUS_COLOR[step.status]}>
-            {STATUS_LABEL[step.status]}
+            {statusLabel}
           </Badge>
         </Group>
 
@@ -123,10 +141,7 @@ export function PlanStepNode(props: NodeProps): JSX.Element {
         {step.status === "succeeded" ?
           <Stack gap={2}>
             <Text size="xs" c="dimmed" ff="monospace">
-              {step.rowCount ?? 0} rows
-              {step.actualSchema && step.actualSchema.length > 0 ?
-                ` · ${step.actualSchema.length} cols`
-              : null}
+              {t`${step.rowCount ?? 0} rows${colCountSuffix}`}
             </Text>
             {step.actualSchema && step.actualSchema.length > 0 ?
               <Text

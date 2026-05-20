@@ -1,5 +1,6 @@
 import { useComposerRuntime } from "@assistant-ui/react";
 import { useBoolean } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Button,
@@ -72,6 +73,7 @@ function VoiceModelSelectOption({
   checked,
   isDesktopPlatform,
 }: VoiceModelSelectOptionProps): JSX.Element {
+  const { t } = useLingui();
   const model = VOICE_MODELS.find((entry) => {
     return entry.id === option.value;
   });
@@ -82,7 +84,7 @@ function VoiceModelSelectOption({
         <Text size="sm">{option.label}</Text>
         {checked ?
           <Text size="xs" c="primary">
-            Selected
+            <Trans>Selected</Trans>
           </Text>
         : null}
       </Group>
@@ -90,7 +92,7 @@ function VoiceModelSelectOption({
   }
   return (
     <Tooltip
-      label="These are too big for web and are only available on Avandar Desktop"
+      label={t`These are too big for web and are only available on Avandar Desktop`}
       position="right"
       withinPortal
     >
@@ -99,7 +101,7 @@ function VoiceModelSelectOption({
           {option.label}
         </Text>
         <Text size="xs" c="neutral.6">
-          Desktop only
+          <Trans>Desktop only</Trans>
         </Text>
       </Group>
     </Tooltip>
@@ -123,6 +125,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const isDesktopPlatform = platform === "desktop";
   const workspace = useCurrentWorkspace();
   const { locale: workspaceLocale } = useWorkspaceLanguage(workspace.id);
+  const { t } = useLingui();
   const workspaceVoiceLanguage = voiceLanguageForLocale(workspaceLocale);
   const [language, setLanguage] = useState<VoiceLanguageCode>(() => {
     return readStoredVoiceLanguage() ?? workspaceVoiceLanguage;
@@ -247,8 +250,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         const { anyDownloaded } = await refreshDownloadState();
         const model = findVoiceModel(modelId);
         notifications.show({
-          title: "Voice model removed",
-          message: `${model.displayName} was deleted from this device.`,
+          title: t`Voice model removed`,
+          message: t`${model.displayName} was deleted from this device.`,
           color: "success",
         });
         if (!anyDownloaded) {
@@ -256,18 +259,18 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         }
       } catch (error) {
         notifications.show({
-          title: "Could not remove voice model",
+          title: t`Could not remove voice model`,
           message:
             error instanceof Error ?
               error.message
-            : "Unable to delete the voice model from cache.",
+            : t`Unable to delete the voice model from cache.`,
           color: "danger",
         });
       } finally {
         setDeletingModelId(null);
       }
     },
-    [closeSettings, manager, refreshDownloadState],
+    [closeSettings, manager, refreshDownloadState, t],
   );
 
   const handleConfirmDownload = useCallback(
@@ -281,22 +284,22 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         await refreshDownloadState();
         const model = findVoiceModel(selectedModelId);
         notifications.show({
-          title: "Voice model ready",
-          message: `${model.displayName} downloaded. Tap the mic to start dictating.`,
+          title: t`Voice model ready`,
+          message: t`${model.displayName} downloaded. Tap the mic to start dictating.`,
           color: "success",
         });
       } catch (error) {
         notifications.show({
-          title: "Voice model download failed",
+          title: t`Voice model download failed`,
           message:
             error instanceof Error ?
               error.message
-            : "Unable to download the voice model.",
+            : t`Unable to download the voice model.`,
           color: "danger",
         });
       }
     },
-    [closeSettings, manager, refreshDownloadState, selectedModelId],
+    [closeSettings, manager, refreshDownloadState, selectedModelId, t],
   );
 
   const modelSelectData = VOICE_MODELS.map((model) => {
@@ -318,15 +321,15 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       setIsRecording(true);
     } catch (error) {
       notifications.show({
-        title: "Microphone access denied",
+        title: t`Microphone access denied`,
         message:
           error instanceof Error ?
             error.message
-          : "Could not access the microphone.",
+          : t`Could not access the microphone.`,
         color: "danger",
       });
     }
-  }, []);
+  }, [t]);
 
   const stopRecordingAndTranscribe = useCallback(async () => {
     const recorder = recorderRef.current;
@@ -349,25 +352,24 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         composerRuntime.setText(joined);
       } else {
         notifications.show({
-          title: "No speech detected",
-          message:
-            "We didn't catch anything — try again a bit closer to the mic.",
+          title: t`No speech detected`,
+          message: t`We didn't catch anything — try again a bit closer to the mic.`,
           color: "warning",
         });
       }
     } catch (error) {
       notifications.show({
-        title: "Transcription failed",
+        title: t`Transcription failed`,
         message:
           error instanceof Error ?
             error.message
-          : "Could not transcribe your audio.",
+          : t`Could not transcribe your audio.`,
         color: "danger",
       });
     } finally {
       setIsTranscribing(false);
     }
-  }, [composerRuntime, language, manager, selectedModelId]);
+  }, [composerRuntime, language, manager, selectedModelId, t]);
 
   const handleClick = useCallback(async () => {
     if (isRecording) {
@@ -382,10 +384,10 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   }, [isModelReady, isRecording, startRecording, stopRecordingAndTranscribe]);
 
   const tooltipLabel =
-    isRecording ? "Stop and transcribe"
-    : isTranscribing ? "Transcribing…"
-    : isModelReady ? "Speak (local voice-to-text)"
-    : "Set up voice prompting";
+    isRecording ? t`Stop and transcribe`
+    : isTranscribing ? t`Transcribing…`
+    : isModelReady ? t`Speak (local voice-to-text)`
+    : t`Set up voice prompting`;
 
   const Icon = isRecording ? IconMicrophoneOff : IconMicrophone;
   const selectedModel = findVoiceModel(selectedModelId);
@@ -412,12 +414,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             shadow="md"
           >
             <Popover.Target>
-              <Tooltip label="Voice settings" disabled={isSettingsOpen}>
+              <Tooltip label={t`Voice settings`} disabled={isSettingsOpen}>
                 <ActionIcon
                   variant="subtle"
                   color="neutral"
                   size="md"
-                  aria-label="Voice settings"
+                  aria-label={t`Voice settings`}
                   onClick={toggleSettings}
                   disabled={settingsDisabled}
                   className={css.button}
@@ -434,12 +436,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             >
               <Stack gap="sm">
                 <Text size="sm" fw={500}>
-                  Voice prompting
+                  <Trans>Voice prompting</Trans>
                 </Text>
                 <Stack gap="xs">
                   <Select
-                    label="Model"
-                    description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
+                    label={t`Model`}
+                    description={t`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
                     value={selectedModelId}
                     onChange={(value) => {
                       if (value) {
@@ -468,14 +470,14 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                           void handleConfirmDownload();
                         }}
                       >
-                        Download
+                        <Trans>Download</Trans>
                       </Button>
                     </Group>
                   : null}
                   {downloadedModelIds.length > 0 ?
                     <Stack gap={4}>
                       <Text size="xs" c="neutral.6">
-                        Downloaded on this device
+                        <Trans>Downloaded on this device</Trans>
                       </Text>
                       {downloadedModelIds.map((modelId) => {
                         const model = findVoiceModel(modelId);
@@ -490,12 +492,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                             <Text size="sm" truncate>
                               {model.displayName}
                             </Text>
-                            <Tooltip label={`Remove ${model.displayName}`}>
+                            <Tooltip label={t`Remove ${model.displayName}`}>
                               <ActionIcon
                                 variant="subtle"
                                 color="neutral"
                                 size="sm"
-                                aria-label={`Remove ${model.displayName}`}
+                                aria-label={t`Remove ${model.displayName}`}
                                 loading={isDeleting}
                                 disabled={
                                   settingsDisabled || deletingModelId !== null
@@ -514,8 +516,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                   : null}
                 </Stack>
                 <Select
-                  label="Language"
-                  description="Used when transcribing; does not change the model download."
+                  label={t`Language`}
+                  description={t`Used when transcribing; does not change the model download.`}
                   value={language}
                   onChange={handleVoiceLanguageChange}
                   data={languageSelectData}
@@ -531,14 +533,14 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             variant="light"
             color="danger"
             size="compact-sm"
-            aria-label="End transcription"
+            aria-label={t`End transcription`}
             className={css.endTranscription}
             onClick={() => {
               void stopRecordingAndTranscribe();
             }}
             disabled={disabled || isTranscribing}
           >
-            End transcription
+            <Trans>End transcription</Trans>
           </Button>
         : null}
 
@@ -565,20 +567,22 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         onClose={() => {
           setIsPromptOpen(false);
         }}
-        title="Enable voice prompting"
+        title={t`Enable voice prompting`}
         centered
         size="md"
       >
         <Stack gap="md">
           <Text size="sm">
-            Voice prompts run entirely on your device. To dictate, we need to
-            download a Whisper model from Hugging Face once. The download runs
-            in the background; progress appears in the bottom-left corner.
+            <Trans>
+              Voice prompts run entirely on your device. To dictate, we need to
+              download a Whisper model from Hugging Face once. The download runs
+              in the background; progress appears in the bottom-left corner.
+            </Trans>
           </Text>
 
           <Select
-            label="Model"
-            description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
+            label={t`Model`}
+            description={t`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
             value={selectedModelId}
             onChange={(value) => {
               if (value) {
@@ -599,8 +603,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
           />
 
           <Select
-            label="Language"
-            description="Whisper supports many languages; auto-detect handles mixed input."
+            label={t`Language`}
+            description={t`Whisper supports many languages; auto-detect handles mixed input.`}
             value={language}
             onChange={handleVoiceLanguageChange}
             data={languageSelectData}
@@ -614,7 +618,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                 setIsPromptOpen(false);
               }}
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
             <Button
               variant="filled"
@@ -623,7 +627,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                 void handleConfirmDownload();
               }}
             >
-              Download &amp; enable
+              <Trans>Download &amp; enable</Trans>
             </Button>
           </Group>
         </Stack>

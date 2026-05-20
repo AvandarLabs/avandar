@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui";
@@ -26,6 +27,7 @@ export function useWorkspaceInviteModal({
   numberOfSeats: number | undefined;
   roleGroups: readonly RoleGroupWithMatrix[];
 }): () => void {
+  const { t } = useLingui();
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
@@ -92,7 +94,7 @@ export function useWorkspaceInviteModal({
           rolesMatrix: matrix,
           userGroupIds: tagIds,
         });
-        notifySuccess({ title: "Invite sent" });
+        notifySuccess({ title: t`Invite sent` });
         modals.close(modalId);
       } catch {
         modals.updateModal({
@@ -103,10 +105,10 @@ export function useWorkspaceInviteModal({
     };
 
     modalId = modals.openConfirmModal({
-      title: "Invite a member",
+      title: t`Invite a member`,
       labels: {
-        confirm: "Send invite",
-        cancel: "Cancel",
+        confirm: t`Send invite`,
+        cancel: t`Cancel`,
       },
       closeOnConfirm: false,
       onConfirm: () => {
@@ -139,7 +141,7 @@ export function useWorkspaceInviteModal({
     ) {
       if (featurePlanType === "free") {
         return void modals.open({
-          title: "Seat limit reached",
+          title: t`Seat limit reached`,
           size: "100%",
           styles: {
             content: { height: "100%" },
@@ -147,9 +149,11 @@ export function useWorkspaceInviteModal({
           children: (
             <Stack>
               <Text>
-                Your workspace is on the Free plan, which supports up to 2
-                seats. To invite more team members, upgrade to a paid plan for
-                unlimited seats.
+                <Trans>
+                  Your workspace is on the Free plan, which supports up to 2
+                  seats. To invite more team members, upgrade to a paid plan
+                  for unlimited seats.
+                </Trans>
               </Text>
 
               <WorkspaceBillingView hideTitle hideIntroText />
@@ -159,7 +163,7 @@ export function useWorkspaceInviteModal({
       }
 
       return void modals.open({
-        title: "Additional seats required",
+        title: t`Additional seats required`,
         children: (
           <PurchaseSeatsModalContents
             subscription={workspace.subscription!}

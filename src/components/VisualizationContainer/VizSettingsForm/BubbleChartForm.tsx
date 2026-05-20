@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -16,6 +17,7 @@ export function BubbleChartForm({
   config,
   onConfigChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
       fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
@@ -30,13 +32,13 @@ export function BubbleChartForm({
       <Select
         allowDeselect
         data={numericFieldOptions}
-        label="X Axis (numeric)"
+        label={t`X Axis (numeric)`}
         value={xAxisKey}
         disabled={numericFieldOptions.length === 0}
         placeholder={
           numericFieldOptions.length === 0 ?
-            "There are no numeric columns"
-          : "Select a column"
+            t`There are no numeric columns`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, xAxisKey: field ?? undefined });
@@ -46,13 +48,13 @@ export function BubbleChartForm({
       <Select
         allowDeselect
         data={numericFieldOptions}
-        label="Y Axis (numeric)"
+        label={t`Y Axis (numeric)`}
         value={yAxisKey}
         disabled={numericFieldOptions.length === 0}
         placeholder={
           numericFieldOptions.length === 0 ?
-            "There are no numeric columns"
-          : "Select a column"
+            t`There are no numeric columns`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, yAxisKey: field ?? undefined });
@@ -62,13 +64,13 @@ export function BubbleChartForm({
       <Select
         allowDeselect
         data={numericFieldOptions}
-        label="Bubble size (numeric)"
+        label={t`Bubble size (numeric)`}
         value={sizeKey}
         disabled={numericFieldOptions.length === 0}
         placeholder={
           numericFieldOptions.length === 0 ?
-            "There are no numeric columns"
-          : "Select a column"
+            t`There are no numeric columns`
+          : t`Select a column`
         }
         onChange={(field) => {
           onConfigChange({ ...config, sizeKey: field ?? undefined });

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Center, Drawer, Loader, Title } from "@mantine/core";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceMemberPermissionsEditor } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor";
@@ -21,6 +22,7 @@ export function WorkspaceUserPermissionsDrawer({
   member,
   roleGroups,
 }: Props): JSX.Element | null {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
 
   const [remoteMatrix, remoteMatrixLoading] =
@@ -47,7 +49,7 @@ export function WorkspaceUserPermissionsDrawer({
       onClose={onClose}
       title={
         member ?
-          <Title order={4}>{`Edit access for ${member.displayName}`}</Title>
+          <Title order={4}>{t`Edit access for ${member.displayName}`}</Title>
         : null
       }
       position="right"

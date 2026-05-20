@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Badge, Text } from "@mantine/core";
 import type { SummarySpan } from "../buildShareSummary/buildShareSummary";
 
@@ -28,11 +29,12 @@ type Props = {
  * scope assertions to this exact line rather than the whole dialog.
  */
 export function ShareSummaryLine({ spans }: Props): JSX.Element {
+  const { t } = useLingui();
   return (
     <Text
       component="div"
       role="status"
-      aria-label="Share summary"
+      aria-label={t`Share summary`}
       size="sm"
       c="dimmed"
       lh={1.8}

@@ -1,4 +1,5 @@
 import { useLocalRuntime } from "@assistant-ui/react";
+import { useLingui } from "@lingui/react/macro";
 import { isNotNull, prop } from "@utils";
 import { useMemo, useRef } from "react";
 import { match } from "ts-pattern";
@@ -65,6 +66,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const { parseSql } = useSqlToStructuredQuery();
   const planDispatch = PlanStateManager.useDispatch();
   const planState = PlanStateManager.useState();
+  const { t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
   // inside `run()`. Including `pageContext` or `parseSql` in the adapter
   // useMemo deps recreates the adapter whenever SQL or dataset metadata
@@ -84,6 +86,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
   const workspaceIdRef = useRef(workspace.id);
   workspaceIdRef.current = workspace.id;
+
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -143,7 +148,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 content: [
                   {
                     type: "text" as const,
-                    text: "(Message not sent.)",
+                    text: tRef.current`(Message not sent.)`,
                   },
                 ],
               };
@@ -203,10 +208,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
           if (assumptionReview.needsApproval) {
             if (!currentUser) {
+              const notSignedInMessage = tRef.current`(SQL was not applied. Sign in to approve filter values.)`;
               const assistantParts: Array<{ type: "text"; text: string }> = [
                 {
                   type: "text",
-                  text: `${response.assistantText}\n\n(SQL was not applied. Sign in to approve filter values.)`,
+                  text: `${response.assistantText}\n\n${notSignedInMessage}`,
                 },
               ];
               return { content: assistantParts };
@@ -222,10 +228,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               explicitConsentRequired: assumptionReview.assumptionCapReached,
             });
             if (!consent.approved) {
+              const notApprovedMessage = tRef.current`(SQL was not applied. Approve the assumed filter values to run this query.)`;
               const assistantParts: Array<{ type: "text"; text: string }> = [
                 {
                   type: "text",
-                  text: `${response.assistantText}\n\n(SQL was not applied. Approve the assumed filter values to run this query.)`,
+                  text: `${response.assistantText}\n\n${notApprovedMessage}`,
                 },
               ];
               return { content: assistantParts };

@@ -1,4 +1,5 @@
 import { useBoolean, useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Burger,
@@ -58,6 +59,7 @@ export function Navbar({
   utilityLinks,
   currentWorkspace,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const router = useRouter();
   const navigate = useNavigate();
   const user = useCurrentUser();
@@ -81,7 +83,7 @@ export function Navbar({
     },
     onError: (error) => {
       notifications.show({
-        title: "Sign out failed",
+        title: t`Sign out failed`,
         message: error.message,
         color: "danger",
       });
@@ -172,7 +174,7 @@ export function Navbar({
                       router.navigate({ to: profileLink.to });
                     }}
                   >
-                    Profile
+                    <Trans>Profile</Trans>
                   </Menu.Item>
                   <Menu.Item
                     leftSection={
@@ -180,7 +182,7 @@ export function Navbar({
                     }
                     onClick={openCreateWorkspaceModal}
                   >
-                    Create Workspace
+                    <Trans>Create Workspace</Trans>
                   </Menu.Item>
                   {userWorkspaces && userWorkspaces?.length > 1 ?
                     <Menu.Sub>
@@ -190,7 +192,7 @@ export function Navbar({
                             <IconSwitch2 size={16} stroke={1.5} aria-hidden />
                           }
                         >
-                          Switch Workspace
+                          <Trans>Switch Workspace</Trans>
                         </Menu.Sub.Item>
                       </Menu.Sub.Target>
 
@@ -226,7 +228,7 @@ export function Navbar({
                   sendSignOutRequest();
                 }}
               >
-                Sign Out
+                <Trans>Sign Out</Trans>
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -314,7 +316,7 @@ export function Navbar({
         onClose={closeCreateWorkspaceModal}
       >
         <CreateWorkspaceForm
-          introText="Create a new workspace. You can always edit it later."
+          introText={t`Create a new workspace. You can always edit it later.`}
           onWorkspaceCreated={closeCreateWorkspaceModal}
         />
       </Modal>

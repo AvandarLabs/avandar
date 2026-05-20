@@ -41,11 +41,16 @@ vi.mock(
 );
 
 function TriggerButton({ file }: { file: File }): ReactElement {
+  const tFn = ((strings: TemplateStringsArray, ...values: unknown[]) => {
+    return strings.reduce((acc, str, i) => {
+      return acc + str + (values[i] ?? "");
+    }, "");
+  }) as unknown as Parameters<typeof openFileImportFlow>[1];
   return (
     <button
       type="button"
       onClick={() => {
-        return openFileImportFlow(file);
+        return openFileImportFlow(file, tFn);
       }}
     >
       open

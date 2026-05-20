@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Loader, Stack, Text } from "@mantine/core";
 import { propEq } from "@utils";
 import { SharedWithMeClient } from "@/clients/permissions/SharedWithMeClient";
@@ -14,6 +15,7 @@ import { SharedDatasetSection } from "./SharedDatasetSection/SharedDatasetSectio
  * which now grants access through the route middleware's resourceFallback.
  */
 export function SharedWithMeView(): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [resources, isLoading] = SharedWithMeClient.useListSharedWithMe({
     workspaceId: workspace.id,
@@ -25,13 +27,15 @@ export function SharedWithMeView(): JSX.Element {
   );
 
   return (
-    <AppLayout title="Shared with me">
+    <AppLayout title={t`Shared with me`}>
       <Container py="md">
         <Stack gap="lg">
           {isLoading ?
-            <Loader aria-label="Loading shared resources" />
+            <Loader aria-label={t`Loading shared resources`} />
           : (resources?.length ?? 0) === 0 ?
-            <Text c="dimmed">Nothing has been shared with you here.</Text>
+            <Text c="dimmed">
+              <Trans>Nothing has been shared with you here.</Trans>
+            </Text>
           : <>
               <SharedDatasetSection
                 items={datasets}

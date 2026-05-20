@@ -1,5 +1,5 @@
+import { useLingui } from "@lingui/react/macro";
 import { SegmentedControlItem } from "@mantine/core";
-import { prop } from "@utils";
 import {
   BasicPlanConfig,
   FreePlanConfig,
@@ -22,26 +22,39 @@ import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];
 
-export const FREE_CHOICES = [
-  { value: "custom", label: "Pay what you want" },
-  { value: "free", label: "Free" },
-] as const satisfies SegmentedControlItem[];
+const FREE_CHOICE_VALUES = ["custom", "free"] as const;
+const PAID_CHOICE_VALUES = ["year", "month"] as const;
 
-export const PAID_CHOICES = [
-  { value: "year", label: "Pay yearly" },
-  { value: "month", label: "Pay monthly" },
-] as const satisfies SegmentedControlItem[];
+/** Returns the localized free-plan variant choices for the segmented control. */
+export function useFreeChoices(): readonly SegmentedControlItem[] {
+  const { t } = useLingui();
+  return [
+    { value: "custom", label: t`Pay what you want` },
+    { value: "free", label: t`Free` },
+  ];
+}
 
+/** Returns the localized paid-plan variant choices for the segmented control. */
+export function usePaidChoices(): readonly SegmentedControlItem[] {
+  const { t } = useLingui();
+  return [
+    { value: "year", label: t`Pay yearly` },
+    { value: "month", label: t`Pay monthly` },
+  ];
+}
+
+/** Checks whether a value is a valid free-plan variant identifier. */
 export function isValidFreePlanVariant(
   choice: string,
 ): choice is FreePlanVariants {
-  return isOneOf(choice, FREE_CHOICES.map(prop("value")));
+  return isOneOf(choice, FREE_CHOICE_VALUES);
 }
 
+/** Checks whether a value is a valid paid-plan variant identifier. */
 export function isValidPaidPlanVariant(
   choice: string,
 ): choice is PaidPlanVariants {
-  return isOneOf(choice, PAID_CHOICES.map(prop("value")));
+  return isOneOf(choice, PAID_CHOICE_VALUES);
 }
 
 /**

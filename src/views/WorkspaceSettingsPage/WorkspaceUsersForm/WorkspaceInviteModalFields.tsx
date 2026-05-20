@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { Permissions } from "$/models/Permissions/Permissions";
@@ -43,6 +44,7 @@ export const WorkspaceInviteModalFields = forwardRef<
   { featurePlanType, userGroups, userGroupsLoading, onPressEnter }: Props,
   ref: ForwardedRef<WorkspaceInviteModalFieldsRef>,
 ): JSX.Element {
+  const { t } = useLingui();
   const innerFormRef = useRef<AvaFormRef<{ email: string }>>(null);
   const [rolesMatrix, setROlesMatrix] = useState<UserAppRolesMatrix>(
     Permissions.RolesMatrix.roleMatrixFromPresetType("global_viewer"),
@@ -69,10 +71,12 @@ export const WorkspaceInviteModalFields = forwardRef<
   return (
     <Stack>
       <Text size="sm" c="dimmed">
-        Type or paste an email below.
         {featurePlanType !== "free" ?
-          " Your workspace will be billed per member."
-        : null}
+          <Trans>
+            Type or paste an email below. Your workspace will be billed per
+            member.
+          </Trans>
+        : <Trans>Type or paste an email below.</Trans>}
       </Text>
       <AvaForm
         ref={innerFormRef}
@@ -81,7 +85,7 @@ export const WorkspaceInviteModalFields = forwardRef<
           email: AvaField.email({
             key: "email",
             initialValue: "",
-            label: "Email address",
+            label: t`Email address`,
           }),
         }}
         formElements={["email"]}
@@ -109,8 +113,8 @@ export const WorkspaceInviteModalFields = forwardRef<
         }}
       />
       <MultiSelect
-        label="User groups for invitee"
-        placeholder="Optional"
+        label={t`User groups for invitee`}
+        placeholder={t`Optional`}
         data={userGroups.map((g) => {
           return { value: g.id, label: g.name };
         })}

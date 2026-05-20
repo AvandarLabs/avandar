@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import { formatNumber } from "@utils";
 import type {
@@ -22,15 +23,16 @@ export function PaidPlanPriceRow({ discount, plan }: Props): JSX.Element {
     <Stack gap="xs">
       {discount && plan.planInterval === "year" ?
         <Text size="sm" c="green" fw={500}>
-          You save {discount}% compared to monthly billing
+          <Trans>You save {discount}% compared to monthly billing</Trans>
         </Text>
       : null}
       <Box w="100%">
         <Text size="xl" fw={600} mb="xs">
-          {formattedPriceToDisplay}/seat
+          <Trans>{formattedPriceToDisplay}/seat</Trans>
           <Text component="span" size="sm" fw={400} c="dimmed" ml="xs">
-            /month
-            {plan.planInterval === "year" ? " (paid yearly)" : null}
+            {plan.planInterval === "year" ?
+              <Trans>/month (paid yearly)</Trans>
+            : <Trans>/month</Trans>}
           </Text>
         </Text>
       </Box>

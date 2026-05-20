@@ -32,16 +32,22 @@ describe("AppDropzone", () => {
   it("delegates the drop handler to openFileImportFlow", () => {
     openFileImportFlowMock.mockClear();
     const file = new File(["a"], "test.csv", { type: "text/csv" });
+    const tFn = ((strings: TemplateStringsArray) => {
+      return strings.join("");
+    }) as unknown as Parameters<typeof onAppDropzoneDrop>[1];
 
-    onAppDropzoneDrop([file]);
+    onAppDropzoneDrop([file], tFn);
 
-    expect(openFileImportFlowMock).toHaveBeenCalledWith(file);
+    expect(openFileImportFlowMock).toHaveBeenCalledWith(file, tFn);
   });
 
   it("does not call openFileImportFlow when the drop has no files", () => {
     openFileImportFlowMock.mockClear();
+    const tFn = ((strings: TemplateStringsArray) => {
+      return strings.join("");
+    }) as unknown as Parameters<typeof onAppDropzoneDrop>[1];
 
-    onAppDropzoneDrop([]);
+    onAppDropzoneDrop([], tFn);
 
     expect(openFileImportFlowMock).not.toHaveBeenCalled();
   });

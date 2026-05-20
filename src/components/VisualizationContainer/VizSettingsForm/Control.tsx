@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   ColorInput,
   NumberInput,
@@ -149,6 +150,7 @@ function ColumnPickerControl({
   value: string | undefined;
   onChange: (next: unknown) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   const filtered = useMemo(() => {
     if (dataType === undefined || dataType === "any") {
       return fields;
@@ -183,7 +185,7 @@ function ColumnPickerControl({
       value={value ?? null}
       disabled={options.length === 0}
       placeholder={
-        options.length === 0 ? "No columns available" : "Select a column"
+        options.length === 0 ? t`No columns available` : t`Select a column`
       }
       onChange={(next) => {
         onChange(next ?? undefined);

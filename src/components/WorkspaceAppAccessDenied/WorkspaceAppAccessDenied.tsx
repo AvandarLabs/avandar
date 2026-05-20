@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 
@@ -9,16 +10,21 @@ type Props = {
  * Shown when a member opens a workspace app route without the required role.
  */
 export function WorkspaceAppAccessDenied({ appLabel }: Props): JSX.Element {
+  const { t } = useLingui();
   return (
-    <AppLayout title="Access denied">
+    <AppLayout title={t`Access denied`}>
       <Container py="xxxl" size="md">
-        <Title order={3}>Access denied</Title>
+        <Title order={3}>
+          <Trans>Access denied</Trans>
+        </Title>
         <Text mt="md" c="dimmed">
           {appLabel ?
-            `You do not have permission to open ${appLabel} in this workspace.`
-          : "You do not have permission to open this part of the workspace."
+            t`You do not have permission to open ${appLabel} in this workspace.`
+          : t`You do not have permission to open this part of the workspace.`
           }{" "}
-          Ask a workspace settings administrator to update your roles.
+          <Trans>
+            Ask a workspace settings administrator to update your roles.
+          </Trans>
         </Text>
       </Container>
     </AppLayout>

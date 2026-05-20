@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Loader, TextInput } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
@@ -70,9 +71,12 @@ export function InputTextForm({
   onCancel,
   showSubmitButton = true,
   showCancelButton = false,
-  submitButtonLabel = "Submit",
-  cancelButtonLabel = "Cancel",
+  submitButtonLabel,
+  cancelButtonLabel,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedSubmitLabel = submitButtonLabel ?? t`Submit`;
+  const resolvedCancelLabel = cancelButtonLabel ?? t`Cancel`;
   const form = useForm<SingleInputForm>({
     mode: "uncontrolled",
     initialValues: {
@@ -85,14 +89,15 @@ export function InputTextForm({
       value: (value) => {
         if (value.trim().length === 0) {
           // prevent a value that is only empty spaces
-          return "This field cannot be empty";
+          return t`This field cannot be empty`;
         }
 
         if (minLength && value.length < minLength) {
-          return `${hideLabel ? "This field" : label} must be at least ${minLength} characters long`;
+          const fieldName = hideLabel ? t`This field` : label;
+          return t`${fieldName} must be at least ${minLength} characters long`;
         }
         if (type === "email") {
-          return isEmail("Invalid email address")(value);
+          return isEmail(t`Invalid email address`)(value);
         }
         return null;
       },
@@ -119,7 +124,7 @@ export function InputTextForm({
             type="submit"
             disabled={isSubmitting || (validateOnChange && !form.isValid())}
           >
-            {submitButtonLabel}
+            {resolvedSubmitLabel}
             {isSubmitting ?
               <Loader />
             : null}
@@ -127,7 +132,7 @@ export function InputTextForm({
         : null}
         {showCancelButton ?
           <Button variant="default" onClick={onCancel}>
-            {cancelButtonLabel}
+            {resolvedCancelLabel}
           </Button>
         : null}
       </Group>

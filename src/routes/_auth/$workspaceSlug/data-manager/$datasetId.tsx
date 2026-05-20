@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import {
   createFileRoute,
@@ -33,6 +34,7 @@ function RouteComponent() {
 }
 
 function DatasetMetaErrorView({ error }: ErrorComponentProps) {
+  const { t } = useLingui();
   useEffect(() => {
     Logger.error(error);
   }, [error]);
@@ -40,8 +42,8 @@ function DatasetMetaErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%">
       <Callout
-        title="Dataset failed to load"
-        message="The dataset failed to load. Please try again later or reach out to support."
+        title={t`Dataset failed to load`}
+        message={t`The dataset failed to load. Please try again later or reach out to support.`}
       />
     </Center>
   );

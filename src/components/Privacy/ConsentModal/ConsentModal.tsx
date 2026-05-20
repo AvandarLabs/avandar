@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Badge,
@@ -78,6 +79,7 @@ export function ConsentModal({
   columnName,
   onClose,
 }: ConsentModalProps): JSX.Element {
+  const { t } = useLingui();
   const [piiAcknowledged, setPiiAcknowledged] = useState(false);
   const [confirmationPhrase, setConfirmationPhrase] = useState("");
 
@@ -98,14 +100,18 @@ export function ConsentModal({
       {mode === "clean" ?
         <>
           <Text size="sm">
-            Send <strong>{totalCount ?? sampleValues?.length ?? 0}</strong>{" "}
-            value
-            {(totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"} to the
-            AI?
+            <Trans>
+              Send{" "}
+              <strong>{totalCount ?? sampleValues?.length ?? 0}</strong> value
+              {(totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"} to
+              the AI?
+            </Trans>
           </Text>
           {columnName ?
             <Text size="xs" c="dimmed">
-              From column: <Code>{columnName}</Code>
+              <Trans>
+                From column: <Code>{columnName}</Code>
+              </Trans>
             </Text>
           : null}
           <Preview values={previewValues} />
@@ -117,23 +123,27 @@ export function ConsentModal({
           <Alert
             color={pii.severity === "critical" ? "red" : "yellow"}
             icon={<IconAlertTriangle size={18} />}
-            title="Personal data detected"
+            title={t`Personal data detected`}
           >
             <Text size="sm">
-              The values you selected may contain personal information. The AI
-              provider will receive them and may log the request.
+              <Trans>
+                The values you selected may contain personal information. The
+                AI provider will receive them and may log the request.
+              </Trans>
             </Text>
           </Alert>
 
           {columnName ?
             <Text size="xs" c="dimmed">
-              From column: <Code>{columnName}</Code>
+              <Trans>
+                From column: <Code>{columnName}</Code>
+              </Trans>
             </Text>
           : null}
 
           <Group gap="xs" wrap="wrap">
             <Text size="xs" c="dimmed">
-              Detected:
+              <Trans>Detected:</Trans>
             </Text>
             {pii.hits.map((h: PiiPatternHit, i) => {
               return (
@@ -157,7 +167,7 @@ export function ConsentModal({
           <Preview values={previewValues} />
 
           <Checkbox
-            label="I understand this data will be sent to the AI provider"
+            label={t`I understand this data will be sent to the AI provider`}
             checked={piiAcknowledged}
             onChange={(e) => {
               return setPiiAcknowledged(e.currentTarget.checked);
@@ -171,24 +181,28 @@ export function ConsentModal({
           <Alert
             color="red"
             icon={<IconHeartbeat size={18} />}
-            title="Health information detected"
+            title={t`Health information detected`}
           >
             <Text size="sm">
-              This data appears to contain health or patient information.
-              Sending it to an AI provider may have legal and ethical
-              implications (HIPAA, GDPR, etc.).
+              <Trans>
+                This data appears to contain health or patient information.
+                Sending it to an AI provider may have legal and ethical
+                implications (HIPAA, GDPR, etc.).
+              </Trans>
             </Text>
           </Alert>
 
           {columnName ?
             <Text size="xs" c="dimmed">
-              From column: <Code>{columnName}</Code>
+              <Trans>
+                From column: <Code>{columnName}</Code>
+              </Trans>
             </Text>
           : null}
 
           <Group gap="xs" wrap="wrap">
             <Text size="xs" c="dimmed">
-              Detected:
+              <Trans>Detected:</Trans>
             </Text>
             {pii.hits.map((h: PiiPatternHit, i) => {
               return (
@@ -208,7 +222,10 @@ export function ConsentModal({
 
           <Stack gap={4}>
             <Text size="sm" fw={500}>
-              To confirm, type <Code>{MEDICAL_CONFIRMATION_PHRASE}</Code> below:
+              <Trans>
+                To confirm, type <Code>{MEDICAL_CONFIRMATION_PHRASE}</Code>{" "}
+                below:
+              </Trans>
             </Text>
             <TextInput
               value={confirmationPhrase}
@@ -217,12 +234,12 @@ export function ConsentModal({
               }}
               placeholder={MEDICAL_CONFIRMATION_PHRASE}
               autoComplete="off"
-              aria-label="Type the confirmation phrase"
+              aria-label={t`Type the confirmation phrase`}
             />
           </Stack>
 
           <Checkbox
-            label="I have legal authority to share this data with the AI provider"
+            label={t`I have legal authority to share this data with the AI provider`}
             checked={piiAcknowledged}
             onChange={(e) => {
               return setPiiAcknowledged(e.currentTarget.checked);
@@ -236,23 +253,27 @@ export function ConsentModal({
           <Alert
             color={pii.severity === "critical" ? "red" : "yellow"}
             icon={<IconAlertTriangle size={18} />}
-            title="Personal data + biased framing detected"
+            title={t`Personal data + biased framing detected`}
           >
             <Text size="sm">
-              We detected both potential personal information and language that
-              may bias the AI&apos;s answer. Review both below.
+              <Trans>
+                We detected both potential personal information and language
+                that may bias the AI&apos;s answer. Review both below.
+              </Trans>
             </Text>
           </Alert>
 
           {columnName ?
             <Text size="xs" c="dimmed">
-              From column: <Code>{columnName}</Code>
+              <Trans>
+                From column: <Code>{columnName}</Code>
+              </Trans>
             </Text>
           : null}
 
           <Group gap="xs" wrap="wrap">
             <Text size="xs" c="dimmed">
-              PII detected:
+              <Trans>PII detected:</Trans>
             </Text>
             {pii.hits.map((h: PiiPatternHit, i) => {
               return (
@@ -270,7 +291,7 @@ export function ConsentModal({
 
           <Group gap="xs" wrap="wrap">
             <Text size="xs" c="dimmed">
-              Bias detected:
+              <Trans>Bias detected:</Trans>
             </Text>
             {bias.map((h, i) => {
               return (
@@ -291,14 +312,14 @@ export function ConsentModal({
           {bias[0]?.suggestion ?
             <Stack gap={4}>
               <Text size="xs" c="dimmed">
-                Suggested rewrite:
+                <Trans>Suggested rewrite:</Trans>
               </Text>
               <Text size="sm">{bias[0].suggestion}</Text>
             </Stack>
           : null}
 
           <Checkbox
-            label="I understand this data will be sent to the AI provider"
+            label={t`I understand this data will be sent to the AI provider`}
             checked={piiAcknowledged}
             onChange={(e) => {
               return setPiiAcknowledged(e.currentTarget.checked);
@@ -312,17 +333,19 @@ export function ConsentModal({
           <Alert
             color="blue"
             icon={<IconBulb size={18} />}
-            title="Consider rephrasing"
+            title={t`Consider rephrasing`}
           >
             <Text size="sm">
-              Your question contains language that may bias the AI&apos;s
-              answer.
+              <Trans>
+                Your question contains language that may bias the AI&apos;s
+                answer.
+              </Trans>
             </Text>
           </Alert>
 
           <Group gap="xs" wrap="wrap">
             <Text size="xs" c="dimmed">
-              Detected:
+              <Trans>Detected:</Trans>
             </Text>
             {bias.map((h, i) => {
               return (
@@ -341,7 +364,7 @@ export function ConsentModal({
           {userText ?
             <Stack gap={4}>
               <Text size="xs" c="dimmed">
-                You wrote:
+                <Trans>You wrote:</Trans>
               </Text>
               <Code block>{userText}</Code>
             </Stack>
@@ -350,7 +373,7 @@ export function ConsentModal({
           {bias[0]?.suggestion ?
             <Stack gap={4}>
               <Text size="xs" c="dimmed">
-                Suggested:
+                <Trans>Suggested:</Trans>
               </Text>
               <Text size="sm">{bias[0].suggestion}</Text>
             </Stack>
@@ -366,7 +389,7 @@ export function ConsentModal({
             return onClose({ action: "cancel" });
           }}
         >
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
 
         {(
@@ -383,7 +406,7 @@ export function ConsentModal({
               return onClose({ action: "send", useSuggestion: true });
             }}
           >
-            Use suggestion
+            <Trans>Use suggestion</Trans>
           </Button>
         : null}
 
@@ -400,7 +423,7 @@ export function ConsentModal({
           }}
           data-autofocus={mode === "clean" || mode === "bias_nudge"}
         >
-          {mode === "bias_nudge" ? "Continue as-is" : "Send"}
+          {mode === "bias_nudge" ? t`Continue as-is` : t`Send`}
         </Button>
       </Group>
     </Stack>
@@ -418,7 +441,7 @@ function Preview({
   return (
     <Stack gap={4}>
       <Text size="xs" c="dimmed">
-        Preview:
+        <Trans>Preview:</Trans>
       </Text>
       <Stack gap={2} pl="sm">
         {values.map((value, i) => {
