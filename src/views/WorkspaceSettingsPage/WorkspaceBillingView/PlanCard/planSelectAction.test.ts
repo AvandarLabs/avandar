@@ -1,8 +1,5 @@
+import { BasicPlanConfig, FreePlanConfig } from "$/config/FeaturePlansConfig";
 import { describe, expect, it } from "vitest";
-import {
-  BasicPlanConfig,
-  FreePlanConfig,
-} from "$/config/FeaturePlansConfig";
 import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UUID } from "@utils/types/common.types";

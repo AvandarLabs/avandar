@@ -1,8 +1,8 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
-import type { UserId } from "$/models/User/User.types";
 import type { TablesInsert } from "../../../shared/types/database.types";
 import type { UUID } from "@utils/types/common.types";
+import type { UserId } from "$/models/User/User.types";
 
 /**
  * Ensures the workspace has a native free `subscriptions` row (no Polar).
