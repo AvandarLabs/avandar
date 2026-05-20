@@ -15,9 +15,22 @@ export type DataExplorerPanelPreferences = Partial<{
   settings: DataExplorerPanelPreference;
 }>;
 
-/** Local storage key for Data Explorer floating panel preferences. */
-export const DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY =
+/**
+ * Local storage key prefix for Data Explorer floating panel preferences.
+ * The full key is `${PREFIX}:${tabId}` so each browser tab gets its own
+ * isolated slot and tabs do not leak positions to one another.
+ */
+export const DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY_PREFIX =
   "ava.data-explorer.panel-preferences" as const;
+
+/**
+ * Builds the localStorage key for a given tab id.
+ */
+export function buildDataExplorerPanelPreferencesStorageKey(
+  tabId: string,
+): string {
+  return `${DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY_PREFIX}:${tabId}`;
+}
 
 function _sanitizePosition(
   value: unknown,
@@ -67,12 +80,14 @@ function _sanitizePreference(
 }
 
 /**
- * Reads persisted Data Explorer floating-panel preferences from local storage.
+ * Reads persisted Data Explorer floating-panel preferences for a given tab.
  */
-export function readDataExplorerPanelPreferences(): DataExplorerPanelPreferences {
+export function readDataExplorerPanelPreferences(
+  tabId: string,
+): DataExplorerPanelPreferences {
   try {
     const raw = window.localStorage.getItem(
-      DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
+      buildDataExplorerPanelPreferencesStorageKey(tabId),
     );
     if (!raw) {
       return {};
@@ -88,17 +103,32 @@ export function readDataExplorerPanelPreferences(): DataExplorerPanelPreferences
 }
 
 /**
- * Writes Data Explorer floating-panel preferences to local storage.
+ * Writes Data Explorer floating-panel preferences for a given tab.
  */
 export function writeDataExplorerPanelPreferences(
+  tabId: string,
   preferences: DataExplorerPanelPreferences,
 ): void {
   try {
     window.localStorage.setItem(
-      DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
+      buildDataExplorerPanelPreferencesStorageKey(tabId),
       JSON.stringify(preferences),
     );
   } catch {
     // Storage may be unavailable. The UI can still work in memory.
+  }
+}
+
+/**
+ * Removes the persisted preferences for the given tab id. Called when the
+ * tab is closing so we don't accumulate stale entries across sessions.
+ */
+export function clearDataExplorerPanelPreferences(tabId: string): void {
+  try {
+    window.localStorage.removeItem(
+      buildDataExplorerPanelPreferencesStorageKey(tabId),
+    );
+  } catch {
+    // Storage may be unavailable. Nothing else we can do.
   }
 }

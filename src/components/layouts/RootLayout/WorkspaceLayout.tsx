@@ -1,3 +1,4 @@
+import { ModalsProvider } from "@mantine/modals";
 import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
@@ -9,6 +10,7 @@ import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootW
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
+import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -99,24 +101,26 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
 
   return (
     <WorkspaceI18nProvider locale={locale}>
-      <DataExplorerStateManager.Provider>
-        <DashboardEditorStateManager.Provider>
-          <ChatPanelProvider>
-            <AppDropzone>
-              <AppShell
-                title={workspace.name}
-                currentWorkspace={workspace}
-                profileLink={profileLink}
-                navbarLinks={mainNavBarLinks}
-                utilityLinks={utilityNavBarLinks}
-                spotlightActions={spotlightActions}
-              >
-                {children}
-              </AppShell>
-            </AppDropzone>
-          </ChatPanelProvider>
-        </DashboardEditorStateManager.Provider>
-      </DataExplorerStateManager.Provider>
+      <ModalsProvider modalProps={{ zIndex: MODAL_ROOT_Z_INDEX }}>
+        <DataExplorerStateManager.Provider>
+          <DashboardEditorStateManager.Provider>
+            <ChatPanelProvider>
+              <AppDropzone>
+                <AppShell
+                  title={workspace.name}
+                  currentWorkspace={workspace}
+                  profileLink={profileLink}
+                  navbarLinks={mainNavBarLinks}
+                  utilityLinks={utilityNavBarLinks}
+                  spotlightActions={spotlightActions}
+                >
+                  {children}
+                </AppShell>
+              </AppDropzone>
+            </ChatPanelProvider>
+          </DashboardEditorStateManager.Provider>
+        </DataExplorerStateManager.Provider>
+      </ModalsProvider>
     </WorkspaceI18nProvider>
   );
 }

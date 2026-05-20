@@ -14,6 +14,8 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { useCallback, useRef } from "react";
+import { FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
 import css from "./FloatingPanel.module.css";
 import type { ReactNode } from "react";
 
@@ -75,6 +77,23 @@ export function FloatingPanel({
   width = 360,
   children,
 }: Props): JSX.Element {
+  // Mantine's `useFloatingWindow` lists `onPositionChange` and each
+  // `initialPosition.*` field in the drag effect's dependency array. If the
+  // parent passes a new inline callback or recomputes `initialPosition` (e.g.
+  // by persisting the live position to state), the effect tears down its
+  // event listeners mid-drag and the window stops being draggable. Stabilize
+  // both: forward the latest callback through a ref, and freeze
+  // `initialPosition` to the value captured on first render.
+  const onPositionChangeRef = useRef(onPositionChange);
+  onPositionChangeRef.current = onPositionChange;
+  const handlePositionChange = useCallback(
+    (position: FloatingPanelPosition) => {
+      onPositionChangeRef.current?.(position);
+    },
+    [],
+  );
+  const initialPositionRef = useRef(initialPosition);
+
   return (
     <Transition
       mounted={opened}
@@ -90,8 +109,9 @@ export function FloatingPanel({
             radius="md"
             withBorder
             w={width}
-            initialPosition={initialPosition}
-            onPositionChange={onPositionChange}
+            zIndex={FLOATING_PANEL_Z_INDEX}
+            initialPosition={initialPositionRef.current}
+            onPositionChange={handlePositionChange}
             dragHandleSelector={`.${css.header}`}
             excludeDragHandleSelector={`.${css.actions}`}
             className={css.root}

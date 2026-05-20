@@ -39,18 +39,26 @@ import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/Query
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import {
+  clearDataExplorerPanelPreferences,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+import { useDataExplorerTabId } from "@/views/DataExplorerApp/useDataExplorerTabId";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 
-const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
-const SETTINGS_INITIAL_POSITION = { top: 140, right: 32 };
 const QUERY_DETAILS_WIDTH = 380;
 const SETTINGS_WIDTH = 340;
+
+/**
+ * Default stacked layout: Query Details near the top-left of the canvas
+ * with Visualization Settings below it. Both anchor to the left edge so
+ * they share the same column.
+ */
+const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
+const SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
@@ -81,9 +89,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     isOpenDatasetDrawerOpen,
     { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
   ] = useDisclosure(false);
+  const tabId = useDataExplorerTabId();
   const [panelPreferences, setPanelPreferences] =
     useState<DataExplorerPanelPreferences>(() => {
-      return readDataExplorerPanelPreferences();
+      return readDataExplorerPanelPreferences(tabId);
     });
   const hasSavedQueryDetailsPreference =
     panelPreferences.queryDetails !== undefined;
@@ -114,8 +123,21 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   }, [hasSavedQueryDetailsPreference]);
 
   useEffect(() => {
-    writeDataExplorerPanelPreferences(panelPreferences);
-  }, [panelPreferences]);
+    writeDataExplorerPanelPreferences(tabId, panelPreferences);
+  }, [tabId, panelPreferences]);
+
+  // Wipe persisted panel positions when the browser tab closes so the next
+  // session starts from the default stacked layout. We don't want one tab's
+  // dragged layout bleeding into a new tab session.
+  useEffect(() => {
+    const handleUnload = (): void => {
+      clearDataExplorerPanelPreferences(tabId);
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, [tabId]);
 
   useDataExplorerURLSync({ urlSearch, navigate });
 

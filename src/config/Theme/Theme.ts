@@ -54,6 +54,13 @@ export const APP_SHELL_MAIN_Z_INDEX = 200;
  */
 export const MODAL_ROOT_Z_INDEX = 300;
 
+/**
+ * Floating panel z-index. Sits above the app shell (200) but below
+ * Mantine's default popover/combobox z-index (300) so that dropdowns
+ * opened inside a floating panel render on top of it.
+ */
+export const FLOATING_PANEL_Z_INDEX = 250;
+
 const interactiveTransition = AnimationTheme.transition.interactive;
 
 const COMBOBOX_DEFAULT_PROPS = AnimationTheme.combobox;
@@ -466,6 +473,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--ava-surface-raised": elevation.surfaces.light.raised,
       "--ava-surface-overlay": elevation.surfaces.light.overlay,
       "--ava-surface-sunken": elevation.surfaces.light.sunken,
+      "--ava-surface-panel-header": elevation.surfaces.light.panelHeader,
     },
     dark: {
       "--mantine-primary-color": theme.other.primaryColor,
@@ -479,6 +487,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--ava-surface-raised": elevation.surfaces.dark.raised,
       "--ava-surface-overlay": elevation.surfaces.dark.overlay,
       "--ava-surface-sunken": elevation.surfaces.dark.sunken,
+      "--ava-surface-panel-header": elevation.surfaces.dark.panelHeader,
 
       "--mantine-shadow-xs": elevation.shadows.xs,
       "--mantine-shadow-sm": elevation.shadows.sm,

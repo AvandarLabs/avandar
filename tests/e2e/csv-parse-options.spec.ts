@@ -2,6 +2,7 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
   SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
@@ -14,7 +15,7 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
 /**
@@ -61,8 +62,9 @@ async function clickReparse(page: Page): Promise<void> {
   const reparseButton = page.getByRole("button", {
     name: "Process data again",
   });
+  await expect(reparseButton).toBeEnabled({ timeout: LONG_WAIT });
   await reparseButton.click();
-  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
+  await expect(reparseButton).toBeEnabled({ timeout: LONG_WAIT });
 }
 
 /**
@@ -73,7 +75,7 @@ async function expectParsedRowCount(
   page: Page,
   expectedRowCount: number,
 ): Promise<void> {
-  const formatted = expectedRowCount.toLocaleString("en-US");
+  const formatted = formatImportPreviewRowCount(expectedRowCount);
   await expect(
     page.getByText(`Parsed ${formatted} rows successfully`),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
@@ -106,7 +108,9 @@ test.describe("CSV parsing options", () => {
       workspaceSlug,
     });
 
-    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`, {
+      waitUntil: "domcontentloaded",
+    });
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel

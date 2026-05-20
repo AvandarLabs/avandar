@@ -7,10 +7,7 @@
 }
 
 .header {
-  background: linear-gradient(
-    var(--mantine-color-neutral-0),
-    var(--mantine-color-neutral-1)
-  );
+  background: var(--ava-surface-panel-header);
   border-bottom: 1px solid
     var(--ava-border-default, var(--mantine-color-neutral-2));
   cursor: grab;
@@ -23,10 +20,6 @@
 }
 
 .root[data-dragging] .header {
-  background: linear-gradient(
-    var(--mantine-color-neutral-1),
-    var(--mantine-color-neutral-2)
-  );
   cursor: grabbing;
 }
 
