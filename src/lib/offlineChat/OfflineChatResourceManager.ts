@@ -104,7 +104,8 @@ export const OfflineChatResourceManager = new OfflineChatResourceManagerImpl();
 
 declare global {
   interface Window {
-    /** Playwright: drop cached engine so the next turn picks up an updated mock script. */
+    /** Playwright: drop cached engine so the next turn picks up an updated
+     * mock script. */
     __resetOfflineChatEngine?: () => Promise<void>;
   }
 }
