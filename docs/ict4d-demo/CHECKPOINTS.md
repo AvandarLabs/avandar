@@ -1242,13 +1242,11 @@ infrastructure is end-to-end but the translated surface is one page.
 
 - **LLM translator** (`scripts/i18n/translateWithLLM.ts`)
   - Parses each non-source `.po`, batches empty `msgstr` entries
-    (40 per request), sends them through OpenRouter with the existing
-    `OPEN_ROUTER_API_KEY` (default model `anthropic/claude-sonnet-4.5`,
-    overridable via `I18N_LLM_MODEL`), enforces JSON output, writes
-    each translation back into the same `.po` without re-ordering or
-    losing comments.
-  - Supports `--dry-run` and per-locale args
-    (`pnpm i18n:translate-llm -- fr es`).
+    (40 per request), enforces JSON output, writes each translation
+    back into the same `.po` without re-ordering or losing comments.
+  - **Updated in Checkpoint 12.5** (see below): now uses the OpenAI
+    Chat Completions API (not OpenRouter) and has a real CLI with
+    `--help`, `--scope`, `--locale`, `--all`, `--dry-run`, `--model`.
 
 ### Verification
 
@@ -1261,8 +1259,10 @@ infrastructure is end-to-end but the translated surface is one page.
 ### What is NOT done
 
 - Catalogs are still empty on disk for every non-source locale.
-  Running `pnpm i18n:update` with `OPEN_ROUTER_API_KEY` set populates
-  them; we did not run it in this session.
+  Running `pnpm i18n:update` with `OPENAI_API_KEY` set populates
+  them; we did not run it in this session. **(Partially closed in
+  Checkpoint 12.5 — Spanish is now populated for the Workspace
+  Settings page.)**
 - No human translation review pass.
 - No `Trans`/`t` coverage on any surface beyond the workspace settings
   page (by design — see brief).
@@ -1273,6 +1273,97 @@ infrastructure is end-to-end but the translated surface is one page.
 - Language preference is per-workspace per-browser (localStorage). If
   product wants it server-synced across devices or shared workspace-wide,
   promote it to a `workspaces.preferred_locale` column.
+
+---
+
+## Checkpoint 12.5 — Translate-script overhaul + Spanish for Workspace Settings ✅
+
+Direct continuation of item #24 / Checkpoint 12. The Lingui scaffold from
+Checkpoint 12 left the LLM filler usable but blunt: one undocumented
+positional-arg interface, an all-or-nothing per-locale knob, and a hard
+dependency on OpenRouter. This checkpoint reworks the script so we can
+populate translations **one page at a time, one language at a time** — and
+uses it to ship the first real translated surface (Spanish on the
+Workspace Settings page).
+
+### What shipped
+
+- **`scripts/i18n/translateWithLLM.ts` rewritten end-to-end**
+  - **OpenAI Chat Completions** instead of OpenRouter. Default model is
+    `gpt-4o-mini` (cheap, good for short UI strings); override with
+    `--model` or `I18N_LLM_MODEL`.
+  - Credentials loaded via `dotenv` from `.env.development`, with
+    `.env.development.edge` as a fallback (that's where `OPENAI_API_KEY`
+    currently lives under the Supabase edge convention). Already-set
+    `process.env` wins, so callers can still override on the command line.
+  - **Real CLI** with help text printed when no args are passed (so
+    humans and LLMs both discover usage without reading the source):
+    - `--help` / `-h` — show usage and exit.
+    - `--all` — translate every empty `msgstr` in every non-source locale.
+    - `--scope <pattern>` — only translate entries whose `#:` source-file
+      reference contains `<pattern>`. Repeatable; comma-separated lists
+      are also accepted. Substring match on the path, so
+      `--scope WorkspaceSettingsPage` picks up every msgid extracted from
+      anywhere under `src/views/WorkspaceSettingsPage/`.
+    - `--locale <code>` — target locale (e.g. `es`, `ar`, `zh-Hans`).
+      Repeatable; comma-separated lists accepted.
+    - `--model <name>` — model override.
+    - `--dry-run` — translate but don't write.
+    - `--all` is mutually exclusive with `--scope` / `--locale`; a bare
+      invocation with neither errors out with the help text.
+  - The script still preserves the existing PO parser / serializer (so
+    comments + `#:` references + multi-line headers survive a round trip).
+
+- **Tests** — `scripts/i18n/translateWithLLM.test.ts`, 32 vitest tests
+  covering CLI parsing (success + every error path), help text content,
+  PO parse/serialize round-trip (including escaping), scope filtering on
+  `#:` reference comments, and the OpenAI request shape (URL, bearer
+  auth header, model, `response_format: json_object`, payload, and error
+  surfaces). Pure functions + an injectable `fetchImpl` keep the suite
+  hermetic — no network calls.
+
+- **Spanish translations populated** for the Workspace Settings page.
+  All 15 msgids (page chrome + Language tab copy) now have `msgstr`s in
+  `src/i18n/locales/es/messages.po`, compiled into
+  `src/i18n/locales/es/messages.ts` via `pnpm i18n:compile`.
+
+### Verification
+
+- `pnpm eslint scripts/i18n/` — clean.
+- `pnpm tsc --noEmit -p tsconfig.app.json` — clean.
+- `pnpm vitest run scripts/i18n/translateWithLLM.test.ts` — 32/32 pass.
+- Live run against the real OpenAI API:
+  - `pnpm i18n:translate-llm --scope WorkspaceSettingsPage --locale es --dry-run`
+    → reports `[es] 15 missing of 15 entries`, no write.
+  - Same command without `--dry-run` → wrote 15 translations; other
+    locales untouched (verified by `git diff --stat`).
+- `pnpm i18n:compile` regenerated the runtime catalog cleanly; non-`es`
+  catalogs were re-Prettified to match their committed shape.
+
+### What is NOT done
+
+- The other 6 non-source locales (`pt, fr, sw, ar, zh-Hans, zh-Hant`)
+  are still empty for the Workspace Settings page. Each is one command
+  away (`pnpm i18n:translate-llm --scope WorkspaceSettingsPage --locale <code>`)
+  but we deferred running them until product confirms the Spanish quality.
+- No `Trans` / `t` coverage added on any surface beyond the workspace
+  settings page (out of scope for this checkpoint — that's still item
+  #24's remaining work).
+- No live RTL smoke test on Arabic — gated on Arabic catalogs being
+  populated, which we haven't done yet.
+
+### How to extend coverage
+
+```sh
+# Translate one page into one language (cheap, page-by-page rollout):
+pnpm i18n:translate-llm --scope <PageDirOrFile> --locale <code>
+
+# Translate one page into several languages at once:
+pnpm i18n:translate-llm --scope WorkspaceSettingsPage --locale es,fr,pt
+
+# Full sweep across every locale once we trust the prompt:
+pnpm i18n:translate-llm --all
+```
 
 ---
 
