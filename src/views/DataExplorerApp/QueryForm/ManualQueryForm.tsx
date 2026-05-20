@@ -12,8 +12,17 @@ import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSe
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
 import type { SelectData } from "@ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type {
+  OrderByDirection,
+  PartialStructuredQuery,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 const HIDE_LIMIT = true;
 
@@ -22,15 +31,104 @@ const orderDirectionOptions = [
   { value: "desc", label: "Descending" },
 ] as const satisfies SelectData<string>;
 
-type Props = {
+/**
+ * Callbacks invoked when the user changes the form. Mirrors the action set on
+ * `DataExplorerStateManager` so both Data Explorer and dashboard editors can
+ * drive this form. Implementations are expected to regenerate the raw SQL
+ * (via `structuredQueryToSQL`) and update sync metadata.
+ */
+export type ManualQueryFormHandlers = {
+  onSetDataSource: (dataSource: QueryDataSource | undefined) => void;
+  onSetColumns: (columns: readonly QueryColumn.T[]) => void;
+  onSetColumnAggregation: (payload: {
+    columnId: QueryColumn.Id;
+    aggregation: QueryAggregationType.T;
+  }) => void;
+  onSetOrderByColumn: (columnId: QueryColumnId | undefined) => void;
+  onSetOrderByDirection: (direction: OrderByDirection | undefined) => void;
+  onSetFilters: (filters: QueryFilterGroup) => void;
+};
+
+type ControlledProps = {
+  /**
+   * Controlled mode — when omitted, the form reads from the global
+   * `DataExplorerStateManager` (legacy Data Explorer wiring).
+   */
+  query: PartialStructuredQuery;
+  isStructuredQueryInSync: boolean;
+  handlers: ManualQueryFormHandlers;
   withinPortal?: boolean;
 };
 
+type LegacyProps = {
+  query?: undefined;
+  isStructuredQueryInSync?: undefined;
+  handlers?: undefined;
+  withinPortal?: boolean;
+};
+
+type Props = ControlledProps | LegacyProps;
+
 type PendingChange = { kind: "filter"; nextFilter: QueryFilterGroup } | null;
 
-export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
+export function ManualQueryForm(props: Props): JSX.Element {
+  const { withinPortal = true } = props;
+  if (props.query !== undefined) {
+    return (
+      <ManualQueryFormView
+        query={props.query}
+        isStructuredQueryInSync={props.isStructuredQueryInSync}
+        handlers={props.handlers}
+        withinPortal={withinPortal}
+      />
+    );
+  }
+  return <DataExplorerManualQueryForm withinPortal={withinPortal} />;
+}
+
+/**
+ * Legacy wrapper that wires the form to the global Data Explorer state
+ * manager. Kept so existing callers in the Data Explorer don't have to
+ * thread state and handlers through props.
+ */
+function DataExplorerManualQueryForm({
+  withinPortal,
+}: {
+  withinPortal: boolean;
+}): JSX.Element {
   const [{ query, isStructuredQueryInSync }, dispatch] =
     DataExplorerStateManager.useContext();
+
+  const handlers: ManualQueryFormHandlers = {
+    onSetDataSource: dispatch.setDataSource,
+    onSetColumns: dispatch.setColumns,
+    onSetColumnAggregation: dispatch.setColumnAggregation,
+    onSetOrderByColumn: dispatch.setOrderByColumn,
+    onSetOrderByDirection: dispatch.setOrderByDirection,
+    onSetFilters: dispatch.setFilters,
+  };
+
+  return (
+    <ManualQueryFormView
+      query={query}
+      isStructuredQueryInSync={isStructuredQueryInSync}
+      handlers={handlers}
+      withinPortal={withinPortal}
+    />
+  );
+}
+
+function ManualQueryFormView({
+  query,
+  isStructuredQueryInSync,
+  handlers,
+  withinPortal,
+}: {
+  query: PartialStructuredQuery;
+  isStructuredQueryInSync: boolean;
+  handlers: ManualQueryFormHandlers;
+  withinPortal: boolean;
+}): JSX.Element {
   const {
     dataSource,
     queryColumns,
@@ -54,7 +152,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
       setPendingChange({ kind: "filter", nextFilter: next });
       return;
     }
-    dispatch.setFilters(next);
+    handlers.onSetFilters(next);
   };
 
   return (
@@ -87,7 +185,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
                 c="red"
                 onClick={() => {
                   if (pendingChange.kind === "filter") {
-                    dispatch.setFilters(pendingChange.nextFilter);
+                    handlers.onSetFilters(pendingChange.nextFilter);
                   }
                   setPendingChange(null);
                 }}
@@ -128,7 +226,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
         <QueryDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {
-            dispatch.setDataSource(newDataSource ?? undefined);
+            handlers.onSetDataSource(newDataSource ?? undefined);
           }}
           comboboxProps={{ withinPortal }}
         />
@@ -139,7 +237,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
           dataSourceId={dataSource ? Model.getTypedId(dataSource) : undefined}
           value={queryColumns}
           onChange={(newColumns: readonly QueryColumnRead[]) => {
-            dispatch.setColumns(newColumns);
+            handlers.onSetColumns(newColumns);
           }}
           comboboxProps={{ withinPortal }}
         />
@@ -157,7 +255,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
                   dataType={col.baseColumn.dataType}
                   value={aggregations[col.id] ?? "none"}
                   onChange={(newAggregation: QueryAggregationType.T) => {
-                    dispatch.setColumnAggregation({
+                    handlers.onSetColumnAggregation({
                       columnId: col.id,
                       aggregation: newAggregation,
                     });
@@ -191,7 +289,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
             value={orderByColumn}
             placeholder="Select column to sort by"
             onChange={(newColId) => {
-              dispatch.setOrderByColumn(newColId ?? undefined);
+              handlers.onSetOrderByColumn(newColId ?? undefined);
             }}
             comboboxProps={{ withinPortal }}
           />
@@ -202,7 +300,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
             data={orderDirectionOptions}
             value={orderByDirection}
             onChange={(value) => {
-              dispatch.setOrderByDirection(value ?? undefined);
+              handlers.onSetOrderByDirection(value ?? undefined);
             }}
             comboboxProps={{ withinPortal }}
           />

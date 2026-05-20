@@ -1561,6 +1561,99 @@ out but Phase 3 had silently skipped.
 
 ---
 
+## Checkpoint 16 — Manual query form in dashboards (#21 + dashboards-side of #6) ✅
+
+The Data Explorer's manual query form is now available inside the
+dashboard editor's DataViz block, giving dashboards full parity with
+the Data Explorer for both AI and manual query authoring. Closes
+item #21 and the dashboards-related part of item #6 (bidirectional
+SQL ↔ manual-query-form sync).
+
+### What shipped
+
+**`ManualQueryForm` refactored to a controlled component.**
+- `src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx` now
+  accepts an explicit `{ query, isStructuredQueryInSync, handlers }`
+  triple. Handlers mirror the `DataExplorerStateManager` action set
+  (`onSetDataSource`, `onSetColumns`, `onSetColumnAggregation`,
+  `onSetOrderByColumn`, `onSetOrderByDirection`, `onSetFilters`).
+- The legacy `<ManualQueryForm withinPortal />` call shape still
+  works: when called with no controlled props, it falls back to a
+  thin `DataExplorerManualQueryForm` wrapper that wires the form to
+  the global Data Explorer state manager. No Data Explorer callers
+  needed to change.
+
+**`NLQueryPField` is now a 3-tab side panel.**
+- Tabs: `Prompt` (existing NL → SQL flow), `Manual` (the structured
+  form), `SQL` (read-only viewer + Edit query mode + mapping-warning
+  Alert — the same shape as the Data Explorer's `SqlQueryView`).
+- The Prompt tab no longer also renders the Generated SQL fieldset
+  underneath; it lives in its own tab now to match Data Explorer's
+  Query Details panel.
+
+**Per-block manual query state (`useDashboardManualQueryState`).**
+- New hook at
+  `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState.ts`
+  that holds the structured query in local React state and exposes
+  the same handler shape `ManualQueryForm` expects.
+- On any form change → regenerates SQL via the shared
+  `structuredQueryToSQL` (knex-based) → writes the new SQL up via
+  `onRawSqlChange` → marks the structured query as in-sync.
+- On any *external* `rawSql` change (e.g. AI generation, user typing
+  in the SQL tab) → re-derives the structured query via the shared
+  `useSqlToStructuredQuery` (`node-sql-parser`) hook, surfacing the
+  same lossy-mapping warnings used in Data Explorer.
+- Uses a `lastSyncedSqlRef` to break the feedback loop: when the
+  hook regenerates SQL and pushes it up, the resulting prop change
+  is recognised as our own write and the parser is not re-run.
+
+**No schema changes.**
+- The structured query is *not* persisted on the block — it is
+  re-derived from `rawSql` on each mount / external update. This
+  keeps `AvaPageData` migrations untouched (still v4) and avoids
+  storing potentially-large parsed query trees inside the Puck JSON.
+
+### What this unlocks
+
+- Open any DataViz block on a dashboard → click the **Manual** tab →
+  pick a data source / columns / aggregations / filters / sort.
+- Switch to the **SQL** tab → see the regenerated SQL, optionally
+  paste your own → the Manual tab will show a best-effort
+  approximation with the yellow "approximation" Alert when the SQL
+  contains things the form can't represent.
+- Switch back to the **Prompt** tab → run an AI query → the new SQL
+  flows back into both Manual and SQL tabs.
+- This is the dashboard counterpart of Checkpoint 7. Together they
+  give the demo full SQL ↔ form parity on both surfaces.
+
+### Files touched
+
+- `src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx` —
+  refactored to controlled, legacy wrapper added.
+- `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx` —
+  rewritten as a 3-tab side panel.
+- `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState.ts` —
+  new per-block state hook.
+- `docs/ict4d-demo/FEATURE_CHECKLIST.md` — items #6 and #21 marked
+  done.
+
+### Testing
+
+- `pnpm tsc -b --noEmit` clean for the new files (pre-existing
+  `tsconfig.app.json` deprecation + `shared/env/*` ImportMeta
+  warnings unchanged).
+- Live browser verification still pending — the environment's
+  `vitest` binary isn't on `PATH` and we can't drive Playwright
+  here. The unit-test coverage from Checkpoint 7
+  (`sqlToStructuredQuery.test.ts`, `structuredQueryToSQL.test.ts`)
+  covers the deterministic parse + regenerate behaviour the
+  dashboard hook reuses verbatim; the integration path
+  (Manual tab → form change → `nlQuery.rawSql` updates → DataViz
+  block re-runs query) should be smoke-tested in a follow-up
+  session with a live preview.
+
+---
+
 ## What to do next (recommended order)
 
 1. **Live-verify Checkpoint 10 on the Vercel preview** (see "Live
