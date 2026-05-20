@@ -1,3 +1,4 @@
+import { ModalsProvider } from "@mantine/modals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
@@ -62,7 +63,9 @@ describe("openFileImportFlow", () => {
 
     render(
       <AvandarUiProvider>
-        <TriggerButton file={file} />
+        <ModalsProvider>
+          <TriggerButton file={file} />
+        </ModalsProvider>
       </AvandarUiProvider>,
     );
 
@@ -83,7 +86,9 @@ describe("openFileImportFlow", () => {
 
     render(
       <AvandarUiProvider>
-        <TriggerButton file={file} />
+        <ModalsProvider>
+          <TriggerButton file={file} />
+        </ModalsProvider>
       </AvandarUiProvider>,
     );
 
@@ -109,7 +114,9 @@ describe("openFileImportFlow", () => {
 
     render(
       <AvandarUiProvider>
-        <TriggerButton file={file} />
+        <ModalsProvider>
+          <TriggerButton file={file} />
+        </ModalsProvider>
       </AvandarUiProvider>,
     );
 
@@ -128,7 +135,9 @@ describe("openFileImportFlow", () => {
 
     render(
       <AvandarUiProvider>
-        <TriggerButton file={file} />
+        <ModalsProvider>
+          <TriggerButton file={file} />
+        </ModalsProvider>
       </AvandarUiProvider>,
     );
 

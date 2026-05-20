@@ -145,6 +145,9 @@ export function useDashboardManualQueryState(opts: {
     onSetFilters: (filters: QueryFilterGroup) => {
       applyQueryChange({ ...query, filters } as PartialStructuredQuery);
     },
+    onSetLimit: (limit: number | undefined) => {
+      applyQueryChange({ ...query, limit } as PartialStructuredQuery);
+    },
   };
 
   return {

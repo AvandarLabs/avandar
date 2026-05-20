@@ -4,6 +4,9 @@ import {
   applyDefaultManualQueryLimit,
   DEFAULT_MANUAL_QUERY_LIMIT,
   getManualQueryLimitValue,
+  LARGE_DATASET_AUTO_LIMIT,
+  LARGE_DATASET_ROW_THRESHOLD,
+  shouldAutoLimitLargeDataset,
   shouldDefaultManualQueryLimit,
 } from "@/views/DataExplorerApp/manualQueryLimit";
 
@@ -42,5 +45,36 @@ describe("manualQueryLimit", () => {
     expect(shouldDefaultManualQueryLimit(query)).toBe(false);
     expect(getManualQueryLimitValue(query)).toBe(20);
     expect(applyDefaultManualQueryLimit(query).limit).toBe(20);
+  });
+
+  it("exports the large-dataset threshold and auto limit", () => {
+    expect(LARGE_DATASET_ROW_THRESHOLD).toBe(50_000);
+    expect(LARGE_DATASET_AUTO_LIMIT).toBe(DEFAULT_MANUAL_QUERY_LIMIT);
+  });
+
+  it("allows auto limit only when no limit or filters are set", () => {
+    const emptyQuery = StructuredQuery.makeEmpty();
+
+    expect(shouldAutoLimitLargeDataset(emptyQuery)).toBe(true);
+
+    const withLimit = { ...emptyQuery, limit: 10 };
+    expect(shouldAutoLimitLargeDataset(withLimit)).toBe(false);
+
+    const withFilter = {
+      ...emptyQuery,
+      filters: {
+        type: "group" as const,
+        combinator: "AND" as const,
+        rules: [
+          {
+            type: "rule" as const,
+            columnName: "id",
+            operator: "=" as const,
+            value: 1,
+          },
+        ],
+      },
+    };
+    expect(shouldAutoLimitLargeDataset(withFilter)).toBe(false);
   });
 });

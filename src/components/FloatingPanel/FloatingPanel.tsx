@@ -83,7 +83,7 @@ export function FloatingPanel({
   // by persisting the live position to state), the effect tears down its
   // event listeners mid-drag and the window stops being draggable. Stabilize
   // both: forward the latest callback through a ref, and freeze
-  // `initialPosition` to the value captured on first render.
+  // `initialPosition` while the FloatingWindow is mounted.
   const onPositionChangeRef = useRef(onPositionChange);
   onPositionChangeRef.current = onPositionChange;
   const handlePositionChange = useCallback(
@@ -92,7 +92,17 @@ export function FloatingPanel({
     },
     [],
   );
+
+  // Re-capture the latest `initialPosition` each time the window transitions
+  // from closed to open. While `opened` stays true the ref is left alone so
+  // that the drag effect stays attached during a drag, but reopening the
+  // panel picks up the most recently persisted position from localStorage.
   const initialPositionRef = useRef(initialPosition);
+  const prevOpenedRef = useRef(opened);
+  if (opened && !prevOpenedRef.current) {
+    initialPositionRef.current = initialPosition;
+  }
+  prevOpenedRef.current = opened;
 
   return (
     <Transition

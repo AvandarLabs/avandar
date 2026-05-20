@@ -4,6 +4,12 @@ import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/St
 /** Default LIMIT shown for a brand-new manual query. */
 export const DEFAULT_MANUAL_QUERY_LIMIT = 100;
 
+/** Row count above which we auto-apply a LIMIT when picking a dataset. */
+export const LARGE_DATASET_ROW_THRESHOLD = 50_000;
+
+/** LIMIT applied when a large dataset is selected without filters. */
+export const LARGE_DATASET_AUTO_LIMIT = DEFAULT_MANUAL_QUERY_LIMIT;
+
 function _hasNonDefaultAggregation(query: PartialStructuredQuery): boolean {
   return Object.values(query.aggregations).some((aggregation) => {
     return aggregation !== undefined && aggregation !== "none";
@@ -44,6 +50,19 @@ export function getManualQueryLimitValue(
   return shouldDefaultManualQueryLimit(query) ?
       DEFAULT_MANUAL_QUERY_LIMIT
     : undefined;
+}
+
+/**
+ * True when selecting a dataset should trigger the large-dataset auto LIMIT.
+ */
+export function shouldAutoLimitLargeDataset(
+  query: PartialStructuredQuery,
+): boolean {
+  return (
+    query.limit === undefined &&
+    isEmptyQueryFilter(query.filters) &&
+    isEmptyQueryFilter(query.having)
+  );
 }
 
 /**

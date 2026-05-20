@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -145,7 +147,8 @@ describe("DatasetImportForm", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _csvDataSourceMetadata();
     render(
-      <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.csv"
@@ -154,7 +157,8 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUiProvider>,
+      </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     fireEvent.change(screen.getByLabelText("Delimiter"), {
@@ -172,7 +176,8 @@ describe("DatasetImportForm", () => {
   it("disables sheet picker when xlsx has one sheet", () => {
     const metadata = _xlsxDataSourceMetadata(["Sheet1"]);
     render(
-      <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.xlsx"
@@ -181,7 +186,8 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUiProvider>,
+      </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     expect(
@@ -193,7 +199,8 @@ describe("DatasetImportForm", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _xlsxDataSourceMetadata(["Sheet1", "Sheet2"]);
     render(
-      <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.xlsx"
@@ -202,7 +209,8 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUiProvider>,
+      </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     expect(
@@ -242,9 +250,11 @@ describe("DatasetImportForm", () => {
     }
 
     render(
-      <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
         <ControlledMetadataHarness />
-      </AvandarUiProvider>,
+      </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     const warningRegex = /This dataset will no longer be stored online/i;

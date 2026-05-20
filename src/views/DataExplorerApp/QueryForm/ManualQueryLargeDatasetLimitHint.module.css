@@ -1,0 +1,6 @@
+.hint {
+  background-color: var(--mantine-color-blue-0);
+  border: 1px solid var(--mantine-color-blue-2);
+  flex-shrink: 0;
+  max-width: 14rem;
+}

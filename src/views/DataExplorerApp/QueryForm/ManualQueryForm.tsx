@@ -1,4 +1,11 @@
-import { Alert, Fieldset, NumberInput, Stack, Text } from "@mantine/core";
+import {
+  Alert,
+  Fieldset,
+  Group,
+  NumberInput,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { Model } from "@models";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
@@ -10,7 +17,9 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
+import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
+import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import type { SelectData } from "@ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -141,6 +150,11 @@ function ManualQueryFormView({
   const limit = getManualQueryLimitValue(query);
 
   const [pendingChange, setPendingChange] = useState<PendingChange>(null);
+  const {
+    onDataSourceChange,
+    isLargeDatasetLimitHintVisible,
+    dismissLargeDatasetLimitHint,
+  } = useManualQueryDataSourceChange({ query, handlers });
 
   const selectedColumnOptions = makeSelectOptions(queryColumns, {
     valueFn: prop("id"),
@@ -227,9 +241,7 @@ function ManualQueryFormView({
 
         <QueryDataSourceSelect
           value={dataSource ?? null}
-          onChange={(newDataSource) => {
-            handlers.onSetDataSource(newDataSource ?? undefined);
-          }}
+          onChange={onDataSourceChange}
           comboboxProps={{ withinPortal }}
         />
 
@@ -312,16 +324,25 @@ function ManualQueryFormView({
           legend="Result size"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
-          <NumberInput
-            label="Limit"
-            placeholder="Maximum rows to return"
-            min={1}
-            step={1}
-            value={typeof limit === "number" ? limit : ""}
-            onChange={(value) => {
-              handlers.onSetLimit(typeof value === "number" ? value : undefined);
-            }}
-          />
+          <Group align="flex-end" wrap="nowrap" gap="sm">
+            <NumberInput
+              label="Limit"
+              placeholder="Maximum rows to return"
+              min={1}
+              step={1}
+              style={{ flex: 1 }}
+              value={typeof limit === "number" ? limit : ""}
+              onChange={(value) => {
+                dismissLargeDatasetLimitHint();
+                handlers.onSetLimit(
+                  typeof value === "number" ? value : undefined,
+                );
+              }}
+            />
+            <ManualQueryLargeDatasetLimitHint
+              visible={isLargeDatasetLimitHintVisible}
+            />
+          </Group>
         </Fieldset>
       </Stack>
     </form>

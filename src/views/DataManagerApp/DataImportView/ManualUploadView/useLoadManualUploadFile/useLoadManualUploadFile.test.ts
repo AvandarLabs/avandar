@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { Expect, IsEqual } from "@utils";
@@ -87,7 +89,11 @@ function _wrapper({ children }: { children: ReactNode }) {
       },
     },
   });
-  return createElement(QueryClientProvider, { client: queryClient }, children);
+  return createElement(
+    I18nProvider,
+    { i18n },
+    createElement(QueryClientProvider, { client: queryClient }, children),
+  );
 }
 
 describe("useLoadManualUploadFile", () => {

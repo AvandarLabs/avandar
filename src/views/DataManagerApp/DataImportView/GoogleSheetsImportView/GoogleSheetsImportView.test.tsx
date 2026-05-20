@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,
@@ -207,9 +209,11 @@ function renderWithProviders(
   return renderRtl(ui, {
     wrapper: ({ children }) => {
       return (
-        <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>{children}</AvandarUiProvider>
-        </QueryClientProvider>
+        <I18nProvider i18n={i18n}>
+          <QueryClientProvider client={queryClient}>
+            <AvandarUiProvider>{children}</AvandarUiProvider>
+          </QueryClientProvider>
+        </I18nProvider>
       );
     },
     ...options,
