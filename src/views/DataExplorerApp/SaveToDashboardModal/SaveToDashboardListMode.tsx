@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Group,
@@ -46,6 +47,7 @@ export function SaveToDashboardListMode({
   onCancel,
   onSelectAndSave,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDashboardId, setSelectedDashboardId] =
     useState<DashboardId | null>(null);
@@ -76,13 +78,13 @@ export function SaveToDashboardListMode({
   return (
     <>
       <TextInput
-        placeholder="Search dashboards"
+        placeholder={t`Search dashboards`}
         leftSection={<IconSearch size={16} />}
         value={searchQuery}
         onChange={(event) => {
           setSearchQuery(event.currentTarget.value);
         }}
-        aria-label="Search dashboards"
+        aria-label={t`Search dashboards`}
       />
 
       {isLoading ?
@@ -91,9 +93,9 @@ export function SaveToDashboardListMode({
         </Group>
       : filteredDashboards.length === 0 ?
         <Text size="sm" c="dimmed" className={css.emptyFilter}>
-          No dashboards match &ldquo;{searchQuery}&rdquo;.
+          <Trans>No dashboards match &ldquo;{searchQuery}&rdquo;.</Trans>
         </Text>
-      : <div role="listbox" aria-label="Dashboards" className={css.list}>
+      : <div role="listbox" aria-label={t`Dashboards`} className={css.list}>
           {filteredDashboards.map((dashboard) => {
             const isSelected = dashboard.id === selectedDashboardId;
             return (
@@ -118,7 +120,9 @@ export function SaveToDashboardListMode({
                   {dashboard.name}
                 </Text>
                 <Text className={css.rowMeta}>
-                  Updated {formatDashboardDate(dashboard.updatedAt)}
+                  <Trans>
+                    Updated {formatDashboardDate(dashboard.updatedAt, t)}
+                  </Trans>
                 </Text>
                 {isSelected ?
                   <IconCheck size={16} stroke={2} className={css.rowCheck} />
@@ -136,18 +140,18 @@ export function SaveToDashboardListMode({
           leftSection={<IconPlus size={16} />}
           onClick={onSwitchToCreate}
         >
-          Create new dashboard
+          <Trans>Create new dashboard</Trans>
         </Button>
         <Group gap="sm">
           <Button variant="subtle" color="neutral" onClick={onCancel}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button
             onClick={onSave}
             disabled={!selectedDashboardId || isDisabled}
             loading={isSaving}
           >
-            Save to dashboard
+            <Trans>Save to dashboard</Trans>
           </Button>
         </Group>
       </Group>

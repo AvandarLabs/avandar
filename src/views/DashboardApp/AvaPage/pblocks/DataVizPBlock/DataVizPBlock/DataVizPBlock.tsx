@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { Paper } from "@ui";
@@ -102,7 +103,9 @@ export function DataVizPBlock({
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Add a prompt and generate SQL to configure this visualization.
+          <Trans>
+            Add a prompt and generate SQL to configure this visualization.
+          </Trans>
         </Text>
       </Paper>
     );
@@ -112,7 +115,7 @@ export function DataVizPBlock({
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Run a query to see results.
+          <Trans>Run a query to see results.</Trans>
         </Text>
       </Paper>
     );

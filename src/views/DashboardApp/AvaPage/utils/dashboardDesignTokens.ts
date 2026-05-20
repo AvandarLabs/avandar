@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import type {
   AvaPageThemeName,
   AvaPageTypographyName,
@@ -110,24 +111,39 @@ export function getDashboardDesignTokens(options: {
   };
 }
 
-/** Display labels for the editor select inputs. */
-export const DASHBOARD_THEME_OPTIONS: ReadonlyArray<{
+/**
+ * React hook returning the display labels for the dashboard theme select
+ * input. Labels are translated via the Lingui macro, so this must be invoked
+ * from a React component / hook.
+ */
+export function useDashboardThemeOptions(): ReadonlyArray<{
   value: AvaPageThemeName;
   label: string;
-}> = [
-  { value: "default", label: "Avandar (default)" },
-  { value: "ocean", label: "Ocean" },
-  { value: "forest", label: "Forest" },
-  { value: "rose", label: "Rose" },
-  { value: "amber", label: "Amber" },
-  { value: "graphite", label: "Graphite" },
-];
+}> {
+  const { t } = useLingui();
+  return [
+    { value: "default", label: t`Avandar (default)` },
+    { value: "ocean", label: t`Ocean` },
+    { value: "forest", label: t`Forest` },
+    { value: "rose", label: t`Rose` },
+    { value: "amber", label: t`Amber` },
+    { value: "graphite", label: t`Graphite` },
+  ];
+}
 
-export const DASHBOARD_TYPOGRAPHY_OPTIONS: ReadonlyArray<{
+/**
+ * React hook returning the display labels for the dashboard typography select
+ * input. Labels are translated via the Lingui macro, so this must be invoked
+ * from a React component / hook.
+ */
+export function useDashboardTypographyOptions(): ReadonlyArray<{
   value: AvaPageTypographyName;
   label: string;
-}> = [
-  { value: "system", label: "System sans" },
-  { value: "serif", label: "Editorial serif" },
-  { value: "mono", label: "Monospace headlines" },
-];
+}> {
+  const { t } = useLingui();
+  return [
+    { value: "system", label: t`System sans` },
+    { value: "serif", label: t`Editorial serif` },
+    { value: "mono", label: t`Monospace headlines` },
+  ];
+}

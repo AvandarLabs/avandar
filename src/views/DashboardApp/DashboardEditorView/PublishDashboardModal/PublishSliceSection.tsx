@@ -1,3 +1,4 @@
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
   Accordion,
   ActionIcon,
@@ -41,15 +42,17 @@ type Props = {
   onChange: (next: DashboardPublishConfig) => void;
 };
 
-const MODE_DESCRIPTIONS: Record<PublishSliceConfig["mode"], string> = {
-  queried:
-    "Publish only the columns your dashboard reads. Narrowest, most private.",
-  all_columns:
-    "Publish every column, all rows. Maximum flexibility for viewers, " +
-    "maximum exposure.",
-  custom:
-    "Pick columns and add row constraints (enum, number range, date range).",
-};
+type TranslateFn = ReturnType<typeof useLingui>["t"];
+
+function _getModeDescriptions(
+  t: TranslateFn,
+): Record<PublishSliceConfig["mode"], string> {
+  return {
+    queried: t`Publish only the columns your dashboard reads. Narrowest, most private.`,
+    all_columns: t`Publish every column, all rows. Maximum flexibility for viewers, maximum exposure.`,
+    custom: t`Pick columns and add row constraints (enum, number range, date range).`,
+  };
+}
 
 type DatasetSummary = {
   id: DatasetId;
@@ -129,10 +132,12 @@ export function PublishSliceSection({
     return (
       <Stack gap={4}>
         <Title order={5} fw={600}>
-          Data scope
+          <Trans>Data scope</Trans>
         </Title>
         <Text size="xs" c="dimmed">
-          This dashboard doesn't reference any datasets — nothing to publish.
+          <Trans>
+            This dashboard doesn't reference any datasets — nothing to publish.
+          </Trans>
         </Text>
       </Stack>
     );
@@ -149,14 +154,16 @@ export function PublishSliceSection({
       <Group gap={6} align="center">
         <IconShieldLock size={16} color="var(--mantine-color-blue-7)" />
         <Title order={5} fw={600}>
-          Data scope
+          <Trans>Data scope</Trans>
         </Title>
       </Group>
       <Text size="xs" c="dimmed">
-        Choose how much of each dataset to publish. The default — "Only what's
-        queried" — uploads just the columns your visualizations read. Widen the
-        scope if you've added viewer-editable filters and want viewers to be
-        able to filter beyond your defaults.
+        <Trans>
+          Choose how much of each dataset to publish. The default — "Only
+          what's queried" — uploads just the columns your visualizations read.
+          Widen the scope if you've added viewer-editable filters and want
+          viewers to be able to filter beyond your defaults.
+        </Trans>
       </Text>
 
       <Accordion variant="separated" multiple defaultValue={[]}>
@@ -181,10 +188,10 @@ export function PublishSliceSection({
                     }
                   >
                     {slice.mode === "queried" ?
-                      "Narrowest"
+                      <Trans>Narrowest</Trans>
                     : slice.mode === "all_columns" ?
-                      "All columns"
-                    : "Custom"}
+                      <Trans>All columns</Trans>
+                    : <Trans>Custom</Trans>}
                   </Badge>
                 </Group>
               </Accordion.Control>
@@ -214,6 +221,8 @@ function SliceModeEditor({
   slice: PublishSliceConfig;
   onChange: (next: PublishSliceConfig) => void;
 }): JSX.Element {
+  const { t } = useLingui();
+  const modeDescriptions = _getModeDescriptions(t);
   return (
     <Stack gap="md">
       <Radio.Group
@@ -235,18 +244,18 @@ function SliceModeEditor({
         <Stack gap={6}>
           <Radio
             value="queried"
-            label="Only what's queried (recommended)"
-            description={MODE_DESCRIPTIONS.queried}
+            label={t`Only what's queried (recommended)`}
+            description={modeDescriptions.queried}
           />
           <Radio
             value="custom"
-            label="Custom selection"
-            description={MODE_DESCRIPTIONS.custom}
+            label={t`Custom selection`}
+            description={modeDescriptions.custom}
           />
           <Radio
             value="all_columns"
-            label="Whole dataset"
-            description={MODE_DESCRIPTIONS.all_columns}
+            label={t`Whole dataset`}
+            description={modeDescriptions.all_columns}
           />
         </Stack>
       </Radio.Group>
@@ -266,8 +275,10 @@ function QueriedPreview({ dataset }: { dataset: DatasetSummary }): JSX.Element {
   if (dataset.treatAsAllColumns) {
     return (
       <Text size="xs" c="dimmed">
-        At least one query on this dataset uses <code>SELECT *</code> or
-        couldn't be parsed safely, so all columns will be published.
+        <Trans>
+          At least one query on this dataset uses <code>SELECT *</code> or
+          couldn't be parsed safely, so all columns will be published.
+        </Trans>
       </Text>
     );
   }
@@ -275,14 +286,21 @@ function QueriedPreview({ dataset }: { dataset: DatasetSummary }): JSX.Element {
   if (cols.length === 0) {
     return (
       <Text size="xs" c="dimmed">
-        No columns detected for this dataset. Falling back to all columns.
+        <Trans>
+          No columns detected for this dataset. Falling back to all columns.
+        </Trans>
       </Text>
     );
   }
+  const numCols = cols.length;
   return (
     <Stack gap={4}>
       <Text size="xs" c="dimmed">
-        Will publish {cols.length} column{cols.length === 1 ? "" : "s"}:
+        <Plural
+          value={numCols}
+          one="Will publish # column:"
+          other="Will publish # columns:"
+        />
       </Text>
       <ScrollArea.Autosize mah={120}>
         <Group gap={4}>
@@ -332,7 +350,7 @@ function CustomEditor({
       <Stack gap={6}>
         <Group justify="space-between" align="end">
           <Text size="sm" fw={500}>
-            Columns
+            <Trans>Columns</Trans>
           </Text>
           <Group gap="xs">
             <Button
@@ -342,7 +360,7 @@ function CustomEditor({
                 return _setColumns(allColumnNames);
               }}
             >
-              Select all
+              <Trans>Select all</Trans>
             </Button>
             <Button
               size="compact-xs"
@@ -352,7 +370,7 @@ function CustomEditor({
               }}
               disabled={dataset.queriedColumns.length === 0}
             >
-              Just what's queried
+              <Trans>Just what's queried</Trans>
             </Button>
           </Group>
         </Group>
@@ -372,7 +390,7 @@ function CustomEditor({
                       </Badge>
                       {isQueried ?
                         <Badge size="xs" variant="light" color="teal">
-                          queried
+                          <Trans>queried</Trans>
                         </Badge>
                       : null}
                     </Group>
@@ -394,7 +412,7 @@ function CustomEditor({
       <Stack gap={6}>
         <Group justify="space-between" align="end">
           <Text size="sm" fw={500}>
-            Row filters
+            <Trans>Row filters</Trans>
           </Text>
           <AddRowFilterMenu
             columns={filterableColumns}
@@ -405,8 +423,10 @@ function CustomEditor({
         </Group>
         {slice.rowFilters.length === 0 ?
           <Text size="xs" c="dimmed">
-            No row filters. The slice will include every row in the dataset (for
-            the selected columns).
+            <Trans>
+              No row filters. The slice will include every row in the dataset
+              (for the selected columns).
+            </Trans>
           </Text>
         : <Stack gap="xs">
             {slice.rowFilters.map((rf, idx) => {
@@ -446,9 +466,10 @@ function AddRowFilterMenu({
   columns: ReadonlyArray<{ name: string; type: AvaDataType.T }>;
   onAdd: (rf: PublishSliceRowFilter) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   return (
     <Select
-      placeholder="+ Add row filter"
+      placeholder={t`+ Add row filter`}
       size="xs"
       searchable
       clearable={false}
@@ -483,6 +504,7 @@ function RowFilterRow({
   onChange: (next: PublishSliceRowFilter) => void;
   onRemove: () => void;
 }): JSX.Element {
+  const { t } = useLingui();
   return (
     <Box
       p="xs"
@@ -501,12 +523,12 @@ function RowFilterRow({
             size="xs"
             value={rowFilter.kind}
             data={[
-              { value: "enum", label: "Values" },
+              { value: "enum", label: t`Values` },
               ...(_isNumericType(columnType) ?
-                [{ value: "range_number", label: "Number range" }]
+                [{ value: "range_number", label: t`Number range` }]
               : []),
               ...(_isDateLikeType(columnType) ?
-                [{ value: "range_date", label: "Date range" }]
+                [{ value: "range_date", label: t`Date range` }]
               : []),
             ]}
             onChange={(kind) => {
@@ -534,7 +556,7 @@ function RowFilterRow({
           color="red"
           size="sm"
           onClick={onRemove}
-          aria-label="Remove row filter"
+          aria-label={t`Remove row filter`}
         >
           <IconTrash size={14} />
         </ActionIcon>
@@ -542,7 +564,7 @@ function RowFilterRow({
 
       {rowFilter.kind === "enum" ?
         <TagsInput
-          placeholder="Enter values; press Enter after each"
+          placeholder={t`Enter values; press Enter after each`}
           value={[...rowFilter.values]}
           onChange={(v) => {
             return onChange({ ...rowFilter, values: v });
@@ -551,7 +573,7 @@ function RowFilterRow({
       : rowFilter.kind === "range_number" ?
         <Group gap="xs">
           <NumberInput
-            placeholder="Min"
+            placeholder={t`Min`}
             value={rowFilter.min ?? ""}
             onChange={(v) => {
               return onChange({
@@ -561,10 +583,10 @@ function RowFilterRow({
             }}
           />
           <Text size="xs" c="dimmed">
-            to
+            <Trans>to</Trans>
           </Text>
           <NumberInput
-            placeholder="Max"
+            placeholder={t`Max`}
             value={rowFilter.max ?? ""}
             onChange={(v) => {
               return onChange({
@@ -576,17 +598,17 @@ function RowFilterRow({
         </Group>
       : <Group gap="xs">
           <TextInput
-            placeholder="Start (e.g. 2024-01-01)"
+            placeholder={t`Start (e.g. 2024-01-01)`}
             value={rowFilter.start ?? ""}
             onChange={(e) => {
               return onChange({ ...rowFilter, start: e.currentTarget.value });
             }}
           />
           <Text size="xs" c="dimmed">
-            to
+            <Trans>to</Trans>
           </Text>
           <TextInput
-            placeholder="End (e.g. 2024-12-31)"
+            placeholder={t`End (e.g. 2024-12-31)`}
             value={rowFilter.end ?? ""}
             onChange={(e) => {
               return onChange({ ...rowFilter, end: e.currentTarget.value });

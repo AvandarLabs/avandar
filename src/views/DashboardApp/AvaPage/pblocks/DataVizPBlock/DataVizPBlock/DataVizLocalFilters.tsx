@@ -7,6 +7,7 @@
  * `useApplyDashboardFiltersToSql`); the strip itself is purely presentational
  * + state-management glue.
  */
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Group,
@@ -57,7 +58,7 @@ export function DataVizLocalFilters({
         <Group gap={6} c="dimmed">
           <IconAdjustmentsHorizontal size={14} />
           <Text size="xs" fw={500} tt="uppercase" lts={0.4}>
-            Filters for this chart
+            <Trans>Filters for this chart</Trans>
           </Text>
         </Group>
         {hasActiveValue ?
@@ -67,7 +68,7 @@ export function DataVizLocalFilters({
             leftSection={<IconRefresh size={12} />}
             onClick={state.reset}
           >
-            Reset
+            <Trans>Reset</Trans>
           </Button>
         : null}
       </Group>
@@ -98,6 +99,7 @@ function LocalFilterInput({
   value: LocalFilterValue;
   onChange: (next: LocalFilterValue) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   const options = parseLocalFilterOptions(filter.optionsRaw);
 
   if (filter.mode === "select_multi") {
@@ -106,7 +108,7 @@ function LocalFilterInput({
         miw={180}
         size="xs"
         label={filter.label}
-        placeholder="All"
+        placeholder={t`All`}
         data={options}
         clearable
         searchable
@@ -124,7 +126,7 @@ function LocalFilterInput({
         miw={180}
         size="xs"
         label={filter.label}
-        placeholder="Contains…"
+        placeholder={t`Contains…`}
         value={(value as string) ?? ""}
         onChange={(e) => {
           onChange(e.currentTarget.value);
@@ -138,7 +140,7 @@ function LocalFilterInput({
       miw={180}
       size="xs"
       label={filter.label}
-      placeholder="All"
+      placeholder={t`All`}
       data={options}
       clearable
       searchable

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
 import {
   ActionIcon,
@@ -33,13 +34,20 @@ type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
 };
 
-const SOURCE_TYPE_LABEL: Record<DatasetSource.SourceType, string> = {
-  csv_file: "CSV",
-  xlsx_file: "Excel",
-  google_sheets: "Google Sheets",
-  open_data: "Open data",
-  virtual: "Derived",
-};
+/**
+ * Returns the localized label for a given dataset source type. Defined as a
+ * hook so the labels can use the active translation function.
+ */
+function _useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
+  const { t } = useLingui();
+  return {
+    csv_file: t`CSV`,
+    xlsx_file: t`Excel`,
+    google_sheets: t`Google Sheets`,
+    open_data: t`Open data`,
+    virtual: t`Derived`,
+  };
+}
 
 /**
  * Lists every saved dataset in the workspace. Opening a derived (virtual)
@@ -48,6 +56,8 @@ const SOURCE_TYPE_LABEL: Record<DatasetSource.SourceType, string> = {
  * raw rows in the Data Explorer canvas.
  */
 export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
+  const { t } = useLingui();
+  const sourceTypeLabels = _useSourceTypeLabels();
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
@@ -69,10 +79,10 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset deleted.");
+      notifySuccess(t`Dataset deleted.`);
     },
     onError: (error) => {
-      notifyError(`Failed to delete dataset: ${error.message}`);
+      notifyError(t`Failed to delete dataset: ${error.message}`);
     },
   });
 
@@ -82,7 +92,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         where("dataset_id", "eq", dataset.id),
       );
       if (!virtualDataset) {
-        throw new Error("Could not load the dataset's SQL query.");
+        throw new Error(t`Could not load the dataset's SQL query.`);
       }
       return { dataset, virtualDataset };
     },
@@ -152,14 +162,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
 
   const onDeleteClick = (dataset: Dataset.T) => {
     modals.openConfirmModal({
-      title: "Delete dataset",
+      title: t`Delete dataset`,
       children: (
         <Text size="sm">
-          Are you sure you want to permanently delete{" "}
-          <strong>{dataset.name}</strong>? This cannot be undone.
+          <Trans>
+            Are you sure you want to permanently delete{" "}
+            <strong>{dataset.name}</strong>? This cannot be undone.
+          </Trans>
         </Text>
       ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
+      labels: { confirm: t`Delete`, cancel: t`Cancel` },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteDataset({ id: dataset.id });
@@ -172,7 +184,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   return (
     <Stack gap="sm">
       <TextInput
-        placeholder="Search datasets..."
+        placeholder={t`Search datasets...`}
         leftSection={<IconSearch size={14} />}
         value={search}
         onChange={(e) => {
@@ -182,17 +194,21 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
 
       {isLoadingDatasets ?
         <Text c="dimmed" size="sm">
-          Loading datasets…
+          <Trans>Loading datasets…</Trans>
         </Text>
       : filtered.length === 0 ?
         <Text c="dimmed" size="sm">
-          No saved datasets found.
+          <Trans>No saved datasets found.</Trans>
         </Text>
       : <Table highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th w={120}>Type</Table.Th>
+              <Table.Th>
+                <Trans>Name</Trans>
+              </Table.Th>
+              <Table.Th w={120}>
+                <Trans>Type</Trans>
+              </Table.Th>
               <Table.Th w={140} />
             </Table.Tr>
           </Table.Thead>
@@ -203,7 +219,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
                   <Table.Td>{dataset.name}</Table.Td>
                   <Table.Td>
                     <Badge color="neutral" variant="light" size="sm">
-                      {SOURCE_TYPE_LABEL[dataset.sourceType] ??
+                      {sourceTypeLabels[dataset.sourceType] ??
                         dataset.sourceType}
                     </Badge>
                   </Table.Td>
@@ -217,14 +233,14 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
                           onOpenClick(dataset);
                         }}
                       >
-                        Open
+                        <Trans>Open</Trans>
                       </Button>
                       <ActionIcon
                         size="sm"
                         variant="subtle"
                         color="red"
                         disabled={isBusy}
-                        aria-label={`Delete ${dataset.name}`}
+                        aria-label={t`Delete ${dataset.name}`}
                         onClick={() => {
                           onDeleteClick(dataset);
                         }}

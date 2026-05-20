@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -73,6 +74,7 @@ export function PdfAnnotator({
   onClose,
   onBack,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [baseCanvas, setBaseCanvas] = useState<HTMLCanvasElement | null>(null);
   const [isCapturing, setIsCapturing] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
@@ -103,7 +105,7 @@ export function PdfAnnotator({
       .catch((e: unknown) => {
         if (!isMounted) return;
         notifyError({
-          title: "Couldn't capture dashboard",
+          title: t`Couldn't capture dashboard`,
           message: e instanceof Error ? e.message : String(e),
         });
         setIsCapturing(false);
@@ -111,7 +113,7 @@ export function PdfAnnotator({
     return () => {
       isMounted = false;
     };
-  }, [sourceElement]);
+  }, [sourceElement, t]);
 
   // Derive display dimensions from the captured canvas.
   const displayWidth =
@@ -188,7 +190,7 @@ export function PdfAnnotator({
         e.currentTarget.setPointerCapture(e.pointerId);
         _redrawDraft();
       } else if (tool === "text") {
-        const text = window.prompt("Annotation text:");
+        const text = window.prompt(t`Annotation text:`);
         if (!text) return;
         setStrokes((s) => {
           return [
@@ -212,6 +214,7 @@ export function PdfAnnotator({
       roughness,
       strokeWidth,
       tool,
+      t,
       _toCanvasCoord,
       _redrawDraft,
     ],
@@ -271,20 +274,20 @@ export function PdfAnnotator({
       onClose();
     } catch (e: unknown) {
       notifyError({
-        title: "Couldn't export PDF",
+        title: t`Couldn't export PDF`,
         message: e instanceof Error ? e.message : String(e),
       });
     } finally {
       setIsExporting(false);
     }
-  }, [filename, onClose, sourceElement, title]);
+  }, [filename, onClose, sourceElement, title, t]);
 
   if (isCapturing) {
     return (
       <Stack align="center" py="xl">
         <Loader />
         <Text size="sm" c="dimmed">
-          Capturing dashboard…
+          <Trans>Capturing dashboard…</Trans>
         </Text>
       </Stack>
     );
@@ -294,10 +297,10 @@ export function PdfAnnotator({
     return (
       <Stack align="center" py="xl">
         <Text size="sm" c="red">
-          Couldn't capture the dashboard for annotation.
+          <Trans>Couldn't capture the dashboard for annotation.</Trans>
         </Text>
         <Button variant="subtle" onClick={onBack}>
-          Back
+          <Trans>Back</Trans>
         </Button>
       </Stack>
     );
@@ -308,13 +311,13 @@ export function PdfAnnotator({
       <Group gap="md" wrap="wrap" align="end">
         <Stack gap={2}>
           <Text size="xs" c="dimmed">
-            Tool
+            <Trans>Tool</Trans>
           </Text>
           <SegmentedControl
             size="xs"
             value={tool}
-            onChange={(t) => {
-              return setTool(t as Tool);
+            onChange={(nextTool) => {
+              return setTool(nextTool as Tool);
             }}
             data={[
               {
@@ -322,7 +325,9 @@ export function PdfAnnotator({
                 label: (
                   <Group gap={4}>
                     <IconPencil size={14} />
-                    <span>Freehand</span>
+                    <span>
+                      <Trans>Freehand</Trans>
+                    </span>
                   </Group>
                 ),
               },
@@ -331,7 +336,9 @@ export function PdfAnnotator({
                 label: (
                   <Group gap={4}>
                     <IconArrowRight size={14} />
-                    <span>Arrow</span>
+                    <span>
+                      <Trans>Arrow</Trans>
+                    </span>
                   </Group>
                 ),
               },
@@ -340,7 +347,9 @@ export function PdfAnnotator({
                 label: (
                   <Group gap={4}>
                     <IconTypography size={14} />
-                    <span>Text</span>
+                    <span>
+                      <Trans>Text</Trans>
+                    </span>
                   </Group>
                 ),
               },
@@ -350,7 +359,7 @@ export function PdfAnnotator({
 
         <Stack gap={2} miw={180}>
           <Text size="xs" c="dimmed">
-            Roughness ({roughness.toFixed(1)})
+            <Trans>Roughness ({roughness.toFixed(1)})</Trans>
           </Text>
           <Slider
             size="xs"
@@ -360,16 +369,16 @@ export function PdfAnnotator({
             value={roughness}
             onChange={setRoughness}
             marks={[
-              { value: 0, label: "Formal" },
-              { value: 2, label: "Sketch" },
-              { value: 4, label: "Loose" },
+              { value: 0, label: t`Formal` },
+              { value: 2, label: t`Sketch` },
+              { value: 4, label: t`Loose` },
             ]}
           />
         </Stack>
 
         <Stack gap={2} miw={140}>
           <Text size="xs" c="dimmed">
-            Stroke ({strokeWidth}px)
+            <Trans>Stroke ({strokeWidth}px)</Trans>
           </Text>
           <Slider
             size="xs"
@@ -383,7 +392,7 @@ export function PdfAnnotator({
 
         <Stack gap={2}>
           <Text size="xs" c="dimmed">
-            Color
+            <Trans>Color</Trans>
           </Text>
           <ColorInput
             size="xs"
@@ -410,7 +419,7 @@ export function PdfAnnotator({
             variant="subtle"
             onClick={_undo}
             disabled={strokes.length === 0}
-            aria-label="Undo"
+            aria-label={t`Undo`}
           >
             <IconArrowBack size={16} />
           </ActionIcon>
@@ -419,7 +428,7 @@ export function PdfAnnotator({
             color="red"
             onClick={_clear}
             disabled={strokes.length === 0}
-            aria-label="Clear all"
+            aria-label={t`Clear all`}
           >
             <IconClearAll size={16} />
           </ActionIcon>
@@ -441,7 +450,7 @@ export function PdfAnnotator({
         >
           <img
             src={baseCanvas.toDataURL()}
-            alt="Dashboard snapshot"
+            alt={t`Dashboard snapshot`}
             ref={(el) => {
               // Keep the same width as the overlay so coords line up.
               if (el) {
@@ -483,18 +492,18 @@ export function PdfAnnotator({
 
       <Group justify="space-between" mt="xs">
         <Button variant="subtle" color="neutral" onClick={onBack}>
-          ← Back
+          <Trans>← Back</Trans>
         </Button>
         <Group gap="xs">
           <Button variant="subtle" color="neutral" onClick={onClose}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button
             loading={isExporting}
             leftSection={<IconFileExport size={16} />}
             onClick={_export}
           >
-            Export annotated PDF
+            <Trans>Export annotated PDF</Trans>
           </Button>
         </Group>
       </Group>

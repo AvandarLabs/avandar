@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Anchor,
@@ -64,6 +65,7 @@ export function PublishDashboardModal({
   onClose,
   modalId,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   // Track the live dashboard locally so a successful publish flips the
   // UI to the "already published" branch (with share URLs and QR) without
@@ -75,8 +77,8 @@ export function PublishDashboardModal({
     onSuccess: (updatedDashboard) => {
       notifySuccess(
         currentDashboard.isPublic ?
-          "Dashboard share settings updated."
-        : "Dashboard published!",
+          t`Dashboard share settings updated.`
+        : t`Dashboard published!`,
       );
       void logAnalyticsEvent({
         event: "dashboard.published",
@@ -95,13 +97,13 @@ export function PublishDashboardModal({
       if (modalId) {
         modals.updateModal({
           modalId,
-          title: "Manage sharing",
+          title: t`Manage sharing`,
         });
       }
     },
     onError: (e: Error) => {
       notifyError({
-        title: "Could not publish dashboard",
+        title: t`Could not publish dashboard`,
         message: e.message,
       });
     },
@@ -208,15 +210,19 @@ export function PublishDashboardModal({
       {isAlreadyPublished ?
         <Alert color="teal" icon={<IconWorld size={18} />} variant="light">
           <Text size="sm">
-            This dashboard is <strong>public</strong>. Anyone with the link
-            below can view it.
+            <Trans>
+              This dashboard is <strong>public</strong>. Anyone with the link
+              below can view it.
+            </Trans>
           </Text>
         </Alert>
       : <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
           <Text size="sm">
-            Publishing makes this dashboard viewable by anyone with the link —
-            no Avandar account required. Datasets referenced by the dashboard
-            are copied to public storage at publish time.
+            <Trans>
+              Publishing makes this dashboard viewable by anyone with the link
+              — no Avandar account required. Datasets referenced by the
+              dashboard are copied to public storage at publish time.
+            </Trans>
           </Text>
         </Alert>
       }
@@ -224,8 +230,8 @@ export function PublishDashboardModal({
       <Stack gap={6}>
         <Text size="sm" fw={500}>
           {isAlreadyPublished ?
-            "Your dashboard is published at:"
-          : "Your dashboard will be published to:"}
+            <Trans>Your dashboard is published at:</Trans>
+          : <Trans>Your dashboard will be published to:</Trans>}
         </Text>
         <Code
           block
@@ -239,8 +245,14 @@ export function PublishDashboardModal({
         </Code>
         <Text size="xs" c="dimmed">
           {isUsingVanity ?
-            "Using your custom URL. The permanent UUID link below also still works."
-          : "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
+            <Trans>
+              Using your custom URL. The permanent UUID link below also still
+              works.
+            </Trans>
+          : <Trans>
+              By default we use a permanent UUID-based link. Add a custom path
+              below for a nicer URL.
+            </Trans>
           }
         </Text>
       </Stack>
@@ -249,15 +261,17 @@ export function PublishDashboardModal({
 
       <Stack gap={4}>
         <Title order={5} fw={600}>
-          Custom URL (optional)
+          <Trans>Custom URL (optional)</Trans>
         </Title>
         <Text size="xs" c="dimmed">
-          A short, memorable URL for flyers, reports, and QR codes. Whatever you
-          type is kebab-cased automatically.
+          <Trans>
+            A short, memorable URL for flyers, reports, and QR codes. Whatever
+            you type is kebab-cased automatically.
+          </Trans>
         </Text>
         <TextInput
-          aria-label="Custom URL path"
-          placeholder="e.g. cholera-outbreak-2024"
+          aria-label={t`Custom URL path`}
+          placeholder={t`e.g. cholera-outbreak-2024`}
           value={slugInput}
           onChange={(e) => {
             return setSlugInput(e.currentTarget.value);
@@ -271,7 +285,7 @@ export function PublishDashboardModal({
               <IconCheck
                 size={18}
                 color="var(--mantine-color-teal-6)"
-                aria-label="Custom URL is available"
+                aria-label={t`Custom URL is available`}
               />
             : null
           }
@@ -280,7 +294,7 @@ export function PublishDashboardModal({
         {normalisedSlug ?
           <Group gap={6} mt={2} wrap="nowrap">
             <Text size="xs" c="dimmed">
-              Preview:
+              <Trans>Preview:</Trans>
             </Text>
             <Code style={{ fontSize: "0.78em", padding: "1px 6px" }}>
               /d/{normalisedSlug}
@@ -302,27 +316,27 @@ export function PublishDashboardModal({
           <Divider />
           <Stack gap="md">
             <Title order={5} fw={600}>
-              Share
+              <Trans>Share</Trans>
             </Title>
             {livePreviewUrls.vanity ?
               <ShareUrlRow
-                label="Custom URL"
+                label={t`Custom URL`}
                 url={livePreviewUrls.vanity}
-                hint="Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
+                hint={t`Best for word-of-mouth sharing. Visiting the permanent link below also redirects here.`}
                 showQr={false}
               />
             : null}
             <ShareUrlRow
               label={
                 livePreviewUrls.vanity ?
-                  "Permanent link (use for QR codes)"
-                : "Share link"
+                  t`Permanent link (use for QR codes)`
+                : t`Share link`
               }
               url={livePreviewUrls.canonical}
               hint={
                 livePreviewUrls.vanity ?
-                  "Never changes, so QR codes printed from here keep working even if the custom URL changes."
-                : "Anyone with this link can view the dashboard."
+                  t`Never changes, so QR codes printed from here keep working even if the custom URL changes.`
+                : t`Anyone with this link can view the dashboard.`
               }
             />
           </Stack>
@@ -331,11 +345,11 @@ export function PublishDashboardModal({
 
       <Group justify="space-between" mt="md">
         <Anchor size="xs" c="dimmed" onClick={onClose} component="button">
-          Close
+          <Trans>Close</Trans>
         </Anchor>
         <Group gap="xs">
           <Button variant="subtle" color="neutral" onClick={onClose}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button
             loading={isPublishing}
@@ -343,7 +357,9 @@ export function PublishDashboardModal({
             onClick={submit}
             leftSection={<IconWorld size={16} />}
           >
-            {isAlreadyPublished ? "Update & republish" : "Publish"}
+            {isAlreadyPublished ?
+              <Trans>Update &amp; republish</Trans>
+            : <Trans>Publish</Trans>}
           </Button>
         </Group>
       </Group>

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Tooltip } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -24,11 +25,12 @@ export function ViewDashboardButton({
   dashboardId,
   hasUnsavedChanges,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
 
   return (
     <Tooltip
-      label="Unsaved changes will not appear in preview. Save first."
+      label={t`Unsaved changes will not appear in preview. Save first.`}
       disabled={!hasUnsavedChanges}
     >
       <Button
@@ -45,7 +47,7 @@ export function ViewDashboardButton({
           });
         }}
       >
-        View
+        <Trans>View</Trans>
       </Button>
     </Tooltip>
   );

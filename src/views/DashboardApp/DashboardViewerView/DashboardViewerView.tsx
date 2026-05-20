@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Button,
@@ -41,6 +42,7 @@ export function DashboardViewerView({
   mode = "public",
   workspaceSlug,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const [isLoadingDatasets, loadingDatasetsError] =
     useEnsurePublishedDashboardDatasets(dashboard);
@@ -49,6 +51,7 @@ export function DashboardViewerView({
     dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     workspaceId: dashboard?.workspaceId,
     dashboardId: dashboard.id,
+    t,
   });
 
   const data = useMemo(() => {
@@ -74,10 +77,10 @@ export function DashboardViewerView({
     }
 
     notifyError({
-      title: "Unable to load dashboard datasets",
+      title: t`Unable to load dashboard datasets`,
       message: loadingDatasetsError.message,
     });
-  }, [loadingDatasetsError]);
+  }, [loadingDatasetsError, t]);
 
   const avaPageMetadata = useMemo(() => {
     return getAvaPageMetadataFromDashboard(dashboard);
@@ -88,11 +91,13 @@ export function DashboardViewerView({
       <Paper p="xxl" maw={720} mx="auto">
         <Stack gap="xs">
           <Title order={2} fw={650}>
-            You do not have access to this dashboard
+            <Trans>You do not have access to this dashboard</Trans>
           </Title>
           <Text c="dimmed">
-            This dashboard is private. This dashboard has not been made publicly
-            viewable.
+            <Trans>
+              This dashboard is private. This dashboard has not been made
+              publicly viewable.
+            </Trans>
           </Text>
         </Stack>
       </Paper>
@@ -105,9 +110,11 @@ export function DashboardViewerView({
         <LoadingOverlay visible />
         <Stack gap="xs">
           <Title order={2} fw={650}>
-            Loading dashboard datasets
+            <Trans>Loading dashboard datasets</Trans>
           </Title>
-          <Text c="dimmed">Preparing data for the visualizations…</Text>
+          <Text c="dimmed">
+            <Trans>Preparing data for the visualizations…</Trans>
+          </Text>
         </Stack>
       </Paper>
     );
@@ -118,10 +125,13 @@ export function DashboardViewerView({
       <Paper p="xxl" maw={720} mx="auto">
         <Stack gap="xs">
           <Title order={2} fw={650}>
-            Unable to load dashboard
+            <Trans>Unable to load dashboard</Trans>
           </Title>
           <Text c="dimmed">
-            Some published datasets could not be loaded. Please try again later.
+            <Trans>
+              Some published datasets could not be loaded. Please try again
+              later.
+            </Trans>
           </Text>
         </Stack>
       </Paper>
@@ -145,12 +155,15 @@ export function DashboardViewerView({
             <Group gap="xs">
               <IconEye size={16} color="var(--mantine-color-blue-7)" />
               <Text size="sm" c="blue.9" fw={500}>
-                Previewing this dashboard
+                <Trans>Previewing this dashboard</Trans>
               </Text>
               <Text size="xs" c="dimmed">
                 {dashboard.isPublic ?
-                  "This dashboard is published publicly."
-                : "Not yet published. Public viewers will not see this."}
+                  <Trans>This dashboard is published publicly.</Trans>
+                : <Trans>
+                    Not yet published. Public viewers will not see this.
+                  </Trans>
+                }
               </Text>
             </Group>
             <Button
@@ -165,7 +178,7 @@ export function DashboardViewerView({
                 });
               }}
             >
-              Back to editor
+              <Trans>Back to editor</Trans>
             </Button>
           </Group>
         : null}

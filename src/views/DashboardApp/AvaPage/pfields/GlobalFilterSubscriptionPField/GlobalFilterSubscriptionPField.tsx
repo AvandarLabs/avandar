@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Checkbox,
@@ -16,11 +17,14 @@ import type {
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 
-const MODE_DESCRIPTIONS: Record<GlobalFilterSubscriptionMode, string> = {
-  all: "Apply every global filter on the dashboard.",
-  selected: "Pick which global filters apply to this visualization.",
-  none: "Ignore all global filters — this visualization is unfiltered.",
-};
+function _useModeDescriptions(): Record<GlobalFilterSubscriptionMode, string> {
+  const { t } = useLingui();
+  return {
+    all: t`Apply every global filter on the dashboard.`,
+    selected: t`Pick which global filters apply to this visualization.`,
+    none: t`Ignore all global filters — this visualization is unfiltered.`,
+  };
+}
 
 /**
  * Puck side-panel field that controls how a DataViz block reacts to
@@ -34,6 +38,8 @@ export function GlobalFilterSubscriptionPField({
   value,
   onChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const modeDescriptions = _useModeDescriptions();
   const { filtersById } = DashboardFilterStateManager.useState();
   const registeredFilters = Object.values(filtersById);
 
@@ -65,14 +71,14 @@ export function GlobalFilterSubscriptionPField({
           _setMode(m as GlobalFilterSubscriptionMode);
         }}
         data={[
-          { value: "all", label: "All" },
-          { value: "selected", label: "Some" },
-          { value: "none", label: "None" },
+          { value: "all", label: t`All` },
+          { value: "selected", label: t`Some` },
+          { value: "none", label: t`None` },
         ]}
         fullWidth
       />
       <Text size="xs" c="dimmed">
-        {MODE_DESCRIPTIONS[value.mode]}
+        {modeDescriptions[value.mode]}
       </Text>
 
       {value.mode === "selected" ?
@@ -83,8 +89,10 @@ export function GlobalFilterSubscriptionPField({
             icon={<IconInfoCircle size={14} />}
           >
             <Text size="xs">
-              Add a Filter block to the dashboard to enable global filtering for
-              this visualization.
+              <Trans>
+                Add a Filter block to the dashboard to enable global filtering
+                for this visualization.
+              </Trans>
             </Text>
           </Alert>
         : <ScrollArea.Autosize mah={200}>

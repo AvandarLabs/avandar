@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
 import { makeSelectOptions, Select } from "@ui";
 import { makeBucketMap, where } from "@utils";
@@ -33,6 +34,7 @@ export function QueryDataSourceSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const isControlled = value !== undefined;
   const [currentDataSource, setCurrentDataSource] =
     useUncontrolled<QueryDataSource | null>({
@@ -94,19 +96,19 @@ export function QueryDataSourceSelect({
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
         .with("csv_file", () => {
-          return "CSVs";
+          return t`CSVs`;
         })
         .with("google_sheets", () => {
-          return "Google Sheets";
+          return t`Google Sheets`;
         })
         .with("virtual", () => {
-          return "Derived Dataset";
+          return t`Derived Dataset`;
         })
         .with("open_data", () => {
-          return "Open Data";
+          return t`Open Data`;
         })
         .with("xlsx_file", () => {
-          return "Excel files";
+          return t`Excel files`;
         })
         .exhaustive(() => {
           return undefined;
@@ -124,14 +126,14 @@ export function QueryDataSourceSelect({
     return [
       ...groups,
       {
-        group: "Profiles",
+        group: t`Profiles`,
         items: makeSelectOptions(entityConfigs ?? [], {
           valueKey: "id",
           labelKey: "name",
         }),
       },
     ];
-  }, [datasets, entityConfigs]);
+  }, [datasets, entityConfigs, t]);
 
   const onDataSourceChange = (newDataSourceId: QueryDataSourceId | null) => {
     const newDataSource =
@@ -144,8 +146,8 @@ export function QueryDataSourceSelect({
   return (
     <Select
       data={dataSourceOptions}
-      label="Data source"
-      placeholder="Select a data source"
+      label={t`Data source`}
+      placeholder={t`Select a data source`}
       value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
       {...selectProps}

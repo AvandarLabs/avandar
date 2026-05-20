@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Title } from "@mantine/core";
 import { Drawer, Tabs } from "@ui";
 import { APP_SHELL_MAIN_ID } from "@/components/AppShell/AppShell";
@@ -28,6 +29,7 @@ export function OpenDatasetDrawer({
   onClose,
   onOpen,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const onImportSaved = (dataset: Dataset.T) => {
     onOpen(
       {
@@ -47,13 +49,17 @@ export function OpenDatasetDrawer({
       boundary={`#${APP_SHELL_MAIN_ID}`}
       position="right"
       size="100%"
-      title={<Title order={4}>Open dataset</Title>}
+      title={
+        <Title order={4}>
+          <Trans>Open dataset</Trans>
+        </Title>
+      }
     >
       <Tabs
         tabIds={["saved", "import"] as const}
         renderTabHeader={{
-          saved: "Saved datasets",
-          import: "Import dataset",
+          saved: t`Saved datasets`,
+          import: t`Import dataset`,
         }}
         renderTabPanel={{
           saved: () => {

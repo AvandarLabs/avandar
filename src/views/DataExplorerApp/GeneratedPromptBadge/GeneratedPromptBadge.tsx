@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   Code,
   Group,
@@ -40,7 +41,7 @@ export function GeneratedPromptBadge(): JSX.Element | null {
         className={css.icon}
       />
       <Text size="xs" c="primary.9" fw={600} className={css.staticText}>
-        From your prompt:
+        <Trans>From your prompt:</Trans>
       </Text>
       <Text
         size="xs"
@@ -55,13 +56,13 @@ export function GeneratedPromptBadge(): JSX.Element | null {
         <Popover position="bottom-end" withArrow shadow="md" width={420}>
           <Popover.Target>
             <UnstyledButton c="primary.7" className={css.showSqlButton}>
-              Show SQL
+              <Trans>Show SQL</Trans>
             </UnstyledButton>
           </Popover.Target>
           <Popover.Dropdown p="sm">
             <Stack gap="xs">
               <Text size="xs" c="neutral.6" fw={600} tt="uppercase">
-                Generated SQL
+                <Trans>Generated SQL</Trans>
               </Text>
               <ScrollArea.Autosize mah={280}>
                 <Code block fz="xs">

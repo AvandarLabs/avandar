@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
@@ -26,11 +27,12 @@ export function PublishDashboardButton({
   dashboard,
   hasUnsavedChanges,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const isDisabled: boolean = !dashboard || hasUnsavedChanges;
 
   return (
     <Tooltip
-      label="You cannot publish while there are unsaved changes. Save first."
+      label={t`You cannot publish while there are unsaved changes. Save first.`}
       disabled={!hasUnsavedChanges}
     >
       <Button
@@ -53,7 +55,8 @@ export function PublishDashboardButton({
           const modalId = `publish-dashboard-${dashboard.id}`;
           modals.open({
             modalId,
-            title: dashboard.isPublic ? "Manage sharing" : "Publish dashboard",
+            title:
+              dashboard.isPublic ? t`Manage sharing` : t`Publish dashboard`,
             size: "lg",
             children: (
               <PublishDashboardModal
@@ -67,7 +70,9 @@ export function PublishDashboardButton({
           });
         }}
       >
-        {dashboard?.isPublic ? "Published" : "Publish"}
+        {dashboard?.isPublic ?
+          <Trans>Published</Trans>
+        : <Trans>Publish</Trans>}
       </Button>
     </Tooltip>
   );

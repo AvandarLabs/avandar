@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
 import { Model } from "@models";
 import { makeSelectOptions, Select } from "@ui";
@@ -32,6 +33,7 @@ export function QueryColumnSingleSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [currentSelectedColumn, setCurrentSelectedColumn] =
     useUncontrolled<QueryColumnRead | null>({
       value,
@@ -101,7 +103,7 @@ export function QueryColumnSingleSelect({
       searchable
       clearable
       label={label}
-      placeholder={isLoading ? "Loading datasets..." : placeholder}
+      placeholder={isLoading ? t`Loading datasets...` : placeholder}
       data={selectableOptions}
       value={selectedColumnId}
       onChange={(newColumnId) => {
@@ -112,7 +114,7 @@ export function QueryColumnSingleSelect({
           : null;
         setCurrentSelectedColumn(newSelectedColumn);
       }}
-      nothingFoundMessage="No fields"
+      nothingFoundMessage={t`No fields`}
       {...selectProps}
     />
   );

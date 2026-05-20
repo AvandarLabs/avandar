@@ -1,47 +1,56 @@
+import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type { FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 
-const defaultProps: FilterPBlockProps = {
-  filterId: "",
-  label: "Filter",
-  columnName: "",
-  mode: "select_single",
-  optionsRaw: "",
-  defaultValue: "",
-};
+/**
+ * Build the Puck component config for the dashboard's Filter block. Reads the
+ * Lingui `t` from `useLingui()` so labels, default props, and category
+ * metadata can be translated. Must be invoked from React component / hook
+ * context.
+ */
+export function useFilterPBlockConfig(): ComponentConfig<FilterPBlockProps> {
+  const { t } = useLingui();
 
-export function buildFilterPBlockConfig(): ComponentConfig<FilterPBlockProps> {
+  const defaultProps: FilterPBlockProps = {
+    filterId: "",
+    label: t`Filter`,
+    columnName: "",
+    mode: "select_single",
+    optionsRaw: "",
+    defaultValue: "",
+  };
+
   return {
-    label: "Filter",
+    label: t`Filter`,
     fields: {
       filterId: {
-        label: "Filter id (stable)",
+        label: t`Filter id (stable)`,
         type: "text",
       },
       label: {
-        label: "Label",
+        label: t`Label`,
         type: "text",
       },
       columnName: {
-        label: "Column name in SQL",
+        label: t`Column name in SQL`,
         type: "text",
       },
       mode: {
-        label: "Mode",
+        label: t`Mode`,
         type: "select",
         options: [
-          { label: "Single select", value: "select_single" },
-          { label: "Multi select", value: "select_multi" },
-          { label: "Contains (free-text)", value: "contains" },
+          { label: t`Single select`, value: "select_single" },
+          { label: t`Multi select`, value: "select_multi" },
+          { label: t`Contains (free-text)`, value: "contains" },
         ],
       },
       optionsRaw: {
-        label: "Options (comma-separated, for select modes)",
+        label: t`Options (comma-separated, for select modes)`,
         type: "textarea",
       },
       defaultValue: {
-        label: "Default value",
+        label: t`Default value`,
         type: "text",
       },
     },

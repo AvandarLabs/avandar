@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -53,6 +54,7 @@ export function ShareUrlRow({
   hint,
   showQr = true,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [qrOpen, setQrOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
@@ -74,14 +76,14 @@ export function ShareUrlRow({
       })
       .catch((e) => {
         notifyError({
-          title: "Could not generate QR code",
+          title: t`Could not generate QR code`,
           message: e instanceof Error ? e.message : String(e),
         });
       });
     return () => {
       cancelled = true;
     };
-  }, [qrOpen, url]);
+  }, [qrOpen, url, t]);
 
   const downloadQr = (): void => {
     if (!qrDataUrl) {
@@ -110,13 +112,13 @@ export function ShareUrlRow({
         <CopyButton value={url}>
           {({ copied, copy }) => {
             return (
-              <Tooltip label={copied ? "Copied!" : "Copy link"}>
+              <Tooltip label={copied ? t`Copied!` : t`Copy link`}>
                 <ActionIcon
                   variant="light"
                   color={copied ? "teal" : "neutral"}
                   size="lg"
                   onClick={copy}
-                  aria-label="Copy share link"
+                  aria-label={t`Copy share link`}
                 >
                   {copied ?
                     <IconCheck size={18} />
@@ -127,12 +129,12 @@ export function ShareUrlRow({
           }}
         </CopyButton>
         {showQr ?
-          <Tooltip label="Show QR code">
+          <Tooltip label={t`Show QR code`}>
             <ActionIcon
               variant="light"
               color="neutral"
               size="lg"
-              aria-label="Show QR code"
+              aria-label={t`Show QR code`}
               onClick={() => {
                 return setQrOpen(true);
               }}
@@ -153,21 +155,21 @@ export function ShareUrlRow({
         onClose={() => {
           return setQrOpen(false);
         }}
-        title="QR code"
+        title={t`QR code`}
         centered
         size="sm"
       >
         <Stack align="center" gap="md">
           {qrDataUrl ?
             <Box>
-              <Image src={qrDataUrl} alt="QR code" w={256} h={256} />
+              <Image src={qrDataUrl} alt={t`QR code`} w={256} h={256} />
             </Box>
           : <Text size="sm" c="dimmed">
-              Generating…
+              <Trans>Generating…</Trans>
             </Text>
           }
           <Text size="xs" c="dimmed" ta="center">
-            Scans to:{" "}
+            <Trans>Scans to:</Trans>{" "}
             <Text component="span" ff="monospace" size="xs">
               {url}
             </Text>
@@ -179,7 +181,7 @@ export function ShareUrlRow({
             disabled={!qrDataUrl}
             onClick={downloadQr}
           >
-            Download PNG
+            <Trans>Download PNG</Trans>
           </Button>
         </Stack>
       </Modal>

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Button,
@@ -83,6 +84,7 @@ type Props = {
 };
 
 export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
+  const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const [
@@ -144,10 +146,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset saved.");
+      notifySuccess(t`Dataset saved.`);
     },
     onError: (error) => {
-      notifyError(`Failed to save dataset: ${error.message}`);
+      notifyError(t`Failed to save dataset: ${error.message}`);
     },
   });
 
@@ -156,10 +158,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     onSuccess: () => {
       dispatch.setOpenDataset(undefined);
       dispatch.setRawSql(undefined);
-      notifySuccess("Dataset deleted.");
+      notifySuccess(t`Dataset deleted.`);
     },
     onError: (error) => {
-      notifyError(`Failed to delete dataset: ${error.message}`);
+      notifyError(t`Failed to delete dataset: ${error.message}`);
     },
   });
 
@@ -247,7 +249,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
 
   return (
-    <AppLayout title="Data Explorer">
+    <AppLayout title={t`Data Explorer`}>
       <Stack flex={1} h="100%" gap={0} mih={0}>
         <Group
           bg="white"
@@ -268,7 +270,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               navigate({ search: EMPTY_EXPLORER_URL_SEARCH, replace: true });
             }}
           >
-            Reset
+            <Trans>Reset</Trans>
           </Button>
           <Button
             variant={isQueryDetailsOpened ? "filled" : "outline"}
@@ -281,7 +283,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               });
             }}
           >
-            Query
+            <Trans>Query</Trans>
           </Button>
           <Button
             variant={isSettingsOpened ? "filled" : "outline"}
@@ -294,7 +296,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               });
             }}
           >
-            Settings
+            <Trans>Settings</Trans>
           </Button>
           <Button
             variant="outline"
@@ -303,7 +305,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             size="compact-sm"
             onClick={openOpenDatasetDrawer}
           >
-            Open
+            <Trans>Open</Trans>
           </Button>
           <Menu shadow="md" width={240}>
             <Menu.Target>
@@ -313,7 +315,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                 size="compact-sm"
                 rightSection={<IconChevronDown size={16} />}
               >
-                Save
+                <Trans>Save</Trans>
               </Button>
             </Menu.Target>
             <Menu.Dropdown>
@@ -334,7 +336,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                         });
                       }}
                     >
-                      Save — {state.openDataset.name}
+                      <Trans>Save — {state.openDataset.name}</Trans>
                     </Menu.Item>
                   : null}
                   <Menu.Item
@@ -345,16 +347,18 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                         return;
                       }
                       modals.openConfirmModal({
-                        title: "Delete dataset",
+                        title: t`Delete dataset`,
                         children: (
                           <Text size="sm">
-                            Permanently delete{" "}
-                            <strong>{state.openDataset.name}</strong>?
+                            <Trans>
+                              Permanently delete{" "}
+                              <strong>{state.openDataset.name}</strong>?
+                            </Trans>
                           </Text>
                         ),
                         labels: {
-                          confirm: "Delete",
-                          cancel: "Cancel",
+                          confirm: t`Delete`,
+                          cancel: t`Cancel`,
                         },
                         confirmProps: { color: "red" },
                         onConfirm: () => {
@@ -368,7 +372,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                       });
                     }}
                   >
-                    Delete — {state.openDataset.name}
+                    <Trans>Delete — {state.openDataset.name}</Trans>
                   </Menu.Item>
                   <Menu.Divider />
                 </>
@@ -379,7 +383,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                 }
                 rightSection={
                   state.rawSQL === undefined ?
-                    <Tooltip label="Run an AI query first.">
+                    <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
@@ -389,7 +393,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                     return;
                   }
                   const modalId = modals.open({
-                    title: "Save as new dataset",
+                    title: t`Save as new dataset`,
                     size: "xl",
                     children: (
                       <SaveAsNewDatasetForm
@@ -405,7 +409,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   });
                 }}
               >
-                Save as new dataset
+                <Trans>Save as new dataset</Trans>
               </Menu.Item>
               <Menu.Item
                 disabled={
@@ -413,7 +417,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                 }
                 rightSection={
                   state.rawSQL === undefined ?
-                    <Tooltip label="Run an AI query first.">
+                    <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
@@ -440,7 +444,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   });
                 }}
               >
-                Save to dashboard
+                <Trans>Save to dashboard</Trans>
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -454,7 +458,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               downloadRowsAsCSV(queryResultData);
             }}
           >
-            Export
+            <Trans>Export</Trans>
           </Button>
         </Group>
         <GeneratedPromptBadge />
@@ -470,7 +474,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         </Box>
       </Stack>
       <FloatingPanel
-        title="Query Details"
+        title={t`Query Details`}
         opened={isQueryDetailsOpened}
         collapsed={isQueryDetailsCollapsed}
         onClose={() => {
@@ -501,7 +505,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         <QueryDetailsBody />
       </FloatingPanel>
       <FloatingPanel
-        title="Visualization Settings"
+        title={t`Visualization Settings`}
         opened={isSettingsOpened}
         collapsed={isSettingsCollapsed}
         onClose={() => {

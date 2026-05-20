@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Box, Button, Stack, Text, TextInput } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
@@ -28,6 +29,7 @@ export function SaveAsNewDatasetForm({
   rawSQL,
   onSaveSuccess,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   // If a multi-step analytic plan produced this save, capture it onto
   // the new virtual dataset so reopening the dataset rehydrates the
@@ -56,10 +58,10 @@ export function SaveAsNewDatasetForm({
       queryToInvalidate: DatasetClient.QueryKeys.getAll(),
       onSuccess: () => {
         onSaveSuccess();
-        notifySuccess("Dataset saved successfully!");
+        notifySuccess(t`Dataset saved successfully!`);
       },
       onError: (error) => {
-        notifyError(`Error saving dataset: ${error.message}`);
+        notifyError(t`Error saving dataset: ${error.message}`);
       },
     });
   const columnNames = columns.map(prop("name"));
@@ -70,7 +72,7 @@ export function SaveAsNewDatasetForm({
     validate: {
       datasetName: (value) => {
         if (value.trim().length === 0) {
-          return "Dataset name is required";
+          return t`Dataset name is required`;
         }
         return undefined;
       },
@@ -114,16 +116,18 @@ export function SaveAsNewDatasetForm({
               p="xs"
             >
               <Text size="xs">
-                The {planSnapshot.steps.length}-step analysis that produced this
-                result will be saved with the dataset, so it can be reopened on
-                the canvas.
+                <Trans>
+                  The {planSnapshot.steps.length}-step analysis that produced
+                  this result will be saved with the dataset, so it can be
+                  reopened on the canvas.
+                </Trans>
               </Text>
             </Alert>
           : null}
           <TextInput
             required
-            label="Dataset Name"
-            placeholder="Enter dataset name"
+            label={t`Dataset Name`}
+            placeholder={t`Enter dataset name`}
             {...form.getInputProps("datasetName")}
           />
           <DataGrid
@@ -139,7 +143,7 @@ export function SaveAsNewDatasetForm({
             type="submit"
             loading={isSavingNewDataset}
           >
-            Save
+            <Trans>Save</Trans>
           </Button>
         </Stack>
       </form>

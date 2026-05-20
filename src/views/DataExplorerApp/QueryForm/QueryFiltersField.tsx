@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import {
   MantineActionElement,
@@ -80,21 +81,29 @@ const _INTERNAL_TO_OPERATOR: Record<QueryFilterOperator, string> = {
   between: "between",
 };
 
-const _OPERATORS_FOR_LIBRARY = [
-  { name: "=", label: "=" },
-  { name: "!=", label: "!=" },
-  { name: ">", label: ">" },
-  { name: ">=", label: ">=" },
-  { name: "<", label: "<" },
-  { name: "<=", label: "<=" },
-  { name: "contains", label: "contains" },
-  { name: "doesNotContain", label: "does not contain" },
-  { name: "in", label: "in" },
-  { name: "notIn", label: "not in" },
-  { name: "null", label: "is null" },
-  { name: "notNull", label: "is not null" },
-  { name: "between", label: "between" },
-];
+/**
+ * Returns the localized operator labels for react-querybuilder. The `name` is
+ * the library's operator code (machine identifier); `label` is user-visible.
+ * Defined as a hook so the labels can use the active translation function.
+ */
+function _useOperatorsForLibrary(): Array<{ name: string; label: string }> {
+  const { t } = useLingui();
+  return [
+    { name: "=", label: "=" },
+    { name: "!=", label: "!=" },
+    { name: ">", label: ">" },
+    { name: ">=", label: ">=" },
+    { name: "<", label: "<" },
+    { name: "<=", label: "<=" },
+    { name: "contains", label: t`contains` },
+    { name: "doesNotContain", label: t`does not contain` },
+    { name: "in", label: t`in` },
+    { name: "notIn", label: t`not in` },
+    { name: "null", label: t`is null` },
+    { name: "notNull", label: t`is not null` },
+    { name: "between", label: t`between` },
+  ];
+}
 
 function _convertRuleFromInternal(rule: QueryFilterRule): LibraryRule {
   const libOperator = _INTERNAL_TO_OPERATOR[rule.operator];
@@ -196,6 +205,7 @@ export function QueryFiltersField({
   value,
   onChange,
 }: Props): JSX.Element {
+  const operatorsForLibrary = _useOperatorsForLibrary();
   const fields: Field[] = useMemo(() => {
     return columns.map((col) => {
       return {
@@ -214,7 +224,7 @@ export function QueryFiltersField({
     return (
       <Stack gap="xs">
         <Text size="sm" c="neutral.6">
-          Add columns to the query above to start defining filters.
+          <Trans>Add columns to the query above to start defining filters.</Trans>
         </Text>
       </Stack>
     );
@@ -225,7 +235,7 @@ export function QueryFiltersField({
       <QueryBuilderMantine>
         <QueryBuilder
           fields={fields}
-          operators={_OPERATORS_FOR_LIBRARY}
+          operators={operatorsForLibrary}
           query={libraryQuery as RuleGroupType}
           onQueryChange={(newQuery) => {
             onChange(_convertGroupToInternal(newQuery as LibraryGroup));

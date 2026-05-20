@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
 import { isPlainObject } from "@utils";
@@ -70,6 +71,7 @@ export function ContainerMaxWidthPField({
   onChange,
   readOnly,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const normalized = _normalizeContainerMaxWidth(value);
 
   const onUnitChange = (nextUnit: ContainerMaxWidthUnit): void => {
@@ -100,7 +102,7 @@ export function ContainerMaxWidthPField({
 
   return (
     <Stack gap={0}>
-      <FieldLabel label="Container max width" />
+      <FieldLabel label={t`Container max width`} />
       <Group gap={6} wrap="nowrap">
         <NumberInput
           value={normalized.value}

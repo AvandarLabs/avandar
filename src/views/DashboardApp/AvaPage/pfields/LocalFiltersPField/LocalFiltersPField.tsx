@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -14,14 +15,17 @@ import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPB
 
 type Props = AvaPageFieldProps<readonly LocalFilter[]>;
 
-const MODE_OPTIONS: ReadonlyArray<{
+function _useModeOptions(): ReadonlyArray<{
   value: LocalFilter["mode"];
   label: string;
-}> = [
-  { value: "select_single", label: "Single-select" },
-  { value: "select_multi", label: "Multi-select" },
-  { value: "contains", label: "Text contains" },
-];
+}> {
+  const { t } = useLingui();
+  return [
+    { value: "select_single", label: t`Single-select` },
+    { value: "select_multi", label: t`Multi-select` },
+    { value: "contains", label: t`Text contains` },
+  ];
+}
 
 function _generateLocalFilterId(): string {
   // Stable enough for client-side keying; collisions across vizzes don't
@@ -72,8 +76,10 @@ export function LocalFiltersPField({ value, onChange }: Props): JSX.Element {
     <Stack gap="xs">
       {filters.length === 0 ?
         <Text size="xs" c="dimmed">
-          No filters yet. Add one to let viewers refine this chart without
-          affecting any others.
+          <Trans>
+            No filters yet. Add one to let viewers refine this chart without
+            affecting any others.
+          </Trans>
         </Text>
       : <Stack gap="xs">
           {filters.map((f, idx) => {
@@ -98,7 +104,7 @@ export function LocalFiltersPField({ value, onChange }: Props): JSX.Element {
         onClick={_addFilter}
         variant="light"
       >
-        Add filter
+        <Trans>Add filter</Trans>
       </Button>
     </Stack>
   );
@@ -113,6 +119,8 @@ function LocalFilterEditor({
   onChange: (next: LocalFilter) => void;
   onRemove: () => void;
 }): JSX.Element {
+  const { t } = useLingui();
+  const modeOptions = _useModeOptions();
   return (
     <Box
       p="xs"
@@ -126,7 +134,7 @@ function LocalFilterEditor({
         <Group justify="space-between">
           <TextInput
             size="xs"
-            placeholder="Label, e.g. Region"
+            placeholder={t`Label, e.g. Region`}
             value={filter.label}
             onChange={(e) => {
               onChange({ ...filter, label: e.currentTarget.value });
@@ -138,14 +146,14 @@ function LocalFilterEditor({
             color="red"
             size="sm"
             onClick={onRemove}
-            aria-label="Remove local filter"
+            aria-label={t`Remove local filter`}
           >
             <IconTrash size={14} />
           </ActionIcon>
         </Group>
         <TextInput
           size="xs"
-          placeholder="Column name (must match SQL)"
+          placeholder={t`Column name (must match SQL)`}
           value={filter.columnName}
           onChange={(e) => {
             onChange({ ...filter, columnName: e.currentTarget.value });
@@ -154,7 +162,7 @@ function LocalFilterEditor({
         <Select
           size="xs"
           allowDeselect={false}
-          data={MODE_OPTIONS.map((o) => {
+          data={modeOptions.map((o) => {
             return { value: o.value, label: o.label };
           })}
           value={filter.mode}
@@ -166,7 +174,7 @@ function LocalFilterEditor({
         {filter.mode !== "contains" ?
           <TextInput
             size="xs"
-            placeholder="Values, comma-separated"
+            placeholder={t`Values, comma-separated`}
             value={filter.optionsRaw}
             onChange={(e) => {
               onChange({ ...filter, optionsRaw: e.currentTarget.value });
@@ -177,8 +185,8 @@ function LocalFilterEditor({
           size="xs"
           placeholder={
             filter.mode === "select_multi" ?
-              "Default values, comma-separated or JSON array"
-            : "Default value (optional)"
+              t`Default values, comma-separated or JSON array`
+            : t`Default value (optional)`
           }
           value={filter.defaultValue}
           onChange={(e) => {

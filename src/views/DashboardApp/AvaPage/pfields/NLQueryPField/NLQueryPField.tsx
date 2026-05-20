@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Button,
@@ -54,6 +55,7 @@ export type NLQuery = {
 type Props = AvaPageFieldProps<NLQuery>;
 
 export function NLQueryPField({ value, onChange }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
@@ -85,9 +87,9 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
       indicatorVariant="floating"
       tabIds={["prompt", "manual-query", "sql"] as const}
       renderTabHeader={{
-        prompt: "Prompt",
-        "manual-query": "Manual",
-        sql: "SQL",
+        prompt: t`Prompt`,
+        "manual-query": t`Manual`,
+        sql: t`SQL`,
       }}
       px="xs"
       py="sm"
@@ -110,7 +112,7 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
           if (!manualState.isParserReady) {
             return (
               <Text size="sm" c="dimmed" px="sm">
-                Loading datasets…
+                <Trans>Loading datasets…</Trans>
               </Text>
             );
           }
@@ -149,17 +151,18 @@ function PromptTabPanel({
   isRunningQuery: boolean;
   onSubmitPrompt: (prompt: string) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   return (
     <Stack gap="sm" px="sm">
       <TextareaForm
         asField
         defaultValue={prompt}
-        description="Enter your question or instructions in natural language to generate a SQL query"
-        label="Prompt"
+        description={t`Enter your question or instructions in natural language to generate a SQL query`}
+        label={t`Prompt`}
         minRows={4}
         autosize
         isSubmitting={isRunningQuery}
-        submitButtonLabel="Generate Query"
+        submitButtonLabel={t`Generate Query`}
         styles={{
           input: {
             fontFamily: "monospace",
@@ -184,6 +187,7 @@ function SqlTabPanel({
   sqlSyncWarnings: readonly string[];
   onSubmitSql: (nextSql: string) => void;
 }): JSX.Element {
+  const { t } = useLingui();
   const [isEditSQLMode, setIsEditSQLMode] = useState(false);
 
   return (
@@ -193,13 +197,15 @@ function SqlTabPanel({
           icon={<IconAlertTriangle size={16} />}
           color="yellow"
           variant="light"
-          title="Manual form shows an approximation"
+          title={t`Manual form shows an approximation`}
           data-testid="sql-sync-warning"
         >
           <Text size="xs" mb="xs">
-            Parts of this SQL could not be represented in the Manual form. The
-            form shows a best-effort approximation; the SQL above is what
-            actually runs.
+            <Trans>
+              Parts of this SQL could not be represented in the Manual form.
+              The form shows a best-effort approximation; the SQL above is what
+              actually runs.
+            </Trans>
           </Text>
           <List size="xs" spacing={2}>
             {sqlSyncWarnings.map((reason) => {
@@ -211,7 +217,9 @@ function SqlTabPanel({
       <Fieldset
         legend={
           <Group justify="space-between" style={{ width: "100%" }}>
-            <span>Generated SQL</span>
+            <span>
+              <Trans>Generated SQL</Trans>
+            </span>
             {!isEditSQLMode && (
               <Button
                 size="xs"
@@ -220,7 +228,7 @@ function SqlTabPanel({
                   setIsEditSQLMode(true);
                 }}
               >
-                Edit query
+                <Trans>Edit query</Trans>
               </Button>
             )}
           </Group>
@@ -240,8 +248,8 @@ function SqlTabPanel({
               autosize
               showSubmitButton={true}
               showCancelButton={true}
-              submitButtonLabel="Save and re-run query"
-              cancelButtonLabel="Cancel"
+              submitButtonLabel={t`Save and re-run query`}
+              cancelButtonLabel={t`Cancel`}
               isSubmitting={false}
               styles={{
                 input: {

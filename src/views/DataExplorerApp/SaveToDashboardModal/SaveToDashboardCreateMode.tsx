@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Button, Group, Text, TextInput, ThemeIcon } from "@mantine/core";
 import { IconArrowLeft, IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export function SaveToDashboardCreateMode({
   onCancel,
   onSubmit,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [name, setName] = useState(defaultName);
 
   const onCreate = () => {
@@ -48,13 +50,13 @@ export function SaveToDashboardCreateMode({
             <IconLayoutDashboard size={26} stroke={1.5} />
           </ThemeIcon>
           <Text size="sm" c="dimmed">
-            You don&apos;t have any dashboards yet.
+            <Trans>You don&apos;t have any dashboards yet.</Trans>
           </Text>
         </div>
       : null}
 
       <TextInput
-        label="Dashboard name"
+        label={t`Dashboard name`}
         placeholder={defaultName}
         value={name}
         onChange={(event) => {
@@ -77,20 +79,22 @@ export function SaveToDashboardCreateMode({
           >
             <Group gap={4} wrap="nowrap">
               <IconArrowLeft size={14} />
-              <span>Back to dashboards</span>
+              <span>
+                <Trans>Back to dashboards</Trans>
+              </span>
             </Group>
           </Anchor>
         : <span />}
         <Group gap="sm">
           <Button variant="subtle" color="neutral" onClick={onCancel}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button
             onClick={onCreate}
             disabled={name.trim().length === 0 || isDisabled}
             loading={isCreating}
           >
-            Create dashboard &amp; save
+            <Trans>Create dashboard &amp; save</Trans>
           </Button>
         </Group>
       </Group>

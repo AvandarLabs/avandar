@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Paper, Text, Transition } from "@mantine/core";
 import css from "./ManualQueryLargeDatasetLimitHint.module.css";
 
@@ -29,8 +30,10 @@ export function ManualQueryLargeDatasetLimitHint({
             aria-live="polite"
           >
             <Text size="xs" c="blue.9">
-              This dataset is large, so we applied a 100-row limit. You can
-              change it anytime.
+              <Trans>
+                This dataset is large, so we applied a 100-row limit. You can
+                change it anytime.
+              </Trans>
             </Text>
           </Paper>
         );

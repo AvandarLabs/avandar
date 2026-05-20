@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useQuery } from "@hooks";
 import { Model } from "@models";
 import { makeObjectFromEntries, prop, sortObjList } from "@utils";
@@ -46,6 +47,7 @@ type UseDataQueryOptions = {
 export function useDataQuery(
   options: UseDataQueryOptions,
 ): UseQueryResultTuple<QueryResult<UnknownRow>> {
+  const { t } = useLingui();
   const { auth, query, rawSQL } = options;
   const {
     dataSource,
@@ -93,7 +95,7 @@ export function useDataQuery(
 
       if (auth === "public") {
         throw new Error(
-          "Public queries are not supported for structured queries. Use raw SQL instead.",
+          t`Public queries are not supported for structured queries. Use raw SQL instead.`,
         );
       }
 

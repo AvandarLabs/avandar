@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
@@ -14,11 +15,44 @@ import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
 
+const OWNER_TAB_IDS = [
+  "general",
+  "users",
+  "roles",
+  "tags",
+  "language",
+  "privacy",
+  "billing",
+] as const;
+const NON_OWNER_TAB_IDS = [
+  "general",
+  "users",
+  "roles",
+  "tags",
+  "language",
+  "privacy",
+] as const;
+
+type OwnerTabId = (typeof OWNER_TAB_IDS)[number];
+type NonOwnerTabId = (typeof NON_OWNER_TAB_IDS)[number];
+
+function isOwnerTabId(value: string): value is OwnerTabId {
+  return (OWNER_TAB_IDS as readonly string[]).includes(value);
+}
+
+function isNonOwnerTabId(value: string): value is NonOwnerTabId {
+  return (NON_OWNER_TAB_IDS as readonly string[]).includes(value);
+}
+
 export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
   const isSettingsAdmin = useIsGlobalAdmin();
   const { t } = useLingui();
+  const navigate = useNavigate();
+  const { tabName } = useParams({
+    from: "/_auth/$workspaceSlug/settings/$tabName",
+  });
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
@@ -93,22 +127,25 @@ export function WorkspaceSettingsPage(): JSX.Element {
     billing: t`Billing`,
   };
 
+  const navigateToTab = (next: string): void => {
+    navigate({
+      to: "/$workspaceSlug/settings/$tabName",
+      params: {
+        workspaceSlug: workspace.slug,
+        tabName: next,
+      },
+      replace: true,
+    });
+  };
+
   return (
     <AppLayout title={t`Settings`}>
       <Container py="xxxl" size="xl">
         {isCurrentUserTheWorkspaceOwner ?
           <Tabs
-            tabIds={
-              [
-                "general",
-                "users",
-                "roles",
-                "tags",
-                "language",
-                "privacy",
-                "billing",
-              ] as const
-            }
+            tabIds={OWNER_TAB_IDS}
+            value={isOwnerTabId(tabName) ? tabName : "general"}
+            onTabChange={navigateToTab}
             renderTabHeader={{
               general: tabHeaders.general,
               users: tabHeaders.users,
@@ -141,16 +178,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
             }}
           />
         : <Tabs
-            tabIds={
-              [
-                "general",
-                "users",
-                "roles",
-                "tags",
-                "language",
-                "privacy",
-              ] as const
-            }
+            tabIds={NON_OWNER_TAB_IDS}
+            value={isNonOwnerTabId(tabName) ? tabName : "general"}
+            onTabChange={navigateToTab}
             renderTabHeader={{
               general: tabHeaders.general,
               users: tabHeaders.users,

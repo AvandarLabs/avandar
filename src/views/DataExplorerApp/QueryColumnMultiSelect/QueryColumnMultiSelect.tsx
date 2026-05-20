@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   defaultOptionsFilter,
   isOptionsGroup,
@@ -59,6 +60,7 @@ export function QueryColumnMultiSelect({
   onChange,
   ...multiSelectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [currentSelectedColumns, setCurrentSelectedColumns] = useUncontrolled<
     readonly QueryColumn.T[]
   >({
@@ -152,7 +154,7 @@ export function QueryColumnMultiSelect({
       searchable
       clearable
       label={label}
-      placeholder={isLoading ? "Loading datasets..." : placeholder}
+      placeholder={isLoading ? t`Loading datasets...` : placeholder}
       data={selectableOptions}
       value={selectedColumnIds}
       onChange={(newColumnIds) => {
@@ -164,7 +166,7 @@ export function QueryColumnMultiSelect({
           .filter(isNonNullish);
         setCurrentSelectedColumns(newSelectedColumns);
       }}
-      nothingFoundMessage="No fields"
+      nothingFoundMessage={t`No fields`}
       {...multiSelectProps}
       filter={matchColumnFilter}
     />

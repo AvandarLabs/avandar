@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   SimpleGrid,
@@ -28,6 +29,7 @@ export function DashboardListView({
   dashboards,
   workspaceSlug,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
@@ -89,10 +91,12 @@ export function DashboardListView({
 
             <Stack gap="xs">
               <Title order={2} fw={650}>
-                You have not created any dashboards
+                <Trans>You have not created any dashboards</Trans>
               </Title>
               <Text c="dimmed">
-                Create your first dashboard to track key metrics and insights.
+                <Trans>
+                  Create your first dashboard to track key metrics and insights.
+                </Trans>
               </Text>
             </Stack>
 
@@ -103,7 +107,7 @@ export function DashboardListView({
               loading={isInsertDashboardPending}
               disabled={isLoadingUserProfile}
             >
-              Create a dashboard
+              <Trans>Create a dashboard</Trans>
             </Button>
           </Stack>
         </Paper>
@@ -141,7 +145,7 @@ export function DashboardListView({
 
   return (
     <AppLayout
-      title="Dashboards"
+      title={t`Dashboards`}
       toolbarButtonSection={
         <Button
           leftSection={<IconPlus size={18} />}
@@ -151,7 +155,7 @@ export function DashboardListView({
           loading={isInsertDashboardPending}
           disabled={isLoadingUserProfile}
         >
-          Create a dashboard
+          <Trans>Create a dashboard</Trans>
         </Button>
       }
       containerProps={{

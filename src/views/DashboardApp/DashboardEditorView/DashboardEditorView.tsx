@@ -1,5 +1,6 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Flex, Text } from "@mantine/core";
 import { Link, notifyDevAlert, notifySuccess } from "@ui";
 import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
@@ -34,6 +35,7 @@ export function DashboardEditorView({
   dashboard,
   workspaceSlug,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [appRoles] = useUserAppRoles();
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const { pendingBlocks } = DashboardEditorStateManager.useState();
@@ -99,8 +101,9 @@ export function DashboardEditorView({
       dashboardTitle,
       workspaceId: dashboard.workspaceId,
       dashboardId: dashboard.id,
+      t,
     });
-  }, [dashboard.id, dashboard.workspaceId, dashboardTitle]);
+  }, [dashboard.id, dashboard.workspaceId, dashboardTitle, t]);
 
   // Drain blocks queued by the chat panel into the dashboard's Puck data.
   // Marks the editor dirty so the Save button can be activated.
@@ -130,7 +133,7 @@ export function DashboardEditorView({
         ]
       : undefined,
     onSuccess: () => {
-      notifySuccess("Dashboard saved successfully!");
+      notifySuccess(t`Dashboard saved successfully!`);
       setHasUnsavedChanges(false);
     },
   });
@@ -167,9 +170,16 @@ export function DashboardEditorView({
       <AppLayout floatingToolbar>
         <Flex direction="column" h="100%" pt={40}>
           {isShareOnlyAccess ?
-            <Alert color="blue" variant="light" title="Shared with you" m="sm">
+            <Alert
+              color="blue"
+              variant="light"
+              title={t`Shared with you`}
+              m="sm"
+            >
               <Text size="sm">
-                You can view this dashboard because it was shared with you.
+                <Trans>
+                  You can view this dashboard because it was shared with you.
+                </Trans>
                 {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
                   <>
                     {" "}
@@ -177,7 +187,7 @@ export function DashboardEditorView({
                       to="/$workspaceSlug/shared-with-me"
                       params={{ workspaceSlug }}
                     >
-                      See all shared items
+                      <Trans>See all shared items</Trans>
                     </Link>
                   </>
                 : null}

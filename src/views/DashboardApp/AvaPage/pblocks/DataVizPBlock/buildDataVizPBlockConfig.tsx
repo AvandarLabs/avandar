@@ -1,13 +1,14 @@
+import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps";
-import { buildGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig";
-import { buildLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig";
-import { buildNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
-import { buildVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig";
+import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig";
+import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig";
+import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
+import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -25,13 +26,6 @@ const defaultProps: DataVizPBlockProps = {
   localFilters: [],
 };
 
-const vizTypeOptions = VizTypes.map((vizType) => {
-  return {
-    label: VizConfigs.getDisplayName(vizType),
-    value: vizType,
-  };
-});
-
 /**
  * Build the Puck component config for the dashboard's Data Visualization
  * block.
@@ -43,27 +37,44 @@ const vizTypeOptions = VizTypes.map((vizType) => {
  * in sync by running `VizConfigs.convertVizConfig` whenever the user picks a
  * different `vizType`, and by falling back to defaults when older saved data
  * is missing either field.
+ *
+ * This is a React hook because it composes the per-field configs (which are
+ * themselves hooks). It must be invoked from a React component / hook.
  */
-export function buildDataVizPBlockConfig(options: {
+export function useDataVizPBlockConfig(options: {
   dashboardTitle: string;
   workspaceId: Workspace.Id | undefined;
   dashboardId: DashboardId;
 }): ComponentConfig<DataVizPBlockProps> {
+  const { t } = useLingui();
+  const nlQueryFieldConfig = useNLQueryPFieldConfig();
+  const vizConfigFieldConfig = useVizConfigPFieldConfig({
+    workspaceId: options.workspaceId,
+    dashboardId: options.dashboardId,
+  });
+  const globalFilterSubscriptionFieldConfig =
+    useGlobalFilterSubscriptionPFieldConfig();
+  const localFiltersFieldConfig = useLocalFiltersPFieldConfig();
+
+  const vizTypeOptions = VizTypes.map((vizType) => {
+    return {
+      label: VizConfigs.getDisplayName(vizType),
+      value: vizType,
+    };
+  });
+
   return {
-    label: "Data Visualization",
+    label: t`Data Visualization`,
     fields: {
-      nlQuery: buildNLQueryPFieldConfig(),
+      nlQuery: nlQueryFieldConfig,
       vizType: {
-        label: "Visualization Type",
+        label: t`Visualization Type`,
         type: "select",
         options: vizTypeOptions,
       },
-      vizConfig: buildVizConfigPFieldConfig({
-        workspaceId: options.workspaceId,
-        dashboardId: options.dashboardId,
-      }),
-      globalFilterSubscription: buildGlobalFilterSubscriptionPFieldConfig(),
-      localFilters: buildLocalFiltersPFieldConfig(),
+      vizConfig: vizConfigFieldConfig,
+      globalFilterSubscription: globalFilterSubscriptionFieldConfig,
+      localFilters: localFiltersFieldConfig,
     },
     defaultProps,
     resolveData: (data, { changed }) => {

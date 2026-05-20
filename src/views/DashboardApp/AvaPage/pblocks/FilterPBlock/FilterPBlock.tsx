@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
 import { Paper } from "@ui";
 import { useEffect, useMemo } from "react";
@@ -52,6 +53,7 @@ function _parseDefaultMulti(raw: string): readonly string[] {
 
 export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
   const { filterId, label, columnName, mode, optionsRaw, defaultValue } = props;
+  const { t } = useLingui();
 
   const dispatch = DashboardFilterStateManager.useDispatch();
   const { filtersById } = DashboardFilterStateManager.useState();
@@ -95,8 +97,10 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Configure this filter: set its id, label, and column name in the side
-          panel.
+          <Trans>
+            Configure this filter: set its id, label, and column name in the
+            side panel.
+          </Trans>
         </Text>
       </Paper>
     );
@@ -110,7 +114,7 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
         </Text>
         {mode === "select_multi" ?
           <MultiSelect
-            placeholder="All"
+            placeholder={t`All`}
             data={options}
             clearable
             searchable
@@ -126,7 +130,7 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
           />
         : mode === "contains" ?
           <TextInput
-            placeholder="Contains…"
+            placeholder={t`Contains…`}
             value={(filterState?.value as string) ?? ""}
             onChange={(e) => {
               dispatch.setFilterValue({
@@ -136,7 +140,7 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
             }}
           />
         : <Select
-            placeholder="All"
+            placeholder={t`All`}
             data={options}
             clearable
             searchable

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Button,
@@ -24,6 +25,7 @@ import css from "./SqlQueryView.module.css";
  * saved dataset.
  */
 export function SqlQueryView(): JSX.Element {
+  const { t } = useLingui();
   const [{ rawSQL, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
     DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -45,8 +47,10 @@ export function SqlQueryView(): JSX.Element {
     return (
       <Stack gap="xs" px="sm">
         <Text size="sm" c="neutral.6">
-          No SQL yet. Ask Avandar a question or build a query in the Manual tab
-          to generate SQL.
+          <Trans>
+            No SQL yet. Ask Avandar a question or build a query in the Manual
+            tab to generate SQL.
+          </Trans>
         </Text>
       </Stack>
     );
@@ -59,13 +63,15 @@ export function SqlQueryView(): JSX.Element {
           icon={<IconAlertTriangle size={16} />}
           color="yellow"
           variant="light"
-          title="Manual form shows an approximation"
+          title={t`Manual form shows an approximation`}
           data-testid="sql-sync-warning"
         >
           <Text size="xs" mb="xs">
-            Parts of this SQL could not be represented in the Manual form. The
-            form shows a best-effort approximation; the SQL above is what
-            actually runs.
+            <Trans>
+              Parts of this SQL could not be represented in the Manual form.
+              The form shows a best-effort approximation; the SQL above is what
+              actually runs.
+            </Trans>
           </Text>
           <List size="xs" spacing={2}>
             {sqlSyncWarnings.map((reason) => {
@@ -78,7 +84,9 @@ export function SqlQueryView(): JSX.Element {
         className={css.fieldset}
         legend={
           <Group justify="space-between" className={css.legendGroup}>
-            <span>Generated SQL</span>
+            <span>
+              <Trans>Generated SQL</Trans>
+            </span>
             {isEditMode ? null : (
               <Button
                 size="xs"
@@ -87,7 +95,7 @@ export function SqlQueryView(): JSX.Element {
                   setIsEditMode(true);
                 }}
               >
-                Edit query
+                <Trans>Edit query</Trans>
               </Button>
             )}
           </Group>
@@ -102,8 +110,8 @@ export function SqlQueryView(): JSX.Element {
               autosize
               showSubmitButton={true}
               showCancelButton={true}
-              submitButtonLabel="Re-run query"
-              cancelButtonLabel="Cancel"
+              submitButtonLabel={t`Re-run query`}
+              cancelButtonLabel={t`Cancel`}
               isSubmitting={false}
               classNames={{ input: css.sqlEditInput }}
               validateOnChange={true}

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Fieldset,
@@ -34,10 +35,17 @@ import type {
   PartialStructuredQuery,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
-const orderDirectionOptions = [
-  { value: "asc", label: "Ascending" },
-  { value: "desc", label: "Descending" },
-] as const satisfies SelectData<string>;
+/**
+ * Returns the localized order direction options for the manual query form.
+ * Defined as a hook so the labels can use the active translation function.
+ */
+function _useOrderDirectionOptions(): SelectData<OrderByDirection> {
+  const { t } = useLingui();
+  return [
+    { value: "asc", label: t`Ascending` },
+    { value: "desc", label: t`Descending` },
+  ];
+}
 
 /**
  * Callbacks invoked when the user changes the form. Mirrors the action set on
@@ -139,6 +147,8 @@ function ManualQueryFormView({
   handlers: ManualQueryFormHandlers;
   withinPortal: boolean;
 }): JSX.Element {
+  const { t } = useLingui();
+  const orderDirectionOptions = _useOrderDirectionOptions();
   const {
     dataSource,
     queryColumns,
@@ -179,7 +189,7 @@ function ManualQueryFormView({
             icon={<IconAlertTriangle size={16} />}
             color="yellow"
             variant="light"
-            title="Overwrite SQL?"
+            title={t`Overwrite SQL?`}
             withCloseButton
             onClose={() => {
               setPendingChange(null);
@@ -187,10 +197,12 @@ function ManualQueryFormView({
             data-testid="overwrite-sql-warning"
           >
             <Text size="xs" mb="xs">
-              The current SQL contains parts that the form could not represent.
-              Continuing will overwrite that SQL with one generated from the
-              form. This cannot be undone (unless you re-run your previous chat
-              prompt).
+              <Trans>
+                The current SQL contains parts that the form could not
+                represent. Continuing will overwrite that SQL with one generated
+                from the form. This cannot be undone (unless you re-run your
+                previous chat prompt).
+              </Trans>
             </Text>
             <Stack gap="xs">
               <Text
@@ -214,7 +226,7 @@ function ManualQueryFormView({
                   padding: 0,
                 }}
               >
-                Overwrite SQL with form changes
+                <Trans>Overwrite SQL with form changes</Trans>
               </Text>
               <Text
                 component="button"
@@ -233,7 +245,7 @@ function ManualQueryFormView({
                   padding: 0,
                 }}
               >
-                Keep SQL as-is
+                <Trans>Keep SQL as-is</Trans>
               </Text>
             </Stack>
           </Alert>
@@ -246,8 +258,8 @@ function ManualQueryFormView({
         />
 
         <QueryColumnMultiSelect
-          label="Select columns"
-          placeholder="Select columns to query"
+          label={t`Select columns`}
+          placeholder={t`Select columns to query`}
           dataSourceId={dataSource ? Model.getTypedId(dataSource) : undefined}
           value={queryColumns}
           onChange={(newColumns: readonly QueryColumnRead[]) => {
@@ -258,7 +270,7 @@ function ManualQueryFormView({
 
         {queryColumns.length > 0 ?
           <Fieldset
-            legend="Aggregations"
+            legend={t`Aggregations`}
             style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
           >
             {queryColumns.map((col) => {
@@ -282,7 +294,7 @@ function ManualQueryFormView({
         : null}
 
         <Fieldset
-          legend="Filters (Where)"
+          legend={t`Filters (Where)`}
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <QueryFiltersField
@@ -293,15 +305,15 @@ function ManualQueryFormView({
         </Fieldset>
 
         <Fieldset
-          legend="Sort by"
+          legend={t`Sort by`}
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <Select
             clearable
-            label="Column"
+            label={t`Column`}
             data={selectedColumnOptions}
             value={orderByColumn}
-            placeholder="Select column to sort by"
+            placeholder={t`Select column to sort by`}
             onChange={(newColId) => {
               handlers.onSetOrderByColumn(newColId ?? undefined);
             }}
@@ -309,8 +321,8 @@ function ManualQueryFormView({
           />
           <Select
             clearable={false}
-            label="Direction"
-            placeholder="Select sort order"
+            label={t`Direction`}
+            placeholder={t`Select sort order`}
             data={orderDirectionOptions}
             value={orderByDirection}
             onChange={(value) => {
@@ -321,13 +333,13 @@ function ManualQueryFormView({
         </Fieldset>
 
         <Fieldset
-          legend="Result size"
+          legend={t`Result size`}
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <Group align="flex-end" wrap="nowrap" gap="sm">
             <NumberInput
-              label="Limit"
-              placeholder="Maximum rows to return"
+              label={t`Limit`}
+              placeholder={t`Maximum rows to return`}
               min={1}
               step={1}
               style={{ flex: 1 }}

@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useDashboardPuck } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuck";
@@ -19,7 +20,7 @@ export function SaveDashboardButton({ onSave }: Props): JSX.Element {
         onSave(appState.data as AvaPageData);
       }}
     >
-      Save
+      <Trans>Save</Trans>
     </Button>
   );
 }

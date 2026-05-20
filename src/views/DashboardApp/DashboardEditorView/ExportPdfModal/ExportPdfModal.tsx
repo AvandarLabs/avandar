@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Box, Button, Group, Stack, Text } from "@mantine/core";
 import { Render as PuckPageRender } from "@puckeditor/core";
 import {
@@ -39,6 +40,7 @@ type Step = "choose" | "snapshot" | "annotate";
  * editor chrome doesn't show up in the snapshot.
  */
 export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
+  const { t } = useLingui();
   const [step, setStep] = useState<Step>("choose");
   const renderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -48,8 +50,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
       dashboardTitle: dashboard.name,
       workspaceId: dashboard.workspaceId,
       dashboardId: dashboard.id,
+      t,
     });
-  }, [dashboard]);
+  }, [dashboard, t]);
 
   const puckData = useMemo(() => {
     const cfg = dashboard.config as unknown as AvaPageGenericData;
@@ -81,7 +84,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
 
   const handleDirectExport = useCallback(async (): Promise<void> => {
     if (!renderContainerRef.current) {
-      notifyError({ title: "Dashboard not ready", message: "Try again." });
+      notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
       return;
     }
     setIsExporting(true);
@@ -91,17 +94,17 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         filename,
         title: dashboard.name || "Untitled dashboard",
       });
-      notifySuccess("PDF downloaded.");
+      notifySuccess(t`PDF downloaded.`);
       onClose();
     } catch (e: unknown) {
       notifyError({
-        title: "Couldn't export PDF",
+        title: t`Couldn't export PDF`,
         message: e instanceof Error ? e.message : String(e),
       });
     } finally {
       setIsExporting(false);
     }
-  }, [filename, dashboard.name, onClose]);
+  }, [filename, dashboard.name, onClose, t]);
 
   // Always-mounted hidden render container so html2canvas can capture from
   // it. Positioned off-screen but at a fixed width so the layout matches a
@@ -135,9 +138,11 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         {hiddenRender}
         <Alert color="blue" variant="light">
           <Text size="sm">
-            Export this dashboard as a PDF, or sketch on it first. Annotations
-            support text, arrows, and freehand drawing with adjustable roughness
-            (RoughJS).
+            <Trans>
+              Export this dashboard as a PDF, or sketch on it first.
+              Annotations support text, arrows, and freehand drawing with
+              adjustable roughness (RoughJS).
+            </Trans>
           </Text>
         </Alert>
 
@@ -151,7 +156,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
             onClick={handleDirectExport}
             justify="space-between"
           >
-            Export as PDF
+            <Trans>Export as PDF</Trans>
           </Button>
           <Button
             size="md"
@@ -162,13 +167,13 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
             }}
             justify="space-between"
           >
-            Annotate, then export
+            <Trans>Annotate, then export</Trans>
           </Button>
         </Stack>
 
         <Group justify="flex-end">
           <Button variant="subtle" color="neutral" onClick={onClose}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
         </Group>
       </Stack>

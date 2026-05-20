@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, Text } from "@mantine/core";
 import { usePuck } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
@@ -72,7 +73,7 @@ export function VizConfigPField({
     return (
       <Box>
         <Text c="dimmed" fz="sm">
-          The table visualization has no extra settings.
+          <Trans>The table visualization has no extra settings.</Trans>
         </Text>
       </Box>
     );
@@ -82,7 +83,7 @@ export function VizConfigPField({
     return (
       <Box>
         <Text c="dimmed" fz="sm">
-          Generate a query to configure this visualization.
+          <Trans>Generate a query to configure this visualization.</Trans>
         </Text>
       </Box>
     );

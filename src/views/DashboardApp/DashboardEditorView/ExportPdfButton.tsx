@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
@@ -24,11 +25,12 @@ export function ExportPdfButton({
   dashboard,
   hasUnsavedChanges,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const isDisabled = !dashboard || hasUnsavedChanges;
 
   return (
     <Tooltip
-      label="Save your changes first — the PDF reflects the saved dashboard."
+      label={t`Save your changes first — the PDF reflects the saved dashboard.`}
       disabled={!hasUnsavedChanges}
     >
       <Button
@@ -55,7 +57,7 @@ export function ExportPdfButton({
           });
 
           const modalId = modals.open({
-            title: "Export PDF",
+            title: t`Export PDF`,
             size: "xl",
             children: (
               <ExportPdfModal
@@ -68,7 +70,7 @@ export function ExportPdfButton({
           });
         }}
       >
-        Export PDF
+        <Trans>Export PDF</Trans>
       </Button>
     </Tooltip>
   );

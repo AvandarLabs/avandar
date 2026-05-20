@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   Blockquote,
   Box,
@@ -13,13 +14,13 @@ import { Paper } from "@ui";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
-import { buildDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
-import { buildFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig";
-import { buildContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
+import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
+import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig";
+import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
 import {
-  DASHBOARD_THEME_OPTIONS,
-  DASHBOARD_TYPOGRAPHY_OPTIONS,
   getDashboardDesignTokens,
+  useDashboardThemeOptions,
+  useDashboardTypographyOptions,
 } from "@/views/DashboardApp/AvaPage/utils/dashboardDesignTokens";
 import type {
   AvaPageConfig,
@@ -263,7 +264,7 @@ function _getGridCellKey(options: {
   return `r${options.rowIdx + 1}c${options.colIdx + 1}`;
 }
 
-function _createGridCellSlotFields(): Record<
+function _createGridCellSlotFields(t: TranslateFn): Record<
   `r${number}c${number}`,
   { label: string; type: "slot" }
 > {
@@ -274,10 +275,12 @@ function _createGridCellSlotFields(): Record<
         void unusedCol;
 
         const key: `r${number}c${number}` = _getGridCellKey({ colIdx, rowIdx });
+        const rowNum = rowIdx + 1;
+        const colNum = colIdx + 1;
 
         return [
           key,
-          { label: `Row ${rowIdx + 1} / Col ${colIdx + 1}`, type: "slot" },
+          { label: t`Row ${rowNum} / Col ${colNum}`, type: "slot" },
         ] as const;
       });
     }),
@@ -364,11 +367,23 @@ function _parseTableRows(options: {
     });
 }
 
+type TranslateFn = ReturnType<typeof useLingui>["t"];
+
 export function getDashboardPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: Workspace.Id | undefined;
   dashboardId: DashboardId;
+  t: TranslateFn;
 }): AvaPageConfig {
+  const { t } = options;
+  const themeOptions = useDashboardThemeOptions();
+  const typographyOptions = useDashboardTypographyOptions();
+  const dataVizFieldConfig = useDataVizPBlockConfig({
+    dashboardTitle: options.dashboardTitle,
+    workspaceId: options.workspaceId,
+    dashboardId: options.dashboardId,
+  });
+  const filterFieldConfig = useFilterPBlockConfig();
   return {
     root: {
       fields: {
@@ -376,79 +391,79 @@ export function getDashboardPuckConfig(options: {
           // leave this as `false`. Set to `true` only for debugging
           visible: false,
           type: "custom",
-          label: "Schema version",
+          label: t`Schema version`,
           render: ({ value }) => {
             return <>Version: {value}</>;
           },
         },
         title: {
-          label: "Page title",
+          label: t`Page title`,
           type: "text",
         },
         theme: {
-          label: "Theme",
+          label: t`Theme`,
           type: "select",
-          options: DASHBOARD_THEME_OPTIONS.map((o) => {
+          options: themeOptions.map((o) => {
             return { label: o.label, value: o.value };
           }),
         },
         typography: {
-          label: "Typography",
+          label: t`Typography`,
           type: "select",
-          options: DASHBOARD_TYPOGRAPHY_OPTIONS.map((o) => {
+          options: typographyOptions.map((o) => {
             return { label: o.label, value: o.value };
           }),
         },
-        containerMaxWidth: buildContainerMaxWidthPFieldConfig(),
+        containerMaxWidth: useContainerMaxWidthPFieldConfig(),
         isTitleHidden: {
-          label: "Hide title",
+          label: t`Hide title`,
           type: "radio",
           options: [
-            { label: "No", value: false },
-            { label: "Yes", value: true },
+            { label: t`No`, value: false },
+            { label: t`Yes`, value: true },
           ],
         },
         subtitle: {
-          label: "Subtitle",
+          label: t`Subtitle`,
           type: "text",
         },
         isSubtitleHidden: {
-          label: "Hide subtitle",
+          label: t`Hide subtitle`,
           type: "radio",
           options: [
-            { label: "No", value: false },
-            { label: "Yes", value: true },
+            { label: t`No`, value: false },
+            { label: t`Yes`, value: true },
           ],
         },
         author: {
-          label: "Author",
+          label: t`Author`,
           type: "text",
         },
         isAuthorHidden: {
-          label: "Hide author",
+          label: t`Hide author`,
           type: "radio",
           options: [
-            { label: "No", value: false },
-            { label: "Yes", value: true },
+            { label: t`No`, value: false },
+            { label: t`Yes`, value: true },
           ],
         },
         publishedAt: {
-          label: "Published Date",
+          label: t`Published Date`,
           type: "text",
         },
         isPublishedAtHidden: {
-          label: "Hide published date",
+          label: t`Hide published date`,
           type: "radio",
           options: [
-            { label: "No", value: false },
-            { label: "Yes", value: true },
+            { label: t`No`, value: false },
+            { label: t`Yes`, value: true },
           ],
         },
         verticalPadding: {
-          label: "Vertical padding",
+          label: t`Vertical padding`,
           type: "select",
           options: [
-            { label: "None", value: "none" },
+            { label: t`None`, value: "none" },
             { label: "XS", value: "xs" },
             { label: "SM", value: "sm" },
             { label: "MD", value: "md" },
@@ -457,10 +472,10 @@ export function getDashboardPuckConfig(options: {
           ],
         },
         horizontalPadding: {
-          label: "Horizontal padding",
+          label: t`Horizontal padding`,
           type: "select",
           options: [
-            { label: "None", value: "none" },
+            { label: t`None`, value: "none" },
             { label: "XS", value: "xs" },
             { label: "SM", value: "sm" },
             { label: "MD", value: "md" },
@@ -528,7 +543,7 @@ export function getDashboardPuckConfig(options: {
           _getRootPaddingProp({ props, key: "horizontalPadding" }) ?? "md";
 
         const title: string =
-          _getStringProp({ props, key: "title" }) ?? "Untitled";
+          _getStringProp({ props, key: "title" }) ?? t`Untitled`;
         const subtitle: string | undefined = _getStringProp({
           props,
           key: "subtitle",
@@ -661,12 +676,12 @@ export function getDashboardPuckConfig(options: {
     // term "pblocks" to mean "Page Blocks")
     categories: {
       layout: {
-        title: "Layout",
+        title: t`Layout`,
         defaultExpanded: true,
         components: ["Section", "Columns", "Grid", "SidebarLayout"],
       },
       content: {
-        title: "Content",
+        title: t`Content`,
         defaultExpanded: true,
         components: [
           "DataViz",
@@ -683,44 +698,44 @@ export function getDashboardPuckConfig(options: {
         ],
       },
       media: {
-        title: "Media",
+        title: t`Media`,
         components: ["FigureBlock", "EmbedBlock"],
       },
     },
 
     components: {
       Section: {
-        label: "Section",
+        label: t`Section`,
         fields: {
           maxWidth: {
-            label: "Max width",
+            label: t`Max width`,
             type: "select",
             options: [
-              { label: "Narrow", value: "narrow" },
-              { label: "Normal", value: "normal" },
-              { label: "Wide", value: "wide" },
-              { label: "Full", value: "full" },
+              { label: t`Narrow`, value: "narrow" },
+              { label: t`Normal`, value: "normal" },
+              { label: t`Wide`, value: "wide" },
+              { label: t`Full`, value: "full" },
             ],
           },
           padding: {
-            label: "Padding",
+            label: t`Padding`,
             type: "select",
             options: [
-              { label: "Small", value: "sm" },
-              { label: "Medium", value: "md" },
-              { label: "Large", value: "lg" },
+              { label: t`Small`, value: "sm" },
+              { label: t`Medium`, value: "md" },
+              { label: t`Large`, value: "lg" },
             ],
           },
           background: {
-            label: "Background",
+            label: t`Background`,
             type: "select",
             options: [
-              { label: "None", value: "none" },
-              { label: "Subtle", value: "subtle" },
+              { label: t`None`, value: "none" },
+              { label: t`Subtle`, value: "subtle" },
             ],
           },
           content: {
-            label: "Content",
+            label: t`Content`,
             type: "slot",
           },
         },
@@ -746,31 +761,31 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Columns: {
-        label: "Columns",
+        label: t`Columns`,
         fields: {
           numColumns: {
-            label: "Number of columns",
+            label: t`Number of columns`,
             type: "number",
             min: 1,
             max: 12,
             step: 1,
           },
           leftSpan: {
-            label: "Left span",
+            label: t`Left span`,
             type: "number",
             min: 1,
             max: 12,
             step: 1,
           },
           rightSpan: {
-            label: "Right span",
+            label: t`Right span`,
             type: "number",
             min: 1,
             max: 12,
             step: 1,
           },
           gap: {
-            label: "Gap",
+            label: t`Gap`,
             type: "select",
             options: [
               { label: "XS", value: "xs" },
@@ -780,7 +795,7 @@ export function getDashboardPuckConfig(options: {
             ],
           },
           collapseAt: {
-            label: "Collapse at",
+            label: t`Collapse at`,
             type: "select",
             options: [
               { label: "SM", value: "sm" },
@@ -789,51 +804,51 @@ export function getDashboardPuckConfig(options: {
             ],
           },
           col1: {
-            label: "Column 1",
+            label: t`Column 1`,
             type: "slot",
           },
           col2: {
-            label: "Column 2",
+            label: t`Column 2`,
             type: "slot",
           },
           col3: {
-            label: "Column 3",
+            label: t`Column 3`,
             type: "slot",
           },
           col4: {
-            label: "Column 4",
+            label: t`Column 4`,
             type: "slot",
           },
           col5: {
-            label: "Column 5",
+            label: t`Column 5`,
             type: "slot",
           },
           col6: {
-            label: "Column 6",
+            label: t`Column 6`,
             type: "slot",
           },
           col7: {
-            label: "Column 7",
+            label: t`Column 7`,
             type: "slot",
           },
           col8: {
-            label: "Column 8",
+            label: t`Column 8`,
             type: "slot",
           },
           col9: {
-            label: "Column 9",
+            label: t`Column 9`,
             type: "slot",
           },
           col10: {
-            label: "Column 10",
+            label: t`Column 10`,
             type: "slot",
           },
           col11: {
-            label: "Column 11",
+            label: t`Column 11`,
             type: "slot",
           },
           col12: {
-            label: "Column 12",
+            label: t`Column 12`,
             type: "slot",
           },
         },
@@ -921,25 +936,25 @@ export function getDashboardPuckConfig(options: {
         },
       },
       SidebarLayout: {
-        label: "Sidebar layout",
+        label: t`Sidebar layout`,
         fields: {
           sidebarPosition: {
-            label: "Sidebar position",
+            label: t`Sidebar position`,
             type: "radio",
             options: [
-              { label: "Left", value: "left" },
-              { label: "Right", value: "right" },
+              { label: t`Left`, value: "left" },
+              { label: t`Right`, value: "right" },
             ],
           },
           sidebarSpan: {
-            label: "Sidebar span",
+            label: t`Sidebar span`,
             type: "number",
             min: 2,
             max: 10,
             step: 1,
           },
           gap: {
-            label: "Gap",
+            label: t`Gap`,
             type: "select",
             options: [
               { label: "XS", value: "xs" },
@@ -949,7 +964,7 @@ export function getDashboardPuckConfig(options: {
             ],
           },
           collapseAt: {
-            label: "Collapse at",
+            label: t`Collapse at`,
             type: "select",
             options: [
               { label: "SM", value: "sm" },
@@ -958,11 +973,11 @@ export function getDashboardPuckConfig(options: {
             ],
           },
           sidebar: {
-            label: "Sidebar",
+            label: t`Sidebar`,
             type: "slot",
           },
           main: {
-            label: "Main",
+            label: t`Main`,
             type: "slot",
           },
         },
@@ -1025,24 +1040,24 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Grid: {
-        label: "Grid",
+        label: t`Grid`,
         fields: {
           numColumns: {
-            label: "Number of columns",
+            label: t`Number of columns`,
             type: "number",
             min: 1,
             max: 12,
             step: 1,
           },
           numRows: {
-            label: "Number of rows",
+            label: t`Number of rows`,
             type: "number",
             min: 1,
             max: 12,
             step: 1,
           },
           gap: {
-            label: "Gap",
+            label: t`Gap`,
             type: "select",
             options: [
               { label: "XS", value: "xs" },
@@ -1051,7 +1066,7 @@ export function getDashboardPuckConfig(options: {
               { label: "LG", value: "lg" },
             ],
           },
-          ..._createGridCellSlotFields(),
+          ..._createGridCellSlotFields(t),
         },
         defaultProps: {
           gap: "md",
@@ -1103,21 +1118,21 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Card: {
-        label: "Card",
+        label: t`Card`,
         fields: {
           title: {
-            label: "Title",
+            label: t`Title`,
             type: "text",
           },
           content: {
-            label: "Content",
+            label: t`Content`,
             type: "slot",
             disallow: ["Card"],
           },
         },
         defaultProps: {
           content: [],
-          title: "Card",
+          title: t`Card`,
         },
         render: (props) => {
           return (
@@ -1132,17 +1147,17 @@ export function getDashboardPuckConfig(options: {
           );
         },
       },
-      DataViz: buildDataVizPBlockConfig(options),
-      Filter: buildFilterPBlockConfig(),
+      DataViz: dataVizFieldConfig,
+      Filter: filterFieldConfig,
       HeadingBlock: {
-        label: "Heading",
+        label: t`Heading`,
         fields: {
           text: {
-            label: "Text",
+            label: t`Text`,
             type: "text",
           },
           level: {
-            label: "Level",
+            label: t`Level`,
             type: "select",
             options: [
               { label: "H1", value: 1 },
@@ -1152,19 +1167,19 @@ export function getDashboardPuckConfig(options: {
             ],
           },
           align: {
-            label: "Align",
+            label: t`Align`,
             type: "radio",
             options: [
-              { label: "Left", value: "left" },
-              { label: "Center", value: "center" },
-              { label: "Right", value: "right" },
+              { label: t`Left`, value: "left" },
+              { label: t`Center`, value: "center" },
+              { label: t`Right`, value: "right" },
             ],
           },
         },
         defaultProps: {
           align: "left",
           level: 2,
-          text: "Heading",
+          text: t`Heading`,
         },
         render: (props: HeadingBlockProps) => {
           return (
@@ -1175,25 +1190,25 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ParagraphBlock: {
-        label: "Paragraph",
+        label: t`Paragraph`,
         fields: {
           text: {
-            label: "Text",
+            label: t`Text`,
             type: "textarea",
           },
           align: {
-            label: "Align",
+            label: t`Align`,
             type: "radio",
             options: [
-              { label: "Left", value: "left" },
-              { label: "Center", value: "center" },
-              { label: "Right", value: "right" },
+              { label: t`Left`, value: "left" },
+              { label: t`Center`, value: "center" },
+              { label: t`Right`, value: "right" },
             ],
           },
         },
         defaultProps: {
           align: "left",
-          text: "Write your paragraph here...",
+          text: t`Write your paragraph here...`,
         },
         render: (props: ParagraphBlockProps) => {
           return (
@@ -1204,20 +1219,20 @@ export function getDashboardPuckConfig(options: {
         },
       },
       QuoteBlock: {
-        label: "Quote",
+        label: t`Quote`,
         fields: {
           quote: {
-            label: "Quote",
+            label: t`Quote`,
             type: "textarea",
           },
           cite: {
-            label: "Attribution",
+            label: t`Attribution`,
             type: "text",
           },
         },
         defaultProps: {
           cite: "",
-          quote: "Add a pull quote...",
+          quote: t`Add a pull quote...`,
         },
         render: (props: QuoteBlockProps) => {
           return (
@@ -1228,25 +1243,25 @@ export function getDashboardPuckConfig(options: {
         },
       },
       DividerBlock: {
-        label: "Divider",
+        label: t`Divider`,
         fields: {},
         render: () => {
           return <Divider />;
         },
       },
       FigureBlock: {
-        label: "Image",
+        label: t`Image`,
         fields: {
           src: {
-            label: "Image URL",
+            label: t`Image URL`,
             type: "text",
           },
           alt: {
-            label: "Alt text",
+            label: t`Alt text`,
             type: "text",
           },
           caption: {
-            label: "Caption",
+            label: t`Caption`,
             type: "textarea",
           },
         },
@@ -1261,7 +1276,7 @@ export function getDashboardPuckConfig(options: {
               {props.src.trim().length > 0 ?
                 <Image src={props.src} alt={props.alt} radius="sm" />
               : <Text c="dimmed" fz="sm">
-                  Add an image URL to render a figure.
+                  {t`Add an image URL to render a figure.`}
                 </Text>
               }
               {props.caption.trim().length > 0 ?
@@ -1274,29 +1289,29 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CalloutBlock: {
-        label: "Callout",
+        label: t`Callout`,
         fields: {
           tone: {
-            label: "Tone",
+            label: t`Tone`,
             type: "select",
             options: [
-              { label: "Info", value: "info" },
-              { label: "Warning", value: "warning" },
-              { label: "Neutral", value: "neutral" },
+              { label: t`Info`, value: "info" },
+              { label: t`Warning`, value: "warning" },
+              { label: t`Neutral`, value: "neutral" },
             ],
           },
           title: {
-            label: "Title",
+            label: t`Title`,
             type: "text",
           },
           body: {
-            label: "Body",
+            label: t`Body`,
             type: "textarea",
           },
         },
         defaultProps: {
-          body: "Add context, methodology, or a key takeaway.",
-          title: "Callout",
+          body: t`Add context, methodology, or a key takeaway.`,
+          title: t`Callout`,
           tone: "neutral",
         },
         render: (props: CalloutBlockProps) => {
@@ -1318,22 +1333,22 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ListBlock: {
-        label: "List",
+        label: t`List`,
         fields: {
           type: {
-            label: "Type",
+            label: t`Type`,
             type: "radio",
             options: [
-              { label: "Unordered", value: "unordered" },
-              { label: "Ordered", value: "ordered" },
+              { label: t`Unordered`, value: "unordered" },
+              { label: t`Ordered`, value: "ordered" },
             ],
           },
           items: {
-            label: "Items",
+            label: t`Items`,
             type: "array",
             arrayFields: {
               text: {
-                label: "Text",
+                label: t`Text`,
                 type: "text",
               },
             },
@@ -1342,12 +1357,12 @@ export function getDashboardPuckConfig(options: {
 
               return typeof text === "string" && text.trim().length > 0 ?
                   text
-                : "List item";
+                : t`List item`;
             },
           },
         },
         defaultProps: {
-          items: [{ text: "First point" }, { text: "Second point" }],
+          items: [{ text: t`First point` }, { text: t`Second point` }],
           type: "unordered",
         },
         render: (props: ListBlockProps) => {
@@ -1361,14 +1376,14 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CodeBlock: {
-        label: "Code",
+        label: t`Code`,
         fields: {
           language: {
-            label: "Language",
+            label: t`Language`,
             type: "text",
           },
           code: {
-            label: "Code",
+            label: t`Code`,
             type: "textarea",
           },
         },
@@ -1403,18 +1418,18 @@ export function getDashboardPuckConfig(options: {
         },
       },
       EmbedBlock: {
-        label: "Embed",
+        label: t`Embed`,
         fields: {
           title: {
-            label: "Title",
+            label: t`Title`,
             type: "text",
           },
           url: {
-            label: "URL",
+            label: t`URL`,
             type: "text",
           },
           height: {
-            label: "Height",
+            label: t`Height`,
             type: "number",
             min: 200,
             max: 1200,
@@ -1432,7 +1447,7 @@ export function getDashboardPuckConfig(options: {
           if (!url) {
             return (
               <Text c="dimmed" fz="sm">
-                Add a URL to embed a visualization or external content.
+                {t`Add a URL to embed a visualization or external content.`}
               </Text>
             );
           }
@@ -1441,7 +1456,7 @@ export function getDashboardPuckConfig(options: {
             <Paper withBorder p={0} radius="sm">
               <iframe
                 src={url}
-                title={props.title.trim().length > 0 ? props.title : "Embed"}
+                title={props.title.trim().length > 0 ? props.title : t`Embed`}
                 loading="lazy"
                 style={{
                   border: 0,
@@ -1455,27 +1470,27 @@ export function getDashboardPuckConfig(options: {
         },
       },
       TableBlock: {
-        label: "Table",
+        label: t`Table`,
         fields: {
           delimiter: {
-            label: "Delimiter",
+            label: t`Delimiter`,
             type: "select",
             options: [
-              { label: "Comma (,)", value: "comma" },
-              { label: "Tab", value: "tab" },
-              { label: "Pipe (|)", value: "pipe" },
+              { label: t`Comma (,)`, value: "comma" },
+              { label: t`Tab`, value: "tab" },
+              { label: t`Pipe (|)`, value: "pipe" },
             ],
           },
           hasHeader: {
-            label: "Header row",
+            label: t`Header row`,
             type: "radio",
             options: [
-              { label: "Yes", value: true },
-              { label: "No", value: false },
+              { label: t`Yes`, value: true },
+              { label: t`No`, value: false },
             ],
           },
           data: {
-            label: "Data",
+            label: t`Data`,
             type: "textarea",
           },
         },
@@ -1493,7 +1508,7 @@ export function getDashboardPuckConfig(options: {
           if (rows.length === 0) {
             return (
               <Text c="dimmed" fz="sm">
-                Add tabular data to render a simple table.
+                {t`Add tabular data to render a simple table.`}
               </Text>
             );
           }
