@@ -18,6 +18,7 @@ import clsx from "clsx";
 import { useCallback, useRef } from "react";
 import { ANIMATION_PRESET, FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
 import css from "./FloatingPanel.module.css";
+import { useFloatingPanelDismiss } from "./useFloatingPanelDismiss";
 import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
@@ -45,6 +46,12 @@ type Props = {
 
   /** Called when the close button is clicked. */
   onClose: () => void;
+
+  /**
+   * Called when the user dismisses the panel (Escape while the panel chrome or
+   * open trigger has focus, not a nested input). Defaults to `onClose`.
+   */
+  onRequestClose?: () => void;
 
   /** Called when the collapse toggle is clicked. */
   onToggleCollapse: () => void;
@@ -80,6 +87,7 @@ export function FloatingPanel({
   opened,
   collapsed,
   onClose,
+  onRequestClose,
   onToggleCollapse,
   initialPosition,
   onPositionChange,
@@ -123,6 +131,16 @@ export function FloatingPanel({
     initialPosition: initialPositionRef.current,
   });
 
+  const isPanelMounted = usesMorphTransition ? morph.isRendered : opened;
+
+  const { handlePanelMouseDown } = useFloatingPanelDismiss({
+    opened,
+    isPanelMounted,
+    panelRef,
+    openOriginRef,
+    onDismiss: onRequestClose ?? onClose,
+  });
+
   const onToggleCollapseRef = useRef(onToggleCollapse);
   onToggleCollapseRef.current = onToggleCollapse;
   const handleDragHandleDoubleClick = useCallback(() => {
@@ -158,6 +176,10 @@ export function FloatingPanel({
         }}
         onAnimationEnd={morph.handleAnimationEnd}
         aria-label={title}
+        role="dialog"
+        aria-modal={false}
+        tabIndex={-1}
+        onMouseDown={handlePanelMouseDown}
       >
         <Group
           className={css.header}

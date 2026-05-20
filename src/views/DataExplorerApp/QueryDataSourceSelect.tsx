@@ -143,6 +143,9 @@ export function QueryDataSourceSelect({
     setCurrentDataSource(newDataSource);
   };
 
+  const hasDataSources = dataSources.length > 0;
+  const { disabled: disabledProp, ...restSelectProps } = selectProps;
+
   return (
     <Select
       data={dataSourceOptions}
@@ -150,7 +153,8 @@ export function QueryDataSourceSelect({
       placeholder={t`Select a data source`}
       value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
-      {...selectProps}
+      disabled={disabledProp ?? !hasDataSources}
+      {...restSelectProps}
     />
   );
 }

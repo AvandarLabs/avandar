@@ -3,6 +3,7 @@ import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { Paper } from "@ui";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { useMemo } from "react";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
@@ -99,6 +100,18 @@ export function DataVizPBlock({
   const data = queryResults?.data ?? [];
   const dateColumns = getDateColumns(columns, data);
 
+  const displayVizConfig = useMemo(() => {
+    if (columns.length === 0) {
+      return vizConfig;
+    }
+    return applyVizConfigFromQueryResult({
+      vizConfig,
+      rawSQL: rawSql,
+      query: emptyStructuredQuery,
+      columns,
+    });
+  }, [vizConfig, rawSql, emptyStructuredQuery, columns]);
+
   if (prompt.length === 0) {
     return (
       <Paper withBorder p="md">
@@ -152,7 +165,7 @@ export function DataVizPBlock({
             columns={columns}
             data={data}
             dateColumns={dateColumns}
-            vizConfig={vizConfig}
+            vizConfig={displayVizConfig}
           />
         </Box>
       </Stack>

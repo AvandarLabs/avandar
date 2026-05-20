@@ -149,6 +149,10 @@ export function QueryColumnMultiSelect({
     return renderedSelectedColumns.map(prop("id"));
   }, [renderedSelectedColumns]);
 
+  const hasSelectableColumns = selectableOptions.length > 0;
+  const { disabled: disabledProp, ...restMultiSelectProps } = multiSelectProps;
+  const isDisabled = disabledProp ?? (!isLoading && !hasSelectableColumns);
+
   return (
     <MultiSelect
       searchable
@@ -156,6 +160,7 @@ export function QueryColumnMultiSelect({
       label={label}
       placeholder={isLoading ? t`Loading datasets...` : placeholder}
       data={selectableOptions}
+      disabled={isDisabled}
       value={selectedColumnIds}
       onChange={(newColumnIds) => {
         // convert the column ids back to columns by looking them up
@@ -167,7 +172,7 @@ export function QueryColumnMultiSelect({
         setCurrentSelectedColumns(newSelectedColumns);
       }}
       nothingFoundMessage={t`No fields`}
-      {...multiSelectProps}
+      {...restMultiSelectProps}
       filter={matchColumnFilter}
     />
   );

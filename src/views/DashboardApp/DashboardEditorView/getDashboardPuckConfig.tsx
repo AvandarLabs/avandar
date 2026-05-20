@@ -10,7 +10,6 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import puckConfigCss from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig.module.css";
 import { Paper } from "@ui";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
@@ -23,6 +22,8 @@ import {
   useDashboardThemeOptions,
   useDashboardTypographyOptions,
 } from "@/views/DashboardApp/AvaPage/utils/dashboardDesignTokens";
+import { puckDrawerLabel } from "@/views/DashboardApp/DashboardEditorView/dashboardPuckDrawerLabel";
+import puckConfigCss from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig.module.css";
 import type {
   AvaPageConfig,
   AvaPageData,
@@ -265,10 +266,9 @@ function _getGridCellKey(options: {
   return `r${options.rowIdx + 1}c${options.colIdx + 1}`;
 }
 
-function _createGridCellSlotFields(t: TranslateFn): Record<
-  `r${number}c${number}`,
-  { label: string; type: "slot" }
-> {
+function _createGridCellSlotFields(
+  t: TranslateFn,
+): Record<`r${number}c${number}`, { label: string; type: "slot" }> {
   return Object.fromEntries(
     Array.from({ length: 12 }).flatMap((unusedRow, rowIdx) => {
       return Array.from({ length: 12 }).map((unusedCol, colIdx) => {
@@ -678,12 +678,12 @@ export function getDashboardPuckConfig(options: {
     // term "pblocks" to mean "Page Blocks")
     categories: {
       layout: {
-        title: t`Layout`,
+        title: puckDrawerLabel("Layout"),
         defaultExpanded: true,
         components: ["Section", "Columns", "Grid", "SidebarLayout"],
       },
       content: {
-        title: t`Content`,
+        title: puckDrawerLabel("Content"),
         defaultExpanded: true,
         components: [
           "DataViz",
@@ -700,14 +700,14 @@ export function getDashboardPuckConfig(options: {
         ],
       },
       media: {
-        title: t`Media`,
+        title: puckDrawerLabel("Media"),
         components: ["FigureBlock", "EmbedBlock"],
       },
     },
 
     components: {
       Section: {
-        label: t`Section`,
+        label: puckDrawerLabel("Section"),
         fields: {
           maxWidth: {
             label: t`Max width`,
@@ -763,7 +763,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Columns: {
-        label: t`Columns`,
+        label: puckDrawerLabel("Columns"),
         fields: {
           numColumns: {
             label: t`Number of columns`,
@@ -938,7 +938,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       SidebarLayout: {
-        label: t`Sidebar layout`,
+        label: puckDrawerLabel("Sidebar layout"),
         fields: {
           sidebarPosition: {
             label: t`Sidebar position`,
@@ -1042,7 +1042,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Grid: {
-        label: t`Grid`,
+        label: puckDrawerLabel("Grid"),
         fields: {
           numColumns: {
             label: t`Number of columns`,
@@ -1120,7 +1120,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Card: {
-        label: t`Card`,
+        label: puckDrawerLabel("Card"),
         fields: {
           title: {
             label: t`Title`,
@@ -1152,7 +1152,7 @@ export function getDashboardPuckConfig(options: {
       DataViz: dataVizFieldConfig,
       Filter: filterFieldConfig,
       HeadingBlock: {
-        label: t`Heading`,
+        label: puckDrawerLabel("Heading"),
         fields: {
           text: {
             label: t`Text`,
@@ -1192,7 +1192,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ParagraphBlock: {
-        label: t`Paragraph`,
+        label: puckDrawerLabel("Paragraph"),
         fields: {
           text: {
             label: t`Text`,
@@ -1221,7 +1221,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       QuoteBlock: {
-        label: t`Quote`,
+        label: puckDrawerLabel("Quote"),
         fields: {
           quote: {
             label: t`Quote`,
@@ -1245,14 +1245,14 @@ export function getDashboardPuckConfig(options: {
         },
       },
       DividerBlock: {
-        label: t`Divider`,
+        label: puckDrawerLabel("Divider"),
         fields: {},
         render: () => {
           return <Divider />;
         },
       },
       FigureBlock: {
-        label: t`Image`,
+        label: puckDrawerLabel("Image"),
         fields: {
           src: {
             label: t`Image URL`,
@@ -1291,7 +1291,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CalloutBlock: {
-        label: t`Callout`,
+        label: puckDrawerLabel("Callout"),
         fields: {
           tone: {
             label: t`Tone`,
@@ -1335,7 +1335,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ListBlock: {
-        label: t`List`,
+        label: puckDrawerLabel("List"),
         fields: {
           type: {
             label: t`Type`,
@@ -1378,7 +1378,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CodeBlock: {
-        label: t`Code`,
+        label: puckDrawerLabel("Code"),
         fields: {
           language: {
             label: t`Language`,
@@ -1420,7 +1420,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       EmbedBlock: {
-        label: t`Embed`,
+        label: puckDrawerLabel("Embed"),
         fields: {
           title: {
             label: t`Title`,
@@ -1472,7 +1472,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       TableBlock: {
-        label: t`Table`,
+        label: puckDrawerLabel("Table"),
         fields: {
           delimiter: {
             label: t`Delimiter`,

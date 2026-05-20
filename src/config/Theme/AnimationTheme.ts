@@ -48,7 +48,7 @@ export const ANIMATION_PRESET = {
     className: "ava-animate-swipe-out",
     durationMs: ANIMATION_DURATION_MS.fast,
     easing: ANIMATION_EASING.swipeOut,
-    translateXPx: 12,
+    translateYPx: -12,
   },
   reducedMotionDurationMs: 120,
 } as const;

@@ -322,6 +322,7 @@ function ManualQueryFormView({
             data={selectedColumnOptions}
             value={orderByColumn}
             placeholder={t`Select column to sort by`}
+            disabled={selectedColumnOptions.length === 0}
             onChange={(newColId) => {
               handlers.onSetOrderByColumn(newColId ?? undefined);
             }}

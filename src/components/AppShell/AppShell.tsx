@@ -50,6 +50,12 @@ const ASIDE_DEFAULT_WIDTH = 380;
  */
 export const APP_SHELL_MAIN_ID = "ava-app-shell-main";
 
+/**
+ * Mantine `useHotkeys` skips INPUT/TEXTAREA/SELECT by default. Omit TEXTAREA so
+ * app chrome shortcuts (chat toggle, navbar toggle) still work in the composer.
+ */
+const APP_SHELL_HOTKEY_TAGS_TO_IGNORE = ["INPUT", "SELECT"] as const;
+
 type Props = {
   /**
    * The main content of the app shell.
@@ -98,20 +104,23 @@ function AppShellComponent({
   // We use mod+/ instead of mod+J because Chrome and Firefox both bind
   // mod+J to the Downloads window at the browser/OS layer and the keydown
   // never reaches the page.
-  useHotkeys([
+  useHotkeys(
     [
-      "mod+/",
-      () => {
-        chatPanelDispatch.toggle();
-      },
+      [
+        "mod+/",
+        () => {
+          chatPanelDispatch.toggle();
+        },
+      ],
+      [
+        "mod+.",
+        () => {
+          appShellDispatch.toggleDesktopNavbar();
+        },
+      ],
     ],
-    [
-      "mod+.",
-      () => {
-        appShellDispatch.toggleDesktopNavbar();
-      },
-    ],
-  ]);
+    [...APP_SHELL_HOTKEY_TAGS_TO_IGNORE],
+  );
 
   const headerHeight =
     isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT

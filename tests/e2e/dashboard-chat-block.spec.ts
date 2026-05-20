@@ -48,7 +48,7 @@ test.describe("dashboard chat → P-block", () => {
         dashboardBlock: {
           kind: "DataViz",
           prompt: "California cases by region",
-          sql: 'SELECT 1 AS "result"',
+          sql: 'SELECT 1 AS "state", 1 AS "total_cases"',
           vizType: "bar",
         },
       };

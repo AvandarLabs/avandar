@@ -12,7 +12,6 @@ import type { Table } from "dexie";
  */
 export type ClarificationOutcome =
   | "answered"
-  | "let_ai_decide"
   | "cancelled"
   | "cap_reached"
   | "neutral_failure";

@@ -494,7 +494,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--ava-animation-duration-reduced": `${AnimationTheme.preset.reducedMotionDurationMs}ms`,
     "--ava-animation-easing-spring": AnimationTheme.preset.oozeIn.easing,
     "--ava-animation-easing-swipe-out": AnimationTheme.preset.swipeOut.easing,
-    "--ava-animate-swipe-translate-x": `${AnimationTheme.preset.swipeOut.translateXPx}px`,
+    "--ava-animate-swipe-translate-y": `${AnimationTheme.preset.swipeOut.translateYPx}px`,
   };
 
   return {

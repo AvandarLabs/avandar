@@ -16,7 +16,10 @@ type Options = {
   opened: boolean;
   originRef?: RefObject<HTMLElement | null>;
   panelRef: RefObject<HTMLElement | null>;
-  /** Saved viewport position; used so ooze origin matches the button before layout. */
+  /**
+   * Saved viewport position; used so ooze origin matches the button before
+   * layout.
+   */
   initialPosition?: FloatingPanelInitialPosition;
 };
 
@@ -91,7 +94,8 @@ function _buildOozeOriginStyle(
 }
 
 /**
- * Opening: theme ooze-in preset from a trigger. Closing: theme swipe-out preset.
+ * Opening: theme ooze-in preset from a trigger. Closing: theme swipe-out
+ * preset.
  */
 export function useFloatingPanelMorphTransition({
   opened,

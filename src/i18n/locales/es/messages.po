@@ -13,7 +13,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
 msgstr "Al menos una consulta en este conjunto de datos utiliza <0>SELECT *</0> o no pudo ser analizada de manera segura, por lo que se publicarán todas las columnas."
@@ -157,10 +156,9 @@ msgstr "← Regresar"
 msgid " {numRejectedRows} rows were rejected"
 msgstr "Se rechazaron {numRejectedRows} filas"
 
-#. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
-msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Para aumentar el número de conjuntos de datos que puedes agregar a tu espacio de trabajo, puedes comprar más asientos. ¡Cada asiento te permite agregar 10 conjuntos de datos más!"
+#~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+#~ msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Para aumentar el número de conjuntos de datos que puedes agregar a tu espacio de trabajo, puedes comprar más asientos. ¡Cada asiento te permite agregar 10 conjuntos de datos más!"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -169,6 +167,11 @@ msgstr "No se han agregado conjuntos de datos aún"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
 msgstr "Elige cuánto de cada conjunto de datos publicar. El predeterminado — \"Solo lo que se consulta\" — sube solo las columnas que tus visualizaciones leen. Amplía el alcance si has agregado filtros editables por el espectador y deseas que los espectadores puedan filtrar más allá de tus predeterminados."
+
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
@@ -204,6 +207,10 @@ msgstr "Mantener SQL tal como está"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "Actualizado {0}"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Request a data source connection via feedback"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "This dataset has no description."
@@ -293,8 +300,8 @@ msgid "Name"
 msgstr "Nombre"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
-msgstr "Tu espacio de trabajo está en el plan Gratuito, que admite hasta 5 conjuntos de datos. Para agregar más conjuntos de datos, actualiza a un plan de pago."
+#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+#~ msgstr "Tu espacio de trabajo está en el plan Gratuito, que admite hasta 5 conjuntos de datos. Para agregar más conjuntos de datos, actualiza a un plan de pago."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "User groups"
@@ -489,6 +496,10 @@ msgstr "Rangos de <0>{numericLow}</0> a <1>{numericHigh}</1>, promediando <2>{av
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "Conjunto de datos sin título"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -854,10 +865,9 @@ msgstr "Buscar por nombre, organización, canal…"
 msgid "Save to dashboard"
 msgstr "Guardar en el panel"
 
-#. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "Su plan actual solo admite hasta {0} conjuntos de datos. Actualice a nuestro plan Impacto para aumentar el número de conjuntos de datos que puede agregar a su espacio de trabajo."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgstr "Su plan actual solo admite hasta {0} conjuntos de datos. Actualice a nuestro plan Impacto para aumentar el número de conjuntos de datos que puede agregar a su espacio de trabajo."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -947,10 +957,9 @@ msgstr "Mayormente único: <0>{0}</0> valores distintos en <1>{1}</1> filas."
 msgid "Run an AI query first."
 msgstr "Ejecuta primero una consulta de IA."
 
-#. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Actualiza a nuestro plan Starter o Impact para aumentar el número de conjuntos de datos que puedes agregar a tu espacio de trabajo."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Actualiza a nuestro plan Starter o Impact para aumentar el número de conjuntos de datos que puedes agregar a tu espacio de trabajo."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Parsed {formattedNumRows} rows successfully"
@@ -1476,6 +1485,11 @@ msgstr "Eliminar conjunto de datos"
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
 msgstr "Se procesaron {numSuccessRows} filas con éxito, pero {numRejectedStr}"
 
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "Este conjunto de datos es solo para uso offline. Haga clic para permitir la sincronización en línea."
@@ -1690,6 +1704,10 @@ msgstr "Filtros (Dónde)"
 msgid "Single-select"
 msgstr "Selección única"
 
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "Organización"
@@ -1789,6 +1807,11 @@ msgstr "Tableros"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
 msgstr "entero"
+
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx

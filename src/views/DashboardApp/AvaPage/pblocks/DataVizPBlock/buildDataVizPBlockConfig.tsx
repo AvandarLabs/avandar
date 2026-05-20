@@ -9,6 +9,7 @@ import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/Av
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig";
+import { puckDrawerLabel } from "@/views/DashboardApp/DashboardEditorView/dashboardPuckDrawerLabel";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -64,7 +65,7 @@ export function useDataVizPBlockConfig(options: {
   });
 
   return {
-    label: t`Data Visualization`,
+    label: puckDrawerLabel("Data Visualization"),
     fields: {
       nlQuery: nlQueryFieldConfig,
       vizType: {

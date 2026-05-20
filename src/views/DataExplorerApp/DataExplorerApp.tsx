@@ -46,6 +46,7 @@ import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetFo
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 import type { ChatPlan } from "$/types/chat.types";
@@ -163,9 +164,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   });
 
   const workspace = useCurrentWorkspace();
+  const applyLargeDatasetAutoLimit = useCallback(
+    (limit: number) => {
+      if (state.query.limit === limit) {
+        return;
+      }
+      dispatch.setLimit(limit);
+    },
+    [dispatch, state.query.limit],
+  );
+
+  useSyncLargeDatasetAutoLimit({
+    query: state.query,
+    onApplyAutoLimit: applyLargeDatasetAutoLimit,
+  });
+
   const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
+    isStructuredQueryInSync: state.isStructuredQueryInSync,
     auth: "workspace",
     workspaceId: workspace.id,
   });
@@ -502,6 +519,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         onClose={() => {
           setQueryDetailsOpened(false);
         }}
+        onRequestClose={() => {
+          setQueryDetailsOpened(false);
+        }}
         onToggleCollapse={() => {
           setPanelPreferences((prev) => {
             return _updatePanelPreferences(prev, "queryDetails", {
@@ -533,6 +553,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         collapsed={isSettingsCollapsed}
         openOriginRef={settingsPanelButtonRef}
         onClose={() => {
+          setSettingsOpened(false);
+        }}
+        onRequestClose={() => {
           setSettingsOpened(false);
         }}
         onToggleCollapse={() => {

@@ -14,27 +14,43 @@ import type { PiiDetectionResult } from "@/lib/privacy/piiDetector";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
- * `crossBoundary` is the single chokepoint for sending values or text to
- * the LLM. Every code path that crosses the data → LLM boundary should
- * route through it.
+ * Privacy chokepoint for anything that leaves the browser for the LLM.
  *
- * v1 scope (what ships in this branch):
+ * **What "crossBoundary" means:** Avandar keeps row-level data in DuckDB on
+ * the client. The "boundary" is browser → model/API. `crossBoundary()` is
+ * the only supported way to move user-typed text or concrete cell values
+ * across that boundary. Call it before appending chat text, sending
+ * clarification answers, applying generated SQL with assumed filters, etc.
+ *
+ * **What it does:**
+ *   1. Run local PII + bias detectors (no LLM).
+ *   2. If needed, open `ConsentModal` so the user explicitly approves.
+ *   3. On approval, mint an HMAC `ackToken` and queue it in `pendingAcks.ts`.
+ *   4. `useAvandarChatRuntime` attaches matching acks on the next
+ *      `chat/.../messages` POST; the edge function verifies them or returns
+ *      `UNAPPROVED_DATA_TRANSFER`.
+ *
+ * **Call sites (grep `crossBoundary(`):** chat user messages, clarification
+ * answers, discovery dropdown picks, assumed SQL literals after the
+ * clarification cap (`generated_sql_assumptions`).
+ *
+ * **Design doc:** `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
+ * (section "`crossBoundary` API"). Audit UI: Settings → Privacy log.
+ *
+ * v1 scope:
  *   - PII detection (column-name + content layers, English-only)
  *   - Bias detection (English-only patterns)
- *   - Consent modal Modes A / B / C / D / E
- *   - HMAC-signed ack tokens via `sessionSecret.ts`; backend rejects
- *     unverified consent acks with `UNAPPROVED_DATA_TRANSFER` (400)
- *   - Dexie-persisted audit log; viewable at `/settings/privacy/log`
+ *   - Consent modal modes A–E (`ConsentModal.tsx`)
+ *   - Dexie audit via `consentAuditLog.ts` and `clarificationAuditLog.ts`
  *
- * Deferred (logged in CHECKPOINTS.md):
- *   - Spanish / French pattern files (UX copy stubbed; patterns to follow
- *     after a social-sector-advisor review per spec)
- *   - Server-issued nonce registry (v2 of the ack-token design — for now
- *     replay protection is best-effort in-memory on the edge worker)
+ * Deferred (see `docs/ict4d-demo/CHECKPOINTS.md`):
+ *   - Spanish / French pattern files
+ *   - Server-issued nonce registry for ack replay protection
  */
 
 export type CrossBoundaryContext =
   | "discovery_clarification"
+  | "generated_sql_assumptions"
   | "plan_step_input"
   | "user_message_text"
   | "clarification_answer";
@@ -63,6 +79,11 @@ export type CrossBoundaryRequest = {
   workspaceId: Workspace.Id;
   userId: string;
   threadId?: string;
+  /**
+   * When true, show the consent modal even if detectors are clean — used
+   * for assumed SQL filter values after the clarification cap.
+   */
+  explicitConsentRequired?: boolean;
 };
 
 export type ApprovedPayload = {
@@ -81,12 +102,13 @@ export type CrossBoundaryResult =
   | { approved: false; reason: "cancelled" | "edited_to_empty" };
 
 /**
- * Run detectors, surface the appropriate consent modal, and on approval
- * return a payload that downstream code can attach to its LLM request.
+ * Run detectors, surface the consent modal when required, and return an
+ * approved payload (with `ackToken`) for the caller to send onward.
+ *
+ * @see Module comment above for architecture and design-doc link.
  *
  * Resolves with `{ approved: false, reason: "cancelled" }` if the user
- * cancels the modal — callers should drop the request silently in that
- * case (no error toast; cancel is a normal flow).
+ * dismisses the modal — callers should abort that send (no error toast).
  */
 export async function crossBoundary(
   req: CrossBoundaryRequest,
@@ -102,7 +124,15 @@ export async function crossBoundary(
     : null;
   const biasHits: BiasHit[] = biasInput ? detectBias(biasInput).hits : [];
 
-  const mode = _chooseMode({ pii, biasHits });
+  let mode = _chooseMode({ pii, biasHits });
+
+  const hasPayload =
+    (typeof req.text === "string" && req.text.trim().length > 0) ||
+    (req.values !== undefined && req.values.length > 0);
+
+  if (mode === null && req.explicitConsentRequired && hasPayload) {
+    mode = "clean";
+  }
 
   // Clean send when there is nothing to flag.
   if (mode === null) {

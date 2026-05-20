@@ -295,11 +295,50 @@ const ALLOWED_DASHBOARD_VIZ_TYPES = new Set<ChatDashboardVizType>([
   "pie",
 ]);
 
+const ALLOWED_DASHBOARD_BLOCK_KINDS = new Set([
+  "DataViz",
+  "HeadingBlock",
+  "ParagraphBlock",
+  "QuoteBlock",
+  "DividerBlock",
+  "CalloutBlock",
+  "ListBlock",
+  "CodeBlock",
+  "TableBlock",
+  "Card",
+]);
+
+const ALLOWED_BLOCK_ALIGN = new Set(["left", "center", "right"]);
+const ALLOWED_HEADING_LEVELS = new Set([1, 2, 3, 4]);
+const ALLOWED_CALLOUT_TONES = new Set(["info", "warning", "neutral"]);
+const ALLOWED_LIST_TYPES = new Set(["ordered", "unordered"]);
+const ALLOWED_TABLE_DELIMITERS = new Set(["comma", "tab", "pipe"]);
+
 type RawDashboardBlockArgs = {
+  kind?: unknown;
   prompt?: unknown;
   sql?: unknown;
   vizType?: unknown;
+  text?: unknown;
+  level?: unknown;
+  align?: unknown;
+  quote?: unknown;
+  cite?: unknown;
+  title?: unknown;
+  body?: unknown;
+  tone?: unknown;
+  items?: unknown;
+  listType?: unknown;
+  code?: unknown;
+  language?: unknown;
+  data?: unknown;
+  delimiter?: unknown;
+  hasHeader?: unknown;
 };
+
+function _trimString(value: unknown): string | undefined {
+  return typeof value === "string" ? value.trim() : undefined;
+}
 
 function _parseAddDashboardBlock(
   argsJson: string | undefined,
@@ -313,23 +352,183 @@ function _parseAddDashboardBlock(
   } catch {
     return undefined;
   }
+
+  let kind = typeof parsed.kind === "string" ? parsed.kind.trim() : undefined;
+
+  // Backward compatibility: older tool calls omitted `kind` for DataViz.
   if (
-    typeof parsed.prompt !== "string" ||
-    typeof parsed.sql !== "string" ||
-    typeof parsed.vizType !== "string"
+    kind === undefined &&
+    typeof parsed.sql === "string" &&
+    typeof parsed.prompt === "string"
   ) {
+    kind = "DataViz";
+  }
+
+  if (kind === undefined || !ALLOWED_DASHBOARD_BLOCK_KINDS.has(kind)) {
     return undefined;
   }
-  const prompt = parsed.prompt.trim();
-  const sql = cleanGeneratedSQL(parsed.sql).trim();
-  const vizType = parsed.vizType.trim() as ChatDashboardVizType;
-  if (prompt.length === 0 || sql.length === 0) {
-    return undefined;
+
+  switch (kind) {
+    case "DataViz": {
+      const prompt = _trimString(parsed.prompt);
+      const sqlRaw = _trimString(parsed.sql);
+      const vizTypeRaw = _trimString(parsed.vizType);
+      if (!prompt || !sqlRaw || !vizTypeRaw) {
+        return undefined;
+      }
+      const sql = cleanGeneratedSQL(sqlRaw).trim();
+      const vizType = vizTypeRaw as ChatDashboardVizType;
+      if (sql.length === 0 || !ALLOWED_DASHBOARD_VIZ_TYPES.has(vizType)) {
+        return undefined;
+      }
+      return { kind: "DataViz", prompt, sql, vizType };
+    }
+    case "HeadingBlock": {
+      const text = _trimString(parsed.text);
+      if (!text) {
+        return undefined;
+      }
+      const level =
+        (
+          typeof parsed.level === "number" &&
+          ALLOWED_HEADING_LEVELS.has(parsed.level as 1 | 2 | 3 | 4)
+        ) ?
+          (parsed.level as 1 | 2 | 3 | 4)
+        : undefined;
+      const alignRaw = _trimString(parsed.align);
+      const align =
+        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw) ?
+          (alignRaw as "left" | "center" | "right")
+        : undefined;
+      return {
+        kind: "HeadingBlock",
+        text,
+        ...(level ? { level } : {}),
+        ...(align ? { align } : {}),
+      };
+    }
+    case "ParagraphBlock": {
+      const text = _trimString(parsed.text);
+      if (!text) {
+        return undefined;
+      }
+      const alignRaw = _trimString(parsed.align);
+      const align =
+        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw) ?
+          (alignRaw as "left" | "center" | "right")
+        : undefined;
+      return { kind: "ParagraphBlock", text, ...(align ? { align } : {}) };
+    }
+    case "QuoteBlock": {
+      const quote = _trimString(parsed.quote);
+      if (!quote) {
+        return undefined;
+      }
+      const cite = _trimString(parsed.cite);
+      return { kind: "QuoteBlock", quote, ...(cite ? { cite } : {}) };
+    }
+    case "DividerBlock":
+      return { kind: "DividerBlock" };
+    case "CalloutBlock": {
+      const title = _trimString(parsed.title);
+      const body = _trimString(parsed.body);
+      if (!title || !body) {
+        return undefined;
+      }
+      const toneRaw = _trimString(parsed.tone);
+      const tone =
+        toneRaw && ALLOWED_CALLOUT_TONES.has(toneRaw) ?
+          (toneRaw as "info" | "warning" | "neutral")
+        : undefined;
+      return { kind: "CalloutBlock", title, body, ...(tone ? { tone } : {}) };
+    }
+    case "ListBlock": {
+      if (!Array.isArray(parsed.items)) {
+        return undefined;
+      }
+      const items = parsed.items
+        .filter((item): item is string => {
+          return typeof item === "string" && item.trim().length > 0;
+        })
+        .map((item) => {
+          return item.trim();
+        });
+      if (items.length === 0) {
+        return undefined;
+      }
+      const listTypeRaw = _trimString(parsed.listType);
+      const listType =
+        listTypeRaw && ALLOWED_LIST_TYPES.has(listTypeRaw) ?
+          (listTypeRaw as "ordered" | "unordered")
+        : undefined;
+      return { kind: "ListBlock", items, ...(listType ? { listType } : {}) };
+    }
+    case "CodeBlock": {
+      const code = _trimString(parsed.code);
+      if (!code) {
+        return undefined;
+      }
+      const language = _trimString(parsed.language);
+      return { kind: "CodeBlock", code, ...(language ? { language } : {}) };
+    }
+    case "TableBlock": {
+      const data = _trimString(parsed.data);
+      if (!data) {
+        return undefined;
+      }
+      const delimiterRaw = _trimString(parsed.delimiter);
+      const delimiter =
+        delimiterRaw && ALLOWED_TABLE_DELIMITERS.has(delimiterRaw) ?
+          (delimiterRaw as "comma" | "tab" | "pipe")
+        : undefined;
+      const hasHeader =
+        typeof parsed.hasHeader === "boolean" ? parsed.hasHeader : undefined;
+      return {
+        kind: "TableBlock",
+        data,
+        ...(delimiter ? { delimiter } : {}),
+        ...(hasHeader !== undefined ? { hasHeader } : {}),
+      };
+    }
+    case "Card": {
+      const title = _trimString(parsed.title);
+      if (!title) {
+        return undefined;
+      }
+      return { kind: "Card", title };
+    }
+    default:
+      return undefined;
   }
-  if (!ALLOWED_DASHBOARD_VIZ_TYPES.has(vizType)) {
-    return undefined;
+}
+
+function _dashboardBlockSummary(block: ChatGeneratedDashboardBlock): string {
+  switch (block.kind) {
+    case "DataViz":
+      return `Added "${block.prompt}" to your dashboard as a ${block.vizType}.`;
+    case "HeadingBlock":
+      return `Added a heading: "${block.text}".`;
+    case "ParagraphBlock":
+      return `Added a paragraph to your dashboard.`;
+    case "QuoteBlock":
+      return `Added a quote to your dashboard.`;
+    case "DividerBlock":
+      return `Added a divider to your dashboard.`;
+    case "CalloutBlock":
+      return `Added a callout: "${block.title}".`;
+    case "ListBlock":
+      return `Added a list with ${block.items.length} item(s) to your dashboard.`;
+    case "CodeBlock":
+      return `Added a code block to your dashboard.`;
+    case "TableBlock":
+      return `Added a table to your dashboard.`;
+    case "Card":
+      return `Added a card: "${block.title}".`;
+    default: {
+      const _exhaustive: never = block;
+      return _exhaustive;
+    }
   }
-  return { kind: "DataViz", prompt, sql, vizType };
 }
 
 function _parseProposePlan(argsJson: string | undefined): ChatPlan | undefined {
@@ -412,15 +611,43 @@ function _parseProposePlan(argsJson: string | undefined): ChatPlan | undefined {
   return { steps: cleaned, rootMessage };
 }
 
-const dataExplorerSystemPrefix = `
-You are Avandar, an embedded assistant that helps users analyze their data
-inside the Avandar workspace.
+/**
+ * Shared persona for all Avandar chat surfaces. A clear expert role in the
+ * system prompt improves tool use, clarification quality, and plain-language
+ * explanations for non-technical users.
+ */
+const avandarPersonaPrefix = `
+You are Avandar, an embedded data analyst inside the Avandar workspace.
 
+PERSONA AND EXPERTISE
+You are a senior data analyst with deep hands-on expertise in:
+- Data analytics: exploratory analysis, KPIs, trends, and communicating findings
+  clearly to program managers and decision-makers.
+- DuckDB, SQL, and Python (and R when appropriate): idiomatic queries, sound joins
+  and aggregations, and knowing when SQL vs a short script step is the right tool.
+- Social-sector and program data: NGOs, government programs, grants, beneficiaries,
+  service delivery, M&E indicators, and survey-style fields.
+- Real-world bias and ethics: subjective labels ("vulnerable", "at-risk", "success"),
+  proxy metrics, missing data, and definitions that embed human judgment.
+
+AUDIENCE AND TONE
+Most users are not software engineers. Use plain language, avoid jargon unless the
+user uses it first, and never talk down. When a question is underspecified or uses
+loaded terms, ask one neutral clarifying question before assuming a definition.
+State choices briefly when you proceed with a reasonable default.
+
+`;
+
+const dataExplorerSystemPrefix = `${avandarPersonaPrefix}
 The user is currently in the Data Explorer. When they ask a data question,
 either call the \`generateSql\` tool with a DuckDB SELECT, or call the
 \`clarify\` tool first if the question is materially ambiguous.
 
 CLARIFYING QUESTIONS
+
+Use your social-sector and bias expertise to spot loaded or subjective terms
+before generating SQL. Prefer \`clarify\` over guessing when the answer would
+change who or what is counted.
 
 When to call \`clarify\`:
 - Subjective terms without a clear metric ("good", "best", "poor",
@@ -450,12 +677,28 @@ How to clarify:
 - NEVER use gendered, ethnic, religious, or culturally loaded framing.
 - Include a brief \`rationale\` so the user understands why you're asking.
 
-When the user has answered prior clarification(s), the answers will be
-attached at the end of the conversation as \`[Clarification answer: ...]\`
-lines. Use them; do not ask the same thing again.
+When the user has answered prior clarification(s), the answers appear as
+\`[Clarification answer: ...]\` lines. Formats you may see:
+- A preset choice you offered (plain text after the prefix).
+- \`(none of the listed options)\` — your options did not fit; ask a
+  follow-up \`clarify\` (often \`free_text\`) to learn what they mean.
+- \`(custom answer: ...)\` — they typed their own answer; treat it as
+  authoritative user intent, not as one of your listed options.
+
+Re-analyze every clarification answer before calling \`generateSql\`:
+- If the answer is still underspecified for confident SQL (which tables,
+  columns, filters, metrics, or time range), call \`clarify\` again with a
+  more targeted question. Do not guess at data the user has not explicitly
+  named or selected.
+- Discovery dropdown values are the only raw data values you may treat as
+  user-selected filters; never invent or assume unseen column values.
+- Build on prior answers; do not repeat the same question.
 
 After at most 3 clarification turns within one analytic question, make
-a reasonable assumption and call \`generateSql\`.
+a reasonable assumption, state it briefly in \`assistantText\`, and call
+\`generateSql\`. The client will ask the user to approve any filter literals
+in the SQL that they did not explicitly provide, or that look like personal
+data, before the query runs.
 
 MULTI-STEP PLANS
 
@@ -507,34 +750,39 @@ read them and decide.
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;
 
-const dashboardsSystemPrefix = `
-You are Avandar, an embedded assistant that helps users build interactive
-data dashboards inside the Avandar workspace.
-
-The user is currently editing a dashboard. When they ask for a visualization
-("show me revenue by month", "add a bar chart of users per country", "create
-a pie chart of categories") call the \`addDashboardBlock\` tool with a
-DuckDB SELECT and a sensible \`vizType\`. The dashboard editor will append
-the block to the page immediately.
+const dashboardsSystemPrefix = `${avandarPersonaPrefix}
+The user is currently editing a dashboard. To add content, call
+\`addDashboardBlock\` with a \`kind\` and the fields for that block. The
+editor appends the block to the page immediately.
 
 Rules for \`addDashboardBlock\`:
-- ONE block per turn. If the user asks for multiple charts, pick the most
-  central one and mention the next ones in your reply.
-- Choose \`vizType\` from the catalog: table, bar, line, area, scatter, pie.
-- Use a "table" when the user asks for raw data, a "bar" for categorical
-  breakdowns, a "line" or "area" for time series, "pie" only when the user
-  explicitly wants a share-of-whole and there are <= 8 categories.
-- Wrap dataset ids and column names in double quotes in the SQL.
-- The \`prompt\` field should be a short, human-readable description of what
-  the block shows ("Monthly revenue", "Customers by country"). It becomes
-  the block's persisted natural-language prompt.
+- ONE block per turn. If the user asks for multiple items, add the most
+  important one and mention the rest in your reply.
+- \`kind\` must be one of:
+  - \`DataViz\` — charts and tables (requires \`prompt\`, \`sql\`, \`vizType\`).
+  - \`HeadingBlock\` — title text (requires \`text\`; optional \`level\` 1–4).
+  - \`ParagraphBlock\` — body copy (requires \`text\`).
+  - \`QuoteBlock\` — quotation (requires \`quote\`; optional \`cite\`).
+  - \`DividerBlock\` — horizontal rule (no extra fields).
+  - \`CalloutBlock\` — highlighted box (requires \`title\`, \`body\`; optional \`tone\`: info, warning, neutral).
+  - \`ListBlock\` — bullet or numbered list (requires \`items\` string array; optional \`listType\`: ordered, unordered).
+  - \`CodeBlock\` — code snippet (requires \`code\`; optional \`language\`).
+  - \`TableBlock\` — markdown-style table data as CSV text (requires \`data\`).
+  - \`Card\` — titled card container (requires \`title\`).
 
-If the user is NOT asking for a chart (e.g. layout, copy, design questions),
-answer concisely in text. Don't call any tool.`;
+DataViz rules:
+- \`vizType\`: table, bar, line, area, scatter, pie.
+- Wrap dataset ids and column names in double quotes in \`sql\`.
+- \`prompt\` is a short label for the chart ("Monthly revenue").
 
-const genericSystemPrompt = `
-You are Avandar, an embedded assistant inside the Avandar workspace. The user
-is not currently on a page where data tools are available. Be concise and
+For headings, copy, callouts, lists, etc., use the matching \`kind\` — do not
+use DataViz unless the user wants data from SQL.
+
+If the user is only asking a general question (not to add a block), answer in
+text without calling the tool.`;
+
+const genericSystemPrompt = `${avandarPersonaPrefix}
+The user is not currently on a page where data tools are available. Be concise and
 helpful, and let them know they can switch to the Data Explorer to ask questions about their data.`;
 
 async function fetchSchemaForWorkspace(args: {
@@ -765,7 +1013,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                   function: {
                     name: "clarify",
                     description:
-                      "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata. Use this BEFORE generateSql when ambiguous.",
+                      "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata; the UI always offers Something else and None of the above, so re-clarify if their answer is still ambiguous. Use this BEFORE generateSql when ambiguous.",
                     parameters: {
                       type: "object",
                       properties: {
@@ -914,29 +1162,110 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
               function: {
                 name: "addDashboardBlock",
                 description:
-                  "Append a new data-visualization block (P-block) to the dashboard the user is currently editing. Call this when the user asks for a chart, table, or visual in their dashboard.",
+                  "Append a new dashboard block (P-block) to the page the user is editing. Set `kind` and the fields for that block type.",
                 parameters: {
                   type: "object",
                   properties: {
+                    kind: {
+                      type: "string",
+                      enum: [
+                        "DataViz",
+                        "HeadingBlock",
+                        "ParagraphBlock",
+                        "QuoteBlock",
+                        "DividerBlock",
+                        "CalloutBlock",
+                        "ListBlock",
+                        "CodeBlock",
+                        "TableBlock",
+                        "Card",
+                      ],
+                      description:
+                        "Block type to create. Use HeadingBlock for titles, ParagraphBlock for body text, DataViz only for SQL-driven charts/tables.",
+                    },
                     prompt: {
                       type: "string",
-                      description:
-                        "Short human-readable description of what the block shows. Becomes the persisted NL prompt on the block.",
+                      description: "DataViz only: short label for the chart.",
                       maxLength: 200,
                     },
                     sql: {
                       type: "string",
                       description:
-                        "DuckDB SELECT that powers the block. Wrap dataset ids and column names in double quotes.",
+                        "DataViz only: DuckDB SELECT. Wrap dataset ids and column names in double quotes.",
                     },
                     vizType: {
                       type: "string",
                       enum: ["table", "bar", "line", "area", "scatter", "pie"],
+                      description: "DataViz only: visualization type.",
+                    },
+                    text: {
+                      type: "string",
                       description:
-                        "Visualization type. Use 'table' for raw data, 'bar' for categorical breakdowns, 'line'/'area' for time series, 'pie' only when explicit and <= 8 categories.",
+                        "HeadingBlock or ParagraphBlock: display text.",
+                    },
+                    level: {
+                      type: "number",
+                      description: "HeadingBlock only: 1, 2, 3, or 4.",
+                    },
+                    align: {
+                      type: "string",
+                      enum: ["left", "center", "right"],
+                      description: "HeadingBlock or ParagraphBlock alignment.",
+                    },
+                    quote: {
+                      type: "string",
+                      description: "QuoteBlock: quotation body.",
+                    },
+                    cite: {
+                      type: "string",
+                      description: "QuoteBlock: attribution.",
+                    },
+                    title: {
+                      type: "string",
+                      description: "CalloutBlock or Card title.",
+                    },
+                    body: {
+                      type: "string",
+                      description: "CalloutBlock body text.",
+                    },
+                    tone: {
+                      type: "string",
+                      enum: ["info", "warning", "neutral"],
+                      description: "CalloutBlock tone.",
+                    },
+                    items: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "ListBlock: list item strings.",
+                    },
+                    listType: {
+                      type: "string",
+                      enum: ["ordered", "unordered"],
+                      description: "ListBlock list style.",
+                    },
+                    code: {
+                      type: "string",
+                      description: "CodeBlock source code.",
+                    },
+                    language: {
+                      type: "string",
+                      description: "CodeBlock language hint.",
+                    },
+                    data: {
+                      type: "string",
+                      description: "TableBlock: CSV or delimited table text.",
+                    },
+                    delimiter: {
+                      type: "string",
+                      enum: ["comma", "tab", "pipe"],
+                      description: "TableBlock delimiter.",
+                    },
+                    hasHeader: {
+                      type: "boolean",
+                      description: "TableBlock: first row is header.",
                     },
                   },
-                  required: ["prompt", "sql", "vizType"],
+                  required: ["kind"],
                   additionalProperties: false,
                 },
               },
@@ -1048,8 +1377,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             "Here is the SQL I ran. Results are on the canvas to the left."
           : plan ? plan.rootMessage || "Here is a plan to answer your question."
           : clarification ? clarification.question
-          : dashboardBlock ?
-            `Added "${dashboardBlock.prompt}" to your dashboard as a ${dashboardBlock.vizType}.`
+          : dashboardBlock ? _dashboardBlockSummary(dashboardBlock)
           : "I could not generate a query for that. Try rephrasing.");
 
         const result: ChatResponse = {
@@ -1145,9 +1473,8 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             .join(", ");
         };
 
-        const regenSystemPrompt = `
-You are Avandar, an embedded data assistant. The user is working with a
-multi-step SQL plan in DuckDB.
+        const regenSystemPrompt = `${avandarPersonaPrefix}
+The user is working with a multi-step SQL plan in DuckDB.
 
 A previously-executed step produced columns that don't match what the
 plan predicted. You must regenerate ONLY the downstream steps that

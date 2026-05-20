@@ -39,17 +39,70 @@ export type ChatDashboardVizType =
   | "scatter"
   | "pie";
 
+export type ChatDashboardBlockAlign = "left" | "center" | "right";
+
+export type ChatDashboardHeadingLevel = 1 | 2 | 3 | 4;
+
+export type ChatDashboardCalloutTone = "info" | "warning" | "neutral";
+
+export type ChatDashboardListType = "ordered" | "unordered";
+
+export type ChatDashboardTableDelimiter = "comma" | "tab" | "pipe";
+
 /**
- * A P-block the LLM produced for the dashboard editor. v1 only emits
- * `DataViz` blocks (the most common case for the demo). The client converts
+ * A P-block the LLM produced for the dashboard editor. The client converts
  * this to a Puck content item before appending it to the dashboard.
  */
-export type ChatGeneratedDashboardBlock = {
-  kind: "DataViz";
-  prompt: string;
-  sql: string;
-  vizType: ChatDashboardVizType;
-};
+export type ChatGeneratedDashboardBlock =
+  | {
+      kind: "DataViz";
+      prompt: string;
+      sql: string;
+      vizType: ChatDashboardVizType;
+    }
+  | {
+      kind: "HeadingBlock";
+      text: string;
+      level?: ChatDashboardHeadingLevel;
+      align?: ChatDashboardBlockAlign;
+    }
+  | {
+      kind: "ParagraphBlock";
+      text: string;
+      align?: ChatDashboardBlockAlign;
+    }
+  | {
+      kind: "QuoteBlock";
+      quote: string;
+      cite?: string;
+    }
+  | { kind: "DividerBlock" }
+  | {
+      kind: "CalloutBlock";
+      title: string;
+      body: string;
+      tone?: ChatDashboardCalloutTone;
+    }
+  | {
+      kind: "ListBlock";
+      items: string[];
+      listType?: ChatDashboardListType;
+    }
+  | {
+      kind: "CodeBlock";
+      code: string;
+      language?: string;
+    }
+  | {
+      kind: "TableBlock";
+      data: string;
+      delimiter?: ChatDashboardTableDelimiter;
+      hasHeader?: boolean;
+    }
+  | {
+      kind: "Card";
+      title: string;
+    };
 
 export type ChatGeneratedSql = {
   prompt: string;
@@ -130,7 +183,8 @@ export type ChatResponse = {
   /**
    * Present when the model called the `clarify` tool. The client renders
    * the clarification UI inline in the thread; on answer it issues a new
-   * turn with the answer attached.
+   * turn with a `[Clarification answer: ...]` user message (preset,
+   * custom, or none of the listed options).
    */
   clarification?: ChatClarifyRequest;
   /**

@@ -18,6 +18,7 @@ import {
   parseURLSearch,
   serializeStateToURL,
 } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 
 type Options = {
@@ -145,76 +146,86 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
       return;
     }
 
-    if (restoreStructuredFromURL && restoredDataSource) {
-      dispatch.setDataSource(restoredDataSource);
-    }
+    void (async () => {
+      if (restoreStructuredFromURL && restoredDataSource) {
+        const commitOptions =
+          isDatasetSource ?
+            await buildDataSourceCommitOptions({
+              dataSource: restoredDataSource,
+              query: state.query,
+              workspaceId: workspace.id,
+            })
+          : undefined;
+        dispatch.setDataSource(restoredDataSource, commitOptions);
+      }
 
-    if (
-      restoreStructuredFromURL &&
-      needsColumns &&
-      (datasetColumns ?? entityFieldConfigs)
-    ) {
-      const allQueryColumns = [
-        ...(datasetColumns ?? []).map((col) => {
-          return QueryColumn.makeFromDatasetColumn(col);
-        }),
-        ...(entityFieldConfigs ?? []).map((col) => {
-          return QueryColumn.makeFromEntityFieldConfig(col);
-        }),
-      ];
+      if (
+        restoreStructuredFromURL &&
+        needsColumns &&
+        (datasetColumns ?? entityFieldConfigs)
+      ) {
+        const allQueryColumns = [
+          ...(datasetColumns ?? []).map((col) => {
+            return QueryColumn.makeFromDatasetColumn(col);
+          }),
+          ...(entityFieldConfigs ?? []).map((col) => {
+            return QueryColumn.makeFromEntityFieldConfig(col);
+          }),
+        ];
 
-      const restoredCols = (urlState.colNames ?? [])
-        .map((name) => {
-          return allQueryColumns.find((col) => {
-            return col.baseColumn.name === name;
-          });
-        })
-        .filter(isNonNullish);
+        const restoredCols = (urlState.colNames ?? [])
+          .map((name) => {
+            return allQueryColumns.find((col) => {
+              return col.baseColumn.name === name;
+            });
+          })
+          .filter(isNonNullish);
 
-      if (restoredCols.length > 0) {
-        dispatch.setColumns(restoredCols);
+        if (restoredCols.length > 0) {
+          dispatch.setColumns(restoredCols);
 
-        if (urlState.aggregations) {
-          restoredCols.forEach((col) => {
-            const agg = urlState.aggregations?.[col.baseColumn.name];
-            if (agg) {
-              dispatch.setColumnAggregation({
-                columnId: col.id,
-                aggregation: agg,
-              });
-            }
-          });
-        }
+          if (urlState.aggregations) {
+            restoredCols.forEach((col) => {
+              const agg = urlState.aggregations?.[col.baseColumn.name];
+              if (agg) {
+                dispatch.setColumnAggregation({
+                  columnId: col.id,
+                  aggregation: agg,
+                });
+              }
+            });
+          }
 
-        if (urlState.orderByColName) {
-          const orderCol = restoredCols.find((col) => {
-            return col.baseColumn.name === urlState.orderByColName;
-          });
-          if (orderCol) {
-            dispatch.setOrderByColumn(orderCol.id);
-            if (urlState.orderDir) {
-              dispatch.setOrderByDirection(urlState.orderDir);
+          if (urlState.orderByColName) {
+            const orderCol = restoredCols.find((col) => {
+              return col.baseColumn.name === urlState.orderByColName;
+            });
+            if (orderCol) {
+              dispatch.setOrderByColumn(orderCol.id);
+              if (urlState.orderDir) {
+                dispatch.setOrderByDirection(urlState.orderDir);
+              }
             }
           }
         }
       }
-    }
 
-    if (urlState.rawSQL) {
-      dispatch.setRawSql(urlState.rawSQL);
-    }
+      if (urlState.rawSQL) {
+        dispatch.setRawSql(urlState.rawSQL);
+      }
 
-    if (urlState.openDataset) {
-      dispatch.setOpenDataset(urlState.openDataset);
-    }
+      if (urlState.openDataset) {
+        dispatch.setOpenDataset(urlState.openDataset);
+      }
 
-    // Restore viz config last — may overwrite the result of hydrateFromQuery
-    // that setColumns triggered above.
-    if (urlState.vizConfig) {
-      dispatch.setVizConfig(urlState.vizConfig);
-    }
+      // Restore viz config last — may overwrite the result of hydrateFromQuery
+      // that setColumns triggered above.
+      if (urlState.vizConfig) {
+        dispatch.setVizConfig(urlState.vizConfig);
+      }
 
-    setIsHydrated(true);
+      setIsHydrated(true);
+    })();
     // Intentionally omitting `state` from deps: the "should hydrate?" decision
     // is captured once via shouldHydrateRef so that mid-hydration state changes
     // (from the dispatches above) do not re-trigger the bail-out check.

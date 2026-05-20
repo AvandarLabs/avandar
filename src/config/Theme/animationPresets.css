@@ -54,7 +54,7 @@
 
   100% {
     opacity: 0;
-    transform: translateX(var(--ava-animate-swipe-translate-x));
+    transform: translateY(var(--ava-animate-swipe-translate-y));
   }
 }
 

@@ -53,7 +53,7 @@ describe("manualQueryLimit", () => {
     expect(LARGE_DATASET_AUTO_LIMIT).toBe(DEFAULT_MANUAL_QUERY_LIMIT);
   });
 
-  it("allows auto limit only when no limit or filters are set", () => {
+  it("allows auto limit only when no limit, filters, or aggregations are set", () => {
     const emptyQuery = StructuredQuery.makeEmpty();
 
     expect(shouldAutoLimitLargeDataset(emptyQuery)).toBe(true);
@@ -77,6 +77,12 @@ describe("manualQueryLimit", () => {
       },
     };
     expect(shouldAutoLimitLargeDataset(withFilter)).toBe(false);
+
+    const withAggregation = {
+      ...emptyQuery,
+      aggregations: { col_1: "count" as const },
+    };
+    expect(shouldAutoLimitLargeDataset(withAggregation)).toBe(false);
   });
 
   it("returns the auto limit only when row count exceeds the threshold", () => {

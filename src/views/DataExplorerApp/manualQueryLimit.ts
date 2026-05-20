@@ -17,6 +17,15 @@ function _hasNonDefaultAggregation(query: PartialStructuredQuery): boolean {
 }
 
 /**
+ * True when the structured query applies GROUP BY or non-trivial aggregates.
+ */
+export function hasStructuredQueryAggregations(
+  query: PartialStructuredQuery,
+): boolean {
+  return _hasNonDefaultAggregation(query);
+}
+
+/**
  * Returns `true` when the structured query is still blank and the manual form
  * should show the default LIMIT instead of an empty field.
  */
@@ -53,7 +62,8 @@ export function getManualQueryLimitValue(
 }
 
 /**
- * True when selecting a dataset should trigger the large-dataset auto LIMIT.
+ * True when we should resolve dataset row count before running the structured
+ * query (no limit, filters, HAVING, or aggregations / group-bys).
  */
 export function shouldAutoLimitLargeDataset(
   query: PartialStructuredQuery,
@@ -61,7 +71,8 @@ export function shouldAutoLimitLargeDataset(
   return (
     query.limit === undefined &&
     isEmptyQueryFilter(query.filters) &&
-    isEmptyQueryFilter(query.having)
+    isEmptyQueryFilter(query.having) &&
+    !hasStructuredQueryAggregations(query)
   );
 }
 

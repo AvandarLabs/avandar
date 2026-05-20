@@ -1,12 +1,9 @@
 import { Model } from "@models";
 import { useCallback, useRef, useState } from "react";
-import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import {
-  largeDatasetAutoLimitFromRowCount,
-  shouldAutoLimitLargeDataset,
-} from "@/views/DataExplorerApp/manualQueryLimit";
+import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit";
 import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
+import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
 import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -71,20 +68,17 @@ export function useManualQueryDataSourceChange(opts: {
         return;
       }
 
-      void DatasetQueryClient.getDatasetMeta({
-        datasetId: nextDataSource.id,
+      void buildDataSourceCommitOptions({
+        dataSource: nextDataSource,
+        query,
         workspaceId: workspace.id,
       })
-        .then((meta) => {
+        .then((commitOptions) => {
           if (applyRequestIdRef.current !== requestId) {
             return;
           }
-          const limit = largeDatasetAutoLimitFromRowCount(meta.rows);
-          handlers.onSetDataSource(
-            nextDataSource,
-            limit !== undefined ? { limit } : undefined,
-          );
-          if (limit !== undefined) {
+          handlers.onSetDataSource(nextDataSource, commitOptions);
+          if (commitOptions?.limit !== undefined) {
             showLargeDatasetLimitHint();
           }
         })

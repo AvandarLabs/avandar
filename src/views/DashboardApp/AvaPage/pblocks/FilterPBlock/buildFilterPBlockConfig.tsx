@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
+import { puckDrawerLabel } from "@/views/DashboardApp/DashboardEditorView/dashboardPuckDrawerLabel";
 import type { FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 
 /**
@@ -22,7 +23,7 @@ export function useFilterPBlockConfig(): ComponentConfig<FilterPBlockProps> {
   };
 
   return {
-    label: t`Filter`,
+    label: puckDrawerLabel("Filter"),
     fields: {
       filterId: {
         label: t`Filter id (stable)`,

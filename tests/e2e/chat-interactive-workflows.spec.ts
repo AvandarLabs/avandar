@@ -207,6 +207,91 @@ test.describe("chat interactive workflows", () => {
     });
   });
 
+  test("Phase 1: fixed-options clarification accepts a custom Something else answer", async ({
+    page,
+    e2eWorkerDb,
+  }) => {
+    let lastUserMessage = "";
+
+    await mountMockChat({
+      page,
+      responder: (turnIndex, body) => {
+        if (turnIndex === 0) {
+          return {
+            assistantText: "Which region do you mean?",
+            clarification: {
+              question: "Which region do you mean?",
+              responseShape: {
+                kind: "fixed_options",
+                options: ["North", "South"],
+                multi: false,
+              },
+              turnNumber: 1,
+            },
+          };
+        }
+        const messages = (
+          body as { messages?: Array<{ role: string; content: string }> }
+        ).messages;
+        const lastUser = [...(messages ?? [])].reverse().find((m) => {
+          return m.role === "user";
+        });
+        lastUserMessage = lastUser?.content ?? "";
+        return {
+          assistantText: "Here is the SQL.",
+          generatedSql: {
+            prompt: "show me cases by region",
+            sql: 'SELECT 1 AS "result"',
+          },
+        };
+      },
+    });
+
+    await signInWithEmailPassword(page, {
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
+    });
+    await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`, {
+      waitUntil: "domcontentloaded",
+    });
+    await dismissBlockingOverlays(page);
+
+    await openChatPanelIfClosed(page);
+
+    const composer = getChatComposerInput(page);
+    await composer.fill("show me cases by region");
+    await composer.press("Enter");
+
+    await expect(
+      page.getByText("Which region do you mean?").first(),
+    ).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
+
+    await page
+      .getByRole("radio", { name: /something else/i })
+      .evaluate((node) => {
+        (node as { click: () => void }).click();
+      });
+    await page
+      .getByLabel("Custom clarification answer")
+      .fill("Western corridor");
+
+    const confirmButton = page.getByRole("button", { name: /^confirm$/i });
+    await expect(confirmButton).toBeEnabled({ timeout: SHORT_WAIT });
+    await confirmButton.evaluate((node) => {
+      (node as { click: () => void }).click();
+    });
+
+    await expect(page.getByText("Here is the SQL.")).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
+    expect(lastUserMessage).toContain(
+      "[Clarification answer: (custom answer: Western corridor)]",
+    );
+  });
+
   test("Phase 3: proposePlan renders a multi-step plan that auto-runs against DuckDB", async ({
     page,
     e2eWorkerDb,

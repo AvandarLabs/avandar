@@ -2,8 +2,7 @@ import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
 /** Clarification carrying an optional audit log row id so telemetry can
- *  link the "shown" event with the eventual "answered/cancelled/let-ai-
- *  decide" outcome. */
+ *  link the "shown" event with the eventual answered/cancelled outcome. */
 type PendingClarification = ChatClarifyRequest & { auditId?: string };
 
 type ChatPanelState = {
@@ -11,7 +10,7 @@ type ChatPanelState = {
   /**
    * The clarification the LLM most recently asked for, awaiting a user
    * answer. Set when the chat runtime sees `response.clarification`; cleared
-   * once the user submits an answer or chooses "Let AI decide".
+   * once the user submits an answer.
    */
   pendingClarification: PendingClarification | undefined;
 };

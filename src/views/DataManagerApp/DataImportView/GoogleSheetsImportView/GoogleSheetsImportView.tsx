@@ -1,7 +1,21 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
-import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
-import { notifyError, notifySuccess, notifyWarning, Tooltip } from "@ui";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  Box,
+  BoxProps,
+  Button,
+  Loader,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
+import {
+  Callout,
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+  Tooltip,
+} from "@ui";
 import { formatNumber, MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { csvCellValueSchema } from "$/lib/zodHelpers";
@@ -10,6 +24,10 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import {
+  FEATUREBASE_FEATURE_REQUEST_BOARD,
+  openFeaturebaseFeedbackWidget,
+} from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -282,7 +300,37 @@ export function GoogleSheetsImportView({
 
   return (
     <Box {...props}>
-      <Stack align="flex-start">
+      <Stack align="flex-start" gap="md">
+        <Callout color="warning" messageSize="sm">
+          <Text component="div" size="sm">
+            <Trans>
+              Connecting to Google Sheets and other data sources are in the
+              works and will be available very soon. If there is a database or
+              service you use that you need to connect to,{" "}
+              <UnstyledButton
+                type="button"
+                aria-label={t`Request a data source connection via feedback`}
+                display="inline"
+                p={0}
+                h="auto"
+                td="underline"
+                c="primary"
+                fz="sm"
+                fw={500}
+                style={{ verticalAlign: "baseline" }}
+                onClick={() => {
+                  openFeaturebaseFeedbackWidget({
+                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                  });
+                }}
+              >
+                please let us know so we can prioritize it
+              </UnstyledButton>
+              .
+            </Trans>
+          </Text>
+        </Callout>
+
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?

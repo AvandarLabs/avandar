@@ -2,12 +2,24 @@ import { ComposerPrimitive } from "@assistant-ui/react";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
+  const { isOpen } = ChatPanelStateManager.useState();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  useChatPanelComposerAutoFocus({
+    isOpen,
+    panelRef,
+    composerInputRef,
+  });
+
   const context = useChatPageContext();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
@@ -19,16 +31,20 @@ export function Composer(): JSX.Element {
     : "Chat is enabled in Data Explorer and Dashboards";
 
   return (
-    <div className={css.composerContainer}>
+    <div ref={panelRef} className={css.composerContainer}>
       <ComposerPrimitive.Root
         className={clsx(css.composer, disabled && css.composerDisabled)}
       >
         <ComposerPrimitive.Input
+          ref={composerInputRef}
           className={css.composerInput}
           placeholder={placeholder}
           rows={1}
           autoFocus={false}
           disabled={disabled}
+          unstable_focusOnRunStart={false}
+          unstable_focusOnScrollToBottom={false}
+          unstable_focusOnThreadSwitched={false}
         />
         <Group gap="xs">
           <VoiceInputButton disabled={disabled} />

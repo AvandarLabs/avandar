@@ -13,8 +13,12 @@ import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
+import {
+  buildGeneratedSqlAssumptionAckText,
+  reviewGeneratedSqlAssumptions,
+} from "@/lib/privacy/generatedSqlAssumptions";
 import { consumeAckForText } from "@/lib/privacy/pendingAcks";
-import { buildPendingDataVizBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildPendingDataVizBlock";
+import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -172,12 +176,47 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           },
         });
 
+        let sqlApplied = false;
         if (response.generatedSql) {
+          const assumptionReview = reviewGeneratedSqlAssumptions({
+            sql: response.generatedSql.sql,
+            messages: apiMessages,
+          });
+
+          if (assumptionReview.needsApproval) {
+            if (!user) {
+              const assistantParts: Array<{ type: "text"; text: string }> = [
+                {
+                  type: "text",
+                  text: `${response.assistantText}\n\n(SQL was not applied. Sign in to approve filter values.)`,
+                },
+              ];
+              return { content: assistantParts };
+            }
+            const consent = await crossBoundary({
+              values: assumptionReview.unapprovedValues,
+              text: buildGeneratedSqlAssumptionAckText(
+                assumptionReview.unapprovedValues,
+              ),
+              context: "generated_sql_assumptions",
+              workspaceId: workspace.id,
+              userId: user.id,
+              explicitConsentRequired: assumptionReview.assumptionCapReached,
+            });
+            if (!consent.approved) {
+              const assistantParts: Array<{ type: "text"; text: string }> = [
+                {
+                  type: "text",
+                  text: `${response.assistantText}\n\n(SQL was not applied. Approve the assumed filter values to run this query.)`,
+                },
+              ];
+              return { content: assistantParts };
+            }
+          }
+
           dataExplorerDispatch.setRawSql(response.generatedSql.sql);
           dataExplorerDispatch.setNlPrompt(response.generatedSql.prompt);
-          // Best-effort: also map the SQL into the manual form so the
-          // user can tweak it from there. Anything we cannot represent is
-          // recorded in `sqlSyncWarnings` and surfaced to the user.
+          sqlApplied = true;
           try {
             const mapping = parseSql(response.generatedSql.sql);
             dataExplorerDispatch.applySqlMapping({
@@ -198,14 +237,17 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         if (response.dashboardBlock) {
           dashboardEditorDispatch.queuePendingBlock({
             pendingId: crypto.randomUUID(),
-            block: buildPendingDataVizBlock(response.dashboardBlock),
+            block: buildPendingDashboardBlock(response.dashboardBlock),
           });
           void logAnalyticsEvent({
             event: "dashboard.block_added_via_chat",
             workspaceId: workspace.id,
             app: "dashboards",
             payload: {
-              vizType: response.dashboardBlock.vizType,
+              blockKind: response.dashboardBlock.kind,
+              ...(response.dashboardBlock.kind === "DataViz" ?
+                { vizType: response.dashboardBlock.vizType }
+              : {}),
               dashboardId: pageContext.dashboardId,
             },
           });
@@ -261,7 +303,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const assistantParts: Array<{ type: "text"; text: string }> = [
           { type: "text", text: response.assistantText },
         ];
-        if (response.generatedSql) {
+        if (response.generatedSql && sqlApplied) {
           assistantParts.push({
             type: "text",
             text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,

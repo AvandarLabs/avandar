@@ -291,7 +291,6 @@ function ConsentLogPanel(): JSX.Element {
 
 const OUTCOME_LABEL: Record<ClarificationOutcome, string> = {
   answered: "Answered",
-  let_ai_decide: "Let AI decide",
   cancelled: "Cancelled",
   cap_reached: "Cap reached",
   neutral_failure: "Neutral failure",
@@ -299,10 +298,18 @@ const OUTCOME_LABEL: Record<ClarificationOutcome, string> = {
 
 const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
   answered: "green",
-  let_ai_decide: "blue",
   cancelled: "gray",
   cap_reached: "yellow",
   neutral_failure: "red",
+};
+
+/** Legacy rows written before "Let AI decide" was removed. */
+const LEGACY_OUTCOME_LABEL: Record<string, string> = {
+  let_ai_decide: "Let AI decide (legacy)",
+};
+
+const LEGACY_OUTCOME_COLOR: Record<string, string> = {
+  let_ai_decide: "blue",
 };
 
 function ClarificationLogPanel(): JSX.Element {
@@ -380,11 +387,17 @@ function ClarificationLogPanel(): JSX.Element {
                   </Table.Td>
                   <Table.Td>
                     <Badge
-                      color={OUTCOME_COLOR[entry.outcome]}
+                      color={
+                        OUTCOME_COLOR[entry.outcome as ClarificationOutcome] ??
+                        LEGACY_OUTCOME_COLOR[entry.outcome] ??
+                        "gray"
+                      }
                       size="sm"
                       variant="light"
                     >
-                      {OUTCOME_LABEL[entry.outcome]}
+                      {OUTCOME_LABEL[entry.outcome as ClarificationOutcome] ??
+                        LEGACY_OUTCOME_LABEL[entry.outcome] ??
+                        entry.outcome}
                     </Badge>
                   </Table.Td>
                   <Table.Td>

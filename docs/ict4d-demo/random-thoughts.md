@@ -1,5 +1,6 @@
 Random other features we should consider:
 
+- Improve how apps look under different permissions. Test it with william.farr. Look at error messages (e.g. create dashboard) when he's just a viewer.
 - "Try again" button to regenerate a message if we were unhappy with the SQL.
 - A timeout if we waited too long and no response.
 - Token usage analytics per message and cost (for us)
@@ -10,5 +11,21 @@ Random other features we should consider:
 - "New thread" button
 - Chat history
 - Invite a coworker into your chat.
-- Joint analytics??
-- Do a full slop review
+- Joint analysis?? have two users on the same analysis, show their mouse cursors, let them both talk to the AI together.
+- Do we have the workspace language in supabase? it should be. dont keep it in local storage bc then that's just scoped to ourselves.
+- @ referencing of datasets in messages.
+  - Include automatically guessing what dataset they want and update the dropdown. The chatbot should always use the datasets we tell it to.
+- Test uploading a file, then canceling and not saving it. Do we keep it in duckdb memory? Do we keep it in indexeddb? we should discard it if we canceled and didn't save.
+- Create an avandar-debugging skill
+  - Add helpers in-app to help with playwright debugging.
+  - For example, listing the indexed db tables. Or listing the duckdb tables.
+- If we delete a dataset that is in dashboards... what happens? what should we do? right now we just leave things in an inconsistent state.
+- Move pipelines and avandar/etl to a separate private repo. This is our IP - our open data catalog.
+- Add HDX (CKAN and HAPI)
+- Use ava-cli for i18n generation.
+- Improve acclimate (look at TODOs in it) and move it all to use ink (or whatever the TUI react library was)
+- Data leakage on logout then log in as someone new. Did not clear JWT or something. Still showed other person's datasets, did not apply our roles. Same workspace.
+  - Is there data leakage on separate workspaces?
+- Fine tune our own models on Avandar platform and social sector and querying and other Avandar-specific stuff.
+- Add descriptions and metadata about each model.
+- Make the chat panel look like a drawer under the main layout. No gap. Slightly smaller height. Drop shadow over it.
