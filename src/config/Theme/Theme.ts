@@ -31,6 +31,7 @@ import { cssAvaVar } from "../../lib/utils/browser/css";
 import { AnimationTheme } from "./AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";
+import { OverlayTheme } from "./OverlayTheme";
 import type {
   VariantColorResolverResult,
   VariantColorsResolverInput,
@@ -64,6 +65,23 @@ export const APP_CHROME_Z_INDEX = 250;
  * UI added in the chrome tier cannot accidentally land above modals.
  */
 export const MODAL_ROOT_Z_INDEX = 400;
+
+/** Default props for `<Modal>` and `@mantine/modals` ModalsProvider. */
+export const DEFAULT_MODAL_PROPS = {
+  zIndex: MODAL_ROOT_Z_INDEX,
+  centered: true,
+  radius: OverlayTheme.panel.radius,
+  overlayProps: {
+    backgroundOpacity: 0,
+    color: "transparent",
+    transitionProps: AnimationTheme.mantine.modalOverlay,
+    style: {
+      background: "var(--ava-overlay-background)",
+      backdropFilter: "var(--ava-overlay-backdrop-filter)",
+    },
+  },
+  transitionProps: AnimationTheme.mantine.modal,
+} as const;
 
 /**
  * Floating panel z-index. Sits above the app shell (200) but below
@@ -209,20 +227,22 @@ export const Theme = createTheme({
     }),
 
     Modal: Modal.extend({
-      defaultProps: {
-        zIndex: MODAL_ROOT_Z_INDEX,
-        radius: "sm",
-        centered: true,
-        overlayProps: {
-          backgroundOpacity: 0.35,
-          blur: 0,
-        },
-        transitionProps: AnimationTheme.mantine.modal,
-      },
+      defaultProps: DEFAULT_MODAL_PROPS,
       styles: {
+        overlay: {
+          background: "var(--ava-overlay-background)",
+          backdropFilter: "var(--ava-overlay-backdrop-filter)",
+        },
         content: {
-          border: "1px solid var(--ava-border-default)",
-          boxShadow: "var(--mantine-shadow-lg)",
+          backgroundColor: "var(--mantine-color-body)",
+          border: "none",
+          boxShadow: "var(--ava-overlay-panel-shadow)",
+        },
+        header: {
+          borderBottom: "1px solid var(--ava-border-default)",
+        },
+        title: {
+          fontWeight: 600,
         },
       },
     }),
@@ -440,6 +460,7 @@ export const Theme = createTheme({
     elevation: ElevationTheme,
     borders: BorderTheme,
     animation: AnimationTheme,
+    overlay: OverlayTheme,
     navbar: {
       backgroundColor: NEUTRAL_SHADES[6],
       textColor: DEFAULT_THEME.white,
@@ -453,6 +474,7 @@ export const Theme = createTheme({
 export { AnimationTheme } from "./AnimationTheme";
 export { BorderTheme } from "./BorderTheme";
 export { ElevationTheme } from "./ElevationTheme";
+export { OverlayTheme } from "./OverlayTheme";
 
 export const cssVariablesResolver: CSSVariablesResolver = (
   theme: MantineTheme,
@@ -495,6 +517,10 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--ava-animation-easing-spring": AnimationTheme.preset.oozeIn.easing,
     "--ava-animation-easing-swipe-out": AnimationTheme.preset.swipeOut.easing,
     "--ava-animate-swipe-translate-y": `${AnimationTheme.preset.swipeOut.translateYPx}px`,
+
+    "--ava-overlay-background": OverlayTheme.backdrop.backgroundColor,
+    "--ava-overlay-backdrop-filter": OverlayTheme.backdrop.backdropFilter,
+    "--ava-overlay-panel-shadow": OverlayTheme.panel.shadow,
   };
 
   return {

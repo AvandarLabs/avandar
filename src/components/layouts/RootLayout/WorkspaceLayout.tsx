@@ -10,7 +10,7 @@ import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootW
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
-import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -101,7 +101,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
 
   return (
     <WorkspaceI18nProvider locale={locale}>
-      <ModalsProvider modalProps={{ zIndex: MODAL_ROOT_Z_INDEX }}>
+      <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
         <DataExplorerStateManager.Provider>
           <DashboardEditorStateManager.Provider>
             <ChatPanelProvider>

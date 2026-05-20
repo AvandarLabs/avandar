@@ -96,11 +96,32 @@ export const ANIMATION_TRANSITION = {
   ]),
 } as const;
 
+/** Spring pop for modal content (matches AppDropzone import card). */
+export const MODAL_CONTENT_TRANSITION = {
+  transition: {
+    in: {
+      opacity: 1,
+      transform: "scale(1) translateY(0)",
+      filter: "blur(0)",
+    },
+    out: {
+      opacity: 0,
+      transform: "scale(0.72) translateY(20px)",
+      filter: "blur(10px)",
+    },
+    common: { transformOrigin: "center center" },
+    transitionProperty: "transform, opacity, filter",
+  },
+  duration: 380,
+  timingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+} as const;
+
 /** Default Mantine overlay transition presets. */
 export const MANTINE_TRANSITION_PROPS = {
-  modal: {
-    transition: "pop" as const,
-    duration: ANIMATION_DURATION_MS.normal,
+  modal: MODAL_CONTENT_TRANSITION,
+  modalOverlay: {
+    transition: "fade" as const,
+    duration: ANIMATION_DURATION_MS.fast,
     timingFunction: ANIMATION_EASING.out,
   },
   drawer: {
@@ -129,11 +150,21 @@ export const MANTINE_TRANSITION_PROPS = {
     duration: ANIMATION_DURATION_MS.fast,
     timingFunction: ANIMATION_EASING.out,
   },
+  /**
+   * Bottom-center toasts use Mantine's built-in translateY motion (see
+   * `@mantine/notifications` getNotificationStateStyles), not Transition presets.
+   */
   notification: {
-    transition: "slide-left" as const,
+    transition: "slide-up" as const,
     duration: ANIMATION_DURATION_MS.moderate,
     timingFunction: ANIMATION_EASING.out,
   },
+} as const;
+
+/** Default `<Notifications />` props (position drives slide-up / slide-down). */
+export const DEFAULT_NOTIFICATIONS_PROPS = {
+  position: "bottom-center" as const,
+  transitionDuration: ANIMATION_DURATION_MS.moderate,
 } as const;
 
 /** Default props for Mantine Combobox (Select, MultiSelect, Autocomplete). */

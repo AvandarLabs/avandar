@@ -279,7 +279,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               modals.openConfirmModal({
                 title: t`Delete dataset`,
                 children: (
-                  <Text>
+                  <Text mt="md">
                     <Trans>
                       Are you sure you want to delete {dataset.name}?
                     </Trans>

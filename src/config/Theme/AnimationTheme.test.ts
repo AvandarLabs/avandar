@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   ANIMATION_PRESET,
   AnimationTheme,
+  DEFAULT_NOTIFICATIONS_PROPS,
+  MODAL_CONTENT_TRANSITION,
 } from "@/config/Theme/AnimationTheme";
 import { buildAnimateOriginStyle } from "@/config/Theme/buildAnimateOriginStyle";
 
@@ -28,9 +30,24 @@ describe("AnimationTheme presets", () => {
     expect(fromAnchor).toEqual(fromRect);
   });
 
+  it("uses spring scale-blur pop for modals", () => {
+    expect(MODAL_CONTENT_TRANSITION.duration).toBe(380);
+    expect(MODAL_CONTENT_TRANSITION.transition.out.transform).toContain(
+      "scale(0.72)",
+    );
+  });
+
   it("uses distinct durations for enter and exit presets", () => {
     expect(ANIMATION_PRESET.oozeIn.durationMs).toBeGreaterThan(
       ANIMATION_PRESET.swipeOut.durationMs,
+    );
+  });
+
+  it("anchors toasts at bottom-center with slide-up motion", () => {
+    expect(DEFAULT_NOTIFICATIONS_PROPS.position).toBe("bottom-center");
+    expect(AnimationTheme.mantine.notification.transition).toBe("slide-up");
+    expect(DEFAULT_NOTIFICATIONS_PROPS.transitionDuration).toBe(
+      AnimationTheme.mantine.notification.duration,
     );
   });
 });
