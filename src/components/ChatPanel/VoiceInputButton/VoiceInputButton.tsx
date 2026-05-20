@@ -645,7 +645,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
           <Select
             label={t`Language`}
-            description={t`Whisper supports many languages; auto-detect handles mixed input.`}
+            description={t`Choose the language you will speak when dictating.`}
             value={language}
             onChange={handleVoiceLanguageChange}
             data={languageSelectData}

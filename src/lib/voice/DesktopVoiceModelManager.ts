@@ -173,16 +173,13 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
 
   async transcribe(
     audio: Float32Array,
-    options: { modelId: VoiceModelId; language?: VoiceLanguageCode },
+    options: { modelId: VoiceModelId; language: VoiceLanguageCode },
   ): Promise<string> {
     this.setStatus({ kind: "transcribing", modelId: options.modelId });
     try {
       const { text } = await this.callIpc(VoiceContracts.transcribe, {
         modelId: options.modelId,
-        language:
-          options.language && options.language !== "auto" ?
-            options.language
-          : undefined,
+        language: options.language,
         pcmSamples: Array.from(audio),
       });
       this.setStatus({ kind: "ready", modelId: options.modelId });

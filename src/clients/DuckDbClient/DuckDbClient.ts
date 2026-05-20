@@ -13,15 +13,28 @@ import {
   prop,
 } from "@utils";
 import { uuid } from "$/lib/uuid";
-import {
-  DuckDbDataType,
-  DuckDbDataTypes,
-} from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
+import {
+  buildDuckDbCsvSniffResultFromRejectScan,
+  buildDuckDbCsvSniffResultFromResolved,
+  buildDuckDbCsvSniffResultFromSniffRow,
+  buildReadCsvArgList,
+  buildSniffCsvConstraintArgs,
+  createCsvParseOptionsFromUserHints,
+  CSV_SNIFF_SAMPLE_SIZE,
+  DEFAULT_CSV_ESCAPE_CHAR,
+  DEFAULT_CSV_QUOTE_CHAR,
+  isRecoverableCsvParseError,
+  MAX_CSV_PARSE_ATTEMPTS,
+  mergeSniffCsvRowIntoParseOptions,
+  refineCsvParseOptionsAfterFailure,
+  shouldRetryCsvParse,
+} from "@/clients/DuckDbClient/csvParse";
 import {
   DuckDbColumnSchema,
   DuckDbCsvSniffResult,
@@ -36,6 +49,10 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
+import type {
+  CsvParseUserHints,
+  DuckDbSniffCsvRow,
+} from "@/clients/DuckDbClient/csvParse";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
@@ -126,193 +143,55 @@ export type DuckDbLoadXlsxOptions =
  */
 export type UnknownRow = Record<string, unknown>;
 
-/**
- * The maximum number of rejected rows to store in DuckDb per file.
- * During a scan, once we have hit this limit, the CSV will still
- * continue to parse, but any more rejected rows will be ignored.
- *
- * This limit is intentionally set to 1001 (instead of 1000), so that
- * if we hit this number of errors, our UI can correctly make statements
- * like "Over 1000 rows were rejected." If we left this at 1000, we would
- * not know if there were exaclty 1000 rows or greater.
- *
- * We do not want to store over this many rejected rows because its a waste
- * of space. But we do not want to make this number too low, because
- * for smaller error counts it is helpful for the user to know the exact
- * number of errors.
- */
-const REJECTED_ROW_STORAGE_LIMIT = 1001;
+function _csvParseUserHintsFromLoadOptions(
+  options: BaseDuckDbLoadCsvOptions,
+): CsvParseUserHints {
+  return {
+    numRowsToSkip: options.numRowsToSkip,
+    delimiter: options.delimiter,
+    quoteChar: options.quoteChar,
+    escapeChar: options.escapeChar,
+    newlineDelimiter: options.newlineDelimiter,
+    commentChar: options.commentChar,
+    hasHeader: options.hasHeader,
+    dateFormat: options.dateFormat,
+    timestampFormat: options.timestampFormat,
+    columns: options.columns,
+  };
+}
 
-function _duckDbDataTypeFromString(typeString: string): DuckDbDataType {
-  const normalizedType = typeString.toUpperCase() as DuckDbDataType;
-  const isKnownType = DuckDbDataTypes.includes(normalizedType);
-  if (isKnownType) {
-    return normalizedType;
+async function _sniffCsvWithDuckDb(options: {
+  runRawQuery: DuckDbClientImpl["runRawQuery"];
+  conn: duckdb.AsyncDuckDBConnection;
+  stagingFile: string;
+  userHints: CsvParseUserHints;
+  parseOptions: ReturnType<typeof createCsvParseOptionsFromUserHints>;
+}): Promise<{
+  parseOptions: ReturnType<typeof mergeSniffCsvRowIntoParseOptions>;
+  sniffRow: DuckDbSniffCsvRow | undefined;
+}> {
+  const { runRawQuery, conn, stagingFile, userHints, parseOptions } = options;
+  const sniffArgs = [
+    ...buildSniffCsvConstraintArgs(parseOptions),
+    `sample_size=${CSV_SNIFF_SAMPLE_SIZE}`,
+  ].join(", ");
+
+  const sniffResult = await runRawQuery<DuckDbSniffCsvRow>(
+    `SELECT * FROM sniff_csv('$file$', ${sniffArgs})`,
+    { conn, params: { file: stagingFile } },
+  );
+  const sniffRow = sniffResult.data[0];
+  if (!sniffRow) {
+    return { parseOptions, sniffRow: undefined };
   }
 
-  return "VARCHAR";
-}
-
-function _parseRejectScanColumns(
-  columnsString: string,
-): Array<{ name: string; type: DuckDbDataType }> {
-  const matches = Array.from(
-    columnsString.matchAll(/'([^']+)'\s*:\s*'([^']+)'/g),
-  );
-
-  return matches.flatMap((matchResult) => {
-    const columnName = matchResult[1];
-    const columnTypeString = matchResult[2];
-    if (!columnName || !columnTypeString) {
-      return [];
-    }
-
-    return [
-      { name: columnName, type: _duckDbDataTypeFromString(columnTypeString) },
-    ];
-  });
-}
-
-function _buildReadCSVPrompt(options: {
-  tableName: string;
-  scan: DuckDbScan;
-  commentChar: string | null;
-}): string {
-  const { tableName, scan, commentChar } = options;
-
-  const dateFormat = scan.date_format.trim().length ? scan.date_format : null;
-  const timestampFormat =
-    scan.timestamp_format.trim().length ? scan.timestamp_format : null;
-
-  const args = [
-    "auto_detect=false",
-    `delim='${scan.delimiter}'`,
-    `quote='${scan.quote}'`,
-    `escape='${scan.escape}'`,
-    `new_line='${scan.newline_delimiter}'`,
-    `skip=${scan.skip_rows}`,
-    `header=${scan.has_header}`,
-    commentChar ? `comment='${commentChar}'` : "",
-    scan.columns.trim().length ? `columns=${scan.columns}` : "",
-    dateFormat ? `dateformat='${dateFormat}'` : "",
-    timestampFormat ? `timestampformat='${timestampFormat}'` : "",
-    "encoding='utf-8'",
-    "store_rejects=true",
-    "rejects_scan='reject_scans'",
-    "rejects_table='reject_errors'",
-    `rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-    "strict_mode=false",
-  ].filter((arg) => {
-    return arg.length;
-  });
-
-  return `FROM read_csv('${tableName}', ${args.join(", ")});`;
-}
-
-function _getDuckDbCSVSniffResultFromRejectScan(options: {
-  tableName: string;
-  scan: DuckDbScan;
-  commentChar: string | null;
-}): DuckDbCsvSniffResult {
-  const { scan, tableName, commentChar } = options;
-  const parsedColumns = _parseRejectScanColumns(scan.columns);
-
   return {
-    Delimiter: scan.delimiter,
-    Quote: scan.quote,
-    Escape: scan.escape,
-    NewLineDelimiter: scan.newline_delimiter,
-    Comment: commentChar ?? "",
-    SkipRows: scan.skip_rows,
-    HasHeader: scan.has_header,
-    Columns: parsedColumns,
-    DateFormat: scan.date_format.trim().length ? scan.date_format : null,
-    TimestampFormat:
-      scan.timestamp_format.trim().length ? scan.timestamp_format : null,
-    UserArguments: scan.user_arguments,
-    Prompt: _buildReadCSVPrompt({ scan, tableName, commentChar }),
-    table_name: tableName,
-  };
-}
-
-function _inferHasHeaderFromTableSchema(
-  tableColumns: readonly DuckDbColumnSchema[],
-): boolean {
-  const isAutoColumnName = (columnName: string): boolean => {
-    return /^column\d+$/i.test(columnName);
-  };
-
-  return !tableColumns.every((col) => {
-    return isAutoColumnName(col.column_name);
-  });
-}
-
-function _getDuckDbCSVSniffResultFallback(options: {
-  tableName: string;
-  numRowsToSkip: number;
-  delimiter: string | undefined;
-  quoteChar: string | null;
-  escapeChar: string | null;
-  newlineDelimiter: string | undefined;
-  commentChar: string | null;
-  hasHeader: boolean | undefined;
-  dateFormat: string | undefined;
-  timestampFormat: string | undefined;
-  tableColumns: readonly DuckDbColumnSchema[];
-}): DuckDbCsvSniffResult {
-  const {
-    tableName,
-    numRowsToSkip,
-    delimiter,
-    quoteChar,
-    escapeChar,
-    newlineDelimiter,
-    commentChar,
-    hasHeader,
-    dateFormat,
-    timestampFormat,
-    tableColumns,
-  } = options;
-
-  const inferredHeader =
-    hasHeader ?? _inferHasHeaderFromTableSchema(tableColumns);
-
-  const inferredColumns = tableColumns.map((col) => {
-    return { name: col.column_name, type: col.column_type };
-  });
-
-  const args = [
-    `skip=${numRowsToSkip}`,
-    delimiter ? `delim='${delimiter}'` : "",
-    quoteChar ? `quote='${quoteChar}'` : "",
-    escapeChar ? `escape='${escapeChar}'` : "",
-    newlineDelimiter ? `new_line='${newlineDelimiter}'` : "",
-    commentChar ? `comment='${commentChar}'` : "",
-    `header=${inferredHeader}`,
-    dateFormat ? `dateformat='${dateFormat}'` : "",
-    timestampFormat ? `timestampformat='${timestampFormat}'` : "",
-  ]
-    .filter((v) => {
-      return v.length;
-    })
-    .join(", ");
-
-  return {
-    Delimiter: delimiter ?? ",",
-    Quote: quoteChar ?? '"',
-    Escape: escapeChar ?? '"',
-    NewLineDelimiter: newlineDelimiter ?? "\n",
-    Comment: commentChar ?? "",
-    SkipRows: numRowsToSkip,
-    HasHeader: inferredHeader,
-    Columns: inferredColumns,
-    DateFormat: dateFormat ?? null,
-    TimestampFormat: timestampFormat ?? null,
-    UserArguments: args,
-    Prompt:
-      `FROM read_csv('${tableName}', auto_detect=true, ${args}, ` +
-      "encoding='utf-8');",
-    table_name: tableName,
+    parseOptions: mergeSniffCsvRowIntoParseOptions({
+      base: parseOptions,
+      sniffRow,
+      userHints,
+    }),
+    sniffRow,
   };
 }
 
@@ -729,98 +608,67 @@ class DuckDbClientImpl {
     columns: DuckDbColumnSchema[];
     previewRows: UnknownRow[];
   }> {
-    const {
-      file,
-      numRowsToSkip = 0,
-      delimiter,
-      quoteChar,
-      escapeChar,
-      newlineDelimiter,
-      commentChar,
-      hasHeader = true,
-      dateFormat,
-      timestampFormat,
-      maxPreviewRows,
-    } = options;
+    const userHints: CsvParseUserHints = {
+      numRowsToSkip: options.numRowsToSkip,
+      delimiter: options.delimiter,
+      quoteChar: options.quoteChar,
+      escapeChar: options.escapeChar,
+      newlineDelimiter: options.newlineDelimiter,
+      commentChar: options.commentChar,
+      hasHeader: options.hasHeader,
+      dateFormat: options.dateFormat,
+      timestampFormat: options.timestampFormat,
+    };
 
-    // Staging name keeps the sniff file out of the way of any final view /
-    // table the caller may register under the dataset's id later.
     const stagingFile = `sniff__${uuid()}.csv`;
-    const cleanCommentChar =
-      commentChar === "(empty)" ? null : (commentChar ?? null);
-    const cleanEscapeChar =
-      escapeChar === "(empty)" ? null : (escapeChar ?? null);
-    const cleanQuoteChar = quoteChar === "(empty)" ? null : (quoteChar ?? null);
-
     const conn = await this.#connect();
     try {
       await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
       await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
 
-      await this.#registerCSVFile({ tableName: stagingFile, file });
+      await this.#registerCSVFile({
+        tableName: stagingFile,
+        file: options.file,
+      });
 
-      const readCsvArgs = [
-        "auto_detect=true",
-        "encoding='utf-8'",
-        "store_rejects=true",
-        "rejects_scan='reject_scans'",
-        "rejects_table='reject_errors'",
-        `rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-        "strict_mode=false",
-        numRowsToSkip ? `skip=${numRowsToSkip}` : "",
-        delimiter ? `delim='${delimiter}'` : "",
-        cleanQuoteChar ? `quote='${cleanQuoteChar}'` : "",
-        cleanEscapeChar ? `escape='${cleanEscapeChar}'` : "",
-        newlineDelimiter ? `new_line='${newlineDelimiter}'` : "",
-        cleanCommentChar ? `comment='${cleanCommentChar}'` : "",
-        hasHeader ? `header=${hasHeader}` : "",
-        dateFormat ? `dateformat='${dateFormat}'` : "",
-        timestampFormat ? `timestampformat='${timestampFormat}'` : "",
-      ]
-        .filter((arg) => {
-          return arg.length;
-        })
-        .join(", ");
+      const baseParseOptions = createCsvParseOptionsFromUserHints(userHints);
+      const { parseOptions, sniffRow } = await _sniffCsvWithDuckDb({
+        runRawQuery: this.runRawQuery.bind(this),
+        conn,
+        stagingFile,
+        userHints,
+        parseOptions: baseParseOptions,
+      });
 
-      // Schema via DESCRIBE — DuckDB only reads the sniff sample to answer
-      // this, not the full file.
+      const readCsvArgs = buildReadCsvArgList({
+        parseOptions,
+        mode: "preview",
+      }).join(", ");
+
       const describeResult = await this.runRawQuery<DuckDbColumnSchema>(
         `DESCRIBE SELECT * FROM read_csv('$file$', ${readCsvArgs})`,
         { conn, params: { file: stagingFile } },
       );
 
-      // Preview via LIMIT pushdown. The CSV reader stops scanning after it
-      // has produced `maxPreviewRows` rows.
       const previewResult = await this.runRawQuery<UnknownRow>(
-        `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${maxPreviewRows}`,
+        `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${options.maxPreviewRows}`,
         { conn, params: { file: stagingFile } },
       );
-
-      const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
-        `SELECT * FROM reject_scans WHERE file_path='$file$'`,
-        { conn, params: { file: stagingFile } },
-      );
-      const scan = rejectedScansResult.data[0];
 
       const csvSniff =
-        scan ?
-          _getDuckDbCSVSniffResultFromRejectScan({
+        sniffRow ?
+          buildDuckDbCsvSniffResultFromSniffRow({
             tableName: stagingFile,
-            scan,
-            commentChar: cleanCommentChar,
+            sniffRow,
+            parseOptions,
           })
-        : _getDuckDbCSVSniffResultFallback({
+        : buildDuckDbCsvSniffResultFromResolved({
             tableName: stagingFile,
-            numRowsToSkip,
-            delimiter,
-            quoteChar: cleanQuoteChar,
-            escapeChar: cleanEscapeChar,
-            newlineDelimiter,
-            commentChar: cleanCommentChar,
-            hasHeader,
-            dateFormat,
-            timestampFormat,
-            tableColumns: describeResult.data,
+            parseOptions,
+            columns: describeResult.data.map((col) => {
+              return { name: col.column_name, type: col.column_type };
+            }),
+            userArguments: readCsvArgs,
           });
 
       const db = await this.#getDB();
@@ -837,38 +685,16 @@ class DuckDbClientImpl {
   }
 
   async loadCsv(options: DuckDbLoadCsvOptions): Promise<DuckDbLoadCsvResult> {
-    const {
-      tableName,
-      numRowsToSkip = 0,
-      delimiter,
-      columns,
-      quoteChar,
-      escapeChar,
-      newlineDelimiter,
-      commentChar,
-      hasHeader = true,
-      dateFormat,
-      timestampFormat,
-    } = options;
+    const { tableName } = options;
+    const userHints = _csvParseUserHintsFromLoadOptions(options);
 
-    // Stage the CSV under a distinct MEMFS name so the final VIEW can take
-    // `tableName`. Same story for the transcoded parquet — it lives under a
-    // temp name only as long as it takes to copy the bytes out into a JS
-    // Blob and re-register it via the parquet path.
     const csvStagingFile = `${tableName}__loadCsv_src`;
     const parquetStagingFile = `${tableName}__loadCsv_pq`;
 
     const conn = await this.#connect();
     let loadResults: DuckDbLoadCsvResult;
     try {
-      // Loading a CSV always overwrites existing data under this tableName.
       await this.dropTableViewAndFile(tableName);
-
-      // Drop reject_scans / reject_errors so this run starts clean. They
-      // get repopulated by the `read_csv(..., store_rejects=true)` call
-      // inside the COPY below.
-      await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
-      await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
 
       await this.#registerCSVFile(
         "file" in options ?
@@ -876,86 +702,102 @@ class DuckDbClientImpl {
         : { tableName: csvStagingFile, fileText: options.fileText },
       );
 
-      const cleanCommentChar =
-        commentChar === "(empty)" ? null : (commentChar ?? null);
-      const cleanEscapeChar =
-        escapeChar === "(empty)" ? null : (escapeChar ?? null);
-      const cleanQuoteChar =
-        quoteChar === "(empty)" ? null : (quoteChar ?? null);
-
-      Logger.log("columns specified", { columns });
-
-      // Stream the CSV directly to a parquet file in MEMFS. No DuckDB TABLE
-      // is materialized along the way: rows flow read_csv → row-group
-      // encoder → parquet writer, then the encoder buffer is released. Peak
-      // memory is bounded by one row group + the accumulated parquet bytes
-      // (typically 5-20x smaller than the CSV for tabular data), not by
-      // the input CSV size. This is the change that lets 1+ GB CSV
-      // uploads complete without OOM-ing the tab.
-      await this.runRawQuery(
-        `COPY (
-          SELECT *
-          FROM read_csv(
-            '$csvFile$',
-            auto_detect=true,
-            encoding='utf-8',
-            store_rejects=true,
-            rejects_scan='reject_scans',
-            rejects_table='reject_errors',
-            rejects_limit=${REJECTED_ROW_STORAGE_LIMIT},
-            strict_mode=true
-            ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
-            ${delimiter ? `, delim='${delimiter}'` : ""}
-            ${cleanQuoteChar ? `, quote='${cleanQuoteChar}'` : ""}
-            ${cleanEscapeChar ? `, escape='${cleanEscapeChar}'` : ""}
-            ${newlineDelimiter ? `, new_line='${newlineDelimiter}'` : ""}
-            ${cleanCommentChar ? `, comment='${cleanCommentChar}'` : ""}
-            ${hasHeader ? `, header=${hasHeader}` : ""}
-            ${dateFormat ? `, dateformat='${dateFormat}'` : ""}
-            ${timestampFormat ? `, timestampformat='${timestampFormat}'` : ""}
-            ${
-              columns ?
-                `, columns={${columns
-                  .map(([name, type]) => {
-                    return `'${name}': '${type}'`;
-                  })
-                  .join(",")}}`
-              : ""
-            }
-          )
-        ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
-        {
-          conn,
-          params: {
-            csvFile: csvStagingFile,
-            pqFile: parquetStagingFile,
-          },
-        },
-      );
-
-      // get the parsing errors (reject_scans is keyed by the source file
-      // path, which is the staging name we passed to read_csv)
+      let parseOptions = createCsvParseOptionsFromUserHints(userHints);
       let rejectedScans: DuckDbScan[] = [];
       let rejectedRows: DuckDbRejectedRow[] = [];
-      const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
-        `SELECT * FROM reject_scans WHERE file_path='$csvFile$'`,
-        { conn, params: { csvFile: csvStagingFile } },
-      );
-      rejectedScans = rejectedScansResult.data;
+      let lastSniffRow: DuckDbSniffCsvRow | undefined;
 
-      if (isNonEmptyArray(rejectedScans)) {
-        const fileId = rejectedScans[0].file_id;
-        const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
-          `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
-          { conn, params: { fileId } },
+      Logger.log("columns specified", { columns: parseOptions.columns });
+
+      for (let attempt = 0; attempt < MAX_CSV_PARSE_ATTEMPTS; attempt++) {
+        await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
+        await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
+
+        const sniffed = await _sniffCsvWithDuckDb({
+          runRawQuery: this.runRawQuery.bind(this),
+          conn,
+          stagingFile: csvStagingFile,
+          userHints,
+          parseOptions,
+        });
+        parseOptions = sniffed.parseOptions;
+        lastSniffRow = sniffed.sniffRow;
+
+        const readCsvArgs = buildReadCsvArgList({
+          parseOptions,
+          mode: "load",
+        }).join(", ");
+
+        try {
+          await this.runRawQuery(
+            `COPY (
+              SELECT *
+              FROM read_csv('$csvFile$', ${readCsvArgs})
+            ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
+            {
+              conn,
+              params: {
+                csvFile: csvStagingFile,
+                pqFile: parquetStagingFile,
+              },
+            },
+          );
+        } catch (error) {
+          if (
+            attempt < MAX_CSV_PARSE_ATTEMPTS - 1 &&
+            isRecoverableCsvParseError(error)
+          ) {
+            if (parseOptions.quoteChar == null) {
+              parseOptions = {
+                ...parseOptions,
+                quoteChar: DEFAULT_CSV_QUOTE_CHAR,
+                escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
+              };
+            }
+
+            continue;
+          }
+
+          throw error;
+        }
+
+        const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
+          `SELECT * FROM reject_scans WHERE file_path='$csvFile$'`,
+          { conn, params: { csvFile: csvStagingFile } },
         );
-        rejectedRows = rejectedRowsResult.data;
+        rejectedScans = rejectedScansResult.data;
+        rejectedRows = [];
+
+        if (isNonEmptyArray(rejectedScans)) {
+          const fileId = rejectedScans[0].file_id;
+          const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
+            `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
+            { conn, params: { fileId } },
+          );
+          rejectedRows = rejectedRowsResult.data;
+        }
+
+        const refinedOptions = refineCsvParseOptionsAfterFailure({
+          parseOptions,
+          rejectedRows,
+        });
+
+        if (
+          shouldRetryCsvParse({
+            attemptIndex: attempt,
+            maxAttempts: MAX_CSV_PARSE_ATTEMPTS,
+            rejectedRows,
+            parseOptions,
+            refinedOptions,
+          })
+        ) {
+          parseOptions = refinedOptions;
+          continue;
+        }
+
+        break;
       }
 
-      // Pull the parquet bytes out of MEMFS into a JS Blob, then drop the
-      // MEMFS-side files so the WASM heap reclaims them. The Blob is the
-      // canonical artifact we hand back to the caller for IndexedDB
-      // storage.
       const db = await this.#getDB();
       const parquetBuffer = (await db.copyFileToBuffer(
         parquetStagingFile,
@@ -966,16 +808,10 @@ class DuckDbClientImpl {
       await db.dropFile(csvStagingFile);
       await db.dropFile(parquetStagingFile);
 
-      // Re-load the dataset from the freshly produced parquet. This
-      // creates a VIEW named `tableName` on top of the parquet bytes, so
-      // every subsequent query (preview, summary, exploration) goes
-      // through the columnar read path with projection / LIMIT pushdown.
       await this.loadParquet({ tableName, blob: parquetData });
 
       const tableColumns = await this.getTableSchema(tableName);
       Logger.log("tableColumns", { tableColumns });
-      // For parquet-backed views DuckDB reads the row count from the
-      // footer; this is a constant-time metadata lookup, not a full scan.
       const csvRowCount = await this.getTableRowCount(tableName);
       const csvErrors = {
         rejectedScans,
@@ -983,26 +819,29 @@ class DuckDbClientImpl {
       };
 
       const scan = rejectedScans[0];
-
       const csvSniffResult =
         scan ?
-          _getDuckDbCSVSniffResultFromRejectScan({
+          buildDuckDbCsvSniffResultFromRejectScan({
             tableName,
             scan,
-            commentChar: cleanCommentChar,
+            commentChar: parseOptions.commentChar,
           })
-        : _getDuckDbCSVSniffResultFallback({
+        : lastSniffRow ?
+          buildDuckDbCsvSniffResultFromSniffRow({
             tableName,
-            numRowsToSkip,
-            delimiter,
-            quoteChar: cleanQuoteChar,
-            escapeChar: cleanEscapeChar,
-            newlineDelimiter,
-            commentChar: cleanCommentChar,
-            hasHeader,
-            dateFormat,
-            timestampFormat,
-            tableColumns,
+            sniffRow: lastSniffRow,
+            parseOptions,
+          })
+        : buildDuckDbCsvSniffResultFromResolved({
+            tableName,
+            parseOptions,
+            columns: tableColumns.map((col) => {
+              return { name: col.column_name, type: col.column_type };
+            }),
+            userArguments: buildReadCsvArgList({
+              parseOptions,
+              mode: "load",
+            }).join(", "),
           });
 
       this.#logger.log("Successfully transcoded CSV into parquet!");

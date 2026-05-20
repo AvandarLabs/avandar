@@ -227,34 +227,6 @@ describe("VoiceModelManager", () => {
     );
   });
 
-  it("does not pass `language: auto` to the pipeline (uses Whisper auto-detect)", async () => {
-    const cache = createInMemoryCache();
-    const pipelineFn = vi.fn().mockResolvedValue({ text: "result" });
-    const buildPipeline = vi.fn().mockResolvedValue(pipelineFn);
-
-    const manager = __TEST_ONLY.createManagerForTest(
-      {
-        loadPipeline: async () => {
-          return buildPipeline;
-        },
-        configureEnv: async () => {
-          return undefined;
-        },
-      },
-      cache,
-    );
-
-    await manager.transcribe(new Float32Array([0]), {
-      modelId: "whisper-tiny",
-      language: "auto",
-    });
-
-    const callOptions = pipelineFn.mock.calls[0]?.[1] as
-      | { language?: string }
-      | undefined;
-    expect(callOptions?.language).toBeUndefined();
-  });
-
   it("transitions to error state and clears stored marker when download fails", async () => {
     const cache = createInMemoryCache();
     const downloadError = new Error("network down");

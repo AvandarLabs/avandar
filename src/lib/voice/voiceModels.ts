@@ -136,7 +136,6 @@ export function listModelsForPlatform(
  * Whisper's language identifiers.
  */
 export type VoiceLanguageCode =
-  | "auto"
   | "english"
   | "spanish"
   | "french"
@@ -150,7 +149,6 @@ export type VoiceLanguageOption = {
 };
 
 export const VOICE_LANGUAGES: readonly VoiceLanguageOption[] = [
-  { code: "auto", label: "Auto-detect" },
   { code: "english", label: "English" },
   { code: "spanish", label: "Español" },
   { code: "french", label: "Français" },
@@ -163,8 +161,8 @@ export const VOICE_LANGUAGES: readonly VoiceLanguageOption[] = [
  * Maps a workspace UI locale (Lingui code) to the corresponding Whisper
  * language code we expose in the voice picker. Locales that the voice
  * picker doesn't surface (e.g. Arabic — Whisper supports it but the
- * ict4d-demo language list intentionally doesn't) fall back to `auto` so
- * detection still works. Pass `undefined` during SSR / first render.
+ * ict4d-demo language list intentionally doesn't) fall back to English.
+ * Pass `undefined` during SSR / first render.
  */
 export function voiceLanguageForLocale(
   locale: string | undefined,
@@ -184,6 +182,6 @@ export function voiceLanguageForLocale(
     case "zh-Hant":
       return "chinese";
     default:
-      return "auto";
+      return "english";
   }
 }

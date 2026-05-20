@@ -410,7 +410,7 @@ describe("VoiceInputButton", () => {
     expect((languageInput as HTMLInputElement).value).toBe("English");
   });
 
-  it("falls back to auto-detect when the workspace locale has no voice mapping", async () => {
+  it("falls back to English when the workspace locale has no voice mapping", async () => {
     workspaceLocaleRef.current = "ar";
     isModelDownloadedMock.mockResolvedValue(true);
     render(
@@ -429,7 +429,7 @@ describe("VoiceInputButton", () => {
     const languageInput = await screen.findByRole("combobox", {
       name: /language/i,
     });
-    expect((languageInput as HTMLInputElement).value).toBe("Auto-detect");
+    expect((languageInput as HTMLInputElement).value).toBe("English");
   });
 
   it("shows a remove control for each downloaded model in voice settings", async () => {

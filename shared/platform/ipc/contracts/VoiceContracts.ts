@@ -65,7 +65,7 @@ export const VoiceContracts = {
   transcribe: defineIpcContract<
     {
       modelId: string;
-      language?: string;
+      language: string;
       pcmSamples: readonly number[];
     },
     { text: string }

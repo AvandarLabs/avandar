@@ -215,27 +215,6 @@ describe("DesktopVoiceModelManager", () => {
     expect(text).toBe("Buenos días");
   });
 
-  it("omits language when set to auto so Whisper auto-detects", async () => {
-    const transcribeSpy = vi.fn().mockReturnValue({ text: "result" });
-    const callIpc = makeCallIpc({
-      isModelDownloaded: () => {
-        return { downloaded: true };
-      },
-      transcribe: (req) => {
-        return transcribeSpy(req);
-      },
-    });
-
-    const manager = new DesktopVoiceModelManager({ callIpc });
-    await manager.transcribe(new Float32Array([0]), {
-      modelId: "whisper-tiny",
-      language: "auto",
-    });
-
-    const arg = transcribeSpy.mock.calls[0]?.[0] as { language?: string };
-    expect(arg.language).toBeUndefined();
-  });
-
   it("returns false from isModelDownloaded when the IPC call rejects", async () => {
     const callIpc = vi.fn().mockRejectedValue(new Error("ipc down"));
     const manager = new DesktopVoiceModelManager({ callIpc });

@@ -137,6 +137,7 @@ describe("createWhisperService", () => {
       service.transcribe({
         modelId: "whisper-tiny",
         pcmSamples: new Float32Array([0]),
+        language: "english",
       }),
     ).rejects.toThrow(/has not been downloaded/);
     expect(service.getStatus().kind).toBe("error");
@@ -177,6 +178,7 @@ describe("createWhisperService", () => {
     await service.transcribe({
       modelId: "whisper-tiny",
       pcmSamples: new Float32Array([0]),
+      language: "english",
     });
     expect(service.isModelDownloaded("whisper-tiny")).toBe(true);
 

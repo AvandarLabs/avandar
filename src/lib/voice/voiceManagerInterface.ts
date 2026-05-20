@@ -45,6 +45,6 @@ export type IVoiceModelManager = {
   deleteModel(id: VoiceModelId): Promise<void>;
   transcribe(
     audio: Float32Array,
-    options: { modelId: VoiceModelId; language?: VoiceLanguageCode },
+    options: { modelId: VoiceModelId; language: VoiceLanguageCode },
   ): Promise<string>;
 };

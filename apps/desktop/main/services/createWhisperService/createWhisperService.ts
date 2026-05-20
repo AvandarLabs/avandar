@@ -54,7 +54,7 @@ export type WhisperService = {
   transcribe(args: {
     modelId: string;
     pcmSamples: Float32Array;
-    language?: string;
+    language: string;
   }): Promise<string>;
   getStatus(): WhisperServiceStatus;
   close(): Promise<void>;
@@ -361,7 +361,7 @@ export function createWhisperService(
     try {
       const whisper = await ensureWhisperInstanceLoaded(modelId);
       const task = await whisper.transcribe(pcmSamples, {
-        language: language && language !== "auto" ? language : undefined,
+        language,
       });
       const segments = await task.result;
       const text = segments

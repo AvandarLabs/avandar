@@ -272,9 +272,7 @@ export class VoiceModelManager implements IVoiceModelManager {
    */
   async transcribe(
     audio: Float32Array,
-    options: { modelId: VoiceModelId; language?: VoiceLanguageCode } = {
-      modelId: "whisper-tiny" as VoiceModelId,
-    },
+    options: { modelId: VoiceModelId; language: VoiceLanguageCode },
   ): Promise<string> {
     await this.ensureModelLoaded(options.modelId);
     if (!this.pipelinePromise) {
@@ -284,10 +282,7 @@ export class VoiceModelManager implements IVoiceModelManager {
     this.setStatus({ kind: "transcribing", modelId: options.modelId });
     try {
       const result = await pipelineFn(audio, {
-        language:
-          options.language && options.language !== "auto" ?
-            options.language
-          : undefined,
+        language: options.language,
         task: "transcribe",
         chunk_length_s: 30,
       });

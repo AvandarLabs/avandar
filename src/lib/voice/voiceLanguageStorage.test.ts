@@ -31,4 +31,10 @@ describe("voiceLanguageStorage", () => {
     expect(readStoredVoiceLanguage()).toBeUndefined();
     expect(hasStoredVoiceLanguage()).toBe(false);
   });
+
+  it("ignores a legacy auto-detect code in storage", () => {
+    window.localStorage.setItem(VOICE_LANGUAGE_STORAGE_KEY, "auto");
+    expect(readStoredVoiceLanguage()).toBeUndefined();
+    expect(hasStoredVoiceLanguage()).toBe(false);
+  });
 });
