@@ -30,3 +30,6 @@ Random other features we should consider:
 - Add descriptions and metadata about each model.
 - Make the chat panel look like a drawer under the main layout. No gap. Slightly smaller height. Drop shadow over it.
 - The sample prompts they give us map to the datasets but we should make a better choice of column name (we just say 'categories' but that's not always appropriate)
+- Harden all our indexedDB storage and session storage to also ALWAYS include user ids and workspace ids to make sure we are namespacing them correctly.
+  How do we handle voice models? If same user, diff workspace, use same choice. If different user: we skip downloading online bc we can use the cached model, but they
+  are still expected to pick a model bc they might want a different default.
