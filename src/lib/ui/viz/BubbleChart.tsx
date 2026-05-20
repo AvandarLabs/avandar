@@ -8,7 +8,7 @@ type Props = {
   xAxisKey: string;
   yAxisKey: string;
   sizeKey: string;
-  height?: number;
+  height?: number | string;
 };
 
 export function BubbleChart({

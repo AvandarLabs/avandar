@@ -72,9 +72,22 @@ export const MODAL_ROOT_Z_INDEX = 400;
  */
 export const FLOATING_PANEL_Z_INDEX = 250;
 
+/**
+ * Overlay dropdown z-index for popovers, comboboxes, menus, and tooltips.
+ * Sits above `MODAL_ROOT_Z_INDEX` so dropdowns opened inside a modal
+ * (Share dialog selects, action menus, etc.) render on top of the modal
+ * instead of being hidden behind it. Mantine's defaults (300) live below
+ * our overridden modal layer (400), so we bump everything in this tier
+ * up in one place.
+ */
+export const POPOVER_Z_INDEX = 500;
+
 const interactiveTransition = AnimationTheme.transition.interactive;
 
-const COMBOBOX_DEFAULT_PROPS = AnimationTheme.combobox;
+const COMBOBOX_DEFAULT_PROPS = {
+  ...AnimationTheme.combobox,
+  zIndex: POPOVER_Z_INDEX,
+} as const;
 
 function avandarVariantColorResolver(
   input: VariantColorsResolverInput,
@@ -224,6 +237,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.menu,
       },
       styles: {
@@ -240,6 +254,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.popover,
       },
       styles: {
@@ -311,6 +326,7 @@ export const Theme = createTheme({
     Tooltip: Tooltip.extend({
       defaultProps: {
         radius: "sm",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.tooltip,
       },
     }),
@@ -419,6 +435,7 @@ export const Theme = createTheme({
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
       appChrome: APP_CHROME_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
+      popover: POPOVER_Z_INDEX,
     },
     elevation: ElevationTheme,
     borders: BorderTheme,
@@ -456,6 +473,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
     "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
+    "--mantine-z-index-popover": String(theme.other.zIndex.popover),
 
     "--ava-animation-duration-instant": AnimationTheme.duration.instant,
     "--ava-animation-duration-fast": AnimationTheme.duration.fast,

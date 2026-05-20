@@ -7,7 +7,7 @@ type Props = {
   data: UnknownDataFrame;
   xAxisKey: string;
   yAxisKey: string;
-  height: number;
+  height: number | string;
 };
 
 export function ScatterChart({
