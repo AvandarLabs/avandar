@@ -10,8 +10,9 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
@@ -214,9 +215,30 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       <Divider />
 
       <Group justify="space-between">
-        <Title order={5}>
-          <Trans>Series</Trans>
-        </Title>
+        <Group gap={6} align="center">
+          <Title order={5}>
+            <Trans>Series</Trans>
+          </Title>
+          <Tooltip
+            multiline
+            w={280}
+            label={
+              isRadar ?
+                axisKeyValue ?
+                  t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
+                : t`Each series is a numeric column plotted on the radial value. Pick the category axis above.`
+              : axisKeyValue ?
+                t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
+              : t`Each series is a numeric column plotted on the Y axis. Pick the X axis above.`
+            }
+          >
+            <IconInfoCircle
+              size={14}
+              aria-label={t`What is a series?`}
+              style={{ cursor: "help" }}
+            />
+          </Tooltip>
+        </Group>
         <Button
           size="xs"
           variant="light"
