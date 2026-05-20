@@ -14,8 +14,8 @@ export async function createWorkspaceTagViaSettings(options: {
   const { page, workspaceSlug, tagName, tagColor = "#228be6" } = options;
 
   await page.goto(`/${workspaceSlug}/settings`);
-  await page.getByRole("tab", { name: "Tags" }).click();
-  await page.getByRole("button", { name: "New tag" }).click();
+  await page.getByRole("tab", { name: "User groups" }).click();
+  await page.getByRole("button", { name: "New user group" }).click();
 
   await page.getByRole("textbox", { name: "Name" }).fill(tagName);
   if (tagColor !== "#228be6") {
@@ -49,7 +49,7 @@ export async function assignWorkspaceTagToMember(options: {
   const drawer = page.locator(".mantine-Drawer-content");
   await expect(drawer).toBeVisible({ timeout: LONG_WAIT });
 
-  const tagsField = drawer.getByLabel("Tags");
+  const tagsField = drawer.getByLabel("User groups");
   await tagsField.click();
   await page.getByRole("option", { name: tagName }).click();
   await page.keyboard.press("Escape");

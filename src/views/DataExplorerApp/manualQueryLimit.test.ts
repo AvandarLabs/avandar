@@ -6,6 +6,7 @@ import {
   getManualQueryLimitValue,
   LARGE_DATASET_AUTO_LIMIT,
   LARGE_DATASET_ROW_THRESHOLD,
+  largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
   shouldDefaultManualQueryLimit,
 } from "@/views/DataExplorerApp/manualQueryLimit";
@@ -76,5 +77,14 @@ describe("manualQueryLimit", () => {
       },
     };
     expect(shouldAutoLimitLargeDataset(withFilter)).toBe(false);
+  });
+
+  it("returns the auto limit only when row count exceeds the threshold", () => {
+    expect(
+      largeDatasetAutoLimitFromRowCount(LARGE_DATASET_ROW_THRESHOLD),
+    ).toBeUndefined();
+    expect(
+      largeDatasetAutoLimitFromRowCount(LARGE_DATASET_ROW_THRESHOLD + 1),
+    ).toBe(LARGE_DATASET_AUTO_LIMIT);
   });
 });

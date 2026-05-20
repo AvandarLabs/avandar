@@ -53,8 +53,16 @@ function _useOrderDirectionOptions(): SelectData<OrderByDirection> {
  * drive this form. Implementations are expected to regenerate the raw SQL
  * (via `structuredQueryToSQL`) and update sync metadata.
  */
+export type ManualQuerySetDataSourceOptions = {
+  /** Applied atomically with the data source so the first query is bounded. */
+  limit?: number;
+};
+
 export type ManualQueryFormHandlers = {
-  onSetDataSource: (dataSource: QueryDataSource | undefined) => void;
+  onSetDataSource: (
+    dataSource: QueryDataSource | undefined,
+    options?: ManualQuerySetDataSourceOptions,
+  ) => void;
   onSetColumns: (columns: readonly QueryColumn.T[]) => void;
   onSetColumnAggregation: (payload: {
     columnId: QueryColumn.Id;

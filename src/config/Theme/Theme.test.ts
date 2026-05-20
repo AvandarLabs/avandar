@@ -1,6 +1,7 @@
 import { defaultVariantColorsResolver } from "@mantine/core";
 import { describe, expect, it } from "vitest";
 import {
+  APP_CHROME_Z_INDEX,
   APP_SHELL_MAIN_Z_INDEX,
   MODAL_ROOT_Z_INDEX,
   Theme,
@@ -8,8 +9,9 @@ import {
 import { NEUTRAL_SHADES } from "../../../shared/config/Theme";
 
 describe("Theme modal stacking", () => {
-  it("keeps modal layer above AppShell main z-index", () => {
-    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
+  it("orders app shell → chrome → modal so modals always cover toolbars", () => {
+    expect(APP_CHROME_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
+    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_CHROME_Z_INDEX);
   });
 
   it("registers Modal defaults on the theme", () => {
@@ -19,6 +21,11 @@ describe("Theme modal stacking", () => {
       throw new Error("Expected Theme.components.Modal");
     }
     expect(modal.defaultProps?.zIndex).toBe(MODAL_ROOT_Z_INDEX);
+  });
+
+  it("exposes the chrome tier on theme.other.zIndex", () => {
+    expect(Theme.other.zIndex.appChrome).toBe(APP_CHROME_Z_INDEX);
+    expect(Theme.other.zIndex.modal).toBe(MODAL_ROOT_Z_INDEX);
   });
 });
 

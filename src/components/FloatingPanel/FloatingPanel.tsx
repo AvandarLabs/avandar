@@ -64,7 +64,8 @@ type Props = {
  * A draggable floating window with a header bar, collapse toggle, and close
  * button. Built on Mantine's `FloatingWindow` primitive and wrapped in a
  * `Transition` for animated show/hide. The body is wrapped in `Collapse` so
- * the user can shrink the window to just the header.
+ * the user can shrink the window to just the header. Double-clicking the drag
+ * handle (grip and title) toggles collapse, same as the chevron button.
  */
 export function FloatingPanel({
   title,
@@ -104,6 +105,12 @@ export function FloatingPanel({
   }
   prevOpenedRef.current = opened;
 
+  const onToggleCollapseRef = useRef(onToggleCollapse);
+  onToggleCollapseRef.current = onToggleCollapse;
+  const handleDragHandleDoubleClick = useCallback(() => {
+    onToggleCollapseRef.current();
+  }, []);
+
   return (
     <Transition
       mounted={opened}
@@ -141,6 +148,7 @@ export function FloatingPanel({
                 wrap="nowrap"
                 className={css.titleGroup}
                 aria-hidden
+                onDoubleClick={handleDragHandleDoubleClick}
               >
                 <IconGripVertical size={14} className={css.gripIcon} />
                 <Text

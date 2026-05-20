@@ -120,8 +120,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
   const tabHeaders = {
     general: t`General`,
     users: t`Members`,
-    roles: t`Roles`,
-    tags: t`Tags`,
+    roles: t`Roles & Permissions`,
+    tags: t`User groups`,
     language: t`Language`,
     privacy: t`Privacy log`,
     billing: t`Billing`,

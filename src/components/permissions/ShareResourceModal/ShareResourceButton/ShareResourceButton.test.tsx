@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { render } from "@/utils/testing-utils";
@@ -46,4 +46,29 @@ describe("ShareResourceButton", () => {
 
     expect(screen.getByRole("button", { name: "Share" })).toBeInTheDocument();
   });
+
+  it.each([
+    { resourceType: "dashboard" as const, tooltip: "Share this dashboard" },
+    { resourceType: "dataset" as const, tooltip: "Share this dataset" },
+  ])(
+    "shows $tooltip tooltip for $resourceType",
+    async ({ resourceType, tooltip }) => {
+      render(
+        <ShareResourceButton
+          resourceName="Example"
+          resourceType={resourceType}
+          resourceId="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        />,
+      );
+
+      const shareButton = screen.getByRole("button", { name: "Share" });
+      act(() => {
+        shareButton.focus();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByRole("tooltip")).toHaveTextContent(tooltip);
+      });
+    },
+  );
 });

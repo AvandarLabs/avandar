@@ -13,7 +13,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
 msgstr "Esto permitirá que el conjunto de datos se almacene en línea para que pueda ser accedido en otros dispositivos."
@@ -93,8 +92,8 @@ msgid "This dataset has no description."
 msgstr "Este conjunto de datos no tiene descripción."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-msgid "Roles"
-msgstr "Roles"
+#~ msgid "Roles"
+#~ msgstr "Roles"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
@@ -136,6 +135,10 @@ msgstr "Nombre del espacio de trabajo"
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
 msgstr "Tu espacio de trabajo está en el plan Gratuito, que admite hasta 5 conjuntos de datos. Para agregar más conjuntos de datos, actualiza a un plan de pago."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "User groups"
+msgstr "Grupos de usuarios"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
@@ -229,6 +232,10 @@ msgstr "Rangos de <0>{numericLow}</0> a <1>{numericHigh}</1>, promediando <2>{av
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "Conjunto de datos sin título"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Roles & Permissions"
+msgstr "Roles y permisos"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
@@ -534,10 +541,6 @@ msgstr "Subir"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
 msgstr "más de 1000 filas fueron rechazadas"
-
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-msgid "Tags"
-msgstr "Etiquetas"
 
 #. placeholder {0}: meta.columns.length
 #. placeholder {1}: meta.rows.toLocaleString()

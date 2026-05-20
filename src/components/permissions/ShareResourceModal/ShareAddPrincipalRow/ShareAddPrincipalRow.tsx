@@ -50,7 +50,7 @@ export function ShareAddPrincipalRow({
     }
     if (groups.length > 0) {
       data.push({
-        group: "Tags",
+        group: "User groups",
         items: groups.map((group) => {
           return { value: `user_group:${group.value}`, label: group.label };
         }),
@@ -83,7 +83,7 @@ export function ShareAddPrincipalRow({
         nothingFoundMessage={
           isEmptySource ? SHARE_COPY.emptyState.noMembersOrTags : "No matches"
         }
-        aria-label="Add people, groups, or tags"
+        aria-label="Add people or user groups"
       />
       <Select
         w={120}

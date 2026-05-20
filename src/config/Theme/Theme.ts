@@ -47,12 +47,23 @@ import type {
 export const APP_SHELL_MAIN_Z_INDEX = 200;
 
 /**
- * Modal z-index above AppShell main.
+ * App chrome z-index. Floating toolbars and the mobile navbar live here:
+ * above the main content area but always below modals, drawers, and any
+ * overlay layer. Anchoring chrome to this token (instead of ad-hoc magic
+ * numbers like `1000`) is what keeps things like the Send Feedback button
+ * from punching through modal overlays.
+ */
+export const APP_CHROME_Z_INDEX = 250;
+
+/**
+ * Modal z-index above all app chrome.
  *
  * Mantine's `getDefaultZIndex("modal")` is hardcoded to 201 and ignores
- * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`.
+ * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`. The
+ * value is intentionally well above `APP_CHROME_Z_INDEX` so future floating
+ * UI added in the chrome tier cannot accidentally land above modals.
  */
-export const MODAL_ROOT_Z_INDEX = 300;
+export const MODAL_ROOT_Z_INDEX = 400;
 
 /**
  * Floating panel z-index. Sits above the app shell (200) but below
@@ -406,6 +417,7 @@ export const Theme = createTheme({
     primaryColor: AVANDAR_BLUE_SHADES[PRIMARY_COLOR_LIGHT_SHADE],
     zIndex: {
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
+      appChrome: APP_CHROME_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
     },
     elevation: ElevationTheme,
@@ -442,6 +454,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--navbar-transition-duration": AnimationTheme.duration.fast,
 
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
+    "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
 
     "--ava-animation-duration-instant": AnimationTheme.duration.instant,

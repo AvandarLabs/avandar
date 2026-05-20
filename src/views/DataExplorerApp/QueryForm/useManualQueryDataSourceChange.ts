@@ -3,8 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
-  LARGE_DATASET_AUTO_LIMIT,
-  LARGE_DATASET_ROW_THRESHOLD,
+  largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
 } from "@/views/DataExplorerApp/manualQueryLimit";
 import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
@@ -19,8 +18,9 @@ type Result = {
 };
 
 /**
- * Wraps manual-form data source changes: applies a default LIMIT on very large
- * datasets when the query has no filters, and drives the hint visibility timer.
+ * Wraps manual-form data source changes: resolves row count before committing
+ * the data source when a large-dataset auto LIMIT may apply, then applies
+ * source and limit in one update so the first query is bounded.
  */
 export function useManualQueryDataSourceChange(opts: {
   query: PartialStructuredQuery;
@@ -61,13 +61,13 @@ export function useManualQueryDataSourceChange(opts: {
       hideLargeDatasetLimitHint();
 
       const nextDataSource = dataSource ?? undefined;
-      handlers.onSetDataSource(nextDataSource);
+      const shouldCheckRowCount =
+        nextDataSource !== undefined &&
+        Model.isOfModelType(nextDataSource, "Dataset") &&
+        shouldAutoLimitLargeDataset(query);
 
-      if (
-        nextDataSource === undefined ||
-        !Model.isOfModelType(nextDataSource, "Dataset") ||
-        !shouldAutoLimitLargeDataset(query)
-      ) {
+      if (!shouldCheckRowCount) {
+        handlers.onSetDataSource(nextDataSource);
         return;
       }
 
@@ -79,14 +79,21 @@ export function useManualQueryDataSourceChange(opts: {
           if (applyRequestIdRef.current !== requestId) {
             return;
           }
-          if (meta.rows <= LARGE_DATASET_ROW_THRESHOLD) {
-            return;
+          const limit = largeDatasetAutoLimitFromRowCount(meta.rows);
+          handlers.onSetDataSource(
+            nextDataSource,
+            limit !== undefined ? { limit } : undefined,
+          );
+          if (limit !== undefined) {
+            showLargeDatasetLimitHint();
           }
-          handlers.onSetLimit(LARGE_DATASET_AUTO_LIMIT);
-          showLargeDatasetLimitHint();
         })
         .catch(() => {
-          // Row count is best-effort; the form stays usable without auto-limit.
+          if (applyRequestIdRef.current !== requestId) {
+            return;
+          }
+          // Row count is best-effort; commit the source without auto-limit.
+          handlers.onSetDataSource(nextDataSource);
         });
     },
     [

@@ -5,6 +5,7 @@ import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsid
 import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 
 type Props = {
@@ -29,7 +30,7 @@ export function AppToolbar({
         floatingToolbar ?
           {
             position: "absolute",
-            zIndex: 1000,
+            zIndex: APP_CHROME_Z_INDEX,
             top: 0,
             left: 0,
             width: "fit-content",
