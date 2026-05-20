@@ -97,8 +97,15 @@ export function useDashboardManualQueryState(opts: {
   );
 
   const handlers: ManualQueryFormHandlers = {
-    onSetDataSource: (dataSource: QueryDataSource | undefined) => {
-      applyQueryChange({ ...query, dataSource } as PartialStructuredQuery);
+    onSetDataSource: (
+      dataSource: QueryDataSource | undefined,
+      options?: { limit?: number },
+    ) => {
+      applyQueryChange({
+        ...query,
+        dataSource,
+        ...(options?.limit !== undefined ? { limit: options.limit } : {}),
+      } as PartialStructuredQuery);
     },
     onSetColumns: (columns: readonly QueryColumn.T[]) => {
       const newColumnIds = columns.map(prop("id"));

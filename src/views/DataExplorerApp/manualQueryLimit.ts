@@ -77,3 +77,15 @@ export function applyDefaultManualQueryLimit(
   }
   return { ...query, limit };
 }
+
+/**
+ * LIMIT to apply after a large-dataset row count, or `undefined` when the
+ * dataset is below {@link LARGE_DATASET_ROW_THRESHOLD}.
+ */
+export function largeDatasetAutoLimitFromRowCount(
+  rowCount: number,
+): number | undefined {
+  return rowCount > LARGE_DATASET_ROW_THRESHOLD ?
+      LARGE_DATASET_AUTO_LIMIT
+    : undefined;
+}
