@@ -2,7 +2,6 @@ import { ActionIcon, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
-import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { findLocalChatModel } from "@/lib/offlineChat/localChatModelCatalog";
 import {
   isLocalChatModelMarkedDownloaded,
@@ -20,16 +19,13 @@ type Props = {
  */
 export function OfflineChatDownloadControl({
   disabled = false,
-}: Props): JSX.Element | null {
+}: Props): JSX.Element {
   const [isReady, setIsReady] = useState(() => {
     return isLocalChatModelMarkedDownloaded(readStoredLocalChatModelId());
   });
   const [isBusy, setIsBusy] = useState(false);
 
   useEffect(() => {
-    if (!isOfflineChatEnabled()) {
-      return;
-    }
     return OfflineChatResourceManager.subscribe((status) => {
       if (status.kind === "ready") {
         setIsReady(true);
@@ -69,10 +65,6 @@ export function OfflineChatDownloadControl({
       setIsBusy(false);
     }
   }, []);
-
-  if (!isOfflineChatEnabled()) {
-    return null;
-  }
 
   const label =
     isReady ? "Offline chat model downloaded" : "Download offline chat model";

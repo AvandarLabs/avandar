@@ -13,7 +13,6 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
-import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
 import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
 import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
@@ -354,13 +353,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           });
         };
 
-        if (isOfflineChatEnabled()) {
-          const mode = resolveOfflineChatMode({
-            navigatorOnLine: navigator.onLine,
-          });
-          if (mode.kind === "local") {
-            return runOfflineTurn();
-          }
+        const mode = resolveOfflineChatMode({
+          navigatorOnLine: navigator.onLine,
+        });
+        if (mode.kind === "local") {
+          return runOfflineTurn();
         }
 
         try {

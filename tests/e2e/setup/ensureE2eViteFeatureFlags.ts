@@ -21,7 +21,6 @@ export function appendViteFeatureFlag(
 
 const E2E_REQUIRED_VITE_FEATURE_FLAGS = [
   "enable-shared-with-me",
-  "enable-offline-chat",
   /** Avoid loading spatial.duckdb_extension.wasm (breaks offline Playwright). */
   "disable-duckdb-spatial",
 ] as const;

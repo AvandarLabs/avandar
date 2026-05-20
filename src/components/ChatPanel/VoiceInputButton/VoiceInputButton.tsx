@@ -25,7 +25,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
-import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useDownloadedVoiceModels } from "@/lib/voice/useDownloadedVoiceModels";
@@ -246,9 +245,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         closeSettings();
       }
       try {
-        if (isOfflineChatEnabled()) {
-          await OfflineChatResourceManager.releaseForVoice();
-        }
+        await OfflineChatResourceManager.releaseForVoice();
         await manager.ensureModelLoaded(selectedModelId);
         await refreshDownloadState();
         const model = findVoiceModel(selectedModelId);
@@ -285,9 +282,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
   const startRecording = useCallback(async () => {
     try {
-      if (isOfflineChatEnabled()) {
-        await OfflineChatResourceManager.releaseForVoice();
-      }
+      await OfflineChatResourceManager.releaseForVoice();
       const recorder = await startMicrophoneRecording();
       recorderRef.current = recorder;
       setIsRecording(true);
