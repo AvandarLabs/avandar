@@ -165,24 +165,32 @@ export function Navbar({
               {profileLink ?
                 <>
                   <Menu.Item
-                    leftSection={<IconUser size={16} />}
+                    leftSection={
+                      <IconUser size={16} stroke={1.5} aria-hidden />
+                    }
                     onClick={() => {
                       router.navigate({ to: profileLink.to });
                     }}
                   >
-                    <Text span>Profile</Text>
+                    Profile
                   </Menu.Item>
                   <Menu.Item
-                    leftSection={<IconPlus size={16} />}
+                    leftSection={
+                      <IconPlus size={16} stroke={1.5} aria-hidden />
+                    }
                     onClick={openCreateWorkspaceModal}
                   >
-                    <Text span>Create Workspace</Text>
+                    Create Workspace
                   </Menu.Item>
                   {userWorkspaces && userWorkspaces?.length > 1 ?
                     <Menu.Sub>
                       <Menu.Sub.Target>
-                        <Menu.Sub.Item leftSection={<IconSwitch2 size={14} />}>
-                          <Text>Switch Workspace</Text>
+                        <Menu.Sub.Item
+                          leftSection={
+                            <IconSwitch2 size={16} stroke={1.5} aria-hidden />
+                          }
+                        >
+                          Switch Workspace
                         </Menu.Sub.Item>
                       </Menu.Sub.Target>
 
@@ -210,17 +218,15 @@ export function Navbar({
               : null}
 
               <Menu.Item
-                leftSection={<IconLogout size={16} />}
+                leftSection={
+                  <IconLogout size={16} stroke={1.5} aria-hidden />
+                }
+                rightSection={isSignOutPending ? <Loader size={14} /> : null}
                 onClick={() => {
                   sendSignOutRequest();
                 }}
               >
-                <Group>
-                  <Text span>Sign Out</Text>
-                  {isSignOutPending ?
-                    <Loader />
-                  : null}
-                </Group>
+                Sign Out
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
