@@ -20,6 +20,7 @@ import { z } from "zod";
 export const UpdateSubscriptionSeats = PATCH({
   path: "/:subscriptionId/seats",
   schema: {
+    // Polar subscription id (not the Supabase subscriptions.id row pk).
     subscriptionId: z.uuid(),
   },
 })

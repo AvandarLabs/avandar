@@ -6,12 +6,14 @@ import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
 import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 function featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {
   return match(featurePlanType)
@@ -28,6 +30,7 @@ function featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {
 }
 
 type OpenChangePlanModalOptions = {
+  workspaceId: Workspace.Id;
   newPlan: SubscriptionPlan;
   currentSubscriptionId: string;
   currentPlan: SubscriptionPlan;
@@ -72,8 +75,27 @@ export function useChangePlanModal(): (
     },
     queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
   });
+  const [convertToNativeFree, isConvertingToNativeFree] = useMutation({
+    mutationFn: async ({ workspaceId }: { workspaceId: Workspace.Id }) => {
+      await createFreeSubscription({ workspaceId });
+    },
+    onSuccess: () => {
+      notifySuccess("You're on the Free plan");
+      modals.closeAll();
+    },
+    onError: (error) => {
+      Logger.error("There was an error converting to native free", {
+        errorMessage: error.message,
+      });
+      notifyError(
+        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+      );
+    },
+    queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+  });
 
   const openChangePlanModal = ({
+    workspaceId,
     newPlan,
     currentPlan,
     currentSubscriptionId,
@@ -81,6 +103,7 @@ export function useChangePlanModal(): (
     const newLevel = featurePlanTypeToLevel(newPlan.featurePlan.type);
     const currentLevel = featurePlanTypeToLevel(currentPlan.featurePlan.type);
     const isUpgradingPlan = newLevel > currentLevel;
+    const isNativeFreeDowngrade = newPlan.priceType === "free";
     const newPlanName = newPlan.featurePlan.metadata.featurePlanName;
     const newPlanSubType =
       newPlan.priceType === "seat_based" ?
@@ -102,6 +125,8 @@ export function useChangePlanModal(): (
         confirm:
           newPlan.priceType === "custom" ?
             "Go to billing portal"
+          : isNativeFreeDowngrade ?
+            "Switch to Free plan"
           : "Update subscription",
         cancel: "Cancel",
       },
@@ -111,6 +136,8 @@ export function useChangePlanModal(): (
       onConfirm: () => {
         if (newPlan.priceType === "custom" && user) {
           goToBillingPortal({ userId: user.id });
+        } else if (isNativeFreeDowngrade) {
+          convertToNativeFree({ workspaceId });
         } else {
           sendUpdateSubscriptionRequest({
             newPlan,
@@ -124,6 +151,9 @@ export function useChangePlanModal(): (
             disabled: true,
           },
         });
+      },
+      confirmProps: {
+        loading: isConvertingToNativeFree,
       },
     });
   };

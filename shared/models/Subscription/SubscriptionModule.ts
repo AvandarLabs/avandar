@@ -15,7 +15,7 @@ import {
   SubscriptionStatus,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
-import type { Tables } from "$/types/database.types.ts";
+import type { Tables, TablesInsert } from "$/types/database.types.ts";
 
 export const SubscriptionModule = {
   FeaturePlanTypes: registry<FeaturePlanType>().keys(
@@ -38,6 +38,166 @@ export const SubscriptionModule = {
   ),
 
   /**
+   * Whether the caller may receive a subscription permission result.
+   * Unknown subscriptions and non-members always get false (no probing).
+   */
+  canQuerySubscriptionPermission: (options: {
+    subscriptionFound: boolean;
+    isWorkspaceMember: boolean;
+  }): boolean => {
+    if (!options.subscriptionFound) {
+      return false;
+    }
+
+    if (!options.isWorkspaceMember) {
+      return false;
+    }
+
+    return true;
+  },
+
+  /**
+   * Whether a subscription status grants paid/free plan entitlements.
+   */
+  isEntitlementActiveStatus: (status: SubscriptionStatus): boolean => {
+    return status === "active" || status === "trialing";
+  },
+
+  /**
+   * Whether the subscription row should grant workspace feature entitlements.
+   */
+  grantsWorkspaceEntitlements: (
+    subscription: Pick<SubscriptionRead, "subscriptionStatus"> | undefined,
+  ): boolean => {
+    if (subscription === undefined) {
+      return false;
+    }
+
+    return SubscriptionModule.isEntitlementActiveStatus(
+      subscription.subscriptionStatus,
+    );
+  },
+
+  /**
+   * Whether the workspace still needs billing onboarding (no row or inactive).
+   */
+  shouldPromptForBillingSetup: (
+    subscription: SubscriptionRead | undefined,
+  ): boolean => {
+    return !SubscriptionModule.grantsWorkspaceEntitlements(subscription);
+  },
+
+  /**
+   * Limits applied for permission checks (free tier when inactive).
+   */
+  getEffectiveEntitlementLimits: (
+    subscription: SubscriptionRead,
+  ): {
+    maxSeatsAllowed: number;
+    maxDatasetsAllowed: number | undefined;
+  } => {
+    if (SubscriptionModule.grantsWorkspaceEntitlements(subscription)) {
+      return {
+        maxSeatsAllowed: subscription.maxSeatsAllowed,
+        maxDatasetsAllowed: subscription.maxDatasetsAllowed,
+      };
+    }
+
+    return {
+      maxSeatsAllowed: FreePlanLimitsConfig.maxSeatsAllowed,
+      maxDatasetsAllowed: FreePlanLimitsConfig.maxDatasetsAllowed,
+    };
+  },
+
+  /**
+   * Whether a subscription row is a native free subscription (no Polar).
+   */
+  isNativeFreeSubscription: (
+    subscription: Pick<
+      SubscriptionRead,
+      "polarSubscriptionId" | "featurePlanType"
+    >,
+  ): boolean => {
+    return (
+      subscription.polarSubscriptionId === undefined &&
+      subscription.featurePlanType === "free"
+    );
+  },
+
+  /**
+   * Whether create-free should run for this workspace subscription state.
+   */
+  shouldCreateNativeFreeSubscription: (
+    subscription:
+      | Pick<
+          SubscriptionRead,
+          | "polarSubscriptionId"
+          | "featurePlanType"
+          | "subscriptionStatus"
+        >
+      | undefined,
+  ): boolean => {
+    if (subscription === undefined) {
+      return true;
+    }
+
+    if (subscription.subscriptionStatus === "canceled") {
+      return true;
+    }
+
+    return false;
+  },
+
+  /**
+   * Whether Polar checkout/sync may merge onto an existing subscription row.
+   */
+  canPolarCheckoutMergeOntoExistingRow: (
+    row: Pick<
+      Tables<"subscriptions">,
+      "polar_subscription_id" | "subscription_status"
+    >,
+  ): boolean => {
+    return (
+      row.polar_subscription_id === null ||
+      row.subscription_status === "canceled"
+    );
+  },
+
+  /**
+   * DB fields for insert/update when creating a native free subscription.
+   */
+  buildNativeFreeFieldsForDB: (options: {
+    workspaceId: SubscriptionRead["workspaceId"];
+    subscriptionOwnerId: UserId;
+    startedAt?: string;
+  }): Omit<
+    TablesInsert<"subscriptions">,
+    "id" | "created_at" | "updated_at"
+  > => {
+    const startedAt = options.startedAt ?? new Date().toISOString();
+
+    return {
+      workspace_id: options.workspaceId,
+      subscription_owner_id: options.subscriptionOwnerId,
+      feature_plan_type: "free",
+      subscription_status: "active",
+      started_at: startedAt,
+      current_period_start: startedAt,
+      current_period_end: null,
+      ends_at: null,
+      ended_at: null,
+      polar_subscription_id: null,
+      polar_customer_id: null,
+      polar_customer_email: null,
+      polar_product_id: null,
+      ...SubscriptionModule.computeSubscriptionLimitsForDB({
+        featurePlan: "free",
+        numSeats: 1,
+      }),
+    };
+  },
+
+  /**
    * Checks if the subscription allows the user to add more datasets.
    * @param options.subscription - The subscription to check.
    * @param options.numDatasetsInWorkspace - The number of datasets in the
@@ -54,10 +214,14 @@ export const SubscriptionModule = {
     if (subscription === undefined) {
       return false;
     }
-    if (subscription.maxDatasetsAllowed === undefined) {
+
+    const { maxDatasetsAllowed } =
+      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+
+    if (maxDatasetsAllowed === undefined) {
       return true;
     }
-    return numDatasetsInWorkspace < subscription.maxDatasetsAllowed;
+    return numDatasetsInWorkspace < maxDatasetsAllowed;
   },
 
   /**
@@ -77,7 +241,11 @@ export const SubscriptionModule = {
     if (subscription === undefined) {
       return false;
     }
-    return numMembersInWorkspace < subscription.maxSeatsAllowed;
+
+    const { maxSeatsAllowed } =
+      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+
+    return numMembersInWorkspace < maxSeatsAllowed;
   },
 
   getSeatInfo: ({

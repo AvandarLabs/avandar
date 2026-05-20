@@ -160,6 +160,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             workspaceId: workspaceId as WorkspaceId,
             permissionType: "can_invite_users",
             supabaseAdminClient,
+            userId: user.id,
           });
           if (!canInviteUsers) {
             throw new Error("Your workspace cannot invite any more members.");

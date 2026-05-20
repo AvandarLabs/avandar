@@ -1,14 +1,17 @@
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { UserId } from "$/models/User/User.types.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
+import type { Tables } from "$/types/database.types.ts";
 
 type SubscriptionPermissionOptions = {
   permissionType: Subscription.Permission;
   supabaseAdminClient: AvaSupabaseClient;
+  userId: UserId;
 } & (
   | {
-      subscriptionId: Subscription.Id;
+      subscriptionId: Subscription.Id | Subscription.RowId;
       workspaceId?: undefined;
     }
   | {
@@ -17,28 +20,52 @@ type SubscriptionPermissionOptions = {
     }
 );
 
+/**
+ * Returns whether the user may perform the given subscription-scoped action.
+ */
 export async function hasSubscriptionPermission(
   options: SubscriptionPermissionOptions,
 ): Promise<boolean> {
-  const { permissionType, supabaseAdminClient } = options;
-  const { data: dbSubscription } =
+  const { permissionType, supabaseAdminClient, userId } = options;
+
+  const dbSubscription =
     options.subscriptionId !== undefined ?
       await _loadSubscriptionByIdOrPolarId({
         supabaseAdminClient,
         subscriptionId: options.subscriptionId,
       })
-    : await supabaseAdminClient
-        .from("subscriptions")
-        .select("*")
-        .eq("workspace_id", options.workspaceId)
-        .single()
-        .throwOnError();
+    : (
+        await supabaseAdminClient
+          .from("subscriptions")
+          .select("*")
+          .eq("workspace_id", options.workspaceId)
+          .maybeSingle()
+          .throwOnError()
+      ).data;
+
+  if (dbSubscription === null) {
+    return false;
+  }
+
+  const isMember = await _isWorkspaceMember({
+    supabaseAdminClient,
+    workspaceId: dbSubscription.workspace_id,
+    userId,
+  });
+
+  if (
+    !Subscription.canQuerySubscriptionPermission({
+      subscriptionFound: true,
+      isWorkspaceMember: isMember,
+    })
+  ) {
+    return false;
+  }
 
   const subscription = Subscription.fromDbRowToRead(dbSubscription);
 
   return matchLiteral(permissionType, {
     can_add_datasets: async () => {
-      // get number of datasets in workspace
       const { count } = await supabaseAdminClient
         .from("datasets")
         .select("id", { count: "exact" })
@@ -83,8 +110,8 @@ export async function hasSubscriptionPermission(
 
 async function _loadSubscriptionByIdOrPolarId(options: {
   supabaseAdminClient: AvaSupabaseClient;
-  subscriptionId: Subscription.Id;
-}) {
+  subscriptionId: Subscription.Id | Subscription.RowId;
+}): Promise<Tables<"subscriptions"> | null> {
   const { supabaseAdminClient, subscriptionId } = options;
 
   const byPolarId = await supabaseAdminClient
@@ -95,13 +122,33 @@ async function _loadSubscriptionByIdOrPolarId(options: {
     .throwOnError();
 
   if (byPolarId.data !== null) {
-    return { data: byPolarId.data };
+    return byPolarId.data;
   }
 
-  return await supabaseAdminClient
+  const byRowId = await supabaseAdminClient
     .from("subscriptions")
     .select("*")
     .eq("id", subscriptionId)
-    .single()
+    .maybeSingle()
     .throwOnError();
+
+  return byRowId.data;
+}
+
+async function _isWorkspaceMember(options: {
+  supabaseAdminClient: AvaSupabaseClient;
+  workspaceId: UUID<"Workspace">;
+  userId: UserId;
+}): Promise<boolean> {
+  const { supabaseAdminClient, workspaceId, userId } = options;
+
+  const { data: membership } = await supabaseAdminClient
+    .from("workspace_memberships")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+    .maybeSingle()
+    .throwOnError();
+
+  return membership !== null;
 }

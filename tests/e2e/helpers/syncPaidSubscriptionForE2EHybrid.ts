@@ -57,7 +57,7 @@ export async function syncPaidSubscriptionForE2EHybrid(
 
   const { data: existingRow, error: lookupError } = await supabaseAdminClient
     .from("subscriptions")
-    .select("id, polar_subscription_id")
+    .select("id, polar_subscription_id, subscription_status")
     .eq("workspace_id", workspaceId)
     .maybeSingle();
 
@@ -67,13 +67,10 @@ export async function syncPaidSubscriptionForE2EHybrid(
     );
   }
 
-  if (existingRow !== null) {
-    if (existingRow.polar_subscription_id !== null) {
-      throw new Error(
-        `[e2e] workspace '${workspaceId}' already has a Polar subscription.`,
-      );
-    }
-
+  if (
+    existingRow !== null &&
+    SubscriptionModule.canPolarCheckoutMergeOntoExistingRow(existingRow)
+  ) {
     const { error: updateError } = await supabaseAdminClient
       .from("subscriptions")
       .update(polarFields)
@@ -86,6 +83,12 @@ export async function syncPaidSubscriptionForE2EHybrid(
     }
 
     return { polarSubscriptionId };
+  }
+
+  if (existingRow !== null) {
+    throw new Error(
+      `[e2e] workspace '${workspaceId}' already has a Polar subscription.`,
+    );
   }
 
   const { error: insertError } = await supabaseAdminClient

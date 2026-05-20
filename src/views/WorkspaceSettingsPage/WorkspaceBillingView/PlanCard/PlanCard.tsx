@@ -10,12 +10,15 @@ import {
 import { modals } from "@mantine/modals";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import { useRouter } from "@tanstack/react-router";
-import { notifyExpiredSession, notifySuccess } from "@ui";
+import { notifyExpiredSession, notifyError, notifySuccess } from "@ui";
+import { SUPPORT_EMAIL } from "$/config/AppConfig";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { UserClient } from "@/clients/UserClient";
 import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
+import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
@@ -68,8 +71,8 @@ function getInitialSelectedVariant(
 
   if (type === "free") {
     if (
-      currentSubscription.polarProductId === undefined &&
-      currentSubscription.featurePlanType === "free"
+      currentSubscription !== undefined &&
+      SubscriptionModule.isNativeFreeSubscription(currentSubscription)
     ) {
       return "free";
     }
@@ -117,6 +120,11 @@ export function PlanCard(props: Props): JSX.Element {
       modals.closeAll();
       notifySuccess("You're on the Free plan");
     },
+    onError: () => {
+      notifyError(
+        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+      );
+    },
     queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
   });
   const selectedPlan =
@@ -152,19 +160,25 @@ export function PlanCard(props: Props): JSX.Element {
     }
     const { userId, email } = userProfile;
 
-    if (selectedPlan.priceType === "free") {
+    const planAction = resolvePlanSelectAction({
+      currentSubscription,
+      currentSubscribedPlan,
+      selectedPlan,
+    });
+
+    if (planAction.type === "billing_error") {
+      notifyError(
+        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+      );
+      return;
+    }
+
+    if (planAction.type === "create_native_free") {
       createFreeSub();
       return;
     }
 
-    // if we have no current subscription, or the current plan is a free plan
-    // (meaning any plan we select is going to be an upgrade), then we have to
-    // take the user to the Polar checkout page.
-    if (
-      currentSubscription === undefined ||
-      currentSubscribedPlan === undefined ||
-      currentSubscribedPlan.priceType === "free"
-    ) {
+    if (planAction.type === "polar_checkout") {
       const currentURL = getCurrentURL();
       const successURL = router.buildLocation({
         to: "/$workspaceSlug/checkout",
@@ -187,17 +201,18 @@ export function PlanCard(props: Props): JSX.Element {
       return;
     }
 
-    // otherwise, we are just updating the current from a paid plan to another
-    // paid plan. Or paid plan to free plan. So we don't need to go through the
-    // official Polar checkout page for that.
-    if (currentSubscription.polarSubscriptionId === undefined) {
+    if (currentSubscribedPlan === undefined) {
+      notifyError(
+        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+      );
       return;
     }
 
     openChangePlanModal({
+      workspaceId,
       newPlan: selectedPlan,
       currentPlan: currentSubscribedPlan,
-      currentSubscriptionId: currentSubscription.polarSubscriptionId,
+      currentSubscriptionId: currentSubscription!.polarSubscriptionId!,
     });
   };
 
@@ -345,9 +360,9 @@ function _isCurrentSubscribedPlan(options: {
   }
 
   if (
-    currentSubscription.polarProductId === undefined &&
-    selectedPlan.priceType === "free" &&
-    currentSubscription.featurePlanType === "free"
+    currentSubscription !== undefined &&
+    SubscriptionModule.isNativeFreeSubscription(currentSubscription) &&
+    selectedPlan.priceType === "free"
   ) {
     return true;
   }

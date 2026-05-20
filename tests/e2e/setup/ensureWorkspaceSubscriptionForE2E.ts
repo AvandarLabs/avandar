@@ -47,22 +47,10 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
   const startedAt = new Date().toISOString();
 
   const insertRow: TablesInsert<"subscriptions"> = {
-    workspace_id: workspaceRow.id,
-    subscription_owner_id: workspaceRow.owner_id,
-    subscription_status: "active",
-    feature_plan_type: "free",
-    started_at: startedAt,
-    current_period_start: startedAt,
-    current_period_end: null,
-    ends_at: null,
-    ended_at: null,
-    polar_subscription_id: null,
-    polar_product_id: null,
-    polar_customer_id: null,
-    polar_customer_email: null,
-    ...SubscriptionModule.computeSubscriptionLimitsForDB({
-      featurePlan: "free",
-      numSeats: 1,
+    ...SubscriptionModule.buildNativeFreeFieldsForDB({
+      workspaceId: workspaceRow.id,
+      subscriptionOwnerId: workspaceRow.owner_id,
+      startedAt,
     }),
   };
 

@@ -76,7 +76,7 @@ export async function handleSubscriptionCreatedEvent(
 
   const existingByWorkspaceResponse = await supabaseAdminClient
     .from("subscriptions")
-    .select("id, polar_subscription_id")
+    .select("id, polar_subscription_id, subscription_status")
     .eq("workspace_id", metadata.workspaceId)
     .maybeSingle()
     .throwOnError();
@@ -84,19 +84,21 @@ export async function handleSubscriptionCreatedEvent(
   const existingByWorkspace = existingByWorkspaceResponse.data;
 
   if (existingByWorkspace !== null) {
-    if (existingByWorkspace.polar_subscription_id !== null) {
-      return webhookFailureResponse(
-        `[${polarEvent.type}] Workspace '${metadata.workspaceId}' already has a Polar subscription.`,
-      );
+    if (
+      Subscription.canPolarCheckoutMergeOntoExistingRow(existingByWorkspace)
+    ) {
+      await supabaseAdminClient
+        .from("subscriptions")
+        .update(polarFields)
+        .eq("id", existingByWorkspace.id)
+        .throwOnError();
+
+      return webhookSuccessResponse(polarEvent.type);
     }
 
-    await supabaseAdminClient
-      .from("subscriptions")
-      .update(polarFields)
-      .eq("id", existingByWorkspace.id)
-      .throwOnError();
-
-    return webhookSuccessResponse(polarEvent.type);
+    return webhookFailureResponse(
+      `[${polarEvent.type}] Workspace '${metadata.workspaceId}' already has a Polar subscription.`,
+    );
   }
 
   await supabaseAdminClient

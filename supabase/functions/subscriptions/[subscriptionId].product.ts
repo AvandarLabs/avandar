@@ -21,7 +21,7 @@ import { z } from "zod";
 export const UpdateSubscriptionProduct = PATCH({
   path: "/:subscriptionId/product",
   schema: {
-    // this is the subscription id in the Avandar database
+    // Polar subscription id (not the Supabase subscriptions.id row pk).
     subscriptionId: z.uuid(),
   },
 })

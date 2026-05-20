@@ -2,6 +2,10 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import {
+  shouldCloseBillingSetupModal,
+  shouldOpenBillingSetupModal,
+} from "@/components/layouts/RootLayout/useRootWorkspaceChecks/workspaceBillingSetup";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 
@@ -27,9 +31,12 @@ export function useEnsureWorkspaceBilling(): void {
     // we use queue microtask to ensure that the Mantine ModalsProvider is
     // ready before opening a modal
     queueMicrotask(() => {
-      // if this workspace has no subscription, we are not in the checkout
-      // route, and the billing modal is not already open
-      if (!subscription && !isInCheckoutRoute && !modalId) {
+      const openBillingModal = shouldOpenBillingSetupModal({
+        subscription,
+        isInCheckoutRoute,
+      });
+
+      if (openBillingModal && !modalId) {
         setModalId(
           modals.open({
             title: (
@@ -54,9 +61,11 @@ export function useEnsureWorkspaceBilling(): void {
       }
     });
 
-    // if we have a subscription now and the modal is open, then we need to
-    // close it
-    if (subscription && modalId) {
+    const closeBillingModal = shouldCloseBillingSetupModal({
+      subscription,
+    });
+
+    if (closeBillingModal && modalId) {
       modals.close(modalId);
       setModalId(undefined);
     }

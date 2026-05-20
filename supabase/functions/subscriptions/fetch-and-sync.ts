@@ -1,4 +1,6 @@
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
+import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import {
   PolarProductMetadataSchema,
@@ -16,15 +18,23 @@ import { z } from "zod";
  */
 export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
   .querySchema({
-    userId: z.string(),
+    userId: z.uuid(),
   })
-  .action(async ({ queryParams, supabaseAdminClient }) => {
+  .action(async ({ queryParams, supabaseAdminClient, user }) => {
     const { userId } = queryParams;
+
+    if (userId !== user.id) {
+      throw new AvaHTTPError(
+        "Cannot sync subscriptions for another user.",
+        FORBIDDEN,
+      );
+    }
+
     const subscriptions = await PolarClient.getSubscriptionsByUserId({
       avandarUserId: userId,
     });
 
-    const upsertedSubscriptions: Tables<"subscriptions">[] = [];
+    const upsertedSubscriptions: Array<Tables<"subscriptions">> = [];
 
     for (const subscription of subscriptions) {
       const { product, metadata, status, customer } = subscription;
@@ -85,14 +95,14 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
 
       const { data: existingByWorkspace } = await supabaseAdminClient
         .from("subscriptions")
-        .select("id, polar_subscription_id")
+        .select("id, polar_subscription_id, subscription_status")
         .eq("workspace_id", subscriptionMetadata.workspaceId)
         .maybeSingle()
         .throwOnError();
 
       if (
         existingByWorkspace !== null &&
-        existingByWorkspace.polar_subscription_id === null
+        Subscription.canPolarCheckoutMergeOntoExistingRow(existingByWorkspace)
       ) {
         const { data: updatedRow } = await supabaseAdminClient
           .from("subscriptions")

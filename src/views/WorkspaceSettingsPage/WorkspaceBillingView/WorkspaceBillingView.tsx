@@ -1,5 +1,6 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { match } from "ts-pattern";
 import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
 import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
@@ -151,9 +152,8 @@ function WorkspaceBillingViewContent({
     }
 
     if (
-      subscription.polarProductId === undefined &&
-      plan.priceType === "free" &&
-      subscription.featurePlanType === "free"
+      SubscriptionModule.isNativeFreeSubscription(subscription) &&
+      plan.priceType === "free"
     ) {
       return true;
     }

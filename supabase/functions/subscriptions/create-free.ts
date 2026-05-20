@@ -1,4 +1,7 @@
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { CONFLICT, FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 
@@ -20,47 +23,67 @@ export const CreateFreeSubscription = POST("/create-free")
       .throwOnError();
 
     if (workspace.owner_id !== user.id) {
-      throw new Error(
+      throw new AvaHTTPError(
         "Only the workspace owner can create a subscription for this workspace.",
+        FORBIDDEN,
       );
     }
 
     const { data: existingSubscription } = await supabaseAdminClient
       .from("subscriptions")
-      .select("id")
+      .select("id, polar_subscription_id, subscription_status, feature_plan_type")
       .eq("workspace_id", workspaceId)
       .maybeSingle()
       .throwOnError();
 
-    if (existingSubscription !== null) {
-      throw new Error(
-        "This workspace already has a subscription.",
-      );
-    }
+    const nativeFreeFields = Subscription.buildNativeFreeFieldsForDB({
+      workspaceId,
+      subscriptionOwnerId: user.id,
+    });
 
-    const startedAt = new Date().toISOString();
+    if (existingSubscription !== null) {
+      const existingRead = Subscription.fromDbRowToRead(existingSubscription);
+
+      if (
+        Subscription.isNativeFreeSubscription(existingRead) &&
+        Subscription.grantsWorkspaceEntitlements(existingRead)
+      ) {
+        throw new AvaHTTPError(
+          "This workspace is already on the native Free plan.",
+          CONFLICT,
+        );
+      }
+
+      if (
+        existingRead.polarSubscriptionId !== undefined &&
+        Subscription.grantsWorkspaceEntitlements(existingRead)
+      ) {
+        await PolarClient.revokeSubscription({
+          subscriptionId: existingRead.polarSubscriptionId,
+        });
+      } else if (
+        !Subscription.shouldCreateNativeFreeSubscription(existingRead)
+      ) {
+        throw new AvaHTTPError(
+          "This workspace already has an active subscription.",
+          CONFLICT,
+        );
+      }
+
+      const { data: subscription } = await supabaseAdminClient
+        .from("subscriptions")
+        .update(nativeFreeFields)
+        .eq("id", existingSubscription.id)
+        .select()
+        .single()
+        .throwOnError();
+
+      return { subscription };
+    }
 
     const { data: subscription } = await supabaseAdminClient
       .from("subscriptions")
-      .insert({
-        workspace_id: workspaceId,
-        subscription_owner_id: user.id,
-        feature_plan_type: "free",
-        subscription_status: "active",
-        started_at: startedAt,
-        current_period_start: startedAt,
-        current_period_end: null,
-        ends_at: null,
-        ended_at: null,
-        polar_subscription_id: null,
-        polar_customer_id: null,
-        polar_customer_email: null,
-        polar_product_id: null,
-        ...Subscription.computeSubscriptionLimitsForDB({
-          featurePlan: "free",
-          numSeats: 1,
-        }),
-      })
+      .insert(nativeFreeFields)
       .select()
       .single()
       .throwOnError();
