@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
 import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
+import { afterEach, describe, expect, it } from "vitest";
 import { PlatformProvider, usePlatform } from "./PlatformProvider";
 
 function PlatformKindProbe(): JSX.Element {

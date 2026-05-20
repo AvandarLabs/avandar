@@ -1,15 +1,16 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { DesktopDatasetBlobStore } from "$/platform/desktop/DesktopDatasetBlobStore";
 import { DesktopDuckDbClient } from "$/platform/desktop/DesktopDuckDbClient";
+import { createContext, useContext, useMemo } from "react";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
-import type { AuthProvider } from "$/platform/types/AuthProvider.types";
-import type { DatasetBlobStore } from "$/platform/types/DatasetBlobStore.types";
-import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
 import { createWebAuthProvider } from "./createWebAuthProvider";
 import { createWebDatasetBlobStore } from "./createWebDatasetBlobStore";
 import { createWebDuckDbClient } from "./createWebDuckDbClient";
 import { setPlatformImpls } from "./platformRegistry";
+import type { AuthProvider } from "$/platform/types/AuthProvider.types";
+import type { DatasetBlobStore } from "$/platform/types/DatasetBlobStore.types";
+import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
+import type { ReactNode } from "react";
 
 /**
  * The three platform-agnostic services consumers reach through
@@ -45,17 +46,18 @@ export function PlatformProvider({
   const platformType = usePlatformInfo();
 
   const impls = useMemo<PlatformImpls>(() => {
-    const resolved: PlatformImpls = platformType === "desktop" ?
-      {
-        duckDb: DesktopDuckDbClient,
-        authProvider: DesktopAuthProvider,
-        datasetBlobStore: DesktopDatasetBlobStore,
-      }
-    : {
-        duckDb: createWebDuckDbClient(),
-        authProvider: createWebAuthProvider(),
-        datasetBlobStore: createWebDatasetBlobStore(),
-      };
+    const resolved: PlatformImpls =
+      platformType === "desktop" ?
+        {
+          duckDb: DesktopDuckDbClient,
+          authProvider: DesktopAuthProvider,
+          datasetBlobStore: DesktopDatasetBlobStore,
+        }
+      : {
+          duckDb: createWebDuckDbClient(),
+          authProvider: createWebAuthProvider(),
+          datasetBlobStore: createWebDatasetBlobStore(),
+        };
     // Publish to the module-level registry so non-React modules
     // (`src/clients/`, plain TS utilities) can reach the same impls
     // through `getPlatformImpls()`. Synchronous during render so any

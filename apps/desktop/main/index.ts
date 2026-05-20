@@ -6,7 +6,10 @@ import { resolveWebviewUrl } from "./config/url";
 import { createElectrobunIpcTransport } from "./ipc/createElectrobunIpcTransport/createElectrobunIpcTransport";
 import { createIpcServer } from "./ipc/createIpcServer/createIpcServer";
 import { DESKTOP_IPC_BRIDGE_SCRIPT } from "./ipc/desktopIpcBridgeScript/desktopIpcBridgeScript";
-import { registerAuthHandlers, createAuthState } from "./ipc/registerAuthHandlers/registerAuthHandlers";
+import {
+  createAuthState,
+  registerAuthHandlers,
+} from "./ipc/registerAuthHandlers/registerAuthHandlers";
 import { registerDatasetBlobHandlers } from "./ipc/registerDatasetBlobHandlers/registerDatasetBlobHandlers";
 import { registerDuckDbHandlers } from "./ipc/registerDuckDbHandlers/registerDuckDbHandlers";
 import { registerRdbHandlers } from "./ipc/registerRdbHandlers/registerRdbHandlers";

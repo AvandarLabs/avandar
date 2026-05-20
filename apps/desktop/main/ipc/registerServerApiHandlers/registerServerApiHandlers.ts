@@ -1,6 +1,6 @@
 import { ServerApiContracts } from "../../../../../shared/platform/ipc/contracts/ServerApiContracts";
-import type { AuthState } from "../registerAuthHandlers/registerAuthHandlers";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
+import type { AuthState } from "../registerAuthHandlers/registerAuthHandlers";
 
 /*
  * Bun-main implementation of the Supabase server-API surface (PostgREST
@@ -148,10 +148,7 @@ export function registerServerApiHandlers(
       body: hasBody ? JSON.stringify(req.body) : undefined,
     });
     const text = await response.text();
-    const data =
-      text.length === 0 ?
-        null
-      : (JSON.parse(text) as unknown);
+    const data = text.length === 0 ? null : (JSON.parse(text) as unknown);
     if (!response.ok) {
       throw new Error(
         `serverApi.invokeFunction('${req.route}') failed: ${response.status} ${text}`,

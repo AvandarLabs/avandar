@@ -149,7 +149,8 @@ describe("createKeychain", () => {
       const { spawn } = makeFakeSpawn({
         exitCode: KEYCHAIN_NOT_FOUND_EXIT,
         stdout: "",
-        stderr: "security: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.\n",
+        stderr:
+          "security: SecKeychainSearchCopyNext: The specified item could not be found in the keychain.\n",
       });
       const keychain = createKeychain(spawn);
 
@@ -213,5 +214,4 @@ describe("createKeychain", () => {
       );
     });
   });
-
 });

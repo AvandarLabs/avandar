@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { dismissBillingModalIfVisible } from "./dismissBillingModal";
 import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./constants";
+import { dismissBillingModalIfVisible } from "./dismissBillingModal";
 import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
@@ -38,7 +38,9 @@ export async function signInWithEmailPassword(
  * Opens the workspace user menu and signs out.
  */
 export async function signOutViaUserMenu(page: Page): Promise<void> {
-  await page.getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME }).click();
+  await page
+    .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
+    .click();
   await page.getByRole("menuitem", { name: "Sign Out" }).click();
   await expect(page).toHaveURL(/\/signin/, { timeout: LONG_WAIT });
 }

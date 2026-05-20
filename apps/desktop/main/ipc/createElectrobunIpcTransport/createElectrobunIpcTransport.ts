@@ -18,8 +18,8 @@
  * after wiring it up in `apps/desktop/main/index.ts`.
  */
 
-import type { BrowserView } from "electrobun";
 import type { IpcTransport } from "../createIpcServer/createIpcServer";
+import type { BrowserView } from "electrobun";
 
 /*
  * The shape we install on Electrobun's `BrowserView.rpc`. We never call

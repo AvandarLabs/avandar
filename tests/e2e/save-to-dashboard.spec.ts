@@ -1,5 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import {
   deleteAllDashboardsForOwner,
   deleteDashboardsByIds,
@@ -9,7 +10,6 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
-import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 const MOCK_SQL = "SELECT 1 AS mocked_column";

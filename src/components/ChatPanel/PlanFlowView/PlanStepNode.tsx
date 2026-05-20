@@ -7,11 +7,11 @@ import {
   IconPlayerSkipForward,
 } from "@tabler/icons-react";
 import { Handle, Position } from "@xyflow/react";
-import type { NodeProps } from "@xyflow/react";
 import type {
   PlanNode,
   PlanStepStatus,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
+import type { NodeProps } from "@xyflow/react";
 
 const STATUS_COLOR: Record<PlanStepStatus, string> = {
   pending: "gray",
@@ -95,8 +95,7 @@ export function PlanStepNode(props: NodeProps): JSX.Element {
         width: 280,
         padding: 12,
         cursor: "pointer",
-        fontFamily:
-          'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
+        fontFamily: 'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
       }}
     >
       <Handle

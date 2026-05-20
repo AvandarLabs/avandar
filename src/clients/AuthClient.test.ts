@@ -3,6 +3,7 @@ import {
   __resetPlatformImplsForTests,
   setPlatformImpls,
 } from "@/config/platform/platformRegistry";
+import { AuthClient } from "./AuthClient";
 import type { PlatformImpls } from "@/config/platform/PlatformProvider";
 import type {
   AuthProvider,
@@ -44,8 +45,6 @@ vi.mock("$/platform/isDesktop", () => {
     },
   };
 });
-
-import { AuthClient } from "./AuthClient";
 
 function makeFakeAuthProvider(session: PlatformSession | null): AuthProvider {
   const listeners = new Set<(s: PlatformSession | null) => void>();

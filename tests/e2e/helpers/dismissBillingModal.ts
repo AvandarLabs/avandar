@@ -13,6 +13,9 @@ export async function dismissBillingModalIfVisible(page: Page): Promise<void> {
     return;
   }
 
-  await dialog.getByRole("button", { name: /^select plan$/i }).first().click();
+  await dialog
+    .getByRole("button", { name: /^select plan$/i })
+    .first()
+    .click();
   await expect(dialog).toBeHidden({ timeout: MEDIUM_WAIT });
 }

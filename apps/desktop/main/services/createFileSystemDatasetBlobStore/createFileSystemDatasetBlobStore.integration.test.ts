@@ -127,9 +127,9 @@ describe("FileSystemDatasetBlobStore", () => {
 
   it("rejects path-traversal keys (../ and ..\\)", async () => {
     const store = createFileSystemDatasetBlobStore(dir);
-    await expect(
-      store.put("../escape", new Uint8Array([1])),
-    ).rejects.toThrow(/path traversal/);
+    await expect(store.put("../escape", new Uint8Array([1]))).rejects.toThrow(
+      /path traversal/,
+    );
     await expect(
       store.put("a/../../escape", new Uint8Array([1])),
     ).rejects.toThrow(/path traversal/);
@@ -143,9 +143,9 @@ describe("FileSystemDatasetBlobStore", () => {
 
   it("rejects absolute paths", async () => {
     const store = createFileSystemDatasetBlobStore(dir);
-    await expect(
-      store.put("/etc/passwd", new Uint8Array([1])),
-    ).rejects.toThrow(/absolute path/);
+    await expect(store.put("/etc/passwd", new Uint8Array([1]))).rejects.toThrow(
+      /absolute path/,
+    );
     await expect(
       store.put("C:/Windows/System32/evil", new Uint8Array([1])),
     ).rejects.toThrow(/absolute path/);

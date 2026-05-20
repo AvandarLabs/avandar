@@ -17,7 +17,7 @@
  */
 
 import * as nodeFs from "node:fs";
-import { dirname, join, relative, sep as pathSep } from "node:path";
+import { dirname, join, sep as pathSep, relative } from "node:path";
 
 /**
  * Minimal slice of `node:fs` the blob store touches. Lifted out as a
@@ -131,8 +131,9 @@ export function createFileSystemDatasetBlobStore(
       if (!fs.existsSync(rootDir)) {
         return [];
       }
-      const baseDir = normalisedPrefix.length === 0
-        ? rootDir
+      const baseDir =
+        normalisedPrefix.length === 0 ?
+          rootDir
         : join(rootDir, normalisedPrefix);
       if (!fs.existsSync(baseDir)) {
         return [];

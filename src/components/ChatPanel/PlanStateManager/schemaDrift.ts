@@ -1,11 +1,11 @@
 import { APIClient } from "@/clients/APIClient";
 import type {
-  PlanExecutorDispatch,
   executePlanStep as _executePlanStep,
+  PlanExecutorDispatch,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
-import type { ChatPlan, SchemaDriftReport } from "$/types/chat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatPlan, SchemaDriftReport } from "$/types/chat.types";
 
 /**
  * Phase 4 — Schema-Drift Regen.
@@ -136,9 +136,7 @@ export async function regenerateOnDrift(args: {
     }),
   );
   const ordered = [...response.steps].sort((a, b) => {
-    return (
-      (orderById.get(a.stepId) ?? 0) - (orderById.get(b.stepId) ?? 0)
-    );
+    return (orderById.get(a.stepId) ?? 0) - (orderById.get(b.stepId) ?? 0);
   });
   for (const updated of ordered) {
     await args.runStep(updated.stepId);

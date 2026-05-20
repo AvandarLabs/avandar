@@ -1,8 +1,8 @@
 import { Box, Container, Stack, Text, Title } from "@mantine/core";
+import { Paper } from "@ui";
 import { CSSProperties, ReactNode } from "react";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
-import { Paper } from "@ui";
 
 const TITLEBAR_DRAG_REGION_STYLE: CSSProperties = {
   height: HEADER_DESKTOP_TITLEBAR_HEIGHT,

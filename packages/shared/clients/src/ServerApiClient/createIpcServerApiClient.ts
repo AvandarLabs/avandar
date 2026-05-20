@@ -40,9 +40,7 @@ export function createIpcServerApiClient(): ServerApiClient {
         pathParams: request.pathParams as
           | Record<string, string | number>
           | undefined,
-        queryParams: request.queryParams as
-          | Record<string, unknown>
-          | undefined,
+        queryParams: request.queryParams as Record<string, unknown> | undefined,
         body: request.body,
       });
       /*

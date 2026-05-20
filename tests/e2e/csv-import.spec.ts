@@ -1,10 +1,10 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
+  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_CSV_PATH,
   EXPECTED_CSV_COLUMN_NAMES,
   formatImportPreviewRowCount,
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {

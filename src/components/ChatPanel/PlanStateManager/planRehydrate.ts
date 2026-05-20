@@ -1,17 +1,17 @@
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   rehydratePlanStep,
   stepViewName,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
 import {
-  putPlanStepBlob,
   listPlanStepBlobs,
+  putPlanStepBlob,
 } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import type {
   PlanStateManager,
   PlanStepStatus,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { ChatPlan, ChatPlanStep } from "$/types/chat.types";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 
 export type RehydrateDispatch = ReturnType<typeof PlanStateManager.useDispatch>;
 

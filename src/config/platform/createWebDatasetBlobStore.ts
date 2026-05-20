@@ -1,10 +1,10 @@
+import { asDatasetBlobKey } from "$/platform/types/DatasetBlobStore.types";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import {
-  asDatasetBlobKey,
-  type DatasetBlobKey,
-  type DatasetBlobStat,
-  type DatasetBlobStore,
+import type {
+  DatasetBlobKey,
+  DatasetBlobStat,
+  DatasetBlobStore,
 } from "$/platform/types/DatasetBlobStore.types";
 
 /**

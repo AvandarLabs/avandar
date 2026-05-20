@@ -5,9 +5,9 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { isDesktop } from "$/platform/isDesktop";
 import { getPlatformImpls } from "@/config/platform/platformRegistry";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { Session as PlatformSession } from "$/platform/types/AuthProvider.types";
 
 /**
@@ -136,9 +136,7 @@ function _platformSessionToSupabaseUser(session: PlatformSession): User {
  * Supabase-shaped `refresh_token` is left as the empty string. Consumers
  * that compare token strings explicitly will need to migrate.
  */
-function _platformSessionToSupabaseSession(
-  session: PlatformSession,
-): Session {
+function _platformSessionToSupabaseSession(session: PlatformSession): Session {
   const user = _platformSessionToSupabaseUser(session);
   return {
     access_token: session.accessToken,
@@ -173,9 +171,9 @@ function createAuthClient(): AuthClient {
     _desktopOnAuthChangeUnsub = getPlatformImpls().authProvider.onAuthChange(
       (platformSession) => {
         const supabaseSession =
-          platformSession === null ?
-            null
-          : _platformSessionToSupabaseSession(platformSession);
+          platformSession === null ? null : (
+            _platformSessionToSupabaseSession(platformSession)
+          );
         const event: AuthChangeEvent =
           platformSession === null ? "SIGNED_OUT" : "SIGNED_IN";
         _desktopOnAuthChangeListeners.forEach((cb) => {
@@ -240,10 +238,7 @@ function createAuthClient(): AuthClient {
           }
           return _platformSessionToSupabaseSession(platformSession);
         } catch (err) {
-          console.error(
-            "Failed to get the current session (desktop)",
-            err,
-          );
+          console.error("Failed to get the current session (desktop)", err);
           return undefined;
         }
       }

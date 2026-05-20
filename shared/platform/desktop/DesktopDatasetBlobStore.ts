@@ -94,9 +94,7 @@ async function put(
   });
 }
 
-async function get(
-  key: DatasetBlobKey,
-): Promise<ReadableStream<Uint8Array>> {
+async function get(key: DatasetBlobKey): Promise<ReadableStream<Uint8Array>> {
   const reply = await callIpc(DatasetBlobContracts.get, { key });
   return _bytesToStream(_base64ToUint8(reply.bytesBase64));
 }
