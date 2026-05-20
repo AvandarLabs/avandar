@@ -56,6 +56,7 @@ type PipelineBuilderFn = (
   modelId: string,
   options: {
     progress_callback?: (event: TransformersProgressEvent) => void;
+    dtype?: string | Record<string, string>;
   },
 ) => Promise<ASRPipelineFn>;
 
@@ -179,6 +180,14 @@ export class VoiceModelManager implements IVoiceModelManager {
       "automatic-speech-recognition",
       model.hubRepo,
       {
+        // The default wasm dtype (`q8`) loads the `*_quantized.onnx` Whisper
+        // exports, which onnxruntime-web 1.26+ rejects because they're
+        // missing the merged-scale tensors that the new MatMulNBits path
+        // requires ("Missing required scale: ...weight_merged_0_scale").
+        // Forcing fp32 sidesteps the quantized graph entirely. The download
+        // is larger but still bounded to the small-tier models we expose on
+        // web — see `voiceModels.ts` for the approxSizeMb values.
+        dtype: "fp32",
         progress_callback: (event) => {
           this.handleProgress(id, event);
         },

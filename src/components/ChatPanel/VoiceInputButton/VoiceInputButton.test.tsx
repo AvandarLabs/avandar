@@ -76,6 +76,27 @@ vi.mock("@/lib/voice/audioCapture", () => {
   };
 });
 
+vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
+  return {
+    useCurrentWorkspace: () => {
+      return { id: "ws-test" };
+    },
+  };
+});
+
+const workspaceLocaleRef = { current: "en" as string };
+
+vi.mock("@/i18n/useLanguagePreference", () => {
+  return {
+    useWorkspaceLanguage: () => {
+      return {
+        locale: workspaceLocaleRef.current,
+        setLocale: vi.fn(),
+      };
+    },
+  };
+});
+
 describe("VoiceInputButton", () => {
   beforeEach(() => {
     composerSetText.mockClear();
@@ -83,6 +104,7 @@ describe("VoiceInputButton", () => {
     isModelDownloadedMock.mockClear();
     transcribeMock.mockClear();
     notificationShowMock.mockClear();
+    workspaceLocaleRef.current = "en";
     window.localStorage.clear();
   });
 
@@ -211,6 +233,54 @@ describe("VoiceInputButton", () => {
         }),
       );
     });
+  });
+
+  it("defaults the language picker to the workspace locale", async () => {
+    workspaceLocaleRef.current = "es";
+    isModelDownloadedMock.mockResolvedValueOnce(false);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: /set up voice prompting/i,
+        }),
+      );
+    });
+
+    expect(
+      await screen.findByText(/enable voice prompting/i),
+    ).toBeInTheDocument();
+    const languageInput = screen.getByRole("combobox", { name: /language/i });
+    expect((languageInput as HTMLInputElement).value).toBe("Español");
+  });
+
+  it("falls back to auto-detect when the workspace locale has no voice mapping", async () => {
+    workspaceLocaleRef.current = "ar";
+    isModelDownloadedMock.mockResolvedValueOnce(false);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: /set up voice prompting/i,
+        }),
+      );
+    });
+
+    expect(
+      await screen.findByText(/enable voice prompting/i),
+    ).toBeInTheDocument();
+    const languageInput = screen.getByRole("combobox", { name: /language/i });
+    expect((languageInput as HTMLInputElement).value).toBe("Auto-detect");
   });
 
   it("disables the button when the disabled prop is set", () => {

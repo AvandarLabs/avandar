@@ -14,11 +14,14 @@ import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
   DEFAULT_VOICE_MODEL_ID,
   findVoiceModel,
+  voiceLanguageForLocale,
   VOICE_LANGUAGES,
   VOICE_MODELS,
 } from "@/lib/voice/voiceModels";
@@ -26,20 +29,7 @@ import css from "./VoiceInputButton.module.css";
 import type { AudioRecorder } from "@/lib/voice/audioCapture";
 import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
 
-const LANGUAGE_STORAGE_KEY = "avandar.voice.language";
 const MODEL_STORAGE_KEY = "avandar.voice.modelId";
-
-function readStoredLanguage(): VoiceLanguageCode {
-  try {
-    const raw = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    const matched = VOICE_LANGUAGES.find((lang) => {
-      return lang.code === raw;
-    });
-    return matched?.code ?? "auto";
-  } catch {
-    return "auto";
-  }
-}
 
 function readStoredModelId(): VoiceModelId {
   try {
@@ -72,9 +62,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const manager = useVoiceModelManager();
   const platform = usePlatformInfo();
   const isDesktopPlatform = platform === "desktop";
-  const [language, setLanguage] = useState<VoiceLanguageCode>(() => {
-    return readStoredLanguage();
-  });
+  const workspace = useCurrentWorkspace();
+  const { locale: workspaceLocale } = useWorkspaceLanguage(workspace.id);
+  const workspaceVoiceLanguage = voiceLanguageForLocale(workspaceLocale);
+  const [language, setLanguage] = useState<VoiceLanguageCode>(
+    workspaceVoiceLanguage,
+  );
   const [selectedModelId, setSelectedModelId] = useState<VoiceModelId>(() => {
     return readStoredModelId();
   });
@@ -110,13 +103,13 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     };
   }, [manager, selectedModelId]);
 
+  // Track the workspace language so the picker default follows changes
+  // made from the workspace settings page. The user's per-session override
+  // (e.g. "Auto-detect" for a noisy clip) is intentionally not persisted —
+  // the workspace setting is the source of truth.
   useEffect(() => {
-    try {
-      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-    } catch {
-      // Storage may be unavailable (private browsing); ignore.
-    }
-  }, [language]);
+    setLanguage(workspaceVoiceLanguage);
+  }, [workspaceVoiceLanguage]);
 
   useEffect(() => {
     try {
