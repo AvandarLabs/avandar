@@ -7,63 +7,64 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: es\n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles"
-msgstr ""
+msgstr "Roles"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace Name"
-msgstr ""
+msgstr "Nombre del espacio de trabajo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
-msgstr ""
+msgstr "Error al actualizar el nombre del espacio de trabajo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
-msgstr ""
+msgstr "Elige el idioma utilizado en este espacio de trabajo. Los idiomas de derecha a izquierda invierten automáticamente el diseño."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
-msgstr ""
+msgstr "Nombre del espacio de trabajo actualizado"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Only workspace settings administrators can open workspace settings."
-msgstr ""
+msgstr "Solo los administradores de configuraciones del espacio de trabajo pueden abrir la configuración del espacio de trabajo."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
-msgstr ""
+msgstr "Registro de privacidad"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Billing"
-msgstr ""
+msgstr "Facturación"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
-msgstr ""
+msgstr "Acceso denegado"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "The workspace name was saved successfully."
-msgstr ""
+msgstr "El nombre del espacio de trabajo se guardó correctamente."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
-msgstr ""
+msgstr "Configuraciones"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
-msgstr ""
+msgstr "Miembros"
