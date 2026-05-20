@@ -52,7 +52,7 @@ export const VOICE_MODELS: readonly VoiceModel[] = [
     displayName: "Whisper Tiny (multilingual)",
     description:
       "Smallest multilingual model — fastest to download, good for short clear phrases.",
-    approxSizeMb: 75,
+    approxSizeMb: 155,
     desktopOnly: false,
   },
   {
@@ -61,7 +61,7 @@ export const VOICE_MODELS: readonly VoiceModel[] = [
     displayName: "Whisper Base (multilingual)",
     description:
       "Larger model with better accuracy, especially for non-English audio.",
-    approxSizeMb: 145,
+    approxSizeMb: 295,
     desktopOnly: false,
   },
   {
@@ -69,8 +69,8 @@ export const VOICE_MODELS: readonly VoiceModel[] = [
     hubRepo: "Xenova/whisper-small",
     displayName: "Whisper Small (multilingual)",
     description:
-      "Best web-friendly accuracy. Download is ~485 MB; may be slow on low-bandwidth connections.",
-    approxSizeMb: 485,
+      "Best web-friendly accuracy. Download is ~970 MB; may be slow on low-bandwidth connections.",
+    approxSizeMb: 970,
     desktopOnly: false,
   },
   {
@@ -158,3 +158,32 @@ export const VOICE_LANGUAGES: readonly VoiceLanguageOption[] = [
   { code: "swahili", label: "Kiswahili" },
   { code: "chinese", label: "中文" },
 ];
+
+/**
+ * Maps a workspace UI locale (Lingui code) to the corresponding Whisper
+ * language code we expose in the voice picker. Locales that the voice
+ * picker doesn't surface (e.g. Arabic — Whisper supports it but the
+ * ict4d-demo language list intentionally doesn't) fall back to `auto` so
+ * detection still works. Pass `undefined` during SSR / first render.
+ */
+export function voiceLanguageForLocale(
+  locale: string | undefined,
+): VoiceLanguageCode {
+  switch (locale) {
+    case "en":
+      return "english";
+    case "es":
+      return "spanish";
+    case "pt":
+      return "portuguese";
+    case "fr":
+      return "french";
+    case "sw":
+      return "swahili";
+    case "zh-Hans":
+    case "zh-Hant":
+      return "chinese";
+    default:
+      return "auto";
+  }
+}
