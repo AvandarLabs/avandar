@@ -31,6 +31,10 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import {
+  readDataExplorerPanelPreferences,
+  writeDataExplorerPanelPreferences,
+} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
@@ -39,14 +43,10 @@ import { OpenDatasetDrawer } from "@/views/DataExplorerApp/OpenDatasetDrawer/Ope
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import {
-  readDataExplorerPanelPreferences,
-  writeDataExplorerPanelPreferences,
-} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 
 const QUERY_DETAILS_WIDTH = 380;
 const SETTINGS_WIDTH = 340;
@@ -227,6 +227,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     dispatch,
   ]);
 
+  const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
+  const settingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
   const isSettingsOpenedRef = useRef(isSettingsOpened);
   isSettingsOpenedRef.current = isSettingsOpened;
@@ -267,6 +269,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             <Trans>Reset</Trans>
           </Button>
           <Button
+            ref={queryPanelButtonRef}
             variant={isQueryDetailsOpened ? "filled" : "outline"}
             color="neutral"
             leftSection={<IconListDetails size={16} />}
@@ -280,6 +283,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             <Trans>Query</Trans>
           </Button>
           <Button
+            ref={settingsPanelButtonRef}
             variant={isSettingsOpened ? "filled" : "outline"}
             color="neutral"
             leftSection={<IconAdjustmentsHorizontal size={16} />}
@@ -471,6 +475,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         title={t`Query Details`}
         opened={isQueryDetailsOpened}
         collapsed={isQueryDetailsCollapsed}
+        openOriginRef={queryPanelButtonRef}
         onClose={() => {
           setQueryDetailsOpened(false);
         }}
@@ -492,7 +497,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           });
         }}
         initialPosition={
-          panelPreferences.queryDetails?.position ?? QUERY_DETAILS_INITIAL_POSITION
+          panelPreferences.queryDetails?.position ??
+          QUERY_DETAILS_INITIAL_POSITION
         }
         width={QUERY_DETAILS_WIDTH}
       >
@@ -502,6 +508,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         title={t`Visualization Settings`}
         opened={isSettingsOpened}
         collapsed={isSettingsCollapsed}
+        openOriginRef={settingsPanelButtonRef}
         onClose={() => {
           setSettingsOpened(false);
         }}

@@ -7,6 +7,7 @@ export {
   ThemeColors,
   cssVariablesResolver,
 } from "./Theme";
-export { AnimationTheme } from "./AnimationTheme";
+export { ANIMATION_PRESET, AnimationTheme } from "./AnimationTheme";
+export { buildAnimateOriginStyle } from "./buildAnimateOriginStyle";
 export { BorderTheme } from "./BorderTheme";
 export { ElevationTheme } from "./ElevationTheme";

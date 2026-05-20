@@ -470,6 +470,13 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--ava-transition-transform": AnimationTheme.transition.transform,
     "--ava-transition-opacity": AnimationTheme.transition.opacity,
     "--ava-transition-shadow": AnimationTheme.transition.shadow,
+
+    "--ava-animation-duration-ooze-in": `${AnimationTheme.preset.oozeIn.durationMs}ms`,
+    "--ava-animation-duration-swipe-out": `${AnimationTheme.preset.swipeOut.durationMs}ms`,
+    "--ava-animation-duration-reduced": `${AnimationTheme.preset.reducedMotionDurationMs}ms`,
+    "--ava-animation-easing-spring": AnimationTheme.preset.oozeIn.easing,
+    "--ava-animation-easing-swipe-out": AnimationTheme.preset.swipeOut.easing,
+    "--ava-animate-swipe-translate-x": `${AnimationTheme.preset.swipeOut.translateXPx}px`,
   };
 
   return {

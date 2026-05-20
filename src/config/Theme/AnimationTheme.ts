@@ -25,6 +25,32 @@ export const ANIMATION_EASING = {
   out: "cubic-bezier(0.16, 1, 0.3, 1)",
   outSoft: "cubic-bezier(0.33, 1, 0.68, 1)",
   inOut: "cubic-bezier(0.45, 0, 0.55, 1)",
+  /** Springy overshoot for ooze-in surfaces. */
+  spring: "cubic-bezier(0.2, 0.9, 0.25, 1.35)",
+  /** Quick ease for swipe-away dismissals. */
+  swipeOut: "cubic-bezier(0.45, 0, 0.75, 0.6)",
+} as const;
+
+/**
+ * Reusable CSS animation presets (global classes in animationPresets.css).
+ * Pair ooze-in with `buildAnimateOriginStyle` for trigger-anchored motion.
+ */
+export const ANIMATION_PRESET = {
+  active: {
+    className: "ava-animate-active",
+  },
+  oozeIn: {
+    className: "ava-animate-ooze-in",
+    durationMs: 280,
+    easing: ANIMATION_EASING.spring,
+  },
+  swipeOut: {
+    className: "ava-animate-swipe-out",
+    durationMs: ANIMATION_DURATION_MS.fast,
+    easing: ANIMATION_EASING.swipeOut,
+    translateXPx: 12,
+  },
+  reducedMotionDurationMs: 120,
 } as const;
 
 type TransitionPart = {
@@ -122,6 +148,7 @@ export const AnimationTheme = {
   duration: ANIMATION_DURATION,
   easing: ANIMATION_EASING,
   transition: ANIMATION_TRANSITION,
+  preset: ANIMATION_PRESET,
   mantine: MANTINE_TRANSITION_PROPS,
   combobox: DEFAULT_COMBOBOX_PROPS,
 } as const;

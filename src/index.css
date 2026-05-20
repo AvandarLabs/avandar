@@ -72,4 +72,14 @@ button {
   --mantine-primary-color: ;
   --mantine-color-body: ;
   --mantine-color-text: ;
+
+  /* animation presets */
+  --ava-animation-duration-ooze-in: ;
+  --ava-animation-duration-swipe-out: ;
+  --ava-animation-duration-reduced: ;
+  --ava-animation-easing-spring: ;
+  --ava-animation-easing-swipe-out: ;
+  --ava-animate-swipe-translate-x: ;
+  --ava-animate-origin-x: ;
+  --ava-animate-origin-y: ;
 }

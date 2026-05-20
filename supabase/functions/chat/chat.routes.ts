@@ -18,6 +18,7 @@ import {
   buildSQLSystemPrompt,
   cleanGeneratedSQL,
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
+import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with { type: "json" };
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import {
@@ -26,9 +27,6 @@ import {
 } from "$/utils/chat/chatModelsCache.ts";
 import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
-import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with {
-  type: "json",
-};
 import type {
   ChatAPI,
   ChatClarifyRequest,
@@ -96,7 +94,7 @@ async function _loadLiveChatModelsResponse(): Promise<ChatModelsResponse> {
 // from scratch. The brief calls for "prior prompt + SQL only when relevant"
 // to keep token spend honest; this regex is the relevance gate.
 const REFINEMENT_HINTS =
-  /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also)\b/i;
+  /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;
 
 // OpenRouter speaks the OpenAI Chat Completions wire format, so we POST
 // directly the same way `queries.routes.ts` calls OpenAI. The brief names

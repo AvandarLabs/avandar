@@ -1,6 +1,5 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
-import { IconSparkles } from "@tabler/icons-react";
 import { Link, TruncatedText } from "@ui";
 import { where } from "@utils";
 import { useMemo } from "react";
@@ -101,12 +100,7 @@ export function ChatEmptyState(): JSX.Element {
   return (
     <Stack gap="md" p="md">
       <Group gap="xs">
-        <Badge
-          variant="light"
-          color="primary"
-          radius="sm"
-          leftSection={<IconSparkles size={12} />}
-        >
+        <Badge variant="light" color="primary" radius="sm">
           {pageLabel(context.app)}
         </Badge>
       </Group>

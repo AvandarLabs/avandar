@@ -14,10 +14,12 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import clsx from "clsx";
 import { useCallback, useRef } from "react";
-import { FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
+import { ANIMATION_PRESET, FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
 import css from "./FloatingPanel.module.css";
-import type { ReactNode } from "react";
+import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 
 type FloatingPanelInitialPosition = {
   top?: number;
@@ -56,6 +58,12 @@ type Props = {
   /** Width of the window. */
   width?: number | string;
 
+  /**
+   * Toolbar control to ooze open from when the panel appears. Closing uses a
+   * light swipe-away fade instead of morphing back. When omitted, uses pop.
+   */
+  openOriginRef?: RefObject<HTMLElement | null>;
+
   /** Body content rendered below the header. */
   children: ReactNode;
 };
@@ -76,8 +84,11 @@ export function FloatingPanel({
   initialPosition,
   onPositionChange,
   width = 360,
+  openOriginRef,
   children,
 }: Props): JSX.Element {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const usesMorphTransition = openOriginRef != null;
   // Mantine's `useFloatingWindow` lists `onPositionChange` and each
   // `initialPosition.*` field in the drag effect's dependency array. If the
   // parent passes a new inline callback or recomputes `initialPosition` (e.g.
@@ -105,11 +116,110 @@ export function FloatingPanel({
   }
   prevOpenedRef.current = opened;
 
+  const morph = useFloatingPanelMorphTransition({
+    opened,
+    originRef: openOriginRef,
+    panelRef,
+    initialPosition: initialPositionRef.current,
+  });
+
   const onToggleCollapseRef = useRef(onToggleCollapse);
   onToggleCollapseRef.current = onToggleCollapse;
   const handleDragHandleDoubleClick = useCallback(() => {
     onToggleCollapseRef.current();
   }, []);
+
+  const renderFloatingWindow = (
+    transitionStyles?: CSSProperties,
+  ): JSX.Element => {
+    return (
+      <FloatingWindow
+        ref={panelRef}
+        shadow="md"
+        radius="md"
+        withBorder
+        w={width}
+        zIndex={FLOATING_PANEL_Z_INDEX}
+        initialPosition={initialPositionRef.current}
+        onPositionChange={handlePositionChange}
+        dragHandleSelector={`.${css.header}`}
+        excludeDragHandleSelector={`.${css.actions}`}
+        className={clsx(
+          css.root,
+          morph.isAnimating && ANIMATION_PRESET.active.className,
+          morph.animationPhase === "enter" && ANIMATION_PRESET.oozeIn.className,
+          morph.animationPhase === "exit" &&
+            ANIMATION_PRESET.swipeOut.className,
+        )}
+        style={{
+          ...transitionStyles,
+          ...morph.panelAnimationStyle,
+          ...(morph.isEnterPending ? { opacity: 0 } : undefined),
+        }}
+        onAnimationEnd={morph.handleAnimationEnd}
+        aria-label={title}
+      >
+        <Group
+          className={css.header}
+          px="sm"
+          py="xs"
+          justify="space-between"
+          wrap="nowrap"
+          gap="xs"
+        >
+          <Group
+            gap={6}
+            wrap="nowrap"
+            className={css.titleGroup}
+            aria-hidden
+            onDoubleClick={handleDragHandleDoubleClick}
+          >
+            <IconGripVertical size={14} className={css.gripIcon} />
+            <Text size="sm" fw={600} c="neutral.9" className={css.titleText}>
+              {title}
+            </Text>
+          </Group>
+          <Group gap={2} wrap="nowrap" className={css.actions}>
+            <Tooltip label={collapsed ? "Expand" : "Collapse"} openDelay={400}>
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                color="neutral"
+                onClick={onToggleCollapse}
+                aria-label={collapsed ? "Expand panel" : "Collapse panel"}
+              >
+                {collapsed ?
+                  <IconChevronDown size={14} />
+                : <IconChevronUp size={14} />}
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Close" openDelay={400}>
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                color="neutral"
+                onClick={onClose}
+                aria-label={`Close ${title}`}
+              >
+                <IconX size={14} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+        </Group>
+        <Collapse expanded={!collapsed} transitionDuration={180}>
+          <Box className={css.body}>{children}</Box>
+        </Collapse>
+      </FloatingWindow>
+    );
+  };
+
+  if (usesMorphTransition) {
+    if (!morph.isRendered) {
+      return null;
+    }
+
+    return renderFloatingWindow();
+  }
 
   return (
     <Transition
@@ -120,81 +230,7 @@ export function FloatingPanel({
       timingFunction="ease"
     >
       {(transitionStyles) => {
-        return (
-          <FloatingWindow
-            shadow="md"
-            radius="md"
-            withBorder
-            w={width}
-            zIndex={FLOATING_PANEL_Z_INDEX}
-            initialPosition={initialPositionRef.current}
-            onPositionChange={handlePositionChange}
-            dragHandleSelector={`.${css.header}`}
-            excludeDragHandleSelector={`.${css.actions}`}
-            className={css.root}
-            style={transitionStyles}
-            aria-label={title}
-          >
-            <Group
-              className={css.header}
-              px="sm"
-              py="xs"
-              justify="space-between"
-              wrap="nowrap"
-              gap="xs"
-            >
-              <Group
-                gap={6}
-                wrap="nowrap"
-                className={css.titleGroup}
-                aria-hidden
-                onDoubleClick={handleDragHandleDoubleClick}
-              >
-                <IconGripVertical size={14} className={css.gripIcon} />
-                <Text
-                  size="sm"
-                  fw={600}
-                  c="neutral.9"
-                  className={css.titleText}
-                >
-                  {title}
-                </Text>
-              </Group>
-              <Group gap={2} wrap="nowrap" className={css.actions}>
-                <Tooltip
-                  label={collapsed ? "Expand" : "Collapse"}
-                  openDelay={400}
-                >
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    color="neutral"
-                    onClick={onToggleCollapse}
-                    aria-label={collapsed ? "Expand panel" : "Collapse panel"}
-                  >
-                    {collapsed ?
-                      <IconChevronDown size={14} />
-                    : <IconChevronUp size={14} />}
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label="Close" openDelay={400}>
-                  <ActionIcon
-                    variant="subtle"
-                    size="sm"
-                    color="neutral"
-                    onClick={onClose}
-                    aria-label={`Close ${title}`}
-                  >
-                    <IconX size={14} />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
-            </Group>
-            <Collapse expanded={!collapsed} transitionDuration={180}>
-              <Box className={css.body}>{children}</Box>
-            </Collapse>
-          </FloatingWindow>
-        );
+        return renderFloatingWindow(transitionStyles);
       }}
     </Transition>
   );
