@@ -1,5 +1,8 @@
 Random other features we should consider:
 
+- Implement pill-based editing for the generated SQL.
+- Test out excel parsing again and why columns aren't inferred right
+- Add syncing excel files that disappear from frontend. Harden the syncing.
 - Improve how apps look under different permissions. Test it with william.farr. Look at error messages (e.g. create dashboard) when he's just a viewer.
 - "Try again" button to regenerate a message if we were unhappy with the SQL.
 - A timeout if we waited too long and no response.

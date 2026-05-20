@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   fireEvent,
@@ -235,13 +237,15 @@ function renderWithProviders(
   return renderRtl(ui, {
     wrapper: ({ children }) => {
       return (
-        <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>
-            <DashboardEditorStateManager.Provider>
-              {children}
-            </DashboardEditorStateManager.Provider>
-          </AvandarUiProvider>
-        </QueryClientProvider>
+        <I18nProvider i18n={i18n}>
+          <QueryClientProvider client={queryClient}>
+            <AvandarUiProvider>
+              <DashboardEditorStateManager.Provider>
+                {children}
+              </DashboardEditorStateManager.Provider>
+            </AvandarUiProvider>
+          </QueryClientProvider>
+        </I18nProvider>
       );
     },
     ...options,
@@ -333,6 +337,31 @@ describe("DashboardEditorView", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(
+      screen.getByRole("button", { name: /publish/i }),
+    ).not.toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("saves the dashboard when mod+S is pressed", () => {
+    renderWithProviders(
+      <DashboardEditorView
+        dashboard={_makeDashboard()}
+        workspaceSlug="test-workspace"
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("puck-add-component"));
+    expect(screen.getByRole("button", { name: /publish/i })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+
+    fireEvent.keyDown(document.documentElement, {
+      key: "s",
+      code: "KeyS",
+      metaKey: true,
+    });
 
     expect(
       screen.getByRole("button", { name: /publish/i }),

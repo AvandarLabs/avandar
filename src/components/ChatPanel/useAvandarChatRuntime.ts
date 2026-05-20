@@ -65,11 +65,25 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const { parseSql } = useSqlToStructuredQuery();
   const planDispatch = PlanStateManager.useDispatch();
   const planState = PlanStateManager.useState();
-  // Keep a ref so the adapter can read the latest plan nodes + id without
-  // forcing the adapter to be re-created (which would also blow away
-  // assistant-ui's runtime in-flight state — see CHECKPOINTS bug #29).
+  // Refs keep the adapter instance stable while still reading fresh values
+  // inside `run()`. Including `pageContext` or `parseSql` in the adapter
+  // useMemo deps recreates the adapter whenever SQL or dataset metadata
+  // changes, which thrashes assistant-ui's local runtime and drops side
+  // effects such as `setRawSql` (CHECKPOINTS bug #29).
   const planStateRef = useRef(planState);
   planStateRef.current = planState;
+
+  const pageContextRef = useRef(pageContext);
+  pageContextRef.current = pageContext;
+
+  const parseSqlRef = useRef(parseSql);
+  parseSqlRef.current = parseSql;
+
+  const userRef = useRef(user);
+  userRef.current = user;
+
+  const workspaceIdRef = useRef(workspace.id);
+  workspaceIdRef.current = workspace.id;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -104,18 +118,22 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const lastUserMsg = [...apiMessages].reverse().find((m) => {
           return m.role === "user";
         });
+        const currentUser = userRef.current;
+        const workspaceId = workspaceIdRef.current;
+        const currentPageContext = pageContextRef.current;
+
         if (
           lastUserMsg &&
           !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content) &&
-          user
+          currentUser
         ) {
           const biasResult = detectBias(lastUserMsg.content);
           if (biasResult.hits.length > 0) {
             const consent = await crossBoundary({
               text: lastUserMsg.content,
               context: "user_message_text",
-              workspaceId: workspace.id,
-              userId: user.id,
+              workspaceId,
+              userId: currentUser.id,
             });
             if (!consent.approved) {
               // User cancelled: end the turn with an empty assistant
@@ -155,22 +173,22 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
           void logAnalyticsEvent({
             event: "chat.message_sent",
-            workspaceId: workspace.id,
+            workspaceId,
             app:
-              pageContext.app === "data-explorer" ? "data_explorer"
-              : pageContext.app === "dashboards" ? "dashboards"
-              : pageContext.app === "data-sources" ? "data_sources"
+              currentPageContext.app === "data-explorer" ? "data_explorer"
+              : currentPageContext.app === "dashboards" ? "dashboards"
+              : currentPageContext.app === "data-sources" ? "data_sources"
               : undefined,
-            payload: { app: pageContext.app },
+            payload: { app: currentPageContext.app },
           });
         }
 
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
-          pathParams: { workspaceId: workspace.id },
+          pathParams: { workspaceId },
           body: {
             messages: apiMessages,
-            context: pageContext,
+            context: currentPageContext,
             model,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
           },
@@ -184,7 +202,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           });
 
           if (assumptionReview.needsApproval) {
-            if (!user) {
+            if (!currentUser) {
               const assistantParts: Array<{ type: "text"; text: string }> = [
                 {
                   type: "text",
@@ -199,8 +217,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 assumptionReview.unapprovedValues,
               ),
               context: "generated_sql_assumptions",
-              workspaceId: workspace.id,
-              userId: user.id,
+              workspaceId,
+              userId: currentUser.id,
               explicitConsentRequired: assumptionReview.assumptionCapReached,
             });
             if (!consent.approved) {
@@ -218,7 +236,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           dataExplorerDispatch.setNlPrompt(response.generatedSql.prompt);
           sqlApplied = true;
           try {
-            const mapping = parseSql(response.generatedSql.sql);
+            const mapping = parseSqlRef.current(response.generatedSql.sql);
             dataExplorerDispatch.applySqlMapping({
               query: mapping.query,
               isFullyMapped: mapping.isFullyMapped,
@@ -229,7 +247,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           }
           void logAnalyticsEvent({
             event: "chat.sql_generated",
-            workspaceId: workspace.id,
+            workspaceId,
             app: "data_explorer",
           });
         }
@@ -241,14 +259,14 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           });
           void logAnalyticsEvent({
             event: "dashboard.block_added_via_chat",
-            workspaceId: workspace.id,
+            workspaceId,
             app: "dashboards",
             payload: {
               blockKind: response.dashboardBlock.kind,
               ...(response.dashboardBlock.kind === "DataViz" ?
                 { vizType: response.dashboardBlock.vizType }
               : {}),
-              dashboardId: pageContext.dashboardId,
+              dashboardId: currentPageContext.dashboardId,
             },
           });
         }
@@ -287,7 +305,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           // Telemetry: record the "shown" event. The PendingClarificationBlock
           // settles it with the outcome when the user answers.
           const auditId = await recordShown({
-            workspaceId: workspace.id,
+            workspaceId,
             request: response.clarification,
           });
           chatPanelDispatch.setPendingClarification({
@@ -313,14 +331,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         return { content: assistantParts };
       },
     };
+    // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [
-    workspace.id,
-    user,
-    pageContext,
     dataExplorerDispatch,
     dashboardEditorDispatch,
     chatPanelDispatch,
-    parseSql,
     planDispatch,
   ]);
 
