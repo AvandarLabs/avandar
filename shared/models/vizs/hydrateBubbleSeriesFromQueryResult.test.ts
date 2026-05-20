@@ -127,7 +127,11 @@ describe("hydrateBubbleSeriesFromQueryResult", () => {
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "val", key: "val", sizeKey: "val" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "val",
+      key: "val",
+      sizeKey: "val",
+    });
   });
 
   it("leaves series empty when no numeric columns exist", () => {

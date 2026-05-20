@@ -1,11 +1,11 @@
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
-import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
-import { readStoredLocalChatModelId } from "./localChatModelStore";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
+import { readStoredLocalChatModelId } from "./localChatModelStore";
+import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
 import type { OfflineChatTurnResult } from "./offlineChat.types";
-import type { ChatClientMessage, ChatPageContext } from "$/types/chat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatClientMessage, ChatPageContext } from "$/types/chat.types";
 
 export type RunOfflineChatTurnArgs = {
   workspace: Workspace.T;
@@ -25,8 +25,9 @@ export async function runOfflineChatTurn(
   args: RunOfflineChatTurnArgs,
 ): Promise<OfflineChatTurnResult> {
   const lastUserPrompt =
-    [...args.messages].reverse().find((message) => {return message.role === "user"})
-      ?.content ?? "";
+    [...args.messages].reverse().find((message) => {
+      return message.role === "user";
+    })?.content ?? "";
 
   const schema = await fetchOfflineChatSchema({
     workspace: args.workspace,

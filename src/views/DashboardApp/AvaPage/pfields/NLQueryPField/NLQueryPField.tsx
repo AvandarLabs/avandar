@@ -202,8 +202,8 @@ function SqlTabPanel({
         >
           <Text size="xs" mb="xs">
             <Trans>
-              Parts of this SQL could not be represented in the Manual form.
-              The form shows a best-effort approximation; the SQL above is what
+              Parts of this SQL could not be represented in the Manual form. The
+              form shows a best-effort approximation; the SQL above is what
               actually runs.
             </Trans>
           </Text>

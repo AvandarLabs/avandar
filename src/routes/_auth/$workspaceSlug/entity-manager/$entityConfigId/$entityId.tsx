@@ -5,13 +5,13 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
+import { Callout } from "@ui";
 import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
-import { Callout } from "@ui";
 import { Logger } from "@/utils/Logger";
+import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 

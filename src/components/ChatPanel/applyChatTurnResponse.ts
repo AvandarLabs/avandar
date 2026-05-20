@@ -1,13 +1,15 @@
-import type { ChatModelRunResult } from "@assistant-ui/react";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
+import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/types/chat.types";
 
 export type ApplyChatTurnResponseArgs = {
   response: ChatResponse;
   sqlApplied: boolean;
   handlers: {
-    queueDashboardBlock: (block: NonNullable<ChatResponse["dashboardBlock"]>) => void;
+    queueDashboardBlock: (
+      block: NonNullable<ChatResponse["dashboardBlock"]>,
+    ) => void;
     loadPlan: (plan: NonNullable<ChatResponse["plan"]>) => void;
     setPendingClarification: (
       clarification: ChatClarifyRequestWithAudit | undefined,

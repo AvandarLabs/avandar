@@ -101,8 +101,8 @@ export function ConsentModal({
         <>
           <Text size="sm">
             <Trans>
-              Send{" "}
-              <strong>{totalCount ?? sampleValues?.length ?? 0}</strong> value
+              Send <strong>{totalCount ?? sampleValues?.length ?? 0}</strong>{" "}
+              value
               {(totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"} to
               the AI?
             </Trans>
@@ -127,8 +127,8 @@ export function ConsentModal({
           >
             <Text size="sm">
               <Trans>
-                The values you selected may contain personal information. The
-                AI provider will receive them and may log the request.
+                The values you selected may contain personal information. The AI
+                provider will receive them and may log the request.
               </Trans>
             </Text>
           </Alert>

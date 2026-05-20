@@ -10,6 +10,10 @@ export function formatOfflinePhaseAssistantText(args: {
   if (uniquePhases.length === 0) {
     return args.body;
   }
-  const header = uniquePhases.map((label) => {return `_(${label})_`}).join("\n\n");
+  const header = uniquePhases
+    .map((label) => {
+      return `_(${label})_`;
+    })
+    .join("\n\n");
   return `${header}\n\n${args.body}`;
 }

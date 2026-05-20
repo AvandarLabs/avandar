@@ -1,15 +1,11 @@
 import { capitalize, propEq } from "@utils";
-import {
-  appForResource,
-  appLabel,
-  resourceTypeLabel,
-} from "../shareCopy";
+import { appForResource, appLabel, resourceTypeLabel } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { useLingui } from "@lingui/react/macro";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
  * One run in the rendered summary line: a literal text segment or a labelled

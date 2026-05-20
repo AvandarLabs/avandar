@@ -1,7 +1,7 @@
-import { markLocalChatModelDownloaded } from "./localChatModelStore";
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
-import type { OfflineChatEngine } from "./offlineChat.types";
+import { markLocalChatModelDownloaded } from "./localChatModelStore";
 import type { LocalChatModelId } from "./localChatModelCatalog";
+import type { OfflineChatEngine } from "./offlineChat.types";
 
 export type OfflineChatManagerStatus =
   | { kind: "idle" }

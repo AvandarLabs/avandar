@@ -139,9 +139,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         <Alert color="blue" variant="light">
           <Text size="sm">
             <Trans>
-              Export this dashboard as a PDF, or sketch on it first.
-              Annotations support text, arrows, and freehand drawing with
-              adjustable roughness (RoughJS).
+              Export this dashboard as a PDF, or sketch on it first. Annotations
+              support text, arrows, and freehand drawing with adjustable
+              roughness (RoughJS).
             </Trans>
           </Text>
         </Alert>

@@ -25,15 +25,16 @@
  * to come from ag-grid; this only restores the flex layout.
  */
 .ag-paging-panel {
+  align-items: center;
   display: flex;
   flex-wrap: wrap-reverse;
-  align-items: center;
   justify-content: flex-end;
 }
+
 .ag-paging-page-summary-panel,
 .ag-paging-row-summary-panel {
-  display: flex;
   align-items: center;
+  display: flex;
 }
 
 button {

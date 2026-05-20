@@ -1,5 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
@@ -82,11 +82,9 @@ export function ToggleOfflineOnlyButton({
     }
 
     modals.openConfirmModal({
-      title:
-        isInCloudStorage ? t`Make dataset offline-only?` : t`Sync online?`,
+      title: isInCloudStorage ? t`Make dataset offline-only?` : t`Sync online?`,
       labels: {
-        confirm:
-          isInCloudStorage ? t`Make offline-only` : t`Allow syncing`,
+        confirm: isInCloudStorage ? t`Make offline-only` : t`Allow syncing`,
         cancel: t`Cancel`,
       },
       confirmProps: {

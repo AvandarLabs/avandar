@@ -16,8 +16,7 @@ describe("runOfflineChatPipeline", () => {
       },
       {
         match: "DuckDB SQL generator",
-        response:
-          "Counting rows.\n```sql\nSELECT COUNT(*) FROM \"ds-1\"\n```",
+        response: 'Counting rows.\n```sql\nSELECT COUNT(*) FROM "ds-1"\n```',
       },
     ]);
 

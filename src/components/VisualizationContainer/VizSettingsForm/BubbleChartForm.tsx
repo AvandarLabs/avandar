@@ -1,8 +1,8 @@
 import { Stack } from "@mantine/core";
 import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];
@@ -14,7 +14,11 @@ type Props = {
  * Settings form for the multi-series bubble chart. Delegates series
  * management to `BubbleSeriesFieldset`.
  */
-export function BubbleChartForm({ fields, config, onConfigChange }: Props): JSX.Element {
+export function BubbleChartForm({
+  fields,
+  config,
+  onConfigChange,
+}: Props): JSX.Element {
   return (
     <Stack gap="sm">
       <BubbleSeriesFieldset

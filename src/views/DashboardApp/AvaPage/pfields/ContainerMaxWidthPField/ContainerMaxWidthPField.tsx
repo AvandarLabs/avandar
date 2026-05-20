@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
-import { isPlainObject } from "@utils";
 import { SegmentedControl } from "@ui";
+import { isPlainObject } from "@utils";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type ContainerMaxWidthUnit = "%" | "px";

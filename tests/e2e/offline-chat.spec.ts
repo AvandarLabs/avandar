@@ -42,7 +42,7 @@ test.describe("offline WebLLM chat (mocked)", () => {
         {
           match: "DuckDB SQL generator",
           response:
-            "Here is the query.\n```sql\nSELECT COUNT(*) AS row_count FROM \"DATASET_ID\"\n```",
+            'Here is the query.\n```sql\nSELECT COUNT(*) AS row_count FROM "DATASET_ID"\n```',
         },
       ];
     });
@@ -58,7 +58,9 @@ test.describe("offline WebLLM chat (mocked)", () => {
     await uploadPanel
       .locator('input[type="file"]')
       .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-    await uploadPanel.getByRole("button", { name: "Upload", exact: true }).click();
+    await uploadPanel
+      .getByRole("button", { name: "Upload", exact: true })
+      .click();
 
     await expect(
       page.getByText("Data processed successfully", { exact: false }),

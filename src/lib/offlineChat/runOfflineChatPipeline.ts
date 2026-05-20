@@ -46,7 +46,9 @@ export async function runOfflineChatPipeline(
           content:
             "You are Avandar offline assistant. Answer briefly in plain language.",
         },
-        ...args.messages.filter((message) => {return message.role !== "system"}),
+        ...args.messages.filter((message) => {
+          return message.role !== "system";
+        }),
       ],
       maxTokens: 300,
     });
@@ -56,7 +58,11 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  appendPhase(phaseLabels, "Understanding your question (offline)…", args.onPhase);
+  appendPhase(
+    phaseLabels,
+    "Understanding your question (offline)…",
+    args.onPhase,
+  );
   const analyzeRaw = await args.engine.complete({
     messages: [
       {
@@ -109,14 +115,15 @@ export async function runOfflineChatPipeline(
       { role: "user", content: args.lastUserPrompt },
     ],
     maxTokens: SQL_MAX_TOKENS,
-    onToken: args.onPhase ?
-      (delta) => {
-        if (delta.length > 0 && !phaseLabels.includes("streaming_sql")) {
-          phaseLabels.push("streaming_sql");
-          args.onPhase?.("Generating SQL (offline)…");
+    onToken:
+      args.onPhase ?
+        (delta) => {
+          if (delta.length > 0 && !phaseLabels.includes("streaming_sql")) {
+            phaseLabels.push("streaming_sql");
+            args.onPhase?.("Generating SQL (offline)…");
+          }
         }
-      }
-    : undefined,
+      : undefined,
   });
 
   let sql = extractSqlFromLlmText(sqlPassText);

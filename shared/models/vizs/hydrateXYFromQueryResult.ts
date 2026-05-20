@@ -100,4 +100,3 @@ function _pickBarLineXColumnName(
   }
   return others[0]?.name;
 }
-

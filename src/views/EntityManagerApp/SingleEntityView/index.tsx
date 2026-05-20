@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { ObjectDescriptionList, Paper  } from "@ui";
+import { ObjectDescriptionList, Paper } from "@ui";
 import {
   isNonNullish,
   makeIdLookupMap,

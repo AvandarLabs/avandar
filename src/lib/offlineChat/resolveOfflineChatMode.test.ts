@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { markLocalChatModelDownloaded, clearLocalChatModelDownloaded } from "./localChatModelStore";
+import {
+  clearLocalChatModelDownloaded,
+  markLocalChatModelDownloaded,
+} from "./localChatModelStore";
 import { resolveOfflineChatMode } from "./resolveOfflineChatMode";
 
 describe("resolveOfflineChatMode", () => {
@@ -14,9 +17,9 @@ describe("resolveOfflineChatMode", () => {
   });
 
   it("uses local when offline and model downloaded", () => {
-    expect(
-      resolveOfflineChatMode({ navigatorOnLine: false }),
-    ).toEqual({ kind: "local" });
+    expect(resolveOfflineChatMode({ navigatorOnLine: false })).toEqual({
+      kind: "local",
+    });
   });
 
   it("offers fallback when online, post failed, model downloaded", () => {
@@ -30,8 +33,8 @@ describe("resolveOfflineChatMode", () => {
 
   it("stays on cloud when flag disabled", () => {
     vi.stubEnv("VITE_FEATURE_FLAGS", "");
-    expect(
-      resolveOfflineChatMode({ navigatorOnLine: false }),
-    ).toEqual({ kind: "cloud" });
+    expect(resolveOfflineChatMode({ navigatorOnLine: false })).toEqual({
+      kind: "cloud",
+    });
   });
 });

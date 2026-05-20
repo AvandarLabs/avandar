@@ -11,8 +11,8 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { InputTextForm, notifyError, notifySuccess } from "@ui";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { InputTextForm, notifyError, notifySuccess } from "@ui";
 import { useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { UserClient } from "@/clients/UserClient";

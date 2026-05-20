@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
-import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -15,8 +15,7 @@ import {
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 const SEEDED_SQL = "SELECT 1 AS mocked_column LIMIT 20";
-const PANEL_PREFERENCES_STORAGE_KEY =
-  "ava.data-explorer.panel-preferences";
+const PANEL_PREFERENCES_STORAGE_KEY = "ava.data-explorer.panel-preferences";
 
 async function _goToDataExplorerWithSeededSQL(options: {
   page: import("@playwright/test").Page;

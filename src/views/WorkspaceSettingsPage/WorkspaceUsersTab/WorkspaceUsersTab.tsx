@@ -19,10 +19,10 @@ import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
-import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
-import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
+import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 /**

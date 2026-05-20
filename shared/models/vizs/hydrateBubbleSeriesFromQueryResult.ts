@@ -34,7 +34,9 @@ export function hydrateBubbleSeriesFromQueryResult<
   );
 
   let nextSeries: BubbleSeries[] = currVizConfig.series.filter((s) => {
-    return colNames.has(s.xKey) && colNames.has(s.key) && colNames.has(s.sizeKey);
+    return (
+      colNames.has(s.xKey) && colNames.has(s.key) && colNames.has(s.sizeKey)
+    );
   });
 
   if (nextSeries.length === 0) {

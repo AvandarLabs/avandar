@@ -1,4 +1,8 @@
-import type { ChatClarifyRequest, ChatGeneratedSQL, ChatPageContext  } from "$/types/chat.types";
+import type {
+  ChatClarifyRequest,
+  ChatGeneratedSQL,
+  ChatPageContext,
+} from "$/types/chat.types";
 
 /** Compact schema slice sent to offline prompts. */
 export type OfflineChatSchemaDataset = {

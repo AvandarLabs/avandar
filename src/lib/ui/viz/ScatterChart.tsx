@@ -2,8 +2,8 @@ import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { ScatterChartSeries } from "@mantine/charts";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { UnknownDataFrame } from "@utils";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
@@ -23,7 +23,8 @@ export function ScatterChart({
 }: Props): JSX.Element {
   const scatterSeries: ScatterChartSeries[] = useMemo(() => {
     return series.map((s, idx) => {
-      const color = s.color ?? CHART_COLOR_SWATCHES[idx % CHART_COLOR_SWATCHES.length]!;
+      const color =
+        s.color ?? CHART_COLOR_SWATCHES[idx % CHART_COLOR_SWATCHES.length]!;
       const points = data
         .map((row) => {
           const rowObject = row as Record<string, unknown>;

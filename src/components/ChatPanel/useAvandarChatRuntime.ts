@@ -4,6 +4,7 @@ import { isNotNull, prop } from "@utils";
 import { useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
+import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
@@ -11,6 +12,13 @@ import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
+import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
+import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
+import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
+import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
+import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
+import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
+import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
@@ -23,14 +31,6 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse";
-import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
-import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
-import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
-import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
-import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
-import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
-import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { User } from "$/models/User/User";
 import type {
@@ -225,8 +225,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             }
           }
           const prompt =
-            [...apiMessages].reverse().find((message) => {return message.role === "user"})
-              ?.content ?? "";
+            [...apiMessages].reverse().find((message) => {
+              return message.role === "user";
+            })?.content ?? "";
           dataExplorerDispatch.setRawSql(sql);
           dataExplorerDispatch.setNlPrompt(prompt);
           try {
@@ -311,7 +312,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 if (questionBias.hits.length > 0) {
                   console.warn(
                     "[chat] LLM clarification trips bias detector — passing through for v1:",
-                    questionBias.hits.map((hit) => {return hit.label}),
+                    questionBias.hits.map((hit) => {
+                      return hit.label;
+                    }),
                   );
                 }
                 return recordShown({

@@ -23,9 +23,7 @@ export function openFileImportFlow(
     centered: true,
     children: (
       <Stack mt="md">
-        <Text>
-          {t`Do you want to import "${file.name}" as a new dataset?`}
-        </Text>
+        <Text>{t`Do you want to import "${file.name}" as a new dataset?`}</Text>
       </Stack>
     ),
     onConfirm: () => {

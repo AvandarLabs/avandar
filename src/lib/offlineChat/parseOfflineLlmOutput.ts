@@ -27,7 +27,9 @@ export function parseAnalyzeJson(
     const clarifyOptions =
       Array.isArray(parsed.clarifyOptions) ?
         parsed.clarifyOptions
-          .filter((option): option is string => {return typeof option === "string"})
+          .filter((option): option is string => {
+            return typeof option === "string";
+          })
           .slice(0, 6)
       : undefined;
     return {

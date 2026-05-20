@@ -20,7 +20,11 @@ export function createMockOfflineChatEngine(
       // no-op
     },
     async complete(request: OfflineChatCompletionRequest): Promise<string> {
-      const blob = request.messages.map((message) => {return message.content}).join("\n");
+      const blob = request.messages
+        .map((message) => {
+          return message.content;
+        })
+        .join("\n");
       for (const entry of scripted) {
         const matches =
           typeof entry.match === "string" ?

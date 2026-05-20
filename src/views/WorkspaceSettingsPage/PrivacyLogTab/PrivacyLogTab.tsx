@@ -393,9 +393,9 @@ function ClarificationLogPanel(): JSX.Element {
         </Title>
         <Text size="sm" c="dimmed">
           <Trans>
-            A local record of every clarifying question the AI has asked in
-            this workspace. Only metadata is stored — never the question text
-            or your answer.
+            A local record of every clarifying question the AI has asked in this
+            workspace. Only metadata is stored — never the question text or your
+            answer.
           </Trans>
         </Text>
       </Stack>

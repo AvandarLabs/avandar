@@ -66,9 +66,7 @@ export function SaveToDashboardListMode({
     if (!selectedDashboardId) {
       return;
     }
-    const targetDashboard = dashboards.find(
-      propEq("id", selectedDashboardId),
-    );
+    const targetDashboard = dashboards.find(propEq("id", selectedDashboardId));
     if (!targetDashboard) {
       return;
     }

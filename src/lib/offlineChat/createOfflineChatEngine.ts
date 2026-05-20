@@ -2,8 +2,8 @@ import { createMockOfflineChatEngine } from "./createMockOfflineChatEngine";
 import { createWebLLMOfflineChatEngine } from "./createWebLLMOfflineChatEngine";
 import { isOfflineChatMockForced } from "./isOfflineChatEnabled";
 import type { MockOfflineChatResponse } from "./createMockOfflineChatEngine";
-import type { OfflineChatEngine } from "./offlineChat.types";
 import type { LocalChatModelId } from "./localChatModelCatalog";
+import type { OfflineChatEngine } from "./offlineChat.types";
 
 declare global {
   interface Window {
@@ -27,13 +27,11 @@ export function createOfflineChatEngine(args: {
       script ?? [
         {
           match: "offline assistant",
-          response:
-            '{"summary":"Mock analyze","proceed":true}',
+          response: '{"summary":"Mock analyze","proceed":true}',
         },
         {
           match: "DuckDB SQL generator",
-          response:
-            "Here is the query.\n```sql\nSELECT 1 AS mock_offline\n```",
+          response: "Here is the query.\n```sql\nSELECT 1 AS mock_offline\n```",
         },
       ],
     );

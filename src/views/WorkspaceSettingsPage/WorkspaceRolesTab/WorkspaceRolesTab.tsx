@@ -18,9 +18,9 @@ import { Permissions } from "$/models/Permissions/Permissions";
 import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
-import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { partition } from "@/lib/utils/arrays/partition/partition";
+import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type {
   BuiltinPresetType,

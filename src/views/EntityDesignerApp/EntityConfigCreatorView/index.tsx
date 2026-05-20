@@ -11,9 +11,13 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { makeSelectOptions, Select, Paper  } from "@ui";
+import { makeSelectOptions, Paper, Select } from "@ui";
 import { isDefined, prop, propEq, setValue } from "@utils";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DatasetColumnFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
 import { EntityConfigCreatorStore } from "@/views/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import {
@@ -26,10 +30,6 @@ import {
 } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock";
 import { useSubmitEntityCreatorForm } from "@/views/EntityDesignerApp/EntityConfigCreatorView/useSubmitEntityCreatorForm";
-import { AppLinks } from "@/config/AppLinks";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 

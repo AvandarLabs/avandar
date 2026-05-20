@@ -90,18 +90,6 @@ export function ChatEmptyState(): JSX.Element {
 
   const suggestions = useMemo(() => {
     const fallbackTarget = t`your dataset`;
-    if (context.app === "dashboards") {
-      const target = suggestionTarget?.name ?? fallbackTarget;
-      return [
-        t`Add a bar chart of ${target} grouped by category`,
-        t`Add a line chart showing trends in ${target} over time`,
-        t`Add a table of the top 10 rows of ${target}`,
-      ];
-    }
-    if (context.app !== "data-explorer") {
-      return [];
-    }
-
     const datasetName = suggestionTarget?.name ?? fallbackTarget;
     const columns = datasetColumns ?? [];
     const cachedSummaries =
@@ -114,28 +102,43 @@ export function ChatEmptyState(): JSX.Element {
         })
       : new Map();
 
+    if (context.app === "dashboards") {
+      const groupByColumn = pickGroupByColumn(columns, cachedSummaries);
+      return [
+        groupByColumn ?
+          t`Add a bar chart of ${datasetName} grouped by ${groupByColumn}`
+        : t`Add a bar chart of row counts in ${datasetName}`,
+        t`Add a line chart showing trends in ${datasetName} over time`,
+        t`Add a table of the top 10 rows of ${datasetName}`,
+      ];
+    }
+    if (context.app !== "data-explorer") {
+      return [];
+    }
+
     const pickedGroupBy = pickGroupByColumn(columns, cachedSummaries);
-    const groupByColumn = pickedGroupBy ?? "category";
     const averageColumn = pickAverageColumn(columns);
 
-    const prompts = [
-      t`Show the first 20 rows of ${datasetName}`,
-      t`Count rows in ${datasetName} by ${groupByColumn}`,
-    ];
+    const prompts = [t`Show the first 20 rows of ${datasetName}`];
+
+    if (pickedGroupBy) {
+      prompts.push(t`Count rows in ${datasetName} by ${pickedGroupBy}`);
+    } else {
+      prompts.push(t`Count how many rows there are in ${datasetName}`);
+    }
 
     if (averageColumn) {
       prompts.push(t`What is the average ${averageColumn} in ${datasetName}?`);
-    } else {
-      const secondGroupBy =
-        pickGroupByColumn(columns, cachedSummaries, {
-          excludeColumnNames: pickedGroupBy ? [pickedGroupBy] : [],
-        }) ?? groupByColumn;
-      if (secondGroupBy === groupByColumn) {
-        prompts.push(
-          t`What are the distinct values of ${groupByColumn} in ${datasetName}?`,
-        );
-      } else {
+    } else if (pickedGroupBy) {
+      const secondGroupBy = pickGroupByColumn(columns, cachedSummaries, {
+        excludeColumnNames: [pickedGroupBy],
+      });
+      if (secondGroupBy) {
         prompts.push(t`Count rows in ${datasetName} by ${secondGroupBy}`);
+      } else {
+        prompts.push(
+          t`What are the distinct values of ${pickedGroupBy} in ${datasetName}?`,
+        );
       }
     }
 

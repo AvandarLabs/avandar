@@ -3,9 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import { Tooltip,
-  SegmentedControl,
-  SegmentedControlItem } from "@ui";
+import { SegmentedControl, SegmentedControlItem, Tooltip } from "@ui";
 import {
   MapStyleKey,
   MapStyleKeys,

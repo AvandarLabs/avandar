@@ -1,5 +1,5 @@
-import type { ChatPageContext } from "$/types/chat.types";
 import type { OfflineChatSchema } from "./offlineChat.types";
+import type { ChatPageContext } from "$/types/chat.types";
 
 function formatSchema(schema: OfflineChatSchema): string {
   const datasetLines = schema.datasets

@@ -1,9 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
+import { NavLinkList } from "@ui";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@ui";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {

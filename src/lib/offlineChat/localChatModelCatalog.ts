@@ -26,7 +26,8 @@ export const LOCAL_CHAT_MODELS: readonly LocalChatModel[] = [
     id: "llama-1b",
     mlcModelId: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
     displayName: "Llama 3.2 1B (offline)",
-    description: "Smallest offline model. Faster download, weaker on complex SQL.",
+    description:
+      "Smallest offline model. Faster download, weaker on complex SQL.",
     approxSizeMb: 600,
     recommendedFor8Gb: true,
   },

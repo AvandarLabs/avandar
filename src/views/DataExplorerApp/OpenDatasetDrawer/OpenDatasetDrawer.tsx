@@ -112,9 +112,18 @@ export function OpenDatasetDrawer({
           // The shared Drawer wrapper paints a left border for right-anchored
           // drawers. Replace it with the border that hugs the anchored edge.
           borderLeft: position === "right" ? undefined : "none",
-          borderRight: position === "left" ? "1px solid var(--ava-border-default)" : undefined,
-          borderTop: position === "bottom" ? "1px solid var(--ava-border-default)" : undefined,
-          borderBottom: position === "top" ? "1px solid var(--ava-border-default)" : undefined,
+          borderRight:
+            position === "left" ?
+              "1px solid var(--ava-border-default)"
+            : undefined,
+          borderTop:
+            position === "bottom" ?
+              "1px solid var(--ava-border-default)"
+            : undefined,
+          borderBottom:
+            position === "top" ?
+              "1px solid var(--ava-border-default)"
+            : undefined,
           ...(withOverlay ? null : { pointerEvents: "auto" }),
         },
       }}

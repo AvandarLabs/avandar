@@ -44,6 +44,7 @@ create index idx_dashboards__slug on public.dashboards (slug);
 -- when `is_public = true` so vanity URLs like `/d/<slug>` resolve to at
 -- most one dashboard. Publishing with a colliding slug therefore fails at
 -- the DB level if the frontend check has been bypassed.
-create unique index dashboards__slug_unique_when_public
-  on public.dashboards (slug)
-  where is_public = true and slug is not null;
+create unique index dashboards__slug_unique_when_public on public.dashboards (slug)
+where
+  is_public = true and
+  slug is not null;

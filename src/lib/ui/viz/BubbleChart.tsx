@@ -10,17 +10,20 @@ import { useMemo } from "react";
 import {
   CartesianGrid,
   Legend,
+  ScatterChart as RechartsScatterChart,
   ResponsiveContainer,
   Scatter,
-  ScatterChart as RechartsScatterChart,
   Tooltip,
   XAxis,
   YAxis,
   ZAxis,
 } from "recharts";
-import { BUBBLE_SIZE_RANGE, CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import {
+  BUBBLE_SIZE_RANGE,
+  CHART_COLOR_SWATCHES,
+} from "@/lib/ui/viz/ChartConstants";
 import type { UnknownDataFrame } from "@utils";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
@@ -34,7 +37,11 @@ type Props = {
  * `xKey`, `key` (Y), and `sizeKey` so completely unrelated metric triples
  * can be compared on the same canvas.
  */
-export function BubbleChart({ data, series, height = 500 }: Props): JSX.Element {
+export function BubbleChart({
+  data,
+  series,
+  height = 500,
+}: Props): JSX.Element {
   const seriesData = useMemo(() => {
     return series.map((s) => {
       const points = data
@@ -62,16 +69,21 @@ export function BubbleChart({ data, series, height = 500 }: Props): JSX.Element 
   return (
     <Box h={height} w="100%">
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsScatterChart margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
+        <RechartsScatterChart
+          margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
+        >
           <CartesianGrid />
           <XAxis dataKey="x" type="number" name="x" />
           <YAxis dataKey="y" type="number" name="y" />
           <ZAxis dataKey="z" type="number" range={BUBBLE_SIZE_RANGE} />
           <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-          {showLegend ? <Legend /> : null}
+          {showLegend ?
+            <Legend />
+          : null}
           {seriesData.map(({ series: s, points }, idx) => {
             const color =
-              s.color ?? CHART_COLOR_SWATCHES[idx % CHART_COLOR_SWATCHES.length]!;
+              s.color ??
+              CHART_COLOR_SWATCHES[idx % CHART_COLOR_SWATCHES.length]!;
             return (
               <Scatter
                 key={`${s.key}-${idx}`}

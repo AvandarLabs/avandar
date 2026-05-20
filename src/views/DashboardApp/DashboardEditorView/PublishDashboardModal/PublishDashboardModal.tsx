@@ -219,9 +219,9 @@ export function PublishDashboardModal({
       : <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
           <Text size="sm">
             <Trans>
-              Publishing makes this dashboard viewable by anyone with the link
-              — no Avandar account required. Datasets referenced by the
-              dashboard are copied to public storage at publish time.
+              Publishing makes this dashboard viewable by anyone with the link —
+              no Avandar account required. Datasets referenced by the dashboard
+              are copied to public storage at publish time.
             </Trans>
           </Text>
         </Alert>

@@ -118,9 +118,7 @@ test.describe("Dashboard PDF export — table visualization", () => {
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
       await page.getByRole("button", { name: "Export PDF" }).click();
-      await page
-        .getByRole("button", { name: "Annotate, then export" })
-        .click();
+      await page.getByRole("button", { name: "Annotate, then export" }).click();
 
       // The annotation canvas mounts as an <img alt="Dashboard snapshot">
       // (the captured frame) plus the overlay <canvas>. Asserting the image

@@ -1,11 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useNavigate } from "@tanstack/react-router";
 import { Model } from "@models";
+import { useNavigate } from "@tanstack/react-router";
 import { notifyError } from "@ui";
-import { useMemo, useState } from "react";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
+import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -92,10 +92,7 @@ export function SaveToDashboardModal({
   // loading, in case we initialised assuming "empty" while the query was
   // still in-flight. Only do this if the user has not interacted yet.
   const shouldAutoSwitchToList =
-    !isInitialLoading &&
-    hasDashboards &&
-    mode === "create" &&
-    !enteredFromList;
+    !isInitialLoading && hasDashboards && mode === "create" && !enteredFromList;
   if (shouldAutoSwitchToList) {
     setMode("list");
   }

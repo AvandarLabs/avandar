@@ -1,5 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Card, FileButton, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconUpload } from "@tabler/icons-react";

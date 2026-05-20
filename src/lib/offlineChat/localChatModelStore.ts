@@ -1,7 +1,5 @@
-import {
-  DEFAULT_LOCAL_CHAT_MODEL_ID,
-  type LocalChatModelId,
-} from "./localChatModelCatalog";
+import { DEFAULT_LOCAL_CHAT_MODEL_ID } from "./localChatModelCatalog";
+import type { LocalChatModelId } from "./localChatModelCatalog";
 
 const SELECTED_MODEL_KEY = "avandar.offlineChat.selectedModelId";
 const DOWNLOADED_MODELS_KEY = "avandar.offlineChat.downloadedModels";

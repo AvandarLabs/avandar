@@ -210,12 +210,14 @@ export async function exportPlanCanvasAsPdf(args: {
             Text,
             { key: "schema", style: styles.schema },
             (() => {
-              const cols = node.actualSchema!
-                .map((c) => {
+              const cols = node
+                .actualSchema!.map((c) => {
                   return `${c.name}:${c.type}`;
                 })
                 .join(", ");
-              return translate ? translate`columns: ${cols}` : `columns: ${cols}`;
+              return translate ?
+                  translate`columns: ${cols}`
+                : `columns: ${cols}`;
             })(),
           )
         : null,
@@ -244,9 +246,8 @@ export async function exportPlanCanvasAsPdf(args: {
         React.createElement(
           Text,
           { key: "t", style: styles.title },
-          args.datasetName ?? (translate ? translate`Analytic plan` : (
-            "Analytic plan"
-          )),
+          args.datasetName ??
+            (translate ? translate`Analytic plan` : "Analytic plan"),
         ),
         React.createElement(
           Text,

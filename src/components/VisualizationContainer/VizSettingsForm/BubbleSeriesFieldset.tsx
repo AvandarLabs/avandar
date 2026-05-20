@@ -12,8 +12,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { makeSelectOptions, Select } from "@ui";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -31,7 +31,11 @@ type Props = {
  * An "Add series" button appends a new entry seeded from the first three unused
  * numeric columns.
  */
-export function BubbleSeriesFieldset({ fields, series, onChange }: Props): JSX.Element {
+export function BubbleSeriesFieldset({
+  fields,
+  series,
+  onChange,
+}: Props): JSX.Element {
   const { t } = useLingui();
 
   const numericFields = useMemo(() => {
@@ -41,7 +45,10 @@ export function BubbleSeriesFieldset({ fields, series, onChange }: Props): JSX.E
   }, [fields]);
 
   const numericOptions = useMemo(() => {
-    return makeSelectOptions(numericFields, { valueKey: "name", labelKey: "name" });
+    return makeSelectOptions(numericFields, {
+      valueKey: "name",
+      labelKey: "name",
+    });
   }, [numericFields]);
 
   const addSeries = useCallback(() => {
@@ -71,9 +78,11 @@ export function BubbleSeriesFieldset({ fields, series, onChange }: Props): JSX.E
 
   const removeAt = useCallback(
     (idx: number) => {
-      onChange(series.filter((_, i) => {
-        return i !== idx;
-      }));
+      onChange(
+        series.filter((_, i) => {
+          return i !== idx;
+        }),
+      );
     },
     [series, onChange],
   );
@@ -121,7 +130,11 @@ export function BubbleSeriesFieldset({ fields, series, onChange }: Props): JSX.E
             >
               <Stack gap="xs">
                 <Group justify="space-between" wrap="nowrap">
-                  <Group gap="xs" style={{ flex: 1, minWidth: 0 }} wrap="nowrap">
+                  <Group
+                    gap="xs"
+                    style={{ flex: 1, minWidth: 0 }}
+                    wrap="nowrap"
+                  >
                     <Select
                       allowDeselect={false}
                       label={t`X column`}

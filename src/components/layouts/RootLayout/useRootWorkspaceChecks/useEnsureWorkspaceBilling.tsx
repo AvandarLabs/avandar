@@ -3,8 +3,8 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
 /**
  * Hook to ensure that the workspace has a billing setup.

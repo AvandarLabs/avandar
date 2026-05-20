@@ -31,20 +31,21 @@ export function truncateSchemaForOffline(
       return dataset.id === preferredDatasetId;
     });
 
-  const orderedDatasetIds = hasPreferred ?
-    [
-      preferredDatasetId,
-      ...datasets
-        .map((dataset) => {
-          return dataset.id;
-        })
-        .filter((id) => {
-          return id !== preferredDatasetId;
-        }),
-    ]
-  : datasets.map((dataset) => {
-      return dataset.id;
-    });
+  const orderedDatasetIds =
+    hasPreferred ?
+      [
+        preferredDatasetId,
+        ...datasets
+          .map((dataset) => {
+            return dataset.id;
+          })
+          .filter((id) => {
+            return id !== preferredDatasetId;
+          }),
+      ]
+    : datasets.map((dataset) => {
+        return dataset.id;
+      });
 
   const columns: OfflineChatSchemaColumn[] = [];
   for (const datasetId of orderedDatasetIds) {
@@ -62,7 +63,9 @@ export function truncateSchemaForOffline(
   }
 
   const datasetIdSet = new Set(
-    columns.map((column) => {return column.dataset_id}),
+    columns.map((column) => {
+      return column.dataset_id;
+    }),
   );
   const trimmedDatasets: OfflineChatSchemaDataset[] = datasets.filter((d) => {
     return datasetIdSet.has(d.id);

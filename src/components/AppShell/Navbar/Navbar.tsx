@@ -22,6 +22,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
+import { Link } from "@ui";
 import { APP_NAME } from "$/config/AppConfig";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -31,7 +32,6 @@ import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { Link } from "@ui";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -220,9 +220,7 @@ export function Navbar({
               : null}
 
               <Menu.Item
-                leftSection={
-                  <IconLogout size={16} stroke={1.5} aria-hidden />
-                }
+                leftSection={<IconLogout size={16} stroke={1.5} aria-hidden />}
                 rightSection={isSignOutPending ? <Loader size={14} /> : null}
                 onClick={() => {
                   sendSignOutRequest();

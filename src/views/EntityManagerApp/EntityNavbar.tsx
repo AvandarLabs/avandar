@@ -9,12 +9,12 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { NavLinkList } from "@ui";
 import { constant, prop, where } from "@utils";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@ui";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {

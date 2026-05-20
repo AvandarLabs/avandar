@@ -35,7 +35,12 @@ function SettingsPanelHarness({ onRequestClose }: HarnessProps): JSX.Element {
 
   return (
     <>
-      <Button ref={settingsButtonRef} onClick={() => setOpened(true)}>
+      <Button
+        ref={settingsButtonRef}
+        onClick={() => {
+          return setOpened(true);
+        }}
+      >
         Settings
       </Button>
       <FloatingPanel

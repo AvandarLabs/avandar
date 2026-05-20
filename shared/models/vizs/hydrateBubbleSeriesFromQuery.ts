@@ -22,10 +22,9 @@ type BubbleSeriesConfig = {
  * @param query The structured query to hydrate from.
  * @returns Updated config with stale series pruned and defaults seeded.
  */
-export function hydrateBubbleSeriesFromQuery<VConfig extends BubbleSeriesConfig>(
-  currVizConfig: VConfig,
-  query: PartialStructuredQuery,
-): VConfig {
+export function hydrateBubbleSeriesFromQuery<
+  VConfig extends BubbleSeriesConfig,
+>(currVizConfig: VConfig, query: PartialStructuredQuery): VConfig {
   const { queryColumns } = query;
   const columnNames = new Set(
     queryColumns.map((c) => {

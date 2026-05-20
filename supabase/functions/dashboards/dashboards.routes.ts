@@ -1,7 +1,4 @@
-import {
-  defineRoutes,
-  POST,
-} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { z } from "zod";
 import type { DashboardsAPI } from "@sbfn/dashboards/dashboards.routes.types.ts";
 

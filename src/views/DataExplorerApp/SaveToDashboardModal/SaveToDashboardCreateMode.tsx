@@ -1,5 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Anchor, Button, Group, Text, TextInput, ThemeIcon } from "@mantine/core";
+import {
+  Anchor,
+  Button,
+  Group,
+  Text,
+  TextInput,
+  ThemeIcon,
+} from "@mantine/core";
 import { IconArrowLeft, IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";
@@ -71,12 +78,7 @@ export function SaveToDashboardCreateMode({
 
       <Group justify="space-between" mt="xs">
         {onBack ?
-          <Anchor
-            component="button"
-            type="button"
-            size="sm"
-            onClick={onBack}
-          >
+          <Anchor component="button" type="button" size="sm" onClick={onBack}>
             <Group gap={4} wrap="nowrap">
               <IconArrowLeft size={14} />
               <span>

@@ -12,6 +12,9 @@ import { useRouter } from "@tanstack/react-router";
 import { notifyExpiredSession } from "@ui";
 import { useState } from "react";
 import { match } from "ts-pattern";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
@@ -23,9 +26,6 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import type {
   FreePlanVariants,
   FreeSubscriptionPlanGroup,

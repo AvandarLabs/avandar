@@ -17,10 +17,9 @@ type ScatterSeriesConfig = {
  * @param query The structured query to hydrate from.
  * @returns Updated config with stale series pruned and defaults seeded.
  */
-export function hydrateScatterSeriesFromQuery<VConfig extends ScatterSeriesConfig>(
-  currVizConfig: VConfig,
-  query: PartialStructuredQuery,
-): VConfig {
+export function hydrateScatterSeriesFromQuery<
+  VConfig extends ScatterSeriesConfig,
+>(currVizConfig: VConfig, query: PartialStructuredQuery): VConfig {
   const { queryColumns } = query;
   const columnNames = new Set(
     queryColumns.map((c) => {

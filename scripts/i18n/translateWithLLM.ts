@@ -187,11 +187,9 @@ export function serializePo(parsed: ParsedPo): string {
  */
 export function entryMatchesScope(entry: PoEntry, scopes: string[]): boolean {
   if (scopes.length === 0) return true;
-  const refLines = entry.header
-    .split("\n")
-    .filter((l) => {
-      return l.startsWith("#:");
-    });
+  const refLines = entry.header.split("\n").filter((l) => {
+    return l.startsWith("#:");
+  });
   if (refLines.length === 0) return false;
   const refsText = refLines.join("\n");
   return scopes.some((s) => {
@@ -451,8 +449,7 @@ export async function processLocale(args: {
   const missing = parsed.entries.filter((e) => {
     return e.msgstr.trim() === "" && entryMatchesScope(e, scopes);
   });
-  const scopeNote =
-    scopes.length > 0 ? ` (scopes: ${scopes.join(", ")})` : "";
+  const scopeNote = scopes.length > 0 ? ` (scopes: ${scopes.join(", ")})` : "";
   console.log(
     `\n[${locale}] ${missing.length} missing of ${parsed.entries.length} entries${scopeNote}`,
   );

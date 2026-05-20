@@ -319,9 +319,7 @@ export const DashboardClient = createUsableServiceClient(
            * its existing slug still validates as available.
            */
           dashboardId?: Dashboard.Id;
-        }): Promise<
-          { isValid: true } | { isValid: false; reason: string }
-        > => {
+        }): Promise<{ isValid: true } | { isValid: false; reason: string }> => {
           const logger = config.clientLogger.appendName(
             "validateDashboardSlug",
           );

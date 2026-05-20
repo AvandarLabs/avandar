@@ -137,7 +137,13 @@ export const ScatterPlotVizConfigs = {
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries: BubbleSeries[] = vizConfig.series.map((s) => {
-          return { xKey: s.xKey, key: s.key, sizeKey: s.key, label: s.label, color: s.color };
+          return {
+            xKey: s.xKey,
+            key: s.key,
+            sizeKey: s.key,
+            label: s.label,
+            color: s.color,
+          };
         });
         return { vizType, series: bubbleSeries };
       })

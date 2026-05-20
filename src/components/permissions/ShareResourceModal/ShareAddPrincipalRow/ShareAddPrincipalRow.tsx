@@ -84,7 +84,9 @@ export function ShareAddPrincipalRow({
         onChange={setTarget}
         searchable
         nothingFoundMessage={
-          isEmptySource ? shareCopy.emptyState.noMembersOrTags : shareCopy.noMatches
+          isEmptySource ?
+            shareCopy.emptyState.noMembersOrTags
+          : shareCopy.noMatches
         }
         aria-label={t`Add people or user groups`}
       />

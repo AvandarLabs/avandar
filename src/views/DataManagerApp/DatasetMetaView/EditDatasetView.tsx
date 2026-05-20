@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { notifyError, notifySuccess, InputTextForm  } from "@ui";
+import { InputTextForm, notifyError, notifySuccess } from "@ui";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 

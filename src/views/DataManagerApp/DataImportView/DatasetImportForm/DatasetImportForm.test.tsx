@@ -149,15 +149,15 @@ describe("DatasetImportForm", () => {
     render(
       <I18nProvider i18n={i18n}>
         <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.csv"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={onDataSourceMetadataChange}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.csv"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={onDataSourceMetadataChange}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
       </I18nProvider>,
     );
 
@@ -178,15 +178,15 @@ describe("DatasetImportForm", () => {
     render(
       <I18nProvider i18n={i18n}>
         <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.xlsx"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={vi.fn()}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.xlsx"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={vi.fn()}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
       </I18nProvider>,
     );
 
@@ -201,15 +201,15 @@ describe("DatasetImportForm", () => {
     render(
       <I18nProvider i18n={i18n}>
         <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.xlsx"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={onDataSourceMetadataChange}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.xlsx"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={onDataSourceMetadataChange}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
       </I18nProvider>,
     );
 
@@ -252,8 +252,8 @@ describe("DatasetImportForm", () => {
     render(
       <I18nProvider i18n={i18n}>
         <AvandarUiProvider>
-        <ControlledMetadataHarness />
-      </AvandarUiProvider>
+          <ControlledMetadataHarness />
+        </AvandarUiProvider>
       </I18nProvider>,
     );
 

@@ -159,10 +159,10 @@ export function PublishSliceSection({
       </Group>
       <Text size="xs" c="dimmed">
         <Trans>
-          Choose how much of each dataset to publish. The default — "Only
-          what's queried" — uploads just the columns your visualizations read.
-          Widen the scope if you've added viewer-editable filters and want
-          viewers to be able to filter beyond your defaults.
+          Choose how much of each dataset to publish. The default — "Only what's
+          queried" — uploads just the columns your visualizations read. Widen
+          the scope if you've added viewer-editable filters and want viewers to
+          be able to filter beyond your defaults.
         </Trans>
       </Text>
 

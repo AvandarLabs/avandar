@@ -10,12 +10,12 @@ import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
-import { PurchaseSeatsModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
-import { WorkspaceInviteModalFields } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { PurchaseSeatsModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
+import { WorkspaceInviteModalFields } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type { WorkspaceInviteModalFieldsRef } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
 import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
@@ -151,8 +151,8 @@ export function useWorkspaceInviteModal({
               <Text>
                 <Trans>
                   Your workspace is on the Free plan, which supports up to 2
-                  seats. To invite more team members, upgrade to a paid plan
-                  for unlimited seats.
+                  seats. To invite more team members, upgrade to a paid plan for
+                  unlimited seats.
                 </Trans>
               </Text>
 

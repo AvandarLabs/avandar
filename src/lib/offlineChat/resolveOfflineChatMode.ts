@@ -1,5 +1,5 @@
-import { hasAnyDownloadedLocalChatModel } from "./localChatModelStore";
 import { isOfflineChatEnabled } from "./isOfflineChatEnabled";
+import { hasAnyDownloadedLocalChatModel } from "./localChatModelStore";
 import type { OfflineChatMode } from "./offlineChat.types";
 
 export function resolveOfflineChatMode(args: {

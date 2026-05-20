@@ -3,12 +3,12 @@ import { notifications } from "@mantine/notifications";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
-import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
+import { findLocalChatModel } from "@/lib/offlineChat/localChatModelCatalog";
 import {
   isLocalChatModelMarkedDownloaded,
   readStoredLocalChatModelId,
 } from "@/lib/offlineChat/localChatModelStore";
-import { findLocalChatModel } from "@/lib/offlineChat/localChatModelCatalog";
+import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 
 type Props = {
   disabled?: boolean;
@@ -75,9 +75,7 @@ export function OfflineChatDownloadControl({
   }
 
   const label =
-    isReady ?
-      "Offline chat model downloaded"
-    : "Download offline chat model";
+    isReady ? "Offline chat model downloaded" : "Download offline chat model";
 
   return (
     <Tooltip label={label}>

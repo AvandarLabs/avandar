@@ -1,4 +1,14 @@
-import { describe, expect, it, vi, type Mock } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import {
+  buildHelpText,
+  entryMatchesScope,
+  parseArgs,
+  parsePo,
+  serializePo,
+  translateBatch,
+} from "./translateWithLLM";
+import type { PoEntry } from "./translateWithLLM";
+import type { Mock } from "vitest";
 
 /**
  * vi.fn() doesn't include the static `preconnect` property that lives on
@@ -9,15 +19,6 @@ import { describe, expect, it, vi, type Mock } from "vitest";
 function fetchMock(impl: Mock): Mock & typeof fetch {
   return impl as unknown as Mock & typeof fetch;
 }
-import {
-  buildHelpText,
-  entryMatchesScope,
-  parseArgs,
-  parsePo,
-  serializePo,
-  translateBatch,
-  type PoEntry,
-} from "./translateWithLLM";
 
 describe("parseArgs", () => {
   it("returns help=true for --help", () => {
@@ -351,9 +352,7 @@ describe("translateBatch", () => {
 
     await expect(
       translateBatch({ ...baseArgs, fetchImpl: fetchMock(fetchImpl) }),
-    ).rejects.toThrow(
-      /OpenAI request failed \(401\)/,
-    );
+    ).rejects.toThrow(/OpenAI request failed \(401\)/);
   });
 
   it("throws when the model returns non-JSON content", async () => {
@@ -366,9 +365,7 @@ describe("translateBatch", () => {
 
     await expect(
       translateBatch({ ...baseArgs, fetchImpl: fetchMock(fetchImpl) }),
-    ).rejects.toThrow(
-      /Could not parse JSON/,
-    );
+    ).rejects.toThrow(/Could not parse JSON/);
   });
 
   it("drops non-string values from the model response", async () => {

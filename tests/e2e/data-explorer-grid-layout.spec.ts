@@ -97,7 +97,7 @@ test.describe("Data Explorer grid layout", () => {
         )?.replace(/\s+/g, " ");
       })
       .toContain("Page 2 of 2", {
-      timeout: MEDIUM_WAIT,
-    });
+        timeout: MEDIUM_WAIT,
+      });
   });
 });

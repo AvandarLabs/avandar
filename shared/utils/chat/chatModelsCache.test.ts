@@ -1,10 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import type { ChatModelsResponse } from "$/types/chat.types.ts";
 import {
   hasCachedChatModels,
   parseUseCacheFromURL,
   resolveChatModelsResponse,
 } from "$/utils/chat/chatModelsCache.ts";
+import { describe, expect, it, vi } from "vitest";
+import type { ChatModelsResponse } from "$/types/chat.types.ts";
 
 const FILLED_RESPONSE: ChatModelsResponse = {
   groups: [

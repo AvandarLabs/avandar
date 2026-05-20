@@ -224,7 +224,9 @@ export function QueryFiltersField({
     return (
       <Stack gap="xs">
         <Text size="sm" c="neutral.6">
-          <Trans>Add columns to the query above to start defining filters.</Trans>
+          <Trans>
+            Add columns to the query above to start defining filters.
+          </Trans>
         </Text>
       </Stack>
     );

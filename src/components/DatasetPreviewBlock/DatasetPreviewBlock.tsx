@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { ObjectDescriptionList, Callout  } from "@ui";
+import { Callout, ObjectDescriptionList } from "@ui";
 import { prop } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -51,11 +51,7 @@ export function DatasetPreviewBlock({
         {dataPreviewCalloutContents}
       </Callout>
       <DataGrid columnNames={columnNames} data={previewRows} />
-      <Callout
-        title={t`Column info`}
-        color="info"
-        message={dataColumnsMsg}
-      />
+      <Callout title={t`Column info`} color="info" message={dataColumnsMsg} />
       <ScrollArea h={500} type="auto">
         <ObjectDescriptionList
           data={columns}

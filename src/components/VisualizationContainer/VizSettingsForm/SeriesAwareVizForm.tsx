@@ -227,9 +227,11 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 axisKeyValue ?
                   t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
                 : t`Each series is a numeric column plotted on the radial value. Pick the category axis above.`
+
               : axisKeyValue ?
                 t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
               : t`Each series is a numeric column plotted on the Y axis. Pick the X axis above.`
+
             }
           >
             <IconInfoCircle

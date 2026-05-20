@@ -2,11 +2,11 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { hasCachedChatModels } from "$/utils/chat/chatModelsCache";
 import dotenv from "dotenv";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { hasCachedChatModels } from "$/utils/chat/chatModelsCache";
 import type { ChatModelsResponse } from "$/types/chat.types";
 
 const PROJECT_ROOT = path.resolve(
@@ -58,7 +58,9 @@ async function _writeChatModelsCache(
   response: ChatModelsResponse,
 ): Promise<void> {
   if (!hasCachedChatModels(response)) {
-    throw new Error("Refusing to overwrite chat models cache with an empty list");
+    throw new Error(
+      "Refusing to overwrite chat models cache with an empty list",
+    );
   }
 
   await fs.writeFile(

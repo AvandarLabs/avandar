@@ -5,12 +5,12 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
+import { Callout } from "@ui";
 import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { EntityConfigMetaView } from "@/views/EntityDesignerApp/EntityConfigMetaView";
-import { Callout } from "@ui";
 import { Logger } from "@/utils/Logger";
+import { EntityConfigMetaView } from "@/views/EntityDesignerApp/EntityConfigMetaView";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 export const Route = createFileRoute(

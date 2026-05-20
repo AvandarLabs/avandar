@@ -6,9 +6,9 @@ import clsx from "clsx";
 import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
-import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import css from "./Composer.module.css";
 
@@ -29,8 +29,7 @@ export function Composer(): JSX.Element {
   const disabled = !isChatEnabled;
 
   const placeholder =
-    context.app === "dashboards" ?
-      t`Ask me to add a chart to this dashboard...`
+    context.app === "dashboards" ? t`Ask me to add a chart to this dashboard...`
     : context.app === "data-explorer" ? t`Ask about your data...`
     : t`Chat is enabled in Data Explorer and Dashboards`;
 

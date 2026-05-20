@@ -1,9 +1,9 @@
 import { findLocalChatModel } from "./localChatModelCatalog";
+import type { LocalChatModelId } from "./localChatModelCatalog";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
 } from "./offlineChat.types";
-import type { LocalChatModelId } from "./localChatModelCatalog";
 
 type MlcEngine = {
   chat: {
