@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Code,
   Group,
   Paper,
   SegmentedControl,
@@ -27,6 +26,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { PlanAnnotationOverlay } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay";
+import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode.tsx";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
 import {
   clearAnnotationsForPlan,
@@ -631,9 +631,7 @@ function FocusedStepDetail({
           {node.description}
         </Text>
       </Group>
-      <Code block fz="xs">
-        {node.code}
-      </Code>
+      <PlanStepSqlCode code={node.code} />
       {node.error ?
         <Alert color="red" variant="light" radius="sm" p="xs">
           <Text size="xs" ff="monospace">

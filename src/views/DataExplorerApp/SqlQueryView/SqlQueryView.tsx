@@ -8,10 +8,10 @@ import {
   Paper,
   Stack,
   Text,
-  Textarea,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { TextareaForm } from "@ui";
+import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
+import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
 import { useState } from "react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -30,6 +30,7 @@ export function SqlQueryView(): JSX.Element {
     DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
+  const { catalog } = useSqlDisplayCatalog();
 
   const onSubmitSql = (rawValue: string): void => {
     const trimmedValue = rawValue.trim();
@@ -103,32 +104,24 @@ export function SqlQueryView(): JSX.Element {
       >
         <Stack gap="sm">
           {isEditMode ?
-            <TextareaForm
-              key={rawSQL}
-              defaultValue={rawSQL}
-              minRows={6}
-              autosize
-              showSubmitButton={true}
-              showCancelButton={true}
+            <SqlQueryEditPanel
+              initialSql={rawSQL}
+              catalog={catalog}
               submitButtonLabel={t`Re-run query`}
               cancelButtonLabel={t`Cancel`}
-              isSubmitting={false}
-              classNames={{ input: css.sqlEditInput }}
-              validateOnChange={true}
-              required={true}
-              disabledUntilDirty={true}
               onSubmit={onSubmitSql}
               onCancel={() => {
                 setIsEditMode(false);
               }}
             />
           : <Paper p="sm" className={css.sqlPaper}>
-              <Textarea
+              <SqlEditor
                 value={rawSQL}
+                onChange={() => {}}
+                catalog={catalog}
                 readOnly
                 minRows={6}
-                autosize
-                classNames={{ input: css.sqlReadOnlyInput }}
+                data-testid="sql-query-view-editor"
               />
             </Paper>
           }
