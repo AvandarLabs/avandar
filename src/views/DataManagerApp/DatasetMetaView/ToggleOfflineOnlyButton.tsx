@@ -10,6 +10,7 @@ import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -30,9 +31,7 @@ export function ToggleOfflineOnlyButton({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const offline = useOfflineGate(
-    "Changing offline-only status requires an internet connection.",
-  );
+  const offline = useOfflineGate();
   const sourceType = DatasetSource.getSourceType(dataSource);
 
   const [makeOfflineOnly, isMakeOfflinePending] = useMutation({
@@ -129,32 +128,35 @@ export function ToggleOfflineOnlyButton({
 
   return (
     <Stack gap={4} align="center">
-      <ActionIcon
-        tooltip={
-          isUploadPending ? t`Syncing dataset online...`
+      <OfflineGated isBlocked={offline.isBlocked}>
+        <ActionIcon
+          tooltip={
+            isUploadPending ? t`Syncing dataset online...`
+            : isInCloudStorage ?
+              t`This dataset is synced online. Click to make offline-only.`
+            : t`This dataset is offline-only. Click to allow online syncing.`
+          }
+          variant="default"
+          color="neutral"
+          aria-label={
+            isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
+          }
+          data-disabled={isPending || offline.isBlocked || undefined}
+          aria-disabled={isPending || offline.isBlocked}
+          onClick={onClick}
+        >
+          {isUploadPending ?
+            <Loader size={20} />
           : isInCloudStorage ?
-            t`This dataset is synced online. Click to make offline-only.`
-          : t`This dataset is offline-only. Click to allow online syncing.`
-        }
-        variant="default"
-        color="neutral"
-        aria-label={
-          isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
-        }
-        disabled={isPending || offline.isBlocked}
-        onClick={onClick}
-      >
-        {isUploadPending ?
-          <Loader size={20} />
-        : isInCloudStorage ?
-          <ThemeIcon variant="transparent" c="blue">
-            <IconWorld size={20} />
-          </ThemeIcon>
-        : <ThemeIcon variant="transparent" c="neutral.4">
-            <IconWorldOff size={20} />
-          </ThemeIcon>
-        }
-      </ActionIcon>
+            <ThemeIcon variant="transparent" c="blue">
+              <IconWorld size={20} />
+            </ThemeIcon>
+          : <ThemeIcon variant="transparent" c="neutral.4">
+              <IconWorldOff size={20} />
+            </ThemeIcon>
+          }
+        </ActionIcon>
+      </OfflineGated>
 
       {isUploadPending && uploadPercent !== undefined ?
         <Progress value={uploadPercent} w={80} size={4} />

@@ -30,8 +30,11 @@ import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -60,6 +63,7 @@ export function Navbar({
   currentWorkspace,
 }: Props): JSX.Element {
   const { t } = useLingui();
+  const isOnline = useIsOnline();
   const router = useRouter();
   const navigate = useNavigate();
   const user = useCurrentUser();
@@ -176,14 +180,16 @@ export function Navbar({
                   >
                     <Trans>Profile</Trans>
                   </Menu.Item>
-                  <Menu.Item
-                    leftSection={
-                      <IconPlus size={16} stroke={1.5} aria-hidden />
-                    }
-                    onClick={openCreateWorkspaceModal}
-                  >
-                    <Trans>Create Workspace</Trans>
-                  </Menu.Item>
+                  <OfflineGated isBlocked={!isOnline}>
+                    <Menu.Item
+                      leftSection={
+                        <IconPlus size={16} stroke={1.5} aria-hidden />
+                      }
+                      onClick={openCreateWorkspaceModal}
+                    >
+                      <Trans>Create Workspace</Trans>
+                    </Menu.Item>
+                  </OfflineGated>
                   {userWorkspaces && userWorkspaces?.length > 1 ?
                     <Menu.Sub>
                       <Menu.Sub.Target>
@@ -243,6 +249,33 @@ export function Navbar({
               return null;
             }
 
+            const isOfflineBlocked =
+              !isOnline && !isAppLinkAvailableOffline(link);
+            const linkContent = (
+              <Flex
+                px="xs"
+                py="xs"
+                bdrs="md"
+                align="center"
+                className={css.navbarLinkPill}
+              >
+                <Box mr="xs">{icon}</Box>
+                <Text span fw={500} className={css.collapsibleText}>
+                  {link.label}
+                </Text>
+              </Flex>
+            );
+
+            if (isOfflineBlocked) {
+              return (
+                <OfflineGated key={link.key} isBlocked>
+                  <Box component="span" display="block" w="100%">
+                    {linkContent}
+                  </Box>
+                </OfflineGated>
+              );
+            }
+
             return (
               <Link
                 key={link.key}
@@ -255,18 +288,7 @@ export function Navbar({
                   link.to === "/$workspaceSlug" ? { exact: true } : undefined
                 }
               >
-                <Flex
-                  px="xs"
-                  py="xs"
-                  bdrs="md"
-                  align="center"
-                  className={css.navbarLinkPill}
-                >
-                  <Box mr="xs">{icon}</Box>
-                  <Text span fw={500} className={css.collapsibleText}>
-                    {link.label}
-                  </Text>
-                </Flex>
+                {linkContent}
               </Link>
             );
           })}
@@ -275,6 +297,35 @@ export function Navbar({
         <Divider />
         <Stack gap={0} pb="xs" pos="relative">
           {utilityLinks.map(({ link, icon }) => {
+            const isOfflineBlocked =
+              !isOnline && !isAppLinkAvailableOffline(link);
+            const linkContent = (
+              <Flex
+                px="sm"
+                py="xs"
+                bdrs="md"
+                align="center"
+                className={css.navbarLinkPill}
+              >
+                <Group gap={0} wrap="nowrap">
+                  <Box mr="xs">{icon}</Box>
+                  <Text span fw={500} className={css.collapsibleText}>
+                    {link.label}
+                  </Text>
+                </Group>
+              </Flex>
+            );
+
+            if (isOfflineBlocked) {
+              return (
+                <OfflineGated key={link.key} isBlocked>
+                  <Box component="span" display="block" w="100%">
+                    {linkContent}
+                  </Box>
+                </OfflineGated>
+              );
+            }
+
             return (
               <Link
                 key={link.key}
@@ -290,20 +341,7 @@ export function Navbar({
                   link.to === "/$workspaceSlug" ? { exact: true } : undefined
                 }
               >
-                <Flex
-                  px="sm"
-                  py="xs"
-                  bdrs="md"
-                  align="center"
-                  className={css.navbarLinkPill}
-                >
-                  <Group gap={0} wrap="nowrap">
-                    <Box mr="xs">{icon}</Box>
-                    <Text span fw={500} className={css.collapsibleText}>
-                      {link.label}
-                    </Text>
-                  </Group>
-                </Flex>
+                {linkContent}
               </Link>
             );
           })}

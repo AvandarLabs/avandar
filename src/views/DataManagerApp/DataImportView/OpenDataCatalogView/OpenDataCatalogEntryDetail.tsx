@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
@@ -41,9 +42,7 @@ export function OpenDataCatalogEntryDetail({
   onAddToWorkspace,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const offline = useOfflineGate(
-    t`Adding a dataset from the catalog requires an internet connection.`,
-  );
+  const offline = useOfflineGate();
   if (!entry) {
     return (
       <Stack align="center" justify="center" mih={200} gap="xs">
@@ -67,28 +66,39 @@ export function OpenDataCatalogEntryDetail({
             {entry.displayName}
           </Title>
 
-          <Tooltip
-            label={
-              offline.isBlocked ? offline.tooltip : t`Add to your workspace`
-            }
-          >
-            <ActionIcon
-              aria-label={t`Add dataset to workspace`}
-              color="primary"
-              variant="filled"
-              size="lg"
-              loading={isAdding || isLoadingColumnMetadata}
-              disabled={
-                !isAddAllowed ||
-                isAdding ||
-                isLoadingColumnMetadata ||
-                offline.isBlocked
-              }
-              onClick={offline.guard(onAddToWorkspace)}
+          <OfflineGated isBlocked={offline.isBlocked}>
+            <Tooltip
+              label={t`Add to your workspace`}
+              disabled={offline.isBlocked}
             >
-              <IconPlus size={20} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                aria-label={t`Add dataset to workspace`}
+                color="primary"
+                variant="filled"
+                size="lg"
+                loading={isAdding || isLoadingColumnMetadata}
+                data-disabled={
+                  (
+                    !isAddAllowed ||
+                    isAdding ||
+                    isLoadingColumnMetadata ||
+                    offline.isBlocked
+                  ) ?
+                    true
+                  : undefined
+                }
+                aria-disabled={
+                  !isAddAllowed ||
+                  isAdding ||
+                  isLoadingColumnMetadata ||
+                  offline.isBlocked
+                }
+                onClick={offline.guard(onAddToWorkspace)}
+              >
+                <IconPlus size={20} />
+              </ActionIcon>
+            </Tooltip>
+          </OfflineGated>
         </Group>
 
         {!isAddAllowed ?

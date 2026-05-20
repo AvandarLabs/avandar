@@ -8,7 +8,6 @@ import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
-import { OfflineBanner } from "@/components/OfflineBanner/OfflineBanner";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
@@ -137,7 +136,6 @@ function WorkspaceLayoutContents({
       <DataExplorerStateManager.Provider>
         <DashboardEditorStateManager.Provider>
           <ChatPanelProvider>
-            <OfflineBanner />
             <AppDropzone>
               <AppShell
                 title={workspace.name}

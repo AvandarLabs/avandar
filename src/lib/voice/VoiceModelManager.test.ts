@@ -291,6 +291,54 @@ describe("VoiceModelManager", () => {
     );
   });
 
+  it("uses loading status when reloading a model that is already on device", async () => {
+    const cache = createInMemoryCache();
+    const modelPrefix = "https://huggingface.co/Xenova/whisper-tiny/";
+    cache.entries.set(`${modelPrefix}model.onnx`, new ArrayBuffer(8));
+
+    const pipelineFn = vi.fn().mockResolvedValue({ text: "hi" });
+    const buildPipeline = vi.fn().mockResolvedValue(pipelineFn);
+
+    window.localStorage.setItem(
+      "avandar.voice.downloadedModels",
+      JSON.stringify({ "whisper-tiny": true }),
+    );
+
+    const manager = __TEST_ONLY.createManagerForTest(
+      {
+        loadPipeline: async () => {
+          return buildPipeline;
+        },
+        configureEnv: async () => {
+          return undefined;
+        },
+      },
+      cache,
+    );
+
+    await manager.ensureModelLoaded("whisper-tiny");
+    await manager.releaseLoadedPipeline();
+
+    const isModelDownloadedSpy = vi
+      .spyOn(manager, "isModelDownloaded")
+      .mockResolvedValue(true);
+
+    const kinds: string[] = [];
+    manager.subscribe((status) => {
+      kinds.push(status.kind);
+    });
+
+    await manager.ensureModelLoaded("whisper-tiny");
+
+    expect(isModelDownloadedSpy).toHaveBeenCalled();
+    expect(kinds).toContain("loading");
+    expect(kinds).not.toContain("downloading");
+    expect(manager.getStatus()).toEqual({
+      kind: "ready",
+      modelId: "whisper-tiny",
+    });
+  });
+
   it("deleteModel clears the cache marker and unloads the in-memory pipeline", async () => {
     const cache = createInMemoryCache();
     const modelPrefix = "https://huggingface.co/Xenova/whisper-tiny/";

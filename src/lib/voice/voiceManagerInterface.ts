@@ -22,6 +22,10 @@ export type VoiceManagerStatus =
       phase: "files" | "loading";
       files: readonly VoiceDownloadFileEntry[];
     }
+  | {
+      kind: "loading";
+      modelId: VoiceModelId;
+    }
   | { kind: "ready"; modelId: VoiceModelId }
   | { kind: "transcribing"; modelId: VoiceModelId }
   | { kind: "error"; modelId?: VoiceModelId; message: string };

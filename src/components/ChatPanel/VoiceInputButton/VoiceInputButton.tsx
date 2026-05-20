@@ -14,7 +14,7 @@ import {
 import { notifications } from "@mantine/notifications";
 import {
   IconMicrophone,
-  IconMicrophoneOff,
+  IconPlayerStop,
   IconSettings,
   IconTrash,
   IconX,
@@ -28,6 +28,7 @@ import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { isOfflineChatEnabled } from "@/lib/offlineChat/isOfflineChatEnabled";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
+import { useDownloadedVoiceModels } from "@/lib/voice/useDownloadedVoiceModels";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
   hasStoredVoiceLanguage,
@@ -38,7 +39,6 @@ import {
 import {
   DEFAULT_VOICE_MODEL_ID,
   findVoiceModel,
-  listModelsForPlatform,
   VOICE_LANGUAGES,
   VOICE_MODELS,
   voiceLanguageForLocale,
@@ -136,11 +136,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const [selectedModelId, setSelectedModelId] = useState<VoiceModelId>(() => {
     return readStoredModelId();
   });
-  const [isModelReady, setIsModelReady] = useState(false);
-  const [hasAnyModelDownloaded, setHasAnyModelDownloaded] = useState(false);
-  const [downloadedModelIds, setDownloadedModelIds] = useState<
-    readonly VoiceModelId[]
-  >([]);
+  const {
+    downloadedModelIds,
+    hasAnyDownloaded: hasAnyModelDownloaded,
+    isSelectedModelDownloaded: isModelReady,
+    refresh: refreshDownloadState,
+  } = useDownloadedVoiceModels({ selectedModelId });
   const [deletingModelId, setDeletingModelId] = useState<VoiceModelId | null>(
     null,
   );
@@ -161,45 +162,6 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       setSelectedModelId(DEFAULT_VOICE_MODEL_ID);
     }
   }, [isDesktopPlatform, selectedModelId]);
-
-  const voicePlatform = isDesktopPlatform ? "desktop" : "web";
-
-  const refreshDownloadState = useCallback(async () => {
-    const platformModels = listModelsForPlatform(voicePlatform);
-    const downloadChecks = await Promise.all(
-      platformModels.map(async (model) => {
-        const downloaded = await manager.isModelDownloaded(model.id);
-        return { id: model.id, downloaded };
-      }),
-    );
-    const downloadedIds = downloadChecks
-      .filter((check) => {
-        return check.downloaded;
-      })
-      .map((check) => {
-        return check.id;
-      });
-    setDownloadedModelIds(downloadedIds);
-    const anyDownloaded = downloadedIds.length > 0;
-    setHasAnyModelDownloaded(anyDownloaded);
-    const selectedReady = downloadedIds.includes(selectedModelId);
-    setIsModelReady(selectedReady);
-    return { anyDownloaded, selectedReady, downloadedIds };
-  }, [manager, selectedModelId, voicePlatform]);
-
-  // Re-check local cache (IndexedDB on web, on-disk on desktop) whenever the
-  // selected model changes or after a successful download.
-  useEffect(() => {
-    let cancelled = false;
-    void refreshDownloadState().then(() => {
-      if (cancelled) {
-        return undefined;
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshDownloadState]);
 
   // Follow workspace locale only until the user picks a voice language in
   // settings (stored in localStorage, shared across tabs).
@@ -250,7 +212,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       setDeletingModelId(modelId);
       try {
         await manager.deleteModel(modelId);
-        const { anyDownloaded } = await refreshDownloadState();
+        const { hasAnyDownloaded: anyDownloaded } =
+          await refreshDownloadState();
         const model = findVoiceModel(modelId);
         notifications.show({
           title: t`Voice model removed`,
@@ -413,8 +376,12 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     : isModelReady ? t`Speak (local voice-to-text)`
     : t`Set up voice prompting`;
 
-  const Icon = isRecording ? IconMicrophoneOff : IconMicrophone;
+  const RecordIcon = isRecording ? IconPlayerStop : IconMicrophone;
   const selectedModel = findVoiceModel(selectedModelId);
+  const selectedLanguageLabel =
+    VOICE_LANGUAGES.find((entry) => {
+      return entry.code === language;
+    })?.label ?? language;
 
   const settingsDisabled = disabled || isTranscribing || isRecording;
   const micDisabled = disabled || isTranscribing;
@@ -569,19 +536,15 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                 <IconX size={16} />
               </ActionIcon>
             </Tooltip>
-            <Button
-              variant="light"
-              color="danger"
-              size="compact-sm"
-              aria-label={t`End recording`}
-              className={css.endRecording}
-              onClick={() => {
-                void stopRecordingAndTranscribe();
-              }}
-              disabled={disabled || isTranscribing}
+            <Text
+              size="xs"
+              c="neutral.6"
+              className={css.languageIndicator}
+              title={t`Transcription language: ${selectedLanguageLabel}`}
+              aria-label={t`Transcription language: ${selectedLanguageLabel}`}
             >
-              <Trans>End recording</Trans>
-            </Button>
+              {selectedLanguageLabel}
+            </Text>
           </>
         : null}
 
@@ -598,7 +561,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             loading={isTranscribing}
             className={clsx(css.button, isRecording && css.recording)}
           >
-            <Icon size={16} />
+            <RecordIcon size={16} />
           </ActionIcon>
         </Tooltip>
       </Group>

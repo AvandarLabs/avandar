@@ -87,6 +87,14 @@ vi.mock("@/lib/voice/useVoiceModelManager", () => {
   };
 });
 
+vi.mock("@/hooks/usePlatformInfo/usePlatformInfo", () => {
+  return {
+    usePlatformInfo: () => {
+      return "web";
+    },
+  };
+});
+
 vi.mock("@/lib/voice/audioCapture", () => {
   return {
     startMicrophoneRecording: startMicrophoneRecordingMock,
@@ -128,7 +136,7 @@ describe("VoiceInputButton", () => {
     startMicrophoneRecordingMock.mockReset();
   });
 
-  it("shows end recording and cancel controls while recording", async () => {
+  it("shows stop, language, and cancel controls while recording", async () => {
     isModelDownloadedMock.mockResolvedValue(true);
     startMicrophoneRecordingMock.mockResolvedValue({
       stop: vi.fn().mockResolvedValue(new Float32Array([0])),
@@ -147,11 +155,17 @@ describe("VoiceInputButton", () => {
     });
 
     expect(
-      await screen.findByRole("button", { name: /end recording/i }),
+      await screen.findByRole("button", { name: /stop and transcribe/i }),
     ).toBeInTheDocument();
     expect(
       await screen.findByRole("button", { name: /^cancel$/i }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/transcription language: english/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /end recording/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("discards audio when cancel is clicked during recording", async () => {
@@ -184,7 +198,7 @@ describe("VoiceInputButton", () => {
     expect(transcribeMock).not.toHaveBeenCalled();
     expect(composerSetText).not.toHaveBeenCalled();
     expect(
-      screen.queryByRole("button", { name: /end recording/i }),
+      screen.queryByRole("button", { name: /stop and transcribe/i }),
     ).not.toBeInTheDocument();
   });
 

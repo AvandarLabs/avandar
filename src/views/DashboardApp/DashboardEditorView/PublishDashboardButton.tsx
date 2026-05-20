@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
@@ -30,65 +31,61 @@ export function PublishDashboardButton({
   hasUnsavedChanges,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const offline = useOfflineGate(
-    t`Publishing requires an internet connection.`,
-  );
+  const offline = useOfflineGate();
   const isDisabled: boolean =
     !dashboard || hasUnsavedChanges || offline.isBlocked;
 
   return (
-    <Tooltip
-      label={
-        offline.isBlocked ?
-          offline.tooltip
-        : t`You cannot publish while there are unsaved changes. Save first.`
-      }
-      disabled={!hasUnsavedChanges && !offline.isBlocked}
-    >
-      <Button
-        size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
-        variant={dashboard?.isPublic ? "filled" : "outline"}
-        color={dashboard?.isPublic ? "teal" : undefined}
-        leftSection={<IconWorld size={16} />}
-        data-disabled={isDisabled || undefined}
-        aria-disabled={isDisabled || undefined}
-        onClick={(event) => {
-          if (offline.isBlocked) {
-            event.preventDefault();
-            return;
-          }
-          if (!dashboard) {
-            event.preventDefault();
-            notifyDevAlert("Dashboard is not loaded yet.");
-            return;
-          }
-          if (hasUnsavedChanges) {
-            event.preventDefault();
-            return;
-          }
-
-          const modalId = `publish-dashboard-${dashboard.id}`;
-          modals.open({
-            modalId,
-            title:
-              dashboard.isPublic ? t`Manage sharing` : t`Publish dashboard`,
-            size: "lg",
-            children: (
-              <PublishDashboardModal
-                dashboard={dashboard}
-                modalId={modalId}
-                onClose={() => {
-                  modals.close(modalId);
-                }}
-              />
-            ),
-          });
-        }}
+    <OfflineGated isBlocked={offline.isBlocked}>
+      <Tooltip
+        label={t`You cannot publish while there are unsaved changes. Save first.`}
+        disabled={!hasUnsavedChanges || offline.isBlocked}
       >
-        {dashboard?.isPublic ?
-          <Trans>Published</Trans>
-        : <Trans>Publish</Trans>}
-      </Button>
-    </Tooltip>
+        <Button
+          size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
+          variant={dashboard?.isPublic ? "filled" : "outline"}
+          color={dashboard?.isPublic ? "teal" : undefined}
+          leftSection={<IconWorld size={16} />}
+          data-disabled={isDisabled || undefined}
+          aria-disabled={isDisabled || undefined}
+          onClick={(event) => {
+            if (offline.isBlocked) {
+              event.preventDefault();
+              return;
+            }
+            if (!dashboard) {
+              event.preventDefault();
+              notifyDevAlert("Dashboard is not loaded yet.");
+              return;
+            }
+            if (hasUnsavedChanges) {
+              event.preventDefault();
+              return;
+            }
+
+            const modalId = `publish-dashboard-${dashboard.id}`;
+            modals.open({
+              modalId,
+              title:
+                dashboard.isPublic ? t`Manage sharing` : t`Publish dashboard`,
+              size: "lg",
+              children: (
+                <PublishDashboardModal
+                  dashboard={dashboard}
+                  modalId={modalId}
+                  onClose={() => {
+                    modals.close(modalId);
+                  }}
+                />
+              ),
+            });
+          }}
+        >
+          {dashboard?.isPublic ?
+            <Trans>Published</Trans>
+          : <Trans>Publish</Trans>}
+        </Button>
+      </Tooltip>
+    </OfflineGated>
   );
 }

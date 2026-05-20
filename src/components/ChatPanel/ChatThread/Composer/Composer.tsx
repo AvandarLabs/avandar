@@ -11,6 +11,7 @@ import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
 import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudChat";
+import { useIsVoicePromptAvailable } from "@/lib/voice/useIsVoicePromptAvailable";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
@@ -26,9 +27,13 @@ export function Composer(): JSX.Element {
   const context = useChatPageContext();
   const { t } = useLingui();
   const offlineBlocksCloudChat = useOfflineBlocksCloudChat();
+  const { isAvailable: isVoicePromptAvailable, isChecking: isVoiceChecking } =
+    useIsVoicePromptAvailable();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
-  const disabled = !isChatEnabled || offlineBlocksCloudChat;
+  const chatDisabled = !isChatEnabled || offlineBlocksCloudChat;
+  const voiceDisabled =
+    !isChatEnabled || (!isVoicePromptAvailable && !isVoiceChecking);
 
   const placeholder =
     offlineBlocksCloudChat ?
@@ -41,7 +46,7 @@ export function Composer(): JSX.Element {
   return (
     <div ref={panelRef} className={css.composerContainer}>
       <ComposerPrimitive.Root
-        className={clsx(css.composer, disabled && css.composerDisabled)}
+        className={clsx(css.composer, chatDisabled && css.composerDisabled)}
       >
         <ComposerPrimitive.Input
           ref={composerInputRef}
@@ -49,22 +54,22 @@ export function Composer(): JSX.Element {
           placeholder={placeholder}
           rows={1}
           autoFocus={false}
-          disabled={disabled}
+          disabled={chatDisabled}
           unstable_focusOnRunStart={false}
           unstable_focusOnScrollToBottom={false}
           unstable_focusOnThreadSwitched={false}
         />
         <Group gap="xs">
           <OfflineChatDownloadControl disabled={!isChatEnabled} />
-          <VoiceInputButton disabled={disabled} />
-          <ChatModelPicker disabled={disabled} />
+          <VoiceInputButton disabled={voiceDisabled} />
+          <ChatModelPicker disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon
               variant="filled"
               color="primary"
               size="md"
               aria-label={t`Send message`}
-              disabled={disabled}
+              disabled={chatDisabled}
               className={css.composerSend}
             >
               <IconArrowUp size={16} />

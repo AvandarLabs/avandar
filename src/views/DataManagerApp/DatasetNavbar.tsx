@@ -15,6 +15,7 @@ import { NavLinkList } from "@ui";
 import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
+import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/offline/useIsOnline";
@@ -34,6 +35,7 @@ function makeDatasetLink(options: {
   style?: NavLinkProps["style"];
   label?: NavLinkProps["label"];
   showOfflineBadge?: boolean;
+  isOfflineUnavailable?: boolean;
 }): NavLinkProps & { key: string } {
   const {
     workspaceSlug,
@@ -42,6 +44,7 @@ function makeDatasetLink(options: {
     style,
     label,
     showOfflineBadge,
+    isOfflineUnavailable = false,
   } = options;
   const link = {
     ...AppLinks.dataManagerDatasetView({
@@ -52,7 +55,13 @@ function makeDatasetLink(options: {
     style,
     label:
       label ??
-      (showOfflineBadge ?
+      (isOfflineUnavailable ?
+        <Tooltip label={<OfflineUnavailableTooltipLabel />}>
+          <Text size="sm" lineClamp={1} component="span" display="block">
+            {datasetName}
+          </Text>
+        </Tooltip>
+      : showOfflineBadge ?
         <Group gap="xs" wrap="nowrap" justify="space-between">
           <Text size="sm" lineClamp={1}>
             {datasetName}
@@ -69,8 +78,9 @@ function makeDatasetLink(options: {
     // Surface the async-import lifecycle on each dataset entry. The
     // indicator self-hides when the row is `parseStatus === "ready"`.
     rightSection: <DatasetParseStatusIndicator datasetId={datasetId} />,
+    disabled: isOfflineUnavailable,
   };
-  return link;
+  return link as NavLinkProps & { key: string };
 }
 
 export function DatasetNavbar({
@@ -96,12 +106,16 @@ export function DatasetNavbar({
 
     const datasetLinks = DatasetSource.SourceTypes.flatMap((sourceType) => {
       return (datasetsByType.get(sourceType) ?? []).map((dataset) => {
+        const isOfflineUnavailable =
+          !isOnline && !localDatasetIds.has(dataset.id);
+
         return makeDatasetLink({
           workspaceSlug,
           datasetId: dataset.id,
           datasetName: dataset.name,
           style: borderStyle,
           showOfflineBadge: !isOnline && localDatasetIds.has(dataset.id),
+          isOfflineUnavailable,
         });
       });
     });

@@ -45,8 +45,8 @@ function VoiceDownloadFileRow({
 
 /**
  * Floating panel anchored to the bottom-left while a voice model is
- * downloading and loading. Each HF asset gets its own progress row;
- * completed rows stay visible until the model is ready.
+ * downloading from the network. Cached reloads use
+ * `VoiceModelLoadingNotification` instead.
  */
 export function VoiceModelDownloadIndicator(): JSX.Element | null {
   const { t } = useLingui();

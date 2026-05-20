@@ -39,6 +39,7 @@ Random other features we should consider:
 - I think somewhere i had named a ts file with kebab case? Fix that. Only directories should be kebab case. Files should be camelCase or PascalCase always.
 - Allow multiple tabs in desktop
 - Allow multiple tabs in Chrome - multiple analysis tabs and dashboard tabs.
+- + button on tables to quickly add a new column with a calculation
 
 Avandar review:
 

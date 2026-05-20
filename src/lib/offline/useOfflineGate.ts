@@ -1,31 +1,31 @@
+import { useLingui } from "@lingui/react/macro";
 import { notifyError } from "@ui";
 import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 type Gate = {
-  /** True when offline: wire to a Button `disabled` prop. */
+  /** True when offline: wire to a Button `disabled` prop or `OfflineGated`. */
   isBlocked: boolean;
-  /** Tooltip text for a disabled control. */
-  tooltip: string;
   /**
    * Wrap an onClick handler so it short-circuits with a toast when offline.
    */
   guard: <T extends (...args: never[]) => unknown>(fn: T) => T;
 };
 
-export function useOfflineGate(
-  reason = "This action is not available offline.",
-): Gate {
+export function useOfflineGate(): Gate {
+  const { t } = useLingui();
   const isOnline = useIsOnline();
+  const offlineToastMessage = t`Unavailable offline`;
+
   return {
     isBlocked: !isOnline,
-    tooltip: reason,
-    guard: ((fn) =>
-      {return ((...args) => {
+    guard: ((fn) => {
+      return ((...args) => {
         if (!navigator.onLine) {
-          notifyError(reason);
+          notifyError(offlineToastMessage);
           return undefined;
         }
         return fn(...args);
-      }) as typeof fn}) as Gate["guard"],
+      }) as typeof fn;
+    }) as Gate["guard"],
   };
 }

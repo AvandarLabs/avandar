@@ -19,6 +19,7 @@ import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
@@ -67,9 +68,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   });
 
   const loadingSeats = pendingInvitesLoading || workspaceUsersLoading;
-  const offline = useOfflineGate(
-    t`Sending invites requires an internet connection.`,
-  );
+  const offline = useOfflineGate();
   const openInviteModal = useWorkspaceInviteModal({
     numberOfSeats:
       loadingSeats ? undefined : pendingInvites.length + workspaceUsers.length,
@@ -209,12 +208,16 @@ export function WorkspaceUsersTab(): JSX.Element | null {
             </Text>
           : <Box />}
           {isAdmin ?
-            <Button
-              disabled={loadingSeats || offline.isBlocked}
-              onClick={offline.guard(openInviteModal)}
-            >
-              <Trans>Invite member</Trans>
-            </Button>
+            <OfflineGated isBlocked={offline.isBlocked}>
+              <Button
+                data-disabled={loadingSeats || offline.isBlocked || undefined}
+                aria-disabled={loadingSeats || offline.isBlocked}
+                disabled={loadingSeats}
+                onClick={offline.guard(openInviteModal)}
+              >
+                <Trans>Invite member</Trans>
+              </Button>
+            </OfflineGated>
           : null}
         </Flex>
         <Table>

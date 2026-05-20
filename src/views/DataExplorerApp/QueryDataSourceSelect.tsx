@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { useIsOnline } from "@/lib/offline/useIsOnline";
@@ -191,9 +192,7 @@ export function QueryDataSourceSelect({
           <Group justify="space-between" wrap="nowrap">
             <Text size="sm">{option.label}</Text>
             {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
-              <Tooltip
-                label={t`Not available offline. Open this dataset while online to cache it.`}
-              >
+              <Tooltip label={<OfflineUnavailableTooltipLabel />}>
                 <Badge size="xs" color="red" variant="light">
                   <Trans>Not offline</Trans>
                 </Badge>

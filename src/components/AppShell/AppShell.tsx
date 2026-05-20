@@ -17,6 +17,7 @@ import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { VoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator";
+import { VoiceModelLoadingNotification } from "@/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -215,6 +216,7 @@ function AppShellComponent({
       />
 
       <VoiceModelDownloadIndicator />
+      <VoiceModelLoadingNotification />
     </>
   );
 }

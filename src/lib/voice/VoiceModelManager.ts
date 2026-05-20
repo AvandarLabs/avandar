@@ -191,8 +191,13 @@ export class VoiceModelManager implements IVoiceModelManager {
   private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
     await this.configureEnvOnce();
     const model = findVoiceModel(id);
+    const alreadyOnDevice = await this.isModelDownloaded(id);
 
-    this.setStatus(createDownloadingStatus(id));
+    this.setStatus(
+      alreadyOnDevice ?
+        { kind: "loading", modelId: id }
+      : createDownloadingStatus(id),
+    );
 
     const pipelineFn = await this.deps.loadPipeline();
     this.pipelinePromise = pipelineFn(
@@ -313,8 +318,8 @@ export class VoiceModelManager implements IVoiceModelManager {
     modelId: VoiceModelId,
     event: TransformersProgressEvent,
   ): void {
-    // Only emit while we're in a downloading state — once we've flipped
-    // to "ready" we don't want late progress events to overwrite it.
+    // Only emit file download rows while weights are still being fetched.
+    // Cached reloads use `loading` and are surfaced via toast, not the panel.
     if (this.status.kind !== "downloading" || this.status.modelId !== modelId) {
       return;
     }

@@ -4,6 +4,7 @@ import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButt
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
 import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
+import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { mantineColorVar } from "@/lib/utils/browser/css";
@@ -48,8 +49,9 @@ export function AppToolbar({
           {title}
         </Title>
       : null}
-      <Group ml="auto" mr="xxs" gap="xxs">
+      <Group ml="auto" mr="xxs" gap="sm" wrap="nowrap">
         {children}
+        <OfflineIndicator />
         {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
           <FeedbackButton />
         : null}
