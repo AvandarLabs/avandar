@@ -17,6 +17,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -57,9 +58,7 @@ function makeDatasetLink(options: {
             {datasetName}
           </Text>
           <Tooltip
-            label={
-              <Trans>Available offline: parquet cached on this device</Trans>
-            }
+            label={<Trans>This dataset is fully available offline</Trans>}
           >
             <Badge size="xs" color="teal" variant="light">
               <Trans>Offline</Trans>
@@ -88,6 +87,7 @@ export function DatasetNavbar({
       borderBottomRightRadius: theme.radius.md,
     };
   }, [theme.radius]);
+  const isOnline = useIsOnline();
 
   const uploadedDatasetLinks = useMemo(() => {
     const datasetsByType = makeBucketMap(datasets, {
@@ -101,13 +101,13 @@ export function DatasetNavbar({
           datasetId: dataset.id,
           datasetName: dataset.name,
           style: borderStyle,
-          showOfflineBadge: localDatasetIds.has(dataset.id),
+          showOfflineBadge: !isOnline && localDatasetIds.has(dataset.id),
         });
       });
     });
 
     return datasetLinks;
-  }, [datasets, borderStyle, localDatasetIds, workspaceSlug]);
+  }, [datasets, borderStyle, localDatasetIds, workspaceSlug, isOnline]);
 
   const elements = {
     emptyList() {
