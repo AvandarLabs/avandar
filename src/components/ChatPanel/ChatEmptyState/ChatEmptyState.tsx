@@ -1,11 +1,18 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, TruncatedText } from "@ui";
 import { where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { getCachedDatasetColumnSummaries } from "@/components/ChatPanel/ChatEmptyState/getCachedDatasetColumnSummaries";
+import {
+  pickAverageColumn,
+  pickGroupByColumn,
+} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -35,14 +42,14 @@ function _usePageLabel(app: ChatApp): string {
     .exhaustive();
 }
 
-function _pickRandomDatasetName(
+function _pickRandomDataset(
   datasets: readonly Dataset.T[],
-): string | undefined {
+): Dataset.T | undefined {
   if (datasets.length === 0) {
     return undefined;
   }
   const index = Math.floor(Math.random() * datasets.length);
-  return datasets[index]?.name;
+  return datasets[index];
 }
 
 /**
@@ -53,6 +60,7 @@ function _pickRandomDatasetName(
 export function ChatEmptyState(): JSX.Element {
   const context = useChatPageContext();
   const workspace = useCurrentWorkspace();
+  const queryClient = useQueryClient();
   const { openDataset } = DataExplorerStateManager.useState();
   const threadRuntime = useThreadRuntime();
   const { t } = useLingui();
@@ -61,11 +69,29 @@ export function ChatEmptyState(): JSX.Element {
     where("workspace_id", "eq", workspace.id),
   );
 
-  const suggestions = useMemo(() => {
+  const suggestionTarget = useMemo(() => {
     const availableDatasets = datasets ?? [];
+    const randomDataset = _pickRandomDataset(availableDatasets);
+    if (openDataset) {
+      return { datasetId: openDataset.datasetId, name: openDataset.name };
+    }
+    if (randomDataset) {
+      return { datasetId: randomDataset.id, name: randomDataset.name };
+    }
+    return undefined;
+  }, [datasets, openDataset]);
+
+  const [datasetColumns] = DatasetColumnClient.useGetAll({
+    ...where("dataset_id", "eq", suggestionTarget?.datasetId),
+    useQueryOptions: {
+      enabled: suggestionTarget !== undefined,
+    },
+  });
+
+  const suggestions = useMemo(() => {
     const fallbackTarget = t`your dataset`;
     if (context.app === "dashboards") {
-      const target = _pickRandomDatasetName(availableDatasets) ?? fallbackTarget;
+      const target = suggestionTarget?.name ?? fallbackTarget;
       return [
         t`Add a bar chart of ${target} grouped by category`,
         t`Add a line chart showing trends in ${target} over time`,
@@ -75,25 +101,36 @@ export function ChatEmptyState(): JSX.Element {
     if (context.app !== "data-explorer") {
       return [];
     }
-    const promptTemplates = [
-      (name: string) => {
-        return t`Show the first 20 rows of ${name}`;
-      },
-      (name: string) => {
-        return t`Count rows in ${name} by category`;
-      },
-      (name: string) => {
-        return t`What is the average value in ${name}?`;
-      },
+
+    const datasetName = suggestionTarget?.name ?? fallbackTarget;
+    const columns = datasetColumns ?? [];
+    const cachedSummaries =
+      suggestionTarget ?
+        getCachedDatasetColumnSummaries({
+          queryClient,
+          datasetId: suggestionTarget.datasetId,
+          workspaceId: workspace.id,
+          columns,
+        })
+      : new Map();
+
+    const groupByColumn =
+      pickGroupByColumn(columns, cachedSummaries) ?? "category";
+    const averageColumn = pickAverageColumn(columns) ?? "value";
+
+    return [
+      t`Show the first 20 rows of ${datasetName}`,
+      t`Count rows in ${datasetName} by ${groupByColumn}`,
+      t`What is the average ${averageColumn} in ${datasetName}?`,
     ];
-    return promptTemplates.map((buildPrompt) => {
-      const target =
-        openDataset?.name ??
-        _pickRandomDatasetName(availableDatasets) ??
-        fallbackTarget;
-      return buildPrompt(target);
-    });
-  }, [context.app, datasets, openDataset, t]);
+  }, [
+    context.app,
+    datasetColumns,
+    queryClient,
+    suggestionTarget,
+    t,
+    workspace.id,
+  ]);
 
   const sendPrompt = (text: string) => {
     threadRuntime.append({
