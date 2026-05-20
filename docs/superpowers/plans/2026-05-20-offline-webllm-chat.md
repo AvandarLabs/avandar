@@ -44,7 +44,7 @@
 | `src/lib/offlineChat/runOfflineChatTurn.ts` | Maps pipeline → `ChatResponse`-like result |
 | `src/lib/offlineChat/offlineChatFallbackToast.ts` | Mantine toast for failed POST |
 | `src/components/ChatPanel/useAvandarChatRuntime.ts` | Branch cloud vs offline |
-| `src/components/ChatPanel/OfflineChatModelDownload/` | Download UI (mirrors voice pattern) |
+| `src/components/ChatPanel/OfflineChatDownloadControl/` | Download UI (mirrors voice pattern) |
 | `src/lib/voice/VoiceModelManager.ts` | `releaseLoadedPipeline()` for swap |
 | `src/config/FeatureFlagConfig.ts` | `enable-offline-chat` |
 | `tests/e2e/offline-chat.spec.ts` | Mock engine, flag on |
@@ -53,17 +53,17 @@
 
 ## Tasks
 
-- [ ] **1** Add `@mlc-ai/web-llm` dependency; feature flag `enable-offline-chat`
-- [ ] **2** Types + catalog + store + `resolveOfflineChatMode` (Vitest)
-- [ ] **3** Schema fetch + truncate + prompts + parsers (Vitest)
-- [ ] **4** Mock engine + pipeline + `runOfflineChatTurn` (Vitest)
-- [ ] **5** WebLLM engine + resource manager (unit test with mock factory only)
-- [ ] **6** Wire `useAvandarChatRuntime` + fallback toast
-- [ ] **7** Voice `releaseLoadedPipeline`; mic handler calls swap
-- [ ] **8** Offline model download UI in chat panel
-- [ ] **9** Playwright: offline chat SQL turn with mock engine
-- [ ] **10** Manual verify screenshots → `~/Downloads/offline-webllm-chat/`
-- [ ] **11** Merge `feat/offline-webllm-chat` → `feat/ict4d-demo`
+- [x] **1** Add `@mlc-ai/web-llm` dependency; feature flag `enable-offline-chat`
+- [x] **2** Types + catalog + store + `resolveOfflineChatMode` (Vitest)
+- [x] **3** Schema fetch + truncate + prompts + parsers (Vitest)
+- [x] **4** Mock engine + pipeline + `runOfflineChatTurn` (Vitest)
+- [x] **5** WebLLM engine + resource manager (unit test with mock factory only)
+- [x] **6** Wire `useAvandarChatRuntime` + fallback toast
+- [x] **7** Voice `releaseLoadedPipeline`; mic handler calls swap
+- [x] **8** Offline model download UI in chat panel
+- [x] **9** Playwright: offline chat SQL turn with mock engine
+- [ ] **10** Manual verify screenshots → `~/Downloads/offline-webllm-chat/` (optional; run locally with real WebLLM)
+- [x] **11** Merge `feat/offline-webllm-chat` → `feat/ict4d-demo`
 
 ---
 

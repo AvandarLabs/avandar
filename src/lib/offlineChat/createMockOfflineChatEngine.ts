@@ -8,6 +8,24 @@ export type MockOfflineChatResponse = {
   response: string;
 };
 
+declare global {
+  interface Window {
+    __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__?: readonly MockOfflineChatResponse[];
+  }
+}
+
+function resolveMockScript(
+  fallback: readonly MockOfflineChatResponse[],
+): readonly MockOfflineChatResponse[] {
+  if (typeof window !== "undefined") {
+    const dynamic = window.__AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__;
+    if (dynamic && dynamic.length > 0) {
+      return dynamic;
+    }
+  }
+  return fallback;
+}
+
 /**
  * Deterministic offline engine for Vitest and Playwright. Matches the first
  * `match` against the last user/system message content in the request.
@@ -25,7 +43,7 @@ export function createMockOfflineChatEngine(
           return message.content;
         })
         .join("\n");
-      for (const entry of scripted) {
+      for (const entry of resolveMockScript(scripted)) {
         const matches =
           typeof entry.match === "string" ?
             blob.includes(entry.match)

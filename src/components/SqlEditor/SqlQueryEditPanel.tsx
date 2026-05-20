@@ -1,7 +1,7 @@
 import { Button, Group, Stack } from "@mantine/core";
 import { useState } from "react";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 import { SqlEditor } from "./SqlEditor.tsx";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 
 export type SqlQueryEditPanelProps = {
   initialSql: string;

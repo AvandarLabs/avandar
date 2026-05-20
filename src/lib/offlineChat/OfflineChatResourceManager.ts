@@ -101,3 +101,19 @@ class OfflineChatResourceManagerImpl {
 }
 
 export const OfflineChatResourceManager = new OfflineChatResourceManagerImpl();
+
+declare global {
+  interface Window {
+    /** Playwright: drop cached engine so the next turn picks up an updated mock script. */
+    __resetOfflineChatEngine?: () => Promise<void>;
+  }
+}
+
+if (
+  typeof window !== "undefined" &&
+  import.meta.env.VITE_OFFLINE_CHAT_MOCK === "true"
+) {
+  window.__resetOfflineChatEngine = async () => {
+    await OfflineChatResourceManager.unload();
+  };
+}

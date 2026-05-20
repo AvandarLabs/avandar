@@ -26,7 +26,6 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { PlanAnnotationOverlay } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay";
-import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode.tsx";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
 import {
   clearAnnotationsForPlan,
@@ -41,6 +40,7 @@ import {
 import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
 import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
 import { PlanStepNode } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
+import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode.tsx";
 import { RoughEdge } from "@/components/ChatPanel/PlanFlowView/RoughEdge";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import {

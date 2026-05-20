@@ -11,9 +11,9 @@ import {
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Tabs } from "@ui";
+import { useState } from "react";
 import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
 import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
-import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";

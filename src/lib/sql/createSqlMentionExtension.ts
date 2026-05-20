@@ -1,6 +1,7 @@
+import { autocompletion } from "@codemirror/autocomplete";
 import { getSqlMentionOptions } from "@/lib/sql/getSqlMentionOptions.ts";
+import type { Completion } from "@codemirror/autocomplete";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
-import { autocompletion, type Completion } from "@codemirror/autocomplete";
 
 /**
  * `@` mention autocomplete for datasets and columns in SQL.

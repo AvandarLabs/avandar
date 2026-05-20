@@ -1,5 +1,12 @@
 import { Trans } from "@lingui/react/macro";
-import { Group, Popover, ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core";
+import {
+  Group,
+  Popover,
+  ScrollArea,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import { SqlEditor } from "@/components/SqlEditor";
 import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";

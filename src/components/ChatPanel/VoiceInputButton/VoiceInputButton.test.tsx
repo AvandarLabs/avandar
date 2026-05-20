@@ -128,7 +128,7 @@ describe("VoiceInputButton", () => {
     startMicrophoneRecordingMock.mockReset();
   });
 
-  it("shows an end transcription button while recording", async () => {
+  it("shows end recording and cancel controls while recording", async () => {
     isModelDownloadedMock.mockResolvedValue(true);
     startMicrophoneRecordingMock.mockResolvedValue({
       stop: vi.fn().mockResolvedValue(new Float32Array([0])),
@@ -147,8 +147,45 @@ describe("VoiceInputButton", () => {
     });
 
     expect(
-      await screen.findByRole("button", { name: /end transcription/i }),
+      await screen.findByRole("button", { name: /end recording/i }),
     ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: /^cancel$/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("discards audio when cancel is clicked during recording", async () => {
+    isModelDownloadedMock.mockResolvedValue(true);
+    const stopMock = vi.fn().mockResolvedValue(new Float32Array([0]));
+    startMicrophoneRecordingMock.mockResolvedValue({
+      stop: stopMock,
+    });
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const micButton = await screen.findByRole("button", {
+      name: /speak \(local voice-to-text\)/i,
+    });
+    await act(async () => {
+      fireEvent.click(micButton);
+    });
+
+    const cancelButton = await screen.findByRole("button", {
+      name: /^cancel$/i,
+    });
+    await act(async () => {
+      fireEvent.click(cancelButton);
+    });
+
+    expect(stopMock).toHaveBeenCalled();
+    expect(transcribeMock).not.toHaveBeenCalled();
+    expect(composerSetText).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole("button", { name: /end recording/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders a microphone button with a setup tooltip when no model is downloaded", async () => {

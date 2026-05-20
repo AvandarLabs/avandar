@@ -1,7 +1,7 @@
 import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
+import { describe, expect, it } from "vitest";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
-import { describe, expect, it } from "vitest";
 
 const DS_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;
 
@@ -54,12 +54,16 @@ describe("buildSqlDisplaySegments", () => {
       return s.kind === "column";
     });
     expect(columns.length).toBeGreaterThanOrEqual(2);
-    expect(columns.some((c) => {
-      return c.kind === "column" && c.name === "Admin2";
-    })).toBe(true);
-    expect(columns.some((c) => {
-      return c.kind === "column" && c.name === "daily_new_cases";
-    })).toBe(true);
+    expect(
+      columns.some((c) => {
+        return c.kind === "column" && c.name === "Admin2";
+      }),
+    ).toBe(true);
+    expect(
+      columns.some((c) => {
+        return c.kind === "column" && c.name === "daily_new_cases";
+      }),
+    ).toBe(true);
   });
 
   it("does not treat unknown quoted strings as datasets or columns", () => {

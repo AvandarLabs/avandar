@@ -1,5 +1,3 @@
-import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 import { RangeSetBuilder } from "@codemirror/state";
 import {
   Decoration,
@@ -8,6 +6,8 @@ import {
   ViewPlugin,
   WidgetType,
 } from "@codemirror/view";
+import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 
 class SqlPillWidget extends WidgetType {
   constructor(

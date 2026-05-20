@@ -343,7 +343,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             messages: apiMessages,
             navigatorOnLine: navigator.onLine,
             executeSql:
-              currentPageContext.app === "data-explorer" ?
+              currentPageContext.app === "data-explorer" &&
+              navigator.onLine ?
                 tryExecuteOfflineSql
               : undefined,
           });

@@ -1,13 +1,13 @@
-import { createSqlDisplayExtension } from "@/lib/sql/createSqlDisplayExtension.ts";
-import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension.ts";
 import { sql } from "@codemirror/lang-sql";
 import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import { createSqlDisplayExtension } from "@/lib/sql/createSqlDisplayExtension.ts";
+import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension.ts";
 import css from "./SqlEditor.module.css";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 
 const LINE_HEIGHT_PX = 20;
 
@@ -43,7 +43,7 @@ export function SqlEditor({
   }, []);
 
   const buildCatalogExtensions = useMemo(() => {
-    return (): ReturnType<typeof createSqlDisplayExtension>[] => {
+    return (): Array<ReturnType<typeof createSqlDisplayExtension>> => {
       const getCatalog = (): SqlDisplayCatalog => {
         return catalogRef.current;
       };

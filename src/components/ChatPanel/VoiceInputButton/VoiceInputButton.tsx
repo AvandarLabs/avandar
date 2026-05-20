@@ -17,6 +17,7 @@ import {
   IconMicrophoneOff,
   IconSettings,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
@@ -379,6 +380,21 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     }
   }, [composerRuntime, language, manager, selectedModelId, t]);
 
+  const cancelRecording = useCallback(async () => {
+    const recorder = recorderRef.current;
+    if (!recorder) {
+      setIsRecording(false);
+      return;
+    }
+    recorderRef.current = null;
+    setIsRecording(false);
+    try {
+      await recorder.stop();
+    } catch {
+      // Ignore decode/stop errors when discarding captured audio.
+    }
+  }, []);
+
   const handleClick = useCallback(async () => {
     if (isRecording) {
       await stopRecordingAndTranscribe();
@@ -537,19 +553,36 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         : null}
 
         {isRecording ?
-          <Button
-            variant="light"
-            color="danger"
-            size="compact-sm"
-            aria-label={t`End transcription`}
-            className={css.endTranscription}
-            onClick={() => {
-              void stopRecordingAndTranscribe();
-            }}
-            disabled={disabled || isTranscribing}
-          >
-            <Trans>End transcription</Trans>
-          </Button>
+          <>
+            <Tooltip label={t`Cancel`}>
+              <ActionIcon
+                variant="subtle"
+                color="neutral"
+                size="md"
+                aria-label={t`Cancel`}
+                className={css.button}
+                onClick={() => {
+                  void cancelRecording();
+                }}
+                disabled={disabled || isTranscribing}
+              >
+                <IconX size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <Button
+              variant="light"
+              color="danger"
+              size="compact-sm"
+              aria-label={t`End recording`}
+              className={css.endRecording}
+              onClick={() => {
+                void stopRecordingAndTranscribe();
+              }}
+              disabled={disabled || isTranscribing}
+            >
+              <Trans>End recording</Trans>
+            </Button>
+          </>
         : null}
 
         <Tooltip label={tooltipLabel}>

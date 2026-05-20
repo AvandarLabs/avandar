@@ -5,12 +5,6 @@ import type { MockOfflineChatResponse } from "./createMockOfflineChatEngine";
 import type { LocalChatModelId } from "./localChatModelCatalog";
 import type { OfflineChatEngine } from "./offlineChat.types";
 
-declare global {
-  interface Window {
-    __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__?: readonly MockOfflineChatResponse[];
-  }
-}
-
 export function createOfflineChatEngine(args: {
   modelId: LocalChatModelId;
   onDownloadProgress?: (report: { text: string; progress: number }) => void;

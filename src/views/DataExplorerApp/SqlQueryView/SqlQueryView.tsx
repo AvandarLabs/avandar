@@ -10,9 +10,9 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useState } from "react";
 import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
 import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
-import { useState } from "react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";

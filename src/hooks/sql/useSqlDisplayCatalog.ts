@@ -1,10 +1,10 @@
-import { buildSqlDisplayCatalog } from "@/lib/sql/buildSqlDisplayCatalog.ts";
 import { where } from "@utils";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { buildSqlDisplayCatalog } from "@/lib/sql/buildSqlDisplayCatalog.ts";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 
 /**
  * Workspace dataset + column catalog for SQL display pills and `@` mentions.

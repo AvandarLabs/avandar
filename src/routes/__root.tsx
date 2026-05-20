@@ -3,6 +3,7 @@ import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
+import { AppI18nProvider } from "@/i18n/AppI18nProvider";
 
 /**
  * This is the root route of the app. It only renders the <App> component.
@@ -14,7 +15,9 @@ export const Route = createRootRouteWithContext<AvaRouterRootContext>()({
 function RouterRootComponent() {
   return (
     <AvandarUiProvider>
-      <Outlet />
+      <AppI18nProvider>
+        <Outlet />
+      </AppI18nProvider>
       {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
         <>
           <TanStackRouterDevtools />

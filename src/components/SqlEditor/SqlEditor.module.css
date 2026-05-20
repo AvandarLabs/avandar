@@ -1,8 +1,8 @@
 .root {
-  font-family: var(--mantine-font-family-monospace);
-  font-size: var(--mantine-font-size-sm);
   border: 1px solid var(--mantine-color-gray-3);
   border-radius: var(--mantine-radius-sm);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
   overflow: hidden;
 }
 
@@ -28,27 +28,27 @@
 }
 
 :global(.sqlPill) {
-  display: inline-flex;
   align-items: center;
   border-radius: var(--mantine-radius-sm);
+  display: inline-flex;
   font-family: var(--mantine-font-family);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
   line-height: 1.2;
-  padding: 0 var(--mantine-spacing-xs);
   margin: 0 1px;
+  padding: 0 var(--mantine-spacing-xs);
   vertical-align: baseline;
   white-space: nowrap;
 }
 
 :global(.sqlPill--dataset) {
   background: var(--mantine-color-primary-1);
-  color: var(--mantine-color-primary-9);
   border: 1px solid var(--mantine-color-primary-3);
+  color: var(--mantine-color-primary-9);
 }
 
 :global(.sqlPill--column) {
   background: var(--mantine-color-gray-1);
-  color: var(--mantine-color-gray-9);
   border: 1px solid var(--mantine-color-gray-4);
+  color: var(--mantine-color-gray-9);
 }

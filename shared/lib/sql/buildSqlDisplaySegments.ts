@@ -4,11 +4,11 @@
  * `value` or `raw` reproduces the original SQL string.
  */
 import { Parser } from "node-sql-parser";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   SqlDisplayCatalog,
   SqlDisplaySegment,
 } from "$/lib/sql/sqlDisplay.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 
 type AnnotatedSpan = {
   kind: "dataset" | "column";
