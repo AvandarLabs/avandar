@@ -15,6 +15,7 @@ import {
   IconMicrophone,
   IconMicrophoneOff,
   IconSettings,
+  IconTrash,
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
@@ -25,11 +26,18 @@ import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
+  hasStoredVoiceLanguage,
+  readStoredVoiceLanguage,
+  VOICE_LANGUAGE_STORAGE_KEY,
+  writeStoredVoiceLanguage,
+} from "@/lib/voice/voiceLanguageStorage";
+import {
   DEFAULT_VOICE_MODEL_ID,
   findVoiceModel,
-  voiceLanguageForLocale,
+  listModelsForPlatform,
   VOICE_LANGUAGES,
   VOICE_MODELS,
+  voiceLanguageForLocale,
 } from "@/lib/voice/voiceModels";
 import css from "./VoiceInputButton.module.css";
 import type { AudioRecorder } from "@/lib/voice/audioCapture";
@@ -116,13 +124,20 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const { locale: workspaceLocale } = useWorkspaceLanguage(workspace.id);
   const workspaceVoiceLanguage = voiceLanguageForLocale(workspaceLocale);
-  const [language, setLanguage] = useState<VoiceLanguageCode>(
-    workspaceVoiceLanguage,
-  );
+  const [language, setLanguage] = useState<VoiceLanguageCode>(() => {
+    return readStoredVoiceLanguage() ?? workspaceVoiceLanguage;
+  });
   const [selectedModelId, setSelectedModelId] = useState<VoiceModelId>(() => {
     return readStoredModelId();
   });
   const [isModelReady, setIsModelReady] = useState(false);
+  const [hasAnyModelDownloaded, setHasAnyModelDownloaded] = useState(false);
+  const [downloadedModelIds, setDownloadedModelIds] = useState<
+    readonly VoiceModelId[]
+  >([]);
+  const [deletingModelId, setDeletingModelId] = useState<VoiceModelId | null>(
+    null,
+  );
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [isSettingsOpen, , closeSettings, toggleSettings] = useBoolean(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -141,27 +156,78 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     }
   }, [isDesktopPlatform, selectedModelId]);
 
-  // Whenever the selected model changes, re-check whether we already have it
-  // cached locally so we can skip the download prompt next time.
+  const voicePlatform = isDesktopPlatform ? "desktop" : "web";
+
+  const refreshDownloadState = useCallback(async () => {
+    const platformModels = listModelsForPlatform(voicePlatform);
+    const downloadChecks = await Promise.all(
+      platformModels.map(async (model) => {
+        const downloaded = await manager.isModelDownloaded(model.id);
+        return { id: model.id, downloaded };
+      }),
+    );
+    const downloadedIds = downloadChecks
+      .filter((check) => {
+        return check.downloaded;
+      })
+      .map((check) => {
+        return check.id;
+      });
+    setDownloadedModelIds(downloadedIds);
+    const anyDownloaded = downloadedIds.length > 0;
+    setHasAnyModelDownloaded(anyDownloaded);
+    const selectedReady = downloadedIds.includes(selectedModelId);
+    setIsModelReady(selectedReady);
+    return { anyDownloaded, selectedReady, downloadedIds };
+  }, [manager, selectedModelId, voicePlatform]);
+
+  // Re-check local cache (IndexedDB on web, on-disk on desktop) whenever the
+  // selected model changes or after a successful download.
   useEffect(() => {
     let cancelled = false;
-    void manager.isModelDownloaded(selectedModelId).then((ready) => {
-      if (!cancelled) {
-        setIsModelReady(ready);
+    void refreshDownloadState().then(() => {
+      if (cancelled) {
+        return undefined;
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [manager, selectedModelId]);
+  }, [refreshDownloadState]);
 
-  // Track the workspace language so the picker default follows changes
-  // made from the workspace settings page. The user's per-session override
-  // (e.g. "Auto-detect" for a noisy clip) is intentionally not persisted —
-  // the workspace setting is the source of truth.
+  // Follow workspace locale only until the user picks a voice language in
+  // settings (stored in localStorage, shared across tabs).
   useEffect(() => {
+    if (hasStoredVoiceLanguage()) {
+      return;
+    }
     setLanguage(workspaceVoiceLanguage);
   }, [workspaceVoiceLanguage]);
+
+  const handleVoiceLanguageChange = useCallback((value: string | null) => {
+    if (!value) {
+      return;
+    }
+    const code = value as VoiceLanguageCode;
+    setLanguage(code);
+    writeStoredVoiceLanguage(code);
+  }, []);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== VOICE_LANGUAGE_STORAGE_KEY) {
+        return;
+      }
+      const stored = readStoredVoiceLanguage();
+      if (stored) {
+        setLanguage(stored);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -171,29 +237,67 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     }
   }, [selectedModelId]);
 
-  const handleConfirmDownload = useCallback(async () => {
-    setIsPromptOpen(false);
-    closeSettings();
-    try {
-      await manager.ensureModelLoaded(selectedModelId);
-      setIsModelReady(true);
-      const model = findVoiceModel(selectedModelId);
-      notifications.show({
-        title: "Voice model ready",
-        message: `${model.displayName} downloaded. Tap the mic to start dictating.`,
-        color: "success",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "Voice model download failed",
-        message:
-          error instanceof Error ?
-            error.message
-          : "Unable to download the voice model.",
-        color: "danger",
-      });
-    }
-  }, [closeSettings, manager, selectedModelId]);
+  const voiceSelectComboboxProps = { withinPortal: true } as const;
+
+  const handleDeleteModel = useCallback(
+    async (modelId: VoiceModelId) => {
+      setDeletingModelId(modelId);
+      try {
+        await manager.deleteModel(modelId);
+        const { anyDownloaded } = await refreshDownloadState();
+        const model = findVoiceModel(modelId);
+        notifications.show({
+          title: "Voice model removed",
+          message: `${model.displayName} was deleted from this device.`,
+          color: "success",
+        });
+        if (!anyDownloaded) {
+          closeSettings();
+        }
+      } catch (error) {
+        notifications.show({
+          title: "Could not remove voice model",
+          message:
+            error instanceof Error ?
+              error.message
+            : "Unable to delete the voice model from cache.",
+          color: "danger",
+        });
+      } finally {
+        setDeletingModelId(null);
+      }
+    },
+    [closeSettings, manager, refreshDownloadState],
+  );
+
+  const handleConfirmDownload = useCallback(
+    async (options: { closeSettings: boolean } = { closeSettings: false }) => {
+      setIsPromptOpen(false);
+      if (options.closeSettings) {
+        closeSettings();
+      }
+      try {
+        await manager.ensureModelLoaded(selectedModelId);
+        await refreshDownloadState();
+        const model = findVoiceModel(selectedModelId);
+        notifications.show({
+          title: "Voice model ready",
+          message: `${model.displayName} downloaded. Tap the mic to start dictating.`,
+          color: "success",
+        });
+      } catch (error) {
+        notifications.show({
+          title: "Voice model download failed",
+          message:
+            error instanceof Error ?
+              error.message
+            : "Unable to download the voice model.",
+          color: "danger",
+        });
+      }
+    },
+    [closeSettings, manager, refreshDownloadState, selectedModelId],
+  );
 
   const modelSelectData = VOICE_MODELS.map((model) => {
     return {
@@ -286,91 +390,157 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const Icon = isRecording ? IconMicrophoneOff : IconMicrophone;
   const selectedModel = findVoiceModel(selectedModelId);
 
-  const controlsDisabled = disabled || isTranscribing || isRecording;
+  const settingsDisabled = disabled || isTranscribing || isRecording;
+  const micDisabled = disabled || isTranscribing;
 
   return (
     <>
       <Group gap={4} wrap="nowrap" className={css.controls}>
-        <Popover
-          opened={isSettingsOpen}
-          onChange={toggleSettings}
-          onDismiss={closeSettings}
-          position="top-end"
-          width={300}
-          withinPortal
-          shadow="md"
-        >
-          <Popover.Target>
-            <Tooltip label="Voice settings" disabled={isSettingsOpen}>
-              <ActionIcon
-                variant="subtle"
-                color="neutral"
-                size="md"
-                aria-label="Voice settings"
-                onClick={toggleSettings}
-                disabled={controlsDisabled}
-                className={css.button}
-              >
-                <IconSettings size={16} />
-              </ActionIcon>
-            </Tooltip>
-          </Popover.Target>
-          <Popover.Dropdown p="sm">
-            <Stack gap="sm">
-              <Text size="sm" fw={500}>
-                Voice prompting
-              </Text>
-              <Select
-                label="Model"
-                description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
-                value={selectedModelId}
-                onChange={(value) => {
-                  if (value) {
-                    setSelectedModelId(value as VoiceModelId);
-                  }
-                }}
-                data={modelSelectData}
-                comboboxProps={{ withinPortal: true }}
-                renderOption={({ option, checked }) => {
-                  return (
-                    <VoiceModelSelectOption
-                      option={option}
-                      checked={checked}
-                      isDesktopPlatform={isDesktopPlatform}
-                    />
-                  );
-                }}
-              />
-              <Select
-                label="Language"
-                description="Used when transcribing; does not change the model download."
-                value={language}
-                onChange={(value) => {
-                  if (value) {
-                    setLanguage(value as VoiceLanguageCode);
-                  }
-                }}
-                data={languageSelectData}
-                comboboxProps={{ withinPortal: true }}
-              />
-              {isModelReady ?
-                <Text size="xs" c="neutral.6">
-                  {selectedModel.displayName} is ready on this device.
-                </Text>
-              : <Button
-                  variant="light"
-                  color="primary"
-                  size="compact-sm"
-                  onClick={() => {
-                    void handleConfirmDownload();
-                  }}
-                >
-                  Download &amp; enable
-                </Button>
+        {hasAnyModelDownloaded ?
+          <Popover
+            opened={isSettingsOpen}
+            onChange={(opened) => {
+              if (!opened) {
+                closeSettings();
               }
-            </Stack>
-          </Popover.Dropdown>
-        </Popover>
+            }}
+            onDismiss={closeSettings}
+            position="top-end"
+            width={300}
+            withinPortal
+            trapFocus={false}
+            shadow="md"
+          >
+            <Popover.Target>
+              <Tooltip label="Voice settings" disabled={isSettingsOpen}>
+                <ActionIcon
+                  variant="subtle"
+                  color="neutral"
+                  size="md"
+                  aria-label="Voice settings"
+                  onClick={toggleSettings}
+                  disabled={settingsDisabled}
+                  className={css.button}
+                >
+                  <IconSettings size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </Popover.Target>
+            <Popover.Dropdown
+              p="sm"
+              onMouseDown={(event) => {
+                event.stopPropagation();
+              }}
+            >
+              <Stack gap="sm">
+                <Text size="sm" fw={500}>
+                  Voice prompting
+                </Text>
+                <Stack gap="xs">
+                  <Select
+                    label="Model"
+                    description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
+                    value={selectedModelId}
+                    onChange={(value) => {
+                      if (value) {
+                        setSelectedModelId(value as VoiceModelId);
+                      }
+                    }}
+                    data={modelSelectData}
+                    comboboxProps={voiceSelectComboboxProps}
+                    renderOption={({ option, checked }) => {
+                      return (
+                        <VoiceModelSelectOption
+                          option={option}
+                          checked={checked}
+                          isDesktopPlatform={isDesktopPlatform}
+                        />
+                      );
+                    }}
+                  />
+                  {!isModelReady ?
+                    <Group justify="flex-end">
+                      <Button
+                        variant="light"
+                        color="primary"
+                        size="compact-sm"
+                        onClick={() => {
+                          void handleConfirmDownload();
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </Group>
+                  : null}
+                  {downloadedModelIds.length > 0 ?
+                    <Stack gap={4}>
+                      <Text size="xs" c="neutral.6">
+                        Downloaded on this device
+                      </Text>
+                      {downloadedModelIds.map((modelId) => {
+                        const model = findVoiceModel(modelId);
+                        const isDeleting = deletingModelId === modelId;
+                        return (
+                          <Group
+                            key={modelId}
+                            justify="space-between"
+                            wrap="nowrap"
+                            className={css.downloadedModelRow}
+                          >
+                            <Text size="sm" truncate>
+                              {model.displayName}
+                            </Text>
+                            <Tooltip label={`Remove ${model.displayName}`}>
+                              <ActionIcon
+                                variant="subtle"
+                                color="neutral"
+                                size="sm"
+                                aria-label={`Remove ${model.displayName}`}
+                                loading={isDeleting}
+                                disabled={
+                                  settingsDisabled || deletingModelId !== null
+                                }
+                                onClick={() => {
+                                  void handleDeleteModel(modelId);
+                                }}
+                              >
+                                <IconTrash size={14} />
+                              </ActionIcon>
+                            </Tooltip>
+                          </Group>
+                        );
+                      })}
+                    </Stack>
+                  : null}
+                </Stack>
+                <Select
+                  label="Language"
+                  description="Used when transcribing; does not change the model download."
+                  value={language}
+                  onChange={handleVoiceLanguageChange}
+                  data={languageSelectData}
+                  comboboxProps={voiceSelectComboboxProps}
+                />
+              </Stack>
+            </Popover.Dropdown>
+          </Popover>
+        : null}
+
+        {isRecording ?
+          <Button
+            variant="light"
+            color="danger"
+            size="compact-sm"
+            aria-label="End transcription"
+            className={css.endTranscription}
+            onClick={() => {
+              void stopRecordingAndTranscribe();
+            }}
+            disabled={disabled || isTranscribing}
+          >
+            End transcription
+          </Button>
+        : null}
 
         <Tooltip label={tooltipLabel}>
           <ActionIcon
@@ -381,7 +551,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
             onClick={() => {
               void handleClick();
             }}
-            disabled={controlsDisabled}
+            disabled={micDisabled}
             loading={isTranscribing}
             className={clsx(css.button, isRecording && css.recording)}
           >
@@ -402,11 +572,40 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         <Stack gap="md">
           <Text size="sm">
             Voice prompts run entirely on your device. To dictate, we need to
-            download {selectedModel.displayName} (~{selectedModel.approxSizeMb}{" "}
-            MB) from Hugging Face once. Adjust the model or language anytime from
-            the gear icon next to the microphone. The download runs in the
-            background; progress appears in the bottom-left corner.
+            download a Whisper model from Hugging Face once. The download runs
+            in the background; progress appears in the bottom-left corner.
           </Text>
+
+          <Select
+            label="Model"
+            description={`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
+            value={selectedModelId}
+            onChange={(value) => {
+              if (value) {
+                setSelectedModelId(value as VoiceModelId);
+              }
+            }}
+            data={modelSelectData}
+            comboboxProps={{ withinPortal: true }}
+            renderOption={({ option, checked }) => {
+              return (
+                <VoiceModelSelectOption
+                  option={option}
+                  checked={checked}
+                  isDesktopPlatform={isDesktopPlatform}
+                />
+              );
+            }}
+          />
+
+          <Select
+            label="Language"
+            description="Whisper supports many languages; auto-detect handles mixed input."
+            value={language}
+            onChange={handleVoiceLanguageChange}
+            data={languageSelectData}
+            comboboxProps={{ withinPortal: true }}
+          />
 
           <Group justify="flex-end" gap="sm">
             <Button

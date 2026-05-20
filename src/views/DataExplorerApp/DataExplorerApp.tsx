@@ -33,6 +33,7 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
+  hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
@@ -250,16 +251,23 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
-  const isSettingsOpenedRef = useRef(isSettingsOpened);
-  isSettingsOpenedRef.current = isSettingsOpened;
+  /** Auto-open settings once on the first successful query when nothing is in session storage yet. */
+  const hasAutoOpenedSettingsRef = useRef(
+    hasDataExplorerPanelPreferencesInSessionStorage(),
+  );
   useEffect(() => {
     const justFinishedFetching =
       wasFetchingRef.current && !dataQuery.isFetching;
-    if (justFinishedFetching && dataQuery.isSuccess) {
+    if (
+      justFinishedFetching &&
+      dataQuery.isSuccess &&
+      !hasAutoOpenedSettingsRef.current
+    ) {
       setSettingsOpened(true);
+      hasAutoOpenedSettingsRef.current = true;
     }
     wasFetchingRef.current = dataQuery.isFetching;
-  }, [dataQuery.isFetching, dataQuery.isSuccess]);
+  }, [dataQuery.isFetching, dataQuery.isSuccess, setSettingsOpened]);
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);

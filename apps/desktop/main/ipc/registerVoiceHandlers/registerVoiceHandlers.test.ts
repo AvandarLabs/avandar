@@ -41,6 +41,7 @@ function makeFakeService(
       return id === "whisper-tiny";
     },
     downloadModel: vi.fn().mockResolvedValue(undefined),
+    deleteModel: vi.fn().mockResolvedValue(undefined),
     transcribe: vi.fn().mockResolvedValue("transcribed text"),
     getStatus: () => {
       return { kind: "idle" } as const;

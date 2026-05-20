@@ -13,148 +13,149 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
-msgstr ""
+msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
-msgstr ""
+msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى جميع الأعمدة."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Sort by"
-msgstr ""
+msgstr "ترتيب حسب"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Dashboard name"
-msgstr ""
+msgstr "اسم لوحة التحكم"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
-msgstr ""
+msgstr "سيسمح ذلك بتخزين مجموعة البيانات على الإنترنت بحيث يمكن الوصول إليها من أجهزة أخرى."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Run a query to see results."
-msgstr ""
+msgstr "قم بتشغيل استعلام لرؤية النتائج."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Start (e.g. 2024-01-01)"
-msgstr ""
+msgstr "ابدأ (مثل 2024-01-01)"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
 msgid "Open dataset"
-msgstr ""
+msgstr "فتح مجموعة البيانات"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
-msgstr ""
+msgstr "بحث في مجموعات البيانات..."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
-msgstr ""
+msgstr "الأكثر حداثة"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "An error occurred while loading the file"
-msgstr ""
+msgstr "حدث خطأ أثناء تحميل الملف"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Source URL"
-msgstr ""
+msgstr "رابط المصدر"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Type"
-msgstr ""
+msgstr "النوع"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
-msgstr ""
+msgstr "السماح بالمزامنة عبر الإنترنت"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
-msgstr ""
+msgstr "لا توجد فلاتر حتى الآن. أضف واحدة للسماح للمشاهدين بتصفية هذا الرسم البياني دون التأثير على أي رسومات أخرى."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
-msgstr ""
+msgstr "ملفات Excel"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Enter your question or instructions in natural language to generate a SQL query"
-msgstr ""
+msgstr "أدخل سؤالك أو تعليماتك بلغة طبيعية لإنشاء استعلام SQL"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query"
-msgstr ""
+msgstr "استعلام"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Row filters"
-msgstr ""
+msgstr "فلاتر الصفوف"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
-msgstr ""
+msgstr "تحميل Excel"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Could not load the dataset's SQL query."
-msgstr ""
+msgstr "لم يتمكن من تحميل استعلام SQL لمجموعة البيانات."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
-msgstr ""
+msgstr "ملاحظات"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
-msgstr ""
+msgstr "لا يمكن إضافة مجموعة بيانات"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Open"
-msgstr ""
+msgstr "فتح"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
-msgstr ""
+msgstr "التجميعات"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Save and re-run query"
-msgstr ""
+msgstr "احفظ وأعد تشغيل الاستعلام"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Unknown error"
-msgstr ""
+msgstr "خطأ غير معروف"
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
-msgstr ""
+msgstr "مصادر البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
-msgstr ""
+msgstr "تصدير PDF معلق"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
-msgstr ""
+msgstr "تحميل ملف"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Manage sharing"
-msgstr ""
+msgstr "إدارة المشاركة"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "The table visualization has no extra settings."
-msgstr ""
+msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Monospace headlines"
-msgstr ""
+msgstr "عناوين أحادية المسافة"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
-msgstr ""
+msgstr "← العودة"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
-msgstr ""
+msgstr "تم رفض {numRejectedRows} صفوف"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
@@ -162,63 +163,63 @@ msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
-msgstr ""
+msgstr "لم تتم إضافة أي مجموعات بيانات حتى الآن"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
-msgstr ""
+msgstr "اختر مقدار كل مجموعة بيانات لنشرها. الافتراضي - \"فقط ما تم استعلامه\" - يقوم بتحميل الأعمدة التي تقرأها تصوراتك. قم بتوسيع النطاق إذا كنت قد أضفت فلاتر قابلة للتعديل من قبل المشاهدين وترغب في أن يتمكن المشاهدون من التصفية بما يتجاوز الافتراضات الخاصة بك."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
-msgstr ""
+msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك، يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
-msgstr ""
+msgstr "أضف أعمدة إلى الاستعلام أعلاه لبدء تعريف الفلاتر."
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
-msgstr ""
+msgstr "متوسط"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Open data"
-msgstr ""
+msgstr "فتح البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
-msgstr ""
+msgstr "الانحراف المعياري"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
-msgstr ""
+msgstr "تحتوي الورقة على صف رأس"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search the data catalog to add open datasets to your workspace."
-msgstr ""
+msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة العمل الخاصة بك."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
-msgstr ""
+msgstr "احتفظ بـ SQL كما هو"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, t)
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
-msgstr ""
+msgstr "تم التحديث {0}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Request a data source connection via feedback"
-msgstr ""
+msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "This dataset has no description."
-msgstr ""
+msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
 msgid "Saved datasets"
-msgstr ""
+msgstr "مجموعات البيانات المحفوظة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #~ msgid "Roles"
@@ -226,78 +227,78 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
-msgstr ""
+msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية لإضافة مجموعة بيانات الكتالوج هذه."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save as new dataset"
-msgstr ""
+msgstr "احفظ كمجموعة بيانات جديدة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
-msgstr ""
+msgstr "اختيار فردي"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing — {eta} remaining"
-msgstr ""
+msgstr "جارٍ المعالجة — {eta} المتبقية"
 
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
-msgstr ""
+msgstr "هذه هي الصفوف الأولى {0} من مجموعة بياناتك. تحقق من صحة البيانات. إذا لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Dataset saved."
-msgstr ""
+msgstr "تم حفظ مجموعة البيانات."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "Publish dashboard"
-msgstr ""
+msgstr "نشر لوحة المعلومات"
 
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 msgid "Container max width"
-msgstr ""
+msgstr "عرض الحاوية الأقصى"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
-msgstr ""
+msgstr "خط الأنابيب"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
 msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
-msgstr ""
+msgstr "تظهر هذه المجموعات في مساحة العمل الخاصة بك، لكن لم يتم العثور على بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
-msgstr ""
+msgstr "البيانات الوصفية"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
-msgstr ""
+msgstr "النطاق"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
-msgstr ""
+msgstr "CSV"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Permanently delete <0>{0}</0>?"
-msgstr ""
+msgstr "هل تريد حذف <0>{0}</0> بشكل دائم؟"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
-msgstr ""
+msgstr "أضف إلى مساحة العمل"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace Name"
-msgstr ""
+msgstr "اسم مساحة العمل"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Your dashboard is published at:"
-msgstr ""
+msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Name"
-msgstr ""
+msgstr "الاسم"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
@@ -305,242 +306,242 @@ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "User groups"
-msgstr ""
+msgstr "مجموعات المستخدمين"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
-msgstr ""
+msgstr "يجعل النشر هذه اللوحة مرئية لأي شخص لديه الرابط — لا حاجة لحساب Avandar. يتم نسخ مجموعات البيانات المشار إليها بواسطة اللوحة إلى التخزين العام عند النشر."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Column name in SQL"
-msgstr ""
+msgstr "اسم العمود في SQL"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
-msgstr ""
+msgstr "تأكيد"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't export PDF"
-msgstr ""
+msgstr "لم يتمكن من تصدير PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Label"
-msgstr ""
+msgstr "التسمية"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
-msgstr ""
+msgstr "إنشاء لوحة معلومات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
-msgstr ""
+msgstr "مفقود"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "One standard deviation around the mean"
-msgstr ""
+msgstr "انحراف معياري واحد حول المتوسط"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Custom"
-msgstr ""
+msgstr "مخصص"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
-msgstr ""
+msgstr "جميع الأعمدة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
-msgstr ""
+msgstr "ملخص البيانات"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 msgid "Filters for this chart"
-msgstr ""
+msgstr "الفلاتر لهذا الرسم البياني"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
-msgstr ""
+msgstr "تراجع"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "Dataset updated successfully!"
-msgstr ""
+msgstr "تم تحديث مجموعة البيانات بنجاح!"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Excel file"
-msgstr ""
+msgstr "ملف Excel"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture the dashboard for annotation."
-msgstr ""
+msgstr "لم نتمكن من التقاط لوحة المعلومات للتعليق."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Contains…"
-msgstr ""
+msgstr "يحتوي على…"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
-msgstr ""
+msgstr "\"{0}\" الآن في مساحة العمل الخاصة بك."
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Delete — {0}"
-msgstr ""
+msgstr "حذف — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
-msgstr ""
+msgstr "اختر مجموعة بيانات من القائمة لعرض بياناتها الوصفية."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
-msgstr ""
+msgstr "كتالوج البيانات المفتوحة العامة لا يزال في <0/><1/>نحن نضيف المزيد من مجموعات البيانات المفتوحة كما يخبرنا المستخدمون بالمجموعات التي يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، <2>أخبرنا</2>!"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset deleted successfully"
-msgstr ""
+msgstr "تم حذف مجموعة البيانات بنجاح"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "decimal"
-msgstr ""
+msgstr "عشري"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Group by"
-msgstr ""
+msgstr "تجميع بواسطة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Please select a file to import"
-msgstr ""
+msgstr "يرجى اختيار ملف للاستيراد"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
-msgstr ""
+msgstr "اختر مصدر البيانات"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
-msgstr ""
+msgstr "البيانات المفتوحة"
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
-msgstr ""
+msgstr "إضافة مجموعة بيانات جديدة"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {0} rows"
-msgstr ""
+msgstr "تم تحليل {0} صفوف"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
-msgstr ""
+msgstr "القيمة الافتراضية (اختياري)"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
-msgstr ""
+msgstr "لم يتم تحميل ملف تعريف المستخدم الخاص بك بعد. يرجى المحاولة مرة أخرى."
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Sum"
-msgstr ""
+msgstr "مجموع"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
-msgstr ""
+msgstr "متوسط"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Generating…"
-msgstr ""
+msgstr "يتم الإنشاء…"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Previewing data for {0}"
-msgstr ""
+msgstr "معاينة البيانات لـ {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
-msgstr ""
+msgstr "نوع الملف غير مدعوم"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side panel."
-msgstr ""
+msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته، واسم العمود في اللوحة الجانبية."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
-msgstr ""
+msgstr "تحتوي SQL الحالية على أجزاء لا يمكن للنموذج تمثيلها. الاستمرار سيؤدي إلى الكتابة فوق تلك SQL بواحدة تم إنشاؤها من النموذج. لا يمكن التراجع عن ذلك (ما لم تقم بإعادة تشغيل طلب الدردشة السابق)."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Formal"
-msgstr ""
+msgstr "رسمي"
 
 #. placeholder {0}: planSnapshot.steps.length
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr ""
+msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث يمكن إعادة فتحه على اللوحة."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
-msgstr ""
+msgstr "استبدال SQL بتغييرات النموذج"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset did not match the expected schema"
-msgstr ""
+msgstr "لم تتطابق مجموعة البيانات مع المخطط المتوقع"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File was partially loaded"
-msgstr ""
+msgstr "تم تحميل الملف جزئيًا"
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
-msgstr ""
+msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط <2>{avg}</2>{0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
-msgstr ""
+msgstr "مجموعة بيانات بلا عنوان"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
-msgstr ""
+msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخرى قيد العمل وسيكون متاحًا قريبًا جدًا. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها وتحتاج إلى الاتصال بها، <0>يرجى إخبارنا حتى نتمكن من إعطائها الأولوية</0>."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
-msgstr ""
+msgstr "المسح إلى:"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
-msgstr ""
+msgstr "يدوي"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
-msgstr ""
+msgstr "الأدوار والأذونات"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
-msgstr ""
+msgstr "الاتصال بـ Google Sheets"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
 msgid "Data Visualization"
-msgstr ""
+msgstr "تصوير البيانات"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
-msgstr ""
+msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
-msgstr ""
+msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
-msgstr ""
+msgstr "الأقصى"
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
-msgstr ""
+msgstr "استيراد البيانات"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Descending"
-msgstr ""
+msgstr "تنازلي"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -548,56 +549,56 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Failed to save dataset: {0}"
-msgstr ""
+msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
-msgstr ""
+msgstr "تم تنزيل PDF."
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
-msgstr ""
+msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Annotate, then export"
-msgstr ""
+msgstr "قم بالتعليق، ثم التصدير"
 
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 msgid "Show SQL"
-msgstr ""
+msgstr "عرض SQL"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset name is required"
-msgstr ""
+msgstr "اسم مجموعة البيانات مطلوب"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Narrowest"
-msgstr ""
+msgstr "الأضيق"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Graphite"
-msgstr ""
+msgstr "جرافيت"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "not in"
-msgstr ""
+msgstr "ليس في"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
-msgstr ""
+msgstr "أدخل اسمًا لهذه المجموعة من البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Custom selection"
-msgstr ""
+msgstr "اختيار مخصص"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a description for this dataset"
-msgstr ""
+msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -612,258 +613,258 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "You do not have access to this dashboard"
-msgstr ""
+msgstr "ليس لديك حق الوصول إلى هذه اللوحة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
-msgstr ""
+msgstr "لم يتمكن من تلخيص هذه العمود. قد يكون الاستعلام قد فشل بسبب قيمة غير مدعومة أو خلية مشوهة."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Data scope"
-msgstr ""
+msgstr "نطاق البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
-msgstr ""
+msgstr "معاينة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
-msgstr ""
+msgstr "إلى"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
-msgstr ""
+msgstr "نص التعليق:"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Result size"
-msgstr ""
+msgstr "حجم النتيجة"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search open data catalog"
-msgstr ""
+msgstr "ابحث في كتالوج البيانات المفتوحة"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Ocean"
-msgstr ""
+msgstr "المحيط"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Dataset deleted."
-msgstr ""
+msgstr "تم حذف مجموعة البيانات."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
-msgstr ""
+msgstr "اسم الورقة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-msgstr ""
+msgstr "هذه اللوحة <0>عامة</0>. يمكن لأي شخص لديه الرابط أدناه مشاهدتها."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
-msgstr ""
+msgstr "قم بالتمرير لأعلى إلى الحقول أعلاه، أو استخدم القائمة أدناه."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "None"
-msgstr ""
+msgstr "لا شيء"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Publish"
-msgstr ""
+msgstr "نشر"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
-msgstr ""
+msgstr "لا يوجد SQL حتى الآن. اسأل Avandar سؤالاً أو قم ببناء استعلام في علامة التبويب اليدوية لإنشاء SQL."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Manual form shows an approximation"
-msgstr ""
+msgstr "تظهر النموذج اليدوي تقريبًا"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Your dashboard will be published to:"
-msgstr ""
+msgstr "سيتم نشر لوحتك إلى:"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
-msgstr ""
+msgstr "مصدر البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "description"
-msgstr ""
+msgstr "الوصف"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
-msgstr ""
+msgstr "الأدنى"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
-msgstr ""
+msgstr "مرشحات محلية (يمكن للمشاهد تعديلها، هذه الرسم البياني فقط)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "e.g. cholera-outbreak-2024"
-msgstr ""
+msgstr "مثل: cholera-outbreak-2024"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
-msgstr ""
+msgstr "خطأ في مصادقة Google"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is private. This dashboard has not been made publicly viewable."
-msgstr ""
+msgstr "هذه اللوحة خاصة. لم يتم جعل هذه اللوحة قابلة للرؤية للجمهور."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
-msgstr ""
+msgstr "مشتق"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default values, comma-separated or JSON array"
-msgstr ""
+msgstr "القيم الافتراضية، مفصولة بفواصل أو مصفوفة JSON"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
-msgstr ""
+msgstr "ليس فارغًا"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Create dashboard & save"
-msgstr ""
+msgstr "إنشاء لوحة & حفظ"
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: top.count.toLocaleString()
 #. placeholder {2}: (share * 100).toFixed(0)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Most common value: <0>{0}</0> ({1} rows, {2}%)."
-msgstr ""
+msgstr "القيمة الأكثر شيوعًا: <0>{0}</0> ({1} صفوف، {2}%)."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
-msgstr ""
+msgstr "تم حفظ اللوحة بنجاح!"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
-msgstr ""
+msgstr "العودة إلى المحرر"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
-msgstr ""
+msgstr "لم يتمكن من التقاط اللوحة"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
-msgstr ""
+msgstr "جارٍ معالجة مجموعة البيانات…"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
-msgstr ""
+msgstr "جارٍ التقاط اللوحة…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "+ Add row filter"
-msgstr ""
+msgstr "+ إضافة فلتر صف"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
-msgstr ""
+msgstr "القيم"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
-msgstr ""
+msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية العالمية لهذه التصور."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
-msgstr ""
+msgstr "CSV"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
-msgstr ""
+msgstr "رمز الاستجابة السريعة"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is null"
-msgstr ""
+msgstr "فارغ"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to save to dashboard: {0}"
-msgstr ""
+msgstr "فشل في الحفظ إلى اللوحة: {0}"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Rose"
-msgstr ""
+msgstr "وردة"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Are you sure you want to delete {0}?"
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
-msgstr ""
+msgstr "حذف اللوحة؟"
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
 msgid "Loading datasets..."
-msgstr ""
+msgstr "جارٍ تحميل مجموعات البيانات..."
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
 msgid "No fields"
-msgstr ""
+msgstr "لا توجد حقول"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
-msgstr ""
+msgstr "فشل في تحديث اسم مساحة العمل"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
-msgstr ""
+msgstr "تصدير"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
-msgstr ""
+msgstr "معاينة:"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
-msgstr ""
+msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {maxDatasetNameLength} حرفًا (الحالي: {0})."
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
-msgstr ""
+msgstr "إعادة تشغيل الاستعلام"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
-msgstr ""
+msgstr "اختر اللغة المستخدمة في هذه المساحة. اللغات من اليمين إلى اليسار تعكس التخطيط تلقائيًا."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
-msgstr ""
+msgstr "لا توجد قيم للتلخيص."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Dashboard not ready"
-msgstr ""
+msgstr "اللوحة غير جاهزة"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
-msgstr ""
+msgstr "تطبيق كل فلتر عالمي على اللوحة."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
-msgstr ""
+msgstr "تحميل CSV"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
-msgstr ""
+msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Save to dashboard"
-msgstr ""
+msgstr "حفظ إلى اللوحة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
@@ -871,91 +872,91 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
-msgstr ""
+msgstr "لا يوجد ملف محدد"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "See all shared items"
-msgstr ""
+msgstr "عرض جميع العناصر المشتركة"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
-msgstr ""
+msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة أخرى لاحقًا."
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
 msgid "Manual Query"
-msgstr ""
+msgstr "استعلام يدوي"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
-msgstr ""
+msgstr "مجموعة البيانات الآن متاحة فقط في وضع عدم الاتصال"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
-msgstr ""
+msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Are you sure you want to delete this dataset? This action cannot be undone."
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا الإجراء."
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
-msgstr ""
+msgstr "افاندر (افتراضي)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
-msgstr ""
+msgstr "{numCols, plural, one {سيتم نشر # عمود:} other {سيتم نشر # أعمدة:}}"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
-msgstr ""
+msgstr "مكرر بشكل كبير: <0>{0}</0> يظهر في <1>{1}%</1> من الصفوف."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
-msgstr ""
+msgstr "عودة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "coverage"
-msgstr ""
+msgstr "التغطية"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Generated SQL"
-msgstr ""
+msgstr "SQL المُولد"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Maximum rows to return"
-msgstr ""
+msgstr "الحد الأقصى لعدد الصفوف للعودة"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Failed to delete dataset"
-msgstr ""
+msgstr "فشل في حذف مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "License"
-msgstr ""
+msgstr "الرخصة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Date range"
-msgstr ""
+msgstr "نطاق التاريخ"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
-msgstr ""
+msgstr "إضافة مجموعة البيانات إلى مساحة العمل"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString()
 #. placeholder {1}: totalRows.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
-msgstr ""
+msgstr "فريد إلى حد كبير: <0>{0}</0> قيم مميزة عبر <1>{1}</1> صفوف."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
-msgstr ""
+msgstr "قم بتشغيل استعلام AI أولاً."
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
@@ -963,1086 +964,1086 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Parsed {formattedNumRows} rows successfully"
-msgstr ""
+msgstr "تم تحليل {formattedNumRows} صفوف بنجاح"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Label, e.g. Region"
-msgstr ""
+msgstr "التسمية، على سبيل المثال: المنطقة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
-msgstr ""
+msgstr "اختر ملف"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Column name (must match SQL)"
-msgstr ""
+msgstr "اسم العمود (يجب أن يتطابق مع SQL)"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Generate Query"
-msgstr ""
+msgstr "توليد استعلام"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "No frequency data available."
-msgstr ""
+msgstr "لا توجد بيانات تكرارية متاحة."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
-msgstr ""
+msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Number range"
-msgstr ""
+msgstr "نطاق الأرقام"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Columns"
-msgstr ""
+msgstr "الأعمدة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
-msgstr ""
+msgstr "هل تريد الكتابة فوق SQL؟"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
-msgstr ""
+msgstr "أضف إلى مساحة العمل الخاصة بك"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
-msgstr ""
+msgstr "غير قادر على تحميل لوحة التحكم"
 
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Connectors"
-msgstr ""
+msgstr "الموصلات"
 
 #. placeholder {0}: displayedEntries.length
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Catalog ({0})"
-msgstr ""
+msgstr "الفهرس ({0})"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
-msgstr ""
+msgstr "فشل الاستيراد: {reason}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
-msgstr ""
+msgstr "تنسيق الطابع الزمني"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
-msgstr ""
+msgstr "عرض"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "{0} deleted successfully"
-msgstr ""
+msgstr "{0} تم حذفه بنجاح"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Open dashboard"
-msgstr ""
+msgstr "فتح لوحة التحكم"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "End (e.g. 2024-12-31)"
-msgstr ""
+msgstr "النهاية (على سبيل المثال 2024-12-31)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
 msgid "No datasets match your search."
-msgstr ""
+msgstr "لا توجد مجموعات بيانات تتطابق مع بحثك."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "in"
-msgstr ""
+msgstr "في"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
-msgstr ""
+msgstr "تصدير PDF"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "There is only one sheet in this excel sheet."
-msgstr ""
+msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make dataset offline-only?"
-msgstr ""
+msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Color"
-msgstr ""
+msgstr "لون"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
-msgstr ""
+msgstr "اختر العمود للفرز حسبه"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "You can view this dataset because it was shared with you."
-msgstr ""
+msgstr "يمكنك عرض مجموعة البيانات هذه لأنها تمت مشاركتها معك."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
-msgstr ""
+msgstr "إنشاء لوحة تحكم جديدة"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Forest"
-msgstr ""
+msgstr "غابة"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first — the PDF reflects the saved dashboard."
-msgstr ""
+msgstr "احفظ تغييراتك أولاً - ملف PDF يعكس لوحة التحكم المحفوظة."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
-msgstr ""
+msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون العامون من رؤية هذا."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns"
-msgstr ""
+msgstr "اختر الأعمدة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
-msgstr ""
+msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
-msgstr ""
+msgstr "اختر لوحة تحكم، أو أنشئ واحدة جديدة."
 
 #. placeholder {0}: selectedGoogleAccount.google_email
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
-msgstr ""
+msgstr "لقد اتصلت بنجاح بـ {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
-msgstr ""
+msgstr "تنسيق التاريخ"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
-msgstr ""
+msgstr "تمت إضافة مجموعة البيانات"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
-msgstr ""
+msgstr "العودة إلى لوحات التحكم"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "Most common"
-msgstr ""
+msgstr "الأكثر شيوعًا"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
-msgstr ""
+msgstr "تم تحميل مجموعة البيانات بنجاح"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
-msgstr ""
+msgstr "خيارات (مفصولة بفواصل، لوضع الاختيار)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
-msgstr ""
+msgstr "لا تتغير أبدًا، لذا تظل رموز QR المطبوعة من هنا تعمل حتى لو تغيرت عنوان URL المخصص."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
-msgstr ""
+msgstr "عدد الصفوف التي سيتم تخطيها"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
-msgstr ""
+msgstr "دقيقة"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "You don't have any dashboards yet."
-msgstr ""
+msgstr "ليس لديك أي لوحات تحكم بعد."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
-msgstr ""
+msgstr "أداة"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Error saving dataset: {0}"
-msgstr ""
+msgstr "خطأ في حفظ مجموعة البيانات: {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
-msgstr ""
+msgstr "البيانات الوصفية الخام (JSON)"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
-msgstr ""
+msgstr "تم حذف لوحة التحكم بنجاح!"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL"
-msgstr ""
+msgstr "عنوان URL مخصص"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
-msgstr ""
+msgstr "تحضير البيانات للتصورات…"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Direction"
-msgstr ""
+msgstr "الاتجاه"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
-msgstr ""
+msgstr "تم حفظ مجموعة البيانات بنجاح!"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
-msgstr ""
+msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
-msgstr ""
+msgstr "حذف مجموعة البيانات"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "SQL"
-msgstr ""
+msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
-msgstr ""
+msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة للأعمدة المحددة)."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
-msgstr ""
+msgstr "الكل"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "System sans"
-msgstr ""
+msgstr "نظام بدون"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
-msgstr ""
+msgstr "اختر التجميع"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Multi select"
-msgstr ""
+msgstr "تحديد متعدد"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
-msgstr ""
+msgstr "غير قادر على تحميل مجموعات بيانات لوحة التحكم"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "No description has been added yet."
-msgstr ""
+msgstr "لم يتم إضافة أي وصف بعد."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
-msgstr ""
+msgstr "مدة الزمن"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to create dashboard: {0}"
-msgstr ""
+msgstr "فشل إنشاء لوحة التحكم: {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "kind"
-msgstr ""
+msgstr "نوع"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
-msgstr ""
+msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters — this visualization is unfiltered."
-msgstr ""
+msgstr "تجاهل جميع الفلاتر العالمية — هذه التصور غير مصفاة."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Sketch"
-msgstr ""
+msgstr "رسم تخطيطي"
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset \"{0}\" saved successfully"
-msgstr ""
+msgstr "تم حفظ مجموعة البيانات \"{0}\" بنجاح"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Please fix the highlighted fields."
-msgstr ""
+msgstr "يرجى إصلاح الحقول المميزة."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "between"
-msgstr ""
+msgstr "بين"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
-msgstr ""
+msgstr "الوصف"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
-msgstr ""
+msgstr "تكرار التحديث"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
-msgstr ""
+msgstr "السماح بالمزامنة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Ascending"
-msgstr ""
+msgstr "تصاعدي"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Enter values; press Enter after each"
-msgstr ""
+msgstr "أدخل القيم؛ اضغط على Enter بعد كل واحدة"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
-msgstr ""
+msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "{0} · run {1}"
-msgstr ""
+msgstr "{0} · تشغيل {1}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Process data again"
-msgstr ""
+msgstr "معالجة البيانات مرة أخرى"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export as PDF"
-msgstr ""
+msgstr "تصدير كملف PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter"
-msgstr ""
+msgstr "تصفية"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "This cannot be undone."
-msgstr ""
+msgstr "لا يمكن التراجع عن هذا."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
-msgstr ""
+msgstr "يجب أن يكون اسم مجموعة البيانات مكونًا من حرفين على الأقل."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
-msgstr ""
+msgstr "إعادة تعيين"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "does not contain"
-msgstr ""
+msgstr "لا يحتوي على"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
-msgstr ""
+msgstr "تم تحديث اسم مساحة العمل"
 
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
-msgstr ""
+msgstr "رفع"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
-msgstr ""
+msgstr "اختر الأعمدة للاستعلام"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
-msgstr ""
+msgstr "تم رفض أكثر من 1000 صف"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
-msgstr ""
+msgstr "لا توجد لوحات تحكم تطابق “{searchQuery}”."
 
 #. placeholder {0}: roughness.toFixed(1)
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Roughness ({0})"
-msgstr ""
+msgstr "خشونة ({0})"
 
 #. placeholder {0}: meta.columns.length
 #. placeholder {1}: meta.rows.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "{0} columns · {1} rows"
-msgstr ""
+msgstr "{0} أعمدة · {1} صفوف"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Edit query"
-msgstr ""
+msgstr "تحرير الاستعلام"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Data Explorer"
-msgstr ""
+msgstr "مستكشف البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now synced online"
-msgstr ""
+msgstr "تم مزامنة مجموعة البيانات الآن عبر الإنترنت"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Copied!"
-msgstr ""
+msgstr "تم النسخ!"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
-msgstr ""
+msgstr "احتفظ بمجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL path"
-msgstr ""
+msgstr "مسار URL مخصص"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
-msgstr ""
+msgstr "المتوسط"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Dashboard snapshot"
-msgstr ""
+msgstr "لقطة لوحة التحكم"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
-msgstr ""
+msgstr "تفاصيل الاستعلام"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Remove row filter"
-msgstr ""
+msgstr "إزالة فلتر الصف"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset deleted"
-msgstr ""
+msgstr "تم حذف مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Can't save dataset"
-msgstr ""
+msgstr "لا يمكن حفظ مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
-msgstr ""
+msgstr "حدث خطأ أثناء حفظ مجموعة البيانات"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
 msgid "Import dataset"
-msgstr ""
+msgstr "استيراد مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
-msgstr ""
+msgstr "اختر ورقة جوجل"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Only workspace settings administrators can open workspace settings."
-msgstr ""
+msgstr "يمكن لمشرفي إعدادات مساحة العمل فقط فتح إعدادات مساحة العمل."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
-msgstr ""
+msgstr "اختر الفلاتر العالمية التي تنطبق على هذه التصويرية."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
-msgstr ""
+msgstr "لا تحتوي هذه الإدخالات في الكتالوج على بيانات وصفية للأعمدة. لا يمكن استيرادها بعد."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
-msgstr ""
+msgstr "تم تحديث وصف العمود بنجاح!"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
-msgstr ""
+msgstr "فشل تحميل الملف"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "There was an error on update: {0}"
-msgstr ""
+msgstr "حدث خطأ أثناء التحديث: {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
-msgstr ""
+msgstr "سجل الخصوصية"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
-msgstr ""
+msgstr "إعدادات التصويرية"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
-msgstr ""
+msgstr "فشل معالجة البيانات"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
-msgstr ""
+msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في أي وقت."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets — nothing to publish."
-msgstr ""
+msgstr "لا تشير هذه اللوحة إلى أي مجموعات بيانات - لا يوجد شيء لنشره."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
-msgstr ""
+msgstr "يمكن تخزين مجموعة البيانات هذه في السحابة."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Billing"
-msgstr ""
+msgstr "الفوترة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
 msgid "Visualization Type"
-msgstr ""
+msgstr "نوع التصويرية"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
-msgstr ""
+msgstr "حذف مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr ""
+msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
-msgstr ""
+msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى خطة Impact لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
-msgstr ""
+msgstr "هذه مجموعة البيانات متاحة فقط عند عدم الاتصال. انقر للسماح بالمزامنة عبر الإنترنت."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
-msgstr ""
+msgstr "الفلاتر العالمية"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL instead."
-msgstr ""
+msgstr "لا تدعم الاستعلامات العامة الاستعلامات المنظمة. استخدم SQL الخام بدلاً من ذلك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "CSV file"
-msgstr ""
+msgstr "ملف CSV"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Updating dataset"
-msgstr ""
+msgstr "تحديث مجموعة البيانات"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset Name"
-msgstr ""
+msgstr "اسم مجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Copy share link"
-msgstr ""
+msgstr "نسخ رابط المشاركة"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Canonical URLs"
-msgstr ""
+msgstr "عناوين URL القياسية"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
-msgstr ""
+msgstr "اجعلها متاحة فقط عند عدم الاتصال"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL is available"
-msgstr ""
+msgstr "رابط مخصص متاح"
 
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
-msgstr ""
+msgstr "عدد الصفوف"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Contains (free-text)"
-msgstr ""
+msgstr "يحتوي على (نص حر)"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Loading dashboard datasets"
-msgstr ""
+msgstr "جارٍ تحميل مجموعات بيانات اللوحة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
-msgstr ""
+msgstr "اختر ملف Excel أو CSV من جهاز الكمبيوتر الخاص بك للاستيراد"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
-msgstr ""
+msgstr "تم نشر اللوحة!"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
-msgstr ""
+msgstr "تمت الإضافة إلى \"{dashboardName}\""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "There was an error while trying to authenticate with Google Sheets."
-msgstr ""
+msgstr "حدث خطأ أثناء محاولة المصادقة مع جوجل شيتس."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Loading datasets…"
-msgstr ""
+msgstr "جارٍ تحميل مجموعات البيانات…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
-msgstr ""
+msgstr "تمت معالجة البيانات بنجاح"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
-msgstr ""
+msgstr "تم رفض الوصول"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
-msgstr ""
+msgstr "تم إنشاء \"{dashboardName}\""
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
-msgstr ""
+msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength} حرفًا (الحالي: {0})."
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
-msgstr ""
+msgstr "أدخل اسم مجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
-msgstr ""
+msgstr "لن تظهر التغييرات غير المحفوظة في المعاينة. احفظ أولاً."
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save — {0}"
-msgstr ""
+msgstr "احفظ — {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Just what's queried"
-msgstr ""
+msgstr "فقط ما تم استعلامه"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Could not generate QR code"
-msgstr ""
+msgstr "تعذر إنشاء رمز الاستجابة السريعة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Could not publish dashboard"
-msgstr ""
+msgstr "تعذر نشر لوحة التحكم"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a spreadsheet"
-msgstr ""
+msgstr "قم بتحميل جدول بيانات"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google sheets connector is disabled while this feature is under maintenance."
-msgstr ""
+msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
-msgstr ""
+msgstr "الخدمة"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Google Sheets"
-msgstr ""
+msgstr "جداول بيانات Google"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
-msgstr ""
+msgstr "لن يتم تخزين مجموعة البيانات هذه عبر الإنترنت ويمكن الوصول إليها فقط طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "queried"
-msgstr ""
+msgstr "تم الاستعلام"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Error saving dataset"
-msgstr ""
+msgstr "خطأ في حفظ مجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "Save"
-msgstr ""
+msgstr "احفظ"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Default value"
-msgstr ""
+msgstr "القيمة الافتراضية"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Multi-select"
-msgstr ""
+msgstr "تحديد متعدد"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
-msgstr ""
+msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
 
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
-msgstr ""
+msgstr "يغطي <0>{0}</0>، من <1>{1}</1> إلى <2>{2}</2>."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL (optional)"
-msgstr ""
+msgstr "رابط مخصص (اختياري)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "The workspace name was saved successfully."
-msgstr ""
+msgstr "تم حفظ اسم مساحة العمل بنجاح."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "dataset name"
-msgstr ""
+msgstr "اسم مجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
-msgstr ""
+msgstr "رسم حر"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Permanent link (use for QR codes)"
-msgstr ""
+msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
-msgstr ""
+msgstr "الإعدادات"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
-msgstr ""
+msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "Published"
-msgstr ""
+msgstr "تم النشر"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
-msgstr ""
+msgstr "الفلاتر (أين)"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Single-select"
-msgstr ""
+msgstr "تحديد فردي"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr ""
+msgstr "مساحتك على خطة مجانية، التي تدعم حتى 5 مجموعات بيانات. قم بالترقية إلى خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحتك."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
-msgstr ""
+msgstr "المنظمة"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Text contains"
-msgstr ""
+msgstr "النص يحتوي على"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Share link"
-msgstr ""
+msgstr "رابط المشاركة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
-msgstr ""
+msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUID الدائم أدناه لا يزال يعمل أيضًا."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
-msgstr ""
+msgstr "لم تتم قراءة أي صفوف بنجاح"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Amber"
-msgstr ""
+msgstr "كهرماني"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Excel"
-msgstr ""
+msgstr "إكسل"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
-msgstr ""
+msgstr "ستكون مجموعة البيانات هذه متاحة فقط في وضع عدم الاتصال"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
-msgstr ""
+msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنترنت. انقر لجعلها متاحة فقط في وضع عدم الاتصال."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
-msgstr ""
+msgstr "حاول مرة أخرى."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "contains"
-msgstr ""
+msgstr "يحتوي على"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
-msgstr ""
+msgstr "إضافة فلتر"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد حذف <0>{0}</0> بشكل دائم؟ لا يمكن التراجع عن ذلك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
-msgstr ""
+msgstr "مخطط العمود"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
-msgstr ""
+msgstr "معرف الفلتر (ثابت)"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
-msgstr ""
+msgstr "غير قادر على جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset name"
-msgstr ""
+msgstr "اسم مجموعة البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of columns"
-msgstr ""
+msgstr "عدد الأعمدة"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
-msgstr ""
+msgstr "الملفات الشخصية"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Update & republish"
-msgstr ""
+msgstr "تحديث وإعادة نشر"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
-msgstr ""
+msgstr "اللغة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
-msgstr ""
+msgstr "تعذر قراءة الملف"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Dashboards"
-msgstr ""
+msgstr "لوحات المعلومات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
-msgstr ""
+msgstr "عدد صحيح"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr ""
+msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
-msgstr ""
+msgstr "المطالبة"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"
-msgstr ""
+msgstr "العدد"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
-msgstr ""
+msgstr "عام"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Select all"
-msgstr ""
+msgstr "تحديد الكل"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Only what's queried (recommended)"
-msgstr ""
+msgstr "فقط ما تم استعلامه (موصى به)"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
-msgstr ""
+msgstr "معاينة لوحة المعلومات هذه"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
-msgstr ""
+msgstr "الأعضاء"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
-msgstr ""
+msgstr "رابط قصير وسهل التذكر للنشرات والتقارير وأكواد QR. أي شيء تكتبه يتم تحويله تلقائيًا إلى تنسيق kebab."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
-msgstr ""
+msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Column"
-msgstr ""
+msgstr "عمود"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Remove local filter"
-msgstr ""
+msgstr "إزالة الفلتر المحلي"
 
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 msgid "From your prompt:"
-msgstr ""
+msgstr "من مطالبتك:"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Anyone with this link can view the dashboard."
-msgstr ""
+msgstr "يمكن لأي شخص لديه هذا الرابط عرض لوحة المعلومات."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Delimiter"
-msgstr ""
+msgstr "فاصل"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File loaded successfully"
-msgstr ""
+msgstr "تم تحميل الملف بنجاح"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
-msgstr ""
+msgstr "تم حفظ مجموعة البيانات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
-msgstr ""
+msgstr "نص"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
-msgstr ""
+msgstr "حدد ترتيب الفرز"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
-msgstr ""
+msgstr "حفظ مجموعة البيانات"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
-msgstr ""
+msgstr "البحث في لوحات المعلومات"
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
-msgstr ""
+msgstr "المستند المحدد: {0}"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
-msgstr ""
+msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعمدة أدناه للتأكد من صحتها. إذا لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة أخرى."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
-msgstr ""
+msgstr "مزامنة عبر الإنترنت؟"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
-msgstr ""
+msgstr "أضف موجهًا وأنشئ SQL لتكوين هذه التصوير."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Copy link"
-msgstr ""
+msgstr "نسخ الرابط"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Delete {0}"
-msgstr ""
+msgstr "حذف {0}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
-msgstr ""
+msgstr "فشل تحميل ورقة Google"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "You have not created any dashboards"
-msgstr ""
+msgstr "لم تقم بإنشاء أي لوحات معلومات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
-msgstr ""
+msgstr "الأقدم"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "max"
-msgstr ""
+msgstr "الحد الأقصى"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Dataset limit reached"
-msgstr ""
+msgstr "تم الوصول إلى حد مجموعة البيانات"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Distinct values"
-msgstr ""
+msgstr "قيم مميزة"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
-msgstr ""
+msgstr "مجموعة بيانات مشتقة"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
-msgstr ""
+msgstr "يرجى إلقاء نظرة على البيانات والتأكد من صحتها. بمجرد التأكيد، ستتم مزامنة مجموعة البيانات مع هذه البيانات."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Stroke ({strokeWidth}px)"
-msgstr ""
+msgstr "سمك الخط ({strokeWidth}px)"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
-msgstr ""
+msgstr "خط تحرير"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Untitled dashboard"
-msgstr ""
+msgstr "لوحة معلومات بدون عنوان"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Limit"
-msgstr ""
+msgstr "حد"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Fix these issues before saving"
-msgstr ""
+msgstr "قم بإصلاح هذه المشكلات قبل الحفظ"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
-msgstr ""
+msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا أيضًا."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Clear all"
-msgstr ""
+msgstr "مسح الكل"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
-msgstr ""
+msgstr "إغلاق"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
-msgstr ""
+msgstr "مشارك معك"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
-msgstr ""
+msgstr "تم نشر هذه اللوحة للجمهور."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Share"
-msgstr ""
+msgstr "مشاركة"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Whole dataset"
-msgstr ""
+msgstr "مجموعة البيانات الكاملة"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
-msgstr ""
+msgstr "بعض"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
-msgstr ""
+msgstr "سهم"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Values, comma-separated"
-msgstr ""
+msgstr "قيم، مفصولة بفواصل"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "+{0} more values tied at {1} rows"
-msgstr ""
+msgstr "+{0} قيم إضافية مرتبطة بـ {1} صفوف"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
-msgstr ""
+msgstr "فضفاض"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"
-msgstr ""
+msgstr "تحميل PNG"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Show QR code"
-msgstr ""
+msgstr "عرض رمز QR"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
-msgstr ""
+msgstr "بشكل افتراضي، نستخدم رابط دائم يعتمد على UUID. أضف مسارًا مخصصًا أدناه للحصول على عنوان URL أجمل."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Mode"
-msgstr ""
+msgstr "وضع"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Failed to delete dataset: {0}"
-msgstr ""
+msgstr "فشل حذف مجموعة البيانات: {0}"

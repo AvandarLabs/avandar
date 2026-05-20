@@ -15,12 +15,41 @@ import { VoiceInputButton } from "./VoiceInputButton";
 
 const composerSetText = vi.fn();
 const composerGetState = vi.fn().mockReturnValue({ text: "" });
-const ensureModelLoadedMock = vi.fn().mockResolvedValue(undefined);
-const isModelDownloadedMock = vi.fn().mockResolvedValue(false);
-const transcribeMock = vi.fn().mockResolvedValue("hello world");
-
-const { notificationShowMock } = vi.hoisted(() => {
-  return { notificationShowMock: vi.fn() };
+const {
+  ensureModelLoadedMock,
+  deleteModelMock,
+  isModelDownloadedMock,
+  transcribeMock,
+  voiceManagerMock,
+  notificationShowMock,
+  startMicrophoneRecordingMock,
+} = vi.hoisted(() => {
+  const ensureModelLoaded = vi.fn().mockResolvedValue(undefined);
+  const deleteModel = vi.fn().mockResolvedValue(undefined);
+  const isModelDownloaded = vi.fn().mockResolvedValue(false);
+  const transcribe = vi.fn().mockResolvedValue("hello world");
+  return {
+    ensureModelLoadedMock: ensureModelLoaded,
+    deleteModelMock: deleteModel,
+    isModelDownloadedMock: isModelDownloaded,
+    transcribeMock: transcribe,
+    voiceManagerMock: {
+      ensureModelLoaded,
+      deleteModel,
+      isModelDownloaded,
+      transcribe,
+      getStatus: () => {
+        return { kind: "idle" as const };
+      },
+      subscribe: () => {
+        return () => {
+          return undefined;
+        };
+      },
+    },
+    notificationShowMock: vi.fn(),
+    startMicrophoneRecordingMock: vi.fn(),
+  };
 });
 
 vi.mock("@mantine/notifications", async () => {
@@ -50,19 +79,7 @@ vi.mock("@assistant-ui/react", () => {
 vi.mock("@/lib/voice/useVoiceModelManager", () => {
   return {
     useVoiceModelManager: () => {
-      return {
-        ensureModelLoaded: ensureModelLoadedMock,
-        isModelDownloaded: isModelDownloadedMock,
-        transcribe: transcribeMock,
-        getStatus: () => {
-          return { kind: "idle" };
-        },
-        subscribe: () => {
-          return () => {
-            return undefined;
-          };
-        },
-      };
+      return voiceManagerMock;
     },
     useVoiceModelStatus: () => {
       return { kind: "idle" };
@@ -72,7 +89,7 @@ vi.mock("@/lib/voice/useVoiceModelManager", () => {
 
 vi.mock("@/lib/voice/audioCapture", () => {
   return {
-    startMicrophoneRecording: vi.fn(),
+    startMicrophoneRecording: startMicrophoneRecordingMock,
   };
 });
 
@@ -101,15 +118,40 @@ describe("VoiceInputButton", () => {
   beforeEach(() => {
     composerSetText.mockClear();
     ensureModelLoadedMock.mockClear();
+    deleteModelMock.mockClear();
     isModelDownloadedMock.mockClear();
+    isModelDownloadedMock.mockResolvedValue(false);
     transcribeMock.mockClear();
     notificationShowMock.mockClear();
     workspaceLocaleRef.current = "en";
     window.localStorage.clear();
+    startMicrophoneRecordingMock.mockReset();
+  });
+
+  it("shows an end transcription button while recording", async () => {
+    isModelDownloadedMock.mockResolvedValue(true);
+    startMicrophoneRecordingMock.mockResolvedValue({
+      stop: vi.fn().mockResolvedValue(new Float32Array([0])),
+    });
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const micButton = await screen.findByRole("button", {
+      name: /speak \(local voice-to-text\)/i,
+    });
+    await act(async () => {
+      fireEvent.click(micButton);
+    });
+
+    expect(
+      await screen.findByRole("button", { name: /end transcription/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders a microphone button with a setup tooltip when no model is downloaded", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
@@ -123,7 +165,6 @@ describe("VoiceInputButton", () => {
   });
 
   it("opens the download prompt when clicked and no model is downloaded", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
@@ -147,7 +188,6 @@ describe("VoiceInputButton", () => {
   });
 
   it("kicks off ensureModelLoaded when the user confirms the download", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
@@ -171,8 +211,9 @@ describe("VoiceInputButton", () => {
   });
 
   it("fires a success toast when the download completes", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
-    ensureModelLoadedMock.mockResolvedValueOnce(undefined);
+    ensureModelLoadedMock.mockImplementation(async () => {
+      isModelDownloadedMock.mockResolvedValue(true);
+    });
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
@@ -203,7 +244,6 @@ describe("VoiceInputButton", () => {
   });
 
   it("fires a danger toast when the download fails", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
     ensureModelLoadedMock.mockRejectedValueOnce(new Error("disk full"));
     render(
       <AvandarUiProvider>
@@ -235,8 +275,22 @@ describe("VoiceInputButton", () => {
     });
   });
 
-  it("renders a voice settings button to the left of the microphone", async () => {
-    isModelDownloadedMock.mockResolvedValueOnce(false);
+  it("does not render voice settings until a model is downloaded locally", async () => {
+    isModelDownloadedMock.mockResolvedValue(false);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    await screen.findByRole("button", { name: /set up voice prompting/i });
+    expect(
+      screen.queryByRole("button", { name: /voice settings/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders voice settings after a model is present in the local cache", async () => {
+    isModelDownloadedMock.mockResolvedValue(true);
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
@@ -248,19 +302,20 @@ describe("VoiceInputButton", () => {
     ).toBeInTheDocument();
   });
 
-  it("defaults the language picker to the workspace locale", async () => {
+  it("defaults the language picker to the workspace locale when nothing is stored", async () => {
     workspaceLocaleRef.current = "es";
-    isModelDownloadedMock.mockResolvedValueOnce(false);
+    isModelDownloadedMock.mockResolvedValue(true);
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
       </AvandarUiProvider>,
     );
 
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
     await act(async () => {
-      fireEvent.click(
-        await screen.findByRole("button", { name: /voice settings/i }),
-      );
+      fireEvent.click(settingsButton);
     });
 
     const languageInput = await screen.findByRole("combobox", {
@@ -269,25 +324,140 @@ describe("VoiceInputButton", () => {
     expect((languageInput as HTMLInputElement).value).toBe("Español");
   });
 
-  it("falls back to auto-detect when the workspace locale has no voice mapping", async () => {
-    workspaceLocaleRef.current = "ar";
-    isModelDownloadedMock.mockResolvedValueOnce(false);
+  it("shows an explicit download button when the selected model is not cached", async () => {
+    window.localStorage.setItem("avandar.voice.modelId", "whisper-base");
+    isModelDownloadedMock.mockImplementation(async (id: string) => {
+      return id === "whisper-tiny";
+    });
     render(
       <AvandarUiProvider>
         <VoiceInputButton />
       </AvandarUiProvider>,
     );
 
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
     await act(async () => {
-      fireEvent.click(
-        await screen.findByRole("button", { name: /voice settings/i }),
-      );
+      fireEvent.click(settingsButton);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /^download$/i }),
+      ).toBeInTheDocument();
+    });
+    expect(ensureModelLoadedMock).not.toHaveBeenCalled();
+  });
+
+  it("uses a stored voice language instead of the workspace locale", async () => {
+    workspaceLocaleRef.current = "es";
+    window.localStorage.setItem("avandar.voice.language", "english");
+    isModelDownloadedMock.mockResolvedValue(true);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
+    await act(async () => {
+      fireEvent.click(settingsButton);
+    });
+
+    const languageInput = await screen.findByRole("combobox", {
+      name: /language/i,
+    });
+    expect((languageInput as HTMLInputElement).value).toBe("English");
+  });
+
+  it("falls back to auto-detect when the workspace locale has no voice mapping", async () => {
+    workspaceLocaleRef.current = "ar";
+    isModelDownloadedMock.mockResolvedValue(true);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
+    await act(async () => {
+      fireEvent.click(settingsButton);
     });
 
     const languageInput = await screen.findByRole("combobox", {
       name: /language/i,
     });
     expect((languageInput as HTMLInputElement).value).toBe("Auto-detect");
+  });
+
+  it("shows a remove control for each downloaded model in voice settings", async () => {
+    isModelDownloadedMock.mockImplementation(async (id: string) => {
+      return id === "whisper-tiny" || id === "whisper-base";
+    });
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
+    await act(async () => {
+      fireEvent.click(settingsButton);
+    });
+
+    await waitFor(() => {
+      const removeButtons = screen.getAllByRole("button", {
+        name: /^remove whisper/i,
+      });
+      expect(removeButtons).toHaveLength(2);
+    });
+  });
+
+  it("deletes a model from cache and hides settings when the last model is removed", async () => {
+    isModelDownloadedMock.mockImplementation(async (id: string) => {
+      return id === "whisper-tiny";
+    });
+    deleteModelMock.mockImplementation(async () => {
+      isModelDownloadedMock.mockImplementation(async () => {
+        return false;
+      });
+    });
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    const settingsButton = await screen.findByRole("button", {
+      name: /voice settings/i,
+    });
+    await act(async () => {
+      fireEvent.click(settingsButton);
+    });
+
+    const removeButton = await screen.findByRole("button", {
+      name: /remove whisper tiny/i,
+    });
+    await act(async () => {
+      fireEvent.click(removeButton);
+    });
+
+    expect(deleteModelMock).toHaveBeenCalledWith("whisper-tiny");
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: /voice settings/i }),
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      await screen.findByRole("button", { name: /set up voice prompting/i }),
+    ).toBeInTheDocument();
   });
 
   it("disables the button when the disabled prop is set", () => {

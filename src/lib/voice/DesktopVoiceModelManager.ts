@@ -19,6 +19,7 @@
  */
 
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
+import { isSameVoiceManagerStatus } from "./voiceManagerInterface";
 import type {
   IVoiceModelManager,
   VoiceManagerListener,
@@ -85,6 +86,8 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
 
   private pollHandle: unknown = null;
 
+  private readonly loadInFlight = new Map<VoiceModelId, Promise<void>>();
+
   constructor(deps: DesktopVoiceManagerDependencies) {
     this.callIpc = deps.callIpc;
     this.setTimer =
@@ -124,6 +127,16 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
     }
   }
 
+  async deleteModel(id: VoiceModelId): Promise<void> {
+    await this.callIpc(VoiceContracts.deleteModel, { modelId: id });
+    if (
+      this.status.kind !== "idle" &&
+      ("modelId" in this.status ? this.status.modelId === id : false)
+    ) {
+      this.setStatus({ kind: "idle" });
+    }
+  }
+
   async ensureModelLoaded(id: VoiceModelId): Promise<void> {
     // Short-circuit if the service already reports the model as ready.
     if (await this.isModelDownloaded(id)) {
@@ -131,7 +144,24 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
       return;
     }
 
-    this.setStatus({ kind: "downloading", modelId: id, progressPercent: -1 });
+    const inFlight = this.loadInFlight.get(id);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const loadPromise = this.runEnsureModelLoaded(id);
+    this.loadInFlight.set(id, loadPromise);
+    try {
+      await loadPromise;
+    } finally {
+      this.loadInFlight.delete(id);
+    }
+  }
+
+  private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
+    if (this.status.kind !== "downloading" || this.status.modelId !== id) {
+      this.setStatus({ kind: "downloading", modelId: id, progressPercent: -1 });
+    }
     await this.callIpc(VoiceContracts.downloadModel, { modelId: id });
 
     await this.waitForReadyOrError(id);
@@ -228,6 +258,9 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
   }
 
   private setStatus(next: VoiceManagerStatus): void {
+    if (isSameVoiceManagerStatus(this.status, next)) {
+      return;
+    }
     this.status = next;
     this.listeners.forEach((listener) => {
       listener(next);

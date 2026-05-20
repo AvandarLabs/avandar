@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
+  hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
@@ -8,6 +9,13 @@ import {
 describe("dataExplorerPanelPreferences", () => {
   beforeEach(() => {
     window.sessionStorage.clear();
+  });
+
+  it("reports whether session storage has panel preferences", () => {
+    expect(hasDataExplorerPanelPreferencesInSessionStorage()).toBe(false);
+
+    writeDataExplorerPanelPreferences({ settings: { opened: false } });
+    expect(hasDataExplorerPanelPreferencesInSessionStorage()).toBe(true);
   });
 
   it("returns an empty object when storage is missing or invalid", () => {

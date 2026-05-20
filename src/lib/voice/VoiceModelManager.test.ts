@@ -97,6 +97,96 @@ describe("VoiceModelManager", () => {
     expect(statuses[statuses.length - 1]).toBe("ready");
   });
 
+  it("does not revert progressPercent to -1 after a numeric progress event", async () => {
+    const cache = createInMemoryCache();
+
+    let capturedProgressCb: ((event: ProgressEvent) => void) | undefined;
+    let releaseAsrPipeline: (fn: ReturnType<typeof vi.fn>) => void = () => {
+      return undefined;
+    };
+    const asrPipeline = vi.fn().mockResolvedValue({ text: "hello" });
+    const buildPipeline = vi
+      .fn()
+      .mockImplementation((_task, _modelId, options) => {
+        capturedProgressCb = options.progress_callback;
+        return new Promise<ReturnType<typeof vi.fn>>((resolve) => {
+          releaseAsrPipeline = resolve;
+        });
+      });
+
+    const manager = __TEST_ONLY.createManagerForTest(
+      {
+        loadPipeline: async () => {
+          return buildPipeline;
+        },
+        configureEnv: async () => {
+          return undefined;
+        },
+      },
+      cache,
+    );
+
+    const ensure = manager.ensureModelLoaded("whisper-tiny");
+    await vi.waitUntil(() => {
+      return capturedProgressCb !== undefined;
+    });
+    capturedProgressCb?.({
+      status: "progress",
+      progress: 50,
+      file: "model.onnx",
+    });
+    capturedProgressCb?.({
+      status: "progress",
+      file: "tokenizer.json",
+    });
+
+    expect(manager.getStatus()).toMatchObject({
+      kind: "downloading",
+      progressPercent: 50,
+    });
+
+    releaseAsrPipeline(asrPipeline);
+    await ensure;
+  });
+
+  it("coalesces concurrent ensureModelLoaded calls into one pipeline build", async () => {
+    const cache = createInMemoryCache();
+
+    let releasePipeline: (fn: ReturnType<typeof vi.fn>) => void = () => {
+      return undefined;
+    };
+    const pipelineFn = vi.fn().mockResolvedValue({ text: "hello" });
+    const buildPipeline = vi.fn().mockImplementation(() => {
+      return new Promise<ReturnType<typeof vi.fn>>((resolve) => {
+        releasePipeline = resolve;
+      });
+    });
+
+    const manager = __TEST_ONLY.createManagerForTest(
+      {
+        loadPipeline: async () => {
+          return buildPipeline;
+        },
+        configureEnv: async () => {
+          return undefined;
+        },
+      },
+      cache,
+    );
+
+    const first = manager.ensureModelLoaded("whisper-tiny");
+    const second = manager.ensureModelLoaded("whisper-tiny");
+
+    await vi.waitUntil(() => {
+      return buildPipeline.mock.calls.length === 1;
+    });
+
+    releasePipeline(pipelineFn);
+    await Promise.all([first, second]);
+
+    expect(manager.getStatus().kind).toBe("ready");
+  });
+
   it("transcribes audio using the loaded pipeline and returns the trimmed text", async () => {
     const cache = createInMemoryCache();
     const pipelineFn = vi.fn().mockResolvedValue({ text: "  Hola mundo  " });
@@ -182,6 +272,41 @@ describe("VoiceModelManager", () => {
     expect(
       window.localStorage.getItem("avandar.voice.downloadedModels"),
     ).toBeNull();
+  });
+
+  it("deleteModel clears the cache marker and unloads the in-memory pipeline", async () => {
+    const cache = createInMemoryCache();
+    const modelPrefix = "https://huggingface.co/Xenova/whisper-tiny/";
+    cache.entries.set(`${modelPrefix}model.onnx`, new ArrayBuffer(8));
+
+    const pipelineFn = vi.fn().mockResolvedValue({ text: "hi" });
+    const buildPipeline = vi.fn().mockResolvedValue(pipelineFn);
+
+    window.localStorage.setItem(
+      "avandar.voice.downloadedModels",
+      JSON.stringify({ "whisper-tiny": true }),
+    );
+
+    const manager = __TEST_ONLY.createManagerForTest(
+      {
+        loadPipeline: async () => {
+          return buildPipeline;
+        },
+        configureEnv: async () => {
+          return undefined;
+        },
+      },
+      cache,
+    );
+
+    await manager.ensureModelLoaded("whisper-tiny");
+    await manager.deleteModel("whisper-tiny");
+
+    expect(await manager.isModelDownloaded("whisper-tiny")).toBe(false);
+    expect(manager.getStatus()).toEqual({ kind: "idle" });
+    expect(window.localStorage.getItem("avandar.voice.downloadedModels")).toBe(
+      "{}",
+    );
   });
 
   it("isModelDownloaded returns false when the cache lacks files even if marker says yes", async () => {

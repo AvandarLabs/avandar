@@ -164,6 +164,29 @@ describe("createWhisperService", () => {
     });
   });
 
+  it("deleteModel removes the on-disk weights and unloads an active instance", async () => {
+    writeFileSync(join(workDir, "ggml-tiny.bin"), Buffer.from([1, 2, 3]));
+
+    const service = createWhisperService({
+      modelsDir: workDir,
+      loadSmartWhisper: async () => {
+        return makeStubModule();
+      },
+    });
+
+    await service.transcribe({
+      modelId: "whisper-tiny",
+      pcmSamples: new Float32Array([0]),
+    });
+    expect(service.isModelDownloaded("whisper-tiny")).toBe(true);
+
+    await service.deleteModel("whisper-tiny");
+
+    expect(service.isModelDownloaded("whisper-tiny")).toBe(false);
+    expect(service.getStatus()).toEqual({ kind: "idle" });
+    expect(service.listDownloadedModels()).toEqual([]);
+  });
+
   it("rejects unknown model ids", async () => {
     const service = createWhisperService({
       modelsDir: workDir,

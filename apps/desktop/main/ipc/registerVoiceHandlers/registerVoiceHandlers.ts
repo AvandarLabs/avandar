@@ -37,6 +37,11 @@ export function registerVoiceHandlers(
     return { started: true };
   });
 
+  ipcServer.handle(VoiceContracts.deleteModel, async (req) => {
+    await whisperService.deleteModel(req.modelId);
+    return { deleted: true };
+  });
+
   ipcServer.handle(VoiceContracts.getStatus, () => {
     return { status: whisperService.getStatus() };
   });

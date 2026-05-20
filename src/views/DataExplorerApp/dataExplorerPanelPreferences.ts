@@ -78,6 +78,22 @@ function _sanitizePreference(
 }
 
 /**
+ * True when this tab already has persisted floating-panel preferences in
+ * `sessionStorage` (including an empty object written on a prior visit).
+ */
+export function hasDataExplorerPanelPreferencesInSessionStorage(): boolean {
+  try {
+    return (
+      window.sessionStorage.getItem(
+        DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY,
+      ) !== null
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Reads persisted Data Explorer floating-panel preferences for the current
  * browser tab. Reads from `sessionStorage`, so positions persist across
  * refreshes but are wiped when the tab is closed.

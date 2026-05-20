@@ -14,6 +14,7 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import { DashboardChatPendingBlocksSync } from "@/views/DashboardApp/DashboardEditorView/DashboardChatPendingBlocksSync";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import {
@@ -38,7 +39,6 @@ export function DashboardEditorView({
   const { t } = useLingui();
   const [appRoles] = useUserAppRoles();
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
-  const { pendingBlocks } = DashboardEditorStateManager.useState();
 
   // Register / unregister this dashboard as the active editor target. The
   // chat panel reads this to decide whether to offer the `addDashboardBlock`
@@ -104,25 +104,6 @@ export function DashboardEditorView({
       t,
     });
   }, [dashboard.id, dashboard.workspaceId, dashboardTitle, t]);
-
-  // Drain blocks queued by the chat panel into the dashboard's Puck data.
-  // Marks the editor dirty so the Save button can be activated.
-  useEffect(() => {
-    if (pendingBlocks.length === 0) {
-      return;
-    }
-    setData((prev) => {
-      const newContent = [
-        ...prev.content,
-        ...pendingBlocks.map((p) => {
-          return p.block;
-        }),
-      ];
-      return { ...prev, content: newContent };
-    });
-    setHasUnsavedChanges(true);
-    dashboardEditorDispatch.consumePendingBlocks();
-  }, [pendingBlocks, dashboardEditorDispatch]);
 
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate:
@@ -208,6 +189,7 @@ export function DashboardEditorView({
               headerActions: () => {
                 return (
                   <>
+                    <DashboardChatPendingBlocksSync />
                     <SaveDashboardButton onSave={onSave} />
                     <ShareResourceButton
                       resourceName={dashboardTitle}

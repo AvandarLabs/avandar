@@ -29,3 +29,4 @@ Random other features we should consider:
 - Fine tune our own models on Avandar platform and social sector and querying and other Avandar-specific stuff.
 - Add descriptions and metadata about each model.
 - Make the chat panel look like a drawer under the main layout. No gap. Slightly smaller height. Drop shadow over it.
+- The sample prompts they give us map to the datasets but we should make a better choice of column name (we just say 'categories' but that's not always appropriate)

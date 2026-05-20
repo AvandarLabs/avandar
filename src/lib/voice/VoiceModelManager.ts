@@ -1,4 +1,8 @@
 import {
+  isSameVoiceManagerStatus,
+  mergeDownloadingProgressPercent,
+} from "./voiceManagerInterface";
+import {
   clearCachedFilesForPrefix,
   createVoiceModelCache,
   hasCachedFilesForPrefix,
@@ -107,6 +111,9 @@ export class VoiceModelManager implements IVoiceModelManager {
 
   private envConfigured = false;
 
+  /** Coalesces overlapping ensureModelLoaded calls for the same model. */
+  private readonly loadInFlight = new Map<VoiceModelId, Promise<void>>();
+
   private readonly cache: VoiceModelCache;
 
   private readonly deps: ManagerDependencies;
@@ -166,6 +173,21 @@ export class VoiceModelManager implements IVoiceModelManager {
       return;
     }
 
+    const inFlight = this.loadInFlight.get(id);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const loadPromise = this.runEnsureModelLoaded(id);
+    this.loadInFlight.set(id, loadPromise);
+    try {
+      await loadPromise;
+    } finally {
+      this.loadInFlight.delete(id);
+    }
+  }
+
+  private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
     await this.configureEnvOnce();
     const model = findVoiceModel(id);
 
@@ -211,6 +233,27 @@ export class VoiceModelManager implements IVoiceModelManager {
           error instanceof Error ? error.message : "Failed to load voice model",
       });
       throw error;
+    }
+  }
+
+  /**
+   * Removes cached weights for `id` and clears the downloaded marker. If the
+   * model was loaded in memory, drops the pipeline so the next transcription
+   * re-downloads.
+   */
+  async deleteModel(id: VoiceModelId): Promise<void> {
+    const model = findVoiceModel(id);
+    await clearCachedFilesForPrefix(modelCachePrefix(model));
+    clearVoiceModelDownloaded(id);
+    if (this.loadedModelId === id) {
+      this.pipelinePromise = null;
+      this.loadedModelId = null;
+    }
+    if (
+      this.status.kind !== "idle" &&
+      ("modelId" in this.status ? this.status.modelId === id : false)
+    ) {
+      this.setStatus({ kind: "idle" });
     }
   }
 
@@ -271,8 +314,13 @@ export class VoiceModelManager implements IVoiceModelManager {
       return;
     }
     if (event.status === "progress") {
-      const progressPercent =
+      const rawPercent =
         typeof event.progress === "number" ? Math.min(99, event.progress) : -1;
+      const progressPercent = mergeDownloadingProgressPercent(
+        this.status,
+        modelId,
+        rawPercent,
+      );
       this.setStatus({
         kind: "downloading",
         modelId,
@@ -280,16 +328,24 @@ export class VoiceModelManager implements IVoiceModelManager {
         currentFile: event.file,
       });
     } else if (event.status === "done" || event.status === "ready") {
+      const progressPercent = mergeDownloadingProgressPercent(
+        this.status,
+        modelId,
+        99,
+      );
       this.setStatus({
         kind: "downloading",
         modelId,
-        progressPercent: 99,
+        progressPercent,
         currentFile: event.file,
       });
     }
   }
 
   private setStatus(next: VoiceManagerStatus): void {
+    if (isSameVoiceManagerStatus(this.status, next)) {
+      return;
+    }
     this.status = next;
     this.listeners.forEach((listener) => {
       listener(next);

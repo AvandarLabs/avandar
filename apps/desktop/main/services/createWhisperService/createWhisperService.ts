@@ -50,6 +50,7 @@ export type WhisperService = {
   listDownloadedModels(): readonly string[];
   isModelDownloaded(modelId: string): boolean;
   downloadModel(modelId: string): Promise<void>;
+  deleteModel(modelId: string): Promise<void>;
   transcribe(args: {
     modelId: string;
     pcmSamples: Float32Array;
@@ -252,6 +253,35 @@ export function createWhisperService(
     return downloaded;
   };
 
+  const deleteModel = async (modelId: string): Promise<void> => {
+    const ggmlName = WHISPER_MODEL_ID_TO_GGML_NAME[modelId];
+    if (!ggmlName) {
+      throw new Error(`Unknown voice model id: ${modelId}`);
+    }
+
+    if (activeWhisper?.modelId === modelId) {
+      await activeWhisper.instance.free().catch(() => {
+        return undefined;
+      });
+      activeWhisper = null;
+    }
+
+    const destPath = fullPathForModel(modelId);
+    await unlink(destPath).catch(() => {
+      return undefined;
+    });
+    await unlink(`${destPath}.partial`).catch(() => {
+      return undefined;
+    });
+
+    if (
+      status.kind !== "idle" &&
+      ("modelId" in status ? status.modelId === modelId : false)
+    ) {
+      status = { kind: "idle" };
+    }
+  };
+
   const downloadModel = async (modelId: string): Promise<void> => {
     const ggmlName = WHISPER_MODEL_ID_TO_GGML_NAME[modelId];
     if (!ggmlName) {
@@ -354,6 +384,7 @@ export function createWhisperService(
     listDownloadedModels,
     isModelDownloaded,
     downloadModel,
+    deleteModel,
     transcribe,
     getStatus(): WhisperServiceStatus {
       return status;

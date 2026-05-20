@@ -78,5 +78,35 @@ describe("VoiceModelDownloadIndicator", () => {
     expect(
       screen.getByText(/Preparing local voice model/i),
     ).toBeInTheDocument();
+    expect(screen.getByText("Starting…")).toBeInTheDocument();
+  });
+
+  it("keeps a single determinate progress bar when percent updates", () => {
+    mockStatus = {
+      kind: "downloading",
+      modelId: "whisper-tiny",
+      progressPercent: -1,
+    };
+    const { rerender } = render(
+      <AvandarUiProvider>
+        <VoiceModelDownloadIndicator />
+      </AvandarUiProvider>,
+    );
+
+    mockStatus = {
+      kind: "downloading",
+      modelId: "whisper-tiny",
+      progressPercent: 42,
+      currentFile: "model.onnx",
+    };
+    rerender(
+      <AvandarUiProvider>
+        <VoiceModelDownloadIndicator />
+      </AvandarUiProvider>,
+    );
+
+    expect(screen.getByText("42%")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.queryByText("Starting…")).not.toBeInTheDocument();
   });
 });

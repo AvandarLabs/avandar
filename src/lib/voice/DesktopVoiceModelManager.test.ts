@@ -134,6 +134,36 @@ describe("DesktopVoiceModelManager", () => {
     expect(pollCount).toBe(3);
   });
 
+  it("coalesces concurrent ensureModelLoaded calls into one downloadModel IPC", async () => {
+    const callIpc = makeCallIpc({
+      isModelDownloaded: () => {
+        return { downloaded: false };
+      },
+      getStatus: () => {
+        return {
+          status: { kind: "ready", modelId: "whisper-tiny" },
+        };
+      },
+    });
+    const { setTimer, clearTimer } = makeImmediateTimer();
+
+    const manager = new DesktopVoiceModelManager({
+      callIpc,
+      setTimer,
+      clearTimer,
+    });
+
+    await Promise.all([
+      manager.ensureModelLoaded("whisper-tiny"),
+      manager.ensureModelLoaded("whisper-tiny"),
+    ]);
+
+    const downloadCalls = callIpc.mock.calls.filter((call) => {
+      return call[0].name === VoiceContracts.downloadModel.name;
+    });
+    expect(downloadCalls).toHaveLength(1);
+  });
+
   it("rejects ensureModelLoaded when the service reports an error", async () => {
     const callIpc = makeCallIpc({
       isModelDownloaded: () => {

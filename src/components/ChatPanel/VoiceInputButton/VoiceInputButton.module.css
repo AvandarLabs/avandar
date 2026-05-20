@@ -6,8 +6,16 @@
   flex-shrink: 0;
 }
 
+.endTranscription {
+  flex-shrink: 0;
+}
+
 .recording {
   animation: pulse 1.4s ease-in-out infinite;
+}
+
+.downloadedModelRow {
+  min-width: 0;
 }
 
 @keyframes pulse {

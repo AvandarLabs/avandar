@@ -47,6 +47,10 @@ export const VoiceContracts = {
     "voice.downloadModel",
   ),
 
+  deleteModel: defineIpcContract<{ modelId: string }, { deleted: boolean }>(
+    "voice.deleteModel",
+  ),
+
   getStatus: defineIpcContract<
     Record<string, never>,
     { status: VoiceServiceStatus }
