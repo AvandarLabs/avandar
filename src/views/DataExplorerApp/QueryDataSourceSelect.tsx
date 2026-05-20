@@ -186,20 +186,22 @@ export function QueryDataSourceSelect({
       value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
       disabled={disabledProp ?? !hasDataSources}
-      renderOption={({ option }) => (
-        <Group justify="space-between" wrap="nowrap">
-          <Text size="sm">{option.label}</Text>
-          {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
-            <Tooltip
-              label={t`Not available offline. Open this dataset while online to cache it.`}
-            >
-              <Badge size="xs" color="red" variant="light">
-                <Trans>Not offline</Trans>
+      renderOption={({ option }) => {
+        return (
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="sm">{option.label}</Text>
+            {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
+              <Tooltip
+                label={t`Not available offline. Open this dataset while online to cache it.`}
+              >
+                <Badge size="xs" color="red" variant="light">
+                  <Trans>Not offline</Trans>
+                </Badge>
               </Tooltip>
-            </Tooltip>
-          : null}
-        </Group>
-      )}
+            : null}
+          </Group>
+        );
+      }}
       {...restSelectProps}
     />
   );
