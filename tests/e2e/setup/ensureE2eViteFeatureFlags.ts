@@ -19,7 +19,10 @@ export function appendViteFeatureFlag(
   return tokens.join(",");
 }
 
-const E2E_REQUIRED_VITE_FEATURE_FLAGS = ["enable-shared-with-me"] as const;
+const E2E_REQUIRED_VITE_FEATURE_FLAGS = [
+  "enable-shared-with-me",
+  "enable-offline-chat",
+] as const;
 
 /**
  * Ensures feature flags required by Playwright specs are enabled for the test
@@ -32,4 +35,5 @@ export function ensureE2eViteFeatureFlags(): void {
       flag,
     );
   }
+  process.env.VITE_OFFLINE_CHAT_MOCK = "true";
 }

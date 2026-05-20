@@ -76,6 +76,12 @@ export enum FeatureFlag {
    * spatial functions.
    */
   DisableDuckDbSpatial = "disable-duckdb-spatial",
+
+  /**
+   * Enable offline chat via WebLLM when the browser is offline or when a
+   * chat POST fails and the user accepts a downloaded local model.
+   */
+  EnableOfflineChat = "enable-offline-chat",
 }
 
 export const FeatureFlagConfig = {
@@ -89,6 +95,7 @@ export const FeatureFlagConfig = {
   [FeatureFlag.EnableUserFeedback]: undefined,
   [FeatureFlag.EnableSharedWithMe]: undefined,
   [FeatureFlag.DisableDuckDbSpatial]: undefined,
+  [FeatureFlag.EnableOfflineChat]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

@@ -91,6 +91,7 @@
     "@lingui/core": "^6.0.1",
     "@lingui/detect-locale": "^6.0.1",
     "@lingui/react": "^6.0.1",
+    "@mlc-ai/web-llm": "^0.2.81",
     "@mantine/charts": "^9.2.0",
     "@mantine/core": "^9.2.0",
     "@mantine/dropzone": "^9.2.0",
