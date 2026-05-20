@@ -280,7 +280,16 @@ test.describe("chat interactive workflows", () => {
       await expect(page.getByText("Keep only confirmed cases")).toBeVisible();
       await expect(page.getByText("Aggregate by day")).toBeVisible();
 
-      // Both steps should eventually succeed (auto-run is the default)
+      await dismissBlockingOverlays(page);
+      const approveButton = page.getByRole("button", {
+        name: "Approve and run",
+      });
+      await expect(approveButton).toBeVisible({ timeout: MEDIUM_WAIT });
+      await approveButton.evaluate((node) => {
+        (node as { click: () => void }).click();
+      });
+
+      // Both steps should eventually succeed after approval (auto-run is default)
       await expect(
         page.getByText("All steps succeeded.", { exact: false }),
       ).toBeVisible({ timeout: LONG_WAIT });

@@ -14,11 +14,15 @@ import { IconInfoCircle, IconWorld } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { readDashboardPublishConfig } from "@/clients/dashboards/sliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
+import { PublishSliceSection } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection";
 import { ShareUrlRow } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/slug";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardPublishConfig } from "$/models/Dashboard/PublishSliceConfig";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -51,6 +55,15 @@ export function PublishDashboardModal({
           "Dashboard share settings updated."
         : "Dashboard published!",
       );
+      void logAnalyticsEvent({
+        event: "dashboard.published",
+        workspaceId: dashboard.workspaceId,
+        app: "dashboards",
+        payload: {
+          dashboardId: dashboard.id,
+          wasPreviouslyPublic: dashboard.isPublic,
+        },
+      });
     },
     onError: (e: Error) => {
       notifyError({
@@ -64,6 +77,12 @@ export function PublishDashboardModal({
   const normalisedSlug = useMemo(() => {
     return toVanitySlug(slugInput);
   }, [slugInput]);
+
+  const [publishConfig, setPublishConfig] = useState<DashboardPublishConfig>(
+    () => {
+      return readDashboardPublishConfig(dashboard.config);
+    },
+  );
 
   // The URL the dashboard will be (or has been) published to. Prefers
   // the live vanity preview when the user has typed something; falls
@@ -82,6 +101,7 @@ export function PublishDashboardModal({
     publishDashboard({
       dashboardId: dashboard.id,
       ...(normalisedSlug ? { slug: normalisedSlug } : {}),
+      publishConfig,
     });
   };
 
@@ -162,6 +182,14 @@ export function PublishDashboardModal({
         />
       </Stack>
 
+      <Divider />
+
+      <PublishSliceSection
+        dashboard={dashboard}
+        publishConfig={publishConfig}
+        onChange={setPublishConfig}
+      />
+
       {isAlreadyPublished ?
         <>
           <Divider />
@@ -206,11 +234,7 @@ export function PublishDashboardModal({
             onClick={submit}
             leftSection={<IconWorld size={16} />}
           >
-            {isAlreadyPublished ?
-              normalisedSlug && normalisedSlug !== dashboard.slug ?
-                "Update custom URL"
-              : "Already published"
-            : "Publish"}
+            {isAlreadyPublished ? "Update & republish" : "Publish"}
           </Button>
         </Group>
       </Group>

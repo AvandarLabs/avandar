@@ -4,12 +4,20 @@ import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defaultExclude, defineConfig } from "vitest/config";
 
+const reactWithLinguiMacro = () => {
+  return react({
+    babel: {
+      plugins: ["@lingui/babel-plugin-lingui-macro"],
+    },
+  });
+};
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   return {
     plugins:
       mode === "test" ?
-        [react()]
+        [reactWithLinguiMacro()]
       : [
           TanStackRouterVite({
             target: "react",
@@ -19,7 +27,7 @@ export default defineConfig(({ mode }) => {
             routesDirectory: "src/routes",
             generatedRouteTree: "src/routeTree.gen.ts",
           }),
-          react(),
+          reactWithLinguiMacro(),
           eslintPlugin(),
 
           // node polyfills are necessary to run `knex` in browser

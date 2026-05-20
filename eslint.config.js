@@ -22,6 +22,7 @@ export default [
       "apps/desktop/build/**",
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
+      "src/i18n/locales/**/messages.ts",
     ],
   },
   eslintPluginImportX.flatConfigs.recommended,

@@ -12,7 +12,9 @@ import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppR
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
+import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
@@ -20,6 +22,7 @@ import {
 import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -32,6 +35,18 @@ export function DashboardEditorView({
   workspaceSlug,
 }: Props): JSX.Element {
   const [appRoles] = useUserAppRoles();
+  const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
+  const { pendingBlocks } = DashboardEditorStateManager.useState();
+
+  // Register / unregister this dashboard as the active editor target. The
+  // chat panel reads this to decide whether to offer the `addDashboardBlock`
+  // tool to the model.
+  useEffect(() => {
+    dashboardEditorDispatch.setActiveDashboard(dashboard.id);
+    return () => {
+      dashboardEditorDispatch.setActiveDashboard(undefined);
+    };
+  }, [dashboard.id, dashboardEditorDispatch]);
   // True when the user has no dashboards app role; in that case the
   // dashboard is visible only through a resource share. The banner is
   // informational and never blocks rendering.
@@ -87,6 +102,25 @@ export function DashboardEditorView({
     });
   }, [dashboard.id, dashboard.workspaceId, dashboardTitle]);
 
+  // Drain blocks queued by the chat panel into the dashboard's Puck data.
+  // Marks the editor dirty so the Save button can be activated.
+  useEffect(() => {
+    if (pendingBlocks.length === 0) {
+      return;
+    }
+    setData((prev) => {
+      const newContent = [
+        ...prev.content,
+        ...pendingBlocks.map((p) => {
+          return p.block;
+        }),
+      ];
+      return { ...prev, content: newContent };
+    });
+    setHasUnsavedChanges(true);
+    dashboardEditorDispatch.consumePendingBlocks();
+  }, [pendingBlocks, dashboardEditorDispatch]);
+
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate:
       dashboard ?
@@ -129,65 +163,71 @@ export function DashboardEditorView({
   }, [dashboard]);
 
   return (
-    <AppLayout floatingToolbar>
-      <Flex direction="column" h="100%">
-        {isShareOnlyAccess ?
-          <Alert color="blue" variant="light" title="Shared with you" m="sm">
-            <Text size="sm">
-              You can view this dashboard because it was shared with you.
-              {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
-                <>
-                  {" "}
-                  <Link
-                    to="/$workspaceSlug/shared-with-me"
-                    params={{ workspaceSlug }}
-                  >
-                    See all shared items
-                  </Link>
-                </>
-              : null}
-            </Text>
-          </Alert>
-        : null}
-        <Puck
-          key={editorKey}
-          metadata={avaPageMetadata}
-          config={puckConfig}
-          height="100%"
-          data={data}
-          onChange={(d: Data) => {
-            setData(d as AvaPageData);
-            setHasUnsavedChanges(true);
-          }}
-          overrides={{
-            headerActions: () => {
-              return (
-                <>
-                  <SaveDashboardButton onSave={onSave} />
-                  <ShareResourceButton
-                    resourceName={dashboardTitle}
-                    resourceType="dashboard"
-                    resourceId={dashboard.id}
-                  />
-                  <ViewDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard.id}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                  />
-                  <PublishDashboardButton
-                    dashboard={dashboard}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                  />
-                  <DeleteDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard.id}
-                  />
-                </>
-              );
-            },
-          }}
-        />
-      </Flex>
-    </AppLayout>
+    <DashboardFilterStateManager.Provider>
+      <AppLayout floatingToolbar>
+        <Flex direction="column" h="100%">
+          {isShareOnlyAccess ?
+            <Alert color="blue" variant="light" title="Shared with you" m="sm">
+              <Text size="sm">
+                You can view this dashboard because it was shared with you.
+                {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
+                  <>
+                    {" "}
+                    <Link
+                      to="/$workspaceSlug/shared-with-me"
+                      params={{ workspaceSlug }}
+                    >
+                      See all shared items
+                    </Link>
+                  </>
+                : null}
+              </Text>
+            </Alert>
+          : null}
+          <Puck
+            key={editorKey}
+            metadata={avaPageMetadata}
+            config={puckConfig}
+            height="100%"
+            data={data}
+            onChange={(d: Data) => {
+              setData(d as AvaPageData);
+              setHasUnsavedChanges(true);
+            }}
+            overrides={{
+              headerActions: () => {
+                return (
+                  <>
+                    <SaveDashboardButton onSave={onSave} />
+                    <ShareResourceButton
+                      resourceName={dashboardTitle}
+                      resourceType="dashboard"
+                      resourceId={dashboard.id}
+                    />
+                    <ViewDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard.id}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <PublishDashboardButton
+                      dashboard={dashboard}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <ExportPdfButton
+                      dashboard={dashboard}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <DeleteDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard.id}
+                    />
+                  </>
+                );
+              },
+            }}
+          />
+        </Flex>
+      </AppLayout>
+    </DashboardFilterStateManager.Provider>
   );
 }

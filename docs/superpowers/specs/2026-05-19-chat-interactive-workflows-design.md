@@ -1,8 +1,36 @@
 # Chat Panel — Interactive Analytic Workflows Design
 
 **Date:** 2026-05-19
-**Status:** Draft for review — Phase 0 and Phase 1 design locked with the product owner; Phases 2–7 at architecture level only. Looking for coworker review on the overall plan before drilling into the remaining phases.
+**Status:** Phases 0–4 shipped on `feat/ict4d-demo` (Phase 0–2 with small gaps noted below; Phases 3–4 complete). Phases 5–7 + Phase 9 at architecture level only.
 **Author:** Pablo (with Claude)
+
+## Implementation status (canonical: `docs/ict4d-demo/FEATURE_CHECKLIST.md`)
+
+The checklist file is the granular source of truth. Quick snapshot:
+
+| Phase | Status | Outstanding gaps |
+|---|---|---|
+| 0 — PII + Bias Foundation | ~95% | `containsHealthData` workspace UI; opt-in `shareAnonymousPrivacyMetrics` setting; server-issued ack-token nonce registry (in-memory today) |
+| 1 — Basic Clarifications | ~95% | Silent bias re-prompt loop (currently warns only); 20-question ambiguous-question eval set |
+| 2 — Discovery Clarifications | ~90% | Ack-token signing for `values` scope (text scope is signed end-to-end; `values` is accept-on-presence); "Edit selection" hook on the consent modal |
+| 3 — Plans + DAG | done | Plan approval gate added (user must approve before any step runs). Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts) |
+| 4 — Schema-Drift Regen | done | — |
+| 5 — Branching | partial | Branch state manager + sidebar + "Branch from here" CTA shipped. Missing: separate chat thread per branch (assistant-ui multi-thread orchestration), virtual-dataset persistence of the branch tree. |
+| 6 — Python + R Executor | partial | Sandboxed iframe + CSP + Pyodide + Arrow IPC bridge shipped. Missing: WebR (R) runtime, external security review (REQUIRED before user exposure), stdout/stderr UI. |
+| 7 — Context Compression | not started | All. Spec architecture below. |
+| 9 — Annotation + Export | partial | Text/sticky/arrow/pen annotations + IndexedDB persistence + PNG (html-to-image) + multi-page PDF (@react-pdf) shipped. Missing: virtual-dataset persistence of annotations, drag-to-move handles, sticky resize. |
+
+Cross-cutting gaps that aren't tied to a single phase:
+- 50-question eval harness with correctness + clarification-count + token-spend scoring
+- System prompt versioning with prompt-version label round-tripped to client
+- Public privacy page copy on avandarlabs.com (sandboxing + PII + bias detection)
+- Spanish + French bias patterns themselves (currently empty stubs; UX copy translated; pending social-sector advisor review)
+
+**Live verification gap.** Phases 3 and 4 have NOT been exercised against a real LLM or DuckDB-WASM end-to-end — the remote dev container hosting the implementation work has `openrouter.ai` and Supabase image hosts off its network allowlist. Verification is gated on the Vercel preview build of `feat/ict4d-demo`. Three smoke checks before stacking new phase work on top:
+
+1. A real `proposePlan` turn — canvas renders, steps run, auto-zoom feels right.
+2. A real schema-drift case — force a wrong predicted schema and watch the regen endpoint fire.
+3. Save → close → reopen a multi-step plan as a virtual dataset.
 
 ## Summary
 
@@ -843,7 +871,7 @@ When a plan step's actual output schema differs from the LLM's prediction (a GRO
 
 # Phase 5 — Branching
 
-**Status:** Architecture level.
+**Status:** Partial. Branch state + sidebar + "Branch from here" CTA shipped. Separate chat thread per branch + virtual-dataset persistence still pending.
 
 ## Goal
 
@@ -851,15 +879,24 @@ User can branch from any executed plan node into a new chat thread, anchored at 
 
 ## Architecture
 
-- New action on any node: "Branch from this step."
-- Creates a new assistant-ui thread. Initial system context = parent node's `actualSchema` + one-line summary of upstream steps.
-- Local state: `branch.parentNodeId`, `branch.rootSchema`. xyflow view stitches threads into one DAG.
-- Sidebar lists branches as named threads (auto-named from the first user message in each).
-- Persistence: extend Dexie schema with branch records.
+- New action on any node: "Branch from this step." **Shipped** — exposed in the focused-step detail panel (only when the step has succeeded), wired to `PlanBranchStateManager.openBranch`.
+- Creates a new assistant-ui thread. Initial system context = parent node's `actualSchema` + one-line summary of upstream steps. **Not yet** — the branch is created in state but the chat thread is still shared; clicking a branch in the sidebar switches the canvas focus but the chat composer still feeds the root plan. Needs assistant-ui multi-thread orchestration to finish.
+- Local state: `branch.parentNodeId`, `branch.rootSchema`. **Shipped** — `PlanBranchStateManager` (`src/components/ChatPanel/PlanStateManager/PlanBranchStateManager.tsx`) holds `Record<branchPlanId, BranchRecord>` + `activeBranchId`. Each `BranchRecord` carries `parentPlanId`, `parentStepId`, `anchorSchema`, `anchorViewName`, `title`, `plan`, `statuses`, `createdAt`. `PlanState.parentBranch` carries the anchor when a plan IS a branch.
+- Sidebar lists branches as named threads (auto-named from the first user message in each). **Shipped** — `PlanBranchSidebar` shows Root + every branch; X to close.
+- Persistence: extend Dexie schema with branch records. **Not yet** — branches live in memory only. When the root plan is saved as a virtual dataset, branches are dropped from the JSONB blob. Follow-up work.
 
 ## Effort
 
-~1.5 weeks. Mostly state model + thread switcher UI; no new LLM surface.
+~1.5 weeks. Mostly state model + thread switcher UI; no new LLM surface. State + UI shipped in Checkpoint 15 (~3 days); per-branch chat thread orchestration is the remaining ~1 week.
+
+## Definition of Done
+
+- [x] `PlanBranchStateManager` with open/update/setActive/close/clearAll actions
+- [x] "Branch from here" CTA on succeeded steps
+- [x] Branch sidebar showing Root + branches, click to switch, X to close
+- [x] 4 unit tests on the state manager
+- [ ] Separate assistant-ui chat thread per branch
+- [ ] Branches persisted into the virtual-dataset JSONB column
 
 ---
 
@@ -867,9 +904,28 @@ User can branch from any executed plan node into a new chat thread, anchored at 
 
 **Status:** Architecture level. Security-critical.
 
+**Status:** Partial. Sandbox iframe + CSP + Pyodide + parquet bridge shipped. R (WebR), external security review, and stdout/stderr UI deferred. **NOT YET externally security-reviewed — gate user exposure on that review.**
+
 ## Goal
 
 Add Python (Pyodide) and R (WebR) as execution engines for plan steps. Everything runs in the browser. Data never leaves.
+
+## What landed in Checkpoint 15
+
+| Item | Status | Notes |
+|---|---|---|
+| Sandboxed iframe (`public/sandbox-executor.html`) with `sandbox="allow-scripts"` (null opaque origin) | ✅ | |
+| Strict CSP (`default-src 'none'`, `connect-src https://cdn.jsdelivr.net`, `worker-src 'self' blob:`) | ✅ | jsdelivr is the only network the runtime can reach — needed for Pyodide bootstrap |
+| Pre-boot stubs: `fetch` allowlist, `XMLHttpRequest`/`WebSocket`/`EventSource`/`RTCPeerConnection` throw, `sendBeacon` neutered | ✅ | |
+| Pyodide lazy load (~10 MB) with `pyarrow`/`pyarrow.parquet`/`pandas` preimports | ✅ | `src/sandbox/sandboxExecutor.ts` |
+| Parent-side client (`src/sandbox/sandboxClient.ts`) — mount iframe, await ready+boot, single-threaded queue | ✅ | |
+| `postMessage` protocol with `sandboxKey` discriminator on every request | ✅ | `src/sandbox/sandboxProtocol.ts` — single source of truth between sides |
+| Parquet round-trip (DuckDB → parent → sandbox → parquet bytes → `loadParquet` → DuckDB view) | ✅ | Uses parquet, not Arrow IPC, to reuse DuckDB-WASM's existing roundtrip |
+| 30-second default timeout per run, caller-overridable | ✅ | |
+| Web Worker inside the iframe with `terminate()` for runaway loops | ❌ | Currently the iframe runs Pyodide directly. Adding a worker is a follow-up. |
+| WebR (R runtime) | ❌ | `availableRuntimes: ["python"]`; R steps return `[sandbox] runtime 'r' not enabled in this build` |
+| stdout/stderr UI panel | ❌ | Streams to parent `console.log` / `console.warn` only |
+| External security review | ❌ | **REQUIRED before user-facing exposure** |
 
 ## Sandbox architecture
 
@@ -935,11 +991,11 @@ Pyodide bundle (~10–11 MB Brotli with pandas+numpy) and WebR (~10 MB Brotli) l
 
 ## Definition of Done
 
-- [ ] Iframe + CSP deployed and tested with hostile-payload red-team
-- [ ] Pyodide and WebR both load lazily, ≤10s cold start on mid-range hardware
-- [ ] Arrow round-trip (DuckDB → Python → DuckDB) preserves types
-- [ ] Worker timeout terminates a runaway loop within 1s of cap
-- [ ] `generatePython` and `generateR` integrated as plan step types
+- [x] Iframe + CSP deployed (hostile-payload red-team pending review)
+- [~] Pyodide loads lazily; WebR not yet wired
+- [x] Parquet round-trip (DuckDB → Python → DuckDB) — parquet substituted for Arrow IPC to reuse DuckDB-WASM's existing path; types preserved
+- [ ] Worker timeout terminates a runaway loop within 1s of cap — currently 30s iframe-level timeout, no in-worker termination yet
+- [x] `python` registered as a plan step type the executor dispatches to the sandbox; `r` registered in the type system but rejected at runtime
 - [ ] External security review signed off
 
 ---
@@ -1001,7 +1057,7 @@ At 100 chat turns/user/month, including plans and code:
 
 # Phase 9 — Canvas Annotation + Export
 
-**Status:** Architecture only.
+**Status:** Partial. Annotations + PNG export + multi-page PDF export shipped. Virtual-dataset persistence of annotations, drag-to-move handles, and sticky resize deferred.
 
 ## Why now
 
@@ -1016,48 +1072,45 @@ We're skipping the phase numbers between Phase 7 and Phase 9 deliberately to res
 
 ## Architecture
 
-### Annotations
+### Annotations — what shipped in Checkpoint 15
 
-- **State**: a new Dexie-backed table `plan_annotations` keyed by `(planId, annotationId)`. Annotations persist alongside the materialised step blobs and are cleared with the same `clearPlanStepBlobs(planId)` call. For virtual datasets, annotations serialise into a second JSONB column on `datasets__virtual` (`annotations`) so they round-trip across saves like the plan itself.
-- **Annotation kinds**:
-  - `text`: position, content, font size, colour, rotation.
-  - `arrow`: start/end coords, RoughJS seed, label.
-  - `sticky`: position, content, background colour.
-  - `stroke`: SVG path produced by a freehand-drawing tool — uses [`perfect-freehand`](https://github.com/steveruizok/perfect-freehand) for natural-looking pen pressure.
-- **Rendering**: an overlay xyflow layer that holds annotations as their own nodes (`{ type: 'annotation' }`), with `selectable: true` and `draggable: true`. Toolbar exposes Pan / Text / Arrow / Sticky / Pen modes; the current mode drives the click handler on the canvas.
-- **Undo / redo**: a small in-memory `AnnotationHistoryManager` with capped depth (50). Ctrl-Z / Ctrl-Y key bindings on the canvas surface.
-- **Hand-drawn aesthetic stays**: arrow annotations re-use the existing `RoughEdge` style so user-drawn arrows match the auto-laid-out plan arrows.
+- **State**: `PlanAnnotationStateManager` (`src/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager.tsx`) — discriminated union of annotation kinds keyed by id, plus active tool + selected id + undo/redo stacks.
+- **Annotation kinds**: all four shipped.
+  - `text`: `{ x, y, fontSize, rotation?, text, color }`
+  - `sticky`: `{ x, y, width, height, text, color }`
+  - `arrow`: `{ fromX, fromY, toX, toY, color }` — drawn via RoughJS so it matches the auto-laid-out plan edges.
+  - `stroke`: `{ points: Array<[x, y, pressure?]>, strokeWidth, color }` — rendered via `perfect-freehand`.
+- **Rendering**: `PlanAnnotationOverlay` (`src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx`) is an absolutely-positioned overlay sitting on top of the xyflow viewport. It applies the same `translate` + `scale` transform as the DAG, so annotations pan/zoom together. Pointer events are gated by the active tool — `pan` → overlay is `pointer-events: none` (xyflow takes the drag); any drawing tool → overlay captures.
+- **Toolbar**: `PlanCanvasToolbar` (`src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx`) — Pan / Text / Sticky / Arrow / Pen / Erase tools, colour swatch row, Undo / Redo buttons, Export menu.
+- **Undo / redo**: snapshot-stack on `PlanAnnotationStateManager`, capped at 50 entries. Ctrl-Z / Ctrl-Shift-Z bound in the overlay's `keydown` listener; Delete / Backspace removes the selected annotation.
+- **Persistence**: dedicated Dexie database `AvandarPlanAnnotationDB` (`src/components/ChatPanel/PlanFlowView/planAnnotationStorage.ts`) keyed by `(planId, annotationId)`. Loaded on plan mount, written on every state change. Cleared on plan close.
+- **Hand-drawn aesthetic stays**: arrow annotations re-use `RoughJS` so user-drawn arrows visually match the auto-laid-out plan arrows.
+- **Not yet**: virtual-dataset persistence (annotations stay in IndexedDB only — saving a virtual dataset doesn't snapshot annotations); per-annotation drag-to-move handles (the overlay supports create + delete, not move); sticky-note resize handles.
 
-### Export
+### Export — what shipped in Checkpoint 15
 
-- **PDF**: use [`@react-pdf/renderer`](https://github.com/diegomura/react-pdf) so we can render a layout that mirrors the canvas server-style — one page per step (zoomed-in viz thumbnail + step description + actual schema + annotations near that step) plus a first-page overview that screenshots the full DAG. Generated entirely client-side.
-- **Image**: use [`html-to-image`](https://github.com/bubkoo/html-to-image) against the xyflow root element. Annotations are part of the DOM so they capture for free.
-- **Filename**: `{datasetName}-{YYYY-MM-DD}.pdf` / `.png`.
-- **Output options**:
-  - Resolution: 1x, 2x, 4x (image only).
-  - Background: white, transparent, grid.
-  - Inclusions: plan DAG only / DAG + annotations / DAG + annotations + step thumbnails (default).
+- **PDF**: dynamic-imported `@react-pdf/renderer` (so the ~1.5 MB dependency doesn't bloat the main bundle until the user first exports). Page 1 captures the canvas via `html-to-image` and embeds it as the overview image; subsequent pages render one per plan step with `{ description, status badge, type, row count, code, schema, error? }`.
+- **Image**: `html-to-image`'s `toPng` against the canvas container. Toolbar / MiniMap / Controls are filtered out via the `filter` callback so they don't bleed into the export. Default `pixelRatio: 2`; caller can override.
+- **Filename**: `avandar-plan-{YYYY-MM-DD}.pdf` / `.png`.
+- **Not yet**: SVG export; 1× / 4× resolution pickers; background picker (currently always white); inclusion picker (currently always DAG + annotations).
 
 ## Tool surface
 
-No LLM tool is added in Phase 9 — annotations and exports are client-side only. The LLM does not learn about annotation content; it stays inside the data-locality promise.
+No LLM tool is added in Phase 9 — annotations and exports are client-side only. The LLM does not learn about annotation content; it stays inside the data-locality promise. (The Phase 0 lint rule that pins data flow to `crossBoundary` already enforces this — annotation content never reaches `crossBoundary`'s `text` or `values` parameters.)
 
 ## Effort
 
-~1.5 weeks.
-
-- Annotation state + toolbar + persistence: ~3 days
-- Freehand stroke renderer + undo/redo: ~2 days
-- PDF / image export wiring + design polish: ~3 days
+~1.5 weeks per the spec; landed in Checkpoint 15 alongside Phase 5 + Phase 6.
 
 ## Definition of Done
 
-- [ ] Annotation toolbar exposed on the plan canvas (Pan / Text / Arrow / Sticky / Pen)
-- [ ] Annotations persist across reloads (IndexedDB) and across virtual dataset saves (JSONB column)
-- [ ] Undo/redo per (planId, annotation) edit, capped at 50 entries
-- [ ] PDF export: multi-page layout with overview + per-step pages
-- [ ] Image export: PNG + SVG at 1×/2×/4× resolution, configurable background
-- [ ] Annotations excluded from the LLM payload — confirm via the lint rule that no annotation content ever crosses through `crossBoundary`
+- [x] Annotation toolbar exposed on the plan canvas (Pan / Text / Arrow / Sticky / Pen + Erase)
+- [x] Annotations persist across reloads (IndexedDB)
+- [ ] Annotations persist across virtual dataset saves (JSONB column)
+- [x] Undo/redo per (planId, annotation) edit, capped at 50 entries
+- [x] PDF export: multi-page layout with overview + per-step pages
+- [x] Image export: PNG (SVG + multiple resolutions deferred)
+- [x] Annotations excluded from the LLM payload — by construction, the overlay never feeds `crossBoundary`
 
 # Decision Log
 

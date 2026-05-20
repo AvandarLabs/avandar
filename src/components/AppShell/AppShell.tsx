@@ -15,6 +15,7 @@ import { Navbar } from "@/components/AppShell/Navbar/Navbar";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { VoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { AppLink } from "@/config/AppLinks";
@@ -200,6 +201,8 @@ function AppShellComponent({
           placeholder: "Search...",
         }}
       />
+
+      <VoiceModelDownloadIndicator />
     </>
   );
 }

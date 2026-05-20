@@ -9,10 +9,13 @@ import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanSt
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
 import { consumeAckForText } from "@/lib/privacy/pendingAcks";
+import { buildPendingDataVizBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildPendingDataVizBlock";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
@@ -53,6 +56,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const user = useCurrentUser();
   const pageContext = useChatPageContext();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
+  const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const { parseSql } = useSqlToStructuredQuery();
   const planDispatch = PlanStateManager.useDispatch();
@@ -144,6 +148,19 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           }
         }
 
+        if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
+          void logAnalyticsEvent({
+            event: "chat.message_sent",
+            workspaceId: workspace.id,
+            app:
+              pageContext.app === "data-explorer" ? "data_explorer"
+              : pageContext.app === "dashboards" ? "dashboards"
+              : pageContext.app === "data-sources" ? "data_sources"
+              : undefined,
+            payload: { app: pageContext.app },
+          });
+        }
+
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId: workspace.id },
@@ -171,6 +188,27 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           } catch {
             // ignore; the structured form will simply be out of sync.
           }
+          void logAnalyticsEvent({
+            event: "chat.sql_generated",
+            workspaceId: workspace.id,
+            app: "data_explorer",
+          });
+        }
+
+        if (response.dashboardBlock) {
+          dashboardEditorDispatch.queuePendingBlock({
+            pendingId: crypto.randomUUID(),
+            block: buildPendingDataVizBlock(response.dashboardBlock),
+          });
+          void logAnalyticsEvent({
+            event: "dashboard.block_added_via_chat",
+            workspaceId: workspace.id,
+            app: "dashboards",
+            payload: {
+              vizType: response.dashboardBlock.vizType,
+              dashboardId: pageContext.dashboardId,
+            },
+          });
         }
 
         if (response.plan && response.plan.steps.length > 0) {
@@ -238,6 +276,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     user,
     pageContext,
     dataExplorerDispatch,
+    dashboardEditorDispatch,
     chatPanelDispatch,
     parseSql,
     planDispatch,

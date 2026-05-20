@@ -12,6 +12,9 @@ import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
+import { WorkspaceI18nProvider } from "@/i18n/WorkspaceI18nProvider";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 
 type Props = {
@@ -26,6 +29,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   useRootWorkspaceChecks();
 
   const workspace = useCurrentWorkspace();
+  const { locale } = useWorkspaceLanguage(workspace.id);
   const canAccessDataSources = useHasPermission(
     "data_sources__can_list_sources",
   );
@@ -94,21 +98,25 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   }, [workspace.slug]);
 
   return (
-    <DataExplorerStateManager.Provider>
-      <ChatPanelProvider>
-        <AppDropzone>
-          <AppShell
-            title={workspace.name}
-            currentWorkspace={workspace}
-            profileLink={profileLink}
-            navbarLinks={mainNavBarLinks}
-            utilityLinks={utilityNavBarLinks}
-            spotlightActions={spotlightActions}
-          >
-            {children}
-          </AppShell>
-        </AppDropzone>
-      </ChatPanelProvider>
-    </DataExplorerStateManager.Provider>
+    <WorkspaceI18nProvider locale={locale}>
+      <DataExplorerStateManager.Provider>
+        <DashboardEditorStateManager.Provider>
+          <ChatPanelProvider>
+            <AppDropzone>
+              <AppShell
+                title={workspace.name}
+                currentWorkspace={workspace}
+                profileLink={profileLink}
+                navbarLinks={mainNavBarLinks}
+                utilityLinks={utilityNavBarLinks}
+                spotlightActions={spotlightActions}
+              >
+                {children}
+              </AppShell>
+            </AppDropzone>
+          </ChatPanelProvider>
+        </DashboardEditorStateManager.Provider>
+      </DataExplorerStateManager.Provider>
+    </WorkspaceI18nProvider>
   );
 }

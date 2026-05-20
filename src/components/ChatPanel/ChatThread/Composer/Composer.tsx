@@ -4,11 +4,19 @@ import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
   const context = useChatPageContext();
-  const disabled = context.app !== "data-explorer";
+  const isChatEnabled =
+    context.app === "data-explorer" || context.app === "dashboards";
+  const disabled = !isChatEnabled;
+
+  const placeholder =
+    context.app === "dashboards" ? "Ask me to add a chart to this dashboard..."
+    : context.app === "data-explorer" ? "Ask about your data..."
+    : "Chat is enabled in Data Explorer and Dashboards";
 
   return (
     <div className={css.composerContainer}>
@@ -17,16 +25,13 @@ export function Composer(): JSX.Element {
       >
         <ComposerPrimitive.Input
           className={css.composerInput}
-          placeholder={
-            disabled ?
-              "Chat actions available in Data Explorer for now"
-            : "Ask about your data..."
-          }
+          placeholder={placeholder}
           rows={1}
           autoFocus={false}
           disabled={disabled}
         />
         <Group gap="xs">
+          <VoiceInputButton disabled={disabled} />
           <ChatModelPicker disabled={disabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon

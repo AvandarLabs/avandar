@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Simplify } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type {
   CustomFieldRender,
   Config as PuckConfig,
@@ -113,6 +114,18 @@ export type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
 
 export type AvaPageRootWidthUnit = "%" | "px";
 
+/** Built-in dashboard themes. Each maps to a Mantine color + accent shade. */
+export type AvaPageThemeName =
+  | "default"
+  | "ocean"
+  | "forest"
+  | "rose"
+  | "amber"
+  | "graphite";
+
+/** Built-in dashboard typography presets. */
+export type AvaPageTypographyName = "system" | "serif" | "mono";
+
 export type AvaPageRootProps = {
   author: string;
   publishedAt: string;
@@ -128,6 +141,10 @@ export type AvaPageRootProps = {
     unit: AvaPageRootWidthUnit;
     value: number;
   };
+  /** Visual theme. Drives accent color + heading color. */
+  theme: AvaPageThemeName;
+  /** Typography preset. Drives body + heading font family. */
+  typography: AvaPageTypographyName;
   isAuthorHidden: boolean;
   isPublishedAtHidden: boolean;
   isSubtitleHidden: boolean;
@@ -144,6 +161,7 @@ export type PBlockPropsRegistry = {
   DividerBlock: DividerBlockProps;
   EmbedBlock: EmbedBlockProps;
   FigureBlock: FigureBlockProps;
+  Filter: FilterPBlockProps;
   Grid: GridProps;
   HeadingBlock: HeadingBlockProps;
   ListBlock: ListBlockProps;

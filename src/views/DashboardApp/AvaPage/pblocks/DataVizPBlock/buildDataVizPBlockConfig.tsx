@@ -1,8 +1,11 @@
 import { ComponentConfig } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
+import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps";
+import { buildGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig";
+import { buildLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig";
 import { buildNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
 import { buildVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
@@ -18,6 +21,8 @@ const defaultProps: DataVizPBlockProps = {
   },
   vizType: DEFAULT_VIZ_TYPE,
   vizConfig: VizConfigs.makeEmptyConfig(DEFAULT_VIZ_TYPE),
+  globalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+  localFilters: [],
 };
 
 const vizTypeOptions = VizTypes.map((vizType) => {
@@ -57,6 +62,8 @@ export function buildDataVizPBlockConfig(options: {
         workspaceId: options.workspaceId,
         dashboardId: options.dashboardId,
       }),
+      globalFilterSubscription: buildGlobalFilterSubscriptionPFieldConfig(),
+      localFilters: buildLocalFiltersPFieldConfig(),
     },
     defaultProps,
     resolveData: (data, { changed }) => {

@@ -69,7 +69,14 @@ describe("AvaPageDataMigration - v3", () => {
 
   it("downgrades the schema version to 2", () => {
     const v3: V3_AvaPageData = {
-      root: { props: { ...V2_ROOT_PROPS, schemaVersion: 3 } },
+      root: {
+        props: {
+          ...V2_ROOT_PROPS,
+          schemaVersion: 3,
+          theme: "default",
+          typography: "system",
+        },
+      },
       content: [
         {
           type: "DataViz",
@@ -223,7 +230,14 @@ describe("AvaPageDataMigration - v3", () => {
 
   it("downgrades a multi-series bar by keeping the first series", () => {
     const v3: V3_AvaPageData = {
-      root: { props: { ...V2_ROOT_PROPS, schemaVersion: 3 } },
+      root: {
+        props: {
+          ...V2_ROOT_PROPS,
+          schemaVersion: 3,
+          theme: "default",
+          typography: "system",
+        },
+      },
       content: [
         {
           type: "DataViz",

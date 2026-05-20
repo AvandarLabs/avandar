@@ -3,6 +3,8 @@ import {
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { ChatPanelAvailableContext } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import type { ReactNode } from "react";
@@ -47,9 +49,13 @@ export function ChatPanelProvider({
     >
       {isChatAvailable ?
         <PlanStateManager.Provider>
-          <ChatPanelAvailableContext.Provider value={true}>
-            <ChatPanelContents>{children}</ChatPanelContents>
-          </ChatPanelAvailableContext.Provider>
+          <PlanBranchStateManager.Provider>
+            <PlanAnnotationStateManager.Provider>
+              <ChatPanelAvailableContext.Provider value={true}>
+                <ChatPanelContents>{children}</ChatPanelContents>
+              </ChatPanelAvailableContext.Provider>
+            </PlanAnnotationStateManager.Provider>
+          </PlanBranchStateManager.Provider>
         </PlanStateManager.Provider>
       : <ChatPanelAvailableContext.Provider value={false}>
           <ChatPanelContents>{children}</ChatPanelContents>

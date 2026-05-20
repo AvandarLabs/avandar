@@ -10,11 +10,13 @@ import {
   MAX_REGEN_ATTEMPTS,
   regenerateOnDrift,
 } from "@/components/ChatPanel/PlanStateManager/schemaDrift";
+import { runInSandbox } from "@/sandbox/sandboxClient";
 import type {
   PlanNode,
   PlanStateManager,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { PlanStepBlob } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
+import type { SandboxRuntime } from "@/sandbox/sandboxProtocol";
 import type * as duckdb from "@duckdb/duckdb-wasm";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPlan } from "$/types/chat.types";
@@ -81,15 +83,35 @@ export async function executePlanStep(args: {
   workspaceId: Workspace.Id;
   /** When running a full plan, pass one connection for all steps. */
   duckDbConnection?: duckdb.AsyncDuckDBConnection;
+  /**
+   * View-name → upstream PlanNode lookup used by python/r steps to
+   * pull the source Arrow IPC bytes out of DuckDB before handing them
+   * to the sandbox. Required for non-SQL steps; SQL steps ignore.
+   */
+  nodeById?: ReadonlyMap<string, PlanNode>;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { planId, step, dispatch, workspaceId, duckDbConnection } = args;
-  if (step.type !== "sql") {
-    // Non-SQL steps (Python / R / clarification) aren't executable in
-    // Phase 3; mark them skipped so the UI can show why.
+  const { planId, step, dispatch, workspaceId, duckDbConnection, nodeById } =
+    args;
+  if (step.type === "clarification") {
+    // Clarification steps are presentational — the plan was supposed
+    // to pause here for user input. We mark them skipped so the user
+    // can read what was requested and resume manually.
     dispatch.markStepSkipped(step.id);
     return { ok: true };
   }
 
+  if (step.type === "python" || step.type === "r") {
+    return await _executeSandboxStep({
+      planId,
+      step,
+      runtime: step.type as SandboxRuntime,
+      dispatch,
+      nodeById,
+      duckDbConnection,
+    });
+  }
+
+  // SQL
   dispatch.markStepRunning(step.id);
 
   const viewName = stepViewName(step.id);
@@ -192,6 +214,117 @@ export async function executePlanStep(args: {
 }
 
 /**
+ * Phase 6 — run a python or r plan step inside the sandboxed
+ * iframe. Pulls input views out of DuckDB as Arrow IPC bytes,
+ * dispatches to the sandbox via `runInSandbox`, then registers the
+ * result back into DuckDB as a parquet-backed view so downstream
+ * steps can reference it like any other step.
+ */
+async function _executeSandboxStep(args: {
+  planId: string;
+  step: PlanNode;
+  runtime: SandboxRuntime;
+  dispatch: PlanExecutorDispatch;
+  nodeById?: ReadonlyMap<string, PlanNode>;
+  duckDbConnection?: duckdb.AsyncDuckDBConnection;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { planId, step, runtime, dispatch, nodeById, duckDbConnection } = args;
+  dispatch.markStepRunning(step.id);
+
+  try {
+    // Gather each upstream view as parquet bytes. We use parquet for
+    // both directions of the sandbox boundary because (a) DuckDB-WASM
+    // already exports parquet via runRawQuery's returnType, (b)
+    // pyarrow can read parquet natively, and (c) it round-trips via
+    // DuckDb's existing `loadParquet` on the way back. Avoids adding
+    // Arrow-IPC-specific paths to the client.
+    const inputs: Array<{ name: string; arrow: Uint8Array }> = [];
+    for (const inputId of step.inputs) {
+      const upstream = nodeById?.get(inputId);
+      const viewName = upstream?.viewName ?? stepViewName(inputId);
+      const runParquetQuery = async (
+        conn: duckdb.AsyncDuckDBConnection,
+      ): Promise<Blob> => {
+        return await DuckDbClient.runRawQuery(`SELECT * FROM "${viewName}"`, {
+          returnType: "parquet",
+          conn,
+        });
+      };
+      const parquetBlob =
+        duckDbConnection ?
+          await runParquetQuery(duckDbConnection)
+        : await DuckDbClient.withConnection(runParquetQuery);
+      const bytes = new Uint8Array(await parquetBlob.arrayBuffer());
+      // We send under the upstream's view name so user code can
+      // reference each input as a local variable in Python / R.
+      inputs.push({ name: viewName, arrow: bytes });
+    }
+
+    const result = await runInSandbox({
+      runtime,
+      code: step.code,
+      inputs,
+    });
+
+    // Bring the result back into DuckDB as a parquet-backed view.
+    const viewName = stepViewName(step.id);
+    const resultBlob = new Blob([result.arrow.buffer as ArrayBuffer], {
+      type: "application/vnd.apache.parquet",
+    });
+    await DuckDbClient.loadParquet({
+      tableName: viewName,
+      blob: resultBlob,
+    });
+
+    // Pull schema + preview.
+    const previewResult = await DuckDbClient.runRawQuery<
+      Record<string, unknown>
+    >(`SELECT * FROM "${viewName}" LIMIT ${PREVIEW_ROW_CAP}`);
+    const actualSchema = previewResult.columns.map((c) => {
+      return { name: c.name, type: String(c.dataType ?? "unknown") };
+    });
+    const countResult = await DuckDbClient.runRawQuery<{
+      rc: bigint | number;
+    }>(`SELECT COUNT(*) AS rc FROM "${viewName}"`);
+    const firstRow = countResult.data[0];
+    const rowCount =
+      firstRow && firstRow.rc !== undefined && firstRow.rc !== null ?
+        Number(firstRow.rc)
+      : previewResult.data.length;
+
+    // Persist to IndexedDB so the analysis is reloadable across page
+    // refreshes — same pattern as SQL steps.
+    try {
+      await putPlanStepBlob({
+        planId,
+        stepId: step.id,
+        parquet: resultBlob,
+        schema: actualSchema,
+        rowCount,
+      });
+    } catch (e) {
+      console.warn(
+        `[plan] failed to persist sandbox step ${step.id} as parquet:`,
+        e,
+      );
+    }
+
+    dispatch.markStepSucceeded({
+      stepId: step.id,
+      viewName,
+      actualSchema,
+      rowCount,
+      previewRows: previewResult.data,
+    });
+    return { ok: true };
+  } catch (e) {
+    const error = e instanceof Error ? e.message : String(e);
+    dispatch.markStepFailed({ stepId: step.id, error });
+    return { ok: false, error };
+  }
+}
+
+/**
  * Optional Phase 4 — schema-drift regen — context. Pass this to
  * `executePlan` to enable automatic regeneration of downstream steps
  * when an executed step produces a schema different from what the LLM
@@ -227,12 +360,18 @@ export async function executePlan(args: {
   await DuckDbClient.withConnection(async (duckDbConnection) => {
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]!;
+      const nodeById = new Map<string, PlanNode>();
+      for (let j = 0; j < i; j++) {
+        const earlier = nodes[j]!;
+        nodeById.set(earlier.id, earlier);
+      }
       const outcome = await executePlanStep({
         planId,
         step: node,
         dispatch,
         workspaceId,
         duckDbConnection,
+        nodeById,
       });
       if (!outcome.ok) {
         // Mark all subsequent nodes as skipped. We bail on first failure
@@ -290,12 +429,17 @@ export async function executePlan(args: {
             if (!target) {
               return;
             }
+            const regenNodeById = new Map<string, PlanNode>();
+            for (const planNode of latest.steps as PlanNode[]) {
+              regenNodeById.set(planNode.id, planNode);
+            }
             await executePlanStep({
               planId,
               step: target,
               dispatch,
               workspaceId: driftRegen.workspaceId,
               duckDbConnection,
+              nodeById: regenNodeById,
             });
           },
         });
