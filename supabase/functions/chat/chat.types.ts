@@ -44,6 +44,9 @@ export type ChatAPI = APITypeDef<
   {
     "/models": {
       GET: {
+        queryParams?: {
+          useCache?: boolean;
+        };
         returnType: ChatModelsResponse;
       };
     };

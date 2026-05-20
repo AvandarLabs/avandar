@@ -4,6 +4,7 @@ import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { DEFAULT_PUBLISH_SLICE } from "$/models/Dashboard/PublishSliceConfig";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
+import { APIClient } from "@/clients/APIClient";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import {
   buildSliceSql,
@@ -44,10 +45,14 @@ export const DashboardClient = createUsableServiceClient(
           /**
            * Optional vanity slug. The caller is responsible for snake-casing /
            * sanitising; the server-side uniqueness constraint catches
-           * collisions. When omitted, the dashboard remains accessible by id
-           * but no vanity URL is registered.
+           * collisions.
+           *
+           * - `undefined` — leave the existing slug alone.
+           * - `string`    — set the slug (and register the vanity URL).
+           * - `null`      — explicitly clear any existing slug, so the
+           *                 dashboard is reachable only by its dashboardId URL.
            */
-          slug?: string;
+          slug?: string | null;
           /**
            * Per-dataset slice configuration. When provided, replaces any
            * previously-persisted slice config and is also persisted into the
@@ -276,7 +281,8 @@ export const DashboardClient = createUsableServiceClient(
 
           const updateModel: Partial<Dashboard.T> = {
             isPublic: true,
-            ...(slug ? { slug } : {}),
+            // `undefined` means "leave alone"; `null` means "clear it".
+            ...(slug !== undefined ? { slug: slug ?? undefined } : {}),
             ...(nextConfig ?
               {
                 config: nextConfig as unknown as Dashboard.T["config"],
@@ -298,10 +304,42 @@ export const DashboardClient = createUsableServiceClient(
 
           return config.parsers.fromDBReadToModelRead(updatedDBDashboard);
         },
+
+        /**
+         * Check whether a dashboard slug is available for use as a public
+         * vanity URL (`/d/<slug>`). Backed by the
+         * `POST dashboards/validate-slug` edge function so the lookup runs
+         * with admin privileges and isn't gated by RLS.
+         */
+        validateDashboardSlug: async (options: {
+          slug: string;
+          /**
+           * The dashboard the user is currently editing. Excluded from the
+           * "already taken" check so a public dashboard re-publishing with
+           * its existing slug still validates as available.
+           */
+          dashboardId?: Dashboard.Id;
+        }): Promise<
+          { isValid: true } | { isValid: false; reason: string }
+        > => {
+          const logger = config.clientLogger.appendName(
+            "validateDashboardSlug",
+          );
+          logger.log("Checking dashboard slug availability", options);
+          return APIClient.post({
+            route: "dashboards/validate-slug",
+            body: {
+              slug: options.slug,
+              ...(options.dashboardId ?
+                { dashboardId: options.dashboardId }
+              : {}),
+            },
+          });
+        },
       };
     },
   }),
   {
-    mutationFns: ["publishDashboard", "delete"],
+    mutationFns: ["publishDashboard", "validateDashboardSlug", "delete"],
   },
 );

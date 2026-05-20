@@ -30,17 +30,29 @@ type Props = {
    * ever changed."
    */
   hint?: string;
+  /**
+   * Whether to show the "Show QR code" button. Defaults to true. We hide
+   * the QR affordance on the vanity row so all QR codes encode the stable
+   * dashboardId URL — even if the user later changes the vanity slug, any
+   * printed QR keeps resolving.
+   */
+  showQr?: boolean;
 };
 
 /**
  * Display row for a single share URL. Read-only field showing the URL,
- * with a one-click copy button and a "Show QR code" button that opens a
- * modal with the rendered QR image plus a download button.
+ * with a one-click copy button and an optional "Show QR code" button that
+ * opens a modal with the rendered QR image plus a download button.
  *
  * QR codes are generated client-side via `qrcode` (no network call) so we
  * can render even on the desktop offline build.
  */
-export function ShareUrlRow({ label, url, hint }: Props): JSX.Element {
+export function ShareUrlRow({
+  label,
+  url,
+  hint,
+  showQr = true,
+}: Props): JSX.Element {
   const [qrOpen, setQrOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
@@ -114,19 +126,21 @@ export function ShareUrlRow({ label, url, hint }: Props): JSX.Element {
             );
           }}
         </CopyButton>
-        <Tooltip label="Show QR code">
-          <ActionIcon
-            variant="light"
-            color="neutral"
-            size="lg"
-            aria-label="Show QR code"
-            onClick={() => {
-              return setQrOpen(true);
-            }}
-          >
-            <IconQrcode size={18} />
-          </ActionIcon>
-        </Tooltip>
+        {showQr ?
+          <Tooltip label="Show QR code">
+            <ActionIcon
+              variant="light"
+              color="neutral"
+              size="lg"
+              aria-label="Show QR code"
+              onClick={() => {
+                return setQrOpen(true);
+              }}
+            >
+              <IconQrcode size={18} />
+            </ActionIcon>
+          </Tooltip>
+        : null}
       </Group>
       {hint ?
         <Text size="xs" c="dimmed">

@@ -1020,6 +1020,44 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_analytics_events: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"] | null
+          created_at: string
+          event_name: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_analytics_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_group_memberships: {
         Row: {
           created_at: string
@@ -1344,44 +1382,6 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_memberships_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      usage_analytics_events: {
-        Row: {
-          app: Database["public"]["Enums"]["app_type"] | null
-          created_at: string
-          event_name: string
-          id: string
-          payload: Json | null
-          user_id: string | null
-          workspace_id: string | null
-        }
-        Insert: {
-          app?: Database["public"]["Enums"]["app_type"] | null
-          created_at?: string
-          event_name: string
-          id?: string
-          payload?: Json | null
-          user_id?: string | null
-          workspace_id?: string | null
-        }
-        Update: {
-          app?: Database["public"]["Enums"]["app_type"] | null
-          created_at?: string
-          event_name?: string
-          id?: string
-          payload?: Json | null
-          user_id?: string | null
-          workspace_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "usage_analytics_events_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

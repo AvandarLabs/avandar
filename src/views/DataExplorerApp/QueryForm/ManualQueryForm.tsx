@@ -1,4 +1,4 @@
-import { Alert, Fieldset, Stack, Text } from "@mantine/core";
+import { Alert, Fieldset, NumberInput, Stack, Text } from "@mantine/core";
 import { Model } from "@models";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
@@ -7,6 +7,7 @@ import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/Q
 import { useState } from "react";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
@@ -23,8 +24,6 @@ import type {
   OrderByDirection,
   PartialStructuredQuery,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-
-const HIDE_LIMIT = true;
 
 const orderDirectionOptions = [
   { value: "asc", label: "Ascending" },
@@ -46,6 +45,7 @@ export type ManualQueryFormHandlers = {
   }) => void;
   onSetOrderByColumn: (columnId: QueryColumnId | undefined) => void;
   onSetOrderByDirection: (direction: OrderByDirection | undefined) => void;
+  onSetLimit: (limit: number | undefined) => void;
   onSetFilters: (filters: QueryFilterGroup) => void;
 };
 
@@ -105,6 +105,7 @@ function DataExplorerManualQueryForm({
     onSetColumnAggregation: dispatch.setColumnAggregation,
     onSetOrderByColumn: dispatch.setOrderByColumn,
     onSetOrderByDirection: dispatch.setOrderByDirection,
+    onSetLimit: dispatch.setLimit,
     onSetFilters: dispatch.setFilters,
   };
 
@@ -137,6 +138,7 @@ function ManualQueryFormView({
     orderByDirection,
     filters,
   } = query;
+  const limit = getManualQueryLimitValue(query);
 
   const [pendingChange, setPendingChange] = useState<PendingChange>(null);
 
@@ -306,7 +308,21 @@ function ManualQueryFormView({
           />
         </Fieldset>
 
-        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+        <Fieldset
+          legend="Result size"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+        >
+          <NumberInput
+            label="Limit"
+            placeholder="Maximum rows to return"
+            min={1}
+            step={1}
+            value={typeof limit === "number" ? limit : ""}
+            onChange={(value) => {
+              handlers.onSetLimit(typeof value === "number" ? value : undefined);
+            }}
+          />
+        </Fieldset>
       </Stack>
     </form>
   );

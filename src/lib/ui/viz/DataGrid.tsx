@@ -75,8 +75,18 @@ export function DataGrid({
 
   // AgGrid will fill the size of the parent container
   return (
-    <Box className={className} style={{ height, width: "100%", ...style }}>
+    <Box
+      className={className}
+      style={{
+        display: "flex",
+        height,
+        minHeight: 0,
+        width: "100%",
+        ...style,
+      }}
+    >
       <AgGridReact
+        containerStyle={{ flex: 1, minHeight: 0, width: "100%" }}
         defaultColDef={{ flex: 1, minWidth: 120 }}
         columnDefs={columnDefs}
         theme={avandarGridTheme}

@@ -20,8 +20,15 @@ import {
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
+import {
+  parseUseCacheFromURL,
+  resolveChatModelsResponse,
+} from "$/utils/chat/chatModelsCache.ts";
 import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
+import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with {
+  type: "json",
+};
 import type {
   ChatAPI,
   ChatClarifyRequest,
@@ -54,11 +61,33 @@ type OpenRouterModelsResponse = {
   data?: OpenRouterModelInput[];
 };
 
+const cachedChatModelsResponse =
+  cachedChatModelsResponseJSON as ChatModelsResponse;
+
 function _resolveChatModel(model: string | undefined): string {
   if (model && OPENROUTER_MODEL_ID_PATTERN.test(model)) {
     return model;
   }
   return AppConfig.chat.defaultModelId;
+}
+
+async function _loadLiveChatModelsResponse(): Promise<ChatModelsResponse> {
+  const response = await fetch(OPENROUTER_MODELS_URL, {
+    headers: {
+      Authorization: `Bearer ${openRouterApiKey}`,
+      "HTTP-Referer": openRouterReferer,
+      "X-Title": "Avandar",
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenRouter models API error: ${errorText}`);
+  }
+
+  const payload = (await response.json()) as OpenRouterModelsResponse;
+  const groups = curateOpenRouterModels(payload.data ?? []);
+  return { groups };
 }
 
 // Cheap heuristic for "this prompt is a refinement of the previous turn."
@@ -556,24 +585,15 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
    * proprietary) for the chat panel model picker.
    */
   "/models": {
-    GET: GET("/models").action(async (): Promise<ChatModelsResponse> => {
-      const response = await fetch(OPENROUTER_MODELS_URL, {
-        headers: {
-          Authorization: `Bearer ${openRouterApiKey}`,
-          "HTTP-Referer": openRouterReferer,
-          "X-Title": "Avandar",
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenRouter models API error: ${errorText}`);
-      }
-
-      const payload = (await response.json()) as OpenRouterModelsResponse;
-      const groups = curateOpenRouterModels(payload.data ?? []);
-      return { groups };
-    }),
+    GET: GET("/models").action(
+      async ({ request }): Promise<ChatModelsResponse> => {
+        return await resolveChatModelsResponse({
+          useCache: parseUseCacheFromURL(request.url),
+          cachedResponse: cachedChatModelsResponse,
+          loadLiveResponse: _loadLiveChatModelsResponse,
+        });
+      },
+    ),
   },
   /**
    * Handles a chat turn for the Ask Avandar panel in a workspace.

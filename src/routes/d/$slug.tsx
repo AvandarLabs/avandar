@@ -1,36 +1,29 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { DashboardRead } from "$/models/Dashboard/Dashboard.types";
 
 /**
- * Vanity URL for a published dashboard:
- *   /d/<workspaceSlug>/<dashboardSlug>
+ * Public vanity URL for a published dashboard:
+ *   /d/<slug>
  *
- * This is the URL users get to put on flyers / QR codes. It resolves to
- * the same `DashboardViewerView` as `/public/dashboards/...` but lets us
- * use a short, memorable slug instead of a UUID. The slug column is
- * unique-per-workspace (see `supabase/schemas/10.dashboards.sql`), so
- * `(workspaceSlug, slug)` is a globally unique key.
+ * Slugs are globally unique among public dashboards (see
+ * `dashboards__slug_unique_when_public` in `supabase/schemas/10.dashboards.sql`),
+ * so the slug alone resolves to at most one dashboard. The dashboardId
+ * URL at `/public/dashboards/<workspaceSlug>/<dashboardId>` stays valid
+ * and is what QR codes encode — it redirects here when a slug is set.
  *
- * Like the id-based public route, this enforces `dashboard.isPublic`
- * before rendering anything.
+ * Anon SELECT on `dashboards` is gated to `is_public = true` rows (see
+ * `supabase/schemas/17.rls.dashboards.sql`), so no workspace lookup is
+ * required.
  */
-export const Route = createFileRoute("/d/$workspaceSlug/$slug")({
+export const Route = createFileRoute("/d/$slug")({
   loader: async ({ params }): Promise<{ dashboard: DashboardRead }> => {
-    const workspaces = await WorkspaceClient.getAll({
-      where: { slug: { eq: params.workspaceSlug } },
-    });
-    const workspace = workspaces[0];
-    if (!workspace) {
-      throw notFound();
-    }
     const dashboards = await DashboardClient.getAll({
       where: {
         slug: { eq: params.slug },
-        workspace_id: { eq: workspace.id },
+        is_public: { eq: true },
       },
     });
     const dashboard = dashboards[0];

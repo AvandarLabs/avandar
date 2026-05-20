@@ -26,6 +26,7 @@ import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit";
 
 /**
  * Try to compute a fresh SQL string from the structured query. Used by
@@ -80,7 +81,10 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       dataSource: QueryDataSource | undefined,
     ) => {
-      const newQuery = { ...state.query, dataSource } as PartialStructuredQuery;
+      const newQuery = applyDefaultManualQueryLimit({
+        ...state.query,
+        dataSource,
+      } as PartialStructuredQuery);
       return _applyQueryChange(state, newQuery);
     },
 
@@ -163,6 +167,18 @@ export const DataExplorerStateManager = createAppStateManager({
       const newQuery = {
         ...state.query,
         orderByDirection: direction,
+      } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
+    },
+
+    /** Set the LIMIT clause for the query. */
+    setLimit: (
+      state: DataExplorerAppState,
+      limit: number | undefined,
+    ) => {
+      const newQuery = {
+        ...state.query,
+        limit,
       } as PartialStructuredQuery;
       return _applyQueryChange(state, newQuery);
     },

@@ -129,16 +129,18 @@ export function VisualizationContainer({
   const columnNames = columns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const viz = match(vizConfig)
+  return match(vizConfig)
     .with({ vizType: "table" }, () => {
       return (
-        <DataGrid
-          columnNames={columnNames}
-          data={limitedData}
-          dateColumns={dateColumns}
-          dateFormat="YYYY-MM-DD HH:mm:ss Z"
-          height="100%"
-        />
+        <Box h="100%" w="100%" mih={0}>
+          <DataGrid
+            columnNames={columnNames}
+            data={limitedData}
+            dateColumns={dateColumns}
+            dateFormat="YYYY-MM-DD HH:mm:ss Z"
+            height="100%"
+          />
+        </Box>
       );
     })
     .with({ vizType: "bar" }, (config) => {
@@ -302,13 +304,13 @@ export function VisualizationContainer({
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })
-    .exhaustive();
-
-  return (
-    <Flex h="100%" w="100%" justify="center" align="center">
-      {viz}
-    </Flex>
-  );
+    .otherwise((viz) => {
+      return (
+        <Flex h="100%" w="100%" justify="center" align="center">
+          {viz}
+        </Flex>
+      );
+    });
 }
 
 function _renderError(

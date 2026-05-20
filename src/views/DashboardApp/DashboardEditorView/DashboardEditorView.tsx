@@ -165,7 +165,7 @@ export function DashboardEditorView({
   return (
     <DashboardFilterStateManager.Provider>
       <AppLayout floatingToolbar>
-        <Flex direction="column" h="100%">
+        <Flex direction="column" h="100%" pt={40}>
           {isShareOnlyAccess ?
             <Alert color="blue" variant="light" title="Shared with you" m="sm">
               <Text size="sm">

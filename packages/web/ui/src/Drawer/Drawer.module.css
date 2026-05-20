@@ -21,13 +21,16 @@
  */
 .scopedRoot {
   inset: 0;
+  pointer-events: none;
   position: absolute;
 }
 
 .scopedInner {
+  pointer-events: auto;
   position: absolute;
 }
 
 .scopedOverlay {
+  pointer-events: auto;
   position: absolute;
 }

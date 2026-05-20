@@ -5,8 +5,10 @@ import {
   openChatPanelIfClosed,
 } from "./helpers/chatPanelFlow";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
+  EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
+  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
@@ -91,19 +93,44 @@ async function uploadCsvAndOpenChat(args: {
   workspaceSlug: string;
 }): Promise<void> {
   const { page, workspaceSlug } = args;
+
   await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+
   const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
   await uploadPanel
     .locator('input[type="file"]')
-    .setInputFiles(CALIFORNIA_CSV_PATH);
+    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
+
   await uploadPanel
     .getByRole("button", { name: "Upload", exact: true })
     .click();
+
   await expect(
     page.getByText("Data processed successfully", { exact: false }),
   ).toBeVisible({ timeout: LONG_WAIT });
-  // Click anywhere to dismiss any notifications.
-  await page.locator("body").click({ position: { x: 10, y: 10 } });
+
+  const formattedPreviewRowCount = formatImportPreviewRowCount(
+    SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  );
+  await expect(
+    page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
+  ).toBeVisible({ timeout: LONG_WAIT });
+
+  await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
+
+  await Promise.all(
+    EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+      await expect(
+        page.getByRole("columnheader", { name: columnName }),
+      ).toBeVisible({ timeout: SHORT_WAIT });
+    }),
+  );
+
+  await expect(page.getByText("California").first()).toBeVisible({
+    timeout: SHORT_WAIT,
+  });
 }
 
 test.describe("chat interactive workflows", () => {
@@ -143,7 +170,9 @@ test.describe("chat interactive workflows", () => {
       password: e2eWorkerDb.primaryUser.password,
       workspaceSlug: e2eWorkerDb.workspaceSlug,
     });
-    await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
+    await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`, {
+      waitUntil: "domcontentloaded",
+    });
     await dismissBlockingOverlays(page);
 
     await openChatPanelIfClosed(page);
@@ -223,7 +252,7 @@ test.describe("chat interactive workflows", () => {
                   id: "filter_rows",
                   description: "Keep only confirmed cases",
                   type: "sql",
-                  code: `SELECT * FROM "${datasetId}" LIMIT 50`,
+                  code: `SELECT * FROM "${datasetId}" LIMIT ${SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT}`,
                   inputs: [],
                   predictedSchema: [
                     { name: "Province_State", type: "varchar" },
@@ -243,13 +272,15 @@ test.describe("chat interactive workflows", () => {
         },
       });
       await pollUntilCloudDatasetToggleShowsOnline(page);
-      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
+      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`, {
+        waitUntil: "domcontentloaded",
+      });
       await dismissBlockingOverlays(page);
       await page.getByRole("button", { name: /^open$/i }).click();
       const openDrawer = page.getByRole("dialog", { name: /open dataset/i });
       await openDrawer
         .getByRole("row")
-        .filter({ hasText: "california-covid-sample.csv" })
+        .filter({ hasText: "small-california-covid-sample.csv" })
         .getByRole("button", { name: /^open$/i })
         .click();
       await dismissBlockingOverlays(page);
@@ -304,8 +335,3 @@ test.describe("chat interactive workflows", () => {
     }
   });
 });
-// Keep the import to silence "unused" complaints if a future fixture
-// regression removes one of these references. They're documentation-
-// valuable.
-void CALIFORNIA_CSV_EXPECTED_ROW_COUNT;
-void SHORT_WAIT;

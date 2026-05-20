@@ -33,6 +33,7 @@ export function QueryDataSourceSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const isControlled = value !== undefined;
   const [currentDataSource, setCurrentDataSource] =
     useUncontrolled<QueryDataSource | null>({
       value,
@@ -53,6 +54,10 @@ export function QueryDataSourceSelect({
   }, [datasets, entityConfigs]);
 
   useOnBecomesDefined(dataSources, (dsources) => {
+    if (isControlled) {
+      return;
+    }
+
     // if the current value is contained in the datasource list, then
     // we don't have to trigger any change
     if (

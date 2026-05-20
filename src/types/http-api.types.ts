@@ -1,4 +1,5 @@
 import type { ChatAPI } from "@sbfn/chat/chat.types";
+import type { DashboardsAPI } from "@sbfn/dashboards/dashboards.routes.types";
 import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types";
 import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types";
@@ -21,6 +22,7 @@ type FullAPI = SupportAPI &
   HealthzAPI &
   QueriesAPI &
   ChatAPI &
+  DashboardsAPI &
   WorkspacesAPI &
   GoogleAuthAPI &
   GoogleAuthCallbackAPI &

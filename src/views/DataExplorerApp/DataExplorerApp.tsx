@@ -38,14 +38,33 @@ import { OpenDatasetDrawer } from "@/views/DataExplorerApp/OpenDatasetDrawer/Ope
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
+import {
+  readDataExplorerPanelPreferences,
+  writeDataExplorerPanelPreferences,
+} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 
 const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
 const SETTINGS_INITIAL_POSITION = { top: 140, right: 32 };
 const QUERY_DETAILS_WIDTH = 380;
 const SETTINGS_WIDTH = 340;
+
+function _updatePanelPreferences(
+  preferences: DataExplorerPanelPreferences,
+  panel: "queryDetails" | "settings",
+  next: DataExplorerPanelPreferences["queryDetails"],
+): DataExplorerPanelPreferences {
+  return {
+    ...preferences,
+    [panel]: {
+      ...preferences[panel],
+      ...next,
+    },
+  };
+}
 
 type Props = {
   urlSearch: DataExplorerURLSearch;
@@ -62,11 +81,41 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     isOpenDatasetDrawerOpen,
     { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
   ] = useDisclosure(false);
+  const [panelPreferences, setPanelPreferences] =
+    useState<DataExplorerPanelPreferences>(() => {
+      return readDataExplorerPanelPreferences();
+    });
+  const hasSavedQueryDetailsPreference =
+    panelPreferences.queryDetails !== undefined;
 
-  const [isQueryDetailsOpened, setQueryDetailsOpened] = useState(false);
-  const [isQueryDetailsCollapsed, setQueryDetailsCollapsed] = useState(false);
+  const [isQueryDetailsOpened, setQueryDetailsOpened] = useState(() => {
+    return !hasSavedQueryDetailsPreference;
+  });
   const [isSettingsOpened, setSettingsOpened] = useState(false);
-  const [isSettingsCollapsed, setSettingsCollapsed] = useState(false);
+  const isQueryDetailsCollapsed =
+    panelPreferences.queryDetails?.collapsed ?? false;
+  const isSettingsCollapsed = panelPreferences.settings?.collapsed ?? false;
+
+  useEffect(() => {
+    if (hasSavedQueryDetailsPreference) {
+      return;
+    }
+
+    setPanelPreferences((prev) => {
+      if (prev.queryDetails !== undefined) {
+        return prev;
+      }
+
+      return _updatePanelPreferences(prev, "queryDetails", {
+        collapsed: false,
+        position: QUERY_DETAILS_INITIAL_POSITION,
+      });
+    });
+  }, [hasSavedQueryDetailsPreference]);
+
+  useEffect(() => {
+    writeDataExplorerPanelPreferences(panelPreferences);
+  }, [panelPreferences]);
 
   useDataExplorerURLSync({ urlSearch, navigate });
 
@@ -167,9 +216,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     const justFinishedFetching =
       wasFetchingRef.current && !dataQuery.isFetching;
     if (justFinishedFetching && dataQuery.isSuccess) {
-      if (!isSettingsOpenedRef.current) {
-        setSettingsCollapsed(false);
-      }
       setSettingsOpened(true);
     }
     wasFetchingRef.current = dataQuery.isFetching;
@@ -180,7 +226,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   return (
     <AppLayout title="Data Explorer">
-      <Stack flex={1} gap={0} mih={0}>
+      <Stack flex={1} h="100%" gap={0} mih={0}>
         <Group
           bg="white"
           py="xs"
@@ -211,10 +257,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               setQueryDetailsOpened((prev) => {
                 return !prev;
               });
-              setQueryDetailsCollapsed(false);
             }}
           >
-            Show query details
+            Query
           </Button>
           <Button
             variant={isSettingsOpened ? "filled" : "outline"}
@@ -225,7 +270,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               setSettingsOpened((prev) => {
                 return !prev;
               });
-              setSettingsCollapsed(false);
             }}
           >
             Settings
@@ -411,11 +455,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           setQueryDetailsOpened(false);
         }}
         onToggleCollapse={() => {
-          setQueryDetailsCollapsed((prev) => {
-            return !prev;
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "queryDetails", {
+              collapsed: !isQueryDetailsCollapsed,
+            });
           });
         }}
-        initialPosition={QUERY_DETAILS_INITIAL_POSITION}
+        onPositionChange={(position) => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "queryDetails", {
+              position: {
+                left: position.x,
+                top: position.y,
+              },
+            });
+          });
+        }}
+        initialPosition={
+          panelPreferences.queryDetails?.position ?? QUERY_DETAILS_INITIAL_POSITION
+        }
         width={QUERY_DETAILS_WIDTH}
       >
         <QueryDetailsBody />
@@ -428,11 +486,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           setSettingsOpened(false);
         }}
         onToggleCollapse={() => {
-          setSettingsCollapsed((prev) => {
-            return !prev;
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "settings", {
+              collapsed: !isSettingsCollapsed,
+            });
           });
         }}
-        initialPosition={SETTINGS_INITIAL_POSITION}
+        onPositionChange={(position) => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "settings", {
+              position: {
+                left: position.x,
+                top: position.y,
+              },
+            });
+          });
+        }}
+        initialPosition={
+          panelPreferences.settings?.position ?? SETTINGS_INITIAL_POSITION
+        }
         width={SETTINGS_WIDTH}
       >
         <VizSettingsForm

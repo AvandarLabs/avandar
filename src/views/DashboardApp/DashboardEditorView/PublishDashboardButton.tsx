@@ -50,12 +50,15 @@ export function PublishDashboardButton({
             return;
           }
 
-          const modalId = modals.open({
+          const modalId = `publish-dashboard-${dashboard.id}`;
+          modals.open({
+            modalId,
             title: dashboard.isPublic ? "Manage sharing" : "Publish dashboard",
             size: "lg",
             children: (
               <PublishDashboardModal
                 dashboard={dashboard}
+                modalId={modalId}
                 onClose={() => {
                   modals.close(modalId);
                 }}

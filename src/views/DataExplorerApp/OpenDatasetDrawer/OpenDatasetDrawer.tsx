@@ -43,6 +43,7 @@ export function OpenDatasetDrawer({
     <Drawer
       opened={opened}
       onClose={onClose}
+      keepMounted={false}
       boundary={`#${APP_SHELL_MAIN_ID}`}
       position="right"
       size="100%"

@@ -14,11 +14,11 @@ import { Route as SigninRouteImport } from "./routes/signin";
 import { Route as RegisterRouteImport } from "./routes/register";
 import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password";
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route";
+import { Route as DSlugRouteImport } from "./routes/d/$slug";
 import { Route as AuthnoWorkspaceRouteRouteImport } from "./routes/_auth/(no-workspace)/route";
 import { Route as AuthWorkspaceSlugRouteRouteImport } from "./routes/_auth/$workspaceSlug/route";
 import { Route as AuthnoWorkspaceIndexRouteImport } from "./routes/_auth/(no-workspace)/index";
 import { Route as AuthWorkspaceSlugIndexRouteImport } from "./routes/_auth/$workspaceSlug/index";
-import { Route as DWorkspaceSlugSlugRouteImport } from "./routes/d/$workspaceSlug.$slug";
 import { Route as AuthnoWorkspaceInvalidWorkspaceRouteImport } from "./routes/_auth/(no-workspace)/invalid-workspace";
 import { Route as AuthWorkspaceSlugSettingsRouteImport } from "./routes/_auth/$workspaceSlug/settings";
 import { Route as AuthWorkspaceSlugProfileRouteImport } from "./routes/_auth/$workspaceSlug/profile";
@@ -70,6 +70,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
   id: "/_auth",
   getParentRoute: () => rootRouteImport,
 } as any);
+const DSlugRoute = DSlugRouteImport.update({
+  id: "/d/$slug",
+  path: "/d/$slug",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const AuthnoWorkspaceRouteRoute = AuthnoWorkspaceRouteRouteImport.update({
   id: "/(no-workspace)",
   getParentRoute: () => AuthRouteRoute,
@@ -88,11 +93,6 @@ const AuthWorkspaceSlugIndexRoute = AuthWorkspaceSlugIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AuthWorkspaceSlugRouteRoute,
-} as any);
-const DWorkspaceSlugSlugRoute = DWorkspaceSlugSlugRouteImport.update({
-  id: "/d/$workspaceSlug/$slug",
-  path: "/d/$workspaceSlug/$slug",
-  getParentRoute: () => rootRouteImport,
 } as any);
 const AuthnoWorkspaceInvalidWorkspaceRoute =
   AuthnoWorkspaceInvalidWorkspaceRouteImport.update({
@@ -259,6 +259,7 @@ export interface FileRoutesByFullPath {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/$workspaceSlug": typeof AuthWorkspaceSlugRouteRouteWithChildren;
+  "/d/$slug": typeof DSlugRoute;
   "/$workspaceSlug/dashboards": typeof AuthWorkspaceSlugDashboardsRouteRouteWithChildren;
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
@@ -270,7 +271,6 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
-  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
   "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
@@ -294,6 +294,7 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/d/$slug": typeof DSlugRoute;
   "/$workspaceSlug/shared-with-me": typeof AuthWorkspaceSlugSharedWithMeRouteRoute;
   "/$workspaceSlug/access-denied": typeof AuthWorkspaceSlugAccessDeniedRoute;
   "/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
@@ -302,7 +303,6 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
-  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/$workspaceSlug": typeof AuthWorkspaceSlugIndexRoute;
   "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
   "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
@@ -328,6 +328,7 @@ export interface FileRoutesById {
   "/update-password": typeof UpdatePasswordRoute;
   "/_auth/$workspaceSlug": typeof AuthWorkspaceSlugRouteRouteWithChildren;
   "/_auth/(no-workspace)": typeof AuthnoWorkspaceRouteRouteWithChildren;
+  "/d/$slug": typeof DSlugRoute;
   "/_auth/$workspaceSlug/dashboards": typeof AuthWorkspaceSlugDashboardsRouteRouteWithChildren;
   "/_auth/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/_auth/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
@@ -339,7 +340,6 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/_auth/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/_auth/(no-workspace)/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
-  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/_auth/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
   "/_auth/(no-workspace)/": typeof AuthnoWorkspaceIndexRoute;
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
@@ -367,6 +367,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/$workspaceSlug"
+    | "/d/$slug"
     | "/$workspaceSlug/dashboards"
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
@@ -378,7 +379,6 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
     | "/invalid-workspace"
-    | "/d/$workspaceSlug/$slug"
     | "/$workspaceSlug/"
     | "/$workspaceSlug/entity-manager/$entityConfigId"
     | "/$workspaceSlug/data-manager/$datasetId"
@@ -402,6 +402,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/d/$slug"
     | "/$workspaceSlug/shared-with-me"
     | "/$workspaceSlug/access-denied"
     | "/$workspaceSlug/checkout"
@@ -410,7 +411,6 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
     | "/invalid-workspace"
-    | "/d/$workspaceSlug/$slug"
     | "/$workspaceSlug"
     | "/$workspaceSlug/data-manager/$datasetId"
     | "/$workspaceSlug/data-manager/data-import"
@@ -435,6 +435,7 @@ export interface FileRouteTypes {
     | "/update-password"
     | "/_auth/$workspaceSlug"
     | "/_auth/(no-workspace)"
+    | "/d/$slug"
     | "/_auth/$workspaceSlug/dashboards"
     | "/_auth/$workspaceSlug/data-manager"
     | "/_auth/$workspaceSlug/entity-designer"
@@ -446,7 +447,6 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/profile"
     | "/_auth/$workspaceSlug/settings"
     | "/_auth/(no-workspace)/invalid-workspace"
-    | "/d/$workspaceSlug/$slug"
     | "/_auth/$workspaceSlug/"
     | "/_auth/(no-workspace)/"
     | "/_auth/$workspaceSlug/entity-manager/$entityConfigId"
@@ -472,7 +472,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute;
   SigninRoute: typeof SigninRoute;
   UpdatePasswordRoute: typeof UpdatePasswordRoute;
-  DWorkspaceSlugSlugRoute: typeof DWorkspaceSlugSlugRoute;
+  DSlugRoute: typeof DSlugRoute;
   PublicDashboardsWorkspaceSlugDashboardIdRoute: typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
 }
 
@@ -513,6 +513,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthRouteRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/d/$slug": {
+      id: "/d/$slug";
+      path: "/d/$slug";
+      fullPath: "/d/$slug";
+      preLoaderRoute: typeof DSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/_auth/(no-workspace)": {
       id: "/_auth/(no-workspace)";
       path: "";
@@ -540,13 +547,6 @@ declare module "@tanstack/react-router" {
       fullPath: "/$workspaceSlug/";
       preLoaderRoute: typeof AuthWorkspaceSlugIndexRouteImport;
       parentRoute: typeof AuthWorkspaceSlugRouteRoute;
-    };
-    "/d/$workspaceSlug/$slug": {
-      id: "/d/$workspaceSlug/$slug";
-      path: "/d/$workspaceSlug/$slug";
-      fullPath: "/d/$workspaceSlug/$slug";
-      preLoaderRoute: typeof DWorkspaceSlugSlugRouteImport;
-      parentRoute: typeof rootRouteImport;
     };
     "/_auth/(no-workspace)/invalid-workspace": {
       id: "/_auth/(no-workspace)/invalid-workspace";
@@ -893,7 +893,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SigninRoute: SigninRoute,
   UpdatePasswordRoute: UpdatePasswordRoute,
-  DWorkspaceSlugSlugRoute: DWorkspaceSlugSlugRoute,
+  DSlugRoute: DSlugRoute,
   PublicDashboardsWorkspaceSlugDashboardIdRoute:
     PublicDashboardsWorkspaceSlugDashboardIdRoute,
 };

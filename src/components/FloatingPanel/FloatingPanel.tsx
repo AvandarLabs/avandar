@@ -24,6 +24,11 @@ type FloatingPanelInitialPosition = {
   bottom?: number;
 };
 
+type FloatingPanelPosition = {
+  x: number;
+  y: number;
+};
+
 type Props = {
   /** Title shown in the draggable header. */
   title: string;
@@ -42,6 +47,9 @@ type Props = {
 
   /** Initial viewport-relative position of the window when first mounted. */
   initialPosition?: FloatingPanelInitialPosition;
+
+  /** Called when the panel is dragged to a new viewport position. */
+  onPositionChange?: (position: FloatingPanelPosition) => void;
 
   /** Width of the window. */
   width?: number | string;
@@ -63,6 +71,7 @@ export function FloatingPanel({
   onClose,
   onToggleCollapse,
   initialPosition,
+  onPositionChange,
   width = 360,
   children,
 }: Props): JSX.Element {
@@ -82,6 +91,7 @@ export function FloatingPanel({
             withBorder
             w={width}
             initialPosition={initialPosition}
+            onPositionChange={onPositionChange}
             dragHandleSelector={`.${css.header}`}
             excludeDragHandleSelector={`.${css.actions}`}
             className={css.root}

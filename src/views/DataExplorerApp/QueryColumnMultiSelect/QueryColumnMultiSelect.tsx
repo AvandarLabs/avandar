@@ -10,7 +10,7 @@ import { isNonNullish, makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId";
@@ -134,22 +134,18 @@ export function QueryColumnMultiSelect({
     return filter;
   }, [queryColumns]);
 
-  // When available columns change (e.g. data source changed, or columns
-  // were restored from URL with different synthetic UUIDs), remap the
-  // current selection to the canonical instances from the available set.
-  useEffect(() => {
-    const remapped = remapColumnsByBaseId({
-      selectedColumns: currentSelectedColumns,
-      availableColumns: queryColumns,
-    });
-    if (remapped !== undefined) {
-      setCurrentSelectedColumns(remapped);
-    }
-  }, [queryColumns, currentSelectedColumns, setCurrentSelectedColumns]);
+  const renderedSelectedColumns = useMemo(() => {
+    return (
+      remapColumnsByBaseId({
+        selectedColumns: currentSelectedColumns,
+        availableColumns: queryColumns,
+      }) ?? currentSelectedColumns
+    );
+  }, [currentSelectedColumns, queryColumns]);
 
   const selectedColumnIds = useMemo(() => {
-    return currentSelectedColumns.map(prop("id"));
-  }, [currentSelectedColumns]);
+    return renderedSelectedColumns.map(prop("id"));
+  }, [renderedSelectedColumns]);
 
   return (
     <MultiSelect
