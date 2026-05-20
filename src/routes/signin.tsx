@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -37,6 +38,7 @@ function SignInPage() {
   const router = useRouter();
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
+  const { t } = useLingui();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -69,11 +71,15 @@ function SignInPage() {
 
   return (
     <AuthLayout
-      title="Welcome back!"
+      title={t`Welcome back!`}
       subtitle={
         <>
-          <span>Don&apos;t have an account yet?</span>
-          <Link to="/register">Create account</Link>
+          <span>
+            <Trans>Don&apos;t have an account yet?</Trans>
+          </span>
+          <Link to="/register">
+            <Trans>Create account</Trans>
+          </Link>
         </>
       }
       footer={<AuthFooter />}
@@ -82,7 +88,7 @@ function SignInPage() {
         <Stack>
           <TextInput
             required
-            label="Email"
+            label={t`Email`}
             name="email"
             type="email"
             key={form.key("email")}
@@ -90,7 +96,7 @@ function SignInPage() {
           />
           <PasswordInput
             required
-            label="Password"
+            label={t`Password`}
             name="password"
             type="password"
             key={form.key("password")}
@@ -101,12 +107,14 @@ function SignInPage() {
             }}
           />
           <Button type="submit" disabled={isSignInPending}>
-            Sign in
+            <Trans>Sign in</Trans>
             {isSignInPending ?
               <Loader />
             : null}
           </Button>
-          <Link to="/forgot-password">Forgot your password?</Link>
+          <Link to="/forgot-password">
+            <Trans>Forgot your password?</Trans>
+          </Link>
         </Stack>
       </form>
     </AuthLayout>

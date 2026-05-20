@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
 import { objectKeys, objectValues } from "@utils";
 import { useImperativeHandle, useMemo, useRef } from "react";
@@ -100,6 +101,7 @@ export function AvaForm<
   hideSubmitButton,
   onKeyDown,
 }: Props<FieldSchemaRecord, FieldKey, FormValues>): JSX.Element {
+  const { t } = useLingui();
   const formNodeRef = useRef<HTMLFormElement>(null);
 
   // first, we hydrate the fields with additional default values and validation
@@ -110,7 +112,7 @@ export function AvaForm<
       const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
       const improvedField = match(field)
         .with({ type: "text" }, (fieldSchema) => {
-          return hydrateTextFieldSchema(fieldSchema);
+          return hydrateTextFieldSchema(fieldSchema, t);
         })
         .with({ type: "select" }, (fieldSchema) => {
           return fieldSchema;
@@ -162,7 +164,7 @@ export function AvaForm<
                     currentFieldKey as unknown as FieldKey,
                   );
                 }
-                return "Received a non-string value for a text field";
+                return t`Received a non-string value for a text field`;
               }
               return undefined;
             })
@@ -175,7 +177,7 @@ export function AvaForm<
                     currentFieldKey as unknown as FieldKey,
                   );
                 }
-                return "Received a non-string value for a select field";
+                return t`Received a non-string value for a select field`;
               }
               // there is no semantic validation function to use
               return undefined;
@@ -275,7 +277,7 @@ export function AvaForm<
                 }
                 type="submit"
               >
-                Submit
+                <Trans>Submit</Trans>
               </Button>
             </Flex>
           </Box>

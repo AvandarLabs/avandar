@@ -1,4 +1,5 @@
 import { useToggleBoolean } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import {
@@ -92,6 +93,7 @@ function AppShellComponent({
   utilityLinks = [],
   showChatPanel = true,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
   const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
@@ -205,10 +207,10 @@ function AppShellComponent({
       <Spotlight
         highlightQuery
         actions={spotlightActions ?? []}
-        nothingFound="Nothing found..."
+        nothingFound={t`Nothing found...`}
         searchProps={{
           leftSection: <IconSearch size={20} stroke={1.5} />,
-          placeholder: "Search...",
+          placeholder: t`Search...`,
         }}
       />
 

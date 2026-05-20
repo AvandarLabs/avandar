@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
   Box,
@@ -28,6 +29,7 @@ import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
  * Members and pending invites table with invite and per-member permissions.
  */
 export function WorkspaceUsersTab(): JSX.Element | null {
+  const { t } = useLingui();
   const isAdmin = useIsGlobalAdmin();
   const workspace = useCurrentWorkspace();
   const [drawerMember, setDrawerMember] =
@@ -48,10 +50,10 @@ export function WorkspaceUsersTab(): JSX.Element | null {
 
   const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
     onSuccess: () => {
-      return notifySuccess({ title: "User removed" });
+      return notifySuccess({ title: t`User removed` });
     },
     onError: (error: Error) => {
-      return notifyError({ title: "Remove failed", message: error.message });
+      return notifyError({ title: t`Remove failed`, message: error.message });
     },
     queriesToInvalidate: [
       WorkspaceClient.QueryKeys.getUsersForWorkspace({
@@ -81,7 +83,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   };
 
   const memberRows = workspaceUsers.map((user) => {
-    const roleLabel = user.roleGroupName ?? "Custom role";
+    const roleLabel = user.roleGroupName ?? t`Custom role`;
     return (
       <Table.Tr key={user.userId}>
         <Table.Td>{user.displayName}</Table.Td>
@@ -112,7 +114,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                   <IconEdit
                     size={18}
                     style={{ cursor: "pointer" }}
-                    aria-label="Edit permissions"
+                    aria-label={t`Edit permissions`}
                     onClick={() => {
                       setDrawerMember(user);
                     }}
@@ -120,13 +122,12 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                   <IconTrash
                     size={18}
                     style={{ cursor: "pointer" }}
-                    aria-label="Remove member"
+                    aria-label={t`Remove member`}
                     onClick={() => {
                       modals.openConfirmModal({
-                        title: "Remove User",
-                        children:
-                          "Are you sure you want to remove this user from the workspace?",
-                        labels: { confirm: "Remove", cancel: "Cancel" },
+                        title: t`Remove User`,
+                        children: t`Are you sure you want to remove this user from the workspace?`,
+                        labels: { confirm: t`Remove`, cancel: t`Cancel` },
                         confirmProps: { color: "red" },
                         onConfirm: () => {
                           removeMember({
@@ -139,7 +140,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                   />
                 </>
               : <Text size="xs" c="dimmed">
-                  Owner
+                  <Trans>Owner</Trans>
                 </Text>
               }
             </Group>
@@ -191,20 +192,33 @@ export function WorkspaceUsersTab(): JSX.Element | null {
         <Flex justify="space-between" align="center" mb="md">
           {!loadingSeats && maxSeats != null ?
             <Text size="sm" c="dimmed">
-              {`${usedSeats} of ${maxSeats} seat${maxSeats === 1 ? "" : "s"} used · ${remainingSeats} remaining`}
+              {maxSeats === 1 ?
+                <Trans>
+                  {usedSeats} of {maxSeats} seat used · {remainingSeats}{" "}
+                  remaining
+                </Trans>
+              : <Trans>
+                  {usedSeats} of {maxSeats} seats used · {remainingSeats}{" "}
+                  remaining
+                </Trans>
+              }
             </Text>
           : <Box />}
           {isAdmin ?
             <Button disabled={loadingSeats} onClick={openInviteModal}>
-              Invite member
+              <Trans>Invite member</Trans>
             </Button>
           : null}
         </Flex>
         <Table>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th w="280px">Name</Table.Th>
-              <Table.Th>Role & user groups</Table.Th>
+              <Table.Th w="280px">
+                <Trans>Name</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Role & user groups</Trans>
+              </Table.Th>
               {isAdmin ?
                 <Table.Th w="120px" />
               : null}

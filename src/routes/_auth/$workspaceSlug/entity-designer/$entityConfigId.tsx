@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import {
   createFileRoute,
@@ -34,6 +35,7 @@ function RouteComponent() {
 }
 
 function EntityMetaErrorView({ error }: ErrorComponentProps) {
+  const { t } = useLingui();
   useEffect(() => {
     Logger.error(error);
   }, [error]);
@@ -41,8 +43,8 @@ function EntityMetaErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%">
       <Callout
-        title="Profile failed to load"
-        message="The profile manager page failed to load. Please try again later or reach out to support."
+        title={t`Profile failed to load`}
+        message={t`The profile manager page failed to load. Please try again later or reach out to support.`}
       />
     </Center>
   );

@@ -1,13 +1,8 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { SHARE_COPY } from "../shareCopy";
+import { useShareCopy } from "../shareCopy";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-
-const ROLE_OPTIONS: Array<{ value: RoleLevel; label: string }> = [
-  { value: "viewer", label: "Viewer" },
-  { value: "editor", label: "Editor" },
-  { value: "admin", label: "Admin" },
-];
 
 type Option = { value: string; label: string };
 
@@ -35,14 +30,22 @@ export function ShareAddPrincipalRow({
   isAdding,
   onAdd,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const shareCopy = useShareCopy();
   const [target, setTarget] = useState<string | null>(null);
   const [role, setRole] = useState<RoleLevel>("viewer");
+
+  const roleOptions: Array<{ value: RoleLevel; label: string }> = [
+    { value: "viewer", label: t`Viewer` },
+    { value: "editor", label: t`Editor` },
+    { value: "admin", label: t`Admin` },
+  ];
 
   const groupedOptions = useMemo(() => {
     const data: Array<{ group: string; items: Option[] }> = [];
     if (members.length > 0) {
       data.push({
-        group: "Members",
+        group: t`Members`,
         items: members.map((member) => {
           return { value: `user:${member.value}`, label: member.label };
         }),
@@ -50,14 +53,14 @@ export function ShareAddPrincipalRow({
     }
     if (groups.length > 0) {
       data.push({
-        group: "User groups",
+        group: t`User groups`,
         items: groups.map((group) => {
           return { value: `user_group:${group.value}`, label: group.label };
         }),
       });
     }
     return data;
-  }, [members, groups]);
+  }, [members, groups, t]);
 
   const onClick = (): void => {
     if (!target) {
@@ -74,21 +77,21 @@ export function ShareAddPrincipalRow({
     <Group align="flex-end" wrap="nowrap" gap="sm">
       <Select
         flex={1}
-        placeholder={SHARE_COPY.addPlaceholder}
-        description={SHARE_COPY.addHelper}
+        placeholder={shareCopy.addPlaceholder}
+        description={shareCopy.addHelper}
         data={groupedOptions}
         value={target}
         onChange={setTarget}
         searchable
         nothingFoundMessage={
-          isEmptySource ? SHARE_COPY.emptyState.noMembersOrTags : "No matches"
+          isEmptySource ? shareCopy.emptyState.noMembersOrTags : shareCopy.noMatches
         }
-        aria-label="Add people or user groups"
+        aria-label={t`Add people or user groups`}
       />
       <Select
         w={120}
-        label="Role"
-        data={ROLE_OPTIONS}
+        label={t`Role`}
+        data={roleOptions}
         value={role}
         allowDeselect={false}
         onChange={(value) => {
@@ -96,10 +99,10 @@ export function ShareAddPrincipalRow({
             setRole(value as RoleLevel);
           }
         }}
-        aria-label="Role for new share"
+        aria-label={t`Role for new share`}
       />
       <Button loading={isAdding} disabled={!target} onClick={onClick}>
-        Share
+        <Trans>Share</Trans>
       </Button>
     </Group>
   );

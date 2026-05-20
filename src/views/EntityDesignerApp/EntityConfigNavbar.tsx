@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
@@ -15,6 +16,7 @@ export function EntityConfigNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
@@ -38,13 +40,13 @@ export function EntityConfigNavbar({
       }),
       {
         to: AppLinks.entityDesignerCreatorView(workspace.slug).to,
-        label: "Create new profile type",
+        label: t`Create new profile type`,
         style: borderStyle,
         key: "create-new",
       },
     ];
     return entityConfigLinks;
-  }, [entityConfigs, borderStyle, workspace.slug]);
+  }, [entityConfigs, borderStyle, workspace.slug, t]);
 
   return (
     <Box bg="neutral.1" pt="0" {...boxProps}>

@@ -1,4 +1,5 @@
 import { useLocalRuntime } from "@assistant-ui/react";
+import { useLingui } from "@lingui/react/macro";
 import { isNotNull, prop } from "@utils";
 import { useMemo, useRef } from "react";
 import { match } from "ts-pattern";
@@ -75,6 +76,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const { parseSql } = useSqlToStructuredQuery();
   const planDispatch = PlanStateManager.useDispatch();
   const planState = PlanStateManager.useState();
+  const { t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
   // inside `run()`. Including `pageContext` or `parseSql` in the adapter
   // useMemo deps recreates the adapter whenever SQL or dataset metadata
@@ -97,6 +99,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
   const workspaceRef = useRef(workspace);
   workspaceRef.current = workspace;
+
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -156,7 +161,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 content: [
                   {
                     type: "text" as const,
-                    text: "(Message not sent.)",
+                    text: tRef.current`(Message not sent.)`,
                   },
                 ],
               };

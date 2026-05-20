@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
@@ -28,6 +29,7 @@ export function ChatModelPicker({
   const { groups, models, isLoading, isError } = useChatModels();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
   const [search, setSearch] = useState("");
+  const { t } = useLingui();
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -91,9 +93,9 @@ export function ChatModelPicker({
   }, [groups, search]);
 
   const tooltipLabel =
-    isLoading ? "Loading models..."
-    : selectedModel ? `Using ${selectedModel.name}`
-    : "Choose a model";
+    isLoading ? t`Loading models...`
+    : selectedModel ? t`Using ${selectedModel.name}`
+    : t`Choose a model`;
 
   const isTriggerDisabled = disabled || isLoading || !resolvedModelId;
 
@@ -122,12 +124,12 @@ export function ChatModelPicker({
             size="compact-sm"
             className={css.trigger}
             disabled={isTriggerDisabled}
-            aria-label="Choose chat model"
+            aria-label={t`Choose chat model`}
             onClick={() => {
               combobox.toggleDropdown();
             }}
           >
-            {selectedModel?.nameWithoutProvider ?? "Model"}
+            {selectedModel?.nameWithoutProvider ?? t`Model`}
           </Button>
         </Combobox.Target>
       </Tooltip>
@@ -140,8 +142,8 @@ export function ChatModelPicker({
               setSearch(event.currentTarget.value);
               combobox.updateSelectedOptionIndex();
             }}
-            placeholder="Search models"
-            aria-label="Search models"
+            placeholder={t`Search models`}
+            aria-label={t`Search models`}
           />
           <Combobox.Options className={css.options}>
             {filteredGroups.length > 0 ?
@@ -174,7 +176,7 @@ export function ChatModelPicker({
                   </Combobox.Group>
                 );
               })
-            : <Combobox.Empty>No models match your search</Combobox.Empty>}
+            : <Combobox.Empty>{t`No models match your search`}</Combobox.Empty>}
           </Combobox.Options>
         </Combobox.Dropdown>
       : null}

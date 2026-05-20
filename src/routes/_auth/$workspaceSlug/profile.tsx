@@ -1,4 +1,5 @@
 import { useMutation, useToggleBoolean } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Container,
@@ -36,6 +37,7 @@ function ProfilePage(): JSX.Element {
   const { user } = Route.useRouteContext();
   const workspace = useCurrentWorkspace();
   const [userProfile, isProfileLoading] = useCurrentUserProfile();
+  const { t } = useLingui();
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
   });
@@ -43,7 +45,7 @@ function ProfilePage(): JSX.Element {
 
   if (!user || !userProfile || isProfileLoading) {
     return (
-      <AppLayout title="Profile">
+      <AppLayout title={t`Profile`}>
         <Container size={560} py="xxxl">
           <Loader />
         </Container>
@@ -52,14 +54,18 @@ function ProfilePage(): JSX.Element {
   }
 
   return (
-    <AppLayout title="Profile">
+    <AppLayout title={t`Profile`}>
       <Container size={560} py="xxxl">
         <Stack gap="xxl">
           <Stack gap={4}>
-            <Title order={2}>Profile</Title>
+            <Title order={2}>
+              <Trans>Profile</Trans>
+            </Title>
             <Text c="dimmed" size="sm">
-              Manage how you appear in {workspace.name} and the account you use
-              to sign in.
+              <Trans>
+                Manage how you appear in {workspace.name} and the account you
+                use to sign in.
+              </Trans>
             </Text>
           </Stack>
 
@@ -114,19 +120,20 @@ function DisplayNameSection({
   const [value, setValue] = useState(currentDisplayName);
   const trimmed = value.trim();
   const isDirty = trimmed !== currentDisplayName;
+  const { t } = useLingui();
 
   const [saveProfile, isSaving] = UserClient.useUpdateProfile({
     queryToInvalidate: UserClient.QueryKeys.getProfile({ workspaceId }),
     onSuccess: (updated) => {
       setValue(updated.displayName);
       notifySuccess({
-        title: "Display name updated",
-        message: `Saved as "${updated.displayName}".`,
+        title: t`Display name updated`,
+        message: t`Saved as "${updated.displayName}".`,
       });
     },
     onError: (error) => {
       notifyError({
-        title: "Failed to update display name",
+        title: t`Failed to update display name`,
         message: error.message,
       });
     },
@@ -135,9 +142,11 @@ function DisplayNameSection({
   return (
     <Stack gap="xs">
       <Stack gap={2}>
-        <Text fw={600}>Display name</Text>
+        <Text fw={600}>
+          <Trans>Display name</Trans>
+        </Text>
         <Text c="dimmed" size="sm">
-          The name other members see in {workspaceName}.
+          <Trans>The name other members see in {workspaceName}.</Trans>
         </Text>
       </Stack>
       <form
@@ -159,8 +168,8 @@ function DisplayNameSection({
             onChange={(event) => {
               setValue(event.currentTarget.value);
             }}
-            placeholder="Your name"
-            aria-label="Display name"
+            placeholder={t`Your name`}
+            aria-label={t`Display name`}
             maxLength={80}
           />
           <Button
@@ -168,14 +177,16 @@ function DisplayNameSection({
             loading={isSaving}
             disabled={!isDirty || trimmed.length === 0}
           >
-            Save
+            <Trans>Save</Trans>
           </Button>
         </Group>
       </form>
       {isInMultipleWorkspaces ?
         <Text c="dimmed" size="xs">
-          This name only applies in {workspaceName}. Your other workspaces keep
-          their own.
+          <Trans>
+            This name only applies in {workspaceName}. Your other workspaces
+            keep their own.
+          </Trans>
         </Text>
       : null}
     </Stack>
@@ -192,19 +203,20 @@ type EmailSectionProps = {
  */
 function EmailSection({ email }: EmailSectionProps): JSX.Element {
   const [isEditing, toggleEditing] = useToggleBoolean(false);
+  const { t } = useLingui();
   const [sendUpdateEmailRequest, isUpdateEmailPending] = useMutation({
     mutationFn: AuthClient.updateEmail,
     onSuccess: () => {
       notifySuccess({
-        title: "Email address updated",
-        message: "Please check your email for a confirmation link.",
+        title: t`Email address updated`,
+        message: t`Please check your email for a confirmation link.`,
       });
       toggleEditing();
     },
     onError: () => {
       notifyError({
-        title: "Failed to update email",
-        message: "Please try again or reach out to support.",
+        title: t`Failed to update email`,
+        message: t`Please try again or reach out to support.`,
       });
     },
   });
@@ -212,9 +224,11 @@ function EmailSection({ email }: EmailSectionProps): JSX.Element {
   return (
     <Stack gap="xs">
       <Stack gap={2}>
-        <Text fw={600}>Email</Text>
+        <Text fw={600}>
+          <Trans>Email</Trans>
+        </Text>
         <Text c="dimmed" size="sm">
-          Used to sign in to your account.
+          <Trans>Used to sign in to your account.</Trans>
         </Text>
       </Stack>
       {isEditing ?
@@ -224,9 +238,9 @@ function EmailSection({ email }: EmailSectionProps): JSX.Element {
           isSubmitting={isUpdateEmailPending}
           showCancelButton
           type="email"
-          label="Email"
+          label={t`Email`}
           defaultValue={email}
-          submitButtonLabel="Change"
+          submitButtonLabel={t`Change`}
           minLength={3}
           placeholder="you@example.com"
           onCancel={toggleEditing}
@@ -240,7 +254,7 @@ function EmailSection({ email }: EmailSectionProps): JSX.Element {
             {email}
           </Text>
           <Button variant="default" onClick={toggleEditing}>
-            Change
+            <Trans>Change</Trans>
           </Button>
         </Group>
       }
@@ -258,9 +272,11 @@ function PasswordSection({
   return (
     <Stack gap="xs">
       <Stack gap={2}>
-        <Text fw={600}>Password</Text>
+        <Text fw={600}>
+          <Trans>Password</Trans>
+        </Text>
         <Text c="dimmed" size="sm">
-          You'll be asked to confirm your current password.
+          <Trans>You'll be asked to confirm your current password.</Trans>
         </Text>
       </Stack>
       <Group justify="space-between" wrap="nowrap">
@@ -268,7 +284,7 @@ function PasswordSection({
           ••••••••••
         </Text>
         <Button variant="default" onClick={onChangePassword}>
-          Change password
+          <Trans>Change password</Trans>
         </Button>
       </Group>
     </Stack>

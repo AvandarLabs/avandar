@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
   Button,
@@ -30,12 +31,16 @@ import type { ConsentAuditEntry } from "@/lib/privacy/consentAuditLog";
 
 type FilterValue = "all" | ConsentAuditEntry["decision"];
 
-const DECISION_LABEL: Record<ConsentAuditEntry["decision"], string> = {
-  approved: "Approved",
-  used_suggestion: "Used suggestion",
-  cancelled: "Cancelled",
-  edited: "Edited",
-};
+/** Returns localized labels for consent decisions. */
+function _useDecisionLabels(): Record<ConsentAuditEntry["decision"], string> {
+  const { t } = useLingui();
+  return {
+    approved: t`Approved`,
+    used_suggestion: t`Used suggestion`,
+    cancelled: t`Cancelled`,
+    edited: t`Edited`,
+  };
+}
 
 const DECISION_COLOR: Record<ConsentAuditEntry["decision"], string> = {
   approved: "green",
@@ -44,12 +49,17 @@ const DECISION_COLOR: Record<ConsentAuditEntry["decision"], string> = {
   edited: "yellow",
 };
 
-const CONTEXT_LABEL: Record<ConsentAuditEntry["context"], string> = {
-  user_message_text: "Chat message",
-  clarification_answer: "Clarification answer",
-  discovery_clarification: "Discovery clarification",
-  plan_step_input: "Plan step input",
-};
+/** Returns localized labels for consent contexts. */
+function _useContextLabels(): Record<ConsentAuditEntry["context"], string> {
+  const { t } = useLingui();
+  return {
+    user_message_text: t`Chat message`,
+    clarification_answer: t`Clarification answer`,
+    discovery_clarification: t`Discovery clarification`,
+    plan_step_input: t`Plan step input`,
+    generated_sql_assumptions: t`Generated SQL assumptions`,
+  };
+}
 
 /**
  * "Privacy log" tab in workspace settings. Renders two sub-tabs:
@@ -64,8 +74,12 @@ export function PrivacyLogTab(): JSX.Element {
   return (
     <Tabs defaultValue="consent">
       <Tabs.List>
-        <Tabs.Tab value="consent">Consent</Tabs.Tab>
-        <Tabs.Tab value="clarifications">Clarifications</Tabs.Tab>
+        <Tabs.Tab value="consent">
+          <Trans>Consent</Trans>
+        </Tabs.Tab>
+        <Tabs.Tab value="clarifications">
+          <Trans>Clarifications</Trans>
+        </Tabs.Tab>
       </Tabs.List>
       <Tabs.Panel value="consent" pt="md">
         <ConsentLogPanel />
@@ -78,9 +92,12 @@ export function PrivacyLogTab(): JSX.Element {
 }
 
 function ConsentLogPanel(): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
   const [filter, setFilter] = useState<FilterValue>("all");
+  const decisionLabels = _useDecisionLabels();
+  const contextLabels = _useContextLabels();
 
   const load = useCallback(async (): Promise<void> => {
     const rows = await listConsentLog({ workspaceId: workspace.id });
@@ -119,19 +136,21 @@ function ConsentLogPanel(): JSX.Element {
 
   const confirmClear = (): void => {
     modals.openConfirmModal({
-      title: "Clear privacy log",
+      title: t`Clear privacy log`,
       children: (
         <Text size="sm">
-          Permanently delete all consent decisions on this device? This action
-          cannot be undone, and the log on other devices is not affected.
+          <Trans>
+            Permanently delete all consent decisions on this device? This action
+            cannot be undone, and the log on other devices is not affected.
+          </Trans>
         </Text>
       ),
-      labels: { confirm: "Clear log", cancel: "Cancel" },
+      labels: { confirm: t`Clear log`, cancel: t`Cancel` },
       confirmProps: { color: "red" },
       onConfirm: async () => {
         await clearConsentLog();
         await load();
-        notifySuccess("Privacy log cleared.");
+        notifySuccess(t`Privacy log cleared.`);
       },
     });
   };
@@ -147,23 +166,27 @@ function ConsentLogPanel(): JSX.Element {
   return (
     <Stack gap="md">
       <Stack gap={4}>
-        <Title order={4}>Privacy log</Title>
+        <Title order={4}>
+          <Trans>Privacy log</Trans>
+        </Title>
         <Text size="sm" c="dimmed">
-          A local record of every time you approved (or cancelled) sending data
-          to an AI provider in this workspace. Last 90 days, stored on this
-          device only.
+          <Trans>
+            A local record of every time you approved (or cancelled) sending
+            data to an AI provider in this workspace. Last 90 days, stored on
+            this device only.
+          </Trans>
         </Text>
       </Stack>
 
       <Group justify="space-between">
         <Select
-          label="Decision"
+          label={t`Decision`}
           data={[
-            { value: "all", label: "All decisions" },
-            { value: "approved", label: "Approved" },
-            { value: "used_suggestion", label: "Used suggestion" },
-            { value: "cancelled", label: "Cancelled" },
-            { value: "edited", label: "Edited" },
+            { value: "all", label: t`All decisions` },
+            { value: "approved", label: t`Approved` },
+            { value: "used_suggestion", label: t`Used suggestion` },
+            { value: "cancelled", label: t`Cancelled` },
+            { value: "edited", label: t`Edited` },
           ]}
           value={filter}
           onChange={(v) => {
@@ -181,7 +204,7 @@ function ConsentLogPanel(): JSX.Element {
             onClick={downloadCsv}
             size="sm"
           >
-            Export CSV
+            <Trans>Export CSV</Trans>
           </Button>
           <Button
             variant="outline"
@@ -191,7 +214,7 @@ function ConsentLogPanel(): JSX.Element {
             onClick={confirmClear}
             size="sm"
           >
-            Clear log
+            <Trans>Clear log</Trans>
           </Button>
         </Group>
       </Group>
@@ -199,17 +222,30 @@ function ConsentLogPanel(): JSX.Element {
       {filtered && filtered.length === 0 ?
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
-            No entries yet. The log fills in as the chat panel asks for consent.
+            <Trans>
+              No entries yet. The log fills in as the chat panel asks for
+              consent.
+            </Trans>
           </Text>
         </Card>
       : <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>When</Table.Th>
-              <Table.Th>Context</Table.Th>
-              <Table.Th>Decision</Table.Th>
-              <Table.Th>Detected</Table.Th>
-              <Table.Th>Source column</Table.Th>
+              <Table.Th>
+                <Trans>When</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Context</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Decision</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Detected</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Source column</Trans>
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -222,7 +258,7 @@ function ConsentLogPanel(): JSX.Element {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{CONTEXT_LABEL[entry.context]}</Text>
+                    <Text size="sm">{contextLabels[entry.context]}</Text>
                   </Table.Td>
                   <Table.Td>
                     <Badge
@@ -230,7 +266,7 @@ function ConsentLogPanel(): JSX.Element {
                       size="sm"
                       variant="light"
                     >
-                      {DECISION_LABEL[entry.decision]}
+                      {decisionLabels[entry.decision]}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
@@ -264,7 +300,7 @@ function ConsentLogPanel(): JSX.Element {
                         entry.detectedBias.length === 0
                       ) ?
                         <Text size="xs" c="dimmed">
-                          (clean)
+                          <Trans>(clean)</Trans>
                         </Text>
                       : null}
                     </Group>
@@ -289,12 +325,16 @@ function ConsentLogPanel(): JSX.Element {
   );
 }
 
-const OUTCOME_LABEL: Record<ClarificationOutcome, string> = {
-  answered: "Answered",
-  cancelled: "Cancelled",
-  cap_reached: "Cap reached",
-  neutral_failure: "Neutral failure",
-};
+/** Returns localized labels for clarification outcomes. */
+function _useOutcomeLabels(): Record<ClarificationOutcome, string> {
+  const { t } = useLingui();
+  return {
+    answered: t`Answered`,
+    cancelled: t`Cancelled`,
+    cap_reached: t`Cap reached`,
+    neutral_failure: t`Neutral failure`,
+  };
+}
 
 const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
   answered: "green",
@@ -304,9 +344,12 @@ const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
 };
 
 /** Legacy rows written before "Let AI decide" was removed. */
-const LEGACY_OUTCOME_LABEL: Record<string, string> = {
-  let_ai_decide: "Let AI decide (legacy)",
-};
+function _useLegacyOutcomeLabels(): Record<string, string> {
+  const { t } = useLingui();
+  return {
+    let_ai_decide: t`Let AI decide (legacy)`,
+  };
+}
 
 const LEGACY_OUTCOME_COLOR: Record<string, string> = {
   let_ai_decide: "blue",
@@ -314,6 +357,8 @@ const LEGACY_OUTCOME_COLOR: Record<string, string> = {
 
 function ClarificationLogPanel(): JSX.Element {
   const workspace = useCurrentWorkspace();
+  const outcomeLabels = _useOutcomeLabels();
+  const legacyOutcomeLabels = _useLegacyOutcomeLabels();
   const [entries, setEntries] = useState<ClarificationAuditEntry[] | null>(
     null,
   );
@@ -343,29 +388,45 @@ function ClarificationLogPanel(): JSX.Element {
   return (
     <Stack gap="md">
       <Stack gap={4}>
-        <Title order={4}>Clarifications</Title>
+        <Title order={4}>
+          <Trans>Clarifications</Trans>
+        </Title>
         <Text size="sm" c="dimmed">
-          A local record of every clarifying question the AI has asked in this
-          workspace. Only metadata is stored — never the question text or your
-          answer.
+          <Trans>
+            A local record of every clarifying question the AI has asked in
+            this workspace. Only metadata is stored — never the question text
+            or your answer.
+          </Trans>
         </Text>
       </Stack>
 
       {entries.length === 0 ?
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
-            No clarifications yet. The log fills in as the chat asks clarifying
-            questions.
+            <Trans>
+              No clarifications yet. The log fills in as the chat asks
+              clarifying questions.
+            </Trans>
           </Text>
         </Card>
       : <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>When</Table.Th>
-              <Table.Th>Turn</Table.Th>
-              <Table.Th>Shape</Table.Th>
-              <Table.Th>Outcome</Table.Th>
-              <Table.Th>Time to answer</Table.Th>
+              <Table.Th>
+                <Trans>When</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Turn</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Shape</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Outcome</Trans>
+              </Table.Th>
+              <Table.Th>
+                <Trans>Time to answer</Trans>
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -378,7 +439,9 @@ function ClarificationLogPanel(): JSX.Element {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{entry.turnNumber} / 3</Text>
+                    <Text size="sm">
+                      <Trans>{entry.turnNumber} / 3</Trans>
+                    </Text>
                   </Table.Td>
                   <Table.Td>
                     <Text size="xs" ff="monospace">
@@ -395,15 +458,17 @@ function ClarificationLogPanel(): JSX.Element {
                       size="sm"
                       variant="light"
                     >
-                      {OUTCOME_LABEL[entry.outcome as ClarificationOutcome] ??
-                        LEGACY_OUTCOME_LABEL[entry.outcome] ??
+                      {outcomeLabels[entry.outcome as ClarificationOutcome] ??
+                        legacyOutcomeLabels[entry.outcome] ??
                         entry.outcome}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
                     {entry.timeToAnswerMs !== null ?
                       <Text size="xs">
-                        {Math.round(entry.timeToAnswerMs / 100) / 10}s
+                        <Trans>
+                          {Math.round(entry.timeToAnswerMs / 100) / 10}s
+                        </Trans>
                       </Text>
                     : <Text size="xs" c="dimmed">
                         —

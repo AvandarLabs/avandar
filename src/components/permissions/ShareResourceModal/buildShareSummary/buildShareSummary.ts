@@ -3,13 +3,13 @@ import {
   appForResource,
   appLabel,
   resourceTypeLabel,
-  SHARE_COPY,
 } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { useLingui } from "@lingui/react/macro";
 
 /**
  * One run in the rendered summary line: a literal text segment or a labelled
@@ -31,6 +31,7 @@ type BuildShareSummaryOptions = {
   workspaceName: string;
   userById: Record<string, string>;
   groupById: Record<string, string>;
+  t: ReturnType<typeof useLingui>["t"];
 };
 
 /**
@@ -52,8 +53,9 @@ export function hasPrincipalId(
 export function buildShareSummary(
   opts: Readonly<BuildShareSummaryOptions>,
 ): SummarySpan[] {
-  const resource = resourceTypeLabel(opts.resourceType);
-  const app = appLabel(appForResource(opts.resourceType));
+  const { t } = opts;
+  const resource = resourceTypeLabel(opts.resourceType, t);
+  const app = appLabel(appForResource(opts.resourceType), t);
 
   const userShares = opts.shares
     .filter(hasPrincipalId)
@@ -67,19 +69,19 @@ export function buildShareSummary(
 
   if (!hasAnyShares) {
     if (!opts.isRestricted) {
-      return buildGeneralAccessOnlySummary(resource, app, generalAccessRole);
+      return buildGeneralAccessOnlySummary(resource, app, generalAccessRole, t);
     }
 
     return [
       {
         kind: "text",
-        text: SHARE_COPY.emptyState.noShares(resource),
+        text: t`This ${resource} is currently only accessible to its owner.`,
       },
     ];
   }
 
   const spans: SummarySpan[] = [
-    { kind: "text", text: `This ${resource} is shared with: ` },
+    { kind: "text", text: t`This ${resource} is shared with: ` },
   ];
 
   const fragments: SummarySpan[][] = [];
@@ -89,7 +91,7 @@ export function buildShareSummary(
   if (userShares.length > 0) {
     const userFragment: SummarySpan[] = [];
     userShares.forEach((share, idx) => {
-      const name = opts.userById[share.principalId] ?? "Unknown user";
+      const name = opts.userById[share.principalId] ?? t`Unknown user`;
       if (idx > 0) {
         userFragment.push({ kind: "text", text: ", " });
       }
@@ -99,28 +101,28 @@ export function buildShareSummary(
   }
 
   groupShares.forEach((share) => {
-    const groupName = opts.groupById[share.principalId] ?? "Unknown group";
+    const groupName = opts.groupById[share.principalId] ?? t`Unknown group`;
     const fragment: SummarySpan[] = [
-      { kind: "text", text: "all members of " },
+      { kind: "text", text: t`all members of ` },
       { kind: "pill", label: groupName, variant: "group" },
     ];
     if (share.requiresAppAccess) {
-      fragment.push({ kind: "text", text: " who also have " });
+      fragment.push({ kind: "text", text: t` who also have ` });
       fragment.push({ kind: "pill", label: app, variant: "app" });
-      fragment.push({ kind: "text", text: " access" });
+      fragment.push({ kind: "text", text: t` access` });
     }
     fragments.push(fragment);
   });
 
   if (!opts.isRestricted) {
-    fragments.push(buildGeneralAccessFragment(app, generalAccessRole));
+    fragments.push(buildGeneralAccessFragment(app, generalAccessRole, t));
   }
 
   // Join fragments with commas; if there are 2+ fragments, the final
   // separator becomes ", and " (Oxford-style for readability).
   fragments.forEach((fragment, idx) => {
     if (idx > 0) {
-      const separator = idx === fragments.length - 1 ? ", and " : ", ";
+      const separator = idx === fragments.length - 1 ? t`, and ` : ", ";
       spans.push({ kind: "text", text: separator });
     }
     spans.push(...fragment);
@@ -134,11 +136,12 @@ function buildGeneralAccessOnlySummary(
   resource: string,
   app: string,
   role: RoleLevel,
+  t: ReturnType<typeof useLingui>["t"],
 ): SummarySpan[] {
   return [
     {
       kind: "text",
-      text: `This ${resource} is accessible to anyone with ${app} ${capitalize(role)} permission.`,
+      text: t`This ${resource} is accessible to anyone with ${app} ${capitalize(role)} permission.`,
     },
   ];
 }
@@ -146,12 +149,13 @@ function buildGeneralAccessOnlySummary(
 function buildGeneralAccessFragment(
   app: string,
   role: RoleLevel,
+  t: ReturnType<typeof useLingui>["t"],
 ): SummarySpan[] {
   return [
-    { kind: "text", text: "anyone with " },
+    { kind: "text", text: t`anyone with ` },
     { kind: "pill", label: app, variant: "app" },
     { kind: "text", text: " " },
     { kind: "pill", label: capitalize(role), variant: "role" },
-    { kind: "text", text: " permission" },
+    { kind: "text", text: t` permission` },
   ];
 }

@@ -1,7 +1,7 @@
+import { useLingui } from "@lingui/react/macro";
 import { Radio, SegmentedControl, Stack, Table, Text } from "@mantine/core";
 import { matchLiteral } from "@utils";
 import { Permissions } from "$/models/Permissions/Permissions";
-import { PermissionsModule } from "$/models/Permissions/PermissionsModule/PermissionsModule";
 import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import type {
   AppType,
@@ -18,39 +18,45 @@ const CELL_OPTIONS: readonly AppTypeCellValue[] = [
   "admin",
 ] as const;
 
-function appTypeToLabel(app: AppType): string {
-  return matchLiteral(app, {
-    data_sources: "Data Sources",
-    data_explorer: "Data Explorer",
-    dashboards: "Dashboards",
-    settings: "Settings",
-  });
+/** Returns a localized display label for an app type. */
+function _useAppTypeLabel(): (app: AppType) => string {
+  const { t } = useLingui();
+  return (app: AppType) => {
+    return matchLiteral(app, {
+      data_sources: t`Data Sources`,
+      data_explorer: t`Data Explorer`,
+      dashboards: t`Dashboards`,
+      settings: t`Settings`,
+    });
+  };
 }
 
-function appTypeCellValueToLabel(cell: AppTypeCellValue): string {
-  return matchLiteral(cell, {
-    none: "None",
-    viewer: "Viewer",
-    editor: "Editor",
-    admin: "Admin",
-  });
+/** Returns a localized display label for a role-matrix cell value. */
+function _useCellValueLabel(): (cell: AppTypeCellValue) => string {
+  const { t } = useLingui();
+  return (cell: AppTypeCellValue) => {
+    return matchLiteral(cell, {
+      none: t`None`,
+      viewer: t`Viewer`,
+      editor: t`Editor`,
+      admin: t`Admin`,
+    });
+  };
 }
 
-const PRESET_ROLE_DATA = [
-  {
-    label: PermissionsModule.BuiltinRoleGroupNames.globalAdmin,
-    value: "global_admin",
-  },
-  {
-    label: PermissionsModule.BuiltinRoleGroupNames.globalEditor,
-    value: "global_editor",
-  },
-  {
-    label: PermissionsModule.BuiltinRoleGroupNames.globalViewer,
-    value: "global_viewer",
-  },
-  { label: "Custom", value: "custom" },
-] as const;
+/** Returns the localized preset-role segmented control options. */
+function _usePresetRoleData(): ReadonlyArray<{
+  label: string;
+  value: "global_admin" | "global_editor" | "global_viewer" | "custom";
+}> {
+  const { t } = useLingui();
+  return [
+    { label: t`Global Admin`, value: "global_admin" },
+    { label: t`Global Editor`, value: "global_editor" },
+    { label: t`Global Viewer`, value: "global_viewer" },
+    { label: t`Custom`, value: "custom" },
+  ];
+}
 
 type Props = {
   rolesMatrix: UserAppRolesMatrix;
@@ -76,16 +82,28 @@ export function WorkspaceAppRoleMatrixForm({
   onBuiltinPresetTypeChange,
   disabled,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const presetRoleData = _usePresetRoleData();
+  const appTypeToLabel = _useAppTypeLabel();
+  const appTypeCellValueToLabel = _useCellValueLabel();
   return (
     <Stack gap="md">
       <SegmentedControl
-        data={[...PRESET_ROLE_DATA]}
+        data={[...presetRoleData]}
         value={builtinPresetTypes}
         onChange={(value) => {
-          onBuiltinPresetTypeChange(value);
+          onBuiltinPresetTypeChange(
+            value as
+              | "global_admin"
+              | "global_editor"
+              | "global_viewer"
+              | "custom",
+          );
           if (value !== "custom") {
             onRolesMatrixChange(
-              Permissions.RolesMatrix.roleMatrixFromPresetType(value),
+              Permissions.RolesMatrix.roleMatrixFromPresetType(
+                value as "global_admin" | "global_editor" | "global_viewer",
+              ),
             );
           }
         }}
@@ -95,7 +113,7 @@ export function WorkspaceAppRoleMatrixForm({
       <Table withTableBorder withColumnBorders>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>App</Table.Th>
+            <Table.Th>{t`App`}</Table.Th>
             {CELL_OPTIONS.map((cell) => {
               return (
                 <Table.Th key={cell} ta="center">

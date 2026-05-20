@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   ColorSwatch,
@@ -37,58 +38,67 @@ export type PlanCanvasToolbarProps = {
   onExportPdf: () => void;
 };
 
-const TOOLS: Array<{
+/**
+ * Returns the localized list of annotation tool entries used to render the
+ * canvas toolbar.
+ */
+function _useAnnotationTools(): Array<{
   tool: AnnotationTool;
   label: string;
   icon: () => JSX.Element;
-}> = [
-  {
-    tool: "pan",
-    label: "Pan",
-    icon: () => {
-      return <IconArrowsMove size={16} />;
+}> {
+  const { t } = useLingui();
+  return [
+    {
+      tool: "pan",
+      label: t`Pan`,
+      icon: () => {
+        return <IconArrowsMove size={16} />;
+      },
     },
-  },
-  {
-    tool: "text",
-    label: "Text",
-    icon: () => {
-      return <IconTypography size={16} />;
+    {
+      tool: "text",
+      label: t`Text`,
+      icon: () => {
+        return <IconTypography size={16} />;
+      },
     },
-  },
-  {
-    tool: "sticky",
-    label: "Sticky note",
-    icon: () => {
-      return <IconNote size={16} />;
+    {
+      tool: "sticky",
+      label: t`Sticky note`,
+      icon: () => {
+        return <IconNote size={16} />;
+      },
     },
-  },
-  {
-    tool: "arrow",
-    label: "Arrow",
-    icon: () => {
-      return <IconArrowUpRight size={16} />;
+    {
+      tool: "arrow",
+      label: t`Arrow`,
+      icon: () => {
+        return <IconArrowUpRight size={16} />;
+      },
     },
-  },
-  {
-    tool: "pen",
-    label: "Pen",
-    icon: () => {
-      return <IconPencil size={16} />;
+    {
+      tool: "pen",
+      label: t`Pen`,
+      icon: () => {
+        return <IconPencil size={16} />;
+      },
     },
-  },
-  {
-    tool: "erase",
-    label: "Erase",
-    icon: () => {
-      return <IconTrash size={16} />;
+    {
+      tool: "erase",
+      label: t`Erase`,
+      icon: () => {
+        return <IconTrash size={16} />;
+      },
     },
-  },
-];
+  ];
+}
 
 export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
   const state: PlanAnnotationState = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
+  const { t } = useLingui();
+  const tools = _useAnnotationTools();
 
   return (
     <Stack
@@ -106,20 +116,20 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
       }}
     >
       <Group gap={2}>
-        {TOOLS.map((t) => {
-          const active = state.activeTool === t.tool;
+        {tools.map((tool) => {
+          const active = state.activeTool === tool.tool;
           return (
-            <Tooltip key={t.tool} label={t.label} position="right">
+            <Tooltip key={tool.tool} label={tool.label} position="right">
               <ActionIcon
                 variant={active ? "filled" : "subtle"}
                 color={active ? "blue" : "neutral"}
                 onClick={() => {
-                  dispatch.setTool(t.tool);
+                  dispatch.setTool(tool.tool);
                 }}
-                aria-label={t.label}
+                aria-label={tool.label}
                 aria-pressed={active}
               >
-                {t.icon()}
+                {tool.icon()}
               </ActionIcon>
             </Tooltip>
           );
@@ -127,7 +137,7 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
       </Group>
 
       <Group gap={2}>
-        <Tooltip label="Undo (Ctrl+Z)" position="right">
+        <Tooltip label={t`Undo (Ctrl+Z)`} position="right">
           <ActionIcon
             variant="subtle"
             color="neutral"
@@ -135,12 +145,12 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
             onClick={() => {
               dispatch.undo();
             }}
-            aria-label="Undo"
+            aria-label={t`Undo`}
           >
             <IconArrowBack size={16} />
           </ActionIcon>
         </Tooltip>
-        <Tooltip label="Redo (Ctrl+Shift+Z)" position="right">
+        <Tooltip label={t`Redo (Ctrl+Shift+Z)`} position="right">
           <ActionIcon
             variant="subtle"
             color="neutral"
@@ -148,7 +158,7 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
             onClick={() => {
               dispatch.redo();
             }}
-            aria-label="Redo"
+            aria-label={t`Redo`}
           >
             <IconArrowForward size={16} />
           </ActionIcon>
@@ -158,25 +168,31 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
       <Group gap={2}>
         <Menu position="right" withinPortal>
           <Menu.Target>
-            <Tooltip label="Export" position="right">
-              <ActionIcon variant="subtle" color="neutral" aria-label="Export">
+            <Tooltip label={t`Export`} position="right">
+              <ActionIcon
+                variant="subtle"
+                color="neutral"
+                aria-label={t`Export`}
+              >
                 <IconDownload size={16} />
               </ActionIcon>
             </Tooltip>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Label>Export canvas</Menu.Label>
+            <Menu.Label>
+              <Trans>Export canvas</Trans>
+            </Menu.Label>
             <Menu.Item
               leftSection={<IconPhoto size={14} />}
               onClick={props.onExportPng}
             >
-              PNG image
+              <Trans>PNG image</Trans>
             </Menu.Item>
             <Menu.Item
               leftSection={<IconFileTypePdf size={14} />}
               onClick={props.onExportPdf}
             >
-              PDF (multi-page)
+              <Trans>PDF (multi-page)</Trans>
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -200,10 +216,11 @@ function ColorPalette(): JSX.Element {
   // Color picker for new annotations. Stores the swatch as a CSS
   // string in module-scope so adding it to PlanAnnotationState would
   // be overkill — the user picks once per session.
+  const { t } = useLingui();
   return (
     <Stack gap={2}>
       <Text size="9px" c="dimmed" ta="center">
-        Color
+        <Trans>Color</Trans>
       </Text>
       <Group gap={2} wrap="wrap" maw={72}>
         {PALETTE.map((c) => {
@@ -217,7 +234,7 @@ function ColorPalette(): JSX.Element {
                 setAnnotationColor(c);
               }}
               role="button"
-              aria-label={`Color ${c}`}
+              aria-label={t`Color ${c}`}
             />
           );
         })}

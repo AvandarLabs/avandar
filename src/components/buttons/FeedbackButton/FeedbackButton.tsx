@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Button, Menu } from "@mantine/core";
 import { IconBug, IconSparkles } from "@tabler/icons-react";
 import { hasDefinedProps } from "@utils";
@@ -32,7 +33,7 @@ export function FeedbackButton(): JSX.Element | null {
     >
       <Menu.Target>
         <Button variant="default" size="compact-sm">
-          Send feedback
+          <Trans>Send feedback</Trans>
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
@@ -44,7 +45,7 @@ export function FeedbackButton(): JSX.Element | null {
             });
           }}
         >
-          Request a feature
+          <Trans>Request a feature</Trans>
         </Menu.Item>
         <Menu.Item
           leftSection={<IconBug size={16} stroke={1.5} aria-hidden />}
@@ -54,7 +55,7 @@ export function FeedbackButton(): JSX.Element | null {
             });
           }}
         >
-          Report a bug
+          <Trans>Report a bug</Trans>
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import type { ChatClarifyResponseShape } from "$/types/chat.types";
 
 /** Sentinel value for fixed-option UI when the user rejects all listed choices. */
@@ -6,8 +7,23 @@ export const CLARIFICATION_NONE_OF_ABOVE = "__none_of_above__" as const;
 /** Sentinel value for fixed-option UI when the user will type a custom answer. */
 export const CLARIFICATION_SOMETHING_ELSE = "__something_else__" as const;
 
-export const CLARIFICATION_NONE_OF_ABOVE_LABEL = "None of the above";
-export const CLARIFICATION_SOMETHING_ELSE_LABEL = "Something else…";
+/**
+ * Localized label for the "none of the above" sentinel option in the
+ * clarification card.
+ */
+export function _useClarificationNoneOfAboveLabel(): string {
+  const { t } = useLingui();
+  return t`None of the above`;
+}
+
+/**
+ * Localized label for the "something else" sentinel option in the
+ * clarification card.
+ */
+export function _useClarificationSomethingElseLabel(): string {
+  const { t } = useLingui();
+  return t`Something else…`;
+}
 
 export type ClarificationSubmitAnswer =
   | { kind: "none_of_above" }

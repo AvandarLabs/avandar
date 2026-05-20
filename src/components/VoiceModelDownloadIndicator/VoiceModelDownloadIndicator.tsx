@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Progress, Stack, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { useVoiceModelStatus } from "@/lib/voice/useVoiceModelManager";
@@ -11,11 +12,12 @@ function VoiceDownloadFileRow({
 }: {
   file: VoiceDownloadFileEntry;
 }): JSX.Element {
+  const { t } = useLingui();
   const isComplete = file.state === "complete";
   const label =
-    isComplete ? "Complete"
+    isComplete ? t`Complete`
     : file.progressPercent > 0 ? `${Math.round(file.progressPercent)}%`
-    : "Waiting…";
+    : t`Waiting…`;
 
   return (
     <div className={css.fileRow}>
@@ -47,6 +49,7 @@ function VoiceDownloadFileRow({
  * completed rows stay visible until the model is ready.
  */
 export function VoiceModelDownloadIndicator(): JSX.Element | null {
+  const { t } = useLingui();
   const status = useVoiceModelStatus();
 
   if (status.kind !== "downloading") {
@@ -54,9 +57,10 @@ export function VoiceModelDownloadIndicator(): JSX.Element | null {
   }
 
   const model = findVoiceModel(status.modelId);
-  const message = `Downloading ${model.displayName} for voice prompting`;
+  const message = t`Downloading ${model.displayName} for voice prompting`;
   const overallPercent = overallDownloadPercent(status.files);
-  const overallLabel = overallPercent >= 0 ? `${overallPercent}%` : "Starting…";
+  const overallLabel =
+    overallPercent >= 0 ? `${overallPercent}%` : t`Starting…`;
 
   return (
     <div
@@ -73,7 +77,9 @@ export function VoiceModelDownloadIndicator(): JSX.Element | null {
       </div>
 
       <Text size="xs" c="danger" fw={600} className={css.warning}>
-        Do not refresh or close this tab — the download will be canceled.
+        <Trans>
+          Do not refresh or close this tab — the download will be canceled.
+        </Trans>
       </Text>
 
       {status.files.length > 0 ?
@@ -83,13 +89,13 @@ export function VoiceModelDownloadIndicator(): JSX.Element | null {
           })}
         </Stack>
       : <Text size="xs" c="neutral.6">
-          Preparing download…
+          <Trans>Preparing download…</Trans>
         </Text>
       }
 
       {status.phase === "loading" ?
         <Text size="xs" c="neutral.6" className={css.loadingNote}>
-          Finishing setup — almost ready.
+          <Trans>Finishing setup — almost ready.</Trans>
         </Text>
       : null}
     </div>

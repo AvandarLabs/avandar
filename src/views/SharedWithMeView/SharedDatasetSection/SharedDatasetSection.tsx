@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Badge, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import type { SharedResource } from "@/clients/permissions/SharedWithMeClient";
@@ -20,7 +21,9 @@ export function SharedDatasetSection({
   }
   return (
     <Stack gap="xs">
-      <Title order={4}>Datasets</Title>
+      <Title order={4}>
+        <Trans>Datasets</Trans>
+      </Title>
       <Stack gap="xs">
         {items.map((item) => {
           return (

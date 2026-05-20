@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Loader, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -23,6 +24,7 @@ function UpdatePasswordPage() {
   const router = useRouter();
   const { user } = Route.useRouteContext();
   const searchParams = Route.useSearch();
+  const { t } = useLingui();
 
   const [sendUpdatedPassword, isPasswordUpdatePending] = useMutation({
     mutationFn: async (values: {
@@ -47,14 +49,14 @@ function UpdatePasswordPage() {
         router.navigate({ to: "/" });
       }
       notifications.show({
-        title: "Password updated successfully",
-        message: "You can start using your new password now",
+        title: t`Password updated successfully`,
+        message: t`You can start using your new password now`,
         color: "success",
       });
     },
     onError: (error) => {
       notifications.show({
-        title: "Password update failed",
+        title: t`Password update failed`,
         message: error.message,
         color: "danger",
       });
@@ -70,7 +72,7 @@ function UpdatePasswordPage() {
     validate: {
       confirmPassword: (value: string, formValues: { password: string }) => {
         return value !== formValues.password ?
-            "Passwords do not match"
+            t`Passwords do not match`
           : undefined;
       },
     },
@@ -89,11 +91,11 @@ function UpdatePasswordPage() {
 
   return (
     <form onSubmit={onFormSubmit}>
-      Updating password for {user.email}
+      <Trans>Updating password for {user.email}</Trans>
       <Stack>
         <TextInput
           required
-          label="Password"
+          label={t`Password`}
           name="password"
           type="password"
           key={form.key("password")}
@@ -101,14 +103,14 @@ function UpdatePasswordPage() {
         />
         <TextInput
           required
-          label="Confirm Password"
+          label={t`Confirm Password`}
           name="confirmPassword"
           type="password"
           key={form.key("confirmPassword")}
           {...form.getInputProps("confirmPassword")}
         />
         <Button type="submit" disabled={isPasswordUpdatePending}>
-          Update password
+          <Trans>Update password</Trans>
           {isPasswordUpdatePending ?
             <Loader />
           : null}

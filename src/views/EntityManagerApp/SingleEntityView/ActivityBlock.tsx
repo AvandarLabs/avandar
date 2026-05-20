@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Flex, Stack, Title } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import Highlight from "@tiptap/extension-highlight";
@@ -12,6 +13,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { notifyNotImplemented } from "@ui";
 
 export function ActivityBlock(): JSX.Element {
+  const { t } = useLingui();
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -22,7 +24,7 @@ export function ActivityBlock(): JSX.Element {
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({
-        placeholder: "Enter comment",
+        placeholder: t`Enter comment`,
       }),
     ],
     content: "",
@@ -34,7 +36,9 @@ export function ActivityBlock(): JSX.Element {
 
   return (
     <Stack>
-      <Title order={4}>Activity</Title>
+      <Title order={4}>
+        <Trans>Activity</Trans>
+      </Title>
       <form
         onSubmit={(e) => {
           notifyNotImplemented();
@@ -94,7 +98,9 @@ export function ActivityBlock(): JSX.Element {
             <RichTextEditor.Content />
           </RichTextEditor>
           <Flex justify="flex-end">
-            <Button type="submit">Submit</Button>
+            <Button type="submit">
+              <Trans>Submit</Trans>
+            </Button>
           </Flex>
         </Stack>
       </form>

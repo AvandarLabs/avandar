@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -16,6 +17,7 @@ export function ScatterChartForm({
   config,
   onConfigChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const numericFields = useMemo(() => {
     return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
@@ -34,13 +36,13 @@ export function ScatterChartForm({
       <Select
         allowDeselect
         data={numericOptions}
-        label="X Axis (numeric)"
+        label={t`X Axis (numeric)`}
         value={xAxisKey}
         disabled={numericOptions.length === 0}
         placeholder={
           numericOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
+            t`There are no queried numeric fields`
+          : t`Select a field`
         }
         onChange={(field) => {
           return onConfigChange({
@@ -53,13 +55,13 @@ export function ScatterChartForm({
       <Select
         allowDeselect
         data={numericOptions}
-        label="Y Axis (numeric)"
+        label={t`Y Axis (numeric)`}
         value={yAxisKey}
         disabled={numericOptions.length === 0}
         placeholder={
           numericOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
+            t`There are no queried numeric fields`
+          : t`Select a field`
         }
         onChange={(field) => {
           return onConfigChange({

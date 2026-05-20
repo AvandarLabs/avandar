@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Badge,
@@ -33,6 +34,7 @@ export function PlanBranchSidebar({
 }): JSX.Element | null {
   const branchState = PlanBranchStateManager.useState();
   const planState = PlanStateManager.useState();
+  const { t } = useLingui();
 
   const branchList = useMemo(() => {
     return Object.values(branchState.branches).sort((a, b) => {
@@ -54,15 +56,15 @@ export function PlanBranchSidebar({
         padding: 8,
         overflowY: "auto",
       }}
-      aria-label="Plan branches"
+      aria-label={t`Plan branches`}
     >
       <Stack gap={6}>
         <Text size="xs" fw={700} c="dimmed">
-          Branches
+          <Trans>Branches</Trans>
         </Text>
         <BranchRow
           icon={<IconHome size={14} />}
-          label="Root plan"
+          label={t`Root plan`}
           subtitle={
             planState.rootMessage ?
               planState.rootMessage.slice(0, 60)
@@ -78,8 +80,8 @@ export function PlanBranchSidebar({
                 <BranchRow
                   key={b.planId}
                   icon={<IconGitBranch size={14} />}
-                  label={b.title || "(untitled branch)"}
-                  subtitle={`from step ${b.parentStepId}`}
+                  label={b.title || t`(untitled branch)`}
+                  subtitle={t`from step ${b.parentStepId}`}
                   isActive={branchState.activeBranchId === b.planId}
                   onClick={() => {
                     onSelectBranch(b.planId);
@@ -112,6 +114,7 @@ function BranchRow({
   onClick: () => void;
   onClose?: () => void;
 }): JSX.Element {
+  const { t } = useLingui();
   return (
     <Box
       onClick={onClick}
@@ -143,12 +146,12 @@ function BranchRow({
           </Stack>
           {isActive ?
             <Badge size="xs" variant="filled" color="blue">
-              active
+              <Trans>active</Trans>
             </Badge>
           : null}
         </Group>
         {onClose ?
-          <Tooltip label="Close branch">
+          <Tooltip label={t`Close branch`}>
             <ActionIcon
               size="xs"
               variant="subtle"
@@ -157,7 +160,7 @@ function BranchRow({
                 e.stopPropagation();
                 onClose();
               }}
-              aria-label="Close branch"
+              aria-label={t`Close branch`}
             >
               <IconX size={11} />
             </ActionIcon>

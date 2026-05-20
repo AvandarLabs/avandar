@@ -1,4 +1,5 @@
 import { useThreadRuntime } from "@assistant-ui/react";
+import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { useCallback } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -34,45 +35,49 @@ export function PendingClarificationBlock(): JSX.Element | null {
   const runtime = useThreadRuntime();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
+  const { t } = useLingui();
 
-  const resolveDiscovery = useCallback<DiscoveryResolver>(async (args) => {
-    try {
-      const result = await DuckDbClient.runRawQuery<Record<string, unknown>>(
-        args.query,
-      );
-      const values = result.data
-        .map((row) => {
-          const keys = Object.keys(row);
-          if (keys.length === 0) {
-            return null;
-          }
-          const v = row[keys[0]!];
-          if (v === null || v === undefined) {
-            return null;
-          }
-          return String(v);
-        })
-        .filter((v): v is string => {
-          return v !== null && v.length > 0;
-        });
-      const seen = new Set<string>();
-      const deduped: string[] = [];
-      for (const v of values) {
-        if (!seen.has(v)) {
-          seen.add(v);
-          deduped.push(v);
-          if (deduped.length >= 100) {
-            break;
+  const resolveDiscovery = useCallback<DiscoveryResolver>(
+    async (args) => {
+      try {
+        const result = await DuckDbClient.runRawQuery<Record<string, unknown>>(
+          args.query,
+        );
+        const values = result.data
+          .map((row) => {
+            const keys = Object.keys(row);
+            if (keys.length === 0) {
+              return null;
+            }
+            const v = row[keys[0]!];
+            if (v === null || v === undefined) {
+              return null;
+            }
+            return String(v);
+          })
+          .filter((v): v is string => {
+            return v !== null && v.length > 0;
+          });
+        const seen = new Set<string>();
+        const deduped: string[] = [];
+        for (const v of values) {
+          if (!seen.has(v)) {
+            seen.add(v);
+            deduped.push(v);
+            if (deduped.length >= 100) {
+              break;
+            }
           }
         }
+        return { values: deduped };
+      } catch (e) {
+        return {
+          error: e instanceof Error ? e.message : t`Discovery query failed.`,
+        };
       }
-      return { values: deduped };
-    } catch (e) {
-      return {
-        error: e instanceof Error ? e.message : "Discovery query failed.",
-      };
-    }
-  }, []);
+    },
+    [t],
+  );
 
   if (!pending) {
     return null;

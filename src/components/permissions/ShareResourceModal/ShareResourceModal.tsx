@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifyError } from "@ui";
 import { makeObject, propEq, propNotEq } from "@utils";
@@ -37,13 +38,14 @@ function resolveOwnerDisplayName(
   ownerId: string,
   members: WorkspaceMemberProfile[] | undefined,
   userById: Readonly<Record<string, string>>,
+  t: ReturnType<typeof useLingui>["t"],
 ): string {
   return (
     userById[ownerId] ??
     members?.find((member) => {
       return member.userId === ownerId;
     })?.email ??
-    "Owner"
+    t`Owner`
   );
 }
 
@@ -57,6 +59,7 @@ export function ShareResourceModal({
   resourceId,
   onClose,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const workspaceId = workspace.id as WorkspaceId;
 
@@ -81,7 +84,7 @@ export function ShareResourceModal({
     {
       queriesToInvalidate: invalidateKeys,
       onError: (error: Error) => {
-        notifyError({ title: "Share failed", message: error.message });
+        notifyError({ title: t`Share failed`, message: error.message });
       },
     },
   );
@@ -89,7 +92,7 @@ export function ShareResourceModal({
   const [deleteShare] = ResourceShareClient.useDeleteResourceShare({
     queriesToInvalidate: invalidateKeys,
     onError: (error: Error) => {
-      notifyError({ title: "Remove failed", message: error.message });
+      notifyError({ title: t`Remove failed`, message: error.message });
     },
   });
 
@@ -97,7 +100,7 @@ export function ShareResourceModal({
     queriesToInvalidate: invalidateKeys,
     onError: (error: Error) => {
       notifyError({
-        title: "Restriction update failed",
+        title: t`Restriction update failed`,
         message: error.message,
       });
     },
@@ -119,7 +122,9 @@ export function ShareResourceModal({
   if (isLoadingState || !sharingState) {
     return (
       <Stack gap="md">
-        <Text>Loading sharing settings…</Text>
+        <Text>
+          <Trans>Loading sharing settings…</Trans>
+        </Text>
       </Stack>
     );
   }
@@ -138,6 +143,7 @@ export function ShareResourceModal({
     sharingState.ownerId,
     members,
     userById,
+    t,
   );
 
   const ownerShare: DisplayShare = {
@@ -169,7 +175,7 @@ export function ShareResourceModal({
     .map((share): DisplayShare => {
       return {
         ...share,
-        displayName: userById[share.principalId] ?? "Unknown user",
+        displayName: userById[share.principalId] ?? t`Unknown user`,
       };
     })
     .sort((a, b) => {
@@ -182,7 +188,7 @@ export function ShareResourceModal({
     .map((share): DisplayShare => {
       return {
         ...share,
-        displayName: groupById[share.principalId] ?? "Unknown group",
+        displayName: groupById[share.principalId] ?? t`Unknown group`,
       };
     })
     .sort((a, b) => {
@@ -203,6 +209,7 @@ export function ShareResourceModal({
     workspaceName: workspace.name,
     userById,
     groupById,
+    t,
   });
 
   const onGeneralAccessChange = (next: {
@@ -241,7 +248,7 @@ export function ShareResourceModal({
   return (
     <Stack gap="md">
       <Text size="sm" c="dimmed">
-        Share &ldquo;{resourceName}&rdquo;
+        <Trans>Share &ldquo;{resourceName}&rdquo;</Trans>
       </Text>
 
       <ShareAddPrincipalRow
@@ -318,7 +325,7 @@ export function ShareResourceModal({
 
       <Group justify="flex-end" mt="md">
         <Button variant="default" onClick={onClose}>
-          Done
+          <Trans>Done</Trans>
         </Button>
       </Group>
     </Stack>

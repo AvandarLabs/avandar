@@ -3,6 +3,7 @@ import type {
   PlanNode,
   PlanStepStatus,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
+import type { useLingui } from "@lingui/react/macro";
 
 /**
  * Export the plan canvas as a PNG image.
@@ -74,7 +75,13 @@ export async function exportPlanCanvasAsPdf(args: {
   rootMessage: string;
   datasetName?: string;
   filename?: string;
+  /**
+   * Optional Lingui `t` for translating PDF body strings. Falls back to
+   * English when omitted (e.g. tests / non-React callers).
+   */
+  t?: ReturnType<typeof useLingui>["t"];
 }): Promise<void> {
+  const translate = args.t;
   // Capture the canvas first so we can embed it on page 1.
   const overviewPng = await toPng(args.element, {
     pixelRatio: 2,
@@ -181,12 +188,15 @@ export async function exportPlanCanvasAsPdf(args: {
             React.createElement(
               Text,
               { key: "type", style: { fontSize: 9, color: "#868e96" } },
-              `type: ${node.type}`,
+              translate ? translate`type: ${node.type}` : `type: ${node.type}`,
             ),
             React.createElement(
               Text,
               { key: "rc", style: { fontSize: 9, color: "#868e96" } },
-              node.rowCount !== undefined ? `${node.rowCount} rows` : "—",
+              node.rowCount !== undefined ?
+                translate ? translate`${node.rowCount} rows`
+                : `${node.rowCount} rows`
+              : "—",
             ),
           ],
         ),
@@ -199,11 +209,14 @@ export async function exportPlanCanvasAsPdf(args: {
           React.createElement(
             Text,
             { key: "schema", style: styles.schema },
-            `columns: ${node.actualSchema
-              .map((c) => {
-                return `${c.name}:${c.type}`;
-              })
-              .join(", ")}`,
+            (() => {
+              const cols = node.actualSchema!
+                .map((c) => {
+                  return `${c.name}:${c.type}`;
+                })
+                .join(", ");
+              return translate ? translate`columns: ${cols}` : `columns: ${cols}`;
+            })(),
           )
         : null,
         node.error ?
@@ -213,7 +226,10 @@ export async function exportPlanCanvasAsPdf(args: {
               key: "err",
               style: { ...styles.schema, color: "#e03131" },
             },
-            `error: ${node.error}`,
+            (() => {
+              const err = node.error!;
+              return translate ? translate`error: ${err}` : `error: ${err}`;
+            })(),
           )
         : null,
       ]),
@@ -228,7 +244,9 @@ export async function exportPlanCanvasAsPdf(args: {
         React.createElement(
           Text,
           { key: "t", style: styles.title },
-          args.datasetName ?? "Analytic plan",
+          args.datasetName ?? (translate ? translate`Analytic plan` : (
+            "Analytic plan"
+          )),
         ),
         React.createElement(
           Text,
@@ -243,7 +261,13 @@ export async function exportPlanCanvasAsPdf(args: {
         React.createElement(
           Text,
           { key: "m", style: styles.meta },
-          `Exported ${new Date().toLocaleString()} · ${args.nodes.length} steps`,
+          (() => {
+            const exportedAt = new Date().toLocaleString();
+            const stepCount = args.nodes.length;
+            return translate ?
+                translate`Exported ${exportedAt} · ${stepCount} steps`
+              : `Exported ${exportedAt} · ${stepCount} steps`;
+          })(),
         ),
       ],
     ),

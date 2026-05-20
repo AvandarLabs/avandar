@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
@@ -27,12 +28,15 @@ type Props = { children: ReactNode };
  * un-blur transition every time a drag enters the window.
  */
 export function AppDropzone({ children }: Props): JSX.Element {
+  const { t } = useLingui();
   return (
     <>
       {children}
       <Dropzone.FullScreen
         accept={ACCEPTED_MIME_TYPES}
-        onDrop={onAppDropzoneDrop}
+        onDrop={(files) => {
+          return onAppDropzoneDrop(files, t);
+        }}
         classNames={{
           fullScreen: classes.fullScreen,
           root: classes.root,
@@ -64,10 +68,10 @@ export function AppDropzone({ children }: Props): JSX.Element {
           </div>
           <Stack align="center" gap="xs">
             <Text size="xl" fw={600}>
-              Drop to import
+              <Trans>Drop to import</Trans>
             </Text>
             <Text size="sm" c="dimmed">
-              CSV or Excel file
+              <Trans>CSV or Excel file</Trans>
             </Text>
           </Stack>
         </div>

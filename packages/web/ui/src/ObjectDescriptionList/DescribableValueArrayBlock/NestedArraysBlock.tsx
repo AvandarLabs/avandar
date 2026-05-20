@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { ValueItemContainer } from "../ValueItemContainer";
@@ -26,6 +27,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
   itemRenderOptions,
   ...primitiveRenderValueOptions
 }: Props<T, RootData>): JSX.Element | null {
+  const { t } = useLingui();
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -36,9 +38,12 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
     return null;
   }
 
+  const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>... and {values.length - valuesToRender.length} more</Text>
+      <Text>
+        <Trans>... and {remainingCount} more</Trans>
+      </Text>
     : null;
 
   const arrayItemRenderOptions = {
@@ -50,8 +55,9 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
   return (
     <Stack>
       {valuesToRender.map((valueArray, idx) => {
+        const collectionNumber = idx + 1;
         return (
-          <Fieldset key={idx} title={`Collection ${idx + 1}`}>
+          <Fieldset key={idx} title={t`Collection ${collectionNumber}`}>
             <ValueItemContainer
               type="array"
               value={valueArray}

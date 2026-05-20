@@ -1,6 +1,8 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box, Flex, List, Text } from "@mantine/core";
 import { Callout, DangerText } from "@ui";
 import { objectValues, prop, UnknownDataFrame } from "@utils";
+import { useMemo } from "react";
 import { match } from "ts-pattern";
 import {
   array,
@@ -39,80 +41,82 @@ type Props = {
   vizConfig: VizConfig;
 };
 
-const XAxisKeySchema = string({
-  error: (issue) => {
-    return issue.input === undefined ?
-        "You haven't chosen an X axis"
-      : "Invalid X axis selected";
-  },
-});
-const NameKeySchema = string({
-  error: (issue) => {
-    return issue.input === undefined ?
-        "You haven't chosen a name column"
-      : "Invalid name column selected";
-  },
-});
-const ValueKeySchema = string({
-  error: (issue) => {
-    return issue.input === undefined ?
-        "You haven't chosen a value column"
-      : "Invalid value column selected";
-  },
-});
-const SizeKeySchema = string({
-  error: (issue) => {
-    return issue.input === undefined ?
-        "You haven't chosen a size column"
-      : "Invalid size column selected";
-  },
-});
-const SeriesArraySchema = array(looseObject({ key: string() })).min(1, {
-  error: "You haven't added any series",
-});
+/**
+ * Builds the Zod schemas used to validate `VizConfig` shapes for each chart
+ * type. Schemas are rebuilt per call so their error messages stay localized
+ * to the current Lingui locale.
+ */
+function _useVizConfigSchemas() {
+  const { t } = useLingui();
+  return useMemo(() => {
+    const XAxisKeySchema = string({
+      error: (issue) => {
+        return issue.input === undefined ?
+            t`You haven't chosen an X axis`
+          : t`Invalid X axis selected`;
+      },
+    });
+    const NameKeySchema = string({
+      error: (issue) => {
+        return issue.input === undefined ?
+            t`You haven't chosen a name column`
+          : t`Invalid name column selected`;
+      },
+    });
+    const ValueKeySchema = string({
+      error: (issue) => {
+        return issue.input === undefined ?
+            t`You haven't chosen a value column`
+          : t`Invalid value column selected`;
+      },
+    });
+    const SizeKeySchema = string({
+      error: (issue) => {
+        return issue.input === undefined ?
+            t`You haven't chosen a size column`
+          : t`Invalid size column selected`;
+      },
+    });
+    const SeriesArraySchema = array(looseObject({ key: string() })).min(1, {
+      error: t`You haven't added any series`,
+    });
+    const YAxisKeySchema = string({
+      error: (issue) => {
+        return issue.input === undefined ?
+            t`You haven't chosen a Y axis`
+          : t`Invalid Y axis selected`;
+      },
+    });
 
-const XYSeriesConfigSchema = object({
-  xAxisKey: XAxisKeySchema,
-  series: SeriesArraySchema,
-});
-
-const ScatterPlotConfigSchema = object({
-  xAxisKey: XAxisKeySchema,
-  yAxisKey: string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "You haven't chosen a Y axis"
-        : "Invalid Y axis selected";
-    },
-  }),
-});
-
-const PieChartConfigSchema = object({
-  nameKey: NameKeySchema,
-  valueKey: ValueKeySchema,
-});
-
-const FunnelChartConfigSchema = object({
-  nameKey: NameKeySchema,
-  valueKey: ValueKeySchema,
-});
-
-const RadarChartConfigSchema = object({
-  nameKey: NameKeySchema,
-  series: SeriesArraySchema,
-});
-
-const BubbleChartConfigSchema = object({
-  xAxisKey: XAxisKeySchema,
-  yAxisKey: string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "You haven't chosen a Y axis"
-        : "Invalid Y axis selected";
-    },
-  }),
-  sizeKey: SizeKeySchema,
-});
+    return {
+      XYSeriesConfigSchema: object({
+        xAxisKey: XAxisKeySchema,
+        series: SeriesArraySchema,
+      }),
+      ScatterPlotConfigSchema: object({
+        xAxisKey: XAxisKeySchema,
+        yAxisKey: YAxisKeySchema,
+      }),
+      PieChartConfigSchema: object({
+        nameKey: NameKeySchema,
+        valueKey: ValueKeySchema,
+      }),
+      FunnelChartConfigSchema: object({
+        nameKey: NameKeySchema,
+        valueKey: ValueKeySchema,
+      }),
+      RadarChartConfigSchema: object({
+        nameKey: NameKeySchema,
+        series: SeriesArraySchema,
+      }),
+      BubbleChartConfigSchema: object({
+        xAxisKey: XAxisKeySchema,
+        yAxisKey: YAxisKeySchema,
+        sizeKey: SizeKeySchema,
+      }),
+    };
+  }, [t]);
+}
 
 /**
  * Renders a visualization (chart or table) for a given query result and
@@ -126,6 +130,8 @@ export function VisualizationContainer({
   dateColumns,
   vizConfig,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const schemas = _useVizConfigSchemas();
   const columnNames = columns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
@@ -148,7 +154,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = XYSeriesConfigSchema.safeParse(config);
+      } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -165,14 +171,14 @@ export function VisualizationContainer({
           </Box>
         );
       }
-      return _renderError("bar chart", error);
+      return _renderError(t`bar chart`, error, t);
     })
     .with({ vizType: "line" }, (config) => {
       const {
         success,
         data: validConfig,
         error,
-      } = XYSeriesConfigSchema.safeParse(config);
+      } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -195,7 +201,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = XYSeriesConfigSchema.safeParse(config);
+      } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -219,11 +225,16 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = ScatterPlotConfigSchema.safeParse(config);
+      } = schemas.ScatterPlotConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
-            <ScatterChart data={limitedData} height="100%" {...validConfig} />
+            <ScatterChart
+              data={limitedData}
+              height="100%"
+              xAxisKey={validConfig.xAxisKey}
+              yAxisKey={validConfig.yAxisKey}
+            />
           </Box>
         );
       }
@@ -234,7 +245,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = PieChartConfigSchema.safeParse(config);
+      } = schemas.PieChartConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -257,7 +268,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = FunnelChartConfigSchema.safeParse(config);
+      } = schemas.FunnelChartConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -277,7 +288,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = RadarChartConfigSchema.safeParse(config);
+      } = schemas.RadarChartConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -298,7 +309,7 @@ export function VisualizationContainer({
         success,
         data: validConfig,
         error,
-      } = BubbleChartConfigSchema.safeParse(config);
+      } = schemas.BubbleChartConfigSchema.safeParse(config);
       if (success) {
         return (
           <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
@@ -326,6 +337,7 @@ export function VisualizationContainer({
 function _renderError(
   chartName: string,
   error: Parameters<typeof flattenError>[0],
+  t: ReturnType<typeof useLingui>["t"],
 ): JSX.Element {
   const errors = flattenError(error).fieldErrors as Record<
     string,
@@ -348,11 +360,11 @@ function _renderError(
 
   const summaryMessage =
     errors.xAxisKey || errors.series ?
-      `The ${chartName} cannot be displayed because there are missing axes or series.`
-    : `The ${chartName} cannot be displayed.`;
+      t`The ${chartName} cannot be displayed because there are missing axes or series.`
+    : t`The ${chartName} cannot be displayed.`;
   return (
     <Callout.Error
-      title={`Cannot display ${chartName}`}
+      title={t`Cannot display ${chartName}`}
       message={summaryMessage}
       w="fit-content"
       mt="-20rem"

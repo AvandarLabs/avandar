@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
@@ -30,26 +31,32 @@ function InvalidWorkspacePage() {
     <AppLayout>
       <Container ta="center" fluid py="xxxl">
         <Stack gap="md">
-          <Title order={1}>No workspace was found</Title>
+          <Title order={1}>
+            <Trans>No workspace was found</Trans>
+          </Title>
           <Text size="xl">
             {match(redirectReason)
               .with("NOT_FOUND_OR_ACCESS_REVOKED", () => {
                 return (
-                  <>
+                  <Trans>
                     The workspace you are trying to access either does not exist
                     or you do not have access to it.
-                  </>
+                  </Trans>
                 );
               })
               .with("NO_SUBSCRIPTION", () => {
-                return <>This workspace does not have a valid subscription.</>;
+                return (
+                  <Trans>
+                    This workspace does not have a valid subscription.
+                  </Trans>
+                );
               })
               .otherwise(() => {
                 return (
-                  <>
+                  <Trans>
                     The workspace you are trying to access either does not exist
                     or you do not have access to it.
-                  </>
+                  </Trans>
                 );
               })}
           </Text>

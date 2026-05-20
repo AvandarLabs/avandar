@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -38,11 +39,21 @@ type Props<TConfig extends HostConfig> = {
   onConfigChange: (next: TConfig) => void;
 };
 
-const RENDER_AS_OPTIONS: ReadonlyArray<{ value: RenderAs; label: string }> = [
-  { value: "bar", label: "Bar" },
-  { value: "line", label: "Line" },
-  { value: "area", label: "Area" },
-];
+/**
+ * Hook to build the localized render-as options. Returned from a hook so
+ * the labels stay in sync with the active Lingui locale.
+ */
+function _useRenderAsOptions(): ReadonlyArray<{
+  value: RenderAs;
+  label: string;
+}> {
+  const { t } = useLingui();
+  return [
+    { value: "bar", label: t`Bar` },
+    { value: "line", label: t`Line` },
+    { value: "area", label: t`Area` },
+  ];
+}
 
 /**
  * Form for series-aware viz types (bar / line / area / radar).
@@ -60,6 +71,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   config,
   onConfigChange,
 }: Props<TConfig>): JSX.Element {
+  const { t } = useLingui();
   const isRadar = config.vizType === "radar";
   const chartDescriptors = VizConfigs.getDescriptors(config.vizType).chart;
 
@@ -163,7 +175,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   return (
     <Stack gap="md">
       <Control
-        label={isRadar ? "Category axis" : "X axis"}
+        label={isRadar ? t`Category axis` : t`X axis`}
         spec={{ kind: "columnPicker", dataType: "any" }}
         value={axisKeyValue}
         onChange={(next) => {
@@ -202,7 +214,9 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       <Divider />
 
       <Group justify="space-between">
-        <Title order={5}>Series</Title>
+        <Title order={5}>
+          <Trans>Series</Trans>
+        </Title>
         <Button
           size="xs"
           variant="light"
@@ -210,7 +224,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
           onClick={addSeries}
           disabled={config.series.length >= numericFields.length}
         >
-          Add series
+          <Trans>Add series</Trans>
         </Button>
       </Group>
 
@@ -256,6 +270,8 @@ function SeriesCard({
   onSeriesChange,
   onRemove,
 }: SeriesCardProps): JSX.Element {
+  const { t } = useLingui();
+  const renderAsOptions = _useRenderAsOptions();
   const seriesRenderAs: RenderAs | "radar" =
     isRadarHost ? "radar" : (series as XYSeries).renderAs;
 
@@ -332,7 +348,7 @@ function SeriesCard({
         <Group justify="space-between" wrap="nowrap">
           <Box style={{ flex: 1, minWidth: 0 }}>
             <Control
-              label="Column"
+              label={t`Column`}
               spec={{ kind: "columnPicker", dataType: "numeric" }}
               value={series.key}
               onChange={(next) => {
@@ -342,7 +358,7 @@ function SeriesCard({
             />
           </Box>
           <ActionIcon
-            aria-label="Remove series"
+            aria-label={t`Remove series`}
             variant="subtle"
             color="red"
             onClick={onRemove}
@@ -355,12 +371,12 @@ function SeriesCard({
         {!isRadarHost ?
           <Box>
             <Text size="xs" c="dimmed" mb={4}>
-              Render as
+              <Trans>Render as</Trans>
             </Text>
             <SegmentedControl
               fullWidth
               size="xs"
-              data={RENDER_AS_OPTIONS.map((o) => {
+              data={renderAsOptions.map((o) => {
                 return { value: o.value, label: o.label };
               })}
               value={seriesRenderAs}
@@ -398,7 +414,7 @@ function SeriesCard({
 
         {numericOptions.length === 0 ?
           <Text size="xs" c="dimmed">
-            No numeric columns available to add to this series.
+            <Trans>No numeric columns available to add to this series.</Trans>
           </Text>
         : null}
       </Stack>

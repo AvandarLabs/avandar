@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
@@ -24,6 +25,7 @@ export function ShareResourceButton({
   resourceId,
   size,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [effectiveRole, isLoadingRole] = useResourceRole({
     resourceType,
     resourceId,
@@ -31,14 +33,14 @@ export function ShareResourceButton({
 
   const canManageShares = effectiveRole === "admin";
   const isDisabled = !resourceId || isLoadingRole || !canManageShares;
-  const resourceLabel = resourceTypeLabel(resourceType);
+  const resourceLabel = resourceTypeLabel(resourceType, t);
 
   return (
     <Tooltip
       label={
         canManageShares || isLoadingRole ?
-          `Share this ${resourceLabel}`
-        : "You need admin access on this resource to manage sharing."
+          t`Share this ${resourceLabel}`
+        : t`You need admin access on this resource to manage sharing.`
       }
     >
       <Button
@@ -54,7 +56,7 @@ export function ShareResourceButton({
           }
 
           modals.open({
-            title: "Share",
+            title: t`Share`,
             size: "lg",
             children: (
               <ShareResourceModal
@@ -69,7 +71,7 @@ export function ShareResourceButton({
           });
         }}
       >
-        Share
+        <Trans>Share</Trans>
       </Button>
     </Tooltip>
   );

@@ -1,4 +1,5 @@
 import { useQuery } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { assertIsDefined, isNullish, prop, propEq } from "@utils";
 import { UserId } from "$/models/User/User.types";
@@ -106,6 +107,7 @@ function useResumeInFlightImports(): void {
  * TODO(jpsyx): add syncing google sheets from backend
  */
 export function useSyncLocalDatasets(): void {
+  const { t } = useLingui();
   useGarbageDatasetCollection();
   useResumeInFlightImports();
   const workspace = useCurrentWorkspace();
@@ -195,7 +197,7 @@ export function useSyncLocalDatasets(): void {
       } else {
         setModalId(
           modals.open({
-            title: "Some datasets are missing data",
+            title: t`Some datasets are missing data`,
             withCloseButton: false,
             closeOnClickOutside: false,
             closeOnEscape: false,
@@ -204,5 +206,5 @@ export function useSyncLocalDatasets(): void {
         );
       }
     });
-  }, [missingDatasets, modalId]);
+  }, [missingDatasets, modalId, t]);
 }

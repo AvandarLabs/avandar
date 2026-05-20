@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Box,
@@ -96,6 +97,7 @@ function PlanFlowCanvas(): JSX.Element {
   const annotationDispatch = PlanAnnotationStateManager.useDispatch();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();
+  const { t } = useLingui();
   const { fitView, setCenter, getNode } = useReactFlow();
   const runOnceRef = useRef<string | null>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -346,8 +348,10 @@ function PlanFlowCanvas(): JSX.Element {
       element: canvasContainerRef.current,
       nodes: state.nodes,
       rootMessage: state.rootMessage,
+      datasetName: t`Analytic plan`,
+      t,
     });
-  }, [state.nodes, state.rootMessage]);
+  }, [state.nodes, state.rootMessage, t]);
 
   const allSucceeded = state.nodes.every((n) => {
     return n.status === "succeeded";
@@ -371,7 +375,7 @@ function PlanFlowCanvas(): JSX.Element {
         <Group justify="space-between" wrap="nowrap" align="flex-start">
           <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
             <Text fw={600} size="sm">
-              Analytic plan
+              <Trans>Analytic plan</Trans>
             </Text>
             <Text size="xs" c="dimmed" lineClamp={2}>
               {state.rootMessage}
@@ -382,8 +386,8 @@ function PlanFlowCanvas(): JSX.Element {
               size="xs"
               value={state.runMode}
               data={[
-                { label: "Auto", value: "auto" },
-                { label: "Step", value: "step" },
+                { label: t`Auto`, value: "auto" },
+                { label: t`Step`, value: "step" },
               ]}
               onChange={(v) => {
                 dispatch.setRunMode(v === "step" ? "step" : "auto");
@@ -398,7 +402,7 @@ function PlanFlowCanvas(): JSX.Element {
                 return runAll();
               }}
             >
-              Re-run
+              <Trans>Re-run</Trans>
             </Button>
             <Button
               size="xs"
@@ -415,7 +419,9 @@ function PlanFlowCanvas(): JSX.Element {
                 );
               }}
             >
-              {state.canvasView === "focused" ? "Zoom out" : "Zoom in"}
+              {state.canvasView === "focused" ?
+                <Trans>Zoom out</Trans>
+              : <Trans>Zoom in</Trans>}
             </Button>
             <Button
               size="xs"
@@ -426,7 +432,7 @@ function PlanFlowCanvas(): JSX.Element {
                 return close();
               }}
             >
-              Close
+              <Trans>Close</Trans>
             </Button>
           </Group>
         </Group>
@@ -437,16 +443,24 @@ function PlanFlowCanvas(): JSX.Element {
             variant="light"
             radius="sm"
             p="xs"
-            title="Review and approve the plan"
+            title={t`Review and approve the plan`}
           >
             <Stack gap="xs">
               <Text size="xs">
-                The AI has proposed a {state.nodes.length}-step plan
                 {showSqlStepHint ?
-                  " — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is."
-                : "."}{" "}
-                Nothing has run yet. Click each node to read it; approve to
-                execute.
+                  <Trans>
+                    The AI has proposed a {state.nodes.length}-step plan —
+                    that's a lot of SQL. Consider whether a Python or R step
+                    would express this more cleanly. You can still approve
+                    as-is. Nothing has run yet. Click each node to read it;
+                    approve to execute.
+                  </Trans>
+                : <Trans>
+                    The AI has proposed a {state.nodes.length}-step plan.
+                    Nothing has run yet. Click each node to read it; approve to
+                    execute.
+                  </Trans>
+                }
               </Text>
               <Group gap="xs">
                 <Button
@@ -456,7 +470,7 @@ function PlanFlowCanvas(): JSX.Element {
                     dispatch.approvePlan();
                   }}
                 >
-                  Approve and run
+                  <Trans>Approve and run</Trans>
                 </Button>
                 <Button
                   size="xs"
@@ -466,7 +480,7 @@ function PlanFlowCanvas(): JSX.Element {
                     dispatch.rejectPlan();
                   }}
                 >
-                  Reject
+                  <Trans>Reject</Trans>
                 </Button>
               </Group>
             </Stack>
@@ -476,8 +490,10 @@ function PlanFlowCanvas(): JSX.Element {
         {wasRejected ?
           <Alert color="gray" variant="light" radius="sm" p="xs">
             <Text size="xs">
-              Plan rejected. Ask the chat to propose a different plan, or close
-              this canvas.
+              <Trans>
+                Plan rejected. Ask the chat to propose a different plan, or
+                close this canvas.
+              </Trans>
             </Text>
           </Alert>
         : null}
@@ -485,8 +501,10 @@ function PlanFlowCanvas(): JSX.Element {
         {anyFailed ?
           <Alert color="red" variant="light" radius="sm" p="xs">
             <Text size="xs">
-              A step failed. Click the red node to retry, or use Re-run to
-              restart from the top.
+              <Trans>
+                A step failed. Click the red node to retry, or use Re-run to
+                restart from the top.
+              </Trans>
             </Text>
           </Alert>
         : null}
@@ -494,7 +512,9 @@ function PlanFlowCanvas(): JSX.Element {
         {allSucceeded ?
           <Alert color="green" variant="light" radius="sm" p="xs">
             <Text size="xs">
-              All steps succeeded. Click any node to open it on the canvas.
+              <Trans>
+                All steps succeeded. Click any node to open it on the canvas.
+              </Trans>
             </Text>
           </Alert>
         : null}
@@ -570,10 +590,11 @@ function PlanFlowCanvas(): JSX.Element {
               if (!planId) {
                 return;
               }
+              const truncated = node.description.slice(0, 40);
               branchDispatch.openBranch({
                 parentPlanId: planId,
                 parentStep: node,
-                title: `Branch from "${node.description.slice(0, 40)}"`,
+                title: t`Branch from "${truncated}"`,
               });
               dispatch.addBranch({
                 planId: branchState.activeBranchId ?? "",
@@ -629,7 +650,7 @@ function FocusedStepDetail({
               return onRun(node);
             }}
           >
-            Run step
+            <Trans>Run step</Trans>
           </Button>
         : null}
         {node.status === "succeeded" ?
@@ -640,7 +661,7 @@ function FocusedStepDetail({
               return onOpen(node);
             }}
           >
-            Open on canvas
+            <Trans>Open on canvas</Trans>
           </Button>
         : null}
         {node.status === "succeeded" ?
@@ -652,7 +673,7 @@ function FocusedStepDetail({
               return onBranch(node);
             }}
           >
-            Branch from here
+            <Trans>Branch from here</Trans>
           </Button>
         : null}
       </Group>

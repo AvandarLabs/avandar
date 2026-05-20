@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button, Loader } from "@mantine/core";
 import { assertIsDefined } from "@utils";
 import { ReactNode, useState } from "react";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function BillingPortalButton({ children }: Props): JSX.Element {
+  const { t } = useLingui();
   const [isLoadingCustomerPortalURL, setIsLoadingCustomerPortalURL] =
     useState(false);
   const user = useCurrentUser();
@@ -27,7 +29,7 @@ export function BillingPortalButton({ children }: Props): JSX.Element {
         );
         setIsLoadingCustomerPortalURL(true);
         try {
-          await goToBillingPortal({ userId });
+          await goToBillingPortal({ userId, t });
         } finally {
           setIsLoadingCustomerPortalURL(false);
         }

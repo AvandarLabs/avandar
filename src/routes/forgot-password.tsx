@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -22,20 +23,21 @@ export const Route = createFileRoute("/forgot-password")({
  * and a password reset link will be sent to their email.
  */
 function ForgotPasswordPage() {
+  const { t } = useLingui();
   const [sendResetPasswordRequest, isResetPasswordPending] = useMutation({
     mutationFn: async (values: { email: string }) => {
       await AuthClient.requestPasswordResetEmail(values.email);
     },
     onSuccess: () => {
       notifications.show({
-        title: "Sent password reset email",
-        message: "Check your email for a password reset link",
+        title: t`Sent password reset email`,
+        message: t`Check your email for a password reset link`,
         color: "success",
       });
     },
     onError: (error) => {
       notifications.show({
-        title: "Password reset failed",
+        title: t`Password reset failed`,
         message: error.message,
         color: "danger",
       });
@@ -48,7 +50,7 @@ function ForgotPasswordPage() {
       email: "",
     },
     validate: {
-      email: isEmail("Invalid email address"),
+      email: isEmail(t`Invalid email address`),
     },
   });
 
@@ -61,16 +63,16 @@ function ForgotPasswordPage() {
 
   return (
     <AuthLayout
-      title="Forgot your password?"
-      subtitle="Enter your email to get a reset link"
+      title={t`Forgot your password?`}
+      subtitle={t`Enter your email to get a reset link`}
     >
       <form onSubmit={onFormSubmit}>
         <Stack>
           <TextInput
-            label="Email"
+            label={t`Email`}
             name="email"
             type="email"
-            placeholder="Enter your email address"
+            placeholder={t`Enter your email address`}
             required
             key={form.key("email")}
             {...form.getInputProps("email")}
@@ -84,7 +86,7 @@ function ForgotPasswordPage() {
               type="submit"
               disabled={isResetPasswordPending}
             >
-              Reset password
+              <Trans>Reset password</Trans>
             </Button>
           </Group>
         </Stack>
