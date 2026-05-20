@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
@@ -27,6 +28,7 @@ type Props = {
 export function DatasetParseStatusIndicator({
   datasetId,
 }: Props): JSX.Element | null {
+  const { t } = useLingui();
   const activeJob = useImportJob(datasetId);
   const [localDataset] = LocalDatasetClient.useGetById({ id: datasetId });
 
@@ -34,7 +36,7 @@ export function DatasetParseStatusIndicator({
   if (activeJob?.status === "running") {
     const eta = estimateRemainingFromJob(activeJob);
     const tooltipLabel =
-      eta ? `Processing — ${eta} remaining` : "Processing dataset…";
+      eta ? t`Processing — ${eta} remaining` : t`Processing dataset…`;
     return (
       <Tooltip label={tooltipLabel}>
         <Loader size="xs" />
@@ -54,7 +56,7 @@ export function DatasetParseStatusIndicator({
     // signal that there's progress queued.
     if (localDataset.parseStatus === "parsing") {
       return (
-        <Tooltip label="Resuming dataset processing…">
+        <Tooltip label={t`Resuming dataset processing…`}>
           <Loader size="xs" />
         </Tooltip>
       );
@@ -63,9 +65,9 @@ export function DatasetParseStatusIndicator({
   }
 
   if (localDataset.parseStatus === "failed") {
-    const reason = localDataset.parseFailedReason ?? "Unknown error";
+    const reason = localDataset.parseFailedReason ?? t`Unknown error`;
     return (
-      <Tooltip label={`Import failed: ${reason}`}>
+      <Tooltip label={t`Import failed: ${reason}`}>
         <Text c="red" component="span" lh={1} display="inline-flex">
           <IconAlertTriangle size={16} />
         </Text>

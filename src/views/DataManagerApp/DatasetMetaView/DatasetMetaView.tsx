@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Box,
@@ -45,6 +46,7 @@ type Props = {
  * A view of the metadata for a dataset.
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [appRoles] = useUserAppRoles();
@@ -71,10 +73,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset updated successfully!");
+      notifySuccess(t`Dataset updated successfully!`);
     },
     onError: (err) => {
-      notifyError(`There was an error on update: ${err.message}`);
+      notifyError(t`There was an error on update: ${err.message}`);
     },
   });
 
@@ -106,9 +108,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     <Container py="md">
       <Stack>
         {isShareOnlyAccess ?
-          <Alert color="blue" variant="light" title="Shared with you">
+          <Alert color="blue" variant="light" title={t`Shared with you`}>
             <Text size="sm">
-              You can view this dataset because it was shared with you.
+              <Trans>
+                You can view this dataset because it was shared with you.
+              </Trans>
               {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
                 <>
                   {" "}
@@ -116,7 +120,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     to="/$workspaceSlug/shared-with-me"
                     params={{ workspaceSlug: workspace.slug }}
                   >
-                    See all shared items
+                    <Trans>See all shared items</Trans>
                   </Link>
                 </>
               : null}
@@ -140,7 +144,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             >
               <Box miw={0} style={{ flex: 1 }}>
                 <EditableDisplayText
-                  name="dataset name"
+                  name={t`dataset name`}
                   value={datasetName}
                   onChange={setDatasetName}
                   onSave={(newName) => {
@@ -163,10 +167,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                       datasetName.trim().length > 0 &&
                       datasetName.trim().length < 2
                     ) ?
-                      "Dataset name must be at least 2 characters."
+                      t`Dataset name must be at least 2 characters.`
                     : undefined
                   }
-                  emptyDisplayText="Untitled dataset"
+                  emptyDisplayText={t`Untitled dataset`}
                   displayTextProps={{
                     fw: "var(--mantine-h2-font-weight)",
                     fz: "var(--mantine-h2-font-size)",
@@ -211,20 +215,20 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           <Tabs
             tabIds={["dataset-metadata", "dataset-summary"] as const}
             renderTabHeader={{
-              "dataset-metadata": "Metadata",
-              "dataset-summary": "Data Summary",
+              "dataset-metadata": t`Metadata`,
+              "dataset-summary": t`Data Summary`,
             }}
             renderTabPanel={{
               "dataset-metadata": () => {
                 return (
                   <Stack>
                     <EditableDisplayText
-                      name="description"
+                      name={t`description`}
                       value={datasetDescription}
                       textarea
                       onChange={setDatasetDescription}
                       isSaving={isUpdatePending}
-                      emptyDisplayText="This dataset has no description."
+                      emptyDisplayText={t`This dataset has no description.`}
                       onSave={(newDescription) => {
                         const descriptionToSave =
                           newDescription.trim().length === 0 ?
@@ -246,7 +250,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     <DatasetMetadataList
                       dataset={datasetWithColumnsAndSource}
                     />
-                    <Title order={5}>Data preview</Title>
+                    <Title order={5}>
+                      <Trans>Data preview</Trans>
+                    </Title>
                     {isLoadingPreviewData ?
                       <Loader />
                     : previewData && previewData ?
@@ -271,11 +277,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             mt="lg"
             onClick={() => {
               modals.openConfirmModal({
-                title: "Delete dataset",
+                title: t`Delete dataset`,
                 children: (
-                  <Text>Are you sure you want to delete {dataset.name}?</Text>
+                  <Text>
+                    <Trans>
+                      Are you sure you want to delete {dataset.name}?
+                    </Trans>
+                  </Text>
                 ),
-                labels: { confirm: "Delete", cancel: "Cancel" },
+                labels: { confirm: t`Delete`, cancel: t`Cancel` },
                 confirmProps: {
                   color: "danger",
                   loading: isDeletePending,
@@ -287,8 +297,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                       onSuccess: () => {
                         navigate(AppLinks.dataManagerHome(workspace.slug));
                         notifications.show({
-                          title: "Dataset deleted",
-                          message: `${dataset.name} deleted successfully`,
+                          title: t`Dataset deleted`,
+                          message: t`${dataset.name} deleted successfully`,
                           color: "green",
                         });
                       },
@@ -298,7 +308,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               });
             }}
           >
-            Delete Dataset
+            <Trans>Delete Dataset</Trans>
           </Button>
         </Paper>
       </Stack>

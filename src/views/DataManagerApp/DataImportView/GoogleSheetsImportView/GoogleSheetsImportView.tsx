@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
 import { notifyError, notifySuccess, notifyWarning, Tooltip } from "@ui";
@@ -62,6 +63,7 @@ export function GoogleSheetsImportView({
   onSaveSuccess,
   ...props
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [selectedDocument, setSelectedDocument] = useState<
@@ -117,8 +119,8 @@ export function GoogleSheetsImportView({
     },
     onError: () => {
       notifyError({
-        title: "Google Sheet failed to load",
-        message: "An error occurred while loading the file",
+        title: t`Google Sheet failed to load`,
+        message: t`An error occurred while loading the file`,
       });
     },
   });
@@ -188,29 +190,29 @@ export function GoogleSheetsImportView({
       } = loadResult;
       if (numRejectedRows === 0) {
         notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
+          title: t`File loaded successfully`,
+          message: t`Parsed ${formatNumber(numSuccessRows)} rows`,
         });
       } else if (numSuccessRows === 0) {
         notifyError({
-          title: "File failed to load",
-          message: "No rows were read successfully",
+          title: t`File failed to load`,
+          message: t`No rows were read successfully`,
         });
       } else {
         const numRejectedStr =
           numRejectedRows > 1000 ?
-            " over 1000 rows were rejected"
-          : ` ${numRejectedRows} rows were rejected`;
+            t` over 1000 rows were rejected`
+          : t` ${numRejectedRows} rows were rejected`;
         notifyWarning({
-          title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
+          title: t`File was partially loaded`,
+          message: t`Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
         });
       }
     },
     onError: () => {
       notifyError({
-        title: "File failed to load",
-        message: "An error occurred while loading the file",
+        title: t`File failed to load`,
+        message: t`An error occurred while loading the file`,
       });
     },
   });
@@ -287,8 +289,10 @@ export function GoogleSheetsImportView({
           <>
             {selectedGoogleAccount ?
               <Text>
-                You have successfully connected to{" "}
-                {selectedGoogleAccount.google_email}
+                <Trans>
+                  You have successfully connected to{" "}
+                  {selectedGoogleAccount.google_email}
+                </Trans>
               </Text>
             : null}
 
@@ -299,19 +303,23 @@ export function GoogleSheetsImportView({
                 }
               }}
             >
-              Pick google sheet
+              <Trans>Pick google sheet</Trans>
             </Button>
 
             {selectedDocument ?
               <>
-                <Text>Selected document: {selectedDocument.name}</Text>
+                <Text>
+                  <Trans>Selected document: {selectedDocument.name}</Trans>
+                </Text>
                 {isLoadingGoogleSheet ?
                   <Loader />
                 : null}
               </>
             : null}
           </>
-        : <Tooltip label="Google sheets connector is disabled while this feature is under maintenance.">
+        : <Tooltip
+            label={t`Google sheets connector is disabled while this feature is under maintenance.`}
+          >
             <Button
               disabled
               fullWidth
@@ -332,13 +340,13 @@ export function GoogleSheetsImportView({
                     devMsg: "Error while fetching Google auth URL",
                   });
                   notifyError(
-                    "Google authentication error",
-                    "There was an error while trying to authenticate with Google Sheets.",
+                    t`Google authentication error`,
+                    t`There was an error while trying to authenticate with Google Sheets.`,
                   );
                 }
               }}
             >
-              Connect to Google Sheets
+              <Trans>Connect to Google Sheets</Trans>
             </Button>
           </Tooltip>
         }

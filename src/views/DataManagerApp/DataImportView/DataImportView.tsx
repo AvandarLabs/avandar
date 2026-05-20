@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Container, Stack, Title } from "@mantine/core";
 import { Paper } from "@ui";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -13,7 +14,9 @@ export function DataImportView(): JSX.Element {
     <Container pt="xxl">
       <Paper>
         <Stack>
-          <Title order={2}>Import data</Title>
+          <Title order={2}>
+            <Trans>Import data</Trans>
+          </Title>
           <DataImportTabs isAddAllowed={isAddAllowed} />
         </Stack>
       </Paper>

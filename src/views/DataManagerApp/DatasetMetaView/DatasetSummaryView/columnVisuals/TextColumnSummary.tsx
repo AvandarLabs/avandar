@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 
@@ -17,7 +18,7 @@ export function TextColumnSummary({ summary, totalRows }: Props): JSX.Element {
   if (totalRows === 0 || top.count === 0 || top.value.length === 0) {
     return (
       <Text size="sm" c="dimmed" fs="italic">
-        No frequency data available.
+        <Trans>No frequency data available.</Trans>
       </Text>
     );
   }
@@ -28,7 +29,7 @@ export function TextColumnSummary({ summary, totalRows }: Props): JSX.Element {
   return (
     <Stack gap="xs">
       <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        Most common
+        <Trans>Most common</Trans>
       </Text>
       <Stack gap={4}>
         {top.value.slice(0, 5).map((value) => {
@@ -44,8 +45,10 @@ export function TextColumnSummary({ summary, totalRows }: Props): JSX.Element {
         })}
         {top.value.length > 5 ?
           <Text size="xs" c="dimmed" mt={4}>
-            +{top.value.length - 5} more values tied at{" "}
-            {top.count.toLocaleString()} rows
+            <Trans>
+              +{top.value.length - 5} more values tied at{" "}
+              {top.count.toLocaleString()} rows
+            </Trans>
           </Text>
         : null}
       </Stack>

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Loader, Stack } from "@mantine/core";
 import { ObjectDescriptionList } from "@ui";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function DataSummaryView({ datasetId }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [summary, isLoadingSummary] = DatasetQueryClient.useGetSummary({
     datasetId,
@@ -30,8 +32,8 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
         <>
           <ObjectDescriptionList
             data={{
-              "Number of columns": summary.columns,
-              "Number of rows": summary.rows,
+              [t`Number of columns`]: summary.columns,
+              [t`Number of rows`]: summary.rows,
             }}
           />
           <ObjectDescriptionList

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { FileUploadForm, notifyError } from "@ui";
 import { MIMEType } from "@utils";
@@ -65,6 +66,7 @@ export function ManualUploadView({
   onSaveSuccess,
   ...boxProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const {
     dataSourceMetadata,
@@ -101,8 +103,8 @@ export function ManualUploadView({
       onRequestFileParse({ file, newDatasetId: uuid() as Dataset.Id });
     } else {
       notifyError({
-        title: "No file selected",
-        message: "Please select a file to import",
+        title: t`No file selected`,
+        message: t`Please select a file to import`,
       });
     }
   };
@@ -169,9 +171,9 @@ export function ManualUploadView({
     <Box {...boxProps}>
       <Stack align="flex-start">
         <FileUploadForm
-          label="Upload a spreadsheet"
-          description="Select an Excel or CSV file from your computer to import"
-          placeholder="Select file"
+          label={t`Upload a spreadsheet`}
+          description={t`Select an Excel or CSV file from your computer to import`}
+          placeholder={t`Select file`}
           accept={[
             MIMEType.TEXT_CSV,
             MIMEType.APPLICATION_MS_EXCEL,

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
   Box,
@@ -39,6 +40,7 @@ export function ColumnSummaryBody({
   dataType,
   totalRows,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [summary, isLoading, query] = DatasetQueryClient.useGetColumnSummary({
     datasetId,
@@ -65,8 +67,10 @@ export function ColumnSummaryBody({
   if (query.isError || !summary) {
     return (
       <Text size="sm" c="dimmed" fs="italic">
-        Could not summarize this column. The query may have failed for an
-        unsupported value or a malformed cell.
+        <Trans>
+          Could not summarize this column. The query may have failed for an
+          unsupported value or a malformed cell.
+        </Trans>
       </Text>
     );
   }
@@ -81,7 +85,7 @@ export function ColumnSummaryBody({
       </Text>
 
       <Group gap="lg" align="center" wrap="wrap">
-        <Stat label="Distinct values">
+        <Stat label={t`Distinct values`}>
           <Text fw={650} size="xl" lh={1}>
             {summary.distinctValuesCount.toLocaleString()}
           </Text>
@@ -104,7 +108,7 @@ export function ColumnSummaryBody({
                 {(missingPct * 100).toFixed(missingPct < 0.01 ? 2 : 1)}%
               </Text>
               <Text size="xs" c="dimmed">
-                missing
+                <Trans>missing</Trans>
               </Text>
             </Stack>
           </Group>
@@ -186,7 +190,7 @@ function _buildHeadlineSentence(args: {
     const numericHigh = _fmtNum(summary.maxValue);
     const avg = _fmtNum(summary.averageValue);
     return (
-      <>
+      <Trans>
         Ranges from <Tag>{numericLow}</Tag> to <Tag>{numericHigh}</Tag>,
         averaging <Tag>{avg}</Tag>
         {Number.isFinite(summary.stdDev) ?
@@ -195,17 +199,17 @@ function _buildHeadlineSentence(args: {
             with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>.
           </>
         : "."}
-      </>
+      </Trans>
     );
   }
 
   if (summary.type === "date") {
     return (
-      <>
+      <Trans>
         Covers <Tag>{summary.datasetCoverage}</Tag>, from{" "}
         <Tag>{summary.oldestDate || "earliest"}</Tag> through{" "}
         <Tag>{summary.mostRecentDate || "latest"}</Tag>.
-      </>
+      </Trans>
     );
   }
 
@@ -215,32 +219,32 @@ function _buildHeadlineSentence(args: {
     const share = top.count / totalRows;
     if (share >= 0.5) {
       return (
-        <>
+        <Trans>
           Heavily repeated: <Tag>{top.value.slice(0, 1).join(", ")}</Tag>{" "}
           appears in <Tag>{(share * 100).toFixed(0)}%</Tag> of rows.
-        </>
+        </Trans>
       );
     }
     if (summary.distinctValuesCount >= Math.max(1, totalRows * 0.9)) {
       return (
-        <>
+        <Trans>
           Mostly unique:{" "}
           <Tag>{summary.distinctValuesCount.toLocaleString()}</Tag> distinct
           values across <Tag>{totalRows.toLocaleString()}</Tag> rows.
-        </>
+        </Trans>
       );
     }
     return (
-      <>
+      <Trans>
         Most common value: <Tag>{top.value.slice(0, 2).join(", ")}</Tag> (
         {top.count.toLocaleString()} rows, {(share * 100).toFixed(0)}%).
-      </>
+      </Trans>
     );
   }
 
   return (
     <Text size="sm" c="dimmed" fs="italic">
-      No values to summarize.
+      <Trans>No values to summarize.</Trans>
     </Text>
   );
 }

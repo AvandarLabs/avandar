@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui";
@@ -81,6 +82,7 @@ export function useSaveDataset(
   Dataset.T,
   DatasetImportFormValues & DataSourceMetadata
 > {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const { onSaveSuccess } = options;
@@ -176,8 +178,8 @@ export function useSaveDataset(
     },
     onSuccess: async (savedDataset, params) => {
       notifySuccess({
-        title: "Dataset saved",
-        message: `Dataset "${savedDataset.name}" saved successfully`,
+        title: t`Dataset saved`,
+        message: t`Dataset "${savedDataset.name}" saved successfully`,
       });
 
       // Hanlde post-save actions, such as uploading the dataset to cloud
@@ -234,8 +236,8 @@ export function useSaveDataset(
     },
     onError: () => {
       notifyError({
-        title: "Error saving dataset",
-        message: "An error occurred while saving the dataset",
+        title: t`Error saving dataset`,
+        message: t`An error occurred while saving the dataset`,
       });
     },
   });

@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Paper, Stack, Text, UnstyledButton } from "@mantine/core";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
@@ -21,7 +22,7 @@ export function OpenDataCatalogEntryList({
   if (displayedEntries.length === 0) {
     return (
       <Text c="dimmed" size="sm">
-        No datasets match your search.
+        <Trans>No datasets match your search.</Trans>
       </Text>
     );
   }

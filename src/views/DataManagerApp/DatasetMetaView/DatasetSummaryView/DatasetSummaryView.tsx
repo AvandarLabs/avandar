@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Anchor,
   Box,
@@ -42,6 +43,7 @@ type Props = {
  * second observer pass.
  */
 export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [meta, isLoadingMeta] = DatasetQueryClient.useGetDatasetMeta({
     datasetId,
@@ -69,10 +71,12 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
 
   return (
     <Box className={css.layout}>
-      <Box className={css.nav} component="nav" aria-label="Column outline">
+      <Box className={css.nav} component="nav" aria-label={t`Column outline`}>
         <Stack gap={2}>
           <Text size="xs" tt="uppercase" c="dimmed" fw={600} mb="xs">
-            {meta.columns.length} columns · {meta.rows.toLocaleString()} rows
+            <Trans>
+              {meta.columns.length} columns · {meta.rows.toLocaleString()} rows
+            </Trans>
           </Text>
           {meta.columns.map((col) => {
             const isActive = activeColumn === col.name;
@@ -114,7 +118,7 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
                     {col.name}
                   </Text>
                   <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-                    {_typeShortLabel(col.dataType)}
+                    {_typeShortLabel(col.dataType, t)}
                   </Text>
                 </Group>
               </Anchor>
@@ -170,6 +174,7 @@ function ColumnSection({
   totalRows,
   onEnterView,
 }: ColumnSectionProps): JSX.Element {
+  const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { ref: intersectionRef, entry } = useIntersection({
     root: null,
@@ -223,7 +228,7 @@ function ColumnSection({
             ff="monospace"
             style={{ letterSpacing: "0.04em" }}
           >
-            {_typeFullLabel(dataType)}
+            {_typeFullLabel(dataType, t)}
           </Text>
         </Group>
 
@@ -240,37 +245,39 @@ function ColumnSection({
   );
 }
 
-function _typeShortLabel(dataType: string): string {
+type TranslateFn = ReturnType<typeof useLingui>["t"];
+
+function _typeShortLabel(dataType: string, t: TranslateFn): string {
   if (dataType === "varchar") {
-    return "txt";
+    return t`txt`;
   }
   if (dataType === "bigint" || dataType === "double") {
-    return "num";
+    return t`num`;
   }
   if (dataType === "date" || dataType === "time" || dataType === "timestamp") {
-    return "date";
+    return t`date`;
   }
   return dataType;
 }
 
-function _typeFullLabel(dataType: string): string {
+function _typeFullLabel(dataType: string, t: TranslateFn): string {
   if (dataType === "varchar") {
-    return "Text";
+    return t`Text`;
   }
   if (dataType === "bigint") {
-    return "Whole number";
+    return t`Whole number`;
   }
   if (dataType === "double") {
-    return "Decimal";
+    return t`Decimal`;
   }
   if (dataType === "date") {
-    return "Date";
+    return t`Date`;
   }
   if (dataType === "time") {
-    return "Time";
+    return t`Time`;
   }
   if (dataType === "timestamp") {
-    return "Timestamp";
+    return t`Timestamp`;
   }
   return dataType;
 }

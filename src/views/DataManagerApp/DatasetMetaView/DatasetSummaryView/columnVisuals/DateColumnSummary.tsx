@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 
@@ -18,7 +19,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
   return (
     <Stack gap="sm">
       <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        Timespan
+        <Trans>Timespan</Trans>
       </Text>
 
       <Box pos="relative" px={6}>
@@ -37,7 +38,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
             {oldestDate || "—"}
           </Text>
           <Text size="xs" c="dimmed">
-            earliest
+            <Trans>earliest</Trans>
           </Text>
         </Stack>
         <Stack gap={0} align="center">
@@ -45,7 +46,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
             {datasetCoverage}
           </Text>
           <Text size="xs" c="dimmed">
-            coverage
+            <Trans>coverage</Trans>
           </Text>
         </Stack>
         <Stack gap={0} align="flex-end">
@@ -53,7 +54,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
             {mostRecentDate || "—"}
           </Text>
           <Text size="xs" c="dimmed">
-            most recent
+            <Trans>most recent</Trans>
           </Text>
         </Stack>
       </Group>

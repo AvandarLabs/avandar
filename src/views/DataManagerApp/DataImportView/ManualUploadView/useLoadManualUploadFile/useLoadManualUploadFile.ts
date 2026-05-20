@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useMutation, UseMutationResultTuple } from "@hooks";
 import { notifyError } from "@ui";
 import { MIMEType } from "@utils";
@@ -161,6 +162,7 @@ function _buildDataSourceMetadataFromLoadResult({
  * that's `useSaveDataset`.
  */
 export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
+  const { t } = useLingui();
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [dataSourceMetadata, setDataSourceMetadata] = useState<
@@ -256,7 +258,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
     onError: (err) => {
       const message = err instanceof Error ? err.message : String(err);
       notifyError({
-        title: "Could not read file",
+        title: t`Could not read file`,
         message,
       });
     },

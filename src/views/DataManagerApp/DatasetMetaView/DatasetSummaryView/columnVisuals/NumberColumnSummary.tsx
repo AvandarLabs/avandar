@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 
@@ -14,6 +15,7 @@ type Props = {
  * have looking at a fresh numeric column.
  */
 export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
+  const { t } = useLingui();
   const { minValue, maxValue, averageValue, stdDev } = summary;
   const range = maxValue - minValue;
   const avgPct =
@@ -32,7 +34,7 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
   return (
     <Stack gap="sm">
       <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        Range
+        <Trans>Range</Trans>
       </Text>
 
       <Box pos="relative" h={48} px={8}>
@@ -56,7 +58,7 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
               width: `${Math.max(0, stdRightPct - stdLeftPct)}%`,
               borderRadius: 4,
             }}
-            aria-label="One standard deviation around the mean"
+            aria-label={t`One standard deviation around the mean`}
           />
         : null}
         <Box
@@ -69,7 +71,7 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
             left: `calc(${avgPct * 100}% - 1.5px)`,
             borderRadius: 1,
           }}
-          aria-label="Mean"
+          aria-label={t`Mean`}
         />
 
         <Group
@@ -90,15 +92,15 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
       </Box>
 
       <Group gap="lg" mt="xs">
-        <Stat label="min" value={_fmt(minValue)} />
-        <Stat label="avg" value={_fmt(averageValue)} accent />
-        <Stat label="max" value={_fmt(maxValue)} />
+        <Stat label={t`min`} value={_fmt(minValue)} />
+        <Stat label={t`avg`} value={_fmt(averageValue)} accent />
+        <Stat label={t`max`} value={_fmt(maxValue)} />
         {Number.isFinite(stdDev) ?
-          <Stat label="stddev" value={_fmt(stdDev)} />
+          <Stat label={t`stddev`} value={_fmt(stdDev)} />
         : null}
         <Stat
-          label="kind"
-          value={dataType === "bigint" ? "integer" : "decimal"}
+          label={t`kind`}
+          value={dataType === "bigint" ? t`integer` : t`decimal`}
         />
       </Group>
     </Stack>

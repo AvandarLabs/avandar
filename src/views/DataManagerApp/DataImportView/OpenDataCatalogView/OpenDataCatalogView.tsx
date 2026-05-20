@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   BoxProps,
@@ -52,6 +53,7 @@ export function OpenDataCatalogView({
   onSaveSuccess,
   ...boxProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 150);
@@ -106,8 +108,8 @@ export function OpenDataCatalogView({
     DatasetClient.useInsertOpenDataDataset({
       onSuccess: (dataset) => {
         notifySuccess({
-          title: "Dataset added",
-          message: `"${dataset.name}" is now in your workspace.`,
+          title: t`Dataset added`,
+          message: t`"${dataset.name}" is now in your workspace.`,
         });
         onSaveSuccess?.(dataset);
       },
@@ -126,10 +128,8 @@ export function OpenDataCatalogView({
 
     if (!columnInputs) {
       notifyError({
-        title: "Cannot add dataset",
-        message:
-          "This catalog entry has no column metadata. It cannot be imported " +
-          "yet.",
+        title: t`Cannot add dataset`,
+        message: t`This catalog entry has no column metadata. It cannot be imported yet.`,
       });
       return;
     }
@@ -148,51 +148,55 @@ export function OpenDataCatalogView({
     <Box {...boxProps}>
       <Stack gap="md">
         <Text>
-          Search the data catalog to add open datasets to your workspace.
+          <Trans>
+            Search the data catalog to add open datasets to your workspace.
+          </Trans>
         </Text>
 
         <Callout color="warning" messageSize="sm">
           <Text component="div" size="sm">
-            The public open data catalog is still in{" "}
-            <BetaBadge
-              size="xs"
-              style={{ verticalAlign: "text-bottom" }}
-              withTooltip={false}
-            />
-            <br />
-            We are adding more open datasets as users tell us which datasets
-            they want in Avandar. If there is a dataset you would like to see
-            here,{" "}
-            <UnstyledButton
-              type="button"
-              aria-label="Tell us which open dataset you want via feedback"
-              display="inline"
-              p={0}
-              h="auto"
-              td="underline"
-              c="primary"
-              fz="sm"
-              fw={500}
-              style={{ verticalAlign: "baseline" }}
-              onClick={() => {
-                openFeaturebaseFeedbackWidget({
-                  boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
-                });
-              }}
-            >
-              tell us
-            </UnstyledButton>
-            !
+            <Trans>
+              The public open data catalog is still in{" "}
+              <BetaBadge
+                size="xs"
+                style={{ verticalAlign: "text-bottom" }}
+                withTooltip={false}
+              />
+              <br />
+              We are adding more open datasets as users tell us which datasets
+              they want in Avandar. If there is a dataset you would like to see
+              here,{" "}
+              <UnstyledButton
+                type="button"
+                aria-label={t`Tell us which open dataset you want via feedback`}
+                display="inline"
+                p={0}
+                h="auto"
+                td="underline"
+                c="primary"
+                fz="sm"
+                fw={500}
+                style={{ verticalAlign: "baseline" }}
+                onClick={() => {
+                  openFeaturebaseFeedbackWidget({
+                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                  });
+                }}
+              >
+                tell us
+              </UnstyledButton>
+              !
+            </Trans>
           </Text>
         </Callout>
 
         <TextInput
-          aria-label="Search open data catalog"
+          aria-label={t`Search open data catalog`}
           leftSection={<IconSearch size={18} />}
           onChange={(event) => {
             setSearch(event.currentTarget.value);
           }}
-          placeholder="Search by name, organization, pipeline…"
+          placeholder={t`Search by name, organization, pipeline…`}
           value={search}
         />
         {isLoadingCatalog ?
@@ -203,7 +207,7 @@ export function OpenDataCatalogView({
             <Paper p="md" withBorder shadow="none">
               <Stack gap={6}>
                 <Text fw={600} size="sm">
-                  Catalog ({displayedEntries.length})
+                  <Trans>Catalog ({displayedEntries.length})</Trans>
                 </Text>
 
                 <OpenDataCatalogEntryList

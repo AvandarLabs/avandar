@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   Box,
   BoxProps,
@@ -80,7 +81,9 @@ export function DatasetNavbar({
     emptyList() {
       return (
         <Box ta="center" py="md">
-          <Text>No datasets added yet</Text>
+          <Text>
+            <Trans>No datasets added yet</Trans>
+          </Text>
         </Box>
       );
     },

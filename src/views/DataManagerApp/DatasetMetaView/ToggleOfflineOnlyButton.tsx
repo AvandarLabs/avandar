@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@hooks";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
@@ -26,6 +27,7 @@ export function ToggleOfflineOnlyButton({
   isInCloudStorage,
   dataSource,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const sourceType = DatasetSource.getSourceType(dataSource);
 
@@ -52,16 +54,18 @@ export function ToggleOfflineOnlyButton({
     onSuccess: (dataset) => {
       if (DatasetSource.canBeOfflineOnly(dataset)) {
         notifySuccess(
-          `Dataset is now ${dataset.isInCloudStorage ? "synced online" : "offline-only"}`,
+          dataset.isInCloudStorage ?
+            t`Dataset is now synced online`
+          : t`Dataset is now offline-only`,
         );
       }
     },
     onError: (error) => {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+        error instanceof Error ? error.message : t`Unknown error`;
 
       notifyError({
-        title: "Unable to make dataset offline-only",
+        title: t`Unable to make dataset offline-only`,
         message: errorMessage,
       });
     },
@@ -78,10 +82,12 @@ export function ToggleOfflineOnlyButton({
     }
 
     modals.openConfirmModal({
-      title: isInCloudStorage ? "Make dataset offline-only?" : "Sync online?",
+      title:
+        isInCloudStorage ? t`Make dataset offline-only?` : t`Sync online?`,
       labels: {
-        confirm: isInCloudStorage ? "Make offline-only" : "Allow syncing",
-        cancel: "Cancel",
+        confirm:
+          isInCloudStorage ? t`Make offline-only` : t`Allow syncing`,
+        cancel: t`Cancel`,
       },
       confirmProps: {
         color: isInCloudStorage ? "danger" : undefined,
@@ -90,14 +96,18 @@ export function ToggleOfflineOnlyButton({
       children:
         isInCloudStorage ?
           <Text c="red.8">
-            This dataset will no longer be stored online and can only be
-            accessed as long as it is on your personal computer. Nobody on your
-            team will be able to access this data. This is recommended only for
-            very sensitive data.
+            <Trans>
+              This dataset will no longer be stored online and can only be
+              accessed as long as it is on your personal computer. Nobody on
+              your team will be able to access this data. This is recommended
+              only for very sensitive data.
+            </Trans>
           </Text>
         : <Text>
-            This will allow the dataset to be stored online so it can be
-            accessed in other devices.
+            <Trans>
+              This will allow the dataset to be stored online so it can be
+              accessed in other devices.
+            </Trans>
           </Text>,
       onConfirm: () => {
         if (isInCloudStorage) {
@@ -119,15 +129,15 @@ export function ToggleOfflineOnlyButton({
     <Stack gap={4} align="center">
       <ActionIcon
         tooltip={
-          isUploadPending ? "Syncing dataset online..."
+          isUploadPending ? t`Syncing dataset online...`
           : isInCloudStorage ?
-            "This dataset is synced online. Click to make offline-only."
-          : "This dataset is offline-only. Click to allow online syncing."
+            t`This dataset is synced online. Click to make offline-only.`
+          : t`This dataset is offline-only. Click to allow online syncing.`
         }
         variant="default"
         color="neutral"
         aria-label={
-          isInCloudStorage ? "Make offline-only" : "Allow online syncing"
+          isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
         }
         disabled={isPending}
         onClick={onClick}

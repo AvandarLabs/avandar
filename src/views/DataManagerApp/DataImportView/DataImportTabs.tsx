@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Tabs } from "@ui";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
@@ -23,13 +24,14 @@ export function DataImportTabs({
   isAddAllowed,
   onSaveSuccess,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   return (
     <Tabs
       tabIds={["upload-view", "connectors-view", "open-data-catalog"] as const}
       renderTabHeader={{
-        "upload-view": "Upload",
-        "connectors-view": "Connectors",
-        "open-data-catalog": "Open data",
+        "upload-view": t`Upload`,
+        "connectors-view": t`Connectors`,
+        "open-data-catalog": t`Open data`,
       }}
       renderTabPanel={{
         "upload-view": () => {

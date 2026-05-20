@@ -6,59 +6,765 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
+msgstr "This will allow the dataset to be stored online so it can be accessed in other devices."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "most recent"
+msgstr "most recent"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "An error occurred while loading the file"
+msgstr "An error occurred while loading the file"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Source URL"
+msgstr "Source URL"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Allow online syncing"
+msgstr "Allow online syncing"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Upload Excel"
+msgstr "Upload Excel"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Notes"
+msgstr "Notes"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Cannot add dataset"
+msgstr "Cannot add dataset"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Unknown error"
+msgstr "Unknown error"
+
+#: src/views/DataManagerApp/DataManagerApp.tsx
+msgid "Data Sources"
+msgstr "Data Sources"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Upload file"
+msgstr "Upload file"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid " {numRejectedRows} rows were rejected"
+msgstr " {numRejectedRows} rows were rejected"
+
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+msgstr "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+
+#: src/views/DataManagerApp/DatasetNavbar.tsx
+msgid "No datasets added yet"
+msgstr "No datasets added yet"
+
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+msgid "Open data"
+msgstr "Open data"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "stddev"
+msgstr "stddev"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The sheet has a header row"
+msgstr "The sheet has a header row"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Search the data catalog to add open datasets to your workspace."
+msgstr "Search the data catalog to add open datasets to your workspace."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "This dataset has no description."
+msgstr "This dataset has no description."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles"
 msgstr "Roles"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
+msgstr "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing — {eta} remaining"
+msgstr "Processing — {eta} remaining"
+
+#. placeholder {0}: previewRows.length
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
+msgstr "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Pipeline"
+msgstr "Pipeline"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
+msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
+msgstr "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Metadata"
+msgstr "Metadata"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "Range"
+msgstr "Range"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Add to workspace"
+msgstr "Add to workspace"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace Name"
 msgstr "Workspace Name"
+
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Confirm"
+msgstr "Confirm"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "missing"
+msgstr "missing"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "One standard deviation around the mean"
+msgstr "One standard deviation around the mean"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Data Summary"
+msgstr "Data Summary"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+msgid "Dataset updated successfully!"
+msgstr "Dataset updated successfully!"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Excel file"
+msgstr "Excel file"
+
+#. placeholder {0}: dataset.name
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "\"{0}\" is now in your workspace."
+msgstr "\"{0}\" is now in your workspace."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Select a dataset from the list to view its metadata."
+msgstr "Select a dataset from the list to view its metadata."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
+msgstr "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Dataset deleted successfully"
+msgstr "Dataset deleted successfully"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "decimal"
+msgstr "decimal"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Please select a file to import"
+msgstr "Please select a file to import"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Open Data"
+msgstr "Open Data"
+
+#: src/views/DataManagerApp/DataManagerApp.tsx
+msgid "Add new dataset"
+msgstr "Add new dataset"
+
+#. placeholder {0}: formatNumber(numSuccessRows)
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Parsed {0} rows"
+msgstr "Parsed {0} rows"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "avg"
+msgstr "avg"
+
+#. placeholder {0}: dataset.name
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Previewing data for {0}"
+msgstr "Previewing data for {0}"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Unsupported file type"
+msgstr "Unsupported file type"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Dataset did not match the expected schema"
+msgstr "Dataset did not match the expected schema"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "File was partially loaded"
+msgstr "File was partially loaded"
+
+#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
+msgstr "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Untitled dataset"
+msgstr "Untitled dataset"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Connect to Google Sheets"
+msgstr "Connect to Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Tell us which open dataset you want via feedback"
+msgstr "Tell us which open dataset you want via feedback"
+
+#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
+msgid "Import data"
+msgstr "Import data"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Delete"
+msgstr "Delete"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Enter a name for this dataset"
+msgstr "Enter a name for this dataset"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Enter a description for this dataset"
+msgstr "Enter a description for this dataset"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
+msgstr "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Data preview"
+msgstr "Data preview"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Search open data catalog"
+msgstr "Search open data catalog"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Sheet name"
+msgstr "Sheet name"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Scroll up to the fields above, or use the list below."
+msgstr "Scroll up to the fields above, or use the list below."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "description"
+msgstr "description"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google authentication error"
+msgstr "Google authentication error"
+
+#. placeholder {0}: top.value.slice(0, 2).join(", ")
+#. placeholder {1}: top.count.toLocaleString()
+#. placeholder {2}: (share * 100).toFixed(0)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Most common value: <0>{0}</0> ({1} rows, {2}%)."
+msgstr "Most common value: <0>{0}</0> ({1} rows, {2}%)."
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing dataset…"
+msgstr "Processing dataset…"
+
+#. placeholder {0}: dataset.name
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Are you sure you want to delete {0}?"
+msgstr "Are you sure you want to delete {0}?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "Failed to update workspace name"
 
+#. placeholder {0}: value.length
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
+msgstr "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
 msgstr "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "No values to summarize."
+msgstr "No values to summarize."
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Upload CSV"
+msgstr "Upload CSV"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Search by name, organization, pipeline…"
+msgstr "Search by name, organization, pipeline…"
+
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+msgstr "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "No file selected"
+msgstr "No file selected"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "See all shared items"
+msgstr "See all shared items"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Dataset is now offline-only"
+msgstr "Dataset is now offline-only"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Are you sure you want to delete this dataset? This action cannot be undone."
+msgstr "Are you sure you want to delete this dataset? This action cannot be undone."
+
+#. placeholder {0}: top.value.slice(0, 1).join(", ")
+#. placeholder {1}: (share * 100).toFixed(0)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
+msgstr "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Back"
+msgstr "Back"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "coverage"
+msgstr "coverage"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Failed to delete dataset"
+msgstr "Failed to delete dataset"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "License"
+msgstr "License"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Add dataset to workspace"
+msgstr "Add dataset to workspace"
+
+#. placeholder {0}: summary.distinctValuesCount.toLocaleString()
+#. placeholder {1}: totalRows.toLocaleString()
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
+msgstr "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
+
+#. placeholder {0}: subscription.maxDatasetsAllowed
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgstr "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Parsed {formattedNumRows} rows successfully"
+msgstr "Parsed {formattedNumRows} rows successfully"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Select file"
+msgstr "Select file"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
+msgid "No frequency data available."
+msgstr "No frequency data available."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Add to your workspace"
+msgstr "Add to your workspace"
+
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+msgid "Connectors"
+msgstr "Connectors"
+
+#. placeholder {0}: displayedEntries.length
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Catalog ({0})"
+msgstr "Catalog ({0})"
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Import failed: {reason}"
+msgstr "Import failed: {reason}"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Timestamp format"
+msgstr "Timestamp format"
+
+#. placeholder {0}: dataset.name
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "{0} deleted successfully"
+msgstr "{0} deleted successfully"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
+msgid "No datasets match your search."
+msgstr "No datasets match your search."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one sheet in this excel sheet."
+msgstr "There is only one sheet in this excel sheet."
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Make dataset offline-only?"
+msgstr "Make dataset offline-only?"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "You can view this dataset because it was shared with you."
+msgstr "You can view this dataset because it was shared with you."
+
+#. placeholder {0}: selectedGoogleAccount.google_email
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "You have successfully connected to {0}"
+msgstr "You have successfully connected to {0}"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Date format"
+msgstr "Date format"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Dataset added"
+msgstr "Dataset added"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
+msgid "Most common"
+msgstr "Most common"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Dataset loaded successfully"
+msgstr "Dataset loaded successfully"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Number of rows to skip"
+msgstr "Number of rows to skip"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "min"
+msgstr "min"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Raw metadata (JSON)"
+msgstr "Raw metadata (JSON)"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Delete Dataset"
+msgstr "Delete Dataset"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "Timespan"
+msgstr "Timespan"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "kind"
+msgstr "kind"
+
+#. placeholder {0}: savedDataset.name
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{0}\" saved successfully"
+msgstr "Dataset \"{0}\" saved successfully"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Please fix the highlighted fields."
+msgstr "Please fix the highlighted fields."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Description"
+msgstr "Description"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Update frequency"
+msgstr "Update frequency"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Allow syncing"
+msgstr "Allow syncing"
+
+#. placeholder {0}: entry.pipelineName
+#. placeholder {1}: entry.pipelineRunId
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "{0} · run {1}"
+msgstr "{0} · run {1}"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Process data again"
+msgstr "Process data again"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Dataset name must be at least 2 characters."
+msgstr "Dataset name must be at least 2 characters."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "Workspace name updated"
 
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+msgid "Upload"
+msgstr "Upload"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid " over 1000 rows were rejected"
+msgstr " over 1000 rows were rejected"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Tags"
 msgstr "Tags"
+
+#. placeholder {0}: meta.columns.length
+#. placeholder {1}: meta.rows.toLocaleString()
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
+msgid "{0} columns · {1} rows"
+msgstr "{0} columns · {1} rows"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Dataset is now synced online"
+msgstr "Dataset is now synced online"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Keep Dataset"
+msgstr "Keep Dataset"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "Mean"
+msgstr "Mean"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Dataset deleted"
+msgstr "Dataset deleted"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Can't save dataset"
+msgstr "Can't save dataset"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "An error occurred while saving the dataset"
+msgstr "An error occurred while saving the dataset"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Pick google sheet"
+msgstr "Pick google sheet"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Only workspace settings administrators can open workspace settings."
 msgstr "Only workspace settings administrators can open workspace settings."
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "This catalog entry has no column metadata. It cannot be imported yet."
+msgstr "This catalog entry has no column metadata. It cannot be imported yet."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Column description updated successfully!"
+msgstr "Column description updated successfully!"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "File failed to load"
+msgstr "File failed to load"
+
+#. placeholder {0}: err.message
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+msgid "There was an error on update: {0}"
+msgstr "There was an error on update: {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "Privacy log"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Data processing failed"
+msgstr "Data processing failed"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "This dataset can be stored in the cloud. "
+msgstr "This dataset can be stored in the cloud. "
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Billing"
 msgstr "Billing"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Delete dataset"
+msgstr "Delete dataset"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
+msgstr "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "This dataset is offline-only. Click to allow online syncing."
+msgstr "This dataset is offline-only. Click to allow online syncing."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "CSV file"
+msgstr "CSV file"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Updating dataset"
+msgstr "Updating dataset"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Dataset Name"
+msgstr "Dataset Name"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Canonical URLs"
+msgstr "Canonical URLs"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Make offline-only"
+msgstr "Make offline-only"
+
+#: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
+msgid "Number of rows"
+msgstr "Number of rows"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Select an Excel or CSV file from your computer to import"
+msgstr "Select an Excel or CSV file from your computer to import"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "There was an error while trying to authenticate with Google Sheets."
+msgstr "There was an error while trying to authenticate with Google Sheets."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Data processed successfully"
+msgstr "Data processed successfully"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "Access denied"
+
+#. placeholder {0}: value.length
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
+msgstr "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Upload a spreadsheet"
+msgstr "Upload a spreadsheet"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google sheets connector is disabled while this feature is under maintenance."
+msgstr "Google sheets connector is disabled while this feature is under maintenance."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Service"
+msgstr "Service"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Google Sheets"
+msgstr "Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
+msgstr "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Error saving dataset"
+msgstr "Error saving dataset"
+
+#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+msgid "Save"
+msgstr "Save"
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Resuming dataset processing…"
+msgstr "Resuming dataset processing…"
+
+#. placeholder {0}: summary.datasetCoverage
+#. placeholder {1}: summary.oldestDate || "earliest"
+#. placeholder {2}: summary.mostRecentDate || "latest"
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
+msgstr "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "The workspace name was saved successfully."
 msgstr "The workspace name was saved successfully."
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "dataset name"
+msgstr "dataset name"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Settings"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+msgid "Organization"
+msgstr "Organization"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "No rows were read successfully"
+msgstr "No rows were read successfully"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "This dataset will be offline-only"
+msgstr "This dataset will be offline-only"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "This dataset is synced online. Click to make offline-only."
+msgstr "This dataset is synced online. Click to make offline-only."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
+msgid "Column outline"
+msgstr "Column outline"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Unable to make dataset offline-only"
+msgstr "Unable to make dataset offline-only"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Dataset name"
+msgstr "Dataset name"
+
+#: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
+msgid "Number of columns"
+msgstr "Number of columns"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
 msgstr "Language"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
+msgid "Could not read file"
+msgstr "Could not read file"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "integer"
+msgstr "integer"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
@@ -67,3 +773,79 @@ msgstr "General"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
 msgstr "Members"
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Syncing dataset online..."
+msgstr "Syncing dataset online..."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "Delimiter"
+msgstr "Delimiter"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "File loaded successfully"
+msgstr "File loaded successfully"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset saved"
+msgstr "Dataset saved"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Save Dataset"
+msgstr "Save Dataset"
+
+#. placeholder {0}: selectedDocument.name
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Selected document: {0}"
+msgstr "Selected document: {0}"
+
+#. placeholder {0}: importedColumns.length
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
+msgstr "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
+
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+msgid "Sync online?"
+msgstr "Sync online?"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Sheet failed to load"
+msgstr "Google Sheet failed to load"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "earliest"
+msgstr "earliest"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+msgid "max"
+msgstr "max"
+
+#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
+msgid "Dataset limit reached"
+msgstr "Dataset limit reached"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+msgid "Distinct values"
+msgstr "Distinct values"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Derived Dataset"
+msgstr "Derived Dataset"
+
+#: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
+msgstr "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Fix these issues before saving"
+msgstr "Fix these issues before saving"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Shared with you"
+msgstr "Shared with you"
+
+#. placeholder {0}: top.value.length - 5
+#. placeholder {1}: top.count.toLocaleString()
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
+msgid "+{0} more values tied at {1} rows"
+msgstr "+{0} more values tied at {1} rows"

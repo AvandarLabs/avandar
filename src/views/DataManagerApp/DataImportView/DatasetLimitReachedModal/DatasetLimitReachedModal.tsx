@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Modal, Stack, Text } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { matchLiteral } from "@utils";
@@ -15,13 +16,16 @@ export function DatasetLimitReachedModal({
   workspaceSlug,
   isOpened,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const elements = {
     noSubscriptionFound: () => {
       return (
         <Text>
-          Your workspace is on the Free plan, which supports up to 5 datasets.
-          To add more datasets, upgrade to a paid plan.
+          <Trans>
+            Your workspace is on the Free plan, which supports up to 5 datasets.
+            To add more datasets, upgrade to a paid plan.
+          </Trans>
         </Text>
       );
     },
@@ -29,7 +33,7 @@ export function DatasetLimitReachedModal({
 
   return (
     <Modal
-      title="Dataset limit reached"
+      title={t`Dataset limit reached`}
       opened={isOpened}
       onClose={() => {
         navigate({
@@ -50,10 +54,12 @@ export function DatasetLimitReachedModal({
               return (
                 <>
                   <Text>
-                    Your current plan only supports up to
-                    {subscription.maxDatasetsAllowed} datasets. Upgrade to our
-                    Starter or Impact plan to increase the number of datasets
-                    you can add to your workspace.
+                    <Trans>
+                      Your current plan only supports up to
+                      {subscription.maxDatasetsAllowed} datasets. Upgrade to our
+                      Starter or Impact plan to increase the number of datasets
+                      you can add to your workspace.
+                    </Trans>
                   </Text>
                   <WorkspaceBillingView hideTitle hideIntroText />
                 </>
@@ -63,10 +69,12 @@ export function DatasetLimitReachedModal({
               return (
                 <>
                   <Text>
-                    Your current plan only supports up to
-                    {subscription.maxDatasetsAllowed} datasets. Upgrade to our
-                    Impact plan to increase the number of datasets you can add
-                    to your workspace.
+                    <Trans>
+                      Your current plan only supports up to
+                      {subscription.maxDatasetsAllowed} datasets. Upgrade to our
+                      Impact plan to increase the number of datasets you can add
+                      to your workspace.
+                    </Trans>
                   </Text>
                   <WorkspaceBillingView hideTitle hideIntroText />
                 </>
@@ -76,11 +84,13 @@ export function DatasetLimitReachedModal({
               return (
                 <>
                   <Text>
-                    Your current plan only supports up to
-                    {subscription.maxDatasetsAllowed} datasets. To increase the
-                    number of datasets you can add to your workspace you can
-                    purchase more seats. Each seat allows you to add 10 more
-                    datasets!
+                    <Trans>
+                      Your current plan only supports up to
+                      {subscription.maxDatasetsAllowed} datasets. To increase
+                      the number of datasets you can add to your workspace you
+                      can purchase more seats. Each seat allows you to add 10
+                      more datasets!
+                    </Trans>
                   </Text>
                   <WorkspaceBillingView hideTitle hideIntroText />
                 </>
