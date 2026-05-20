@@ -313,7 +313,10 @@ describe("VoiceModelManager", () => {
     await manager.releaseLoadedPipeline();
 
     expect(manager.getStatus()).toEqual({ kind: "idle" });
-    expect(await manager.isModelDownloaded("whisper-tiny")).toBe(true);
+    expect(buildPipeline).toHaveBeenCalled();
+    expect(window.localStorage.getItem("avandar.voice.downloadedModels")).toBe(
+      JSON.stringify({ "whisper-tiny": true }),
+    );
   });
 
   it("deleteModel clears the cache marker and unloads the in-memory pipeline", async () => {
