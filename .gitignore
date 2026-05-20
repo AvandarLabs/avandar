@@ -42,6 +42,7 @@ supabase/.branches
 .cursor/plans
 
 # Playwright
+/playwright/
 /playwright-report/
 /test-results/
 
