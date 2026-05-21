@@ -3,6 +3,7 @@ import { formatDate, FormattableTimezone } from "@utils";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import type { UnknownDataFrame } from "@utils";
 import type {
@@ -56,19 +57,24 @@ export function DataGrid({
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
+      const isDate = dateColumns?.has(field) ?? false;
       return {
         field: field,
         headerName: field,
         filter: true,
-        valueFormatter:
-          dateColumns?.has(field) ?
-            (p: { value: unknown }) => {
-              return formatDate(p.value, {
-                format: dateFormat,
-                zone: timezone,
-              });
-            }
-          : undefined,
+        valueFormatter: isDate ?
+          (p: { value: unknown }) => {
+            return formatDate(p.value, {
+              format: dateFormat,
+              zone: timezone,
+            });
+          }
+        : (p: { value: unknown }) => {
+            return typeof p.value === "number" ?
+                formatChartNumber(p.value)
+              : (p.value as string | null | undefined) == null ? ""
+              : String(p.value);
+          },
       };
     });
   }, [columnNames, dateColumns, dateFormat, timezone]);

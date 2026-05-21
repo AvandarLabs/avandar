@@ -3,6 +3,7 @@ import { formatDate } from "@utils";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarSeries } from "$/models/vizs/SeriesConfig";
@@ -62,6 +63,8 @@ export function BarChart({
     };
   }, [isDateAxis, dateFormat, timezone]);
 
+  const valueFormatter = formatChartNumber;
+
   const styleProps = useMemo(() => {
     return applyChartStyle(chartStyle, baseXAxisProps);
   }, [chartStyle, baseXAxisProps]);
@@ -81,6 +84,7 @@ export function BarChart({
       withLegend,
       tooltipProps,
       styleProps,
+      valueFormatter,
     });
   }
 
@@ -93,6 +97,7 @@ export function BarChart({
       type={BAR_LAYOUT_TO_MANTINE[layout]}
       withLegend={withLegend}
       tooltipProps={tooltipProps}
+      valueFormatter={valueFormatter}
       series={barSeries.map((s) => {
         return { name: s.key, label: s.label, color: s.color };
       })}

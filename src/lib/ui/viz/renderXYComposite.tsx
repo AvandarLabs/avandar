@@ -12,6 +12,7 @@ type Props = {
   withLegend: boolean;
   tooltipProps?: unknown;
   styleProps: ReturnType<typeof applyChartStyle>;
+  valueFormatter?: (value: number) => string;
 };
 
 /**
@@ -29,6 +30,7 @@ export function renderXYComposite({
   withLegend,
   tooltipProps,
   styleProps,
+  valueFormatter,
 }: Props): JSX.Element {
   const compositeSeries: CompositeChartSeries[] = series.map((s) => {
     return { name: s.key, label: s.label, color: s.color, type: s.renderAs };
@@ -42,6 +44,7 @@ export function renderXYComposite({
       series={compositeSeries}
       withLegend={withLegend}
       tooltipProps={tooltipProps as never}
+      valueFormatter={valueFormatter}
       barProps={(s) => {
         const found = series.find((sx) => {
           return sx.key === s.name;

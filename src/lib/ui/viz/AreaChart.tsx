@@ -31,6 +31,7 @@ import {
 } from "recharts";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { AreaSeries } from "$/models/vizs/SeriesConfig";
@@ -116,6 +117,7 @@ export function AreaChart({
       withLegend,
       tooltipProps: { labelFormatter },
       styleProps,
+      valueFormatter: formatChartNumber,
     });
   }
 
@@ -179,7 +181,12 @@ export function AreaChart({
           {withLegend ?
             <Legend {...styleProps.legendProps} verticalAlign="top" />
           : null}
-          <Tooltip labelFormatter={labelFormatter} />
+          <Tooltip
+            labelFormatter={labelFormatter}
+            formatter={(value: unknown) => {
+              return formatChartNumber(value);
+            }}
+          />
           {areaSeries.map((s, idx) => {
             const color = s.color ?? DEFAULT_AREA_COLOR;
             const id = `${gradientPrefix}-${idx}`;

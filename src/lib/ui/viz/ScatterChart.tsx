@@ -1,6 +1,7 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import type { ScatterChartSeries } from "@mantine/charts";
 import type { UnknownDataFrame } from "@utils";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
@@ -55,6 +56,7 @@ export function ScatterChart({
       xAxisLabel={isSingleSeries && firstSeries ? firstSeries.xKey : undefined}
       yAxisLabel={isSingleSeries && firstSeries ? firstSeries.key : undefined}
       withLegend
+      valueFormatter={formatChartNumber}
     />
   );
 }

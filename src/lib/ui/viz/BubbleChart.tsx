@@ -22,6 +22,7 @@ import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import type { UnknownDataFrame } from "@utils";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 
@@ -73,10 +74,30 @@ export function BubbleChart({
           margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
         >
           <CartesianGrid />
-          <XAxis dataKey="x" type="number" name="x" />
-          <YAxis dataKey="y" type="number" name="y" />
+          <XAxis
+            dataKey="x"
+            type="number"
+            name="x"
+            tickFormatter={(value) => {
+              return formatChartNumber(value, { compact: true });
+            }}
+          />
+          <YAxis
+            dataKey="y"
+            type="number"
+            name="y"
+            width={64}
+            tickFormatter={(value) => {
+              return formatChartNumber(value, { compact: true });
+            }}
+          />
           <ZAxis dataKey="z" type="number" range={BUBBLE_SIZE_RANGE} />
-          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+          <Tooltip
+            cursor={{ strokeDasharray: "3 3" }}
+            formatter={(value: unknown) => {
+              return formatChartNumber(value);
+            }}
+          />
           {showLegend ?
             <Legend />
           : null}

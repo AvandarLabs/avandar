@@ -1,3 +1,4 @@
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle";
 import type {
   CartesianGridProps,
@@ -8,6 +9,21 @@ import type {
 
 const DEFAULT_TICK_FONT_SIZE = 12;
 const DEFAULT_AXIS_LABEL_OFFSET = -10;
+
+/**
+ * Default Y-axis width that fits compact-formatted ticks (`1.5M`, `999.99B`)
+ * plus a small margin. Mantine's default is too narrow for any reasonable
+ * numeric scale and clips the labels.
+ */
+const DEFAULT_Y_AXIS_WIDTH = 64;
+
+/**
+ * Format Y-axis ticks compactly so labels stay narrow regardless of
+ * magnitude — `1.5K`, `2.3M`, `1.5B`. Tooltip / table use the verbose form.
+ */
+function _formatYAxisTick(value: unknown): string {
+  return formatChartNumber(value, { compact: true });
+}
 
 /**
  * Mantine GridChartBaseProps subset that the chart wrappers forward.
@@ -55,7 +71,10 @@ export function applyChartStyle(
     };
   }
 
-  const yAxisProps: Omit<YAxisProps, "ref"> = {};
+  const yAxisProps: Omit<YAxisProps, "ref"> = {
+    tickFormatter: _formatYAxisTick,
+    width: DEFAULT_Y_AXIS_WIDTH,
+  };
   if (yAxisStyle?.tickColor !== undefined) {
     yAxisProps.tick = {
       fill: yAxisStyle.tickColor,
