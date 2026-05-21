@@ -1,0 +1,249 @@
+# `ALL_FEATURES.md` — features on `feat/ict4d-demo` not on `develop`
+
+> **Status: DRAFT — Session 1 (2026-05-21).** This list was assembled
+> from `docs/ict4d-demo/CHECKPOINTS.md`, `docs/ict4d-demo/FEATURE_CHECKLIST.md`,
+> the `docs/superpowers/` spec/plan titles, the 78-commit non-merge log
+> on the delta, and `git diff --stat` of the 896-file diff. It has
+> **not yet been validated against the codebase** — Session 2 (see
+> `PLAN_OF_PLANS.md`) does that pass.
+
+## How to read this
+
+Each row is a feature — a logical unit of capability that will land
+in one reviewable PR. Rows are categorized for human navigation; the
+index column is global so rows can be reshuffled without renumbering.
+
+Legend:
+- `[ ]` — not started (no `NNN-feature-slug.md` exists yet)
+- `[~]` — migration in progress (refactor branch exists, not merged)
+- `[x]` — completed (merged into `develop`; merge SHA in parens)
+
+Status updates happen in `PLAN_OF_PLANS.md` (planning side) and here
+(per-feature completion side). The operator drives both.
+
+Schemas, migrations, and generated TypeScript model files are
+**out of scope** for this list: they belong to Phase 1 (operator-
+driven, one-shot). Every per-feature migration assumes Phase 1 is
+already complete.
+
+---
+
+## A. Data ingestion & dataset management
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 1 | `[ ]` | **async-dataset-import-pipeline** — Streaming CSV/XLSX import via Web Worker, parquet output, two-phase async import with resume + status tracking. Replaces the synchronous upload path. | CHECKPOINT 1 (PRs #234/#235/#236); `docs/superpowers/plans/2026-05-19-async-dataset-import.md`; many commits in the `claude/async-dataset-import` branch series |
+| 2 | `[ ]` | **app-wide-dropzone** — Drop a CSV/XLSX anywhere in the workspace to open the dataset-import flow. Mounted globally inside `<ChatPanelProvider>` in `WorkspaceLayout`. | CHECKPOINT 1 (PR #224) |
+| 3 | `[ ]` | **dataset-drawer** — Replace the modal "Open Dataset" with a tabbed drawer (Saved / Import), with per-virtual-dataset save guards. Slide-from-bottom transition variants. | CHECKPOINT 1 (PR #229); commits `2ce199a`, `09c24af` |
+| 4 | `[ ]` | **dataset-upload-fixes** — Misc fixes to the dataset upload path (parser, status tracking) discovered after the initial import landing. | Commits `da43443`, `673419e` |
+| 5 | `[ ]` | **xlsx-column-inference** — Improvements to XLSX sniffer worker (`src/workers/xlsxSniff.worker.ts`) so columns infer correctly. | CHECKPOINT 1 conflict-resolution notes; part of #234 stack |
+| 6 | `[ ]` | **google-sheets-import-resilience** — `GoogleSheetsImportView` updated for the new async pipeline (`startCsvImport` / `startXlsxImport`). | CHECKPOINT 1 type-error fixes (merge commit `2a67c767`) |
+| 7 | `[ ]` | **resync-dataset-card** — `ResyncDatasetCard.tsx` rewritten for the new async pipeline. | CHECKPOINT 1 type-error fixes |
+
+## B. Data Explorer UX
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 8 | `[ ]` | **floating-query-windows** — Draggable, collapsible Query Details and Visualization Settings floating windows on top of the Data Explorer canvas. | CHECKPOINT 1 (PR #228) |
+| 9 | `[ ]` | **viz-multi-series** — Multi-series visualizations: bar/line/area + scatter + bubble with per-series xKey/yKey/sizeKey; axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527` |
+| 10 | `[ ]` | **viz-settings-fieldsets** — Visualization Settings restructured into labelled fieldsets matching the design doc. | `docs/superpowers/specs/2026-05-21-sql-pills-viz-settings-design.md`; commit `4e85af6` |
+| 11 | `[ ]` | **codemirror-sql-editor** — CodeMirror-based SQL editor in the Data Explorer (replaces the prior textarea), supporting dataset/column pills inline. | Commit `314f8a9`; sql-pills design spec |
+| 12 | `[ ]` | **sql-pill-rendering** — Render dataset names and column names as pills inside the read-only SQL block (`AvaSqlBlock`); editable pill dropdowns when the SQL is editable; widened dropdown. | Commits `4e85af6`, `6febbcf`, `a01db18` |
+| 13 | `[ ]` | **chart-number-formatting** — Centralized formatting helper used across the chart layer for big-number columns, locale-aware. | Commits `57c5803`, `c8fb6b6` |
+| 14 | `[ ]` | **chart-color-picker-fix** — Color picker behavior + chart rendering fixes for big-number columns. | Commit `c8fb6b6` |
+
+## C. Chat panel core fixes & UX
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 15 | `[ ]` | **chat-disabled-visual-feedback** — Chat composer visibly disabled on pages where chat is not available (dim background + placeholder copy). Includes the transparency fix on top of the dark navbar gradient. | CHECKPOINT 1 (PR #232); CHECKPOINT 8 (publish modal polish notes) |
+| 16 | `[ ]` | **chat-context-memo-fix** — Memoize `useChatPageContext` by content (pathname/openDatasetId/rawSQL/lastQueryError) to stop the assistant-ui runtime from being thrashed; fixes the "canvas stops updating after multi-turn" bug (#29). | CHECKPOINT 2; FEATURE_CHECKLIST #29 |
+| 17 | `[ ]` | **chat-empty-state-improvements** — Improved empty-chat-state rendering (suggested prompts, no jumpy layout) merged with i18n suggestion prompts. | Commits `8ca7ce9`, `661511a` |
+| 18 | `[ ]` | **chat-try-again-and-retry-on-empty** — Per-turn "Try Again" button on chat replies; automatic retry-on-empty so transient backend hiccups don't leave the user staring at silence. | Commit `1e7d335` |
+| 19 | `[ ]` | **chat-recover-sql-without-tool-call** — When the model returns SQL in its message body but skipped the `generateSql` tool, recover the SQL and apply it anyway. | Commit `381b07d` |
+| 20 | `[ ]` | **chat-multi-dataset-clarification** — When 2+ datasets could plausibly answer a question, force a clarification asking which dataset to use before generating SQL. | Commit `2359378` |
+| 21 | `[ ]` | **chat-better-pblock-generation** — Improvements to AI-driven P-block generation for chat-in-dashboards (column resolution, viz type heuristics). | Commits `c3e63d6`, `a01db18` |
+
+## D. Chat interactive workflows — Phase 0 (privacy guardrails)
+
+The chat-interactive-workflows spec is
+`docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
+Phases 0-9 cumulatively land below.
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 22 | `[ ]` | **privacy-pii-detector** — Column-name keyword + content regex layers (email, SSN, Luhn CC, IBAN, IP, DOB, address). `src/lib/privacy/piiDetector.ts` with 16 unit tests. | CHECKPOINT 4 |
+| 23 | `[ ]` | **privacy-bias-detector** — Gender / ethnic / cultural / loaded-framing / statistical-assumption rules with curated suggestions. `src/lib/privacy/biasDetector.ts` with 11 unit tests. | CHECKPOINT 4 |
+| 24 | `[ ]` | **privacy-consent-modal** — Modes A/B/C/D/E (clean / PII / bias / composite / medical-strict typed phrase). `src/components/Privacy/ConsentModal/`. | CHECKPOINT 4 + 5 |
+| 25 | `[ ]` | **privacy-crossboundary-hmac** — `crossBoundary` API as the single chokepoint, HMAC-signed ack tokens with replay protection, `UNAPPROVED_DATA_TRANSFER` rejection on the server, ESLint chokepoint guard. | CHECKPOINT 5; CHECKPOINT 9b ESLint guard |
+| 26 | `[ ]` | **privacy-audit-log-page** — Dexie-backed consent audit log + `/settings/privacy/log` page with filter, CSV export, clear. Metadata-only. | CHECKPOINT 5 |
+| 27 | `[ ]` | **privacy-discovery-spanish-french-stubs** — Locale stub files for Spanish + French patterns (UX copy translated; patterns themselves pending advisor review). | CHECKPOINT 5 |
+| 28 | `[ ]` | **privacy-isrowdatamessage-helper** — Server helper that detects row-shaped messages (for Phase 2+ values-scope enforcement). | CHECKPOINT 5 |
+
+## E. Chat interactive workflows — Phases 1-9
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 29 | `[ ]` | **chat-clarify-tool** — `clarify` tool registered alongside `generateSql` with a 3-turn cap; system-prompt clarification block. | CHECKPOINT 4 |
+| 30 | `[ ]` | **chat-clarification-card-and-bias-check** — Inline `ClarificationCard` (free-text / fixed-options-single / fixed-options-multi), keyboard behavior, bias check on outgoing user messages + on LLM clarification questions. | CHECKPOINT 4 + 5 |
+| 31 | `[ ]` | **chat-clarification-telemetry** — Separate Dexie DB `AvandarClarificationAuditDB`, recordShown/recordOutcome with timing, Privacy log "Clarifications" sub-tab. | CHECKPOINT 5 + 9b |
+| 32 | `[ ]` | **chat-discovery-clarifications** — Phase 2: LLM emits a read-only `SELECT DISTINCT`, dropdown populates from local DuckDB, selection routes through `crossBoundary` with `discovery_clarification` context. Shared `isReadOnlyDiscoveryQuery` validator. | CHECKPOINT 9b |
+| 33 | `[ ]` | **chat-plan-propose** — Phase 3: `proposePlan` tool with ≤8-step plans, schema-validated server-side; `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle (`step_<id>`). | CHECKPOINT 9b + 10 |
+| 34 | `[ ]` | **chat-plan-canvas** — xyflow visual DAG canvas with `RoughEdge` (RoughJS-styled bezier), custom `PlanStepNode`, animated zoom-in/zoom-out via `fitView`+`setCenter`, Auto/Step run-mode toggle. | CHECKPOINT 10 |
+| 35 | `[ ]` | **chat-plan-step-materialization** — `planStepStorage.ts` Dexie DB keyed by `(planId, stepId)`; explicit cleanup on Close / replace / new `proposePlan`; **no OPFS**. | CHECKPOINT 10 |
+| 36 | `[ ]` | **chat-plan-virtual-dataset-persistence** — Save-as-virtual-dataset persists the full plan in a new `plan_steps` JSONB column; reopening rehydrates the plan and re-registers cached parquet blobs (`rehydratePlan` + `loadParquet`). | CHECKPOINT 10 |
+| 37 | `[ ]` | **chat-plan-schema-drift-regen** — Phase 4: `isSchemaDrift` strict comparator + `findAffectedDownstream` BFS; `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool; frontend regen loop with ≤2-attempt cap per step. | CHECKPOINT 10 |
+| 38 | `[ ]` | **chat-plan-branching** — Phase 5: `PlanBranchStateManager` + `PlanBranchSidebar` + "Branch from here" CTA on succeeded steps. (Per-branch chat thread + virtual-dataset persistence intentionally deferred upstream.) | CHECKPOINT 15 |
+| 39 | `[ ]` | **chat-plan-python-sandbox** — Phase 6: Sandboxed iframe at `/sandbox-executor.html` with strict CSP + pre-boot network stubs, lazy Pyodide load, parquet bridge via `pyarrow`, `sandboxClient`/`sandboxProtocol`, 30 s default timeout. WebR explicitly deferred. | CHECKPOINT 15 |
+| 40 | `[ ]` | **chat-plan-approval-gate** — `approvalStatus: awaiting_approval | approved | rejected`; Approve/Reject banner blocks auto-run; >7-SQL-step heuristic suggests Python/R. | CHECKPOINT 15 |
+| 41 | `[ ]` | **chat-plan-annotations** — Phase 9: `PlanAnnotationStateManager` (text/sticky/arrow/pen via perfect-freehand), `PlanCanvasToolbar`, `PlanAnnotationOverlay` sharing xyflow viewport, RoughJS arrows, 50-deep undo/redo, `AvandarPlanAnnotationDB` Dexie persistence. | CHECKPOINT 15 |
+| 42 | `[ ]` | **chat-plan-png-pdf-export** — PNG export via `html-to-image` (toolbar/minimap excluded); PDF export via dynamic-imported `@react-pdf/renderer` — page 1 overview + one page per step (description / code / status / schema / row count). | CHECKPOINT 15 |
+| 43 | `[ ]` | **chat-multi-language-plans** — `proposePlan` `type` enum accepts `sql | python | r | clarification`; executor dispatches by type. R returns error today (Python only registered in `availableRuntimes`). | CHECKPOINT 15 |
+
+## F. Manual querying & SQL form
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 44 | `[ ]` | **sql-to-structured-query** — `node-sql-parser` driven `sqlToStructuredQuery` that projects arbitrary SELECT statements onto `PartialStructuredQuery`. Returns `{ query, isFullyMapped, unmappedReasons }`. 12 unit tests. | CHECKPOINT 7; `docs/demo-features/sql-parser-filter-ui.md` |
+| 45 | `[ ]` | **structured-query-to-sql** — Knex-based form-to-SQL renderer extracted from `toRawDuckDBQuery` into a reusable utility. Also renders the new WHERE clause. 5 unit tests. | CHECKPOINT 7 |
+| 46 | `[ ]` | **recursive-filter-ui** — `QueryFiltersField` powered by `react-querybuilder` + `@react-querybuilder/mantine`; nested AND/OR groups; library-agnostic `QueryFilterGroup` shape. | CHECKPOINT 7 |
+| 47 | `[ ]` | **sql-form-sync-data-explorer** — Bidirectional sync: `applySqlMapping` updates `isStructuredQueryInSync` + `sqlSyncWarnings`, manual edits regenerate SQL, out-of-sync confirmation Alert. | CHECKPOINT 7 |
+| 48 | `[ ]` | **sql-form-sync-dashboards** — Per-block `useDashboardManualQueryState` hook giving DataViz blocks the same SQL ↔ form parity as Data Explorer; 3-tab `NLQueryPField` (Prompt / Manual / SQL). | CHECKPOINT 16 |
+| 49 | `[ ]` | **duckdb-sql-parser-updates** — Parser-side updates so DuckDB-specific SQL parses correctly. | Commit `673419e` |
+
+## G. Multilingual voice dictation
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 50 | `[ ]` | **voice-web-whisper** — Mic button in chat composer, `@huggingface/transformers` Whisper (tiny/base/small), IndexedDB-backed `AvandarVoiceModelCache`, MediaRecorder → 16 kHz Float32 pipeline, consent modal with language picker, floating bottom-left progress indicator. | CHECKPOINT 11 |
+| 51 | `[ ]` | **voice-desktop-whispercpp** — `smart-whisper` (whisper.cpp via N-API) in Bun-main; disk-backed cache under `<userData>/whisper-models/`; IPC contracts (`VoiceContracts.*`); `DesktopVoiceModelManager` polling `voice.getStatus`; Medium / Large v3 / Large v3 Turbo gated to desktop. | CHECKPOINT 12 (desktop voice) |
+| 52 | `[ ]` | **voice-platform-factory** — `voiceModelManagerFactory.ts` returns the right backend so React code stays platform-agnostic. | CHECKPOINT 12 (desktop voice) |
+| 53 | `[ ]` | **voice-per-file-progress** — Per-file download progress tracking in the voice download indicator. | Commit `82fdc1b` |
+| 54 | `[ ]` | **voice-wasm-worker-path** — Parallel whisper.cpp WASM voice pipeline running in a Web Worker (alternative web path with better isolation). | Commit `ef5bd0a` |
+| 55 | `[ ]` | **voice-ui-polish** — Voice transcription UI updates (modal styling, badges, swahili-specific hint). | Commits `5a1a3bb`, `a8f96c9`, `1e7d335` (swahili hint), `91137e6` (offline badges) |
+
+## H. Desktop platform & offline (web + desktop)
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 56 | `[ ]` | **desktop-platform-registry** — Module-level `getPlatformImpls`/`setPlatformImpls`; `PlatformProvider` publishes resolved impls; throws loudly if read before mount. | CHECKPOINT 9 (desktop) |
+| 57 | `[ ]` | **desktop-web-platform-impls** — `createWebDuckDbClient` real wrapper around legacy `DuckDbClient` singleton; `createWebDatasetBlobStore` Dexie-backed `LocalDataset` store; loud throws for not-yet-migrated paths. | CHECKPOINT 9 (desktop) |
+| 58 | `[ ]` | **desktop-offline-session** — `AuthClient` desktop polyfill routing through keychain-backed `DesktopAuthProvider`; cached access token survives offline relaunch; `signOut` clears both keychain entries. | CHECKPOINT 9 (desktop) |
+| 59 | `[ ]` | **desktop-bootstrap-snapshot** — `onAuthenticated` hook in `registerAuthHandlers`; first-launch fetches every syncable table into local SQLite. Idempotent. | CHECKPOINT 9 (desktop) |
+| 60 | `[ ]` | **desktop-duckdb-offline-fix** — Fixes so duckdb-wasm works correctly on the desktop offline path. | Commit `2e26626` |
+| 61 | `[ ]` | **web-offline-mode** — PWA + service worker, React Query persistence (`avandar-react-query-cache`), UI gates / disabled controls when offline, offline banners. | `docs/demo-features/web-offline-mode.md`; `docs/superpowers/plans/2026-05-20-web-read-only-offline-mode-demo.md`; commits `c597869`, `7740537`, `207d422` |
+| 62 | `[ ]` | **web-offline-webllm-chat** — Local WebLLM-based chat with multi-pass local inference. `releaseLoadedPipeline` lifecycle. E2E verification fixtures. | `docs/superpowers/plans/2026-05-20-offline-webllm-chat.md`; commits `d515040`, `2d60b41`, `8744137` |
+| 63 | `[ ]` | **offline-chat-sql-hardening** — Misc hardening on the offline-chat SQL path (validation, fallback). | `docs/offline-chat-sql-hardening.md` |
+
+## I. Dashboards — polish & design tokens
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 64 | `[ ]` | **dashboard-design-tokens** — `AvaPageRootProps` gains `theme` (default/ocean/forest/rose/amber/graphite) and `typography` (system/serif/mono); polished header (left-accent strip, tighter title leading, uppercase byline); polished DataViz card. | CHECKPOINT 9 (dashboards) |
+| 65 | `[ ]` | **dashboard-chat-in-editor** — `addDashboardBlock` tool; `DashboardEditorStateManager` queues blocks; chat composer unlocked on dashboards surface; `buildPendingDataVizBlock`. | CHECKPOINT 9 (dashboards) |
+| 66 | `[ ]` | **dashboard-export-buttons-polish** — Updated dashboard buttons and export UI styling. | Commits `9d4ac78`, `7abad7d` |
+| 67 | `[ ]` | **dashboard-modal-styles** — Modal style refresh used by dashboards (Publish, Export, etc.). | Commit `98dc225`, `5eed96a` |
+
+## J. Dashboards — filters
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 68 | `[ ]` | **dashboard-global-filters** — `Filter` P-block (single-select, multi-select, contains); `DashboardFilterStateManager`; `applyDashboardFiltersToSql` subselect wrap. | CHECKPOINT 9 (dashboards) |
+| 69 | `[ ]` | **dashboard-per-viz-filters** — Per-viz global-filter All/Some/None opt-out; per-viz local filters with independent state; `AvaPageDataMigrationV4` seeds defaults on every DataViz block. | CHECKPOINT 14 |
+
+## K. Dashboards — publishing & sharing
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 70 | `[ ]` | **dashboard-view-before-publish** — Auth-gated preview route `/<workspaceSlug>/dashboards/preview/<dashboardId>` with "Back to editor" banner; `mode: "public" \| "preview"` prop on `DashboardViewerView`. | CHECKPOINT 6 |
+| 71 | `[ ]` | **dashboard-publish-modal** — Real modal replaces confirm dialog. URL-first copy ("Your dashboard will be published to: <url>"). | CHECKPOINT 6 + CHECKPOINT 8 polish |
+| 72 | `[ ]` | **dashboard-vanity-url** — Kebab-case slug input + live preview; `toVanitySlug` utility with 8 unit tests; public route `/d/<workspaceSlug>/<slug>` with workspace-scoped uniqueness. | CHECKPOINT 6 + 8 |
+| 73 | `[ ]` | **dashboard-share-url-row-qr** — `ShareUrlRow` shows canonical + vanity URLs with copy buttons; downloadable 256×256 QR PNG via `qrcode` library (client-side, no network). | CHECKPOINT 6 |
+| 74 | `[ ]` | **dashboard-slice-aware-publish** — `Data scope` section with `queried` (default, narrowest) / `all_columns` / `custom` modes; `node-sql-parser` `columnList` extracts referenced columns; `unparseable` sentinel for safe fallback; `buildSliceSql` materializes the slice; persists in `dashboard.config.__publishConfig`. | CHECKPOINT 13 |
+| 75 | `[ ]` | **dashboard-pdf-export-annotate** — `ExportPdfButton` next to Publish; two-step modal (export immediately / annotate then export); off-screen render via `<PuckPageRender>` + `html2canvas` 2× → `jspdf` paginated portrait letter; annotator with freehand/arrow/text (RoughJS), roughness/stroke/color sliders, undo+clear, composited before pagination. | CHECKPOINT 13 |
+
+## L. Dataset summary view
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 76 | `[ ]` | **summary-view-redesign** — `DatasetSummaryView` doc-style outline with sticky TOC, one section per column with plain-language headline + type-appropriate viz (text/number/date), missing-rate `RingProgress` when nonzero, lazy `getColumnSummary` via `useIntersection` 200px margin. New `getDatasetMeta`/`getColumnSummary` on `DatasetQueryClient`. | CHECKPOINT 6 |
+
+## M. Analytics
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 77 | `[ ]` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. | CHECKPOINT 3 + 9 + 13 |
+
+## N. i18n / Lingui
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 78 | `[ ]` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). | CHECKPOINT 12 |
+| 79 | `[ ]` | **workspace-language-picker** — Workspace Settings "Language" tab, `WorkspaceI18nProvider`, `useLanguagePreference` (per-workspace localStorage), Mantine `DirectionProvider` keyed on locale for RTL. | CHECKPOINT 12 |
+| 80 | `[ ]` | **i18n-translate-llm-script** — `scripts/i18n/translateWithLLM.ts` rewritten to use OpenAI Chat Completions; real CLI with `--help`/`--scope`/`--locale`/`--all`/`--model`/`--dry-run`; preserves PO comments + refs; 32 vitest tests. | CHECKPOINT 12.5 |
+| 81 | `[ ]` | **frontend-lingui-wiring** — Wire remaining frontend to Lingui beyond Workspace Settings; translations populated across all 7 non-source locales for the in-scope surfaces. | Commits `c93ad08`, `c3e63d6`, `b161920`, `4f8f00f`, `efa8211` |
+| 82 | `[ ]` | **i18n-catalogs-formatter** — Pre-PR formatter applied to i18n catalogs so prettier doesn't fight regeneration. | Commit `31a166d` |
+
+## O. Billing / subscriptions (PTRCK series)
+
+This whole series only exists on `feat/ict4d-demo` — develop has no
+matching PTRCK history.
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 83 | `[ ]` | **billing-native-free** — Create native free subscriptions without Polar checkout; subscription permission authz; merge fetch-and-sync onto native free rows. | Commits `7accd7f`, `dae6bfb`, `062659e` |
+| 84 | `[ ]` | **billing-internal-subscription-id** — Internal subscription row id added; permission checks use internal id; nullable Polar fields. | Commits `680f551`, `a8d1b38`, `be2bdeb`, migration `20260511120000_subscriptions_internal_id_pk.sql` |
+| 85 | `[ ]` | **billing-polar-checkout-merge** — Merge Polar checkout onto existing native free subscription rows. | Commit `ed5b52d` |
+| 86 | `[ ]` | **billing-e2e-coverage** — Playwright coverage for native free + Polar checkout flows; E2E workspace seeded with native free subscription. | Commits `56dddde`, `1f574f1`, `3f9f08c`, `504eb8c` |
+| 87 | `[ ]` | **supabase-preview-shared-import-map** — Fixes Supabase Preview shared/ import map resolution + edge function bundling so the billing edge worker boots in Preview. | Commits `3b2c171`, `c278a42`, `7fdff75` |
+| 88 | `[ ]` | **billing-qa-regression-fixes** — Misc QA regressions on native free billing + edge workers (test fixtures, formatter, phantom shared/lib/types fix). | Commits `2eda2d4`, `1293836`, `c24a38c`, `0a1eb30`, `72ec020`, `331e6ae`, `5543169`, `eda9bd7` |
+| 89 | `[ ]` | **playwright-install-docs** — Document Playwright browser install for local e2e runs. | Commit `eda9bd7` |
+
+## P. Profile page
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 90 | `[ ]` | **profile-page-redesign** — Redesigned profile page (AppLayout + sectioned identity / account / security layout); `UserClient.updateProfile` mutation for workspace-scoped display name; typography normalized in workspace-name dropdown. (Worktree merge commit `20cfc1b` also brought in `.agents/skills/` files — those are tooling noise, NOT part of this migration.) | Merge commit `20cfc1b` |
+
+## Q. Documentation (deslop scope only)
+
+These docs exist on `feat/ict4d-demo` and provide context for the
+above features. They should be brought across in bulk via a single
+docs migration; they are not features themselves.
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 91 | `[ ]` | **docs-ict4d-demo-history** — Copy `docs/ict4d-demo/CHECKPOINTS.md`, `FEATURE_CHECKLIST.md`, `random-thoughts.md` to develop **read-only** as historical record (or decide to leave them only on `feat/ict4d-demo`). Operator decision required. | Existing on source |
+| 92 | `[ ]` | **docs-superpowers-specs-plans** — Copy `docs/superpowers/specs/` and `docs/superpowers/plans/` to develop as the canonical spec/plan history. | Existing on source |
+| 93 | `[ ]` | **docs-demo-features** — Copy `docs/demo-features/` (web-offline-mode, sql-parser-filter-ui, desktop-offline-session) plus `docs/offline-chat-sql-hardening.md`, `docs/permissions-architecture.md`, `docs/avandar-packages.md`, `docs/adding-new-data-source-types.md`. | Existing on source |
+
+---
+
+## Things Session 2 should specifically verify
+
+- [ ] Confirm whether every PTRCK-NN commit really is unique to
+  `feat/ict4d-demo`. Spot-checked `subscriptions_internal_id_pk`
+  migration — yes — but a full sweep is worth doing in case
+  some PTRCK work was already cherry-picked onto develop.
+- [ ] Confirm the profile-page redesign isn't already on develop by
+  another route (no commits found in Session 1, but worth a
+  re-check via `git log origin/develop -- src/views/Profile*`).
+- [ ] Check whether `docs/ict4d-demo/CHECKPOINTS.md` claims of
+  shipped features ("✅") are all really represented in the diff.
+  Two suspicious gaps:
+  - **#28 dataset types `datasets__pdf` / `datasets__image`** —
+    FEATURE_CHECKLIST has this as `[ ]` not started, so no
+    migration row is needed. Confirm none of the schema additions
+    on the delta accidentally ship a stub for it.
+  - **#11 dashboard media embed** — same; explicitly deferred.
+- [ ] Decide granularity for the chat workflows phases (currently
+  one row per "logical chunk" — e.g. Phase 0 is split into 7 rows
+  but Phase 9 is 2 rows). If Phase 0 should be one big-bang
+  migration instead, merge those rows.
+- [ ] Add any commit-only features that Session 1 missed. The 78
+  non-merge commits include many vague ones — `more fixes`,
+  `changes`, `fixes` — that may hide work. Walk each one and
+  attribute it (or confirm it's noise).
+
+When Session 2 has done these checks, update the header marker
+from `DRAFT — Session 1` to `validated — Session N (YYYY-MM-DD)`.
