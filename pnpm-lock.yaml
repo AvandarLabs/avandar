@@ -486,6 +486,9 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.13)(@types/node@22.19.19)(happy-dom@20.9.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.47.1)(tsx@4.21.0)
+      workbox-window:
+        specifier: 7.4.1
+        version: 7.4.1
 
   apps/ava-cli:
     dependencies:

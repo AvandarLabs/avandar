@@ -71,7 +71,7 @@ export default defineConfig(({ mode }) => {
             registerType: "autoUpdate",
             injectRegister: false,
             workbox: {
-              globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,wasm}"],
+              globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
               maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
               navigateFallback: "/index.html",
               navigateFallbackDenylist: [/^\/functions\//, /^\/auth\//],
@@ -116,6 +116,25 @@ export default defineConfig(({ mode }) => {
                     expiration: {
                       maxEntries: 30,
                       maxAgeSeconds: 30 * 24 * 60 * 60,
+                    },
+                    cacheableResponse: { statuses: [0, 200] },
+                  },
+                },
+                {
+                  // Self-hosted DuckDB core WASM (mvp + eh variants, ~35 MB
+                  // each). Excluded from precache to keep first-load egress
+                  // small; CacheFirst means the first user who triggers
+                  // DuckDB pays the download once, then it's served from
+                  // cache and works offline thereafter.
+                  urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) => {
+                    return sameOrigin && url.pathname.endsWith(".wasm");
+                  },
+                  handler: "CacheFirst" as const,
+                  options: {
+                    cacheName: "app-wasm",
+                    expiration: {
+                      maxEntries: 10,
+                      maxAgeSeconds: 90 * 24 * 60 * 60,
                     },
                     cacheableResponse: { statuses: [0, 200] },
                   },
