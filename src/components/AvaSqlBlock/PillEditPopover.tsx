@@ -1,8 +1,8 @@
 import { Combobox, useCombobox } from "@mantine/core";
+import { computeSqlScope } from "$/lib/sql/sqlScope";
 import { useEffect, useRef } from "react";
-import { computeSqlScope } from "$/lib/sql/sqlScope.ts";
-import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension.ts";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
 type PillEditPopoverProps = {
   pill: SqlPillClickInfo | null;
@@ -130,6 +130,7 @@ export function PillEditPopover({
       <Combobox
         store={combobox}
         position="bottom-start"
+        width={240}
         withinPortal
         onOptionSubmit={(value) => {
           const option = options.find((o) => {
@@ -149,7 +150,10 @@ export function PillEditPopover({
             }}
           />
         </Combobox.Target>
-        <Combobox.Dropdown data-testid="ava-sql-pill-options">
+        <Combobox.Dropdown
+          data-testid="ava-sql-pill-options"
+          style={{ minWidth: 220 }}
+        >
           <Combobox.Options>
             {ungrouped.map((opt) => {
               return (

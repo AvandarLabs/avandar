@@ -19,7 +19,7 @@
 }
 
 .root :global(.cm-line) {
-  line-height: 1.75;
+  line-height: 1.55;
 }
 
 .rootReadOnly {
