@@ -1,10 +1,13 @@
 import { sql } from "@codemirror/lang-sql";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createSqlDisplayExtension } from "@/lib/sql/createSqlDisplayExtension.ts";
+import {
+  createSqlDisplayExtension,
+  type SqlPillClickInfo,
+} from "@/lib/sql/createSqlDisplayExtension.ts";
 import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension.ts";
 import css from "./SqlEditor.module.css";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
@@ -19,6 +22,18 @@ export type SqlEditorProps = {
   readOnly?: boolean;
   /** Approximate minimum visible rows (maps to editor min-height). */
   minRows?: number;
+  /**
+   * Fires when the user clicks a pill in editable mode. The caller is
+   * expected to show an edit popover and dispatch a replacement transaction
+   * via the view ref received in {@link onEditorReady}.
+   */
+  onPillClick?: (info: SqlPillClickInfo) => void;
+  /**
+   * Called once the underlying {@link EditorView} is constructed. Use the
+   * view to dispatch transactions (for example, when committing a pill
+   * replacement from a popover).
+   */
+  onEditorReady?: (view: EditorView) => void;
   "data-testid"?: string;
 };
 
@@ -32,10 +47,14 @@ export function SqlEditor({
   catalog,
   readOnly = false,
   minRows = 6,
+  onPillClick,
+  onEditorReady,
   "data-testid": dataTestId,
 }: SqlEditorProps): JSX.Element {
   const catalogRef = useRef(catalog);
   catalogRef.current = catalog;
+  const onPillClickRef = useRef(onPillClick);
+  onPillClickRef.current = onPillClick;
 
   const [editorView, setEditorView] = useState<EditorView | null>(null);
 
@@ -44,12 +63,18 @@ export function SqlEditor({
   }, []);
 
   const buildCatalogExtensions = useMemo(() => {
-    return (): Array<ReturnType<typeof createSqlDisplayExtension>> => {
+    return (): Extension[] => {
       const getCatalog = (): SqlDisplayCatalog => {
         return catalogRef.current;
       };
+      const pillsEditable = !readOnly;
       return [
-        createSqlDisplayExtension(getCatalog),
+        createSqlDisplayExtension(getCatalog, {
+          editable: pillsEditable,
+          onPillClick: (info) => {
+            onPillClickRef.current?.(info);
+          },
+        }),
         ...(readOnly ? [] : [createSqlMentionExtension(getCatalog)]),
       ];
     };
@@ -87,6 +112,7 @@ export function SqlEditor({
         onChange={onChange}
         onCreateEditor={(view) => {
           setEditorView(view);
+          onEditorReady?.(view);
         }}
         readOnly={readOnly}
         basicSetup={{

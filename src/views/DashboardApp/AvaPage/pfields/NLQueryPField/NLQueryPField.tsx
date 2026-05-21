@@ -12,8 +12,8 @@ import {
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Tabs } from "@ui";
 import { useState } from "react";
-import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
-import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
+import { AvaSqlBlock } from "@/components/AvaSqlBlock";
+import { SqlQueryEditPanel } from "@/components/SqlEditor";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
@@ -190,7 +190,6 @@ function SqlTabPanel({
 }): JSX.Element {
   const { t } = useLingui();
   const [isEditSQLMode, setIsEditSQLMode] = useState(false);
-  const { catalog } = useSqlDisplayCatalog();
 
   return (
     <Stack gap="sm" px="sm">
@@ -241,7 +240,6 @@ function SqlTabPanel({
           {isEditSQLMode ?
             <SqlQueryEditPanel
               initialSql={rawSql}
-              catalog={catalog}
               submitButtonLabel={t`Save and re-run query`}
               cancelButtonLabel={t`Cancel`}
               onSubmit={(newRawSQL) => {
@@ -259,13 +257,7 @@ function SqlTabPanel({
                 border: `1px solid ${mantineColorVar("gray.3")}`,
               }}
             >
-              <SqlEditor
-                value={rawSql}
-                onChange={() => {}}
-                catalog={catalog}
-                readOnly
-                minRows={6}
-              />
+              <AvaSqlBlock value={rawSql} readOnly minRows={6} />
             </Paper>
           }
         </Stack>

@@ -16,7 +16,25 @@ export type ChatApp = "data-explorer" | "data-sources" | "dashboards" | "other";
 export type ChatPageContext = {
   app: ChatApp;
   openDatasetId?: string;
+  /**
+   * The SQL that's currently driving the canvas — whether the assistant
+   * generated it, the user typed it, or it came from a manual form edit.
+   * Always reflects the live document, not just the last assistant
+   * generation. The backend uses this so the next turn knows what the
+   * user is looking at right now.
+   */
   lastSql?: string;
+  /**
+   * The columns of the result the user is currently looking at. Sent
+   * alongside `lastSql` so the model can reason about the current result
+   * schema (which may differ from the dataset schema when the SQL contains
+   * `SELECT`-list projections, aggregations, or `AS` aliases).
+   */
+  lastResultColumns?: ReadonlyArray<{
+    name: string;
+    /** DuckDB type id, e.g. "bigint", "double", "varchar". */
+    dataType: string;
+  }>;
   /**
    * Runtime error message from the most recent SQL execution, if any. Sent
    * so the model can offer to fix the prior SQL when the user asks to

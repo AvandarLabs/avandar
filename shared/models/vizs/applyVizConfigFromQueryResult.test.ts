@@ -118,6 +118,89 @@ describe("applyVizConfigFromQueryResult", () => {
     );
   });
 
+  it("preserves the same-named series across a re-query with new columns", () => {
+    // First query: bar chart with "count" series and "region" x-axis.
+    const initial = applyVizConfigFromQueryResult({
+      vizConfig: {
+        vizType: "bar",
+        xAxisKey: undefined,
+        series: [],
+        layout: "group",
+        withLegend: true,
+      },
+      rawSQL: "SELECT region, count FROM t",
+      query: emptyQuery,
+      columns: cols([
+        { name: "region", dataType: "varchar" },
+        { name: "count", dataType: "bigint" },
+      ]),
+    });
+    expect((initial as { series?: Array<{ key: string }> }).series?.[0]?.key)
+      .toBe("count");
+
+    // Second query: same column names plus a new column. The user-set
+    // "count" series must survive — the bars should still render.
+    const next = applyVizConfigFromQueryResult({
+      vizConfig: initial,
+      rawSQL: "SELECT region, count, total FROM t",
+      query: emptyQuery,
+      columns: cols([
+        { name: "region", dataType: "varchar" },
+        { name: "count", dataType: "bigint" },
+        { name: "total", dataType: "double" },
+      ]),
+    });
+    expect((next as { series?: Array<{ key: string }> }).series?.[0]?.key)
+      .toBe("count");
+  });
+
+  it("falls back to a case-insensitive name match when re-resolving keys", () => {
+    const out = applyVizConfigFromQueryResult({
+      vizConfig: {
+        vizType: "bar",
+        // saved config has "Count" but the new query returned "count"
+        xAxisKey: "Region",
+        series: [{ renderAs: "bar", key: "Count" }],
+        layout: "group",
+        withLegend: true,
+      },
+      rawSQL: undefined,
+      query: { ...emptyQuery, queryColumns: [] },
+      columns: cols([
+        { name: "region", dataType: "varchar" },
+        { name: "count", dataType: "bigint" },
+      ]),
+    });
+    expect((out as { xAxisKey?: string }).xAxisKey).toBe("region");
+    expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
+      "count",
+    );
+  });
+
+  it("drops series whose column is no longer in any form in the result", () => {
+    const out = applyVizConfigFromQueryResult({
+      vizConfig: {
+        vizType: "bar",
+        xAxisKey: "region",
+        series: [
+          { renderAs: "bar", key: "count" },
+          { renderAs: "bar", key: "removed" },
+        ],
+        layout: "group",
+        withLegend: true,
+      },
+      rawSQL: undefined,
+      query: { ...emptyQuery, queryColumns: [] },
+      columns: cols([
+        { name: "region", dataType: "varchar" },
+        { name: "count", dataType: "bigint" },
+      ]),
+    });
+    const series = (out as { series: Array<{ key: string }> }).series;
+    expect(series.length).toBe(1);
+    expect(series[0]!.key).toBe("count");
+  });
+
   it("does not change axes when both are valid in result (2B)", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: {

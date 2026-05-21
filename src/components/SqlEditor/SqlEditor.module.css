@@ -56,3 +56,23 @@
   border: 1px solid var(--mantine-color-gray-4);
   color: var(--mantine-color-gray-9);
 }
+
+:global(.sqlPill--editable) {
+  cursor: pointer;
+}
+
+:global(.sqlPill--editable:hover) {
+  filter: brightness(0.97);
+}
+
+:global(.sqlPill__chevron) {
+  display: inline-flex;
+  font-size: 0.7em;
+  line-height: 1;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+:global(.sqlPill__label) {
+  display: inline-flex;
+}

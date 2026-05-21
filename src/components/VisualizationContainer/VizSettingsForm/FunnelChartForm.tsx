@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { ColorInput, Divider } from "@mantine/core";
+import { ColorInput, Fieldset, Stack } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -16,6 +16,11 @@ type Props = {
   onConfigChange: (newConfig: FunnelChartVizConfig) => void;
 };
 
+/**
+ * Settings form for the funnel chart. Series-equivalent (name + value)
+ * goes first, then per-slice color overrides. Mirrors the pie chart
+ * layout.
+ */
 export function FunnelChartForm({
   fields,
   config,
@@ -51,66 +56,70 @@ export function FunnelChartForm({
   const { nameKey, valueKey } = config;
 
   return (
-    <>
-      <Select
-        allowDeselect
-        data={fieldOptions}
-        label={t`Name column`}
-        value={nameKey}
-        disabled={fieldOptions.length === 0}
-        placeholder={
-          fieldOptions.length === 0 ?
-            t`No columns are available`
-          : t`Select a column`
-        }
-        onChange={(field) => {
-          onConfigChange({ ...config, nameKey: field ?? undefined });
-        }}
-      />
+    <Stack gap="md">
+      <Fieldset legend={t`Series`}>
+        <Stack gap="sm">
+          <Select
+            allowDeselect
+            data={fieldOptions}
+            label={t`Name column`}
+            value={nameKey}
+            disabled={fieldOptions.length === 0}
+            placeholder={
+              fieldOptions.length === 0 ?
+                t`No columns are available`
+              : t`Select a column`
+            }
+            onChange={(field) => {
+              onConfigChange({ ...config, nameKey: field ?? undefined });
+            }}
+          />
 
-      <Select
-        allowDeselect
-        data={numericFieldOptions}
-        label={t`Value column`}
-        value={valueKey}
-        disabled={numericFieldOptions.length === 0}
-        placeholder={
-          numericFieldOptions.length === 0 ?
-            t`There are no numeric columns`
-          : t`Select a column`
-        }
-        onChange={(field) => {
-          onConfigChange({ ...config, valueKey: field ?? undefined });
-        }}
-      />
+          <Select
+            allowDeselect
+            data={numericFieldOptions}
+            label={t`Value column`}
+            value={valueKey}
+            disabled={numericFieldOptions.length === 0}
+            placeholder={
+              numericFieldOptions.length === 0 ?
+                t`There are no numeric columns`
+              : t`Select a column`
+            }
+            onChange={(field) => {
+              onConfigChange({ ...config, valueKey: field ?? undefined });
+            }}
+          />
+        </Stack>
+      </Fieldset>
 
       {sliceNames.length > 0 ?
-        <>
-          <Divider label={t`Slice colors`} mt="sm" mb="xs" />
-          {sliceNames.map((name) => {
-            return (
-              <ColorInput
-                key={name}
-                label={name}
-                value={config.seriesColors?.[name] ?? ""}
-                mt="xs"
-                swatches={CHART_COLOR_SWATCHES}
-                withEyeDropper={false}
-                format="hex"
-                onChange={(value) => {
-                  onConfigChange({
-                    ...config,
-                    seriesColors: {
-                      ...config.seriesColors,
-                      [name]: value || undefined,
-                    } as Record<string, string>,
-                  });
-                }}
-              />
-            );
-          })}
-        </>
+        <Fieldset legend={t`Slice colors`}>
+          <Stack gap="xs">
+            {sliceNames.map((name) => {
+              return (
+                <ColorInput
+                  key={name}
+                  label={name}
+                  value={config.seriesColors?.[name] ?? ""}
+                  swatches={CHART_COLOR_SWATCHES}
+                  withEyeDropper={false}
+                  format="hex"
+                  onChange={(value) => {
+                    onConfigChange({
+                      ...config,
+                      seriesColors: {
+                        ...config.seriesColors,
+                        [name]: value || undefined,
+                      } as Record<string, string>,
+                    });
+                  }}
+                />
+              );
+            })}
+          </Stack>
+        </Fieldset>
       : null}
-    </>
+    </Stack>
   );
 }

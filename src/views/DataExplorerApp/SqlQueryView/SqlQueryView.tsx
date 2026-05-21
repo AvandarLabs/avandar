@@ -2,8 +2,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Button, Group, List, Paper, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
-import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
+import { AvaSqlBlock } from "@/components/AvaSqlBlock";
+import { SqlQueryEditPanel } from "@/components/SqlEditor";
 import { formatSqlForDisplay } from "@/lib/sql/formatSqlForDisplay";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -24,7 +24,6 @@ export function SqlQueryView(): JSX.Element {
     DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
-  const { catalog } = useSqlDisplayCatalog();
   const displaySql = useMemo(() => {
     return formatSqlForDisplay(rawSQL ?? "");
   }, [rawSQL]);
@@ -81,7 +80,6 @@ export function SqlQueryView(): JSX.Element {
       {isEditMode ?
         <SqlQueryEditPanel
           initialSql={rawSQL}
-          catalog={catalog}
           submitButtonLabel={t`Re-run query`}
           cancelButtonLabel={t`Cancel`}
           minRows={SQL_EDITOR_MIN_ROWS}
@@ -92,10 +90,8 @@ export function SqlQueryView(): JSX.Element {
         />
       : <Stack gap="xs">
           <Paper p="sm" className={css.sqlPaper}>
-            <SqlEditor
+            <AvaSqlBlock
               value={displaySql}
-              onChange={() => {}}
-              catalog={catalog}
               readOnly
               minRows={SQL_EDITOR_MIN_ROWS}
               data-testid="sql-query-view-editor"

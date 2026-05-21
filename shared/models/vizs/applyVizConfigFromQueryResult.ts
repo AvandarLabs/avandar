@@ -1,3 +1,4 @@
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -102,13 +103,15 @@ function _sameSeriesKeys(
 }
 
 /**
- * Clears stale axis / series keys missing from the result, then runs
- * `hydrateFromQueryResult` when `shouldHydrateVizFromQueryResult` is true.
- * **2B:** Skips hydration when every primary key remains valid in the
- * result (see `shouldHydrateVizFromQueryResult`).
+ * Reconciles axis / series keys with the latest result columns. Each key is
+ * fed through {@link resolveColumnKey} so case-insensitive matches survive
+ * across re-queries (e.g. an old config with `Count` adapts to a result
+ * column called `count`). Unresolved keys are dropped — the persisted
+ * config will not reference columns the renderer can't find, so the
+ * settings UI never shows ghost references.
  *
- * @param input Current viz, query context, and result columns.
- * @returns The viz config after validation and optional result hydration.
+ * After clearing, `hydrateFromQueryResult` runs when
+ * `shouldHydrateVizFromQueryResult` is true so empty configs get seeded.
  */
 export function applyVizConfigFromQueryResult(
   input: ApplyVizConfigFromQueryResultInput,
@@ -122,9 +125,9 @@ export function applyVizConfigFromQueryResult(
 
   let next: VizConfig = vizConfig;
 
-  const { config: cleared, didChange } = _clearStaleAxisKeys(
+  const { config: cleared, didChange } = _resolveOrClearAxisKeys(
     vizConfig,
-    resultColumnNames,
+    columns,
   );
   if (didChange) {
     next = cleared;
@@ -145,12 +148,13 @@ export function applyVizConfigFromQueryResult(
 }
 
 /**
- * Returns a copy of `vizConfig` with any stale axis / series keys
- * cleared, plus a flag indicating whether any key was cleared.
+ * Returns a copy of `vizConfig` with every axis / series key passed through
+ * {@link resolveColumnKey}: exact match wins, case-insensitive match falls
+ * back to the canonical name, and anything unresolved is dropped.
  */
-function _clearStaleAxisKeys(
+function _resolveOrClearAxisKeys(
   vizConfig: VizConfig,
-  resultColumnNames: ReadonlySet<string>,
+  columns: readonly QueryResultColumn[],
 ): { config: VizConfig; didChange: boolean } {
   if (vizConfig.vizType === "table") {
     return { config: vizConfig, didChange: false };
@@ -166,13 +170,15 @@ function _clearStaleAxisKeys(
     let cleared: VizConfig = vizConfig;
     let didChange = false;
 
-    if (pv.nameKey !== undefined && !resultColumnNames.has(pv.nameKey)) {
-      cleared = { ...cleared, nameKey: undefined } as VizConfig;
+    const nextName = resolveColumnKey(pv.nameKey, columns);
+    if (nextName !== pv.nameKey) {
+      cleared = { ...cleared, nameKey: nextName } as VizConfig;
       didChange = true;
     }
 
-    if (pv.valueKey !== undefined && !resultColumnNames.has(pv.valueKey)) {
-      cleared = { ...cleared, valueKey: undefined } as VizConfig;
+    const nextValue = resolveColumnKey(pv.valueKey, columns);
+    if (nextValue !== pv.valueKey) {
+      cleared = { ...cleared, valueKey: nextValue } as VizConfig;
       didChange = true;
     }
 
@@ -187,16 +193,27 @@ function _clearStaleAxisKeys(
     let cleared: VizConfig = vizConfig;
     let didChange = false;
 
-    if (rv.nameKey !== undefined && !resultColumnNames.has(rv.nameKey)) {
-      cleared = { ...cleared, nameKey: undefined } as VizConfig;
+    const nextName = resolveColumnKey(rv.nameKey, columns);
+    if (nextName !== rv.nameKey) {
+      cleared = { ...cleared, nameKey: nextName } as VizConfig;
       didChange = true;
     }
 
-    const filtered = rv.series.filter((s) => {
-      return resultColumnNames.has(s.key);
-    });
-    if (filtered.length !== rv.series.length) {
-      cleared = { ...cleared, series: filtered } as VizConfig;
+    const remapped: RadarSeries[] = [];
+    for (const s of rv.series) {
+      const resolved = resolveColumnKey(s.key, columns);
+      if (resolved === undefined) {
+        continue;
+      }
+      remapped.push(resolved === s.key ? s : { ...s, key: resolved });
+    }
+    if (
+      remapped.length !== rv.series.length ||
+      remapped.some((s, i) => {
+        return s.key !== rv.series[i]?.key;
+      })
+    ) {
+      cleared = { ...cleared, series: remapped } as VizConfig;
       didChange = true;
     }
 
@@ -211,31 +228,56 @@ function _clearStaleAxisKeys(
     let cleared: VizConfig = vizConfig;
     let didChange = false;
 
-    if (xy.xAxisKey !== undefined && !resultColumnNames.has(xy.xAxisKey)) {
-      cleared = { ...cleared, xAxisKey: undefined } as VizConfig;
+    const nextX = resolveColumnKey(xy.xAxisKey, columns);
+    if (nextX !== xy.xAxisKey) {
+      cleared = { ...cleared, xAxisKey: nextX } as VizConfig;
       didChange = true;
     }
 
-    const filtered = xy.series.filter((s) => {
-      return resultColumnNames.has(s.key);
-    });
-    if (filtered.length !== xy.series.length) {
-      cleared = { ...cleared, series: filtered } as VizConfig;
+    const remapped: XYSeries[] = [];
+    for (const s of xy.series) {
+      const resolved = resolveColumnKey(s.key, columns);
+      if (resolved === undefined) {
+        continue;
+      }
+      remapped.push(resolved === s.key ? s : { ...s, key: resolved });
+    }
+    if (
+      remapped.length !== xy.series.length ||
+      remapped.some((s, i) => {
+        return s.key !== xy.series[i]?.key;
+      })
+    ) {
+      cleared = { ...cleared, series: remapped } as VizConfig;
       didChange = true;
     }
 
     return { config: cleared, didChange };
   }
 
-  // scatter and bubble now use series arrays
   if (vt === "scatter") {
     const sv = vizConfig as { series: readonly ScatterSeries[] };
-    const filtered = sv.series.filter((s) => {
-      return resultColumnNames.has(s.xKey) && resultColumnNames.has(s.key);
-    });
-    if (filtered.length !== sv.series.length) {
+    const remapped: ScatterSeries[] = [];
+    for (const s of sv.series) {
+      const xKey = resolveColumnKey(s.xKey, columns);
+      const yKey = resolveColumnKey(s.key, columns);
+      if (xKey === undefined || yKey === undefined) {
+        continue;
+      }
+      if (xKey === s.xKey && yKey === s.key) {
+        remapped.push(s);
+      } else {
+        remapped.push({ ...s, xKey, key: yKey });
+      }
+    }
+    if (
+      remapped.length !== sv.series.length ||
+      remapped.some((s, i) => {
+        return s.xKey !== sv.series[i]?.xKey || s.key !== sv.series[i]?.key;
+      })
+    ) {
       return {
-        config: { ...vizConfig, series: filtered } as VizConfig,
+        config: { ...vizConfig, series: remapped } as VizConfig,
         didChange: true,
       };
     }
@@ -244,16 +286,33 @@ function _clearStaleAxisKeys(
 
   // bubble
   const bv = vizConfig as { series: readonly BubbleSeries[] };
-  const filtered = bv.series.filter((s) => {
-    return (
-      resultColumnNames.has(s.xKey) &&
-      resultColumnNames.has(s.key) &&
-      resultColumnNames.has(s.sizeKey)
-    );
-  });
-  if (filtered.length !== bv.series.length) {
+  const remapped: BubbleSeries[] = [];
+  for (const s of bv.series) {
+    const xKey = resolveColumnKey(s.xKey, columns);
+    const yKey = resolveColumnKey(s.key, columns);
+    const sizeKey = resolveColumnKey(s.sizeKey, columns);
+    if (xKey === undefined || yKey === undefined || sizeKey === undefined) {
+      continue;
+    }
+    if (xKey === s.xKey && yKey === s.key && sizeKey === s.sizeKey) {
+      remapped.push(s);
+    } else {
+      remapped.push({ ...s, xKey, key: yKey, sizeKey });
+    }
+  }
+  if (
+    remapped.length !== bv.series.length ||
+    remapped.some((s, i) => {
+      const prev = bv.series[i];
+      return (
+        s.xKey !== prev?.xKey ||
+        s.key !== prev?.key ||
+        s.sizeKey !== prev?.sizeKey
+      );
+    })
+  ) {
     return {
-      config: { ...vizConfig, series: filtered } as VizConfig,
+      config: { ...vizConfig, series: remapped } as VizConfig,
       didChange: true,
     };
   }

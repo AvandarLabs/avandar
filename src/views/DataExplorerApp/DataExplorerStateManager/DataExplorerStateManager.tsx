@@ -259,11 +259,21 @@ export const DataExplorerStateManager = createAppStateManager({
         columns,
       });
 
-      if (isVizConfigEqualForQueryResultSync(next, state.vizConfig)) {
+      const columnsChanged = !_sameColumnSchema(state.lastResultColumns, columns);
+      const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
+        next,
+        state.vizConfig,
+      );
+
+      if (!columnsChanged && !vizConfigChanged) {
         return state;
       }
 
-      return { ...state, vizConfig: next };
+      return {
+        ...state,
+        ...(vizConfigChanged ? { vizConfig: next } : {}),
+        ...(columnsChanged ? { lastResultColumns: columns } : {}),
+      };
     },
 
     setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {
@@ -353,3 +363,28 @@ export const DataExplorerStateManager = createAppStateManager({
     },
   },
 });
+
+/**
+ * Returns true when two column lists describe the same result schema —
+ * same length, names, and data types, in order. Used by
+ * `syncVizFromQueryResult` to avoid re-emitting state on identical refetches.
+ */
+function _sameColumnSchema(
+  prev: readonly QueryResultColumn[] | undefined,
+  next: readonly QueryResultColumn[],
+): boolean {
+  if (prev === undefined) {
+    return next.length === 0;
+  }
+  if (prev.length !== next.length) {
+    return false;
+  }
+  for (let i = 0; i < next.length; i++) {
+    const a = prev[i]!;
+    const b = next[i]!;
+    if (a.name !== b.name || a.dataType !== b.dataType) {
+      return false;
+    }
+  }
+  return true;
+}

@@ -8,8 +8,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
-import { SqlEditor } from "@/components/SqlEditor";
-import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
+import { AvaSqlBlock } from "@/components/AvaSqlBlock";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./GeneratedPromptBadge.module.css";
 
@@ -22,7 +21,6 @@ import css from "./GeneratedPromptBadge.module.css";
  */
 export function GeneratedPromptBadge(): JSX.Element | null {
   const { nlPrompt, rawSQL } = DataExplorerStateManager.useState();
-  const { catalog } = useSqlDisplayCatalog();
 
   if (!nlPrompt) {
     return null;
@@ -67,13 +65,7 @@ export function GeneratedPromptBadge(): JSX.Element | null {
                 <Trans>Generated SQL</Trans>
               </Text>
               <ScrollArea.Autosize mah={280}>
-                <SqlEditor
-                  value={rawSQL}
-                  onChange={() => {}}
-                  catalog={catalog}
-                  readOnly
-                  minRows={4}
-                />
+                <AvaSqlBlock value={rawSQL} readOnly minRows={4} />
               </ScrollArea.Autosize>
             </Stack>
           </Popover.Dropdown>

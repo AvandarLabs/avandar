@@ -1,11 +1,9 @@
 import { Button, Group, Stack } from "@mantine/core";
 import { useState } from "react";
-import { SqlEditor } from "./SqlEditor.tsx";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import { AvaSqlBlock } from "@/components/AvaSqlBlock";
 
 export type SqlQueryEditPanelProps = {
   initialSql: string;
-  catalog: SqlDisplayCatalog;
   submitButtonLabel: string;
   cancelButtonLabel: string;
   minRows?: number;
@@ -14,11 +12,12 @@ export type SqlQueryEditPanelProps = {
 };
 
 /**
- * Editable SQL panel with submit/cancel actions and dirty-state gating.
+ * Editable SQL panel with submit/cancel actions and dirty-state gating. Uses
+ * {@link AvaSqlBlock} so pills stay consistent with read-only previews and
+ * remain interactive while editing.
  */
 export function SqlQueryEditPanel({
   initialSql,
-  catalog,
   submitButtonLabel,
   cancelButtonLabel,
   minRows = 6,
@@ -33,12 +32,10 @@ export function SqlQueryEditPanel({
 
   return (
     <Stack gap="sm">
-      <SqlEditor
+      <AvaSqlBlock
         key={initialSql}
         value={draftSql}
         onChange={setDraftSql}
-        catalog={catalog}
-        readOnly={false}
         minRows={minRows}
       />
       <Group justify="flex-end" gap="xs">

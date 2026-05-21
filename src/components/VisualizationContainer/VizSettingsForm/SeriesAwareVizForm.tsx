@@ -4,12 +4,11 @@ import {
   Box,
   Button,
   Card,
-  Divider,
+  Fieldset,
   Group,
   SegmentedControl,
   Stack,
   Text,
-  Title,
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -44,7 +43,7 @@ type Props<TConfig extends HostConfig> = {
  * Hook to build the localized render-as options. Returned from a hook so
  * the labels stay in sync with the active Lingui locale.
  */
-function _useRenderAsOptions(): ReadonlyArray<{
+function useRenderAsOptions(): ReadonlyArray<{
   value: RenderAs;
   label: string;
 }> {
@@ -58,14 +57,18 @@ function _useRenderAsOptions(): ReadonlyArray<{
 
 /**
  * Form for series-aware viz types (bar / line / area / radar).
- * Renders the host's chart-level descriptors, then one card per
- * series with its column picker, `renderAs` switcher, and series-level
- * descriptors (filtered by `composable` when embedded in a foreign
- * host).
+ *
+ * Renders the Series fieldset first (matching the natural user flow:
+ * pick what to plot, then how to bucket it), followed by the axis
+ * fieldset (X axis or Category axis), followed by one Mantine
+ * `<Fieldset>` per chart-level descriptor group ("Y axis", "Legend",
+ * "Layout", "Grid", etc.). Descriptors whose group matches the axis
+ * legend merge into the axis fieldset alongside the column picker so
+ * all X-axis settings live in one visual unit.
  *
  * Single source of truth for the form layout. Each chart type only
  * differs by its descriptor registry; the surrounding structure
- * (X/name picker, series cards, add button) is shared.
+ * (axis picker, series cards, add button) is shared.
  */
 export function SeriesAwareVizForm<TConfig extends HostConfig>({
   fields,
@@ -167,32 +170,120 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
+  const axisLegend = isRadar ? t`Category axis` : t`X axis`;
+
   const groupedChartDescriptors = useMemo(() => {
     return _groupBy(chartDescriptors, (d) => {
       return d.group ?? "";
     });
   }, [chartDescriptors]);
 
+  const axisGroupDescriptors = groupedChartDescriptors.get(axisLegend) ?? [];
+  const otherGroupedDescriptors = Array.from(
+    groupedChartDescriptors.entries(),
+  ).filter(([group]) => {
+    return group !== axisLegend;
+  });
+
   return (
     <Stack gap="md">
-      <Control
-        label={isRadar ? t`Category axis` : t`X axis`}
-        spec={{ kind: "columnPicker", dataType: "any" }}
-        value={axisKeyValue}
-        onChange={(next) => {
-          updateAxisKey(typeof next === "string" ? next : undefined);
-        }}
-        fields={fields}
-      />
+      <Fieldset legend={t`Series`}>
+        <Stack gap="sm">
+          <Group justify="space-between">
+            <Group gap={6} align="center">
+              <Tooltip
+                multiline
+                w={280}
+                label={
+                  isRadar ?
+                    axisKeyValue ?
+                      t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
+                    : t`Each series is a numeric column plotted on the radial value. Pick the category axis below.`
 
-      {Array.from(groupedChartDescriptors.entries()).map(([group, descs]) => {
+                  : axisKeyValue ?
+                    t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
+                  : t`Each series is a numeric column plotted on the Y axis. Pick the X axis below.`
+
+                }
+              >
+                <IconInfoCircle
+                  size={14}
+                  aria-label={t`What is a series?`}
+                  style={{ cursor: "help" }}
+                />
+              </Tooltip>
+            </Group>
+            <Button
+              size="xs"
+              variant="light"
+              leftSection={<IconPlus size={14} />}
+              onClick={addSeries}
+              disabled={config.series.length >= numericFields.length}
+            >
+              <Trans>Add series</Trans>
+            </Button>
+          </Group>
+
+          {config.series.length === 0 ?
+            <Text size="xs" c="dimmed">
+              <Trans>
+                Add a series to choose which numeric column drives the chart.
+              </Trans>
+            </Text>
+          : null}
+
+          {config.series.map((s, idx) => {
+            return (
+              <SeriesCard
+                key={`${s.key}-${idx}`}
+                fields={fields}
+                numericFields={numericFields}
+                series={s}
+                hostVizType={config.vizType}
+                isRadarHost={isRadar}
+                onSeriesChange={(next) => {
+                  updateSeriesAt(idx, next);
+                }}
+                onRemove={() => {
+                  removeSeriesAt(idx);
+                }}
+              />
+            );
+          })}
+        </Stack>
+      </Fieldset>
+
+      <Fieldset legend={axisLegend}>
+        <Stack gap="xs">
+          <Control
+            label={axisLegend}
+            spec={{ kind: "columnPicker", dataType: "any" }}
+            value={axisKeyValue}
+            onChange={(next) => {
+              updateAxisKey(typeof next === "string" ? next : undefined);
+            }}
+            fields={fields}
+          />
+          {axisGroupDescriptors.map((desc) => {
+            return (
+              <Control
+                key={desc.key}
+                label={desc.label}
+                spec={desc.control}
+                value={pathGet(config as never, desc.key as never)}
+                onChange={(next) => {
+                  updateChartPath(desc.key, next);
+                }}
+              />
+            );
+          })}
+        </Stack>
+      </Fieldset>
+
+      {otherGroupedDescriptors.map(([group, descs]) => {
+        const legend = group === "" ? t`Chart settings` : group;
         return (
-          <Box key={group}>
-            {group !== "" ?
-              <Text fw={500} size="sm" c="dimmed" mb="xs">
-                {group}
-              </Text>
-            : null}
+          <Fieldset key={legend} legend={legend}>
             <Stack gap="xs">
               {descs.map((desc) => {
                 return (
@@ -208,70 +299,9 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 );
               })}
             </Stack>
-          </Box>
+          </Fieldset>
         );
       })}
-
-      <Divider />
-
-      <Group justify="space-between">
-        <Group gap={6} align="center">
-          <Title order={5}>
-            <Trans>Series</Trans>
-          </Title>
-          <Tooltip
-            multiline
-            w={280}
-            label={
-              isRadar ?
-                axisKeyValue ?
-                  t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
-                : t`Each series is a numeric column plotted on the radial value. Pick the category axis above.`
-
-              : axisKeyValue ?
-                t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
-              : t`Each series is a numeric column plotted on the Y axis. Pick the X axis above.`
-
-            }
-          >
-            <IconInfoCircle
-              size={14}
-              aria-label={t`What is a series?`}
-              style={{ cursor: "help" }}
-            />
-          </Tooltip>
-        </Group>
-        <Button
-          size="xs"
-          variant="light"
-          leftSection={<IconPlus size={14} />}
-          onClick={addSeries}
-          disabled={config.series.length >= numericFields.length}
-        >
-          <Trans>Add series</Trans>
-        </Button>
-      </Group>
-
-      <Stack gap="sm">
-        {config.series.map((s, idx) => {
-          return (
-            <SeriesCard
-              key={`${s.key}-${idx}`}
-              fields={fields}
-              numericFields={numericFields}
-              series={s}
-              hostVizType={config.vizType}
-              isRadarHost={isRadar}
-              onSeriesChange={(next) => {
-                updateSeriesAt(idx, next);
-              }}
-              onRemove={() => {
-                removeSeriesAt(idx);
-              }}
-            />
-          );
-        })}
-      </Stack>
     </Stack>
   );
 }
@@ -295,7 +325,7 @@ function SeriesCard({
   onRemove,
 }: SeriesCardProps): JSX.Element {
   const { t } = useLingui();
-  const renderAsOptions = _useRenderAsOptions();
+  const renderAsOptions = useRenderAsOptions();
   const seriesRenderAs: RenderAs | "radar" =
     isRadarHost ? "radar" : (series as XYSeries).renderAs;
 

@@ -4,11 +4,10 @@ import {
   Button,
   Card,
   ColorInput,
-  Divider,
+  Fieldset,
   Group,
   Stack,
   TextInput,
-  Title,
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -83,38 +82,34 @@ export function PairSeriesFieldset({
   );
 
   return (
-    <Stack gap="md">
-      <Divider />
-
-      <Group justify="space-between">
-        <Group gap={6} align="center">
-          <Title order={5}>
-            <Trans>Series</Trans>
-          </Title>
-          <Tooltip
-            multiline
-            w={280}
-            label={t`Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart.`}
+    <Fieldset legend={t`Series`}>
+      <Stack gap="md">
+        <Group justify="space-between">
+          <Group gap={6} align="center">
+            <Tooltip
+              multiline
+              w={280}
+              label={t`Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart.`}
+            >
+              <IconInfoCircle
+                size={14}
+                aria-label={t`What is a series?`}
+                style={{ cursor: "help" }}
+              />
+            </Tooltip>
+          </Group>
+          <Button
+            size="xs"
+            variant="light"
+            leftSection={<IconPlus size={14} />}
+            onClick={addSeries}
+            disabled={numericFields.length === 0}
           >
-            <IconInfoCircle
-              size={14}
-              aria-label={t`What is a series?`}
-              style={{ cursor: "help" }}
-            />
-          </Tooltip>
+            <Trans>Add series</Trans>
+          </Button>
         </Group>
-        <Button
-          size="xs"
-          variant="light"
-          leftSection={<IconPlus size={14} />}
-          onClick={addSeries}
-          disabled={numericFields.length === 0}
-        >
-          <Trans>Add series</Trans>
-        </Button>
-      </Group>
 
-      <Stack gap="sm">
+        <Stack gap="sm">
         {series.map((s, idx) => {
           return (
             <Card
@@ -207,7 +202,8 @@ export function PairSeriesFieldset({
             </Card>
           );
         })}
+        </Stack>
       </Stack>
-    </Stack>
+    </Fieldset>
   );
 }

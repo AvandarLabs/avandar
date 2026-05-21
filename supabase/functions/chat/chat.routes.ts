@@ -865,6 +865,9 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
           openDatasetId: z.string().optional(),
           lastSql: z.string().optional(),
+          lastResultColumns: z
+            .array(z.object({ name: z.string(), dataType: z.string() }))
+            .optional(),
           lastError: z.string().optional(),
           dashboardId: z.string().optional(),
         }),
@@ -967,9 +970,26 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\`\n\nError:\n${context.lastError}`
           : "";
 
+        // Tell the model the *current* result schema the user is looking at.
+        // After manual SQL edits or pill swaps the user-visible columns can
+        // diverge from the dataset schemas, so this is the source of truth
+        // for "what's on the canvas right now."
+        const resultColumnsContext =
+          isDataExplorer &&
+          context.lastResultColumns &&
+          context.lastResultColumns.length > 0 ?
+            `\n\nThe user is currently looking at a result with these columns:\n${context.lastResultColumns
+              .map((c) => {
+                return `- ${c.name} (${c.dataType})`;
+              })
+              .join(
+                "\n",
+              )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
+          : "";
+
         const systemContent =
           isDataExplorer ?
-            `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}`
+            `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
           : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
           : genericSystemPrompt;
 

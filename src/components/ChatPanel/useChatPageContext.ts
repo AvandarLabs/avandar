@@ -24,17 +24,23 @@ export function useChatPageContext(): ChatPageContext {
       return s.location.pathname;
     },
   });
-  const { openDataset, rawSQL, lastQueryError } =
+  const { openDataset, rawSQL, lastQueryError, lastResultColumns } =
     DataExplorerStateManager.useState();
   const { activeDashboardId } = DashboardEditorStateManager.useState();
   const openDatasetId = openDataset?.datasetId;
 
   return useMemo<ChatPageContext>(() => {
     if (pathname.includes("/data-explorer")) {
+      const resultColumns = lastResultColumns?.map((c) => {
+        return { name: c.name, dataType: c.dataType };
+      });
       return {
         app: "data-explorer",
         ...(openDatasetId ? { openDatasetId } : {}),
         ...(rawSQL ? { lastSql: rawSQL } : {}),
+        ...(resultColumns && resultColumns.length > 0 ?
+          { lastResultColumns: resultColumns }
+        : {}),
         ...(lastQueryError ? { lastError: lastQueryError } : {}),
       };
     }
@@ -51,5 +57,12 @@ export function useChatPageContext(): ChatPageContext {
       };
     }
     return { app: "other" };
-  }, [pathname, openDatasetId, rawSQL, lastQueryError, activeDashboardId]);
+  }, [
+    pathname,
+    openDatasetId,
+    rawSQL,
+    lastQueryError,
+    lastResultColumns,
+    activeDashboardId,
+  ]);
 }
