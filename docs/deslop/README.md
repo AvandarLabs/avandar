@@ -9,9 +9,14 @@ agentically (Claude, Codex, Cursor). The goal of this directory is to
 get back to a clean `develop → main` flow without users losing any
 feature.
 
-The plan has three phases. Phase 1 (schema) and Phase 3 (cutover) are
-operator-driven. Phase 2 — feature parity — is the multi-week effort
-this directory exists to organize.
+The plan has three phases. Phase 1 (schema + type-check) and Phase 3
+(cutover) are operator-driven one-shots. Phase 2 — feature parity —
+is the multi-week effort this directory exists to organize.
+
+Phase 1 only brings the Supabase schema across and runs
+`pnpm db:gen-types`; it deliberately does **not** create any clients
+or models for new tables. Those land per-feature during Phase 2 when
+something actually needs them. See `PROCESS.md` for the full rules.
 
 ## Quick orientation
 

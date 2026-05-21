@@ -20,9 +20,10 @@ production from there.
 
 ### Phase 1 — Schema resolution (operator-driven, one-shot)
 
-Goal: make `develop`'s database schema and generated TypeScript model
-schema **byte-for-byte identical** to `feat/ict4d-demo`'s before any
-Phase 2 work starts.
+Goal: make `develop`'s **database schema** identical to
+`feat/ict4d-demo`'s and make sure `develop` still type-checks.
+Nothing else. No new clients, no new models, no application code
+brought over.
 
 The operator does this manually:
 
@@ -30,21 +31,43 @@ The operator does this manually:
    exist on `develop` and apply them on `develop`.
 2. Take the declarative schema (`supabase/schemas/`) from
    `feat/ict4d-demo` and copy it onto `develop`.
-3. Regenerate all clients and models (`pnpm` codegen, parser regen,
-   etc.).
-4. Commit + push to `develop`.
+3. Run `pnpm db:gen-types` to regenerate the Supabase-driven
+   TypeScript types.
+4. Fix every type error that results from the regenerated types.
+   The fix is whatever is *minimally* needed to keep `develop`
+   compiling — touch existing call sites only, do not introduce
+   new abstractions, new clients, or new models.
+5. Commit + push to `develop`.
+
+What Phase 1 explicitly does **not** do:
+
+- ❌ Create new TypeScript model files for the new tables/columns.
+- ❌ Create new `*Client` files (Supabase, Dexie, etc.) for the
+  new tables.
+- ❌ Bring over parsers, RPC wrappers, or migration helpers tied to
+  those tables.
+
+Clients and models for new tables get created **when a Phase 2
+feature needs them**, by the migration doc that introduces that
+feature. Doing it earlier creates dead code on `develop` and makes
+later feature migrations harder to review.
 
 Every feature migration markdown in this directory is written with
 the assumption that **Phase 1 is already done** when the migration
 starts. That means:
 
-- Schemas already match.
-- TS model types already match.
-- The migration only ever has to bring **application code** over.
-  It never has to write or backfill a migration.
+- The database schema already matches.
+- `pnpm db:gen-types` output already matches.
+- `pnpm tsc -b --noEmit` is clean on `develop`.
+- But: any new tables introduced by Phase 1 still have no
+  TS client / model wrapper. The feature migration that needs
+  them is responsible for creating those wrappers as part of its
+  own scope.
 
-If a migration ends up needing schema changes anyway, that's a bug
-in Phase 1 — flag it back to the operator instead of paving over it.
+If a migration ends up needing a **schema** change, that's a bug in
+Phase 1 — flag it back to the operator instead of paving over it.
+If a migration needs to create a new client or model for a table
+that Phase 1 added, that is expected and in-scope for the feature.
 
 ### Phase 2 — Feature parity (agent + operator together, weeks)
 

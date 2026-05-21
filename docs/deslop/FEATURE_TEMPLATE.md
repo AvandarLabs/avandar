@@ -52,8 +52,11 @@ Mechanical, in order:
      spell out the per-file edits below.
 3. Resolve any conflicts. Document the resolution choice inline
    below for traceability.
-4. Run codegen if the feature requires it (typed clients, parser
-   regen). Phase 1 is assumed done so no schema regen is needed.
+4. If the feature needs a new `*Client` or new TS model files for
+   a table that Phase 1 introduced, create them as part of this
+   migration. Phase 1 only ran `pnpm db:gen-types`; it deliberately
+   did not author per-table clients/models. Do not run schema
+   regen — Phase 1 is assumed done.
 5. Run the verification commands listed in `Verification`.
 
 ### Files to copy verbatim

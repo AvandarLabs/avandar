@@ -21,10 +21,19 @@ Legend:
 Status updates happen in `PLAN_OF_PLANS.md` (planning side) and here
 (per-feature completion side). The operator drives both.
 
-Schemas, migrations, and generated TypeScript model files are
-**out of scope** for this list: they belong to Phase 1 (operator-
-driven, one-shot). Every per-feature migration assumes Phase 1 is
-already complete.
+Supabase migrations and declarative schema files are **out of
+scope** for this list: they belong to Phase 1 (operator-driven,
+one-shot). Phase 1 also runs `pnpm db:gen-types` and patches any
+resulting TypeScript errors with the smallest possible edits.
+
+Phase 1 explicitly does **not** create new clients or new TS
+model wrappers for the new tables/columns. Those land **per
+feature** during Phase 2: the migration doc that introduces a
+feature is responsible for any new `*Client` / model code that
+feature needs. Every per-feature migration assumes Phase 1 has
+already been completed (schemas + generated DB types in sync;
+`tsc` clean) — but assumes no application-level client/model code
+for those new tables exists yet.
 
 ---
 

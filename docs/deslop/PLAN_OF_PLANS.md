@@ -139,7 +139,10 @@ subject lines. It is likely:
 - If you discover Phase 1 hasn't been completed yet, stop and
   flag it. Validation can still proceed, but every reference to
   "Phase 1 done" in the per-feature docs needs to be a flagged
-  assumption.
+  assumption. Phase 1 is defined narrowly: Supabase migrations +
+  declarative schema copied to `develop`, `pnpm db:gen-types`
+  run, type errors patched minimally. No new clients/models
+  yet — those are per-feature work in Phase 2.
 
 ---
 
