@@ -153,8 +153,8 @@ describe("PillEditPopover", () => {
         />
       </AvandarUiProvider>,
     );
-    expect(container.querySelector(
-      "[data-testid='ava-sql-pill-popover-anchor']",
-    )).toBeNull();
+    expect(
+      container.querySelector("[data-testid='ava-sql-pill-popover-anchor']"),
+    ).toBeNull();
   });
 });

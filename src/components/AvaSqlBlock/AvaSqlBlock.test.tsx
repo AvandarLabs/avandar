@@ -129,8 +129,7 @@ describe("AvaSqlBlock editable", () => {
   });
 
   it("surfaces an inline error notice when out-of-scope columns are present", () => {
-    const otherDatasetId =
-      "00000000-0000-4000-8000-000000000099" as DatasetId;
+    const otherDatasetId = "00000000-0000-4000-8000-000000000099" as DatasetId;
     const broadCatalog: SqlDisplayCatalog = {
       datasets: [
         ...catalog.datasets,

@@ -135,8 +135,9 @@ describe("applyVizConfigFromQueryResult", () => {
         { name: "count", dataType: "bigint" },
       ]),
     });
-    expect((initial as { series?: Array<{ key: string }> }).series?.[0]?.key)
-      .toBe("count");
+    expect(
+      (initial as { series?: Array<{ key: string }> }).series?.[0]?.key,
+    ).toBe("count");
 
     // Second query: same column names plus a new column. The user-set
     // "count" series must survive — the bars should still render.
@@ -150,8 +151,9 @@ describe("applyVizConfigFromQueryResult", () => {
         { name: "total", dataType: "double" },
       ]),
     });
-    expect((next as { series?: Array<{ key: string }> }).series?.[0]?.key)
-      .toBe("count");
+    expect((next as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
+      "count",
+    );
   });
 
   it("falls back to a case-insensitive name match when re-resolving keys", () => {

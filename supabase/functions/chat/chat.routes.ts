@@ -977,9 +977,11 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         // diverge from the dataset schemas, so this is the source of truth
         // for "what's on the canvas right now."
         const resultColumnsContext =
-          isDataExplorer &&
-          context.lastResultColumns &&
-          context.lastResultColumns.length > 0 ?
+          (
+            isDataExplorer &&
+            context.lastResultColumns &&
+            context.lastResultColumns.length > 0
+          ) ?
             `\n\nThe user is currently looking at a result with these columns:\n${context.lastResultColumns
               .map((c) => {
                 return `- ${c.name} (${c.dataType})`;

@@ -100,9 +100,7 @@ const BARE_SQL_REGEX = /\b(?:WITH|SELECT)\b[\s\S]+?(?:;|$)/i;
  * Returns the cleaned SQL (no markdown fencing, no trailing `;`) or
  * `undefined` if nothing recognizable is in the text.
  */
-export function extractSqlFromAssistantText(
-  text: string,
-): string | undefined {
+export function extractSqlFromAssistantText(text: string): string | undefined {
   if (!text || text.length === 0) {
     return undefined;
   }

@@ -1,6 +1,5 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { describe, expect, it } from "vitest";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import {
   applyDefaultManualQueryLimit,
   DEFAULT_MANUAL_QUERY_LIMIT,
@@ -11,6 +10,7 @@ import {
   shouldAutoLimitLargeDataset,
   shouldDefaultManualQueryLimit,
 } from "@/views/DataExplorerApp/manualQueryLimit";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 describe("manualQueryLimit", () => {
   it("defaults the manual-query limit for an empty query", () => {

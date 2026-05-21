@@ -173,7 +173,9 @@ function tryParseRemapAndSqlify(args: {
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
     });
-    const sql = parser.sqlify(ast as unknown as Parameters<Parser["sqlify"]>[0]);
+    const sql = parser.sqlify(
+      ast as unknown as Parameters<Parser["sqlify"]>[0],
+    );
     return {
       sql,
       ok: true,

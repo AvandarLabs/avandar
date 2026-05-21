@@ -1,8 +1,8 @@
-import type { DuckDBBundles } from "@duckdb/duckdb-wasm";
 import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDbWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDbWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import type { DuckDBBundles } from "@duckdb/duckdb-wasm";
 
 /**
  * Vite-resolved DuckDB-WASM bundles for `selectBundle`.

@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import {
   cleanGeneratedSQL,
   extractSqlFromAssistantText,
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
+import { describe, expect, it } from "vitest";
 
 describe("cleanGeneratedSQL", () => {
   it("strips ``` fencing", () => {

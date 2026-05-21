@@ -1,8 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
-import { I18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { render, screen } from "@testing-library/react";
+import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
+import { describe, expect, it } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -61,9 +61,7 @@ describe("SeriesAwareVizForm layout", () => {
         return l.textContent ?? "";
       },
     );
-    expect(legends).toEqual(
-      expect.arrayContaining(["Series", "X axis"]),
-    );
+    expect(legends).toEqual(expect.arrayContaining(["Series", "X axis"]));
   });
 
   it("still shows the Add series button in the Series fieldset", () => {
@@ -72,6 +70,8 @@ describe("SeriesAwareVizForm layout", () => {
       xAxisKey: "region",
       series: [],
     });
-    expect(screen.getByRole("button", { name: "Add series" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Add series" }),
+    ).toBeInTheDocument();
   });
 });

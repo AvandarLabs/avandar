@@ -110,98 +110,100 @@ export function PairSeriesFieldset({
         </Group>
 
         <Stack gap="sm">
-        {series.map((s, idx) => {
-          return (
-            <Card
-              key={`${s.key}-${s.xKey}-${idx}`}
-              withBorder
-              shadow="none"
-              padding="sm"
-            >
-              <Stack gap="xs">
-                <Group justify="space-between" wrap="nowrap">
-                  <Group
-                    gap="xs"
-                    style={{ flex: 1, minWidth: 0 }}
-                    wrap="nowrap"
-                  >
-                    <Select
-                      allowDeselect={false}
-                      label={t`X column`}
-                      data={numericOptions}
-                      value={s.xKey}
-                      disabled={numericOptions.length === 0}
-                      placeholder={
-                        numericOptions.length === 0 ?
-                          t`No numeric columns`
-                        : t`Select a column`
-                      }
-                      onChange={(next) => {
-                        if (next !== null) {
-                          updateAt(idx, { xKey: next });
+          {series.map((s, idx) => {
+            return (
+              <Card
+                key={`${s.key}-${s.xKey}-${idx}`}
+                withBorder
+                shadow="none"
+                padding="sm"
+              >
+                <Stack gap="xs">
+                  <Group justify="space-between" wrap="nowrap">
+                    <Group
+                      gap="xs"
+                      style={{ flex: 1, minWidth: 0 }}
+                      wrap="nowrap"
+                    >
+                      <Select
+                        allowDeselect={false}
+                        label={t`X column`}
+                        data={numericOptions}
+                        value={s.xKey}
+                        disabled={numericOptions.length === 0}
+                        placeholder={
+                          numericOptions.length === 0 ?
+                            t`No numeric columns`
+                          : t`Select a column`
                         }
+                        onChange={(next) => {
+                          if (next !== null) {
+                            updateAt(idx, { xKey: next });
+                          }
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                      <Select
+                        allowDeselect={false}
+                        label={t`Y column`}
+                        data={numericOptions}
+                        value={s.key}
+                        disabled={numericOptions.length === 0}
+                        placeholder={
+                          numericOptions.length === 0 ?
+                            t`No numeric columns`
+                          : t`Select a column`
+                        }
+                        onChange={(next) => {
+                          if (next !== null) {
+                            updateAt(idx, { key: next });
+                          }
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                    </Group>
+                    <ActionIcon
+                      aria-label={t`Remove series`}
+                      variant="subtle"
+                      color="red"
+                      onClick={() => {
+                        removeAt(idx);
+                      }}
+                      mt="lg"
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  </Group>
+
+                  <Group gap="xs">
+                    <TextInput
+                      label={t`Series label`}
+                      value={s.label ?? ""}
+                      placeholder={t`Defaults to "Y vs X"`}
+                      onChange={(event) => {
+                        const val = event.currentTarget.value;
+                        updateAt(idx, { label: val === "" ? undefined : val });
                       }}
                       style={{ flex: 1 }}
                     />
-                    <Select
-                      allowDeselect={false}
-                      label={t`Y column`}
-                      data={numericOptions}
-                      value={s.key}
-                      disabled={numericOptions.length === 0}
-                      placeholder={
-                        numericOptions.length === 0 ?
-                          t`No numeric columns`
-                        : t`Select a column`
-                      }
+                    <ColorInput
+                      label={t`Color`}
+                      value={s.color ?? ""}
+                      swatches={[...CHART_COLOR_SWATCHES]}
+                      withEyeDropper={false}
+                      format="hex"
                       onChange={(next) => {
-                        if (next !== null) {
-                          updateAt(idx, { key: next });
-                        }
+                        updateAt(idx, {
+                          color: next === "" ? undefined : next,
+                        });
                       }}
                       style={{ flex: 1 }}
                     />
                   </Group>
-                  <ActionIcon
-                    aria-label={t`Remove series`}
-                    variant="subtle"
-                    color="red"
-                    onClick={() => {
-                      removeAt(idx);
-                    }}
-                    mt="lg"
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Group>
-
-                <Group gap="xs">
-                  <TextInput
-                    label={t`Series label`}
-                    value={s.label ?? ""}
-                    placeholder={t`Defaults to "Y vs X"`}
-                    onChange={(event) => {
-                      const val = event.currentTarget.value;
-                      updateAt(idx, { label: val === "" ? undefined : val });
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                  <ColorInput
-                    label={t`Color`}
-                    value={s.color ?? ""}
-                    swatches={[...CHART_COLOR_SWATCHES]}
-                    withEyeDropper={false}
-                    format="hex"
-                    onChange={(next) => {
-                      updateAt(idx, { color: next === "" ? undefined : next });
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                </Group>
-              </Stack>
-            </Card>
-          );
-        })}
+                </Stack>
+              </Card>
+            );
+          })}
         </Stack>
       </Stack>
     </Fieldset>
