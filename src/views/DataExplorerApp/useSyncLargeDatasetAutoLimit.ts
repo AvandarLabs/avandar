@@ -10,6 +10,12 @@ import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/St
 
 type Options = {
   query: PartialStructuredQuery;
+  /**
+   * When a `rawSQL` string is present (set by direct SQL edits or
+   * LLM-generated SQL) the auto-limit is suppressed — those SQL strings are
+   * sacrosanct and must run verbatim.
+   */
+  rawSQL: string | undefined;
   onApplyAutoLimit: (limit: number) => void;
 };
 
@@ -20,13 +26,15 @@ type Options = {
  * form and executed SQL stay aligned.
  */
 export function useSyncLargeDatasetAutoLimit(opts: Options): void {
-  const { query, onApplyAutoLimit } = opts;
+  const { query, rawSQL, onApplyAutoLimit } = opts;
   const workspace = useCurrentWorkspace();
   const syncRequestIdRef = useRef(0);
   const onApplyAutoLimitRef = useRef(onApplyAutoLimit);
   onApplyAutoLimitRef.current = onApplyAutoLimit;
   const queryRef = useRef(query);
   queryRef.current = query;
+  const rawSqlRef = useRef(rawSQL);
+  rawSqlRef.current = rawSQL;
 
   const dataSource = query.dataSource;
   const datasetId =
@@ -35,7 +43,11 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
     : undefined;
 
   useEffect(() => {
-    if (datasetId === undefined || !shouldAutoLimitLargeDataset(query)) {
+    if (
+      rawSQL !== undefined ||
+      datasetId === undefined ||
+      !shouldAutoLimitLargeDataset(query)
+    ) {
       return;
     }
 
@@ -48,6 +60,9 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
     })
       .then((rowCount) => {
         if (syncRequestIdRef.current !== requestId) {
+          return;
+        }
+        if (rawSqlRef.current !== undefined) {
           return;
         }
         if (!shouldAutoLimitLargeDataset(queryRef.current)) {
@@ -72,6 +87,7 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
     query.filters,
     query.having,
     query.limit,
+    rawSQL,
     workspace.id,
   ]);
 }

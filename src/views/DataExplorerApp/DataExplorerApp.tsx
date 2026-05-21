@@ -178,6 +178,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   useSyncLargeDatasetAutoLimit({
     query: state.query,
+    rawSQL: state.rawSQL,
     onApplyAutoLimit: applyLargeDatasetAutoLimit,
   });
 

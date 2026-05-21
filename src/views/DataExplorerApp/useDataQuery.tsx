@@ -6,11 +6,11 @@ import { uuid } from "$/lib/uuid";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
+import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { UseQueryResultTuple } from "@hooks";
 import type {
@@ -99,8 +99,11 @@ export function useDataQuery(
       isStructuredQueryInSync,
     ],
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+      // When the user (or LLM) has set `rawSQL`, run it verbatim. Skip the
+      // large-dataset auto-limit resolution and the structured-form round-trip
+      // entirely so direct SQL is never silently rewritten.
       const resolved =
-        auth === "workspace" ?
+        rawSQL === undefined && auth === "workspace" ?
           await resolveManualQueryForExecution({
             query,
             workspaceId: workspaceId as Workspace.Id,
@@ -108,12 +111,11 @@ export function useDataQuery(
         : { query, didAutoLimit: false as const };
       const executionQuery = resolved.query;
 
-      const sqlFromStructuredForm =
-        isStructuredQueryInSync && dataSource !== undefined ?
-          structuredQueryToSQL(executionQuery) || undefined
-        : undefined;
-
-      const sqlToRun = sqlFromStructuredForm ?? rawSQL;
+      const sqlToRun = selectSqlToExecute({
+        rawSQL,
+        isStructuredQueryInSync,
+        executionQuery,
+      });
 
       if (sqlToRun) {
         if (auth === "public") {
