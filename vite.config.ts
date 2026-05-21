@@ -126,7 +126,13 @@ export default defineConfig(({ mode }) => {
                   // small; CacheFirst means the first user who triggers
                   // DuckDB pays the download once, then it's served from
                   // cache and works offline thereafter.
-                  urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) => {
+                  urlPattern: ({
+                    url,
+                    sameOrigin,
+                  }: {
+                    url: URL;
+                    sameOrigin: boolean;
+                  }) => {
                     return sameOrigin && url.pathname.endsWith(".wasm");
                   },
                   handler: "CacheFirst" as const,
