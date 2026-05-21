@@ -13,14 +13,13 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What is the average value in {name}?"
-msgstr "ما هي القيمة المتوسطة في {name}؟"
+#~ msgid "What is the average value in {name}?"
+#~ msgstr "ما هي القيمة المتوسطة في {name}؟"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
@@ -34,6 +33,10 @@ msgstr "حقل المعرف مطلوب"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
 msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
+
+#: src/components/offline/OfflineUnavailableTooltipLabel.tsx
+msgid "Return online to view or make the page available offline."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -63,7 +66,7 @@ msgstr "قم بتشغيل استعلام لرؤية النتائج."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
-#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "فتح مجموعة البيانات"
 
@@ -73,8 +76,8 @@ msgid "Value column"
 msgstr "عمود القيمة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-msgid "There are no queried numeric fields"
-msgstr "لا توجد حقول رقمية مستعلم عنها"
+#~ msgid "There are no queried numeric fields"
+#~ msgstr "لا توجد حقول رقمية مستعلم عنها"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
@@ -97,6 +100,10 @@ msgstr "دعوة عضو"
 msgid "Or {0} to be notified when our public launch is ready."
 msgstr "أو {0} لتكون مُنبهًا عندما يصبح إطلاقنا العام جاهزًا."
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Count rows in {datasetName} by {pickedGroupBy}"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "بحث في مجموعات البيانات..."
@@ -117,10 +124,9 @@ msgstr "الأكثر حداثة"
 msgid "PII detected:"
 msgstr "تم الكشف عن معلومات شخصية:"
 
-#. placeholder {0}: model.displayName
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} downloaded. Tap the mic to start dictating."
-msgstr "{0} تم تنزيله. اضغط على الميكروفون لبدء الإملاء."
+#~ msgid "{0} downloaded. Tap the mic to start dictating."
+#~ msgstr "{0} تم تنزيله. اضغط على الميكروفون لبدء الإملاء."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Title field is required"
@@ -143,12 +149,17 @@ msgid "Source URL"
 msgstr "رابط المصدر"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-msgid "Type"
-msgstr "النوع"
+#~ msgid "Type"
+#~ msgstr "النوع"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "السماح بالمزامنة عبر الإنترنت"
+
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Chart settings"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Discovery is not available in this context."
@@ -157,6 +168,12 @@ msgstr "الاكتشاف غير متاح في هذا السياق."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله على اللوحة."
+
+#. placeholder {0}: modelToDownload.displayName
+#. placeholder {1}: modelToDownload.systemRequirements
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
@@ -236,7 +253,6 @@ msgid "Reject"
 msgstr "رفض"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Open"
 msgstr "فتح"
 
@@ -248,7 +264,6 @@ msgstr "التجميعات"
 msgid "No"
 msgstr "لا"
 
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Select a field"
@@ -277,6 +292,10 @@ msgid "Unknown error"
 msgstr "خطأ غير معروف"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a line chart showing trends in {datasetName} over time"
+msgstr ""
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -285,6 +304,10 @@ msgstr "مصادر البيانات"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
 msgstr "تصدير PDF معلق"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Offline chat model"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
@@ -302,6 +325,10 @@ msgstr "تم مسح سجل الخصوصية."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Export CSV"
 msgstr "تصدير CSV"
+
+#: src/components/AppDropzone/ImportConfirmBody.tsx
+msgid "Do you want to import \"{fileName}\" as a new dataset?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your subscription in your"
@@ -337,6 +364,10 @@ msgstr "سجل محلي لكل سؤال توضيحي طرحه الذكاء ال�
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
 msgstr "تم رفض {numRejectedRows} صفوف"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Re-download"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow multiple values"
@@ -447,6 +478,10 @@ msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
 msgid "This dataset has no description."
 msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 
+#: src/routes/forgot-password.tsx
+msgid "Password reset requires an internet connection."
+msgstr ""
+
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol size"
 msgstr "حجم الرمز"
@@ -468,7 +503,8 @@ msgstr "مدخل خطوة الخطة"
 msgid "I understand this data will be sent to the AI provider"
 msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود الذكاء الاصطناعي"
 
-#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
 
@@ -487,6 +523,10 @@ msgstr "لا يمكنك إضافة المزيد من مجموعات البيان
 #: src/routes/register.tsx
 msgid "Please check your email for a confirmation link. It may take a few minutes to arrive."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق وصوله بضع دقائق."
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Remove offline chat model?"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share “{resourceName}”"
@@ -530,6 +570,10 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة بيانات
 msgid "This field cannot be empty"
 msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Transcription language: {selectedLanguageLabel}"
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
 msgstr "عذرًا!"
@@ -538,7 +582,6 @@ msgstr "عذرًا!"
 msgid "Dataset saved."
 msgstr "تم حفظ مجموعة البيانات."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "There are no numeric columns"
@@ -561,6 +604,10 @@ msgstr "عرض الحاوية الأقصى"
 msgid "Close sidebar"
 msgstr "إغلاق الشريط الجانبي"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Unable to delete the offline chat model from cache."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown user"
 msgstr "مستخدم غير معروف"
@@ -576,6 +623,10 @@ msgstr "تم الوصول إلى حد المقاعد"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "خط الأنابيب"
+
+#: src/views/DataManagerApp/DatasetNavbar.tsx
+msgid "Offline"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
 msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
@@ -601,6 +652,10 @@ msgstr "CSV"
 msgid "Preset"
 msgstr "إعداد مسبق"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+msgstr ""
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Permanently delete <0>{0}</0>?"
@@ -609,6 +664,10 @@ msgstr "هل تريد حذف <0>{0}</0> بشكل دائم؟"
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة بك"
+
+#: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
+msgid "Copied"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
@@ -626,7 +685,6 @@ msgstr "اسم مساحة العمل"
 msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -665,6 +723,10 @@ msgstr "أدخل بريدك الإلكتروني للحصول على رابط إ
 msgid "Approved"
 msgstr "موافق"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice model not available"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Loading plans..."
 msgstr "جارٍ تحميل الخطط..."
@@ -697,8 +759,8 @@ msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Download & enable"
-msgstr "تحميل وتفعيل"
+#~ msgid "Download & enable"
+#~ msgstr "تحميل وتفعيل"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
@@ -744,6 +806,11 @@ msgstr "انحراف معياري واحد حول المتوسط"
 msgid "Name column"
 msgstr "عمود الاسم"
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "Defaults to \"Y vs X\""
+msgstr ""
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
 msgstr "تم اختيار عمود اسم غير صالح"
@@ -768,6 +835,10 @@ msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخ
 #: src/routes/update-password.tsx
 msgid "Password"
 msgstr "كلمة المرور"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Show the first 20 rows of {datasetName}"
+msgstr ""
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
@@ -948,6 +1019,10 @@ msgstr "البيانات المفتوحة"
 msgid "Add new dataset"
 msgstr "إضافة مجموعة بيانات جديدة"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+msgid "Switch to Free plan"
+msgstr ""
+
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {0} rows"
@@ -1090,6 +1165,11 @@ msgstr "استبدال SQL بتغييرات النموذج"
 msgid "Dataset did not match the expected schema"
 msgstr "لم تتطابق مجموعة البيانات مع المخطط المتوقع"
 
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "{0} is on this device. Tap the mic to dictate."
+msgstr ""
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
@@ -1110,11 +1190,9 @@ msgstr "تم تحميل الملف جزئيًا"
 msgid "Payment Methods"
 msgstr "طرق الدفع"
 
-#. placeholder {0}: selectedModel.description
-#. placeholder {1}: selectedModel.approxSizeMb
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} (~{1} MB)"
-msgstr "{0} (~{1} ميغابايت)"
+#~ msgid "{0} (~{1} MB)"
+#~ msgstr "{0} (~{1} ميغابايت)"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1204,6 +1282,10 @@ msgstr "توقف ونسخ"
 #~ msgid "Data Visualization"
 #~ msgstr "تصوير البيانات"
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
+msgid "Choose a saved dataset or import new data into your workspace."
+msgstr ""
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "الإبلاغ عن خطأ"
@@ -1243,6 +1325,7 @@ msgstr "الأقصى"
 msgid "Ready"
 msgstr "جاهز"
 
+#: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "استيراد البيانات"
@@ -1295,9 +1378,10 @@ msgstr "معرّف مساحة العمل"
 msgid "Generate a query to configure this visualization."
 msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Select a column"
 msgstr "اختر عمودًا"
@@ -1317,6 +1401,10 @@ msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
 msgid "Plan branches"
 msgstr "فروع الخطة"
 
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
 msgid "Show SQL"
 msgstr "عرض SQL"
@@ -1329,6 +1417,8 @@ msgstr "بحث عن النماذج"
 msgid "Cannot sync this entity"
 msgstr "لا يمكن مزامنة هذا الكيان"
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Remove series"
 msgstr "إزالة السلاسل"
@@ -1386,6 +1476,8 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
@@ -1509,8 +1601,18 @@ msgid "We will use those columns to merge datasets into a single {entityConfigNa
 msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {entityConfigName} واحدة."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Browser unavailable"
+msgstr ""
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Transcribing…"
 msgstr "يتم النسخ..."
+
+#. placeholder {0}: model.displayName
+#. placeholder {1}: model.approxSizeMb
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -1663,6 +1765,10 @@ msgstr "تأكيد الإجراء"
 msgid "Data Preview"
 msgstr "معاينة البيانات"
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Voice model saved"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "ليس فارغًا"
@@ -1707,12 +1813,16 @@ msgid "Global Admin"
 msgstr "مدير عالمي"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "You haven't chosen a size column"
-msgstr "لم تختار عمود الحجم"
+#~ msgid "You haven't chosen a size column"
+#~ msgstr "لم تختار عمود الحجم"
+
+#: src/routes/register.tsx
+msgid "Registration requires an internet connection."
+msgstr ""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "Invalid size column selected"
-msgstr "تم اختيار عمود حجم غير صالح"
+#~ msgid "Invalid size column selected"
+#~ msgstr "تم اختيار عمود حجم غير صالح"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
 msgid "There are no values"
@@ -1750,6 +1860,10 @@ msgstr "صورة PNG"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Offline chat model ready. Click to switch or re-download."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "جارٍ التقاط اللوحة…"
@@ -1773,6 +1887,10 @@ msgstr "فكر في إعادة صياغة"
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add people or user groups"
 msgstr "إضافة أشخاص أو مجموعات مستخدمين"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+msgid "Size column"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
@@ -1825,6 +1943,10 @@ msgstr "فارغ"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
 msgstr "تم إرسال الدعوة"
+
+#: src/components/offline/OfflineIndicator.tsx
+msgid "You are offline"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -1942,6 +2064,10 @@ msgstr "لا توجد قيم للتلخيص."
 msgid "Dashboard not ready"
 msgstr "اللوحة غير جاهزة"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Downloaded on this browser"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "الدفع شهريًا"
@@ -1994,6 +2120,11 @@ msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
 msgid "Data"
 msgstr "البيانات"
 
+#: src/components/offline/OfflineUnavailableTooltipLabel.tsx
+#: src/lib/offline/useOfflineGate.ts
+msgid "Unavailable offline"
+msgstr ""
+
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
@@ -2004,7 +2135,6 @@ msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة 
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Save to dashboard"
 msgstr "حفظ إلى اللوحة"
 
@@ -2015,6 +2145,10 @@ msgstr "حفظ إلى اللوحة"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "نوع التسمية"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a bar chart of row counts in {datasetName}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2032,6 +2166,11 @@ msgstr "إرسال"
 msgid "See all shared items"
 msgstr "عرض جميع العناصر المشتركة"
 
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "{0} was deleted from this browser."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة أخرى لاحقًا."
@@ -2039,6 +2178,11 @@ msgstr "بعض مجموعات البيانات المنشورة لم تتمكن 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
 msgstr "إرسال الدعوة"
+
+#. placeholder {0}: selectedDataset.name
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "Open {0}"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
 msgid "Manual Query"
@@ -2141,7 +2285,6 @@ msgstr "إجابة توضيحية"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Generated SQL"
 msgstr "SQL المُولد"
 
@@ -2173,6 +2316,10 @@ msgstr "الرخصة"
 msgid "Describe your answer…"
 msgstr "صف إجابتك…"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "What is the average {averageColumn} in {datasetName}?"
+msgstr ""
+
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
 msgstr "اسحب للاستيراد"
@@ -2203,9 +2350,22 @@ msgstr "تشغيل الخطوة"
 msgid "Run an AI query first."
 msgstr "قم بتشغيل استعلام AI أولاً."
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "Y column"
+msgstr ""
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Count how many rows there are in {datasetName}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
 #~ msgstr ""
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Offline model download failed"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Parsed {formattedNumRows} rows successfully"
@@ -2239,6 +2399,7 @@ msgstr "لا توجد بيانات تكرارية متاحة."
 msgid "We'll add this visualization to your new dashboard."
 msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
 
+#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 #: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "جارٍ البدء…"
@@ -2358,6 +2519,8 @@ msgid "Root plan"
 msgstr "الخطة الجذرية"
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -2408,9 +2571,21 @@ msgstr "إنشاء لوحة تحكم جديدة"
 msgid "Create Workspace"
 msgstr "إنشاء مساحة عمل"
 
+#: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+msgid "Try again"
+msgstr ""
+
+#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+msgid "Do not refresh or close this tab or else the download will be canceled."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Forest"
 msgstr "غابة"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Choose the language you will speak when dictating."
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
@@ -2418,9 +2593,13 @@ msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Whisper supports many languages; auto-detect handles mixed input."
-msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال المختلط."
+#~ msgid "Whisper supports many languages; auto-detect handles mixed input."
+#~ msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال المختلط."
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "سلسلة"
@@ -2503,6 +2682,10 @@ msgstr "احصل على مجموع القيم"
 msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
 
+#: src/components/AppDropzone/openFileImportFlow.tsx
+msgid "Import"
+msgstr ""
+
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
 msgid "Yes"
 msgstr "نعم"
@@ -2531,6 +2714,11 @@ msgstr "فشل تسجيل الخروج"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "لقد اتصلت بنجاح بـ {0}"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "X column"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the most frequent value"
@@ -2577,6 +2765,10 @@ msgstr "الأكثر شيوعًا"
 #: src/routes/update-password.tsx
 msgid "Passwords do not match"
 msgstr "كلمات المرور غير متطابقة"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
+msgstr ""
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select longitude column"
@@ -2636,6 +2828,10 @@ msgstr "ليس لديك أي لوحات تحكم بعد."
 msgid "No clarifications yet. The log fills in as the chat asks clarifying questions."
 msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طرح الدردشة لأسئلة توضيحية."
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Offline chat model removed"
+msgstr ""
+
 #: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Preparing download…"
 msgstr "جارٍ إعداد التنزيل…"
@@ -2671,6 +2867,12 @@ msgstr "اختر واحدًا"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "No fields have been added"
 msgstr "لم تتم إضافة أي حقول"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "What is a series?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Context"
@@ -2719,8 +2921,8 @@ msgid "Do not refresh or close this tab — the download will be canceled."
 msgstr "لا تقم بتحديث أو إغلاق هذه الصفحة - سيتم إلغاء التنزيل."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Desktop only"
-msgstr "لأجهزة الكمبيوتر فقط"
+#~ msgid "Desktop only"
+#~ msgstr "لأجهزة الكمبيوتر فقط"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
@@ -2733,6 +2935,10 @@ msgstr "تم استلام قيمة غير نصية لحقل تحديد"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Time to answer"
 msgstr "وقت الرد"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Could not remove offline chat model"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -2777,10 +2983,13 @@ msgstr "تم الكشف"
 msgid "Delete Dataset"
 msgstr "حذف مجموعة البيانات"
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Add series"
 msgstr "إضافة سلسلة"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Download"
 msgstr "تنزيل"
@@ -2802,8 +3011,8 @@ msgid "Turn"
 msgstr "تحويل"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a table of the top 10 rows of {target}"
-msgstr "إضافة جدول لأعلى 10 صفوف من {target}"
+#~ msgid "Add a table of the top 10 rows of {target}"
+#~ msgstr "إضافة جدول لأعلى 10 صفوف من {target}"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -2823,6 +3032,11 @@ msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "System sans"
 msgstr "نظام بدون"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "Series label"
+msgstr ""
 
 #. placeholder {0}: props.name
 #: packages/web/ui/src/buttons/EditButton.tsx
@@ -2895,8 +3109,12 @@ msgid "Sketch"
 msgstr "رسم تخطيطي"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model ready"
-msgstr "نموذج الصوت جاهز"
+#~ msgid "Voice model ready"
+#~ msgstr "نموذج الصوت جاهز"
+
+#: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
+msgid "Copy code"
+msgstr ""
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
@@ -2923,6 +3141,14 @@ msgstr "غير نشط"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "يجب إدخال بعض البيانات يدويًا"
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
+msgstr ""
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Pick a model to download. You can switch models or re-download later."
+msgstr ""
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
@@ -3019,8 +3245,8 @@ msgid "This cannot be undone."
 msgstr "لا يمكن التراجع عن هذا."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Show the first 20 rows of {name}"
-msgstr "عرض أول 20 صفًا من {name}"
+#~ msgid "Show the first 20 rows of {name}"
+#~ msgstr "عرض أول 20 صفًا من {name}"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Approve and run"
@@ -3093,8 +3319,8 @@ msgid "Upload"
 msgstr "رفع"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-msgid "Bubble size (numeric)"
-msgstr "حجم الفقاعة (رقمي)"
+#~ msgid "Bubble size (numeric)"
+#~ msgstr "حجم الفقاعة (رقمي)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3148,6 +3374,10 @@ msgstr "تقييد {displayName} للوصول إلى التطبيق"
 msgid "Confirm Password"
 msgstr "تأكيد كلمة المرور"
 
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Partially offline"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Edit query"
@@ -3158,6 +3388,14 @@ msgstr "تحرير الاستعلام"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "مستكشف البيانات"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Count rows in {datasetName} by {secondGroupBy}"
+msgstr ""
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Each series is a numeric column plotted on the radial value. Pick the category axis below."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -3241,6 +3479,11 @@ msgstr "تفاصيل الاستعلام"
 msgid "Your name"
 msgstr "اسمك"
 
+#. placeholder {0}: model.displayName
+#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+msgid "Downloading {0} for offline chat"
+msgstr ""
+
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat panel"
 msgstr "فتح لوحة الدردشة"
@@ -3269,7 +3512,7 @@ msgstr "فشلت هذه الاستعلام. يرجى إصلاح SQL والمحا
 msgid "An error occurred while saving the dataset"
 msgstr "حدث خطأ أثناء حفظ مجموعة البيانات"
 
-#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer.tsx
+#: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "استيراد مجموعة البيانات"
 
@@ -3285,9 +3528,21 @@ msgstr "يمكن لمشرفي إعدادات مساحة العمل فقط فتح
 msgid "Pick which global filters apply to this visualization."
 msgstr "اختر الفلاتر العالمية التي تنطبق على هذه التصويرية."
 
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+msgid "Each series is one cloud of bubbles. The size column determines bubble radius."
+msgstr ""
+
+#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
+msgid "Download an offline chat model (cloud icon) to ask questions while offline."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "لا تحتوي هذه الإدخالات في الكتالوج على بيانات وصفية للأعمدة. لا يمكن استيرادها بعد."
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Offline chat model ready"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
@@ -3432,6 +3687,11 @@ msgstr "غير قادر على حذف نموذج الصوت من الذاكرة 
 msgid "Make offline-only"
 msgstr "اجعلها متاحة فقط عند عدم الاتصال"
 
+#. placeholder {0}: model.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "{0} is available when you are offline."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL is available"
 msgstr "رابط مخصص متاح"
@@ -3473,8 +3733,12 @@ msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of {target} grouped by category"
-msgstr "إضافة مخطط شريطي لـ {target} مجمع حسب الفئة"
+#~ msgid "Add a bar chart of {target} grouped by category"
+#~ msgstr "إضافة مخطط شريطي لـ {target} مجمع حسب الفئة"
+
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
+msgstr ""
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3493,7 +3757,6 @@ msgid "The owner always has admin access. To change owner, use the {resource} se
 msgstr "المالك لديه دائمًا وصول إداري. لتغيير المالك، استخدم إعدادات {resource}."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
@@ -3504,6 +3767,10 @@ msgstr "نشط"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download offline chat model (WebLLM, not voice)"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -3563,6 +3830,7 @@ msgid "Downloading {0} for voice prompting"
 msgstr "تحميل {0} لتوجيه الصوت"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Model"
 msgstr "نموذج"
@@ -3580,8 +3848,8 @@ msgid "All decisions"
 msgstr "جميع القرارات"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Speak (local voice-to-text)"
-msgstr "تحدث (تحويل الصوت إلى نص محلي)"
+#~ msgid "Speak (local voice-to-text)"
+#~ msgstr "تحدث (تحويل الصوت إلى نص محلي)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Show labels"
@@ -3683,9 +3951,15 @@ msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال 
 msgid "Google sheets connector is disabled while this feature is under maintenance."
 msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "إزالة"
+
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "No numeric columns"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
@@ -3715,9 +3989,13 @@ msgstr "جداول بيانات Google"
 msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
 msgstr "لن يتم تخزين مجموعة البيانات هذه عبر الإنترنت ويمكن الوصول إليها فقط طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download a different offline chat model"
+msgstr ""
+
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
-msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم في الزاوية السفلى اليسرى."
+#~ msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
+#~ msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم في الزاوية السفلى اليسرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -3784,6 +4062,10 @@ msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 msgid "Multi-select"
 msgstr "تحديد متعدد"
 
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
 msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
@@ -3816,8 +4098,8 @@ msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "These are too big for web and are only available on Avandar Desktop"
-msgstr "هذه كبيرة جدًا للويب ومتاحة فقط على Avandar Desktop"
+#~ msgid "These are too big for web and are only available on Avandar Desktop"
+#~ msgstr "هذه كبيرة جدًا للويب ومتاحة فقط على Avandar Desktop"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
@@ -3948,6 +4230,10 @@ msgstr "لم تتم قراءة أي صفوف بنجاح"
 msgid "New user group"
 msgstr "مجموعة مستخدمين جديدة"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 msgid "None of the above"
 msgstr "لا شيء مما سبق"
@@ -3972,13 +4258,26 @@ msgstr "إكسل"
 msgid "Dataset columns"
 msgstr "أعمدة مجموعة البيانات"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid "Could not prepare the offline chat model."
+msgstr ""
+
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "Branches"
 msgstr "الفروع"
 
+#. placeholder {0}: model.displayName
+#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
+msgid "Starting {0}…"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "ستكون مجموعة البيانات هذه متاحة فقط في وضع عدم الاتصال"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Add at least one X / Y / Size series"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -3986,8 +4285,8 @@ msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنت
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-msgid "X Axis (numeric)"
-msgstr "المحور السيني (رقمي)"
+#~ msgid "X Axis (numeric)"
+#~ msgstr "المحور السيني (رقمي)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4071,9 +4370,13 @@ msgstr "الملفات الشخصية"
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+msgid " · downloaded"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {name} by category"
-msgstr "عد الصفوف في {name} حسب الفئة"
+#~ msgid "Count rows in {name} by category"
+#~ msgstr "عد الصفوف في {name} حسب الفئة"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Cancelled"
@@ -4099,12 +4402,20 @@ msgstr "إغلاق اللوحة (⌘/)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-msgid "Y Axis (numeric)"
-msgstr "المحور الصادي (رقمي)"
+#~ msgid "Y Axis (numeric)"
+#~ msgstr "المحور الصادي (رقمي)"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
 msgstr "إعادة التوليد مع الخطأ"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Add a table of the top 10 rows of {datasetName}"
+msgstr ""
+
+#: src/views/DataManagerApp/DatasetNavbar.tsx
+msgid "This dataset is fully available offline"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
@@ -4115,6 +4426,7 @@ msgid "Pay what you want"
 msgstr "ادفع ما تريد"
 
 #. placeholder {0}: model.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Remove {0}"
 msgstr "إزالة {0}"
@@ -4236,6 +4548,10 @@ msgid "Syncing dataset online..."
 msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+msgid "Add a series to choose which numeric column drives the chart."
+msgstr ""
+
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "عمود"
@@ -4284,6 +4600,10 @@ msgstr "لم يتم إضافة أي أعمدة بعد."
 msgid "Display name updated"
 msgstr "تم تحديث اسم العرض"
 
+#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
+msgid "Loading voice model"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
 msgstr "اختر إعداد مسبق لمساحة العمل أو خصصه لكل تطبيق. تتحكم مجموعات المستخدمين في تقاطعات الوصول إلى مجموعة البيانات ولوحة المعلومات."
@@ -4309,6 +4629,10 @@ msgstr "تم حذف مجموعة الدور"
 msgid "Select sort order"
 msgstr "حدد ترتيب الفرز"
 
+#: src/components/AppDropzone/openFileImportFlow.tsx
+msgid "Import this file?"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
 msgstr "حفظ مجموعة البيانات"
@@ -4318,8 +4642,8 @@ msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "Invalid Y axis selected"
-msgstr "تم اختيار محور Y غير صالح"
+#~ msgid "Invalid Y axis selected"
+#~ msgstr "تم اختيار محور Y غير صالح"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/routes/forgot-password.tsx
@@ -4353,6 +4677,10 @@ msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعم
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
 msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مقاعدها {totalSeats}."
 
+#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
+msgid "Upload files, connect external sources, or browse open datasets to add to your workspace."
+msgstr ""
+
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not transcribe your audio."
 msgstr "لم يتمكن من نسخ صوتك."
@@ -4378,8 +4706,8 @@ msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a line chart showing trends in {target} over time"
-msgstr "أضف مخطط خطي يظهر الاتجاهات في {target} مع مرور الوقت"
+#~ msgid "Add a line chart showing trends in {target} over time"
+#~ msgstr "أضف مخطط خطي يظهر الاتجاهات في {target} مع مرور الوقت"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Downloaded on this device"
@@ -4472,6 +4800,10 @@ msgstr "قيم مميزة"
 msgid "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
 msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيير هذه الخطة. سيتم تحديث اشتراكك وفقًا لذلك."
 
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Speak"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
@@ -4506,8 +4838,8 @@ msgid "CSV or Excel file"
 msgstr "ملف CSV أو Excel"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "End transcription"
-msgstr "إنهاء النسخ"
+#~ msgid "End transcription"
+#~ msgstr "إنهاء النسخ"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -4569,6 +4901,10 @@ msgstr "مشارك معك"
 msgid "Longitude column"
 msgstr "عمود الطول"
 
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Not offline"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
@@ -4610,8 +4946,8 @@ msgid "Values, comma-separated"
 msgstr "قيم، مفصولة بفواصل"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "You haven't chosen a Y axis"
-msgstr "لم تختار محور Y"
+#~ msgid "You haven't chosen a Y axis"
+#~ msgstr "لم تختار محور Y"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
@@ -4643,6 +4979,15 @@ msgstr "الخطوات التالية الموصى بها"
 msgid "From column: <0>{columnName}</0>"
 msgstr "من العمود: <0>{columnName}</0>"
 
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Offline ready"
+msgstr ""
+
+#. placeholder {0}: model.systemRequirements
+#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
+msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
+msgstr ""
+
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Set up voice prompting"
 msgstr "إعداد التوجيه الصوتي"
@@ -4650,6 +4995,10 @@ msgstr "إعداد التوجيه الصوتي"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"
 msgstr "تحميل PNG"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Add at least one X / Y series"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Show QR code"

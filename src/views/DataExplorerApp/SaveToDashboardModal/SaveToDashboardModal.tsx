@@ -122,7 +122,7 @@ export function SaveToDashboardModal({
             });
           }}
         >
-          <Trans>Open dashboard</Trans>
+          {t`Open dashboard`}
         </Anchor>
       ),
     });
