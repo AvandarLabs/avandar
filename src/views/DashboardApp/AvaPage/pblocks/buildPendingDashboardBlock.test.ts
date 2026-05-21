@@ -9,8 +9,9 @@ describe("buildPendingDashboardBlock", () => {
       level: 1,
     });
     expect(item.type).toBe("HeadingBlock");
-    expect(item.props.text).toBe("Hello world");
-    expect(item.props.level).toBe(1);
+    const headingProps = item.props as { text: string; level: number };
+    expect(headingProps.text).toBe("Hello world");
+    expect(headingProps.level).toBe(1);
   });
 
   it("constructs a DataViz Puck item", () => {

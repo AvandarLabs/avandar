@@ -43,6 +43,7 @@ import type {
   SlotRenderer,
   TableBlockProps,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import { useMemo } from "react";
 import type { ReactNode } from "react";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
@@ -370,22 +371,29 @@ function _parseTableRows(options: {
 
 type TranslateFn = ReturnType<typeof useLingui>["t"];
 
-export function getDashboardPuckConfig(options: {
+/**
+ * Builds the Puck `AvaPageConfig` for a dashboard. Calls hooks for theme /
+ * typography options and pblock/pfield configs, then memoizes the resulting
+ * config so the Puck editor doesn't see a fresh reference on every render.
+ */
+export function useDashboardPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: Workspace.Id | undefined;
   dashboardId: DashboardId;
   t: TranslateFn;
 }): AvaPageConfig {
-  const { t } = options;
+  const { dashboardTitle, workspaceId, dashboardId, t } = options;
   const themeOptions = useDashboardThemeOptions();
   const typographyOptions = useDashboardTypographyOptions();
   const dataVizFieldConfig = useDataVizPBlockConfig({
-    dashboardTitle: options.dashboardTitle,
-    workspaceId: options.workspaceId,
-    dashboardId: options.dashboardId,
+    dashboardTitle,
+    workspaceId,
+    dashboardId,
   });
   const filterFieldConfig = useFilterPBlockConfig();
-  return {
+  const containerMaxWidthFieldConfig = useContainerMaxWidthPFieldConfig();
+  return useMemo<AvaPageConfig>(() => {
+    return {
     root: {
       fields: {
         schemaVersion: {
@@ -415,7 +423,7 @@ export function getDashboardPuckConfig(options: {
             return { label: o.label, value: o.value };
           }),
         },
-        containerMaxWidth: useContainerMaxWidthPFieldConfig(),
+        containerMaxWidth: containerMaxWidthFieldConfig,
         isTitleHidden: {
           label: t`Hide title`,
           type: "radio",
@@ -498,7 +506,7 @@ export function getDashboardPuckConfig(options: {
         subtitle: "",
         theme: "default",
         typography: "system",
-        title: options.dashboardTitle,
+        title: dashboardTitle,
         verticalPadding: "lg",
       } satisfies AvaPageRootProps,
 
@@ -1553,5 +1561,14 @@ export function getDashboardPuckConfig(options: {
         },
       },
     },
-  };
+    };
+  }, [
+    dashboardTitle,
+    t,
+    themeOptions,
+    typographyOptions,
+    dataVizFieldConfig,
+    filterFieldConfig,
+    containerMaxWidthFieldConfig,
+  ]);
 }

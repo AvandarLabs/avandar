@@ -35,6 +35,7 @@ declare module "@mantine/core" {
       appChrome: number;
       modal: number;
       popover: number;
+      notifications: number;
     };
 
     elevation: typeof ElevationTheme;

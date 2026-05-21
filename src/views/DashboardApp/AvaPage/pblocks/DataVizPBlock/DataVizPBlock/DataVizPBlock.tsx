@@ -96,8 +96,12 @@ export function DataVizPBlock({
       }),
   });
 
-  const columns = queryResults?.columns ?? [];
-  const data = queryResults?.data ?? [];
+  const columns = useMemo(() => {
+    return queryResults?.columns ?? [];
+  }, [queryResults?.columns]);
+  const data = useMemo(() => {
+    return queryResults?.data ?? [];
+  }, [queryResults?.data]);
   const dateColumns = getDateColumns(columns, data);
 
   const displayVizConfig = useMemo(() => {

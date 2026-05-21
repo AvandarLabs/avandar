@@ -62,6 +62,10 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
       .catch(() => {
         // Row count is best-effort; leave limit unset.
       });
+    // Only the listed fields influence `shouldAutoLimitLargeDataset`; the
+    // async callback reads the latest query via `queryRef.current`, so adding
+    // `query` here would re-fire on every render without changing behavior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     datasetId,
     query.aggregations,

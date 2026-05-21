@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   cleanGeneratedSQL,
   extractSqlFromAssistantText,
-} from "./buildSQLSystemPrompt.ts";
+} from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
 
 describe("cleanGeneratedSQL", () => {
   it("strips ``` fencing", () => {

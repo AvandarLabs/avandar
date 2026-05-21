@@ -125,7 +125,9 @@ function DataExplorerManualQueryForm({
     DataExplorerStateManager.useContext();
 
   const handlers: ManualQueryFormHandlers = {
-    onSetDataSource: dispatch.setDataSource,
+    onSetDataSource: (dataSource, options) => {
+      dispatch.setDataSource({ dataSource, options });
+    },
     onSetColumns: dispatch.setColumns,
     onSetColumnAggregation: dispatch.setColumnAggregation,
     onSetOrderByColumn: dispatch.setOrderByColumn,

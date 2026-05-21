@@ -14,7 +14,7 @@ import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/ut
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
 import { captureAndDownloadPdf } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
-import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -45,14 +45,12 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
   const renderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  const puckConfig = useMemo(() => {
-    return getDashboardPuckConfig({
-      dashboardTitle: dashboard.name,
-      workspaceId: dashboard.workspaceId,
-      dashboardId: dashboard.id,
-      t,
-    });
-  }, [dashboard, t]);
+  const puckConfig = useDashboardPuckConfig({
+    dashboardTitle: dashboard.name,
+    workspaceId: dashboard.workspaceId,
+    dashboardId: dashboard.id,
+    t,
+  });
 
   const puckData = useMemo(() => {
     const cfg = dashboard.config as unknown as AvaPageGenericData;

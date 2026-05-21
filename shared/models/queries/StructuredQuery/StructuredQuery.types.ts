@@ -87,14 +87,14 @@ type EmptyStructuredQuery = Model.Versioned<
     dataSource: undefined;
     nestedSubquery?: NestedSubquerySource;
     queryColumns: readonly QueryColumnRead[];
-    orderByColumn: undefined;
-    orderByDirection: undefined;
+    orderByColumn: QueryColumnId | undefined;
+    orderByDirection: OrderByDirection | undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
     filters: QueryFilterGroup;
     having: QueryFilterGroup;
     joins: readonly QueryJoin[];
-    offset: undefined;
-    limit: undefined;
+    offset: number | undefined;
+    limit: number | undefined;
   }
 >;
 

@@ -52,6 +52,7 @@ function _makeState(overrides: {
     nlPrompt: undefined,
     openDataset: undefined,
     lastQueryError: undefined,
+    lastResultColumns: undefined,
     isStructuredQueryInSync: true,
     sqlSyncWarnings: [],
     ...overrides,

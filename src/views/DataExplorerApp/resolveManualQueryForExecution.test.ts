@@ -50,7 +50,7 @@ function _datasetQuery(): ReturnType<typeof StructuredQuery.makeEmpty> {
         aggregation: "none",
       },
     ],
-  };
+  } as unknown as ReturnType<typeof StructuredQuery.makeEmpty>;
 }
 
 describe("resolveManualQueryForExecution", () => {

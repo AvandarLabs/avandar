@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useChatPanelComposerAutoFocus } from "./useChatPanelComposerAutoFocus";
 
-function createAsideWithTransition(): HTMLAsideElement {
+function createAsideWithTransition(): HTMLElement {
   const aside = document.createElement("aside");
   aside.style.transition = "transform 200ms ease";
   document.body.append(aside);

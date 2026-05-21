@@ -1,5 +1,8 @@
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type {
+  ColumnSummary,
+  DatasetSummary,
+} from "@/clients/datasets/DatasetQueryClient";
 import type { QueryClient } from "@tanstack/react-query";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -20,7 +23,7 @@ export function getCachedDatasetColumnSummaries(params: {
   const { queryClient, datasetId, workspaceId, columns } = params;
   const byName = new Map<string, ColumnSummary>();
 
-  const fullSummary = queryClient.getQueryData(
+  const fullSummary = queryClient.getQueryData<DatasetSummary>(
     DatasetQueryClient.QueryKeys.getSummary({ datasetId, workspaceId }),
   );
   if (fullSummary?.columnSummaries) {
@@ -31,7 +34,7 @@ export function getCachedDatasetColumnSummaries(params: {
   }
 
   for (const column of columns) {
-    const cached = queryClient.getQueryData(
+    const cached = queryClient.getQueryData<ColumnSummary>(
       DatasetQueryClient.QueryKeys.getColumnSummary({
         datasetId,
         workspaceId,

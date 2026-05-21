@@ -25,8 +25,9 @@ describe("AnimationTheme presets", () => {
       { left: 32, top: 140 },
     );
 
-    expect(fromRect["--ava-animate-origin-x"]).toBe("108px");
-    expect(fromRect["--ava-animate-origin-y"]).toBe("-78px");
+    const fromRectVars = fromRect as Record<string, string>;
+    expect(fromRectVars["--ava-animate-origin-x"]).toBe("108px");
+    expect(fromRectVars["--ava-animate-origin-y"]).toBe("-78px");
     expect(fromAnchor).toEqual(fromRect);
   });
 

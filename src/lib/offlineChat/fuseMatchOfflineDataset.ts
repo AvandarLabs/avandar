@@ -48,4 +48,5 @@ export function fuseMatchOfflineDatasetByName(args: {
       return dataset.id === top.item.id;
     });
   }
+  return undefined;
 }

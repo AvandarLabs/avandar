@@ -7,13 +7,15 @@ describe("node-sql-parser sqlify after remap", () => {
   it("may emit unquoted FROM so force must handle it", () => {
     const parser = new Parser();
     const sql = 'SELECT *\nFROM "covid_deaths"\nLIMIT 100';
-    const ast = parser.astify(sql, { database: "postgresql" }) as Record<
+    const ast = parser.astify(sql, { database: "postgresql" }) as unknown as Record<
       string,
       unknown
     >;
-    const from = (ast.from as Array<{ table?: string }>)[0];
+    const from = (ast.from as Array<{ table?: string }>)[0]!;
     from.table = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
-    const sqlified = parser.sqlify(ast as Parameters<Parser["sqlify"]>[0]);
+    const sqlified = parser.sqlify(
+      ast as unknown as Parameters<Parser["sqlify"]>[0],
+    );
     const forced = forceFromTableToDatasetId({
       sql: sqlified,
       datasetTableId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",

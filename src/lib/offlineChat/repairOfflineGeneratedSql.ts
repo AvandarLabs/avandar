@@ -117,7 +117,13 @@ function remapTablesInSelectAst(
   },
 ): boolean {
   let changed = false;
-  if (remapTableInFromList(ast.from, args)) {
+  if (
+    remapTableInFromList(ast.from, {
+      datasets: args.schema.datasets,
+      lastUserPrompt: args.lastUserPrompt,
+      preferredDatasetId: args.preferredDatasetId,
+    })
+  ) {
     changed = true;
   }
   return changed;
@@ -150,9 +156,9 @@ function tryParseRemapAndSqlify(args: {
           remapped: false,
         };
       }
-      parsedAst = parsedAst[0];
+      parsedAst = parsedAst[0]!;
     }
-    const ast = parsedAst as Record<string, unknown> | null;
+    const ast = parsedAst as unknown as Record<string, unknown> | null;
     if (!ast || ast.type !== "select") {
       return {
         sql: args.sql,
@@ -167,7 +173,7 @@ function tryParseRemapAndSqlify(args: {
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
     });
-    const sql = parser.sqlify(ast as Parameters<Parser["sqlify"]>[0]);
+    const sql = parser.sqlify(ast as unknown as Parameters<Parser["sqlify"]>[0]);
     return {
       sql,
       ok: true,

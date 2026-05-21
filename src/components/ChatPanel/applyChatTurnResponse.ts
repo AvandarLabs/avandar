@@ -1,4 +1,3 @@
-import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/types/chat.types";

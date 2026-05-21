@@ -10,7 +10,7 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { Tabs } from "@ui";
+import { Tabs, TextareaForm } from "@ui";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/SqlEditor";

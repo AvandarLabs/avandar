@@ -1,4 +1,5 @@
 import { WHISPER_CPP_VOICE_MODELS } from "./whisperCppVoiceModels";
+import type { WhisperCppVoiceModelId } from "./whisperCppVoiceModels";
 
 /**
  * Barrel for voice dictation shared types. Model catalog lives in

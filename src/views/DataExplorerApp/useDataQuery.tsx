@@ -103,7 +103,7 @@ export function useDataQuery(
         auth === "workspace" ?
           await resolveManualQueryForExecution({
             query,
-            workspaceId,
+            workspaceId: workspaceId as Workspace.Id,
           })
         : { query, didAutoLimit: false as const };
       const executionQuery = resolved.query;
@@ -137,12 +137,18 @@ export function useDataQuery(
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {
+        const executionQueryWithSource = {
+          ...executionQuery,
+          dataSource,
+        } as StructuredQuery.T;
         const queryResults = await Model.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
           Dataset: async (): Promise<QueryResult<UnknownRow>> => {
             return await WorkspaceQETLClient.runQuery({
-              rawSQL: StructuredQuery.toRawDuckDBQuery(executionQuery),
+              rawSQL: StructuredQuery.toRawDuckDBQuery(
+                executionQueryWithSource,
+              ),
               workspaceId: options.workspaceId,
             });
           },

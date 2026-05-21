@@ -19,8 +19,8 @@ import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEdi
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import {
-  getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
+  useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton";
@@ -97,14 +97,12 @@ export function DashboardEditorView({
     });
   }, [dashboard, dashboardTitle]);
 
-  const puckConfig = useMemo(() => {
-    return getDashboardPuckConfig({
-      dashboardTitle,
-      workspaceId: dashboard.workspaceId,
-      dashboardId: dashboard.id,
-      t,
-    });
-  }, [dashboard.id, dashboard.workspaceId, dashboardTitle, t]);
+  const puckConfig = useDashboardPuckConfig({
+    dashboardTitle,
+    workspaceId: dashboard.workspaceId,
+    dashboardId: dashboard.id,
+    t,
+  });
 
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate:

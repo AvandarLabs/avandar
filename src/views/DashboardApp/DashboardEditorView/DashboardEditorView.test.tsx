@@ -133,7 +133,7 @@ vi.mock(
   "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig",
   () => {
     return {
-      getDashboardPuckConfig: (): Record<string, unknown> => {
+      useDashboardPuckConfig: (): Record<string, unknown> => {
         return {};
       },
       getDashboardTitleFromPuckData: (): string => {

@@ -868,6 +868,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           lastSql: z.string().optional(),
           lastResultColumns: z
             .array(z.object({ name: z.string(), dataType: z.string() }))
+            .readonly()
             .optional(),
           lastError: z.string().optional(),
           dashboardId: z.string().optional(),

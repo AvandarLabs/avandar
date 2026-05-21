@@ -37,12 +37,15 @@ export function OfflineGated({
     return <>{children}</>;
   }
 
-  const gatedChild = cloneElement(child as ReactElement, {
-    "aria-disabled": true,
-    tabIndex: -1,
-    onClick: blockPointerEvent,
-    onClickCapture: blockPointerEvent,
-  });
+  const gatedChild = cloneElement(
+    child as ReactElement<Record<string, unknown>>,
+    {
+      "aria-disabled": true,
+      tabIndex: -1,
+      onClick: blockPointerEvent,
+      onClickCapture: blockPointerEvent,
+    },
+  );
 
   return (
     <Tooltip label={<OfflineUnavailableTooltipLabel />}>

@@ -27,7 +27,10 @@ export type QuoteBlockProps = {
   quote: string;
 };
 
-export type DividerBlockProps = Record<string, never>;
+export type DividerBlockProps = {
+  /** Reserved so the props shape matches Puck's `WithId<Props>` expectation. */
+  _empty?: never;
+};
 
 export type FigureBlockProps = {
   alt: string;

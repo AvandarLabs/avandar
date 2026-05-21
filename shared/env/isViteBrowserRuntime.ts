@@ -8,9 +8,10 @@
  */
 export function isViteBrowserRuntime(): boolean {
   const g = globalThis as { window?: unknown };
+  const meta = import.meta as ImportMeta & { env?: unknown };
   return (
     typeof import.meta !== "undefined" &&
-    import.meta.env !== undefined &&
+    meta.env !== undefined &&
     typeof g.window !== "undefined"
   );
 }

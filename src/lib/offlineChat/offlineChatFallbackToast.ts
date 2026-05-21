@@ -25,23 +25,6 @@ export function offerOfflineChatFallback(): Promise<boolean> {
       onClose: () => {
         finish(false);
       },
-      actions: [
-        {
-          label: "Use offline model",
-          onClick: () => {
-            notifications.hide(notificationId);
-            finish(true);
-          },
-        },
-        {
-          label: "Cancel",
-          color: "gray",
-          onClick: () => {
-            notifications.hide(notificationId);
-            finish(false);
-          },
-        },
-      ],
     });
 
     function finish(value: boolean): void {

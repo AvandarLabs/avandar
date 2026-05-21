@@ -36,10 +36,10 @@ describe("stripTableNamespacesInSelectAst", () => {
     const ast = parser.astify(
       'SELECT * FROM "duckdb_views"."covid_us_deaths"',
       { database: "postgresql" },
-    ) as Record<string, unknown>;
+    ) as unknown as Record<string, unknown>;
     const changed = stripTableNamespacesInSelectAst(ast);
     expect(changed).toBe(true);
-    const from = (ast.from as Array<Record<string, unknown>>)[0];
+    const from = (ast.from as Array<Record<string, unknown>>)[0]!;
     expect(from.db).toBeUndefined();
     expect(from.table).toBe("covid_us_deaths");
   });

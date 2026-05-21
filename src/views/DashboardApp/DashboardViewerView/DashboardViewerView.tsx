@@ -18,7 +18,7 @@ import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -47,7 +47,7 @@ export function DashboardViewerView({
   const [isLoadingDatasets, loadingDatasetsError] =
     useEnsurePublishedDashboardDatasets(dashboard);
 
-  const config = getDashboardPuckConfig({
+  const config = useDashboardPuckConfig({
     dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     workspaceId: dashboard?.workspaceId,
     dashboardId: dashboard.id,

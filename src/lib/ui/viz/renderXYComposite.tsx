@@ -8,7 +8,7 @@ type Props = {
   data: UnknownDataFrame;
   xAxisKey: string;
   series: readonly XYSeries[];
-  height: number;
+  height: number | string;
   withLegend: boolean;
   tooltipProps?: unknown;
   styleProps: ReturnType<typeof applyChartStyle>;

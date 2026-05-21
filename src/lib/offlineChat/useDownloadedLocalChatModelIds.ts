@@ -29,7 +29,7 @@ function getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
 /**
  * Reactive list of offline chat models marked downloaded in this browser.
  */
-export function useDownloadedLocalChatModelIds(): LocalChatModelId[] {
+export function useDownloadedLocalChatModelIds(): readonly LocalChatModelId[] {
   return useSyncExternalStore(
     subscribeDownloadedLocalChatModels,
     getDownloadedLocalChatModelIdsSnapshot,

@@ -169,7 +169,10 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
               workspaceId: workspace.id,
             })
           : undefined;
-        dispatch.setDataSource(restoredDataSource, commitOptions);
+        dispatch.setDataSource({
+          dataSource: restoredDataSource,
+          options: commitOptions,
+        });
       }
 
       if (

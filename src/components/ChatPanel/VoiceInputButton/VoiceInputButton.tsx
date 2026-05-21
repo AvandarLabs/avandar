@@ -286,7 +286,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         return;
       }
       try {
-        await manager.ensureModelDownloaded(activeModelId);
+        await manager.ensureModelLoaded(activeModelId);
         await refreshDownloadState();
         const model = findWhisperCppVoiceModel(activeModelId);
         notifications.show({

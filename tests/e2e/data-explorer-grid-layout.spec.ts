@@ -88,16 +88,17 @@ test.describe("Data Explorer grid layout", () => {
     await nextPageButton.click();
 
     await expect
-      .poll(async () => {
-        return (
-          await page
-            .locator(".ag-paging-page-summary-panel")
-            .first()
-            .textContent()
-        )?.replace(/\s+/g, " ");
-      })
-      .toContain("Page 2 of 2", {
-        timeout: MEDIUM_WAIT,
-      });
+      .poll(
+        async () => {
+          return (
+            await page
+              .locator(".ag-paging-page-summary-panel")
+              .first()
+              .textContent()
+          )?.replace(/\s+/g, " ");
+        },
+        { timeout: MEDIUM_WAIT },
+      )
+      .toContain("Page 2 of 2");
   });
 });

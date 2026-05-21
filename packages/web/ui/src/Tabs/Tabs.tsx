@@ -68,6 +68,8 @@ export function Tabs<TabId extends string>({
   classNames: tabsClassNames,
   ...props
 }: Props<TabId>): JSX.Element {
+  const tabsClassNamesObj =
+    typeof tabsClassNames === "function" ? undefined : tabsClassNames;
   const [internalTab, setInternalTab] = useState<TabId>(tabIds[0]!);
   const isControlled = value !== undefined;
   const currentTab = isControlled ? value : internalTab;
@@ -108,7 +110,7 @@ export function Tabs<TabId extends string>({
         mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        className={clsx(isFloating && classes.list, tabsClassNames?.list)}
+        className={clsx(isFloating && classes.list, tabsClassNamesObj?.list)}
         style={
           isFloating ? undefined : (
             {

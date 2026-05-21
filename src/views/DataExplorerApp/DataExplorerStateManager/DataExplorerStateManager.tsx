@@ -79,9 +79,12 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Set the data source for the query. */
     setDataSource: (
       state: DataExplorerAppState,
-      dataSource: QueryDataSource | undefined,
-      options?: { limit?: number },
+      payload: {
+        dataSource: QueryDataSource | undefined;
+        options?: { limit?: number };
+      },
     ) => {
+      const { dataSource, options } = payload;
       const newQuery = applyDefaultManualQueryLimit({
         ...state.query,
         dataSource,

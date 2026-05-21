@@ -1,7 +1,7 @@
 import type { LocalChatModelId } from "./localChatModelCatalog";
 import type {
   ChatClarifyRequest,
-  ChatGeneratedSQL,
+  ChatGeneratedSql,
   ChatPageContext,
 } from "$/types/chat.types";
 
@@ -65,14 +65,14 @@ export type OfflineChatPipelineArgs = {
 
 export type OfflineChatPipelineResult = {
   assistantText: string;
-  generatedSql?: ChatGeneratedSQL;
+  generatedSql?: ChatGeneratedSql;
   clarification?: ChatClarifyRequest;
   phaseLabels: readonly string[];
 };
 
 export type OfflineChatTurnResult = {
   assistantText: string;
-  generatedSql?: ChatGeneratedSQL;
+  generatedSql?: ChatGeneratedSql;
   clarification?: ChatClarifyRequest;
 };
 

@@ -94,7 +94,6 @@ test.describe("CSV with quoted fields after sniff sample", () => {
 
   test("LONG_global_deaths.csv preview shows Afghanistan data", async ({
     page,
-    e2eWorkerDb,
   }) => {
     test.setTimeout(120_000);
 
@@ -213,7 +212,7 @@ test.describe("CSV with quoted fields after sniff sample", () => {
             .getByRole("navigation", { name: "Column outline" })
             .innerText();
           const match = outlineText.match(/(\d[\d,]*) rows/i);
-          return match ? Number(match[1].replaceAll(",", "")) : 0;
+          return match?.[1] ? Number(match[1].replaceAll(",", "")) : 0;
         },
         { timeout: LONG_WAIT },
       )

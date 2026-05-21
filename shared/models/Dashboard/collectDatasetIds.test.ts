@@ -26,7 +26,7 @@ describe("collectDatasetIds", () => {
   });
 
   it("returns full when no datasets are referenced", () => {
-    const dashboard = { config: { content: [] } } as Dashboard.T;
+    const dashboard = { config: { content: [] } } as unknown as Dashboard.T;
     expect(collectDatasetIds(dashboard, [])).toEqual([]);
   });
 });

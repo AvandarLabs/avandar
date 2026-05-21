@@ -45,7 +45,7 @@ export type ColumnSummary = {
   };
 } & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
 
-type DatasetSummary = {
+export type DatasetSummary = {
   rows: number;
   columns: number;
   columnSummaries?: readonly ColumnSummary[];

@@ -95,7 +95,7 @@ export function FloatingPanel({
   width = 360,
   openOriginRef,
   children,
-}: Props): JSX.Element {
+}: Props): JSX.Element | null {
   const { t } = useLingui();
   const panelRef = useRef<HTMLDivElement>(null);
   const usesMorphTransition = openOriginRef != null;

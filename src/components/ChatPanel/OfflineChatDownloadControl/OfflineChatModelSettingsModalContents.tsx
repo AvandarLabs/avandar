@@ -37,7 +37,12 @@ type Props = {
   onDownloadedListChange?: () => void;
 };
 
-/** Remounts settings modal body from localStorage after delete/download. */
+/**
+ * Remounts settings modal body from localStorage after delete/download.
+ * Must be a function returning JSX (not a component) because
+ * `modals.updateModal` takes `children` as a ReactNode value.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
 export function createOfflineChatModelSettingsModalChildren({
   settingsModalId,
   onDownloadedListChange,

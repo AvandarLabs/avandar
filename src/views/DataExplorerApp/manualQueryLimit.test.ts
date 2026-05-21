@@ -1,5 +1,6 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { describe, expect, it } from "vitest";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import {
   applyDefaultManualQueryLimit,
   DEFAULT_MANUAL_QUERY_LIMIT,
@@ -30,7 +31,7 @@ describe("manualQueryLimit", () => {
         id: "dataset_123",
         name: "Dataset",
       },
-    };
+    } as unknown as PartialStructuredQuery;
 
     expect(shouldDefaultManualQueryLimit(query)).toBe(false);
     expect(getManualQueryLimitValue(query)).toBeUndefined();
