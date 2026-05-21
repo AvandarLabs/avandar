@@ -832,7 +832,9 @@ function _buildRetryContextNote(
     );
   }
   if (retryContext.priorAssistantText) {
-    lines.push(`Previous assistant message: "${retryContext.priorAssistantText}"`);
+    lines.push(
+      `Previous assistant message: "${retryContext.priorAssistantText}"`,
+    );
   }
   if (lines.length === 0) {
     return "";

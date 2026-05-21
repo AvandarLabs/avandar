@@ -62,19 +62,21 @@ export function DataGrid({
         field: field,
         headerName: field,
         filter: true,
-        valueFormatter: isDate ?
-          (p: { value: unknown }) => {
-            return formatDate(p.value, {
-              format: dateFormat,
-              zone: timezone,
-            });
-          }
-        : (p: { value: unknown }) => {
-            return typeof p.value === "number" ?
-                formatChartNumber(p.value)
-              : (p.value as string | null | undefined) == null ? ""
-              : String(p.value);
-          },
+        valueFormatter:
+          isDate ?
+            (p: { value: unknown }) => {
+              return formatDate(p.value, {
+                format: dateFormat,
+                zone: timezone,
+              });
+            }
+          : (p: { value: unknown }) => {
+              return (
+                typeof p.value === "number" ? formatChartNumber(p.value)
+                : (p.value as string | null | undefined) == null ? ""
+                : String(p.value)
+              );
+            },
       };
     });
   }, [columnNames, dateColumns, dateFormat, timezone]);

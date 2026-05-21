@@ -1,5 +1,5 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { renderHook, waitFor } from "@testing-library/react";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearDatasetRowCountCache,

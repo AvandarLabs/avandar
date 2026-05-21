@@ -20,7 +20,6 @@ import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPick
 import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
 import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
-import { consumePendingVoiceLanguage } from "@/lib/voice/pendingVoiceLanguage";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
@@ -29,6 +28,7 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/lib/privacy/generatedSqlAssumptions";
 import { consumeAckForText } from "@/lib/privacy/pendingAcks";
+import { consumePendingVoiceLanguage } from "@/lib/voice/pendingVoiceLanguage";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
