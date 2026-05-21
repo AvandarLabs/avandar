@@ -1,5 +1,5 @@
-import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { EntityConfigParsers } from "$/models/EntityConfig/EntityConfigParsers";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const EntityConfigClient = createUsableServiceClient(

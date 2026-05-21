@@ -18,6 +18,10 @@
   padding: var(--mantine-spacing-sm);
 }
 
+.root :global(.cm-line) {
+  line-height: 2;
+}
+
 .rootReadOnly {
   background: transparent;
   border: none;

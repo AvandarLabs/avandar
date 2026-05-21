@@ -38,9 +38,9 @@ export async function fetchOfflineChatSchema(args: {
 
   if (args.navigatorOnLine) {
     try {
-      const rows = await DatasetClient.getAllDatasetsWithColumns({
-        where: where("workspace_id", "eq", args.workspace.id),
-      });
+      const rows = await DatasetClient.getAllDatasetsWithColumns(
+        where("workspace_id", "eq", args.workspace.id),
+      );
       const schema = mapFromDatasetClient(rows);
       writeCachedOfflineChatSchema(args.workspace.id, schema);
       return truncateSchemaForOffline(schema, args.openDatasetId);

@@ -42,7 +42,7 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
-import { OpenDatasetDrawer } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer";
+import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
@@ -96,8 +96,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const dispatch = DataExplorerStateManager.useDispatch();
   const planState = PlanStateManager.useState();
   const [
-    isOpenDatasetDrawerOpen,
-    { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
+    isOpenDatasetModalOpen,
+    { open: openOpenDatasetModal, close: closeOpenDatasetModal },
   ] = useDisclosure(false);
   const [panelPreferences, setPanelPreferences] =
     useState<DataExplorerPanelPreferences>(() => {
@@ -253,7 +253,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
   const settingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
-  /** Auto-open settings once on the first successful query when nothing is in session storage yet. */
+  /**
+   * Auto-open settings once on the first successful query when nothing is in
+   * session storage yet.
+   */
   const hasAutoOpenedSettingsRef = useRef(
     hasDataExplorerPanelPreferencesInSessionStorage(),
   );
@@ -331,7 +334,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             color="neutral"
             leftSection={<IconFolderOpen size={16} />}
             size="compact-sm"
-            onClick={openOpenDatasetDrawer}
+            onClick={openOpenDatasetModal}
           >
             <Trans>Open</Trans>
           </Button>
@@ -598,13 +601,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           onVizTypeChange={dispatch.setActiveVizType}
         />
       </FloatingPanel>
-      <OpenDatasetDrawer
-        opened={isOpenDatasetDrawerOpen}
-        onClose={closeOpenDatasetDrawer}
+      <OpenDatasetModal
+        opened={isOpenDatasetModalOpen}
+        onClose={closeOpenDatasetModal}
         onOpen={(info, rawSQL) => {
           dispatch.setRawSql(rawSQL);
           dispatch.setOpenDataset(info);
-          closeOpenDatasetDrawer();
+          closeOpenDatasetModal();
         }}
       />
     </AppLayout>

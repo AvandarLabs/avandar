@@ -77,8 +77,8 @@ export async function inferQuoteCharWhenSniffReportsEmpty(options: {
 }
 
 /**
- * Applies {@link inferQuoteCharWhenSniffReportsEmpty} and pairs escape when quote
- * was inferred.
+ * Applies {@link inferQuoteCharWhenSniffReportsEmpty} and pairs escape when
+ * quote was inferred.
  */
 export async function applyQuoteProbeToParseOptions<
   T extends {

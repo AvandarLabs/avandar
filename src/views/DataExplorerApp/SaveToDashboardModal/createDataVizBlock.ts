@@ -1,5 +1,8 @@
 import { uuid } from "$/lib/uuid";
-import type { VizConfig, VizType } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * Fallback prompt used when the Data Explorer's `state.nlPrompt` is empty

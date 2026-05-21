@@ -67,9 +67,13 @@ export function truncateSchemaForOffline(
       return column.dataset_id;
     }),
   );
-  const trimmedDatasets: OfflineChatSchemaDataset[] = datasets.filter((d) => {
-    return datasetIdSet.has(d.id);
-  });
+  // Keep dataset labels for table resolution when column metadata is empty.
+  const trimmedDatasets: OfflineChatSchemaDataset[] =
+    datasetIdSet.size > 0 ?
+      datasets.filter((dataset) => {
+        return datasetIdSet.has(dataset.id);
+      })
+    : datasets;
 
   return { datasets: trimmedDatasets, columns };
 }

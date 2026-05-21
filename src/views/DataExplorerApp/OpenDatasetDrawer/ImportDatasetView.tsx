@@ -8,8 +8,8 @@ type Props = {
 
 /**
  * Renders the standard "Import data" tabs (Upload, Connectors, Open data)
- * inside the Data Explorer's Open drawer. On successful save, the host
- * drawer is notified instead of redirecting to the dataset detail page.
+ * inside the Data Explorer's Open dataset modal. On successful save, the host
+ * modal is notified instead of redirecting to the dataset detail page.
  */
 export function ImportDatasetView({ onSaveSuccess }: Props): JSX.Element {
   const isAddAllowed = useCanAddDataset();

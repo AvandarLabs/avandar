@@ -1,11 +1,11 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { isDefined, objectKeys, prop } from "@utils";
-import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
 } from "@/components/forms/AvaForm/AvaForm.types";
+import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type { PathValue, StringKeyOf } from "@utils";
 import type { ChangeEvent } from "react";
 import type { Paths } from "type-fest";

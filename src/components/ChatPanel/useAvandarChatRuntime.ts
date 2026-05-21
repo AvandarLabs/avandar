@@ -14,7 +14,9 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
 import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
+import { logOfflineChat } from "@/lib/offlineChat/offlineChatDebugLog";
 import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
+import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
 import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
 import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
@@ -30,6 +32,7 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { LocalChatModelId } from "@/lib/offlineChat/localChatModelCatalog";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { User } from "$/models/User/User";
 import type {
@@ -325,7 +328,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           });
         };
 
-        const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+        const runOfflineTurn = async (
+          localChatModelId?: LocalChatModelId,
+        ): Promise<ChatModelRunResult> => {
           if (!hasAnyDownloadedLocalChatModel()) {
             return {
               content: [
@@ -341,8 +346,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             pageContext: currentPageContext,
             messages: apiMessages,
             navigatorOnLine: navigator.onLine,
+            localChatModelId,
             executeSql:
-              currentPageContext.app === "data-explorer" && navigator.onLine ?
+              currentPageContext.app === "data-explorer" ?
                 tryExecuteOfflineSql
               : undefined,
           });
@@ -355,10 +361,20 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
         const mode = resolveOfflineChatMode({
           navigatorOnLine: navigator.onLine,
+          selectedChatModelId: model,
+        });
+        logOfflineChat("useAvandarChatRuntime:mode", {
+          mode,
+          navigatorOnLine: navigator.onLine,
+          selectedChatModelId: model,
+          pageContext: currentPageContext,
         });
         if (mode.kind === "local") {
-          return runOfflineTurn();
+          return runOfflineTurn(mode.localChatModelId);
         }
+
+        const cloudModelId =
+          model && !parseOfflineChatPickerModelId(model) ? model : undefined;
 
         try {
           const response = await APIClient.post({
@@ -367,20 +383,23 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             body: {
               messages: apiMessages,
               context: currentPageContext,
-              model,
+              ...(cloudModelId ? { model: cloudModelId } : {}),
               ...(consentAcks.length > 0 ? { consentAcks } : {}),
             },
           });
           return applyResponse(response);
         } catch (error) {
-          const mode = resolveOfflineChatMode({
+          const fallbackMode = resolveOfflineChatMode({
             navigatorOnLine: navigator.onLine,
             chatPostFailed: isNetworkChatFailure(error),
+            selectedChatModelId: model,
           });
-          if (mode.kind === "offer_local_fallback") {
+          if (fallbackMode.kind === "offer_local_fallback") {
             const accepted = await offerOfflineChatFallback();
             if (accepted) {
-              return runOfflineTurn();
+              const pickerLocalId =
+                model ? parseOfflineChatPickerModelId(model) : undefined;
+              return runOfflineTurn(pickerLocalId);
             }
           }
           throw error;

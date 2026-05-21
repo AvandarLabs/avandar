@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { render } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VoiceModelLoadingNotification } from "./VoiceModelLoadingNotification";
 import type { VoiceManagerStatus } from "@/lib/voice/voiceManagerInterface";
@@ -42,10 +42,15 @@ vi.mock("@/lib/voice/useVoiceModelManager", () => {
 });
 
 describe("VoiceModelLoadingNotification", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
   afterEach(() => {
     mockStatus = { kind: "idle" };
     notificationShow.mockClear();
     notificationHide.mockClear();
+    vi.useRealTimers();
   });
 
   it("shows a persistent loading toast while the model warms up", () => {
@@ -57,6 +62,10 @@ describe("VoiceModelLoadingNotification", () => {
         </AvandarUiProvider>
       </I18nProvider>,
     );
+
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     expect(notificationShow).toHaveBeenCalledWith(
       expect.objectContaining({

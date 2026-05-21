@@ -26,13 +26,21 @@ export function writeStoredChatModelId(modelId: string): void {
 /**
  * Returns the stored model if it exists in the catalog. Otherwise, falls back
  * to our app's default model id.
+ *
+ * Pass `honorStoredWhenMissing` while the cloud catalog is still loading so a
+ * saved cloud model is not replaced by the first offline entry in a partial
+ * list.
  */
 export function resolveChatModelId(args: {
   availableModels: ReadonlyArray<{ id: string }>;
   storedModelId: string | undefined;
+  honorStoredWhenMissing?: boolean;
 }): string {
-  const { availableModels, storedModelId } = args;
+  const { availableModels, storedModelId, honorStoredWhenMissing } = args;
   if (storedModelId && availableModels.some(propEq("id", storedModelId))) {
+    return storedModelId;
+  }
+  if (honorStoredWhenMissing && storedModelId) {
     return storedModelId;
   }
   if (availableModels.some(propEq("id", AppConfig.chat.defaultModelId))) {

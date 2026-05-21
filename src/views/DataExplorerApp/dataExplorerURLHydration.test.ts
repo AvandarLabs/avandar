@@ -60,7 +60,20 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
 describe("shouldDeferURLHydrationForStructuredLoading", () => {
   const DS = { id: "ds-1" };
 
-  it("does not defer when rawSQL is set even if dsId is unresolved", () => {
+  it("defers when rawSQL is set until workspace SQL mapping metadata loads", () => {
+    expect(
+      shouldDeferURLHydrationForStructuredLoading({
+        urlState: _parsed({ rawSQL: "SELECT 1" }),
+        restoredDataSource: undefined,
+        needsColumns: false,
+        datasetColumns: undefined,
+        entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not defer when rawSQL is set and SQL mapping metadata is loaded", () => {
     expect(
       shouldDeferURLHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "missing", rawSQL: "SELECT 1" }),
@@ -68,6 +81,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: true,
         datasetColumns: undefined,
         entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
   });
@@ -80,6 +94,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: false,
         datasetColumns: undefined,
         entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(true);
   });
@@ -92,6 +107,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: false,
         datasetColumns: undefined,
         entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
   });
@@ -104,6 +120,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: true,
         datasetColumns: undefined,
         entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(true);
   });
@@ -116,6 +133,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: true,
         datasetColumns: [{ id: "c1" }],
         entityFieldConfigs: undefined,
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
   });
@@ -128,6 +146,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
         needsColumns: true,
         datasetColumns: undefined,
         entityFieldConfigs: [{ id: "f1" }],
+        sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
   });

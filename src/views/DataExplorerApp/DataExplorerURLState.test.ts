@@ -43,6 +43,7 @@ function _makeState(overrides: {
   rawSQL?: string;
   vizConfig?: VizConfig;
   openDataset?: OpenDatasetInfo;
+  lastQueryError?: string;
 }): DataExplorerAppState {
   return {
     query: StructuredQuery.makeEmpty(),
@@ -398,6 +399,16 @@ describe("round-trip: serialize then parse", () => {
       serializeStateToURL(_makeState({ rawSQL: sql })),
     );
     expect(parsed.rawSQL).toBe(sql);
+  });
+
+  it("omits rawSQL from the URL when the query has a runtime error", () => {
+    const sql = "SELECT bad_column FROM t";
+    const parsed = parseURLSearch(
+      serializeStateToURL(
+        _makeState({ rawSQL: sql, lastQueryError: "Column not found" }),
+      ),
+    );
+    expect(parsed.rawSQL).toBeUndefined();
   });
 
   it("does not put structured keys in URL when rawSQL is set", () => {

@@ -1,21 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Alert,
-  Button,
-  Fieldset,
-  Group,
-  List,
-  Paper,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Alert, Button, Group, List, Paper, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SqlEditor, SqlQueryEditPanel } from "@/components/SqlEditor";
 import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
+import { formatSqlForDisplay } from "@/lib/sql/formatSqlForDisplay";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";
+
+const SQL_EDITOR_MIN_ROWS = 10;
 
 /**
  * Read-only view of the current SQL with an "Edit query" affordance that
@@ -31,6 +25,9 @@ export function SqlQueryView(): JSX.Element {
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
   const { catalog } = useSqlDisplayCatalog();
+  const displaySql = useMemo(() => {
+    return formatSqlForDisplay(rawSQL ?? "");
+  }, [rawSQL]);
 
   const onSubmitSql = (rawValue: string): void => {
     const trimmedValue = rawValue.trim();
@@ -58,7 +55,7 @@ export function SqlQueryView(): JSX.Element {
   }
 
   return (
-    <Stack gap="md" px="sm">
+    <Stack gap="xs" px="sm" className={css.root}>
       {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
         <Alert
           icon={<IconAlertTriangle size={16} />}
@@ -81,52 +78,42 @@ export function SqlQueryView(): JSX.Element {
           </List>
         </Alert>
       : null}
-      <Fieldset
-        className={css.fieldset}
-        legend={
-          <Group justify="space-between" className={css.legendGroup}>
-            <span>
-              <Trans>Generated SQL</Trans>
-            </span>
-            {isEditMode ? null : (
-              <Button
-                size="xs"
-                variant="subtle"
-                onClick={() => {
-                  setIsEditMode(true);
-                }}
-              >
-                <Trans>Edit query</Trans>
-              </Button>
-            )}
-          </Group>
-        }
-      >
-        <Stack gap="sm">
-          {isEditMode ?
-            <SqlQueryEditPanel
-              initialSql={rawSQL}
+      {isEditMode ?
+        <SqlQueryEditPanel
+          initialSql={rawSQL}
+          catalog={catalog}
+          submitButtonLabel={t`Re-run query`}
+          cancelButtonLabel={t`Cancel`}
+          minRows={SQL_EDITOR_MIN_ROWS}
+          onSubmit={onSubmitSql}
+          onCancel={() => {
+            setIsEditMode(false);
+          }}
+        />
+      : <Stack gap="xs">
+          <Paper p="sm" className={css.sqlPaper}>
+            <SqlEditor
+              value={displaySql}
+              onChange={() => {}}
               catalog={catalog}
-              submitButtonLabel={t`Re-run query`}
-              cancelButtonLabel={t`Cancel`}
-              onSubmit={onSubmitSql}
-              onCancel={() => {
-                setIsEditMode(false);
-              }}
+              readOnly
+              minRows={SQL_EDITOR_MIN_ROWS}
+              data-testid="sql-query-view-editor"
             />
-          : <Paper p="sm" className={css.sqlPaper}>
-              <SqlEditor
-                value={rawSQL}
-                onChange={() => {}}
-                catalog={catalog}
-                readOnly
-                minRows={6}
-                data-testid="sql-query-view-editor"
-              />
-            </Paper>
-          }
+          </Paper>
+          <Group justify="flex-end" className={css.editQueryRow}>
+            <Button
+              size="xs"
+              variant="subtle"
+              onClick={() => {
+                setIsEditMode(true);
+              }}
+            >
+              <Trans>Edit query</Trans>
+            </Button>
+          </Group>
         </Stack>
-      </Fieldset>
+      }
     </Stack>
   );
 }

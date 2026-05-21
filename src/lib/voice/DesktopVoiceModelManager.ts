@@ -15,7 +15,7 @@
  *   on-disk weight cache.
  *
  * The class implements the same `IVoiceModelManager` interface as the
- * web `VoiceModelManager`, so React components are platform-agnostic.
+ * web whisper.cpp WASM manager, so React components are platform-agnostic.
  */
 
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
@@ -169,6 +169,17 @@ export class DesktopVoiceModelManager implements IVoiceModelManager {
     await this.callIpc(VoiceContracts.downloadModel, { modelId: id });
 
     await this.waitForReadyOrError(id);
+  }
+
+  /**
+   * Whisper weights stay in the main process; this only resets renderer UI
+   * state so the mic shows "warm up again" after offline chat used RAM.
+   */
+  async releaseLoadedPipeline(): Promise<void> {
+    this.stopPolling();
+    if (this.status.kind !== "idle") {
+      this.setStatus({ kind: "idle" });
+    }
   }
 
   async transcribe(

@@ -102,6 +102,21 @@ describe("buildSqlDisplaySegments", () => {
     expect(rebuilt).toBe(sql);
   });
 
+  it("labels a backtick-quoted dataset id (e.g. after sqlify formatting)", () => {
+    const sql = `SELECT "Admin2" FROM \`${DS_ID}\` LIMIT 10`;
+    const segments = buildSqlDisplaySegments({ sql, catalog });
+    expect(
+      segments.some((s) => {
+        return (
+          s.kind === "dataset" &&
+          s.datasetId === DS_ID &&
+          s.label === "California cases" &&
+          s.raw === `\`${DS_ID}\``
+        );
+      }),
+    ).toBe(true);
+  });
+
   it("resolves dataset by name when SQL uses the dataset name in FROM", () => {
     const sql = `SELECT * FROM "California cases"`;
     const segments = buildSqlDisplaySegments({ sql, catalog });

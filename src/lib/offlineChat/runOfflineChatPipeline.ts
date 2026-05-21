@@ -3,11 +3,15 @@ import {
   buildOfflineFixSqlPrompt,
   buildOfflineSqlPrompt,
 } from "./buildOfflinePrompts";
+import { narrowOfflineSchema } from "./narrowOfflineSchema";
+import { logOfflineChat } from "./offlineChatDebugLog";
 import {
   extractSqlFromLlmText,
   parseAnalyzeJson,
   stripSqlFenceForAssistantText,
 } from "./parseOfflineLlmOutput";
+import { repairOfflineGeneratedSql } from "./repairOfflineGeneratedSql";
+import { resolveOfflineDataset } from "./resolveOfflineDataset";
 import type {
   OfflineChatPipelineArgs,
   OfflineChatPipelineResult,
@@ -26,8 +30,36 @@ function appendPhase(
   onPhase?.(label);
 }
 
+function hardenExtractedSql(args: {
+  sql: string;
+  schema: OfflineChatPipelineArgs["schema"];
+  lastUserPrompt: string;
+  pageContext: OfflineChatPipelineArgs["pageContext"];
+  analyzeTableName?: string;
+  resolvedDatasetId?: string;
+  executionError?: string;
+}): string {
+  const repaired = repairOfflineGeneratedSql({
+    sql: args.sql,
+    schema: args.schema,
+    lastUserPrompt: args.lastUserPrompt,
+    openDatasetId: args.pageContext.openDatasetId,
+    analyzeTableName: args.analyzeTableName,
+    resolvedDatasetId: args.resolvedDatasetId,
+    executionError: args.executionError,
+  });
+  logOfflineChat("hardenExtractedSql", {
+    sqlIn: args.sql,
+    sqlOut: repaired.sql,
+    resolvedDatasetId: args.resolvedDatasetId,
+    appliedSteps: repaired.appliedSteps,
+  });
+  return repaired.sql;
+}
+
 /**
- * Multi-pass offline inference: analyze → SQL → optional DuckDB fix.
+ * Multi-pass offline inference: analyze → SQL → deterministic repair → DuckDB
+ * → optional column repair → optional LLM fix.
  */
 export async function runOfflineChatPipeline(
   args: OfflineChatPipelineArgs,
@@ -38,7 +70,7 @@ export async function runOfflineChatPipeline(
     args.pageContext.app === "dashboards";
 
   if (!needsSql) {
-    appendPhase(phaseLabels, "Replying (offline)…", args.onPhase);
+    appendPhase(phaseLabels, "Replying…", args.onPhase);
     const text = await args.engine.complete({
       messages: [
         {
@@ -58,11 +90,7 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  appendPhase(
-    phaseLabels,
-    "Understanding your question (offline)…",
-    args.onPhase,
-  );
+  appendPhase(phaseLabels, "Understanding your question…", args.onPhase);
   const analyzeRaw = await args.engine.complete({
     messages: [
       {
@@ -98,16 +126,36 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  appendPhase(phaseLabels, "Writing query (offline)…", args.onPhase);
+  const resolvedDataset = resolveOfflineDataset({
+    schema: args.schema,
+    lastUserPrompt: args.lastUserPrompt,
+    openDatasetId: args.pageContext.openDatasetId,
+    analyzeTableName: analyze?.tableName,
+  });
+
+  logOfflineChat("runOfflineChatPipeline:resolvedDataset", {
+    resolvedId: resolvedDataset?.id,
+    resolvedName: resolvedDataset?.name,
+    analyzeTableName: analyze?.tableName,
+    lastUserPrompt: args.lastUserPrompt,
+  });
+
+  const sqlPromptSchema =
+    resolvedDataset ?
+      narrowOfflineSchema(args.schema, resolvedDataset.id)
+    : args.schema;
+
+  appendPhase(phaseLabels, "Writing query…", args.onPhase);
   let sqlPassText = await args.engine.complete({
     messages: [
       {
         role: "system",
         content: buildOfflineSqlPrompt({
-          schema: args.schema,
+          schema: sqlPromptSchema,
           pageContext: args.pageContext,
           analysisSummary: summary,
           lastUserPrompt: args.lastUserPrompt,
+          resolvedDataset,
           lastSql: args.lastSql,
           lastError: args.lastError,
         }),
@@ -120,19 +168,50 @@ export async function runOfflineChatPipeline(
         (delta) => {
           if (delta.length > 0 && !phaseLabels.includes("streaming_sql")) {
             phaseLabels.push("streaming_sql");
-            args.onPhase?.("Generating SQL (offline)…");
+            args.onPhase?.("Generating SQL…");
           }
         }
       : undefined,
   });
 
   let sql = extractSqlFromLlmText(sqlPassText);
-  let assistantText = stripSqlFenceForAssistantText(sqlPassText);
+  logOfflineChat("runOfflineChatPipeline:sqlExtracted", {
+    rawLlmSql: sql,
+  });
+  let assistantText = resolveOfflineSqlAssistantText({
+    pageContext: args.pageContext,
+    sqlPassText,
+    hasSql: sql !== undefined,
+  });
+
+  if (sql) {
+    appendPhase(phaseLabels, "Repairing query…", args.onPhase);
+    sql = hardenExtractedSql({
+      sql,
+      schema: args.schema,
+      lastUserPrompt: args.lastUserPrompt,
+      pageContext: args.pageContext,
+      analyzeTableName: analyze?.tableName,
+      resolvedDatasetId: resolvedDataset?.id,
+    });
+  }
 
   if (sql && args.executeSql) {
-    const exec = await args.executeSql(sql);
+    let exec = await args.executeSql(sql);
     if (!exec.ok) {
-      appendPhase(phaseLabels, "Fixing query (offline)…", args.onPhase);
+      sql = hardenExtractedSql({
+        sql,
+        schema: args.schema,
+        lastUserPrompt: args.lastUserPrompt,
+        pageContext: args.pageContext,
+        analyzeTableName: analyze?.tableName,
+        resolvedDatasetId: resolvedDataset?.id,
+        executionError: exec.error,
+      });
+      exec = await args.executeSql(sql);
+    }
+    if (!exec.ok) {
+      appendPhase(phaseLabels, "Fixing query…", args.onPhase);
       sqlPassText = await args.engine.complete({
         messages: [
           {
@@ -142,6 +221,7 @@ export async function runOfflineChatPipeline(
               sql,
               error: exec.error,
               lastUserPrompt: args.lastUserPrompt,
+              resolvedDataset,
             }),
           },
           { role: "user", content: "Fix the SQL." },
@@ -150,8 +230,23 @@ export async function runOfflineChatPipeline(
       });
       const fixedSql = extractSqlFromLlmText(sqlPassText);
       if (fixedSql) {
-        sql = fixedSql;
-        assistantText = stripSqlFenceForAssistantText(sqlPassText);
+        sql = hardenExtractedSql({
+          sql: fixedSql,
+          schema: args.schema,
+          lastUserPrompt: args.lastUserPrompt,
+          pageContext: args.pageContext,
+          analyzeTableName: analyze?.tableName,
+          resolvedDatasetId: resolvedDataset?.id,
+          executionError: exec.error,
+        });
+        assistantText = resolveOfflineSqlAssistantText({
+          pageContext: args.pageContext,
+          sqlPassText,
+          hasSql: true,
+        });
+        if (args.executeSql) {
+          await args.executeSql(sql);
+        }
       }
     }
   }
@@ -165,11 +260,26 @@ export async function runOfflineChatPipeline(
     };
   }
 
+  logOfflineChat("runOfflineChatPipeline:finalSql", { sql });
+
   return {
     assistantText:
       assistantText ||
-      "Here is a query based on your workspace metadata (offline).",
+      (args.pageContext.app === "data-explorer" ?
+        ""
+      : "Here is a query based on your workspace metadata."),
     generatedSql: { sql, prompt: args.lastUserPrompt },
     phaseLabels,
   };
+}
+
+function resolveOfflineSqlAssistantText(args: {
+  pageContext: OfflineChatPipelineArgs["pageContext"];
+  sqlPassText: string;
+  hasSql: boolean;
+}): string {
+  if (args.pageContext.app === "data-explorer" && args.hasSql) {
+    return "";
+  }
+  return stripSqlFenceForAssistantText(args.sqlPassText);
 }

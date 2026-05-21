@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { Container, Stack, Title } from "@mantine/core";
-import { Paper } from "@ui";
+import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
+import css from "@/views/DataManagerApp/DataImportView/DataImportView.module.css";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
 import { useCanAddDataset } from "@/views/DataManagerApp/DataImportView/useCanAddDataset";
 
@@ -13,15 +13,26 @@ export function DataImportView(): JSX.Element {
   const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
 
   return (
-    <Container pt="xxl">
-      <Paper>
-        <Stack>
-          <Title order={2}>
+    <Container className={css.page} pt="xxl" px="lg">
+      <Stack gap="lg">
+        <header className={css.header}>
+          <Title order={2} fw={650}>
             <Trans>Import data</Trans>
           </Title>
+          <Text c="dimmed" size="sm" maw={520}>
+            <Trans>
+              Upload files, connect external sources, or browse open datasets to
+              add to your workspace.
+            </Trans>
+          </Text>
+        </header>
+
+        <Divider />
+
+        <Box className={css.panel}>
           <DataImportTabs isAddAllowed={isAddAllowed} />
-        </Stack>
-      </Paper>
+        </Box>
+      </Stack>
 
       {
         // We did a backend check to see if the user is allowed to add more

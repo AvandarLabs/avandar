@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
 
 /**
@@ -29,13 +30,10 @@ export function useSqlToStructuredQuery(): {
 
   const parseSql = useCallback(
     (sql: string): SqlMappingResult => {
-      const datasetList = (datasets ?? []).map((dataset) => {
-        const columns = (allColumns ?? []).filter((col) => {
-          return col.datasetId === dataset.id;
-        });
-        return { dataset, columns };
+      return sqlToStructuredQuery({
+        sql,
+        datasets: buildSqlMappingDatasets(datasets ?? [], allColumns ?? []),
       });
-      return sqlToStructuredQuery({ sql, datasets: datasetList });
     },
     [datasets, allColumns],
   );

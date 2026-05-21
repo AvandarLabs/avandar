@@ -1,10 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import type { ChatClarifyResponseShape } from "$/types/chat.types";
 
-/** Sentinel value for fixed-option UI when the user rejects all listed choices. */
+/**
+ * Sentinel value for fixed-option UI when the user rejects all listed choices.
+ */
 export const CLARIFICATION_NONE_OF_ABOVE = "__none_of_above__" as const;
 
-/** Sentinel value for fixed-option UI when the user will type a custom answer. */
+/**
+ * Sentinel value for fixed-option UI when the user will type a custom answer.
+ */
 export const CLARIFICATION_SOMETHING_ELSE = "__something_else__" as const;
 
 /**

@@ -44,11 +44,19 @@ export type IVoiceModelManager = {
   getStatus(): VoiceManagerStatus;
   subscribe(listener: VoiceManagerListener): () => void;
   isModelDownloaded(id: VoiceModelId): Promise<boolean>;
-  ensureModelLoaded(id: VoiceModelId): Promise<void>;
+  ensureModelLoaded(
+    id: VoiceModelId,
+    options?: { silent?: boolean },
+  ): Promise<void>;
   /** Removes cached weights and clears the downloaded marker for `id`. */
   deleteModel(id: VoiceModelId): Promise<void>;
   transcribe(
     audio: Float32Array,
     options: { modelId: VoiceModelId; language: VoiceLanguageCode },
   ): Promise<string>;
+  /**
+   * Drops the in-memory ASR runtime (web: whisper.cpp WASM; desktop: main
+   * state only) so offline chat can load WebLLM. Cached weights stay on disk.
+   */
+  releaseLoadedPipeline(): Promise<void>;
 };

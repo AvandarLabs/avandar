@@ -5,17 +5,18 @@ import {
   Badge,
   Button,
   Group,
-  Stack,
-  Table,
+  Loader,
   Text,
   TextInput,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { where } from "@utils";
-import { useState } from "react";
+import clsx from "clsx";
+import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
@@ -24,8 +25,10 @@ import { rehydratePlan } from "@/components/ChatPanel/PlanStateManager/planRehyd
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
+import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { ChatPlan } from "$/types/chat.types";
@@ -35,10 +38,9 @@ type Props = {
 };
 
 /**
- * Returns the localized label for a given dataset source type. Defined as a
- * hook so the labels can use the active translation function.
+ * Returns the localized label for a given dataset source type.
  */
-function _useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
+function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
   const { t } = useLingui();
   return {
     csv_file: t`CSV`,
@@ -57,10 +59,13 @@ function _useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
  */
 export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const { t } = useLingui();
-  const sourceTypeLabels = _useSourceTypeLabels();
+  const sourceTypeLabels = useSourceTypeLabels();
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
+  const [selectedDatasetId, setSelectedDatasetId] = useState<DatasetId | null>(
+    null,
+  );
   const planDispatch = PlanStateManager.useDispatch();
   const planState = PlanStateManager.useState();
 
@@ -69,12 +74,34 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
     useQueryOptions: { enabled: true },
   });
 
-  const filtered = (datasets ?? []).filter((dataset) => {
-    if (!debouncedSearch) {
-      return true;
+  const filtered = useMemo(() => {
+    return (datasets ?? []).filter((dataset) => {
+      if (!debouncedSearch) {
+        return true;
+      }
+      return dataset.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+    });
+  }, [datasets, debouncedSearch]);
+
+  const selectedDataset = useMemo(() => {
+    if (!selectedDatasetId) {
+      return null;
     }
-    return dataset.name.toLowerCase().includes(debouncedSearch.toLowerCase());
-  });
+    return filtered.find((dataset) => {
+      return dataset.id === selectedDatasetId;
+    });
+  }, [filtered, selectedDatasetId]);
+
+  useEffect(() => {
+    if (
+      selectedDatasetId !== null &&
+      !filtered.some((dataset) => {
+        return dataset.id === selectedDatasetId;
+      })
+    ) {
+      setSelectedDatasetId(null);
+    }
+  }, [filtered, selectedDatasetId]);
 
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -113,12 +140,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         virtualDataset.rawSQL,
       );
 
-      // If the dataset was produced by a multi-step plan, restore the
-      // canvas. We derive the planId from the virtual dataset id so
-      // IndexedDB caches survive across reloads of the same dataset.
       if (virtualDataset.planSteps) {
-        // Drop any currently-open plan first (different dataset, or
-        // re-open of the same one) so we don't leak views.
         if (planState.nodes.length > 0) {
           void dropPlanTempViews({
             planId: planState.planId ?? undefined,
@@ -149,13 +171,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
     );
   };
 
-  const onOpenClick = (dataset: Dataset.T) => {
-    match(dataset.sourceType)
+  const onOpenSelected = () => {
+    if (!selectedDataset) {
+      return;
+    }
+    match(selectedDataset.sourceType)
       .with("virtual", () => {
-        loadVirtualDataset(dataset);
+        loadVirtualDataset(selectedDataset);
       })
       .with("csv_file", "xlsx_file", "google_sheets", "open_data", () => {
-        openAsRawPreview(dataset);
+        openAsRawPreview(selectedDataset);
       })
       .exhaustive();
   };
@@ -175,6 +200,9 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteDataset({ id: dataset.id });
+        if (selectedDatasetId === dataset.id) {
+          setSelectedDatasetId(null);
+        }
       },
     });
   };
@@ -182,10 +210,10 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const isBusy = isLoadingVirtualDataset || isDeletingDataset;
 
   return (
-    <Stack gap="sm">
+    <div className={css.savedPanel}>
       <TextInput
         placeholder={t`Search datasets...`}
-        leftSection={<IconSearch size={14} />}
+        leftSection={<IconSearch size={16} />}
         value={search}
         onChange={(e) => {
           setSearch(e.currentTarget.value);
@@ -193,68 +221,64 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       />
 
       {isLoadingDatasets ?
-        <Text c="dimmed" size="sm">
-          <Trans>Loading datasets…</Trans>
-        </Text>
+        <Group justify="center" py="lg">
+          <Loader size="sm" />
+        </Group>
       : filtered.length === 0 ?
-        <Text c="dimmed" size="sm">
+        <Text c="dimmed" size="sm" className={css.emptyState}>
           <Trans>No saved datasets found.</Trans>
         </Text>
-      : <Table highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>
-                <Trans>Name</Trans>
-              </Table.Th>
-              <Table.Th w={120}>
-                <Trans>Type</Trans>
-              </Table.Th>
-              <Table.Th w={140} />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {filtered.map((dataset) => {
-              return (
-                <Table.Tr key={dataset.id}>
-                  <Table.Td>{dataset.name}</Table.Td>
-                  <Table.Td>
-                    <Badge color="neutral" variant="light" size="sm">
-                      {sourceTypeLabels[dataset.sourceType] ??
-                        dataset.sourceType}
-                    </Badge>
-                  </Table.Td>
-                  <Table.Td>
-                    <Group gap="xs" justify="flex-end">
-                      <Button
-                        size="compact-xs"
-                        variant="light"
-                        disabled={isBusy}
-                        onClick={() => {
-                          onOpenClick(dataset);
-                        }}
-                      >
-                        <Trans>Open</Trans>
-                      </Button>
-                      <ActionIcon
-                        size="sm"
-                        variant="subtle"
-                        color="red"
-                        disabled={isBusy}
-                        aria-label={t`Delete ${dataset.name}`}
-                        onClick={() => {
-                          onDeleteClick(dataset);
-                        }}
-                      >
-                        <IconTrash size={14} />
-                      </ActionIcon>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              );
-            })}
-          </Table.Tbody>
-        </Table>
+      : <div role="listbox" aria-label={t`Saved datasets`} className={css.list}>
+          {filtered.map((dataset) => {
+            const isSelected = dataset.id === selectedDatasetId;
+            return (
+              <UnstyledButton
+                key={dataset.id}
+                role="option"
+                aria-selected={isSelected}
+                className={clsx(css.row, isSelected ? css.rowSelected : null)}
+                onClick={() => {
+                  setSelectedDatasetId(dataset.id);
+                }}
+              >
+                <Text size="sm" className={css.rowName}>
+                  {dataset.name}
+                </Text>
+                <Badge
+                  color="neutral"
+                  variant="light"
+                  size="sm"
+                  className={css.rowType}
+                >
+                  {sourceTypeLabels[dataset.sourceType] ?? dataset.sourceType}
+                </Badge>
+                <ActionIcon
+                  size="md"
+                  variant="subtle"
+                  color="red"
+                  className={css.rowDelete}
+                  disabled={isBusy}
+                  aria-label={t`Delete ${dataset.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDeleteClick(dataset);
+                  }}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon>
+              </UnstyledButton>
+            );
+          })}
+        </div>
       }
-    </Stack>
+
+      {selectedDataset ?
+        <Group className={css.footer} justify="flex-end">
+          <Button loading={isBusy} onClick={onOpenSelected}>
+            <Trans>Open {selectedDataset.name}</Trans>
+          </Button>
+        </Group>
+      : null}
+    </div>
   );
 }

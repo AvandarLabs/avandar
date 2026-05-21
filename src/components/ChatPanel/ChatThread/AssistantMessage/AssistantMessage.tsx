@@ -1,7 +1,7 @@
 import { MessagePrimitive } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
-import { TextPart } from "@/components/ChatPanel/ChatThread/TextPart/TextPart";
+import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
 import css from "../ChatThread.module.css";
 
 export function AssistantMessage(): JSX.Element {
@@ -17,7 +17,7 @@ export function AssistantMessage(): JSX.Element {
             aria-label={t`Assistant is typing`}
           />
         </MessagePrimitive.If>
-        <MessagePrimitive.Parts components={{ Text: TextPart }} />
+        <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
       </div>
     </MessagePrimitive.Root>
   );

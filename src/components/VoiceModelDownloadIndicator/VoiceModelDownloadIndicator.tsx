@@ -3,7 +3,7 @@ import { Progress, Stack, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { useVoiceModelStatus } from "@/lib/voice/useVoiceModelManager";
 import { overallDownloadPercent } from "@/lib/voice/voiceDownloadProgress";
-import { findVoiceModel } from "@/lib/voice/voiceModels";
+import { findWhisperCppVoiceModel } from "@/lib/voice/whisperCppVoiceModels";
 import css from "./VoiceModelDownloadIndicator.module.css";
 import type { VoiceDownloadFileEntry } from "@/lib/voice/voiceManagerInterface";
 
@@ -56,7 +56,7 @@ export function VoiceModelDownloadIndicator(): JSX.Element | null {
     return null;
   }
 
-  const model = findVoiceModel(status.modelId);
+  const model = findWhisperCppVoiceModel(status.modelId);
   const message = t`Downloading ${model.displayName} for voice prompting`;
   const overallPercent = overallDownloadPercent(status.files);
   const overallLabel =

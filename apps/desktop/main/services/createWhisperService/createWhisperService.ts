@@ -73,8 +73,8 @@ export type WhisperServiceStatus =
   | { kind: "error"; modelId?: string; message: string };
 
 /**
- * Maps our app-facing model ids (which match the web catalogue in
- * `src/lib/voice/voiceModels.ts`) to the ggml model names hosted under
+ * Maps our app-facing model ids (which match
+ * `src/lib/voice/whisperCppVoiceModels.ts`) to ggml model names hosted under
  * `ggerganov/whisper.cpp` on Hugging Face. Kept in this file because the
  * service is the only place that needs the mapping — the IPC layer just
  * forwards opaque ids.

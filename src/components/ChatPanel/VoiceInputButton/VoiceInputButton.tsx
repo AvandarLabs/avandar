@@ -21,14 +21,22 @@ import {
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
+import {
+  formatModelSelectDescription,
+  formatModelSelectLabel,
+} from "@/lib/localModels/formatModelPickerCopy";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useDownloadedVoiceModels } from "@/lib/voice/useDownloadedVoiceModels";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
+import {
+  VOICE_LANGUAGES,
+  voiceLanguageForLocale,
+} from "@/lib/voice/voiceLanguages";
 import {
   hasStoredVoiceLanguage,
   readStoredVoiceLanguage,
@@ -36,27 +44,32 @@ import {
   writeStoredVoiceLanguage,
 } from "@/lib/voice/voiceLanguageStorage";
 import {
-  DEFAULT_VOICE_MODEL_ID,
-  findVoiceModel,
-  VOICE_LANGUAGES,
-  VOICE_MODELS,
-  voiceLanguageForLocale,
-} from "@/lib/voice/voiceModels";
+  DEFAULT_WHISPER_CPP_VOICE_MODEL_ID,
+  findWhisperCppVoiceModel,
+  isWhisperCppModelAvailableOnPlatform,
+  isWhisperCppVoiceModelId,
+  listWhisperCppVoiceModelsSorted,
+  whisperCppApproxDownloadSizeMb,
+} from "@/lib/voice/whisperCppVoiceModels";
 import css from "./VoiceInputButton.module.css";
 import type { AudioRecorder } from "@/lib/voice/audioCapture";
-import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
+import type { VoiceLanguageCode } from "@/lib/voice/voiceLanguages";
+import type { WhisperCppVoiceModelId } from "@/lib/voice/whisperCppVoiceModels";
 
 const MODEL_STORAGE_KEY = "avandar.voice.modelId";
+const LEGACY_MODEL_STORAGE_KEY = "avandar.voice.whisperCpp.modelId";
 
-function readStoredModelId(): VoiceModelId {
+function readStoredModelId(): WhisperCppVoiceModelId {
   try {
-    const raw = window.localStorage.getItem(MODEL_STORAGE_KEY);
-    const matched = VOICE_MODELS.find((model) => {
-      return model.id === raw;
-    });
-    return matched?.id ?? DEFAULT_VOICE_MODEL_ID;
+    const raw =
+      window.localStorage.getItem(MODEL_STORAGE_KEY) ??
+      window.localStorage.getItem(LEGACY_MODEL_STORAGE_KEY);
+    if (raw && isWhisperCppVoiceModelId(raw)) {
+      return raw;
+    }
+    return DEFAULT_WHISPER_CPP_VOICE_MODEL_ID;
   } catch {
-    return DEFAULT_VOICE_MODEL_ID;
+    return DEFAULT_WHISPER_CPP_VOICE_MODEL_ID;
   }
 }
 
@@ -76,11 +89,24 @@ function VoiceModelSelectOption({
   isDesktopPlatform,
 }: VoiceModelSelectOptionProps): JSX.Element {
   const { t } = useLingui();
-  const model = VOICE_MODELS.find((entry) => {
+  const model = listWhisperCppVoiceModelsSorted(
+    isDesktopPlatform ? "desktop" : "web",
+  ).find((entry) => {
     return entry.id === option.value;
   });
-  const disabledForWeb = model?.desktopOnly === true && !isDesktopPlatform;
-  if (!disabledForWeb) {
+  if (!model) {
+    return (
+      <Group justify="space-between" w="100%" wrap="nowrap">
+        <Text size="sm">{option.label}</Text>
+      </Group>
+    );
+  }
+  const voicePlatform = isDesktopPlatform ? "desktop" : "web";
+  const unavailableOnPlatform = !isWhisperCppModelAvailableOnPlatform(
+    model,
+    voicePlatform,
+  );
+  if (!unavailableOnPlatform) {
     return (
       <Group justify="space-between" w="100%" wrap="nowrap">
         <Text size="sm">{option.label}</Text>
@@ -92,9 +118,10 @@ function VoiceModelSelectOption({
       </Group>
     );
   }
+  const sizeMb = whisperCppApproxDownloadSizeMb(model, voicePlatform);
   return (
     <Tooltip
-      label={t`These are too big for web and are only available on Avandar Desktop`}
+      label={t`Not available in the browser (${model.systemRequirements}, ~${sizeMb} MB download).`}
       position="right"
       withinPortal
     >
@@ -103,7 +130,7 @@ function VoiceModelSelectOption({
           {option.label}
         </Text>
         <Text size="xs" c="neutral.6">
-          <Trans>Desktop only</Trans>
+          <Trans>Browser unavailable</Trans>
         </Text>
       </Group>
     </Tooltip>
@@ -116,9 +143,7 @@ function VoiceModelSelectOption({
  *      yet (so the user explicitly opts into the large download), or
  *   2. Starts microphone capture immediately if a model is available.
  *
- * When recording stops, the audio is transcribed locally via the
- * `VoiceModelManager` singleton and the result is pushed into the
- * composer through `useComposerRuntime().setText`.
+ * Local whisper.cpp dictation (WASM on web, native on Desktop).
  */
 export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const composerRuntime = useComposerRuntime();
@@ -132,35 +157,36 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const [language, setLanguage] = useState<VoiceLanguageCode>(() => {
     return readStoredVoiceLanguage() ?? workspaceVoiceLanguage;
   });
-  const [selectedModelId, setSelectedModelId] = useState<VoiceModelId>(() => {
-    return readStoredModelId();
-  });
-  const {
-    downloadedModelIds,
-    hasAnyDownloaded: hasAnyModelDownloaded,
-    isSelectedModelDownloaded: isModelReady,
-    refresh: refreshDownloadState,
-  } = useDownloadedVoiceModels({ selectedModelId });
-  const [deletingModelId, setDeletingModelId] = useState<VoiceModelId | null>(
-    null,
-  );
+  const [selectedModelId, setSelectedModelId] =
+    useState<WhisperCppVoiceModelId>(() => {
+      return readStoredModelId();
+    });
+  const [deletingModelId, setDeletingModelId] =
+    useState<WhisperCppVoiceModelId | null>(null);
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [isSettingsOpen, , closeSettings, toggleSettings] = useBoolean(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const recorderRef = useRef<AudioRecorder | null>(null);
+  const transcribeInFlightRef = useRef(false);
 
-  // If a previous desktop session picked a desktop-only model, drop back
-  // to the default once the web build loads — the user can't run it here.
-  useEffect(() => {
-    if (isDesktopPlatform) {
-      return;
+  const whisperCppPlatform = isDesktopPlatform ? "desktop" : "web";
+
+  /** Avoid binding Select to a model this runtime cannot load (prevents onChange loops). */
+  const activeModelId = useMemo((): WhisperCppVoiceModelId => {
+    const current = findWhisperCppVoiceModel(selectedModelId);
+    if (isWhisperCppModelAvailableOnPlatform(current, whisperCppPlatform)) {
+      return selectedModelId;
     }
-    const current = findVoiceModel(selectedModelId);
-    if (current.desktopOnly) {
-      setSelectedModelId(DEFAULT_VOICE_MODEL_ID);
-    }
-  }, [isDesktopPlatform, selectedModelId]);
+    return DEFAULT_WHISPER_CPP_VOICE_MODEL_ID;
+  }, [selectedModelId, whisperCppPlatform]);
+
+  const {
+    downloadedModelIds,
+    hasAnyDownloaded: hasAnyModelDownloaded,
+    isSelectedModelDownloaded: isModelReady,
+    refresh: refreshDownloadState,
+  } = useDownloadedVoiceModels({ selectedModelId: activeModelId });
 
   // Follow workspace locale only until the user picks a voice language in
   // settings (stored in localStorage, shared across tabs).
@@ -198,22 +224,22 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(MODEL_STORAGE_KEY, selectedModelId);
+      window.localStorage.setItem(MODEL_STORAGE_KEY, activeModelId);
     } catch {
       // Ignore.
     }
-  }, [selectedModelId]);
+  }, [activeModelId]);
 
   const voiceSelectComboboxProps = { withinPortal: true } as const;
 
   const handleDeleteModel = useCallback(
-    async (modelId: VoiceModelId) => {
+    async (modelId: WhisperCppVoiceModelId) => {
       setDeletingModelId(modelId);
       try {
         await manager.deleteModel(modelId);
         const { hasAnyDownloaded: anyDownloaded } =
           await refreshDownloadState();
-        const model = findVoiceModel(modelId);
+        const model = findWhisperCppVoiceModel(modelId);
         notifications.show({
           title: t`Voice model removed`,
           message: t`${model.displayName} was deleted from this device.`,
@@ -244,14 +270,27 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       if (options.closeSettings) {
         closeSettings();
       }
-      try {
-        await OfflineChatResourceManager.releaseForVoice();
-        await manager.ensureModelLoaded(selectedModelId);
-        await refreshDownloadState();
-        const model = findVoiceModel(selectedModelId);
+      const modelToDownload = findWhisperCppVoiceModel(activeModelId);
+      if (
+        !isWhisperCppModelAvailableOnPlatform(
+          modelToDownload,
+          whisperCppPlatform,
+        )
+      ) {
         notifications.show({
-          title: t`Voice model ready`,
-          message: t`${model.displayName} downloaded. Tap the mic to start dictating.`,
+          title: t`Voice model not available`,
+          message: t`${modelToDownload.displayName} needs ${modelToDownload.systemRequirements} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier.`,
+          color: "warning",
+        });
+        return;
+      }
+      try {
+        await manager.ensureModelDownloaded(activeModelId);
+        await refreshDownloadState();
+        const model = findWhisperCppVoiceModel(activeModelId);
+        notifications.show({
+          title: t`Voice model saved`,
+          message: t`${model.displayName} is on this device. Tap the mic to dictate.`,
           color: "success",
         });
       } catch (error) {
@@ -265,14 +304,31 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         });
       }
     },
-    [closeSettings, manager, refreshDownloadState, selectedModelId, t],
+    [
+      closeSettings,
+      manager,
+      refreshDownloadState,
+      activeModelId,
+      t,
+      whisperCppPlatform,
+    ],
   );
 
-  const modelSelectData = VOICE_MODELS.map((model) => {
+  const modelSelectData = listWhisperCppVoiceModelsSorted(
+    whisperCppPlatform,
+  ).map((model) => {
+    const sizeMb = whisperCppApproxDownloadSizeMb(model, whisperCppPlatform);
     return {
       value: model.id,
-      label: `${model.displayName} (~${model.approxSizeMb} MB)`,
-      disabled: model.desktopOnly && !isDesktopPlatform,
+      label: formatModelSelectLabel({
+        displayName: model.displayName,
+        systemRequirements: model.systemRequirements,
+        approxSizeMb: sizeMb,
+      }),
+      disabled: !isWhisperCppModelAvailableOnPlatform(
+        model,
+        whisperCppPlatform,
+      ),
     };
   });
 
@@ -283,6 +339,13 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const startRecording = useCallback(async () => {
     try {
       await OfflineChatResourceManager.releaseForVoice();
+      if (isModelReady) {
+        void manager
+          .ensureModelLoaded(activeModelId, { silent: true })
+          .catch(() => {
+            return undefined;
+          });
+      }
       const recorder = await startMicrophoneRecording();
       recorderRef.current = recorder;
       setIsRecording(true);
@@ -296,21 +359,25 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         color: "danger",
       });
     }
-  }, [t]);
+  }, [activeModelId, isModelReady, manager, t]);
 
   const stopRecordingAndTranscribe = useCallback(async () => {
+    if (transcribeInFlightRef.current) {
+      return;
+    }
     const recorder = recorderRef.current;
     if (!recorder) {
       setIsRecording(false);
       return;
     }
+    transcribeInFlightRef.current = true;
     recorderRef.current = null;
     setIsRecording(false);
     setIsTranscribing(true);
     try {
       const audio = await recorder.stop();
       const text = await manager.transcribe(audio, {
-        modelId: selectedModelId,
+        modelId: activeModelId,
         language,
       });
       if (text.length > 0) {
@@ -325,23 +392,25 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         });
       }
     } catch (error) {
+      const failureMessage =
+        error instanceof Error ? error.message
+        : typeof error === "string" ? error
+        : t`Could not transcribe your audio.`;
       notifications.show({
         title: t`Transcription failed`,
-        message:
-          error instanceof Error ?
-            error.message
-          : t`Could not transcribe your audio.`,
+        message: failureMessage,
         color: "danger",
       });
-    } finally {
-      setIsTranscribing(false);
       try {
         await manager.releaseLoadedPipeline();
       } catch {
-        // Best-effort: free renderer RAM for chat / DuckDB.
+        // Best-effort: free WASM after a failed turn.
       }
+    } finally {
+      transcribeInFlightRef.current = false;
+      setIsTranscribing(false);
     }
-  }, [composerRuntime, language, manager, selectedModelId, t]);
+  }, [activeModelId, composerRuntime, language, manager, t]);
 
   const cancelRecording = useCallback(async () => {
     const recorder = recorderRef.current;
@@ -373,11 +442,15 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const tooltipLabel =
     isRecording ? t`Stop and transcribe`
     : isTranscribing ? t`Transcribing…`
-    : isModelReady ? t`Speak (local voice-to-text)`
+    : isModelReady ? t`Speak`
     : t`Set up voice prompting`;
 
   const RecordIcon = isRecording ? IconPlayerStop : IconMicrophone;
-  const selectedModel = findVoiceModel(selectedModelId);
+  const selectedModel = findWhisperCppVoiceModel(activeModelId);
+  const selectedModelSizeMb = whisperCppApproxDownloadSizeMb(
+    selectedModel,
+    whisperCppPlatform,
+  );
   const selectedLanguageLabel =
     VOICE_LANGUAGES.find((entry) => {
       return entry.code === language;
@@ -432,11 +505,15 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                 <Stack gap="xs">
                   <Select
                     label={t`Model`}
-                    description={t`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
-                    value={selectedModelId}
+                    description={formatModelSelectDescription({
+                      description: selectedModel.description,
+                      recommendedIf: selectedModel.recommendedIf,
+                      approxSizeMb: selectedModelSizeMb,
+                    })}
+                    value={activeModelId}
                     onChange={(value) => {
                       if (value) {
-                        setSelectedModelId(value as VoiceModelId);
+                        setSelectedModelId(value as WhisperCppVoiceModelId);
                       }
                     }}
                     data={modelSelectData}
@@ -471,7 +548,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                         <Trans>Downloaded on this device</Trans>
                       </Text>
                       {downloadedModelIds.map((modelId) => {
-                        const model = findVoiceModel(modelId);
+                        const model = findWhisperCppVoiceModel(modelId);
                         const isDeleting = deletingModelId === modelId;
                         return (
                           <Group
@@ -578,19 +655,23 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         <Stack gap="md">
           <Text size="sm">
             <Trans>
-              Voice prompts run entirely on your device. To dictate, we need to
-              download a Whisper model from Hugging Face once. The download runs
-              in the background; progress appears in the bottom-left corner.
+              Dictation runs locally with whisper.cpp. We download a ggml model
+              into device storage first (without freezing the tab). The model
+              loads when you dictate. Progress appears bottom-left.
             </Trans>
           </Text>
 
           <Select
             label={t`Model`}
-            description={t`${selectedModel.description} (~${selectedModel.approxSizeMb} MB)`}
-            value={selectedModelId}
+            description={formatModelSelectDescription({
+              description: selectedModel.description,
+              recommendedIf: selectedModel.recommendedIf,
+              approxSizeMb: selectedModelSizeMb,
+            })}
+            value={activeModelId}
             onChange={(value) => {
               if (value) {
-                setSelectedModelId(value as VoiceModelId);
+                setSelectedModelId(value as WhisperCppVoiceModelId);
               }
             }}
             data={modelSelectData}
@@ -631,7 +712,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
                 void handleConfirmDownload();
               }}
             >
-              <Trans>Download &amp; enable</Trans>
+              <Trans>Download</Trans>
             </Button>
           </Group>
         </Stack>

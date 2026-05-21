@@ -9,8 +9,10 @@ import {
   resolveChatModelId,
   writeStoredChatModelId,
 } from "@/components/ChatPanel/chatModelStorage/chatModelStorage";
-import { useChatModels } from "@/components/ChatPanel/useChatModels";
+import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
 import { useRegisterChatModelContext } from "@/components/ChatPanel/useRegisterChatModelContext";
+import { writeStoredLocalChatModelId } from "@/lib/offlineChat/localChatModelStore";
+import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
 import css from "./ChatModelPicker.module.css";
 import type { ChatModelOption } from "$/types/chat.types";
 
@@ -26,8 +28,13 @@ type Props = {
 export function ChatModelPicker({
   disabled = false,
 }: Props): JSX.Element | null {
-  const { groups, models, isLoading, isError } = useChatModels();
-  const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
+  const { groups, models, isLoading, isError, hasDownloadedOfflineModels } =
+    useChatModelCatalog();
+  const [selectedModelId, setSelectedModelId] = useState<string | undefined>(
+    () => {
+      return readStoredChatModelId();
+    },
+  );
   const [search, setSearch] = useState("");
   const { t } = useLingui();
 
@@ -46,11 +53,25 @@ export function ChatModelPicker({
     if (models.length === 0) {
       return selectedModelId;
     }
+    const storedModelId = selectedModelId;
+    const storedMissingFromCatalog =
+      storedModelId !== undefined && !models.some(propEq("id", storedModelId));
     return resolveChatModelId({
       availableModels: models,
-      storedModelId: selectedModelId ?? readStoredChatModelId(),
+      storedModelId,
+      honorStoredWhenMissing: isLoading && storedMissingFromCatalog,
     });
-  }, [models, selectedModelId]);
+  }, [models, selectedModelId, isLoading]);
+
+  useEffect(() => {
+    if (!resolvedModelId) {
+      return;
+    }
+    const localModelId = parseOfflineChatPickerModelId(resolvedModelId);
+    if (localModelId) {
+      writeStoredLocalChatModelId(localModelId);
+    }
+  }, [resolvedModelId]);
 
   const selectedModel = useMemo((): ChatModelOption | undefined => {
     if (!resolvedModelId) {
@@ -63,8 +84,19 @@ export function ChatModelPicker({
     if (!resolvedModelId) {
       return;
     }
+    const storedModelId = readStoredChatModelId();
+    if (
+      isLoading &&
+      storedModelId &&
+      !models.some(propEq("id", storedModelId))
+    ) {
+      return;
+    }
+    if (storedModelId === resolvedModelId) {
+      return;
+    }
     writeStoredChatModelId(resolvedModelId);
-  }, [resolvedModelId]);
+  }, [resolvedModelId, models, isLoading]);
 
   useRegisterChatModelContext(resolvedModelId);
 
@@ -97,9 +129,10 @@ export function ChatModelPicker({
     : selectedModel ? t`Using ${selectedModel.name}`
     : t`Choose a model`;
 
-  const isTriggerDisabled = disabled || isLoading || !resolvedModelId;
+  const isTriggerDisabled =
+    disabled || (isLoading && !hasDownloadedOfflineModels) || !resolvedModelId;
 
-  if (isError) {
+  if (isError && !hasDownloadedOfflineModels) {
     return null;
   }
 

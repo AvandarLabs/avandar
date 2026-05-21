@@ -4,8 +4,8 @@
  * this overrides the workspace UI locale default used by the voice picker.
  */
 
-import { VOICE_LANGUAGES } from "./voiceModels";
-import type { VoiceLanguageCode } from "./voiceModels";
+import { VOICE_LANGUAGES } from "./voiceLanguages";
+import type { VoiceLanguageCode } from "./voiceLanguages";
 
 export const VOICE_LANGUAGE_STORAGE_KEY = "avandar.voice.language";
 

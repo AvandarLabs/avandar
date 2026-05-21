@@ -4,11 +4,13 @@
   border-radius: var(--mantine-radius-md);
   bottom: 16px;
   box-shadow: var(--mantine-shadow-md);
+  left: 16px;
+  max-height: min(50vh, 360px);
   max-width: 360px;
   min-width: 280px;
+  overflow-y: auto;
   padding: var(--mantine-spacing-sm);
   position: fixed;
-  right: 16px;
   z-index: 200;
 }
 

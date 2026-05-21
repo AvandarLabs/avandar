@@ -152,7 +152,8 @@ export const MANTINE_TRANSITION_PROPS = {
   },
   /**
    * Bottom-center toasts use Mantine's built-in translateY motion (see
-   * `@mantine/notifications` getNotificationStateStyles), not Transition presets.
+   * `@mantine/notifications` getNotificationStateStyles), not Transition
+   * presets.
    */
   notification: {
     transition: "slide-up" as const,
@@ -161,7 +162,7 @@ export const MANTINE_TRANSITION_PROPS = {
   },
 } as const;
 
-/** Default `<Notifications />` props (position drives slide-up / slide-down). */
+/** Default `<Notifications />` props (position: slide-up / slide-down). */
 export const DEFAULT_NOTIFICATIONS_PROPS = {
   position: "bottom-center" as const,
   transitionDuration: ANIMATION_DURATION_MS.moderate,

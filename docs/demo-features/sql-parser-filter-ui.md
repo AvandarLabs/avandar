@@ -18,7 +18,7 @@ checklist.
     `sum/avg/count/max/min(col)` aggregates are recognised.
   - `WHERE` is mapped onto a new recursive **`QueryFilter`** tree (see
     Phase 1 filter UI below). Operators `=, !=, >, >=, <, <=, LIKE, IN,
-    BETWEEN, IS NULL, IS NOT NULL` are supported; nested AND/OR groups
+BETWEEN, IS NULL, IS NOT NULL` are supported; nested AND/OR groups
     preserve structure.
   - `GROUP BY` flips the relevant columns to `group_by` aggregation.
   - `ORDER BY` (first column only) and `LIMIT/OFFSET` are honoured.
@@ -80,10 +80,10 @@ checklist.
 
 ## Tests
 
-| Path | Coverage |
-|---|---|
-| `shared/models/queries/StructuredQuery/sqlToStructuredQuery.test.ts` | 17 cases — basic SELECT, SELECT *, aggregations + GROUP BY, simple WHERE, nested AND/OR groups, ORDER BY, LIMIT/OFFSET, comma-joined FROM, unparseable SQL, CTE/DISTINCT flagging, missing WHERE, `IN` lists, HAVING, INNER JOIN, LEFT JOIN with subquery target, nested subquery in FROM, non-equality JOIN flagged. |
-| `shared/models/queries/StructuredQuery/structuredQueryToSQL.test.ts` | 9 cases — empty filters, equality predicate, nested AND/OR with parentheses, `IN` list, `IS NULL`, HAVING, INNER JOIN, LEFT JOIN with subquery, nested-subquery FROM. |
+| Path                                                                 | Coverage                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared/models/queries/StructuredQuery/sqlToStructuredQuery.test.ts` | 17 cases — basic SELECT, SELECT \*, aggregations + GROUP BY, simple WHERE, nested AND/OR groups, ORDER BY, LIMIT/OFFSET, comma-joined FROM, unparseable SQL, CTE/DISTINCT flagging, missing WHERE, `IN` lists, HAVING, INNER JOIN, LEFT JOIN with subquery target, nested subquery in FROM, non-equality JOIN flagged. |
+| `shared/models/queries/StructuredQuery/structuredQueryToSQL.test.ts` | 9 cases — empty filters, equality predicate, nested AND/OR with parentheses, `IN` list, `IS NULL`, HAVING, INNER JOIN, LEFT JOIN with subquery, nested-subquery FROM.                                                                                                                                                  |
 
 Both files pass `pnpm vitest run shared/models/queries/StructuredQuery`.
 
@@ -122,7 +122,7 @@ also handle:
   SELECT under `nestedSubquery: NestedSubquerySource` on the structured
   query. The form treats the subquery as opaque text (so the SQL stays
   source-of-truth) and the knex renderer emits `from (<inner sql>) as
-  <alias>`. Joining onto a subquery is similarly handled.
+<alias>`. Joining onto a subquery is similarly handled.
 
 The form widgets for these (a HAVING accordion, a JOIN list, a subquery
 preview) are an explicit follow-up — the parser/renderer round-trip is in
@@ -131,11 +131,9 @@ them in-canvas come next.
 
 ## Outstanding follow-ups
 
-- Wire the SQL → form parser into `useDataExplorerURLSync` so a refreshed
-  URL with `?sql=...` populates the structured form too.
 - The filter UI exposes a limited operator set today (`=`, `!=`, `>`,
   `>=`, `<`, `<=`, `contains`, `does not contain`, `in`, `not in`, `is
-  null`, `is not null`, `between`). Anything else round-trips through
+null`, `is not null`, `between`). Anything else round-trips through
   `unmappedReasons`.
 - E2E tests should mock the OpenRouter chat call. The unit tests above
   cover the deterministic parser; the manual / Playwright pass is for

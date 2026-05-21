@@ -1,7 +1,9 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 
-/** Drive `useIsOnline` without cutting the dev server network (avoids blank HMR screens). */
+/**
+ * Drive `useIsOnline` without cutting dev server network (avoids blank HMR).
+ */
 async function emulateBrowserOffline(page: import("@playwright/test").Page) {
   await page.evaluate(() => {
     Object.defineProperty(navigator, "onLine", {

@@ -13,6 +13,7 @@ export function parseAnalyzeJson(
     const parsed = JSON.parse(trimmed.slice(jsonStart, jsonEnd + 1)) as {
       summary?: unknown;
       proceed?: unknown;
+      tableName?: unknown;
       clarifyQuestion?: unknown;
       clarifyOptions?: unknown;
     };
@@ -32,9 +33,14 @@ export function parseAnalyzeJson(
           })
           .slice(0, 6)
       : undefined;
+    const tableName =
+      typeof parsed.tableName === "string" ?
+        parsed.tableName.trim()
+      : undefined;
     return {
       summary: parsed.summary.trim(),
       proceed,
+      ...(tableName ? { tableName } : {}),
       ...(clarifyQuestion ? { clarifyQuestion } : {}),
       ...(clarifyOptions && clarifyOptions.length >= 2 ?
         { clarifyOptions }

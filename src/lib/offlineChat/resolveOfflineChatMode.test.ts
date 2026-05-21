@@ -3,6 +3,7 @@ import {
   clearLocalChatModelDownloaded,
   markLocalChatModelDownloaded,
 } from "./localChatModelStore";
+import { buildOfflineChatPickerModelId } from "./offlineChatPickerModels";
 import { resolveOfflineChatMode } from "./resolveOfflineChatMode";
 
 describe("resolveOfflineChatMode", () => {
@@ -34,5 +35,23 @@ describe("resolveOfflineChatMode", () => {
     expect(resolveOfflineChatMode({ navigatorOnLine: false })).toEqual({
       kind: "cloud",
     });
+  });
+
+  it("uses local when online and an offline model is selected in the picker", () => {
+    expect(
+      resolveOfflineChatMode({
+        navigatorOnLine: true,
+        selectedChatModelId: buildOfflineChatPickerModelId("qwen-1.5b"),
+      }),
+    ).toEqual({ kind: "local", localChatModelId: "qwen-1.5b" });
+  });
+
+  it("stays on cloud when online with a cloud model selected", () => {
+    expect(
+      resolveOfflineChatMode({
+        navigatorOnLine: true,
+        selectedChatModelId: "anthropic/claude-3.5-sonnet",
+      }),
+    ).toEqual({ kind: "cloud" });
   });
 });

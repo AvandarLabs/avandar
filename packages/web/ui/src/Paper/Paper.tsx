@@ -26,7 +26,7 @@ export function Paper({
       radius={radius}
       bg={bg}
       withBorder={withBorder}
-      shadow={noShadow ? undefined : shadow}
+      shadow={noShadow ? "none" : shadow}
       {...rest}
     />
   );

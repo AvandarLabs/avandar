@@ -1,6 +1,6 @@
+import { createServerApiClient } from "@clients";
 import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
-import { createServerApiClient } from "@clients";
 import type {
   API,
   APIBody,
@@ -50,12 +50,7 @@ async function sendHTTPRequest<
   // error-shape unwrapping that previously lived here move into the adapter.
   return await serverApi.invokeFunction<APIReturnType<Route, Method>>({
     route: route as string,
-    method: method as
-      | "GET"
-      | "POST"
-      | "PATCH"
-      | "PUT"
-      | "DELETE",
+    method: method as "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
     pathParams: (options as { pathParams?: Record<string, string | number> })
       .pathParams,
     queryParams: (options as { queryParams?: Record<string, unknown> })

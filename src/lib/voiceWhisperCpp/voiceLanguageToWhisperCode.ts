@@ -1,4 +1,4 @@
-import type { VoiceLanguageCode } from "@/lib/voice/voiceModels";
+import type { VoiceLanguageCode } from "@/lib/voice/voiceLanguages";
 
 const VOICE_LANGUAGE_TO_WHISPER_CODE: Readonly<
   Record<VoiceLanguageCode, string>

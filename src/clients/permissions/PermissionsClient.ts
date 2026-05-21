@@ -2,9 +2,9 @@ import { createServiceClient, withSupabaseClient } from "@clients";
 import { withQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
 import { withNewMembers } from "@modules";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ILogger } from "@logger";
 import type {
   AppType,

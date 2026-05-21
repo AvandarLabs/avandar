@@ -24,6 +24,9 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
  * When `sql` is present it is the authoritative query: `ds`, `cols`, `agg`,
  * and `orderBy`/`orderDir` are not written (and are ignored on hydrate) so a
  * leftover Manual Query cannot conflict with AI / edited SQL.
+ *
+ * `sql` is omitted while the current query has a runtime error so refresh
+ * does not re-apply broken SQL from the URL.
  */
 export const DataExplorerSearchSchema = z.object({
   ds: z.string().optional(),
@@ -200,7 +203,7 @@ export function serializeStateToURL(
     }
   }
 
-  if (rawSQL) {
+  if (rawSQL && !state.lastQueryError) {
     params.sql = rawSQL;
   }
 

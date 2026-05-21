@@ -18,8 +18,6 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
 import { VoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator";
-import { WhisperCppVoiceModelDownloadIndicator } from "@/components/VoiceModelDownloadIndicator/WhisperCppVoiceModelDownloadIndicator";
-import { WhisperCppVoiceModelLoadingNotification } from "@/components/VoiceModelDownloadIndicator/WhisperCppVoiceModelLoadingNotification";
 import { VoiceModelLoadingNotification } from "@/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
@@ -219,8 +217,6 @@ function AppShellComponent({
       />
 
       <VoiceModelDownloadIndicator />
-      <WhisperCppVoiceModelDownloadIndicator />
-      <WhisperCppVoiceModelLoadingNotification />
       <VoiceModelLoadingNotification />
       <OfflineChatDownloadIndicator />
     </>

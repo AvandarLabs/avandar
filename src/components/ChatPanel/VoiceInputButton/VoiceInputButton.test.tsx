@@ -1,3 +1,5 @@
+import { I18nProvider } from "@lingui/react";
+import { ModalsProvider } from "@mantine/modals";
 import {
   act,
   fireEvent,
@@ -7,7 +9,9 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { i18n } from "@/i18n/i18n";
 import { VoiceInputButton } from "./VoiceInputButton";
+import type { ReactElement } from "react";
 
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -16,28 +20,36 @@ import { VoiceInputButton } from "./VoiceInputButton";
 const composerSetText = vi.fn();
 const composerGetState = vi.fn().mockReturnValue({ text: "" });
 const {
+  ensureModelDownloadedMock,
   ensureModelLoadedMock,
   deleteModelMock,
   isModelDownloadedMock,
   transcribeMock,
+  releaseLoadedPipelineMock,
   voiceManagerMock,
   notificationShowMock,
   startMicrophoneRecordingMock,
 } = vi.hoisted(() => {
+  const ensureModelDownloaded = vi.fn().mockResolvedValue(undefined);
   const ensureModelLoaded = vi.fn().mockResolvedValue(undefined);
   const deleteModel = vi.fn().mockResolvedValue(undefined);
   const isModelDownloaded = vi.fn().mockResolvedValue(false);
   const transcribe = vi.fn().mockResolvedValue("hello world");
+  const releaseLoadedPipeline = vi.fn().mockResolvedValue(undefined);
   return {
+    ensureModelDownloadedMock: ensureModelDownloaded,
     ensureModelLoadedMock: ensureModelLoaded,
     deleteModelMock: deleteModel,
     isModelDownloadedMock: isModelDownloaded,
     transcribeMock: transcribe,
+    releaseLoadedPipelineMock: releaseLoadedPipeline,
     voiceManagerMock: {
+      ensureModelDownloaded,
       ensureModelLoaded,
       deleteModel,
       isModelDownloaded,
       transcribe,
+      releaseLoadedPipeline,
       getStatus: () => {
         return { kind: "idle" as const };
       },
@@ -122,6 +134,16 @@ vi.mock("@/i18n/useLanguagePreference", () => {
   };
 });
 
+function renderVoiceButton(ui: ReactElement = <VoiceInputButton />) {
+  return render(
+    <I18nProvider i18n={i18n}>
+      <AvandarUiProvider>
+        <ModalsProvider>{ui}</ModalsProvider>
+      </AvandarUiProvider>
+    </I18nProvider>,
+  );
+}
+
 describe("VoiceInputButton", () => {
   beforeEach(() => {
     composerSetText.mockClear();
@@ -130,6 +152,7 @@ describe("VoiceInputButton", () => {
     isModelDownloadedMock.mockClear();
     isModelDownloadedMock.mockResolvedValue(false);
     transcribeMock.mockClear();
+    releaseLoadedPipelineMock.mockClear();
     notificationShowMock.mockClear();
     workspaceLocaleRef.current = "en";
     window.localStorage.clear();
@@ -141,14 +164,10 @@ describe("VoiceInputButton", () => {
     startMicrophoneRecordingMock.mockResolvedValue({
       stop: vi.fn().mockResolvedValue(new Float32Array([0])),
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const micButton = await screen.findByRole("button", {
-      name: /speak \(local voice-to-text\)/i,
+      name: /^Speak$/i,
     });
     await act(async () => {
       fireEvent.click(micButton);
@@ -168,20 +187,45 @@ describe("VoiceInputButton", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("keeps the voice pipeline loaded after a successful transcription", async () => {
+    isModelDownloadedMock.mockResolvedValue(true);
+    const stopMock = vi.fn().mockResolvedValue(new Float32Array([0.1, 0.2]));
+    startMicrophoneRecordingMock.mockResolvedValue({
+      stop: stopMock,
+    });
+    renderVoiceButton();
+
+    const micButton = await screen.findByRole("button", {
+      name: /^Speak$/i,
+    });
+    await act(async () => {
+      fireEvent.click(micButton);
+    });
+
+    const stopButton = await screen.findByRole("button", {
+      name: /stop and transcribe/i,
+    });
+    await act(async () => {
+      fireEvent.click(stopButton);
+    });
+
+    await waitFor(() => {
+      expect(transcribeMock).toHaveBeenCalled();
+    });
+    expect(releaseLoadedPipelineMock).not.toHaveBeenCalled();
+    expect(composerSetText).toHaveBeenCalledWith("hello world");
+  });
+
   it("discards audio when cancel is clicked during recording", async () => {
     isModelDownloadedMock.mockResolvedValue(true);
     const stopMock = vi.fn().mockResolvedValue(new Float32Array([0]));
     startMicrophoneRecordingMock.mockResolvedValue({
       stop: stopMock,
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const micButton = await screen.findByRole("button", {
-      name: /speak \(local voice-to-text\)/i,
+      name: /^Speak$/i,
     });
     await act(async () => {
       fireEvent.click(micButton);
@@ -203,11 +247,7 @@ describe("VoiceInputButton", () => {
   });
 
   it("renders a microphone button with a setup tooltip when no model is downloaded", async () => {
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const button = await screen.findByRole("button", {
       name: /set up voice prompting/i,
@@ -216,11 +256,7 @@ describe("VoiceInputButton", () => {
   });
 
   it("opens the download prompt when clicked and no model is downloaded", async () => {
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const button = await screen.findByRole("button", {
       name: /set up voice prompting/i,
@@ -233,17 +269,13 @@ describe("VoiceInputButton", () => {
       await screen.findByText(/enable voice prompting/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /download & enable/i }),
+      screen.getByRole("button", { name: /^Download$/i }),
     ).toBeInTheDocument();
     expect(ensureModelLoadedMock).not.toHaveBeenCalled();
   });
 
-  it("kicks off ensureModelLoaded when the user confirms the download", async () => {
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+  it("kicks off ensureModelDownloaded when the user confirms the download", async () => {
+    renderVoiceButton();
 
     await act(async () => {
       fireEvent.click(
@@ -254,22 +286,18 @@ describe("VoiceInputButton", () => {
     });
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole("button", { name: /download & enable/i }),
+        await screen.findByRole("button", { name: /^Download$/i }),
       );
     });
 
-    expect(ensureModelLoadedMock).toHaveBeenCalledWith("whisper-tiny");
+    expect(ensureModelDownloadedMock).toHaveBeenCalledWith("whisper-tiny");
   });
 
   it("fires a success toast when the download completes", async () => {
-    ensureModelLoadedMock.mockImplementation(async () => {
+    ensureModelDownloadedMock.mockImplementation(async () => {
       isModelDownloadedMock.mockResolvedValue(true);
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     await act(async () => {
       fireEvent.click(
@@ -280,14 +308,14 @@ describe("VoiceInputButton", () => {
     });
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole("button", { name: /download & enable/i }),
+        await screen.findByRole("button", { name: /^Download$/i }),
       );
     });
 
     await waitFor(() => {
       expect(notificationShowMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Voice model ready",
+          title: "Voice model saved",
           color: "success",
         }),
       );
@@ -295,12 +323,8 @@ describe("VoiceInputButton", () => {
   });
 
   it("fires a danger toast when the download fails", async () => {
-    ensureModelLoadedMock.mockRejectedValueOnce(new Error("disk full"));
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    ensureModelDownloadedMock.mockRejectedValueOnce(new Error("disk full"));
+    renderVoiceButton();
 
     await act(async () => {
       fireEvent.click(
@@ -311,7 +335,7 @@ describe("VoiceInputButton", () => {
     });
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole("button", { name: /download & enable/i }),
+        await screen.findByRole("button", { name: /^Download$/i }),
       );
     });
 
@@ -328,11 +352,7 @@ describe("VoiceInputButton", () => {
 
   it("does not render voice settings until a model is downloaded locally", async () => {
     isModelDownloadedMock.mockResolvedValue(false);
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     await screen.findByRole("button", { name: /set up voice prompting/i });
     expect(
@@ -342,11 +362,7 @@ describe("VoiceInputButton", () => {
 
   it("renders voice settings after a model is present in the local cache", async () => {
     isModelDownloadedMock.mockResolvedValue(true);
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     expect(
       await screen.findByRole("button", { name: /voice settings/i }),
@@ -356,11 +372,7 @@ describe("VoiceInputButton", () => {
   it("defaults the language picker to the workspace locale when nothing is stored", async () => {
     workspaceLocaleRef.current = "es";
     isModelDownloadedMock.mockResolvedValue(true);
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -380,11 +392,7 @@ describe("VoiceInputButton", () => {
     isModelDownloadedMock.mockImplementation(async (id: string) => {
       return id === "whisper-tiny";
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -405,11 +413,7 @@ describe("VoiceInputButton", () => {
     workspaceLocaleRef.current = "es";
     window.localStorage.setItem("avandar.voice.language", "english");
     isModelDownloadedMock.mockResolvedValue(true);
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -427,11 +431,7 @@ describe("VoiceInputButton", () => {
   it("falls back to English when the workspace locale has no voice mapping", async () => {
     workspaceLocaleRef.current = "ar";
     isModelDownloadedMock.mockResolvedValue(true);
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -450,11 +450,7 @@ describe("VoiceInputButton", () => {
     isModelDownloadedMock.mockImplementation(async (id: string) => {
       return id === "whisper-tiny" || id === "whisper-base";
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -480,11 +476,7 @@ describe("VoiceInputButton", () => {
         return false;
       });
     });
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton();
 
     const settingsButton = await screen.findByRole("button", {
       name: /voice settings/i,
@@ -500,7 +492,9 @@ describe("VoiceInputButton", () => {
       fireEvent.click(removeButton);
     });
 
-    expect(deleteModelMock).toHaveBeenCalledWith("whisper-tiny");
+    await waitFor(() => {
+      expect(deleteModelMock).toHaveBeenCalledWith("whisper-tiny");
+    });
     await waitFor(() => {
       expect(
         screen.queryByRole("button", { name: /voice settings/i }),
@@ -512,11 +506,7 @@ describe("VoiceInputButton", () => {
   });
 
   it("disables the button when the disabled prop is set", () => {
-    render(
-      <AvandarUiProvider>
-        <VoiceInputButton disabled />
-      </AvandarUiProvider>,
-    );
+    renderVoiceButton(<VoiceInputButton disabled />);
 
     const button = screen.getByRole("button", {
       name: /set up voice prompting/i,

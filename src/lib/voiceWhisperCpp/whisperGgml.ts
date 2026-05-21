@@ -1,29 +1,30 @@
-import type { VoiceModelId } from "@/lib/voice/voiceModels";
+import { findWhisperCppVoiceModel } from "@/lib/voice/whisperCppVoiceModels";
+import type { WhisperCppVoiceModelId } from "@/lib/voice/whisperCppVoiceModels";
 
 /** Same Hugging Face repo as desktop `createWhisperService`. */
 export const WHISPER_GGML_REPO_BASE =
   "https://huggingface.co/ggerganov/whisper.cpp/resolve/main";
 
-/** App-facing voice model ids mapped to ggml file stems. */
-export const WHISPER_MODEL_ID_TO_GGML_NAME: Readonly<
-  Record<VoiceModelId, string>
-> = {
-  "whisper-tiny": "tiny",
-  "whisper-base": "base",
-  "whisper-small": "small",
-  "whisper-medium": "medium",
-  "whisper-large-v3": "large-v3",
-  "whisper-large-v3-turbo": "large-v3-turbo",
-};
-
-export function ggmlFileNameForVoiceModelId(modelId: VoiceModelId): string {
-  const ggml = WHISPER_MODEL_ID_TO_GGML_NAME[modelId];
-  if (!ggml) {
-    throw new Error(`Unknown voice model id: ${modelId}`);
+export function ggmlFileNameForVoiceModelId(
+  modelId: WhisperCppVoiceModelId,
+  platform: "web" | "desktop" = "web",
+): string {
+  const model = findWhisperCppVoiceModel(modelId);
+  if (platform === "web") {
+    const stem = model.webGgmlQuantStem;
+    if (!stem) {
+      throw new Error(
+        `Voice model ${modelId} is not available for whisper.cpp on web`,
+      );
+    }
+    return `ggml-${stem}.bin`;
   }
-  return `ggml-${ggml}.bin`;
+  return `ggml-${model.desktopGgmlStem}.bin`;
 }
 
-export function ggmlUrlForVoiceModelId(modelId: VoiceModelId): string {
-  return `${WHISPER_GGML_REPO_BASE}/${ggmlFileNameForVoiceModelId(modelId)}`;
+export function ggmlUrlForVoiceModelId(
+  modelId: WhisperCppVoiceModelId,
+  platform: "web" | "desktop" = "web",
+): string {
+  return `${WHISPER_GGML_REPO_BASE}/${ggmlFileNameForVoiceModelId(modelId, platform)}`;
 }

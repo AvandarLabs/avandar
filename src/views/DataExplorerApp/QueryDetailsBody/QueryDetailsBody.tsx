@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Tabs } from "@ui";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
+import css from "./QueryDetailsBody.module.css";
 
 /**
  * Body of the "Query Details" floating window. Lets the user inspect or edit
@@ -20,7 +21,9 @@ export function QueryDetailsBody(): JSX.Element {
         sql: "SQL",
       }}
       px="xs"
-      py="sm"
+      pt="xs"
+      pb="sm"
+      classNames={{ list: css.tabList }}
       renderTabPanel={{
         "manual-query": () => {
           return <ManualQueryForm withinPortal />;

@@ -34,7 +34,8 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * answers, discovery dropdown picks, assumed SQL literals after the
  * clarification cap (`generated_sql_assumptions`).
  *
- * **Design doc:** `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
+ * **Design doc:** `docs/superpowers/specs/2026-05-19-chat-interactive-
+ * workflows-design.md`
  * (section "`crossBoundary` API"). Audit UI: Settings → Privacy log.
  *
  * v1 scope:

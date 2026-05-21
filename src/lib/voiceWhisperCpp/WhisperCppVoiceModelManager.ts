@@ -1,42 +1,38 @@
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
-import { getVoiceModelManager } from "@/lib/voice/voiceModelManagerFactory";
+import { createDownloadingStatus } from "@/lib/voice/voiceDownloadProgress";
+import { isSameVoiceManagerStatus } from "@/lib/voice/voiceManagerInterface";
+import { downloadWhisperCppModelToCache } from "./downloadWhisperCppModel";
 import {
-  createDownloadingStatus,
-  VOICE_MODEL_LOADING_ROW_FILE_NAME,
-} from "@/lib/voice/voiceDownloadProgress";
+  deleteWhisperCppModelFromCache,
+  getWhisperCppModelBytes,
+  hasWhisperCppModelInCache,
+} from "./whisperCppModelCache";
 import {
-  isSameVoiceManagerStatus,
-  type IVoiceModelManager,
-  type VoiceManagerListener,
-  type VoiceManagerStatus,
-} from "@/lib/voice/voiceManagerInterface";
-import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
-import { ggmlFileNameForVoiceModelId, ggmlUrlForVoiceModelId } from "./whisperGgml";
+  loadWhisperCppModelBytes,
+  releaseWhisperCppRuntime,
+  transcribeWithWhisperCpp,
+} from "./whisperCppRuntime";
 import {
   clearWhisperCppVoiceModelDownloaded,
-  isWhisperCppVoiceModelMarkedDownloaded,
   markWhisperCppVoiceModelDownloaded,
 } from "./whisperCppVoiceModelStore";
+import { ggmlFileNameForVoiceModelId } from "./whisperGgml";
 import type {
-  WhisperCppWorkerRequest,
-  WhisperCppWorkerResponse,
-} from "./whisperCppVoice.worker";
-
-type PendingCall = {
-  resolve: (value: string | undefined) => void;
-  reject: (error: Error) => void;
-};
+  IVoiceModelManager,
+  VoiceManagerListener,
+  VoiceManagerStatus,
+} from "@/lib/voice/voiceManagerInterface";
+import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
 
 /**
- * Web-only whisper.cpp WASM voice manager. Inference runs in a dedicated
- * worker; only one ggml model is loaded in the worker at a time.
+ * Web-only whisper.cpp WASM voice manager. Downloads ggml weights into
+ * IndexedDB, then runs WASM inference on the main thread.
  */
 export class WhisperCppVoiceModelManager implements IVoiceModelManager {
   private status: VoiceManagerStatus = { kind: "idle" };
   private readonly listeners = new Set<VoiceManagerListener>();
-  private worker: Worker | null = null;
-  private readonly pending = new Map<string, PendingCall>();
   private loadedModelId: VoiceModelId | null = null;
+  private readonly downloadInFlight = new Map<VoiceModelId, Promise<void>>();
   private readonly loadInFlight = new Map<VoiceModelId, Promise<void>>();
 
   getStatus(): VoiceManagerStatus {
@@ -61,93 +57,84 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
     }
   }
 
-  private ensureWorker(): Worker {
-    if (this.worker) {
-      return this.worker;
-    }
-    const worker = new Worker(
-      new URL("./whisperCppVoice.worker.ts", import.meta.url),
-      { type: "module", name: "whisper-cpp-voice" },
-    );
-    worker.addEventListener("message", (event: MessageEvent) => {
-      this.handleWorkerMessage(event.data as WhisperCppWorkerResponse);
-    });
-    this.worker = worker;
-    return worker;
+  async isModelDownloaded(id: VoiceModelId): Promise<boolean> {
+    return hasWhisperCppModelInCache(id);
   }
 
-  private handleWorkerMessage(message: WhisperCppWorkerResponse): void {
-    if (message.type === "progress") {
-      if (this.status.kind !== "downloading") {
-        return;
-      }
-      const fileName = message.fileName;
-      const files = this.status.files.map((file) => {
-        if (file.fileName === fileName) {
-          return {
-            ...file,
-            progressPercent: message.progressPercent,
-            state: "downloading" as const,
-          };
+  /** Streams ggml weights into IndexedDB only (no WASM init). */
+  async ensureModelDownloaded(id: VoiceModelId): Promise<void> {
+    if (await hasWhisperCppModelInCache(id)) {
+      markWhisperCppVoiceModelDownloaded(id);
+      return;
+    }
+
+    const inFlight = this.downloadInFlight.get(id);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const downloadPromise = this.runEnsureModelDownloaded(id);
+    this.downloadInFlight.set(id, downloadPromise);
+    try {
+      await downloadPromise;
+    } finally {
+      this.downloadInFlight.delete(id);
+    }
+  }
+
+  private async runEnsureModelDownloaded(id: VoiceModelId): Promise<void> {
+    const fileName = ggmlFileNameForVoiceModelId(id, "web");
+    this.setStatus({
+      ...createDownloadingStatus(id),
+      files: [
+        {
+          fileName,
+          progressPercent: 0,
+          state: "downloading",
+        },
+      ],
+    });
+
+    try {
+      await downloadWhisperCppModelToCache(id, (progressPercent) => {
+        if (this.status.kind !== "downloading" || this.status.modelId !== id) {
+          return;
         }
-        return file;
-      });
-      const hasFile = files.some((file) => {
-        return file.fileName === fileName;
-      });
-      const nextFiles =
-        hasFile ?
-          files
-        : [
-            ...files,
+        this.setStatus({
+          ...this.status,
+          files: [
             {
               fileName,
-              progressPercent: message.progressPercent,
-              state: "downloading" as const,
+              progressPercent,
+              state:
+                progressPercent >= 100 ?
+                  ("complete" as const)
+                : ("downloading" as const),
             },
-          ];
-      this.setStatus({
-        ...this.status,
-        files: nextFiles,
+          ],
+        });
       });
-      return;
+      markWhisperCppVoiceModelDownloaded(id);
+      this.setStatus({ kind: "idle" });
+    } catch (error) {
+      clearWhisperCppVoiceModelDownloaded(id);
+      await deleteWhisperCppModelFromCache(id).catch(() => {
+        return undefined;
+      });
+      const message =
+        error instanceof Error ?
+          error.message
+        : "Failed to download voice model";
+      this.setStatus({ kind: "error", modelId: id, message });
+      throw error;
     }
-
-    const pending = this.pending.get(message.id);
-    if (!pending) {
-      return;
-    }
-    this.pending.delete(message.id);
-    if (message.type === "error") {
-      pending.reject(new Error(message.message));
-      return;
-    }
-    pending.resolve(message.result);
   }
 
-  private postToWorker(
-    request: Omit<WhisperCppWorkerRequest, "id">,
-    transfer?: Transferable[],
-  ): Promise<string | undefined> {
-    const worker = this.ensureWorker();
-    const id = crypto.randomUUID();
-    return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
-      const payload = { ...request, id } as WhisperCppWorkerRequest;
-      if (transfer && transfer.length > 0) {
-        worker.postMessage(payload, transfer);
-      } else {
-        worker.postMessage(payload);
-      }
-    });
-  }
-
-  async isModelDownloaded(id: VoiceModelId): Promise<boolean> {
-    return isWhisperCppVoiceModelMarkedDownloaded(id);
-  }
-
-  async ensureModelLoaded(id: VoiceModelId): Promise<void> {
-    if (this.loadedModelId === id && this.status.kind === "ready") {
+  async ensureModelLoaded(
+    id: VoiceModelId,
+    options: { silent?: boolean } = {},
+  ): Promise<void> {
+    if (this.loadedModelId === id) {
       return;
     }
 
@@ -156,7 +143,7 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
       return inFlight;
     }
 
-    const loadPromise = this.runEnsureModelLoaded(id);
+    const loadPromise = this.runEnsureModelLoaded(id, options.silent === true);
     this.loadInFlight.set(id, loadPromise);
     try {
       await loadPromise;
@@ -165,75 +152,45 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
     }
   }
 
-  private async runEnsureModelLoaded(id: VoiceModelId): Promise<void> {
+  private async runEnsureModelLoaded(
+    id: VoiceModelId,
+    silent: boolean,
+  ): Promise<void> {
     await OfflineChatResourceManager.releaseForVoice();
-    await getVoiceModelManager().releaseLoadedPipeline();
 
-    const alreadyOnDevice = await this.isModelDownloaded(id);
-    const fileName = ggmlFileNameForVoiceModelId(id);
-    this.setStatus(
-      alreadyOnDevice ?
-        { kind: "loading", modelId: id }
-      : {
-          ...createDownloadingStatus(id),
-          files: [
-            {
-              fileName,
-              progressPercent: 0,
-              state: "pending",
-            },
-          ],
-        },
-    );
+    const cached = await getWhisperCppModelBytes(id);
+    if (!cached || cached.byteLength === 0) {
+      throw new Error(
+        "Voice model is not downloaded. Download it before dictating.",
+      );
+    }
+
+    if (!silent) {
+      this.setStatus({
+        kind: "loading",
+        modelId: id,
+      });
+    }
 
     try {
-      if (!alreadyOnDevice) {
-        this.setStatus({
-          kind: "downloading",
-          modelId: id,
-          phase: "files",
-          files: [
-            {
-              fileName,
-              progressPercent: 0,
-              state: "downloading",
-            },
-          ],
-        });
-      } else {
-        this.setStatus({
-          kind: "downloading",
-          modelId: id,
-          phase: "loading",
-          files: [
-            {
-              fileName,
-              progressPercent: 100,
-              state: "complete",
-            },
-            {
-              fileName: VOICE_MODEL_LOADING_ROW_FILE_NAME,
-              progressPercent: 0,
-              state: "downloading",
-            },
-          ],
-        });
-      }
-
-      const modelUrl = ggmlUrlForVoiceModelId(id);
-      await this.postToWorker({ type: "loadModel", modelUrl });
+      const modelBytes = new Uint8Array(cached);
+      const fileName = ggmlFileNameForVoiceModelId(id, "web");
+      await loadWhisperCppModelBytes(id, modelBytes, fileName);
       this.loadedModelId = id;
       markWhisperCppVoiceModelDownloaded(id);
-      this.setStatus({ kind: "ready", modelId: id });
+      if (!silent) {
+        this.setStatus({ kind: "ready", modelId: id });
+      }
     } catch (error) {
       this.loadedModelId = null;
-      clearWhisperCppVoiceModelDownloaded(id);
-      await this.postToWorker({ type: "clearModelCache" }).catch(() => {
+      await releaseWhisperCppRuntime().catch(() => {
         return undefined;
       });
       const message =
         error instanceof Error ? error.message : "Failed to load voice model";
-      this.setStatus({ kind: "error", modelId: id, message });
+      if (!silent) {
+        this.setStatus({ kind: "error", modelId: id, message });
+      }
       throw error;
     }
   }
@@ -243,9 +200,7 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
       await this.releaseLoadedPipeline();
     }
     clearWhisperCppVoiceModelDownloaded(id);
-    await this.postToWorker({ type: "clearModelCache" }).catch(() => {
-      return undefined;
-    });
+    await deleteWhisperCppModelFromCache(id);
     if (
       this.status.kind !== "idle" &&
       ("modelId" in this.status ? this.status.modelId === id : false)
@@ -261,17 +216,9 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
     await this.ensureModelLoaded(options.modelId);
     this.setStatus({ kind: "transcribing", modelId: options.modelId });
     try {
-      const pcm = audio.slice();
-      const text = await this.postToWorker(
-        {
-          type: "transcribe",
-          audio: pcm,
-          language: options.language,
-        },
-        [pcm.buffer],
-      );
+      const text = await transcribeWithWhisperCpp(audio, options.language);
       this.setStatus({ kind: "ready", modelId: options.modelId });
-      return (text ?? "").trim();
+      return text;
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Transcription failed";
@@ -285,14 +232,7 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
   }
 
   async releaseLoadedPipeline(): Promise<void> {
-    if (this.worker) {
-      await this.postToWorker({ type: "release" }).catch(() => {
-        return undefined;
-      });
-      this.worker.terminate();
-      this.worker = null;
-    }
-    this.pending.clear();
+    await releaseWhisperCppRuntime();
     this.loadedModelId = null;
     this.loadInFlight.clear();
     if (this.status.kind !== "idle") {
@@ -303,8 +243,8 @@ export class WhisperCppVoiceModelManager implements IVoiceModelManager {
 
 let webSingleton: WhisperCppVoiceModelManager | null = null;
 
-export function getWebWhisperCppVoiceModelManager()
-: WhisperCppVoiceModelManager {
+export function getWebWhisperCppVoiceModelManager(): // eslint-disable-line max-len -- export name
+WhisperCppVoiceModelManager {
   if (!webSingleton) {
     webSingleton = new WhisperCppVoiceModelManager();
   }

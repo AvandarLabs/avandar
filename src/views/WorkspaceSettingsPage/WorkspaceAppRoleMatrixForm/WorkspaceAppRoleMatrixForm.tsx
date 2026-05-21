@@ -19,7 +19,7 @@ const CELL_OPTIONS: readonly AppTypeCellValue[] = [
 ] as const;
 
 /** Returns a localized display label for an app type. */
-function _useAppTypeLabel(): (app: AppType) => string {
+function useAppTypeLabel(): (app: AppType) => string {
   const { t } = useLingui();
   return (app: AppType) => {
     return matchLiteral(app, {
@@ -32,7 +32,7 @@ function _useAppTypeLabel(): (app: AppType) => string {
 }
 
 /** Returns a localized display label for a role-matrix cell value. */
-function _useCellValueLabel(): (cell: AppTypeCellValue) => string {
+function useCellValueLabel(): (cell: AppTypeCellValue) => string {
   const { t } = useLingui();
   return (cell: AppTypeCellValue) => {
     return matchLiteral(cell, {
@@ -45,7 +45,7 @@ function _useCellValueLabel(): (cell: AppTypeCellValue) => string {
 }
 
 /** Returns the localized preset-role segmented control options. */
-function _usePresetRoleData(): ReadonlyArray<{
+function usePresetRoleData(): ReadonlyArray<{
   label: string;
   value: "global_admin" | "global_editor" | "global_viewer" | "custom";
 }> {
@@ -83,9 +83,9 @@ export function WorkspaceAppRoleMatrixForm({
   disabled,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const presetRoleData = _usePresetRoleData();
-  const appTypeToLabel = _useAppTypeLabel();
-  const appTypeCellValueToLabel = _useCellValueLabel();
+  const presetRoleData = usePresetRoleData();
+  const appTypeToLabel = useAppTypeLabel();
+  const appTypeCellValueToLabel = useCellValueLabel();
   return (
     <Stack gap="md">
       <SegmentedControl

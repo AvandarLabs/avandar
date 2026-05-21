@@ -18,6 +18,7 @@ export default [
     ignores: [
       "**/dist/**",
       ".agents/**",
+      ".claude",
       ".claude/**",
       "apps/desktop/build/**",
       "apps/desktop/bundle/**",
@@ -96,6 +97,8 @@ export default [
           },
         ],
         "import-x/no-duplicates": "error",
+        // Vite virtual modules (e.g. vite-plugin-pwa's virtual:pwa-register)
+        "import-x/no-unresolved": ["error", { ignore: ["^virtual:"] }],
         "import-x/prefer-default-export": "off",
         "jsx-a11y/anchor-is-valid": [
           "error",
@@ -127,8 +130,19 @@ export default [
         },
         "import-x/resolver-next": [
           createTypeScriptImportResolver({
-            // use a glob pattern to find the project's tsconfig
-            project: "tsconfig.*.json",
+            // Scoped to the real monorepo layout only. Do not use a repo-wide
+            // `tsconfig.*.json` glob: `.claude/worktrees` copies add hundreds of
+            // tsconfigs and slow `pnpm lint` dramatically.
+            project: [
+              "tsconfig.json",
+              "tsconfig.app.json",
+              "tsconfig.node.json",
+              "tsconfig.base.json",
+              "shared/tsconfig.json",
+              "apps/*/tsconfig.json",
+              "apps/*/tsconfig.*.json",
+              "packages/*/*/tsconfig.json",
+            ],
 
             // always try to resolve types under `<root>@types` directory even
             // it doesn't contain any source code, like `@types/unist`

@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -5,6 +7,14 @@ import { loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { VitePWA } from "vite-plugin-pwa";
 import { defaultExclude, defineConfig } from "vitest/config";
+
+const repoRoot = path.dirname(fileURLToPath(import.meta.url));
+
+/** Emscripten glue for @timur00kh/whisper.wasm (not in package exports). */
+const whisperLibmainPath = path.join(
+  repoRoot,
+  "node_modules/@timur00kh/whisper.wasm/dist/libmain-D9-QM3iM.mjs",
+);
 
 const reactWithLinguiMacro = () => {
   return react({
@@ -20,6 +30,20 @@ export default defineConfig(({ mode }) => {
   const supabaseApiUrl = env.VITE_SUPABASE_API_URL ?? "";
 
   return {
+    server: {
+      // pthread whisper.cpp + DuckDB WASM need SharedArrayBuffer.
+      headers: {
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Embedder-Policy": "require-corp",
+      },
+    },
+    worker: {
+      format: "es",
+    },
+    optimizeDeps: {
+      // Pre-bundling adds node polyfills to Emscripten glue; breaks workers.
+      exclude: ["@avandar/whisper-libmain", "@timur00kh/whisper.wasm"],
+    },
     plugins:
       mode === "test" ?
         [reactWithLinguiMacro()]
@@ -47,9 +71,12 @@ export default defineConfig(({ mode }) => {
                 ...(supabaseApiUrl ?
                   [
                     {
-                      urlPattern: ({ url }: { url: URL }) =>
-                        {return url.origin === supabaseApiUrl &&
-                        url.pathname.startsWith("/rest/")},
+                      urlPattern: ({ url }: { url: URL }) => {
+                        return (
+                          url.origin === supabaseApiUrl &&
+                          url.pathname.startsWith("/rest/")
+                        );
+                      },
                       handler: "NetworkFirst" as const,
                       options: {
                         cacheName: "supabase-rest",
@@ -63,8 +90,9 @@ export default defineConfig(({ mode }) => {
                   ]
                 : []),
                 {
-                  urlPattern: ({ url }: { url: URL }) =>
-                    {return url.pathname.startsWith("/storage/v1/object")},
+                  urlPattern: ({ url }: { url: URL }) => {
+                    return url.pathname.startsWith("/storage/v1/object");
+                  },
                   handler: "NetworkOnly" as const,
                 },
               ],
@@ -102,6 +130,7 @@ export default defineConfig(({ mode }) => {
         "@ui": "/packages/web/ui/src",
         "@hooks": "/packages/web/hooks/src",
         "@sbfn": "/supabase/functions",
+        "@avandar/whisper-libmain": whisperLibmainPath,
       },
     },
     publicDir: "public",

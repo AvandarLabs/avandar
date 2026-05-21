@@ -1,6 +1,8 @@
+import { I18nProvider } from "@lingui/react";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { i18n } from "@/i18n/i18n";
 import { VoiceModelDownloadIndicator } from "./VoiceModelDownloadIndicator";
 import type { VoiceManagerStatus } from "@/lib/voice/voiceManagerInterface";
 
@@ -22,9 +24,11 @@ describe("VoiceModelDownloadIndicator", () => {
   it("renders nothing in the idle state", () => {
     mockStatus = { kind: "idle" };
     render(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <VoiceModelDownloadIndicator />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
@@ -32,9 +36,11 @@ describe("VoiceModelDownloadIndicator", () => {
   it("renders nothing in the ready state", () => {
     mockStatus = { kind: "ready", modelId: "whisper-tiny" };
     render(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <VoiceModelDownloadIndicator />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
@@ -58,14 +64,14 @@ describe("VoiceModelDownloadIndicator", () => {
       ],
     };
     render(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <VoiceModelDownloadIndicator />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
-    expect(
-      screen.getByText(/Whisper Base \(multilingual\)/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Whisper Base/i)).toBeInTheDocument();
     expect(screen.getByText("71%")).toBeInTheDocument();
     expect(screen.getByText("model.onnx")).toBeInTheDocument();
     expect(screen.getByText("tokenizer.json")).toBeInTheDocument();
@@ -94,9 +100,11 @@ describe("VoiceModelDownloadIndicator", () => {
       ],
     };
     render(
-      <AvandarUiProvider>
-        <VoiceModelDownloadIndicator />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <VoiceModelDownloadIndicator />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     expect(screen.getByText(/Finishing setup/i)).toBeInTheDocument();

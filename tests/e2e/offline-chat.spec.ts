@@ -92,11 +92,14 @@ test.describe("offline WebLLM chat (mocked)", () => {
     });
     await dismissBlockingOverlays(page);
     await page.getByRole("button", { name: /^open$/i }).click();
-    const openDrawer = page.getByRole("dialog", { name: /open dataset/i });
-    await openDrawer
-      .getByRole("row")
-      .filter({ hasText: "small-california-covid-sample.csv" })
-      .getByRole("button", { name: /^open$/i })
+    const openModal = page.getByRole("dialog", { name: /open dataset/i });
+    await openModal
+      .getByRole("option", { name: /small-california-covid-sample\.csv/i })
+      .click();
+    await openModal
+      .getByRole("button", {
+        name: /open small-california-covid-sample\.csv/i,
+      })
       .click();
     await dismissBlockingOverlays(page);
     await openChatPanelIfClosed(page);

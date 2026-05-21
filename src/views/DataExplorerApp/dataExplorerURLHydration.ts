@@ -19,6 +19,8 @@ type DeferStructuredHydrationOptions = {
   needsColumns: boolean;
   datasetColumns: readonly unknown[] | undefined;
   entityFieldConfigs: readonly unknown[] | undefined;
+  /** Workspace datasets and columns loaded (needed to parse `?sql=`). */
+  sqlMappingMetadataLoaded: boolean;
 };
 
 /**
@@ -28,6 +30,10 @@ type DeferStructuredHydrationOptions = {
 export function shouldDeferURLHydrationForStructuredLoading(
   options: DeferStructuredHydrationOptions,
 ): boolean {
+  if (options.urlState.rawSQL && !options.sqlMappingMetadataLoaded) {
+    return true;
+  }
+
   const restoreStructured = !options.urlState.rawSQL;
   if (
     restoreStructured &&

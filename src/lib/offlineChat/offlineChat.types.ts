@@ -1,3 +1,4 @@
+import type { LocalChatModelId } from "./localChatModelCatalog";
 import type {
   ChatClarifyRequest,
   ChatGeneratedSQL,
@@ -42,6 +43,8 @@ export type OfflineChatEngine = {
 export type OfflineAnalyzeResult = {
   summary: string;
   proceed: boolean;
+  /** Valid workspace dataset UUID from analyze JSON when the model obeys. */
+  tableName?: string;
   clarifyQuestion?: string;
   clarifyOptions?: string[];
 };
@@ -75,5 +78,9 @@ export type OfflineChatTurnResult = {
 
 export type OfflineChatMode =
   | { kind: "cloud" }
-  | { kind: "local" }
+  | {
+      kind: "local";
+      /** When set, overrides the offline settings modal selection. */
+      localChatModelId?: LocalChatModelId;
+    }
   | { kind: "offer_local_fallback" };

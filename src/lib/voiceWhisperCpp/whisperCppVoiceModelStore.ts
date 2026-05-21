@@ -1,6 +1,6 @@
 /**
  * Download markers for whisper.cpp ggml weights (separate from transformers
- * ONNX cache in `voiceModelStore.ts`).
+ * legacy transformers ONNX marker).
  */
 
 import type { VoiceModelId } from "@/lib/voice/voiceModels";

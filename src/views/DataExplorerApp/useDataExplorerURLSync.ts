@@ -1,5 +1,6 @@
 import { isNonNullish, where } from "@utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -18,6 +19,7 @@ import {
   parseURLSearch,
   serializeStateToURL,
 } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 
@@ -38,13 +40,16 @@ type Options = {
  *   selections, aggregations, order-by, raw SQL, and viz config from the URL
  *   params. If `sql` is present in the URL, only raw SQL (plus viz / open
  *   dataset) is applied — `ds` and `cols` are ignored so a stale Manual Query
- *   cannot block restore or conflict with the SQL text. Column objects are
- *   re-fetched via TanStack Query (cached) and matched by
- *   `baseColumn.name` when structured params are used.
+ *   cannot block restore or conflict with the SQL text. The SQL is parsed with
+ *   `sqlToStructuredQuery` once workspace dataset metadata has loaded so the
+ *   Manual Query form is prefilled. Column objects are re-fetched via TanStack
+ *   Query (cached) and matched by `baseColumn.name` when structured params are
+ *   used.
  *
  * - **Persistence (state → URL):** After hydration is complete, every state
  *   change is serialised back to the URL using `replace: true` so the browser
- *   history stays clean.
+ *   history stays clean. Failed queries do not write `sql` to the URL; once a
+ *   bad `?sql=` link errors, the param is removed so refresh does not loop.
  */
 export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
   const state = DataExplorerStateManager.useState();
@@ -111,6 +116,13 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
     useQueryOptions: { enabled: needsColumns && isEntityConfigSource },
   });
 
+  const [allDatasetColumns] = DatasetColumnClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+
+  const sqlMappingMetadataLoaded =
+    datasets !== undefined && allDatasetColumns !== undefined;
+
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Decide once — on the very first render — whether we should hydrate from
@@ -141,6 +153,7 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
         needsColumns,
         datasetColumns,
         entityFieldConfigs,
+        sqlMappingMetadataLoaded,
       })
     ) {
       return;
@@ -212,6 +225,18 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
 
       if (urlState.rawSQL) {
         dispatch.setRawSql(urlState.rawSQL);
+        const mapping = sqlToStructuredQuery({
+          sql: urlState.rawSQL,
+          datasets: buildSqlMappingDatasets(
+            datasets ?? [],
+            allDatasetColumns ?? [],
+          ),
+        });
+        dispatch.applySqlMapping({
+          query: mapping.query,
+          isFullyMapped: mapping.isFullyMapped,
+          unmappedReasons: mapping.unmappedReasons,
+        });
       }
 
       if (urlState.openDataset) {
@@ -237,6 +262,9 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
     datasetColumns,
     entityFieldConfigs,
     needsColumns,
+    datasets,
+    allDatasetColumns,
+    sqlMappingMetadataLoaded,
     dispatch,
   ]);
 

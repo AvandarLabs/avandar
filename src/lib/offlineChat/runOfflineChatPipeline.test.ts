@@ -29,6 +29,8 @@ describe("runOfflineChatPipeline", () => {
     });
 
     expect(result.generatedSql?.sql).toContain("SELECT COUNT");
+    expect(result.assistantText).toBe("");
+    expect(result.phaseLabels).toContain("Repairing query…");
     expect(result.clarification).toBeUndefined();
   });
 

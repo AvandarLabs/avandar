@@ -14,8 +14,9 @@ type Options = {
 };
 
 /**
- * When the manual query can return unbounded rows from a large dataset, resolves
- * row count (cached) and writes the auto LIMIT into structured-query state so the
+ * When the manual query can return unbounded rows from a large dataset,
+ * resolves row count (cached) and writes the auto LIMIT into structured-query
+ * state so the
  * form and executed SQL stay aligned.
  */
 export function useSyncLargeDatasetAutoLimit(opts: Options): void {

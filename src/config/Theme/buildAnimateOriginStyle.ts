@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-/** Viewport top-left of the animated surface (e.g. saved floating window position). */
+/** Viewport top-left of the animated surface (e.g. saved window position). */
 export type AnimateTargetAnchor = {
   left: number;
   top: number;

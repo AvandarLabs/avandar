@@ -14,7 +14,8 @@ type Options = {
 
 /**
  * Focuses the chat composer after the AppShell Aside slide-in finishes.
- * Skips when the panel was already open on mount or the user is typing elsewhere.
+ * Skips when the panel was already open on mount or the user is typing
+ * elsewhere.
  */
 export function useChatPanelComposerAutoFocus({
   isOpen,

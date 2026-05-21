@@ -9,7 +9,8 @@ import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension.t
 import css from "./SqlEditor.module.css";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 
-const LINE_HEIGHT_PX = 20;
+/** Matches `line-height: 1.55` on `.cm-line` at `font-size-sm` (~14px). */
+const LINE_HEIGHT_PX = 22;
 
 export type SqlEditorProps = {
   value: string;

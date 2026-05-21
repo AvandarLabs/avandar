@@ -1,6 +1,10 @@
 import { releaseAllVoiceRuntimes } from "@/lib/voiceWhisperCpp/releaseAllVoiceRuntimes";
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
-import { markLocalChatModelDownloaded } from "./localChatModelStore";
+import { deleteLocalChatModelCache } from "./deleteLocalChatModelCache";
+import {
+  clearLocalChatModelDownloaded,
+  markLocalChatModelDownloaded,
+} from "./localChatModelStore";
 import type { LocalChatModelId } from "./localChatModelCatalog";
 import type { OfflineChatEngine } from "./offlineChat.types";
 
@@ -19,7 +23,8 @@ type Listener = (status: OfflineChatManagerStatus) => void;
 
 /**
  * Singleton that owns the resident WebLLM engine. Voice transcription must call
- * `releaseForVoice()` before loading Whisper. Chat calls `releaseAllVoiceRuntimes`
+ * `releaseForVoice()` before loading Whisper. Chat calls
+ * `releaseAllVoiceRuntimes`
  * before WebLLM so voice and LLM are never resident together.
  */
 class OfflineChatResourceManagerImpl {
@@ -89,6 +94,25 @@ class OfflineChatResourceManagerImpl {
 
   async releaseForVoice(): Promise<void> {
     await this.unload();
+  }
+
+  /**
+   * Removes cached WebLLM artifacts and the downloaded marker for `modelId`.
+   * Unloads first when that model is resident in memory.
+   */
+  async deleteModel(modelId: LocalChatModelId): Promise<void> {
+    if (this.loadedModelId === modelId) {
+      await this.unload();
+    }
+    await deleteLocalChatModelCache(modelId);
+    clearLocalChatModelDownloaded(modelId);
+    if (
+      this.status.kind !== "idle" &&
+      "modelId" in this.status &&
+      this.status.modelId === modelId
+    ) {
+      this.setStatus({ kind: "idle" });
+    }
   }
 
   async unload(): Promise<void> {

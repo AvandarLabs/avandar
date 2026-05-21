@@ -25,7 +25,7 @@ type AvaPolarProduct =
 const FREE_CHOICE_VALUES = ["custom", "free"] as const;
 const PAID_CHOICE_VALUES = ["year", "month"] as const;
 
-/** Returns the localized free-plan variant choices for the segmented control. */
+/** Localized free-plan variant choices for the segmented control. */
 export function useFreeChoices(): readonly SegmentedControlItem[] {
   const { t } = useLingui();
   return [
@@ -34,7 +34,7 @@ export function useFreeChoices(): readonly SegmentedControlItem[] {
   ];
 }
 
-/** Returns the localized paid-plan variant choices for the segmented control. */
+/** Localized paid-plan variant choices for the segmented control. */
 export function usePaidChoices(): readonly SegmentedControlItem[] {
   const { t } = useLingui();
   return [

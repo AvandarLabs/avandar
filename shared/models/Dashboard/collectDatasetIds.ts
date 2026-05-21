@@ -2,7 +2,8 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
- * Returns dataset ids referenced in dashboard config (SQL in viz blocks), scoped
+ * Returns dataset ids referenced in dashboard config (SQL in viz blocks),
+ * scoped
  * to ids known to belong to the workspace.
  */
 export function collectDatasetIds(

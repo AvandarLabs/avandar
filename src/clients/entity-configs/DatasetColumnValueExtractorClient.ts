@@ -1,5 +1,5 @@
-import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { DatasetColumnValueExtractorParsers } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorParsers";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 
 /**
  * Client for managing dataset column value extractor configurations

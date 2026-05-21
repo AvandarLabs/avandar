@@ -5,6 +5,7 @@ import {
   Text,
 } from "@mantine/core";
 import { makeObject } from "@utils";
+import clsx from "clsx";
 import { ReactNode, useState } from "react";
 import classes from "./Tabs.module.css";
 
@@ -44,6 +45,12 @@ type Props<TabId extends string> = {
    * `value` is provided.
    */
   onTabChange?: (tabId: TabId) => void;
+
+  /**
+   * When this value changes, the floating indicator remounts and remeasures
+   * against the active tab (e.g. after a parent modal open animation).
+   */
+  indicatorRemountKey?: number;
 } & Omit<MantineTabsProps, "variant" | "children" | "value" | "onChange">;
 
 /**
@@ -57,6 +64,8 @@ export function Tabs<TabId extends string>({
   indicatorVariant = "floating",
   value,
   onTabChange,
+  indicatorRemountKey = 0,
+  classNames: tabsClassNames,
   ...props
 }: Props<TabId>): JSX.Element {
   const [internalTab, setInternalTab] = useState<TabId>(tabIds[0]!);
@@ -82,6 +91,7 @@ export function Tabs<TabId extends string>({
   return (
     <MantineTabs
       variant="none"
+      classNames={tabsClassNames}
       value={currentTab}
       onChange={(val) => {
         const next = val as TabId;
@@ -98,7 +108,7 @@ export function Tabs<TabId extends string>({
         mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        className={isFloating ? classes.list : undefined}
+        className={clsx(isFloating && classes.list, tabsClassNames?.list)}
         style={
           isFloating ? undefined : (
             {
@@ -128,6 +138,7 @@ export function Tabs<TabId extends string>({
         })}
 
         <FloatingIndicator
+          key={indicatorRemountKey}
           target={tabItemRefs[currentTab]}
           parent={tabListRef}
           className={isFloating ? classes.indicator : undefined}

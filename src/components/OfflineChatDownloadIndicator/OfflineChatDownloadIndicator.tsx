@@ -5,7 +5,7 @@ import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatMan
 import css from "./OfflineChatDownloadIndicator.module.css";
 
 /**
- * Floating panel anchored to the bottom-right while an offline chat model
+ * Floating panel anchored to the bottom-left while an offline chat model
  * (WebLLM) is downloading or initializing.
  */
 export function OfflineChatDownloadIndicator(): JSX.Element | null {
@@ -40,7 +40,8 @@ export function OfflineChatDownloadIndicator(): JSX.Element | null {
 
       <Text size="xs" c="danger" fw={600} className={css.warning}>
         <Trans>
-          Do not refresh or close this tab — the download will be canceled.
+          Do not refresh or close this tab or else the download will be
+          canceled.
         </Trans>
       </Text>
 

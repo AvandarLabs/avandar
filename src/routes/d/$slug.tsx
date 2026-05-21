@@ -9,7 +9,8 @@ import type { DashboardRead } from "$/models/Dashboard/Dashboard.types";
  *   /d/<slug>
  *
  * Slugs are globally unique among public dashboards (see
- * `dashboards__slug_unique_when_public` in `supabase/schemas/10.dashboards.sql`),
+ * `dashboards__slug_unique_when_public` in
+ * `supabase/schemas/10.dashboards.sql`),
  * so the slug alone resolves to at most one dashboard. The dashboardId
  * URL at `/public/dashboards/<workspaceSlug>/<dashboardId>` stays valid
  * and is what QR codes encode — it redirects here when a slug is set.

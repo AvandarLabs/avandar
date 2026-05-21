@@ -8,6 +8,7 @@ export type SqlQueryEditPanelProps = {
   catalog: SqlDisplayCatalog;
   submitButtonLabel: string;
   cancelButtonLabel: string;
+  minRows?: number;
   onSubmit: (sql: string) => void;
   onCancel: () => void;
 };
@@ -20,6 +21,7 @@ export function SqlQueryEditPanel({
   catalog,
   submitButtonLabel,
   cancelButtonLabel,
+  minRows = 6,
   onSubmit,
   onCancel,
 }: SqlQueryEditPanelProps): JSX.Element {
@@ -37,7 +39,7 @@ export function SqlQueryEditPanel({
         onChange={setDraftSql}
         catalog={catalog}
         readOnly={false}
-        minRows={6}
+        minRows={minRows}
       />
       <Group justify="flex-end" gap="xs">
         <Button

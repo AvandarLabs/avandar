@@ -251,7 +251,8 @@ export const Theme = createTheme({
           padding: "var(--mantine-spacing-sm) var(--mantine-spacing-md)",
         },
         body: {
-          // Mantine zeroes body padding-top when a header is present; restore gap below the divider.
+          // Mantine zeroes body padding-top when a header is present; restore
+          // gap below the divider.
           paddingTop: "var(--mantine-spacing-md)",
         },
         title: {

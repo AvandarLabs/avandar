@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useVoiceModelManager } from "./useVoiceModelManager";
-import { listModelsForPlatform } from "./voiceModels";
+import { listWhisperCppModelsForPlatform } from "./whisperCppVoiceModels";
 import type { VoiceModelId } from "./voiceModels";
 
 export type DownloadedVoiceModelsState = {
@@ -40,7 +40,7 @@ export function useDownloadedVoiceModels(options?: {
   const refresh = useCallback(async () => {
     setIsChecking(true);
     try {
-      const platformModels = listModelsForPlatform(voicePlatform);
+      const platformModels = listWhisperCppModelsForPlatform(voicePlatform);
       const downloadChecks = await Promise.all(
         platformModels.map(async (model) => {
           const downloaded = await manager.isModelDownloaded(model.id);

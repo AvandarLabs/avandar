@@ -9,6 +9,12 @@ import {
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import {
+  makeSegmentedControlItems,
+  SegmentedControl,
+  SegmentedControlItem,
+  SegmentedControlProps,
+} from "@ui";
+import {
   isNonEmptyArray,
   makeBucketRecord,
   objectEntries,
@@ -22,10 +28,6 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import { makeSegmentedControlItems,
-  SegmentedControl,
-  SegmentedControlItem,
-  SegmentedControlProps } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetId,

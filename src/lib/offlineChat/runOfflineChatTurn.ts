@@ -1,8 +1,11 @@
+import { ensureOfflineChatSchema } from "./ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
 import { readStoredLocalChatModelId } from "./localChatModelStore";
+import { logOfflineChat } from "./offlineChatDebugLog";
 import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
+import type { LocalChatModelId } from "./localChatModelCatalog";
 import type { OfflineChatTurnResult } from "./offlineChat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClientMessage, ChatPageContext } from "$/types/chat.types";
@@ -12,6 +15,7 @@ export type RunOfflineChatTurnArgs = {
   pageContext: ChatPageContext;
   messages: readonly ChatClientMessage[];
   navigatorOnLine: boolean;
+  localChatModelId?: LocalChatModelId;
   executeSql?: (
     sql: string,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -29,13 +33,27 @@ export async function runOfflineChatTurn(
       return message.role === "user";
     })?.content ?? "";
 
-  const schema = await fetchOfflineChatSchema({
+  const fetchedSchema = await fetchOfflineChatSchema({
     workspace: args.workspace,
     openDatasetId: args.pageContext.openDatasetId,
     navigatorOnLine: args.navigatorOnLine,
   });
+  const schema = ensureOfflineChatSchema({
+    schema: fetchedSchema,
+    openDatasetId: args.pageContext.openDatasetId,
+  });
 
-  const modelId = readStoredLocalChatModelId();
+  logOfflineChat("runOfflineChatTurn:schema", {
+    navigatorOnLine: args.navigatorOnLine,
+    pageContext: args.pageContext,
+    fetchedDatasetCount: fetchedSchema.datasets.length,
+    schemaDatasetCount: schema.datasets.length,
+    datasets: schema.datasets.map((dataset) => {
+      return { id: dataset.id, name: dataset.name };
+    }),
+  });
+
+  const modelId = args.localChatModelId ?? readStoredLocalChatModelId();
   const engine = await OfflineChatResourceManager.ensureEngine(modelId);
 
   const pipelineMessages = args.messages.map((message) => {

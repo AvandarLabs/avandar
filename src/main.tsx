@@ -46,7 +46,9 @@ function MainWrapper() {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         buster: makeCacheBuster(user?.id),
         dehydrateOptions: {
-          shouldDehydrateQuery: (query) => {return query.state.status === "success"},
+          shouldDehydrateQuery: (query) => {
+            return query.state.status === "success";
+          },
         },
       }}
     >

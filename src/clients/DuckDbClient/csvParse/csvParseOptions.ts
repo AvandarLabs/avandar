@@ -47,7 +47,9 @@ export type CsvParseResolvedOptions = {
   columns: ReadonlyArray<
     readonly [columnName: string, columnType: DuckDbDataType]
   >;
-  /** Phase B strict casting; relaxed when sniff column types reject all rows. */
+  /**
+   * Phase B strict casting; relaxed when sniff column types reject all rows.
+   */
   strictMode: boolean;
 };
 

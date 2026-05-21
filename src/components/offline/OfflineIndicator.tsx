@@ -4,7 +4,7 @@ import { IconWifiOff } from "@tabler/icons-react";
 import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 /**
- * Compact offline status shown in the app toolbar (replaces the full-width banner).
+ * Compact offline status in the app toolbar (replaces the full-width banner).
  */
 export function OfflineIndicator(): JSX.Element | null {
   const isOnline = useIsOnline();

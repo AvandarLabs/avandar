@@ -1,34 +1,66 @@
-import { useLingui } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
 import { notifications } from "@mantine/notifications";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { i18n } from "@/i18n/i18n";
 import { useVoiceModelStatus } from "@/lib/voice/useVoiceModelManager";
-import { findVoiceModel } from "@/lib/voice/voiceModels";
+import {
+  findWhisperCppVoiceModel,
+  isWhisperCppVoiceModelId,
+} from "@/lib/voice/whisperCppVoiceModels";
+import type { WhisperCppVoiceModelId } from "@/lib/voice/whisperCppVoiceModels";
 
 const LOADING_NOTIFICATION_ID = "voice-model-loading";
 
-/**
- * Persistent toast while a cached voice model is warming up in memory
- * (transformers.js pipeline). Shown instead of the download progress panel.
- */
+/** Avoid flashing a toast when WASM init finishes in under this window. */
+const LOADING_TOAST_DELAY_MS = 450;
+
+/** Toast while a cached ggml model is loading into whisper.cpp. */
 export function VoiceModelLoadingNotification(): null {
-  const { t } = useLingui();
   const status = useVoiceModelStatus();
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const statusKey = useMemo(() => {
+    if (status.kind === "loading") {
+      return `loading:${status.modelId}`;
+    }
+    return status.kind;
+  }, [status]);
 
   useEffect(() => {
-    if (status.kind === "loading") {
-      const model = findVoiceModel(status.modelId);
-      notifications.show({
-        id: LOADING_NOTIFICATION_ID,
-        title: t`Loading voice model`,
-        message: t`Starting ${model.displayName} for voice prompting…`,
-        loading: true,
-        autoClose: false,
-        withCloseButton: false,
-      });
-      return;
+    const clearShowTimer = (): void => {
+      if (showTimerRef.current !== null) {
+        clearTimeout(showTimerRef.current);
+        showTimerRef.current = null;
+      }
+    };
+
+    if (statusKey.startsWith("loading:")) {
+      const loadingModelId = statusKey.slice("loading:".length);
+      clearShowTimer();
+      showTimerRef.current = setTimeout(() => {
+        if (!isWhisperCppVoiceModelId(loadingModelId)) {
+          return;
+        }
+        const model = findWhisperCppVoiceModel(
+          loadingModelId as WhisperCppVoiceModelId,
+        );
+        notifications.show({
+          id: LOADING_NOTIFICATION_ID,
+          title: i18n._(msg`Loading voice model`),
+          message: i18n._(msg`Starting ${model.displayName}…`),
+          loading: true,
+          autoClose: false,
+          withCloseButton: false,
+        });
+      }, LOADING_TOAST_DELAY_MS);
+      return () => {
+        clearShowTimer();
+      };
     }
+
+    clearShowTimer();
     notifications.hide(LOADING_NOTIFICATION_ID);
-  }, [status, t]);
+    return undefined;
+  }, [statusKey]);
 
   return null;
 }

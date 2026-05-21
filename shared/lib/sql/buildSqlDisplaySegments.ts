@@ -20,7 +20,8 @@ type AnnotatedSpan = {
   columnName?: string;
 };
 
-const QUOTED_IDENT_RE = /"([^"]*)"/g;
+/** Double-quoted and backtick-quoted identifiers (DuckDB / sqlify output). */
+const QUOTED_IDENT_PATTERNS = [/"([^"]*)"/g, /`([^`]*)`/g] as const;
 
 const UUID_REGEX = new RegExp(
   [
@@ -37,6 +38,28 @@ const UUID_REGEX = new RegExp(
 
 function _isUuid(value: string): boolean {
   return UUID_REGEX.test(value);
+}
+
+function _forEachQuotedIdentifier(
+  sql: string,
+  onMatch: (match: {
+    content: string;
+    raw: string;
+    start: number;
+    end: number;
+  }) => void,
+): void {
+  for (const pattern of QUOTED_IDENT_PATTERNS) {
+    for (const match of sql.matchAll(pattern)) {
+      const raw = match[0];
+      const content = match[1] ?? "";
+      const start = match.index;
+      if (start === undefined) {
+        continue;
+      }
+      onMatch({ content, raw, start, end: start + raw.length });
+    }
+  }
 }
 
 function _findDatasetByQuotedContent(
@@ -59,26 +82,20 @@ function _collectQuotedDatasetSpans(
   catalog: SqlDisplayCatalog,
 ): AnnotatedSpan[] {
   const spans: AnnotatedSpan[] = [];
-  for (const match of sql.matchAll(QUOTED_IDENT_RE)) {
-    const raw = match[0];
-    const content = match[1] ?? "";
-    const start = match.index;
-    if (start === undefined) {
-      continue;
-    }
+  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
     const dataset = _findDatasetByQuotedContent(content, catalog);
     if (!dataset) {
-      continue;
+      return;
     }
     spans.push({
       kind: "dataset",
       start,
-      end: start + raw.length,
+      end,
       raw,
       datasetId: dataset.id,
       datasetLabel: dataset.name,
     });
-  }
+  });
   return spans;
 }
 
@@ -122,24 +139,18 @@ function _collectParserColumnSpans(
   }
 
   const spans: AnnotatedSpan[] = [];
-  for (const match of sql.matchAll(QUOTED_IDENT_RE)) {
-    const raw = match[0];
-    const content = match[1] ?? "";
+  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
     if (!columnNames.has(content)) {
-      continue;
-    }
-    const start = match.index;
-    if (start === undefined) {
-      continue;
+      return;
     }
     spans.push({
       kind: "column",
       start,
-      end: start + raw.length,
+      end,
       raw,
       columnName: content,
     });
-  }
+  });
   return spans;
 }
 
@@ -154,30 +165,24 @@ function _collectQuotedColumnSpans(
     }),
   );
   const spans: AnnotatedSpan[] = [];
-  for (const match of sql.matchAll(QUOTED_IDENT_RE)) {
-    const raw = match[0];
-    const content = match[1] ?? "";
-    const start = match.index;
-    if (start === undefined) {
-      continue;
-    }
+  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
     if (datasetIds.has(content) || datasetIds.has(content.toLowerCase())) {
-      continue;
+      return;
     }
     if (_isUuid(content)) {
-      continue;
+      return;
     }
     if (!knownColumns.has(content)) {
-      continue;
+      return;
     }
     spans.push({
       kind: "column",
       start,
-      end: start + raw.length,
+      end,
       raw,
       columnName: content,
     });
-  }
+  });
   return spans;
 }
 

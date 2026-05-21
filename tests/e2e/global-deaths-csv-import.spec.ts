@@ -23,13 +23,13 @@ const GLOBAL_DEATHS_LATE_QUOTES_CSV_PATH = path.join(
   "tests/data/global-deaths-late-quotes.csv",
 );
 
-/** Same late-quote pattern as the full file; small enough for Phase B in e2e. */
+/** Same late-quote pattern as the full file; small enough for Phase B e2e. */
 const GLOBAL_DEATHS_SNIFF_MISSES_QUOTES_CSV_PATH = path.join(
   process.cwd(),
   "tests/data/global-deaths-sniff-misses-quotes.csv",
 );
 
-/** Data rows in `global-deaths-sniff-misses-quotes.csv` (DuckDB may reject 1–2). */
+/** Rows in global-deaths-sniff-misses-quotes.csv (may reject 1–2). */
 const SNIFF_MISSES_MIN_ROW_COUNT = 499;
 
 const FULL_GLOBAL_DEATHS_CSV_PATH =

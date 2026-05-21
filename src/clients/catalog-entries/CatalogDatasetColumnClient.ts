@@ -1,5 +1,5 @@
-import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { CatalogDatasetColumnParsers } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumnParsers";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const CatalogDatasetColumnClient = createUsableServiceClient(

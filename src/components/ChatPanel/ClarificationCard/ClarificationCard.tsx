@@ -29,7 +29,8 @@ export type { ClarificationSubmitAnswer } from "./clarificationAnswer";
  * Inline clarification UI rendered in the chat thread (not modal).
  *
  *   - free_text:           Textarea + "Send answer"
- *   - fixed_options multi: checkbox group + "Something else" / "None of the above"
+ *   - fixed_options multi: checkbox group + "Something else" /
+ *     "None of the above"
  *   - fixed_options single: radio group + custom text + "None of the above"
  */
 export type DiscoveryResolver = (args: {

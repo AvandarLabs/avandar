@@ -1,14 +1,14 @@
-.fieldset {
-  background-color: rgb(255 255 255 / 40%);
-}
-
-.legendGroup {
-  width: 100%;
+.root {
+  padding-top: 0;
 }
 
 .sqlPaper {
   background: var(--mantine-color-gray-0);
   border: 1px solid var(--mantine-color-gray-3);
+}
+
+.editQueryRow {
+  margin-top: 0;
 }
 
 .sqlReadOnlyInput {
