@@ -10,12 +10,62 @@
       rel="stylesheet"
     />
     <title>Avandar</title>
+    <!--
+      The app runs under Cross-Origin-Embedder-Policy: credentialless so the
+      whisper.cpp WASM pthread build can use SharedArrayBuffer. Under that
+      policy, cross-origin iframes (Featurebase widgets, etc.) must opt into
+      `credentialless` BEFORE they navigate; setting the property after
+      insertion is too late. This installer intercepts the `src` setter on
+      `HTMLIFrameElement` and marks any cross-origin frame credentialless
+      before its first navigation.
+    -->
+    <script>
+      (function () {
+        if (typeof HTMLIFrameElement === "undefined") return;
+        if (!("credentialless" in HTMLIFrameElement.prototype)) return;
+        var srcDesc = Object.getOwnPropertyDescriptor(
+          HTMLIFrameElement.prototype,
+          "src",
+        );
+        if (!srcDesc || !srcDesc.set) return;
+        function markIfCrossOrigin(frame, value) {
+          try {
+            if (frame.credentialless) return;
+            var url = new URL(String(value), document.baseURI);
+            if (url.origin !== location.origin) frame.credentialless = true;
+          } catch (_) {
+            /* ignore non-URL src values */
+          }
+        }
+        Object.defineProperty(HTMLIFrameElement.prototype, "src", {
+          configurable: true,
+          enumerable: srcDesc.enumerable,
+          get: srcDesc.get,
+          set: function (value) {
+            markIfCrossOrigin(this, value);
+            return srcDesc.set.call(this, value);
+          },
+        });
+        var origSetAttribute = Element.prototype.setAttribute;
+        HTMLIFrameElement.prototype.setAttribute = function (name, value) {
+          if (typeof name === "string" && name.toLowerCase() === "src") {
+            markIfCrossOrigin(this, value);
+          }
+          return origSetAttribute.call(this, name, value);
+        };
+      })();
+    </script>
   </head>
   <body>
     <!-- Root div for the React app -->
     <div id="root"></div>
 
-    <!-- Importing the Featurebase SDK -->
+    <!--
+      Featurebase SDK loader. `crossorigin="anonymous"` is required under
+      Cross-Origin-Embedder-Policy: credentialless so the no-cors cross-origin
+      fetch can succeed (the request goes out without credentials, which is
+      what credentialless allows).
+    -->
     <script>
       !(function (e, t) {
         const a = "featurebase-sdk";
@@ -24,6 +74,7 @@
             var e = t.createElement("script");
             ((e.id = a),
               (e.src = "https://do.featurebase.app/js/sdk.js"),
+              e.setAttribute("crossorigin", "anonymous"),
               t
                 .getElementsByTagName("script")[0]
                 .parentNode.insertBefore(

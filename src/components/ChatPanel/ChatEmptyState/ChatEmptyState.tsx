@@ -24,7 +24,7 @@ import type { ChatApp } from "$/types/chat.types";
 /**
  * Returns the localized label for the page chip shown in the empty state.
  */
-function _usePageLabel(app: ChatApp): string {
+function usePageLabel(app: ChatApp): string {
   const { t } = useLingui();
   return match(app)
     .with("data-explorer", () => {
@@ -64,7 +64,7 @@ export function ChatEmptyState(): JSX.Element {
   const { openDataset } = DataExplorerStateManager.useState();
   const threadRuntime = useThreadRuntime();
   const { t } = useLingui();
-  const pageLabel = _usePageLabel(context.app);
+  const pageLabel = usePageLabel(context.app);
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );

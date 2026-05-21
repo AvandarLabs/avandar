@@ -1,5 +1,5 @@
 import { SqlEditor } from "@/components/SqlEditor";
-import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
+import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog";
 
 /**
  * Read-only SQL for a plan step with dataset/column pills.

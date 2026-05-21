@@ -172,7 +172,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
   const whisperCppPlatform = isDesktopPlatform ? "desktop" : "web";
 
-  /** Avoid binding Select to a model this runtime cannot load (prevents onChange loops). */
+  // Avoid binding Select to a model this runtime cannot load (prevents
+  // onChange loops).
   const activeModelId = useMemo((): WhisperCppVoiceModelId => {
     const current = findWhisperCppVoiceModel(selectedModelId);
     if (isWhisperCppModelAvailableOnPlatform(current, whisperCppPlatform)) {
@@ -338,14 +339,6 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
 
   const startRecording = useCallback(async () => {
     try {
-      await OfflineChatResourceManager.releaseForVoice();
-      if (isModelReady) {
-        void manager
-          .ensureModelLoaded(activeModelId, { silent: true })
-          .catch(() => {
-            return undefined;
-          });
-      }
       const recorder = await startMicrophoneRecording();
       recorderRef.current = recorder;
       setIsRecording(true);
@@ -359,7 +352,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         color: "danger",
       });
     }
-  }, [activeModelId, isModelReady, manager, t]);
+  }, [t]);
 
   const stopRecordingAndTranscribe = useCallback(async () => {
     if (transcribeInFlightRef.current) {
@@ -376,6 +369,7 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
     setIsTranscribing(true);
     try {
       const audio = await recorder.stop();
+      await OfflineChatResourceManager.releaseForVoice();
       const text = await manager.transcribe(audio, {
         modelId: activeModelId,
         language,

@@ -32,7 +32,7 @@ import type { ConsentAuditEntry } from "@/lib/privacy/consentAuditLog";
 type FilterValue = "all" | ConsentAuditEntry["decision"];
 
 /** Returns localized labels for consent decisions. */
-function _useDecisionLabels(): Record<ConsentAuditEntry["decision"], string> {
+function useDecisionLabels(): Record<ConsentAuditEntry["decision"], string> {
   const { t } = useLingui();
   return {
     approved: t`Approved`,
@@ -50,7 +50,7 @@ const DECISION_COLOR: Record<ConsentAuditEntry["decision"], string> = {
 };
 
 /** Returns localized labels for consent contexts. */
-function _useContextLabels(): Record<ConsentAuditEntry["context"], string> {
+function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
   const { t } = useLingui();
   return {
     user_message_text: t`Chat message`,
@@ -96,8 +96,8 @@ function ConsentLogPanel(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
   const [filter, setFilter] = useState<FilterValue>("all");
-  const decisionLabels = _useDecisionLabels();
-  const contextLabels = _useContextLabels();
+  const decisionLabels = useDecisionLabels();
+  const contextLabels = useContextLabels();
 
   const load = useCallback(async (): Promise<void> => {
     const rows = await listConsentLog({ workspaceId: workspace.id });

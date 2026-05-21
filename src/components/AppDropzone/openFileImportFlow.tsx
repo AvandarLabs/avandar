@@ -1,16 +1,7 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
+import { Trans } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
-
-function ImportConfirmBody({ fileName }: { fileName: string }): JSX.Element {
-  const { t } = useLingui();
-  return (
-    <Stack mt="md">
-      <Text>{t`Do you want to import "${fileName}" as a new dataset?`}</Text>
-    </Stack>
-  );
-}
+import { ImportConfirmBody } from "./ImportConfirmBody";
 
 /**
  * Starts the app-wide "import a file" flow.

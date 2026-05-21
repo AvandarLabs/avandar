@@ -25,7 +25,7 @@ const STATUS_COLOR: Record<PlanStepStatus, string> = {
 /**
  * Returns the localized label shown on a plan step's status badge.
  */
-function _useStatusLabel(status: PlanStepStatus): string {
+function useStatusLabel(status: PlanStepStatus): string {
   const { t } = useLingui();
   switch (status) {
     case "pending":
@@ -91,7 +91,7 @@ export function PlanStepNode(props: NodeProps): JSX.Element {
   const data = props.data as PlanStepNodeData;
   const { step, index, isFocused } = data;
   const { t } = useLingui();
-  const statusLabel = _useStatusLabel(step.status);
+  const statusLabel = useStatusLabel(step.status);
   const colCountSuffix =
     step.actualSchema && step.actualSchema.length > 0 ?
       t` · ${step.actualSchema.length} cols`

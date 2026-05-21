@@ -18,8 +18,8 @@ type Props = {
 /**
  * Downloads the selected offline chat model (WebLLM) for use when cloud chat
  * is unavailable. Opens a modal to pick or switch models; progress appears in
- * the bottom-left corner (same as voice model downloads). Not related to voice /
- * Whisper models.
+ * the bottom-left corner (same as voice model downloads). Not related to
+ * voice/Whisper models.
  */
 export function OfflineChatDownloadControl({
   disabled = false,

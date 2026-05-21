@@ -15,10 +15,10 @@ import {
 import { IconAlertCircle, IconHelp } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  _useClarificationNoneOfAboveLabel,
-  _useClarificationSomethingElseLabel,
   CLARIFICATION_NONE_OF_ABOVE,
   CLARIFICATION_SOMETHING_ELSE,
+  useClarificationNoneOfAboveLabel,
+  useClarificationSomethingElseLabel,
 } from "./clarificationAnswer";
 import type { ClarificationSubmitAnswer } from "./clarificationAnswer";
 import type { ChatClarifyRequest } from "$/types/chat.types";
@@ -179,8 +179,8 @@ function FixedOptionsBody({
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [customText, setCustomText] = useState("");
   const { t } = useLingui();
-  const noneOfAboveLabel = _useClarificationNoneOfAboveLabel();
-  const somethingElseLabel = _useClarificationSomethingElseLabel();
+  const noneOfAboveLabel = useClarificationNoneOfAboveLabel();
+  const somethingElseLabel = useClarificationSomethingElseLabel();
 
   const isSomethingElseSelected =
     multi ?

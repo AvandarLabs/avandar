@@ -16,7 +16,7 @@ type Props = {
  * Returns the localized value-picker rule options for dataset column
  * extractors.
  */
-function _useValuePickerOptions(): ReadonlyArray<{
+function useValuePickerOptions(): ReadonlyArray<{
   value: string;
   label: string;
 }> {
@@ -43,7 +43,7 @@ export function DatasetColumnExtractorCreator({
   fieldName,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const valuePickerOptions = _useValuePickerOptions();
+  const valuePickerOptions = useValuePickerOptions();
   const [state] = EntityConfigCreatorStore.useContext();
   const [fieldKeys, fieldInputProps] = entityConfigForm.keysAndProps(
     `datasetColumnFields.${fieldIdx}`,

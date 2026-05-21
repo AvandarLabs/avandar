@@ -1,7 +1,7 @@
-import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds";
+import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds.ts";
 import { describe, expect, it } from "vitest";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 
 describe("collectDatasetIds", () => {
   it("returns dataset ids referenced in dashboard config", () => {

@@ -1,5 +1,5 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 
 /**
  * Returns dataset ids referenced in dashboard config (SQL in viz blocks),

@@ -1,3 +1,4 @@
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { releaseAllVoiceRuntimes } from "@/lib/voiceWhisperCpp/releaseAllVoiceRuntimes";
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "./deleteLocalChatModelCache";
@@ -94,6 +95,7 @@ class OfflineChatResourceManagerImpl {
 
   async releaseForVoice(): Promise<void> {
     await this.unload();
+    await DuckDbClient.releaseWasmRuntime();
   }
 
   /**

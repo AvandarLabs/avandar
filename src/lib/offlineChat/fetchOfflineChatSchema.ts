@@ -51,6 +51,8 @@ export async function fetchOfflineChatSchema(args: {
     }
   }
 
+  console.log("is cached?", cached);
+
   if (cached) {
     return truncateSchemaForOffline(cached, args.openDatasetId);
   }

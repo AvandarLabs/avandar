@@ -21,16 +21,36 @@ type WhisperWasmModule = {
   free?: () => void;
 };
 
-type WhisperWasmServiceInternals = WhisperWasmService & {
+/**
+ * Mirrors the private members of `WhisperWasmService` that the patches below
+ * need to touch. Direct intersection with the class collapses to `never`
+ * because the upstream fields are declared `private`, so we cast through
+ * `unknown` to this structural type instead.
+ */
+type WhisperWasmServiceInternals = {
   wasmModule: WhisperWasmModule | null;
   instance: unknown;
   modelFileName: string;
   modelData: Uint8Array | null;
+  isTranscribing: boolean;
   bus: WhisperWasmBus;
   logger: WhisperWasmLogger;
+  checkWasmSupport: WhisperWasmService["checkWasmSupport"];
+  loadWasmScript: WhisperWasmService["loadWasmScript"];
+  storeFS: WhisperWasmService["storeFS"];
 };
 
+function asInternals(service: WhisperWasmService): WhisperWasmServiceInternals {
+  return service as unknown as WhisperWasmServiceInternals;
+}
+
 let isPatched = false;
+
+/**
+ * The whisper.cpp WASM binary is compiled with `INITIAL_MEMORY=512 MB`; passing
+ * anything smaller fails to instantiate with a memory-import LinkError.
+ */
+const WHISPER_WASM_INITIAL_MEMORY_BYTES = 512 * 1024 * 1024;
 
 function sleepMs(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -56,8 +76,9 @@ export function patchWhisperWasmLoader(): void {
 
   WhisperWasmService.prototype.loadWasmScript =
     async function loadWasmScriptBundled(this: WhisperWasmService) {
-      const service = this as WhisperWasmServiceInternals;
+      const service = asInternals(this);
       service.wasmModule = await createWhisperModule({
+        INITIAL_MEMORY: WHISPER_WASM_INITIAL_MEMORY_BYTES,
         mainScriptUrlOrBlob: whisperLibmainUrl,
         print: (text: string, ...args: unknown[]) => {
           if (args.length > 0) {
@@ -85,7 +106,7 @@ export function patchWhisperWasmLoader(): void {
     this: WhisperWasmService,
     model: Uint8Array,
   ) {
-    const service = this as WhisperWasmServiceInternals;
+    const service = asInternals(this);
     if (!(await service.checkWasmSupport())) {
       throw new Error("WASM is not supported");
     }
@@ -103,7 +124,9 @@ export function patchWhisperWasmLoader(): void {
     }
 
     service.storeFS(service.modelFileName, model);
-    service.instance = service.wasmModule.init(service.modelFileName);
+    // `loadWasmScript` above sets `wasmModule`, so the non-null assertion is
+    // safe; TS cannot prove that across the `await sleepMs(...)` boundary.
+    service.instance = service.wasmModule!.init(service.modelFileName);
   };
 }
 
@@ -111,17 +134,13 @@ export function patchWhisperWasmLoader(): void {
 export function resetWhisperTranscribingFlag(
   service: WhisperWasmService,
 ): void {
-  (
-    service as WhisperWasmService & {
-      isTranscribing: boolean;
-    }
-  ).isTranscribing = false;
+  asInternals(service).isTranscribing = false;
 }
 
 /** Frees the Emscripten heap without re-initializing the model. */
 export function freeWhisperWasmModule(service: WhisperWasmService): void {
-  const wasmModule = (service as WhisperWasmServiceInternals).wasmModule;
-  wasmModule?.free?.();
-  (service as WhisperWasmServiceInternals).wasmModule = null;
-  (service as WhisperWasmServiceInternals).instance = null;
+  const internals = asInternals(service);
+  internals.wasmModule?.free?.();
+  internals.wasmModule = null;
+  internals.instance = null;
 }

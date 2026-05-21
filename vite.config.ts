@@ -31,10 +31,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     server: {
-      // pthread whisper.cpp + DuckDB WASM need SharedArrayBuffer.
+      // SharedArrayBuffer for whisper.cpp WASM (pthread build) needs cross-
+      // origin isolation. `credentialless` keeps `crossOriginIsolated` true
+      // (so SAB stays available) while still letting third-party scripts that
+      // do not opt in to CORP load (Featurebase SDK, Google Fonts, etc.).
       headers: {
         "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "require-corp",
+        "Cross-Origin-Embedder-Policy": "credentialless",
+        "Cross-Origin-Resource-Policy": "same-origin",
       },
     },
     worker: {
@@ -42,7 +46,11 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       // Pre-bundling adds node polyfills to Emscripten glue; breaks workers.
-      exclude: ["@avandar/whisper-libmain", "@timur00kh/whisper.wasm"],
+      exclude: [
+        "@avandar/whisper-libmain",
+        "@timur00kh/whisper.wasm",
+        "@duckdb/duckdb-wasm",
+      ],
     },
     plugins:
       mode === "test" ?
@@ -94,6 +102,23 @@ export default defineConfig(({ mode }) => {
                     return url.pathname.startsWith("/storage/v1/object");
                   },
                   handler: "NetworkOnly" as const,
+                },
+                {
+                  // DuckDb fetches spatial / excel extension WASM from this CDN
+                  // on every fresh init; CacheFirst lets prod (PWA) keep
+                  // serving them when the user goes offline.
+                  urlPattern: ({ url }: { url: URL }) => {
+                    return url.origin === "https://extensions.duckdb.org";
+                  },
+                  handler: "CacheFirst" as const,
+                  options: {
+                    cacheName: "duckdb-extensions",
+                    expiration: {
+                      maxEntries: 30,
+                      maxAgeSeconds: 30 * 24 * 60 * 60,
+                    },
+                    cacheableResponse: { statuses: [0, 200] },
+                  },
                 },
               ],
             },

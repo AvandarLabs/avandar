@@ -1,8 +1,4 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
-import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
-import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
-import duckDbWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
-import duckDbWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import { ILogger } from "@logger";
 import {
   isNonEmptyArray,
@@ -48,6 +44,8 @@ import {
   DuckDbStructuredQuery,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { buildManualDuckDbBundles } from "@/clients/DuckDbClient/duckDbManualBundles";
+import { shouldLoadDuckDbNetworkExtensions } from "@/clients/DuckDbClient/shouldLoadDuckDbNetworkExtensions";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
@@ -56,17 +54,6 @@ import type {
   DuckDbSniffCsvRow,
 } from "@/clients/DuckDbClient/csvParse";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
-
-const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
-  mvp: {
-    mainModule: duckDbWasm,
-    mainWorker: mvpWorker,
-  },
-  eh: {
-    mainModule: duckDbWasmEh,
-    mainWorker: ehWorker,
-  },
-};
 
 const sql = knex({
   client: "sqlite3",
@@ -82,6 +69,66 @@ function _quoteSQLIdentifier(identifier: string): string {
 
 function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
+}
+
+class DuckDbWasmInitCancelled extends Error {
+  override readonly name = "DuckDbWasmInitCancelled";
+}
+
+function _formatDuckDbWorkerError(event: ErrorEvent): string {
+  if (event.message) {
+    return event.message;
+  }
+  if (event.error instanceof Error && event.error.message) {
+    return event.error.message;
+  }
+  const details: string[] = [];
+  if (event.filename) {
+    details.push(`worker script: ${event.filename}`);
+  }
+  if (event.lineno > 0) {
+    details.push(`line ${event.lineno}`);
+  }
+  if (event.colno > 0) {
+    details.push(`column ${event.colno}`);
+  }
+  if (details.length > 0) {
+    return `DuckDB worker failed to start (${details.join(", ")})`;
+  }
+  return "DuckDB worker failed to start";
+}
+
+/**
+ * DuckDB-WASM clears pending requests on worker `error` without rejecting
+ * `instantiate()`, which leaves dataset imports spinning forever.
+ */
+function _waitForDuckDbWorkerFailure(worker: Worker): Promise<never> {
+  return new Promise((_resolve, reject) => {
+    worker.addEventListener(
+      "error",
+      (event: ErrorEvent) => {
+        reject(
+          new Error(
+            `${_formatDuckDbWorkerError(event)}. ` +
+              "If this persists after a hard refresh, restart the dev server.",
+          ),
+        );
+      },
+      { once: true },
+    );
+    worker.addEventListener(
+      "messageerror",
+      () => {
+        reject(
+          new Error(
+            "DuckDB worker failed to start (message deserialization error). " +
+              "If this persists after a hard refresh, restart the dev server.",
+          ),
+        );
+      },
+      { once: true },
+    );
+  });
 }
 
 function _assertXlsxFileReadable(file: File): void {
@@ -248,6 +295,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
  */
 class DuckDbClientImpl {
   #db?: Promise<duckdb.AsyncDuckDB>;
+  #wasmGeneration = 0;
 
   /**
    * Tracking open connections. This is useful for debugging if we ever need to
@@ -256,46 +304,121 @@ class DuckDbClientImpl {
   #openConnections: Set<duckdb.AsyncDuckDBConnection> = new Set();
   #logger: ILogger = Logger.appendName("DuckDbClient");
 
-  async #initialize(): Promise<duckdb.AsyncDuckDB> {
-    // Select a bundle based on browser checks
-    const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
+  async #disposeDuckDbInstance(
+    db: duckdb.AsyncDuckDB,
+    worker: Worker,
+  ): Promise<void> {
+    worker.terminate();
+    await db.terminate().catch(() => {});
+  }
 
-    // Instantiate the asynchronous version of DuckDB-wasm
+  async #assertInitStillCurrent(
+    initGeneration: number,
+    db: duckdb.AsyncDuckDB,
+    worker: Worker,
+  ): Promise<void> {
+    if (initGeneration === this.#wasmGeneration) {
+      return;
+    }
+    await this.#disposeDuckDbInstance(db, worker);
+    throw new DuckDbWasmInitCancelled();
+  }
+
+  async #initialize(): Promise<duckdb.AsyncDuckDB> {
+    const initGeneration = this.#wasmGeneration;
+    const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
+
     const worker = new Worker(bundle.mainWorker!);
     const logger = new duckdb.ConsoleLogger();
     const db = new duckdb.AsyncDuckDB(logger, worker);
-    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+    try {
+      await Promise.race([
+        db.instantiate(bundle.mainModule, bundle.pthreadWorker),
+        _waitForDuckDbWorkerFailure(worker),
+      ]);
+    } catch (error) {
+      await this.#disposeDuckDbInstance(db, worker);
+      throw error;
+    }
+
+    await this.#assertInitStillCurrent(initGeneration, db, worker);
 
     const conn = await db.connect();
-    // The spatial / excel extensions are fetched at runtime from
-    // `extensions.duckdb.org`. In environments where that host is blocked
-    // (or simply offline), the fetch stalls DuckDB initialization and
-    // every CSV / XLSX import hangs. `DisableDuckDbSpatial` lets the
-    // operator opt out of the spatial fetch — geo queries lose their
-    // spatial functions but the rest of the database boots.
-    // TODO(jpsyx): we should only enable spatial extension when it's needed
-    if (!isFlagEnabled(FeatureFlag.DisableDuckDbSpatial)) {
-      await conn.query("LOAD spatial;");
+    const loadNetworkExtensions = shouldLoadDuckDbNetworkExtensions({
+      isDisableDuckDbSpatialFlagEnabled: isFlagEnabled(
+        FeatureFlag.DisableDuckDbSpatial,
+      ),
+      hasPthreadWorker: bundle.pthreadWorker != null,
+    });
+
+    // Spatial / excel are fetched from `extensions.duckdb.org` on each fresh
+    // AsyncDuckDB init (DuckDb-WASM does not persist extensions across page
+    // loads). When offline, both fetches throw — we let init succeed without
+    // them so the bulk of the app (parquet queries) still works. Geo or
+    // .xlsx flows hit a runtime "unknown function/format" error instead of
+    // breaking the whole client.
+    // TODO(jpsyx): only load spatial when a geo query needs it.
+    const loadOptionalExtension = async (name: string): Promise<void> => {
+      try {
+        await conn.query(`LOAD ${name};`);
+      } catch (error) {
+        this.#logger.warn(
+          `DuckDB extension "${name}" failed to load (likely offline); ` +
+            "queries that need it will fail.",
+          { error },
+        );
+      }
+    };
+    if (loadNetworkExtensions) {
+      await loadOptionalExtension("spatial");
     }
     await conn.query("LOAD parquet;");
-    // XLSX support depends on the excel extension which is also a
-    // network-fetched extension. Mirror the spatial-flag behaviour: if
-    // the operator has explicitly disabled the spatial fetch (a strong
-    // signal that the extensions origin is unreachable), skip the excel
-    // load too so CSV imports still work in the offline / restricted
-    // environment.
-    if (!isFlagEnabled(FeatureFlag.DisableDuckDbSpatial)) {
-      await conn.query("LOAD excel;");
+    if (loadNetworkExtensions) {
+      await loadOptionalExtension("excel");
     }
     await conn.close();
+
+    await this.#assertInitStillCurrent(initGeneration, db, worker);
     return db;
   }
 
   async #getDB(): Promise<duckdb.AsyncDuckDB> {
     if (!this.#db) {
-      this.#db = this.#initialize();
+      this.#db = this.#initialize().catch((error: unknown) => {
+        this.#db = undefined;
+        throw error;
+      });
     }
     return this.#db;
+  }
+
+  /**
+   * Tears down the DuckDB-WASM worker so another large WASM runtime (e.g.
+   * whisper.cpp) can allocate. The next query call re-initializes lazily.
+   */
+  async releaseWasmRuntime(): Promise<void> {
+    this.#wasmGeneration += 1;
+    const pendingInit = this.#db;
+    this.#db = undefined;
+    if (!pendingInit) {
+      return;
+    }
+    try {
+      const db = await pendingInit;
+      const openConnections = [...this.#openConnections];
+      await Promise.all(
+        openConnections.map((connection) => {
+          return this.#closeConnection(connection);
+        }),
+      );
+      await db.terminate();
+    } catch (error) {
+      if (error instanceof DuckDbWasmInitCancelled) {
+        return;
+      }
+      this.#logger.warn("DuckDB WASM release failed", { error });
+    }
+    this.#openConnections.clear();
   }
 
   async #connect(): Promise<duckdb.AsyncDuckDBConnection> {

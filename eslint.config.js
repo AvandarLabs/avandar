@@ -131,8 +131,8 @@ export default [
         "import-x/resolver-next": [
           createTypeScriptImportResolver({
             // Scoped to the real monorepo layout only. Do not use a repo-wide
-            // `tsconfig.*.json` glob: `.claude/worktrees` copies add hundreds of
-            // tsconfigs and slow `pnpm lint` dramatically.
+            // `tsconfig.*.json` glob: `.claude/worktrees` copies add hundreds
+            // of tsconfigs and slow `pnpm lint` dramatically.
             project: [
               "tsconfig.json",
               "tsconfig.app.json",

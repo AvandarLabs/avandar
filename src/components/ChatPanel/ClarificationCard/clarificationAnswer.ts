@@ -15,7 +15,7 @@ export const CLARIFICATION_SOMETHING_ELSE = "__something_else__" as const;
  * Localized label for the "none of the above" sentinel option in the
  * clarification card.
  */
-export function _useClarificationNoneOfAboveLabel(): string {
+export function useClarificationNoneOfAboveLabel(): string {
   const { t } = useLingui();
   return t`None of the above`;
 }
@@ -24,7 +24,7 @@ export function _useClarificationNoneOfAboveLabel(): string {
  * Localized label for the "something else" sentinel option in the
  * clarification card.
  */
-export function _useClarificationSomethingElseLabel(): string {
+export function useClarificationSomethingElseLabel(): string {
   const { t } = useLingui();
   return t`Something else…`;
 }
