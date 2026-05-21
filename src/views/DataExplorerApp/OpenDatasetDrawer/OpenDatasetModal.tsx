@@ -1,0 +1,112 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Stack, Text, Title } from "@mantine/core";
+import { Modal, Tabs } from "@ui";
+import { useEffect, useState } from "react";
+import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
+import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
+import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
+import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
+import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+type Props = {
+  opened: boolean;
+  onClose: () => void;
+
+  /**
+   * Called when the user picks (or imports) a dataset. The modal applies
+   * canvas-side state updates via this callback.
+   */
+  onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
+};
+
+/**
+ * Centered modal for opening or importing a dataset in the Data Explorer.
+ * Replaces the previous bottom drawer so the flow matches other explorer
+ * dialogs (overlay, focus trap, click-outside dismiss).
+ */
+export function OpenDatasetModal({
+  opened,
+  onClose,
+  onOpen,
+}: Props): JSX.Element {
+  const { t } = useLingui();
+  const [indicatorRemountKey, setIndicatorRemountKey] = useState(0);
+
+  useEffect(() => {
+    if (!opened) {
+      setIndicatorRemountKey(0);
+    }
+  }, [opened]);
+
+  const onImportSaved = (dataset: Dataset.T) => {
+    onOpen(
+      {
+        datasetId: dataset.id,
+        name: dataset.name,
+        sourceType: dataset.sourceType,
+      },
+      buildSelectAllPreviewSQL(dataset.id),
+    );
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      size="xl"
+      zIndex={MODAL_ROOT_Z_INDEX}
+      transitionProps={{
+        onEntered: () => {
+          setIndicatorRemountKey((key) => {
+            return key + 1;
+          });
+        },
+      }}
+      title={
+        <Stack gap={2}>
+          <Title order={4}>
+            <Trans>Open dataset</Trans>
+          </Title>
+          <Text c="dimmed" size="sm">
+            <Trans>
+              Choose a saved dataset or import new data into your workspace.
+            </Trans>
+          </Text>
+        </Stack>
+      }
+      styles={{
+        title: { width: "100%" },
+        body: { paddingTop: "var(--mantine-spacing-sm)" },
+      }}
+    >
+      <div className={css.body}>
+        <Tabs
+          indicatorRemountKey={indicatorRemountKey}
+          tabIds={["saved", "import"] as const}
+          renderTabHeader={{
+            saved: t`Saved datasets`,
+            import: t`Import dataset`,
+          }}
+          renderTabPanel={{
+            saved: () => {
+              return (
+                <div className={css.tabPanel}>
+                  <SavedDatasetsView onOpen={onOpen} />
+                </div>
+              );
+            },
+            import: () => {
+              return (
+                <div className={`${css.tabPanel} ${css.importPanel}`}>
+                  <ImportDatasetView onSaveSuccess={onImportSaved} />
+                </div>
+              );
+            },
+          }}
+        />
+      </div>
+    </Modal>
+  );
+}

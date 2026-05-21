@@ -1,0 +1,92 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+  min-height: 0;
+}
+
+.tabPanel {
+  min-height: 320px;
+}
+
+.savedPanel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+  min-height: 320px;
+}
+
+.list {
+  background-color: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-neutral-2);
+  border-radius: var(--mantine-radius-md);
+  flex: 1;
+  max-height: min(52vh, 420px);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.row {
+  align-items: center;
+  border-bottom: 1px solid var(--mantine-color-neutral-1);
+  cursor: pointer;
+  display: flex;
+  gap: var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  transition: background-color 120ms ease;
+  width: 100%;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background-color: var(--mantine-color-neutral-0);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
+
+.rowSelected {
+  background-color: var(--mantine-primary-color-light);
+}
+
+.rowSelected:hover {
+  background-color: var(--mantine-primary-color-light);
+}
+
+.rowName {
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowType {
+  flex-shrink: 0;
+}
+
+.rowDelete {
+  flex-shrink: 0;
+}
+
+.emptyState {
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-md);
+  text-align: center;
+}
+
+.footer {
+  border-top: 1px solid var(--mantine-color-neutral-2);
+  flex-shrink: 0;
+  padding-top: var(--mantine-spacing-md);
+}
+
+.importPanel {
+  padding-top: var(--mantine-spacing-xs);
+}
