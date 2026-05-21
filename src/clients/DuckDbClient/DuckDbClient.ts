@@ -275,6 +275,27 @@ function arrowTableToJS<RowObject extends UnknownRow>(
           return x.toJSON();
         });
       }
+
+      // Apache Arrow wraps DECIMAL / HUGEINT cells in DecimalBigNum objects
+      // (4-limb Int128 representations). Recharts / ag-grid see these as plain
+      // objects and can't compare, sort, or scale them, so unwrap to a JS
+      // number here. Precision loss beyond 2^53 is acceptable for charts;
+      // call sites that need exact decimal arithmetic should round-trip
+      // through a string explicitly.
+      if (v !== null && typeof v === "object") {
+        const ctorName = (v as { constructor?: { name?: string } }).constructor
+          ?.name;
+        if (ctorName === "DecimalBigNum" || ctorName === "BigNum") {
+          const primitive = (v as { valueOf: () => unknown }).valueOf();
+          if (typeof primitive === "bigint") {
+            return Number(primitive);
+          }
+          if (typeof primitive === "number") {
+            return primitive;
+          }
+        }
+      }
+
       return v;
     });
   });

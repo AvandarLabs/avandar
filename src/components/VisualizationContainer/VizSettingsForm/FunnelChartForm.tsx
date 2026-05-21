@@ -105,6 +105,7 @@ export function FunnelChartForm({
                   swatches={CHART_COLOR_SWATCHES}
                   withEyeDropper={false}
                   format="hex"
+                  popoverProps={{ withinPortal: false }}
                   onChange={(value) => {
                     onConfigChange({
                       ...config,
