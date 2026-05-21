@@ -9084,6 +9084,7 @@
         "npm:vite-tsconfig-paths@^6.1.1",
         "npm:vite@^7.0.4",
         "npm:vitest@^3.2.4",
+        "npm:workbox-window@7.4.1",
         "npm:xlsx@~0.18.5",
         "npm:zod@^4.1.13"
       ]
