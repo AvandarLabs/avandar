@@ -17,6 +17,7 @@ import {
 import {
   buildSQLSystemPrompt,
   cleanGeneratedSQL,
+  extractSqlFromAssistantText,
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
 import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with { type: "json" };
 import { AppConfig } from "$/config/AppConfig.ts";
@@ -1373,6 +1374,26 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             if (parsed) {
               plan = parsed;
             }
+          }
+        }
+
+        // Fallback: the model occasionally inlines a SELECT (or a
+        // fenced ```sql block) in plain text instead of invoking the
+        // `generateSql` tool. Recover the SQL from the message body so
+        // the canvas still runs the query.
+        if (
+          !generatedSql &&
+          !clarification &&
+          !plan &&
+          isDataExplorer &&
+          text.length > 0
+        ) {
+          const extracted = extractSqlFromAssistantText(text);
+          if (extracted) {
+            generatedSql = {
+              sql: cleanGeneratedSQL(extracted),
+              prompt: lastUserPrompt,
+            };
           }
         }
 
