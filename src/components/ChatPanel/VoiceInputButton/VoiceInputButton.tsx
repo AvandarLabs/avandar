@@ -31,6 +31,7 @@ import {
 } from "@/lib/localModels/formatModelPickerCopy";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
+import { setPendingVoiceLanguage } from "@/lib/voice/pendingVoiceLanguage";
 import { useDownloadedVoiceModels } from "@/lib/voice/useDownloadedVoiceModels";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
@@ -378,6 +379,10 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
         const previous = composerRuntime.getState().text;
         const joined = previous ? `${previous.trim()} ${text}`.trim() : text;
         composerRuntime.setText(joined);
+        // Tell the chat runtime which language Whisper just transcribed
+        // in so the backend can hint the LLM. The runtime reads-and-clears
+        // this on the next turn.
+        setPendingVoiceLanguage(language);
       } else {
         notifications.show({
           title: t`No speech detected`,

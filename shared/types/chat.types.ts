@@ -195,6 +195,35 @@ export type ChatPlan = {
   rootMessage: string;
 };
 
+/**
+ * Language hint attached to a chat turn when the user just dictated their
+ * message. Intentionally narrow for now: we only forward Swahili because
+ * the cloud LLMs often fail to identify low-resource Bantu languages from
+ * the transcribed text alone, while English / Spanish / French etc. are
+ * already detected reliably and we don't want a hint to regress them.
+ */
+export type ChatVoiceLanguage = "swahili";
+
+/**
+ * Sent on the next turn when the user clicks "Try Again" on a prior
+ * assistant message. The backend uses these fields to inject a system
+ * note telling the model NOT to repeat the same output. Only the field
+ * that matches what the prior turn produced is set; the rest are
+ * omitted.
+ */
+export type ChatRetryContext = {
+  /** Plain-text assistant body from the prior turn, if any. */
+  priorAssistantText?: string;
+  /** SQL the prior turn emitted via `generateSql`, if any. */
+  priorGeneratedSql?: string;
+  /** Question the prior turn asked via `clarify`, if any. */
+  priorClarificationQuestion?: string;
+  /** rootMessage of the plan the prior turn proposed, if any. */
+  priorPlanRootMessage?: string;
+  /** Kind of dashboard block the prior turn appended, if any. */
+  priorDashboardBlockKind?: string;
+};
+
 export type ChatResponse = {
   assistantText: string;
   generatedSql?: ChatGeneratedSql;

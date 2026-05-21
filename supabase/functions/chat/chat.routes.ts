@@ -38,7 +38,9 @@ import type {
   ChatPlan,
   ChatPlanStep,
   ChatResponse,
+  ChatRetryContext,
   ChatSessionSecretResponse,
+  ChatVoiceLanguage,
   RegeneratePlanResponse,
 } from "@sbfn/chat/chat.types.ts";
 import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
@@ -651,8 +653,11 @@ before generating SQL. Prefer \`clarify\` over guessing when the answer would
 change who or what is counted.
 
 When to call \`clarify\`:
-- Subjective terms without a clear metric ("good", "best", "poor",
-  "important", "successful").
+- Terms without a clear metric ("good", "bad", "best", "worst", "poor",
+  "important", "successful", "top", "bottom", "highest", "lowest"). Even
+  ostensibly quantitative words like "top" or "highest" are ambiguous
+  without a named metric and aggregation (peak value? average? cumulative?
+  count?) — when in doubt, clarify which metric to rank or filter by.
 - Multi-meaning columns (e.g. "client" could mean customer or beneficiary).
 - Subjective categorizations the model has to guess at ("poverty
   indicators", "at-risk groups").
@@ -786,6 +791,64 @@ const genericSystemPrompt = `${avandarPersonaPrefix}
 The user is not currently on a page where data tools are available. Be concise and
 helpful, and let them know they can switch to the Data Explorer to ask questions about their data.`;
 
+/**
+ * Builds the trailing system-prompt fragment sent when the user clicked
+ * "Try Again" on the prior assistant turn. Empty string when no retry
+ * context is present, so callers can unconditionally concatenate it.
+ */
+function _buildRetryContextNote(
+  retryContext: ChatRetryContext | undefined,
+): string {
+  if (!retryContext) {
+    return "";
+  }
+  const lines: string[] = [];
+  if (retryContext.priorGeneratedSql) {
+    lines.push(
+      `Previously generated SQL:\n\`\`\`sql\n${retryContext.priorGeneratedSql}\n\`\`\``,
+    );
+  }
+  if (retryContext.priorClarificationQuestion) {
+    lines.push(
+      `Previously asked clarification: "${retryContext.priorClarificationQuestion}"`,
+    );
+  }
+  if (retryContext.priorPlanRootMessage) {
+    lines.push(
+      `Previously proposed plan summary: "${retryContext.priorPlanRootMessage}"`,
+    );
+  }
+  if (retryContext.priorDashboardBlockKind) {
+    lines.push(
+      `Previously appended dashboard block kind: ${retryContext.priorDashboardBlockKind}`,
+    );
+  }
+  if (retryContext.priorAssistantText) {
+    lines.push(`Previous assistant message: "${retryContext.priorAssistantText}"`);
+  }
+  if (lines.length === 0) {
+    return "";
+  }
+  return `\n\nThe user explicitly asked you to TRY AGAIN on their most recent question. Do not repeat the same output — take a different approach. Consider an alternative interpretation, a different SQL strategy, or asking a clarifying question if your previous attempt jumped to SQL too aggressively.\n\n${lines.join("\n\n")}`;
+}
+
+/**
+ * Builds the trailing system-prompt fragment that tells the model the
+ * user's most recent message was dictated in a specific language. Empty
+ * string when no voice language was forwarded. Intentionally narrow:
+ * only Swahili is wired today because low-resource Bantu languages get
+ * misidentified as garbled English by the LLM far more often than the
+ * well-supported European languages do.
+ */
+function _buildVoiceLanguageNote(
+  voiceLanguage: ChatVoiceLanguage | undefined,
+): string {
+  if (voiceLanguage !== "swahili") {
+    return "";
+  }
+  return `\n\nThe user's most recent message was transcribed from spoken Kiswahili (Swahili). Treat it as Swahili — do not assume it is misspelled English or a different Bantu language. Reply in Swahili unless the user has explicitly written in another language earlier in the thread.`;
+}
+
 async function fetchSchemaForWorkspace(args: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseClient: any;
@@ -891,10 +954,27 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             }),
           )
           .optional(),
+        retryContext: z
+          .object({
+            priorAssistantText: z.string().max(2000).optional(),
+            priorGeneratedSql: z.string().max(8000).optional(),
+            priorClarificationQuestion: z.string().max(400).optional(),
+            priorPlanRootMessage: z.string().max(800).optional(),
+            priorDashboardBlockKind: z.string().max(40).optional(),
+          })
+          .optional(),
+        voiceLanguage: z.enum(["swahili"]).optional(),
       })
       .action(async ({ pathParams, body, supabaseClient, user }) => {
         const { workspaceId } = pathParams;
-        const { messages, context, model: requestedModel, consentAcks } = body;
+        const {
+          messages,
+          context,
+          model: requestedModel,
+          consentAcks,
+          retryContext,
+          voiceLanguage,
+        } = body;
         const model = _resolveChatModel(requestedModel);
 
         // Verify any consent acks BEFORE we burn an LLM call. Each ack
@@ -991,11 +1071,16 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
               )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
           : "";
 
+        const retryContextNote = _buildRetryContextNote(retryContext);
+        const voiceLanguageNote = _buildVoiceLanguageNote(voiceLanguage);
+
         const systemContent =
-          isDataExplorer ?
+          (isDataExplorer ?
             `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
           : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
-          : genericSystemPrompt;
+          : genericSystemPrompt) +
+          retryContextNote +
+          voiceLanguageNote;
 
         const requestBody: Record<string, unknown> = {
           model,
@@ -1298,122 +1383,194 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           requestBody.tool_choice = "auto";
         }
 
-        const response = await fetch(
-          "https://openrouter.ai/api/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${openRouterApiKey}`,
-              "HTTP-Referer": openRouterReferer,
-              "X-Title": "Avandar",
+        // Single OpenRouter attempt — wrapped in a helper so the
+        // retry-on-empty escalation below can re-call it with different
+        // params. Throws on non-2xx so the outer handler surfaces it.
+        const runAttempt = async (
+          attemptBody: Record<string, unknown>,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ): Promise<{ message: any; text: string }> => {
+          const r = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${openRouterApiKey}`,
+                "HTTP-Referer": openRouterReferer,
+                "X-Title": "Avandar",
+              },
+              body: JSON.stringify(attemptBody),
             },
-            body: JSON.stringify(requestBody),
-          },
-        );
+          );
+          if (!r.ok) {
+            const errorText = await r.text();
+            throw new Error(`OpenRouter API error: ${errorText}`);
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const d: any = await r.json();
+          const m = d.choices?.[0]?.message;
+          return { message: m, text: (m?.content ?? "").trim() };
+        };
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`OpenRouter API error: ${errorText}`);
-        }
+        type ParsedAttempt = {
+          text: string;
+          generatedSql?: ChatGeneratedSQL;
+          clarification?: ChatClarifyRequest;
+          plan?: ChatPlan;
+          dashboardBlock?: ChatGeneratedDashboardBlock;
+        };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any = await response.json();
-        const message = data.choices?.[0]?.message;
-        const text = (message?.content ?? "").trim();
+        /**
+         * Parses an OpenRouter response message + content into our terminal
+         * output shapes. Defined inline so it can close over the per-request
+         * `isDataExplorer`, `isDashboards`, `lastUserPrompt`, and
+         * `priorClarifications`.
+         */
+        const parseAttempt = (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          msg: any,
+          attemptText: string,
+        ): ParsedAttempt => {
+          const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
+          let sql: ChatGeneratedSQL | undefined;
+          let clar: ChatClarifyRequest | undefined;
+          let pln: ChatPlan | undefined;
+          let block: ChatGeneratedDashboardBlock | undefined;
 
-        let generatedSql: ChatGeneratedSQL | undefined;
-        let clarification: ChatClarifyRequest | undefined;
-        let plan: ChatPlan | undefined;
-        let dashboardBlock: ChatGeneratedDashboardBlock | undefined;
-        const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
+          const sqlCall = calls.find((tc) => {
+            return tc?.function?.name === "generateSql";
+          });
+          if (sqlCall?.function) {
+            try {
+              const args = JSON.parse(sqlCall.function.arguments ?? "{}");
+              if (typeof args.sql === "string" && args.sql.trim()) {
+                sql = {
+                  sql: cleanGeneratedSQL(args.sql),
+                  prompt: lastUserPrompt,
+                };
+              }
+            } catch {
+              // Malformed tool args: ignore.
+            }
+          }
 
-        const generateSqlToolCall = toolCalls.find((tc) => {
-          return tc?.function?.name === "generateSql";
-        });
-        if (generateSqlToolCall?.function) {
-          try {
-            const args = JSON.parse(
-              generateSqlToolCall.function.arguments ?? "{}",
-            );
-            if (typeof args.sql === "string" && args.sql.trim()) {
-              generatedSql = {
-                sql: cleanGeneratedSQL(args.sql),
+          // Only honor `clarify` if no SQL was also produced this turn —
+          // the SQL path is the terminal one.
+          if (!sql) {
+            const clarifyCall = calls.find((tc) => {
+              return tc?.function?.name === "clarify";
+            });
+            if (clarifyCall?.function) {
+              const p = _parseClarify(
+                clarifyCall.function.arguments,
+                priorClarifications,
+              );
+              if (p) {
+                clar = p;
+              }
+            }
+          }
+
+          // proposePlan is terminal like generateSql.
+          if (!sql && !clar) {
+            const planCall = calls.find((tc) => {
+              return tc?.function?.name === "proposePlan";
+            });
+            if (planCall?.function) {
+              const p = _parseProposePlan(planCall.function.arguments);
+              if (p) {
+                pln = p;
+              }
+            }
+          }
+
+          // Fallback: the model occasionally inlines a SELECT (or a
+          // fenced ```sql block) in plain text instead of invoking the
+          // `generateSql` tool.
+          if (
+            !sql &&
+            !clar &&
+            !pln &&
+            isDataExplorer &&
+            attemptText.length > 0
+          ) {
+            const extracted = extractSqlFromAssistantText(attemptText);
+            if (extracted) {
+              sql = {
+                sql: cleanGeneratedSQL(extracted),
                 prompt: lastUserPrompt,
               };
             }
-          } catch {
-            // Malformed tool args: ignore this tool call. The assistant
-            // will still get a chance to produce text below.
           }
-        }
 
-        // Only honor `clarify` if no SQL was also produced this turn — the
-        // SQL path is the terminal one. If the model emitted both, it
-        // already knows what to do, so we skip the clarification.
-        if (!generatedSql) {
-          const clarifyToolCall = toolCalls.find((tc) => {
-            return tc?.function?.name === "clarify";
-          });
-          if (clarifyToolCall?.function) {
-            const parsed = _parseClarify(
-              clarifyToolCall.function.arguments,
-              priorClarifications,
-            );
-            if (parsed) {
-              clarification = parsed;
+          // Dashboard block creation. Only honored on the dashboards surface.
+          if (isDashboards && !sql && !clar && !pln) {
+            const blockCall = calls.find((tc) => {
+              return tc?.function?.name === "addDashboardBlock";
+            });
+            if (blockCall?.function) {
+              const p = _parseAddDashboardBlock(blockCall.function.arguments);
+              if (p) {
+                block = p;
+              }
             }
           }
+
+          return {
+            text: attemptText,
+            generatedSql: sql,
+            clarification: clar,
+            plan: pln,
+            dashboardBlock: block,
+          };
+        };
+
+        /**
+         * An attempt is "empty" when the model returned neither a tool
+         * call we could parse nor any plain text. That's the only case
+         * worth retrying — anything else means the model committed to
+         * something and we should ship it.
+         */
+        const isEmpty = (p: ParsedAttempt): boolean => {
+          return (
+            !p.generatedSql &&
+            !p.clarification &&
+            !p.plan &&
+            !p.dashboardBlock &&
+            p.text.length === 0
+          );
+        };
+
+        // Attempt 1: normal call.
+        let attempt = await runAttempt(requestBody);
+        let parsed = parseAttempt(attempt.message, attempt.text);
+
+        // Attempt 2 (only when attempt 1 returned nothing): literal repeat
+        // with a bumped temperature so we get a meaningfully different
+        // draw rather than the same emptiness twice.
+        if (isEmpty(parsed)) {
+          attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
+          parsed = parseAttempt(attempt.message, attempt.text);
         }
 
-        // proposePlan is terminal like generateSql — only honor if neither
-        // of the other two terminal paths fired this turn.
-        if (!generatedSql && !clarification) {
-          const planToolCall = toolCalls.find((tc) => {
-            return tc?.function?.name === "proposePlan";
+        // Attempt 3 (only when attempts 1 and 2 returned nothing): force
+        // the model into one of the registered tools. Skipped on the
+        // generic surface where the request has no tools to pick from.
+        const hasTools =
+          Array.isArray(requestBody.tools) &&
+          (requestBody.tools as unknown[]).length > 0;
+        if (isEmpty(parsed) && hasTools) {
+          attempt = await runAttempt({
+            ...requestBody,
+            temperature: 0.5,
+            tool_choice: "required",
           });
-          if (planToolCall?.function) {
-            const parsed = _parseProposePlan(planToolCall.function.arguments);
-            if (parsed) {
-              plan = parsed;
-            }
-          }
+          parsed = parseAttempt(attempt.message, attempt.text);
         }
 
-        // Fallback: the model occasionally inlines a SELECT (or a
-        // fenced ```sql block) in plain text instead of invoking the
-        // `generateSql` tool. Recover the SQL from the message body so
-        // the canvas still runs the query.
-        if (
-          !generatedSql &&
-          !clarification &&
-          !plan &&
-          isDataExplorer &&
-          text.length > 0
-        ) {
-          const extracted = extractSqlFromAssistantText(text);
-          if (extracted) {
-            generatedSql = {
-              sql: cleanGeneratedSQL(extracted),
-              prompt: lastUserPrompt,
-            };
-          }
-        }
-
-        // Dashboard block creation. Only honored on the dashboards surface.
-        if (isDashboards && !generatedSql && !clarification && !plan) {
-          const blockToolCall = toolCalls.find((tc) => {
-            return tc?.function?.name === "addDashboardBlock";
-          });
-          if (blockToolCall?.function) {
-            const parsed = _parseAddDashboardBlock(
-              blockToolCall.function.arguments,
-            );
-            if (parsed) {
-              dashboardBlock = parsed;
-            }
-          }
-        }
+        const { text, generatedSql, clarification, plan, dashboardBlock } =
+          parsed;
 
         const assistantText =
           text ||

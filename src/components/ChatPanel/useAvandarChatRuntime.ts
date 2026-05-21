@@ -20,6 +20,7 @@ import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPick
 import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
 import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
+import { consumePendingVoiceLanguage } from "@/lib/voice/pendingVoiceLanguage";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
@@ -39,6 +40,7 @@ import type {
   ChatClarifyRequest,
   ChatClientMessage,
   ChatResponse,
+  ChatRetryContext,
   ConsentAck,
 } from "$/types/chat.types";
 
@@ -48,6 +50,51 @@ export type ChatClarifyRequestWithAudit = ChatClarifyRequest & {
 };
 
 const CLARIFICATION_ANSWER_RE = /^\[Clarification answer:/;
+
+/**
+ * Computes a stable key for a `messages` array so we can tell whether
+ * an incoming `run()` is a "Try Again" (same messages as the last
+ * completed turn) or a fresh user turn. Role+content is enough — the
+ * runtime adapter never sees structured metadata that would change
+ * without the content also changing.
+ */
+function chatMessagesKey(messages: readonly ChatClientMessage[]): string {
+  return messages
+    .map((m) => {
+      return `${m.role}\u0001${m.content}`;
+    })
+    .join("\u0002");
+}
+
+/**
+ * Maps a previously-returned `ChatResponse` to the compact retry
+ * context shape the backend wants. Returns `undefined` when the
+ * previous turn produced nothing worth telling the model about.
+ */
+function buildRetryContext(
+  response: ChatResponse,
+): ChatRetryContext | undefined {
+  const ctx: ChatRetryContext = {};
+  if (response.assistantText && response.assistantText.trim().length > 0) {
+    ctx.priorAssistantText = response.assistantText.slice(0, 2000);
+  }
+  if (response.generatedSql?.sql) {
+    ctx.priorGeneratedSql = response.generatedSql.sql.slice(0, 8000);
+  }
+  if (response.clarification?.question) {
+    ctx.priorClarificationQuestion = response.clarification.question.slice(
+      0,
+      400,
+    );
+  }
+  if (response.plan?.rootMessage) {
+    ctx.priorPlanRootMessage = response.plan.rootMessage.slice(0, 800);
+  }
+  if (response.dashboardBlock?.kind) {
+    ctx.priorDashboardBlockKind = response.dashboardBlock.kind.slice(0, 40);
+  }
+  return Object.keys(ctx).length > 0 ? ctx : undefined;
+}
 
 function extractText(parts: ReadonlyArray<{ type: string }>): string {
   return parts
@@ -104,6 +151,17 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
   const tRef = useRef(t);
   tRef.current = t;
+
+  // Tracks the last completed turn so we can detect "Try Again". When the
+  // user clicks the reload button on an assistant message, assistant-ui
+  // removes that message and re-invokes `run()` with the SAME `messages`
+  // array as the previous turn — so a key match here is a reliable retry
+  // signal. We surface the prior response as `retryContext` on the next
+  // request so the backend can nudge the model to a different output.
+  const lastTurnRef = useRef<{
+    messagesKey: string;
+    response: ChatResponse;
+  } | null>(null);
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -376,6 +434,20 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const cloudModelId =
           model && !parseOfflineChatPickerModelId(model) ? model : undefined;
 
+        const currentMessagesKey = chatMessagesKey(apiMessages);
+        const cachedTurn = lastTurnRef.current;
+        const retryContext =
+          cachedTurn && cachedTurn.messagesKey === currentMessagesKey ?
+            buildRetryContext(cachedTurn.response)
+          : undefined;
+
+        // Forward the voice-dictation language ONLY when the last
+        // composer fill was Swahili — see `pendingVoiceLanguage.ts` for
+        // why other languages are intentionally not piped through yet.
+        const pendingVoiceLang = consumePendingVoiceLanguage();
+        const voiceLanguage =
+          pendingVoiceLang === "swahili" ? ("swahili" as const) : undefined;
+
         try {
           const response = await APIClient.post({
             route: "chat/:workspaceId/messages",
@@ -385,8 +457,14 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               context: currentPageContext,
               ...(cloudModelId ? { model: cloudModelId } : {}),
               ...(consentAcks.length > 0 ? { consentAcks } : {}),
+              ...(retryContext ? { retryContext } : {}),
+              ...(voiceLanguage ? { voiceLanguage } : {}),
             },
           });
+          lastTurnRef.current = {
+            messagesKey: currentMessagesKey,
+            response,
+          };
           return applyResponse(response);
         } catch (error) {
           const fallbackMode = resolveOfflineChatMode({

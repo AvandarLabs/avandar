@@ -10,7 +10,9 @@ import type {
   ChatPlan,
   ChatPlanStep,
   ChatResponse,
+  ChatRetryContext,
   ChatSessionSecretResponse,
+  ChatVoiceLanguage,
   ConsentAck,
   RegeneratePlanResponse,
   SchemaDriftReport,
@@ -27,7 +29,9 @@ export type {
   ChatPlan,
   ChatPlanStep,
   ChatResponse,
+  ChatRetryContext,
   ChatSessionSecretResponse,
+  ChatVoiceLanguage,
   ConsentAck,
   RegeneratePlanResponse,
   SchemaDriftReport,
@@ -60,6 +64,8 @@ export type ChatAPI = APITypeDef<
           context: ChatPageContext;
           model?: string;
           consentAcks?: ConsentAck[];
+          retryContext?: ChatRetryContext;
+          voiceLanguage?: ChatVoiceLanguage;
         };
         returnType: ChatResponse;
       };
