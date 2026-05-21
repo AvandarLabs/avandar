@@ -662,9 +662,17 @@ When to call \`clarify\`:
 - Subjective categorizations the model has to guess at ("poverty
   indicators", "at-risk groups").
 - Ambiguous scopes ("this year" when the data spans multiple years).
+- Ambiguous dataset choice — TWO OR MORE datasets in the workspace could
+  plausibly answer the question and the user did not name one. Picking
+  the wrong dataset silently returns a wrong answer, which is worse than
+  asking. Use \`fixed_options\` with \`multi: true\` listing the dataset
+  names from the schema. On the answer, map the selected names back to
+  the corresponding dataset ids in the schema when building SQL.
 
 When NOT to call \`clarify\`:
-- The metadata already disambiguates the question.
+- The metadata already disambiguates the question (e.g. only one dataset
+  has the column the user mentioned, or only one dataset is plausibly
+  about the entity they named).
 - The ambiguity is minor and a reasonable default exists — make the
   choice, explain it briefly in your reply, and proceed with SQL.
 - The question is straightforward ("monthly revenue by region").
