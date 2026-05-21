@@ -1,5 +1,5 @@
+import { computeSqlScope, listInScopeDatasets } from "$/lib/sql/sqlScope.ts";
 import { describe, expect, it } from "vitest";
-import { computeSqlScope, listInScopeDatasets } from "./sqlScope.ts";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 

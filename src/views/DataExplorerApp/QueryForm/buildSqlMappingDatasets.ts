@@ -6,7 +6,7 @@ import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStru
  * Groups workspace dataset columns by dataset for `sqlToStructuredQuery`.
  */
 export function buildSqlMappingDatasets(
-  datasets: readonly DatasetModel["Read"][],
+  datasets: ReadonlyArray<DatasetModel["Read"]>,
   allColumns: readonly DatasetColumnRead[],
 ): SqlMappingInput["datasets"] {
   return datasets.map((dataset) => {

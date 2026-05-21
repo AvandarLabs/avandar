@@ -39,7 +39,7 @@ import type {
  * Returns the localized order direction options for the manual query form.
  * Defined as a hook so the labels can use the active translation function.
  */
-function _useOrderDirectionOptions(): SelectData<OrderByDirection> {
+function useOrderDirectionOptions(): SelectData<OrderByDirection> {
   const { t } = useLingui();
   return [
     { value: "asc", label: t`Ascending` },
@@ -156,7 +156,7 @@ function ManualQueryFormView({
   withinPortal: boolean;
 }): JSX.Element {
   const { t } = useLingui();
-  const orderDirectionOptions = _useOrderDirectionOptions();
+  const orderDirectionOptions = useOrderDirectionOptions();
   const {
     dataSource,
     queryColumns,

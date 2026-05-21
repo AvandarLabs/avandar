@@ -23,7 +23,7 @@ type Props = {
  * Returns the localized aggregation options. Defined as a hook so the labels
  * can use the active translation function.
  */
-function _useAggregationOptions(): Array<SelectOption<QueryAggregationType.T>> {
+function useAggregationOptions(): Array<SelectOption<QueryAggregationType.T>> {
   const { t } = useLingui();
   return [
     { value: "none", label: t`None` },
@@ -45,7 +45,7 @@ export function AggregationSelect({
   ...selectProps
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const allAggregationOptions = _useAggregationOptions();
+  const allAggregationOptions = useAggregationOptions();
   const validAggregations = AvaDataTypeFns.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options

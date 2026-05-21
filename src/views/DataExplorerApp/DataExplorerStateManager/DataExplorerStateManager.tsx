@@ -259,7 +259,10 @@ export const DataExplorerStateManager = createAppStateManager({
         columns,
       });
 
-      const columnsChanged = !_sameColumnSchema(state.lastResultColumns, columns);
+      const columnsChanged = !_sameColumnSchema(
+        state.lastResultColumns,
+        columns,
+      );
       const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
         next,
         state.vizConfig,

@@ -46,7 +46,7 @@ type Props = {
  * type. Schemas are rebuilt per call so their error messages stay localized
  * to the current Lingui locale.
  */
-function _useVizConfigSchemas() {
+function useVizConfigSchemas() {
   const { t } = useLingui();
   return useMemo(() => {
     const XAxisKeySchema = string({
@@ -122,7 +122,7 @@ export function VisualizationContainer({
   vizConfig,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const schemas = _useVizConfigSchemas();
+  const schemas = useVizConfigSchemas();
   const columnNames = columns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 

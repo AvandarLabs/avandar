@@ -1,5 +1,5 @@
-export { SqlEditor, type SqlEditorProps } from "./SqlEditor.tsx";
+export { SqlEditor, type SqlEditorProps } from "./SqlEditor";
 export {
   SqlQueryEditPanel,
   type SqlQueryEditPanelProps,
-} from "./SqlQueryEditPanel.tsx";
+} from "./SqlQueryEditPanel";

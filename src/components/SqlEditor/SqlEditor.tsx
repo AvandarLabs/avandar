@@ -4,13 +4,11 @@ import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  createSqlDisplayExtension,
-  type SqlPillClickInfo,
-} from "@/lib/sql/createSqlDisplayExtension.ts";
-import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension.ts";
+import { createSqlDisplayExtension } from "@/lib/sql/createSqlDisplayExtension";
+import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension";
 import css from "./SqlEditor.module.css";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
 /** Matches `line-height: 1.55` on `.cm-line` at `font-size-sm` (~14px). */
 const LINE_HEIGHT_PX = 22;

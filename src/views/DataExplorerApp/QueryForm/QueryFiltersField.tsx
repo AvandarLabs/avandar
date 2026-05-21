@@ -86,7 +86,7 @@ const _INTERNAL_TO_OPERATOR: Record<QueryFilterOperator, string> = {
  * the library's operator code (machine identifier); `label` is user-visible.
  * Defined as a hook so the labels can use the active translation function.
  */
-function _useOperatorsForLibrary(): Array<{ name: string; label: string }> {
+function useOperatorsForLibrary(): Array<{ name: string; label: string }> {
   const { t } = useLingui();
   return [
     { name: "=", label: "=" },
@@ -205,7 +205,7 @@ export function QueryFiltersField({
   value,
   onChange,
 }: Props): JSX.Element {
-  const operatorsForLibrary = _useOperatorsForLibrary();
+  const operatorsForLibrary = useOperatorsForLibrary();
   const fields: Field[] = useMemo(() => {
     return columns.map((col) => {
       return {

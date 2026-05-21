@@ -1,4 +1,4 @@
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
 export type SqlMentionOption =
   | {

@@ -188,7 +188,9 @@ export function listWhisperCppVoiceModelsSorted(
   });
 }
 
-/** Models that can run on the current platform (subset of the sorted catalog). */
+/**
+ * Models that can run on the current platform (subset of the sorted catalog).
+ */
 export function listWhisperCppModelsForPlatform(
   platform: "web" | "desktop",
 ): readonly WhisperCppVoiceModel[] {

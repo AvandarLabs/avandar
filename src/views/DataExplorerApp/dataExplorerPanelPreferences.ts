@@ -98,6 +98,7 @@ export function hasDataExplorerPanelPreferencesInSessionStorage(): boolean {
  * browser tab. Reads from `sessionStorage`, so positions persist across
  * refreshes but are wiped when the tab is closed.
  */
+// eslint-disable-next-line max-len
 export function readDataExplorerPanelPreferences(): DataExplorerPanelPreferences {
   try {
     const raw = window.sessionStorage.getItem(

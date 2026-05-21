@@ -43,7 +43,8 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "dateOfLastSync",
 ] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
 
-function _useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
+// eslint-disable-next-line max-len
+function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
   const { t } = useLingui();
   return {
     createdAt: {
@@ -100,7 +101,7 @@ function _useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWi
 
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
-  const datasetMetadataRenderOptions = _useDatasetMetadataRenderOptions();
+  const datasetMetadataRenderOptions = useDatasetMetadataRenderOptions();
   const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });

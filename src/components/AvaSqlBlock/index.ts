@@ -1,1 +1,1 @@
-export { AvaSqlBlock, type AvaSqlBlockProps } from "./AvaSqlBlock.tsx";
+export { AvaSqlBlock, type AvaSqlBlockProps } from "./AvaSqlBlock";

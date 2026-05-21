@@ -17,7 +17,7 @@ import type {
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 
-function _useModeDescriptions(): Record<GlobalFilterSubscriptionMode, string> {
+function useModeDescriptions(): Record<GlobalFilterSubscriptionMode, string> {
   const { t } = useLingui();
   return {
     all: t`Apply every global filter on the dashboard.`,
@@ -39,7 +39,7 @@ export function GlobalFilterSubscriptionPField({
   onChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const modeDescriptions = _useModeDescriptions();
+  const modeDescriptions = useModeDescriptions();
   const { filtersById } = DashboardFilterStateManager.useState();
   const registeredFilters = Object.values(filtersById);
 

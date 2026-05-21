@@ -326,7 +326,7 @@ function ConsentLogPanel(): JSX.Element {
 }
 
 /** Returns localized labels for clarification outcomes. */
-function _useOutcomeLabels(): Record<ClarificationOutcome, string> {
+function useOutcomeLabels(): Record<ClarificationOutcome, string> {
   const { t } = useLingui();
   return {
     answered: t`Answered`,
@@ -344,7 +344,7 @@ const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
 };
 
 /** Legacy rows written before "Let AI decide" was removed. */
-function _useLegacyOutcomeLabels(): Record<string, string> {
+function useLegacyOutcomeLabels(): Record<string, string> {
   const { t } = useLingui();
   return {
     let_ai_decide: t`Let AI decide (legacy)`,
@@ -357,8 +357,8 @@ const LEGACY_OUTCOME_COLOR: Record<string, string> = {
 
 function ClarificationLogPanel(): JSX.Element {
   const workspace = useCurrentWorkspace();
-  const outcomeLabels = _useOutcomeLabels();
-  const legacyOutcomeLabels = _useLegacyOutcomeLabels();
+  const outcomeLabels = useOutcomeLabels();
+  const legacyOutcomeLabels = useLegacyOutcomeLabels();
   const [entries, setEntries] = useState<ClarificationAuditEntry[] | null>(
     null,
   );

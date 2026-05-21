@@ -100,7 +100,7 @@ const VALIDATION_FIELD_ORDER = ["name", "description"] as const;
 
 type ValidationField = (typeof VALIDATION_FIELD_ORDER)[number];
 
-function _useErrorMessageForField(): (
+function useErrorMessageForField(): (
   field: ValidationField,
   value: string,
 ) => string | null {
@@ -181,7 +181,7 @@ export function DatasetImportForm({
   onSaveSuccess,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const errorMessageForField = _useErrorMessageForField();
+  const errorMessageForField = useErrorMessageForField();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
   const [isFormErrorSummaryVisible, setIsFormErrorSummaryVisible] =

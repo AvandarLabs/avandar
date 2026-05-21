@@ -78,7 +78,7 @@ type UploadControlConfig = {
   uploadButtonLabel: string;
 };
 
-function _useUploadControlConfig(
+function useUploadControlConfig(
   sourceType: Dataset.T["sourceType"],
 ): UploadControlConfig {
   const { t } = useLingui();
@@ -210,7 +210,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
     },
   });
 
-  const { acceptMimeTypes, uploadButtonLabel } = _useUploadControlConfig(
+  const { acceptMimeTypes, uploadButtonLabel } = useUploadControlConfig(
     dataset.sourceType,
   );
 

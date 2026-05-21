@@ -8,7 +8,6 @@ import eslintPluginJSXA11y from "eslint-plugin-jsx-a11y";
 import eslintPluginReact from "eslint-plugin-react";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
-import eslintPluginTailwindCSS from "eslint-plugin-tailwindcss";
 import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -27,7 +26,6 @@ export default [
     ],
   },
   eslintPluginImportX.flatConfigs.recommended,
-  ...eslintPluginTailwindCSS.configs["flat/recommended"],
   ...eslintPluginRouter.configs["flat/recommended"],
   ...eslintPluginQuery.configs["flat/recommended"],
   ...tseslint.config(
@@ -55,7 +53,6 @@ export default [
         "react-refresh": eslintPluginReactRefresh,
         "jsx-a11y": eslintPluginJSXA11y,
         "unused-imports": eslintPluginUnusedImports,
-        tailwindcss: eslintPluginTailwindCSS,
       },
       rules: {
         ...eslintPluginReactHooks.configs.recommended.rules,
@@ -119,10 +116,6 @@ export default [
 
         // we use the @typescript-eslint one instead
         "no-shadow": "off",
-        "tailwindcss/no-custom-classname": "off",
-
-        // we use the prettier tailwind plugin for ordering
-        "tailwindcss/classnames-order": "off",
       },
       settings: {
         react: {

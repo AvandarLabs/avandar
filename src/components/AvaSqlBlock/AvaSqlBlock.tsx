@@ -1,14 +1,14 @@
 import { EditorView } from "@codemirror/view";
+import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments";
+import { computeSqlScope } from "$/lib/sql/sqlScope";
 import clsx from "clsx";
 import { useMemo, useRef, useState } from "react";
-import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
-import { computeSqlScope } from "$/lib/sql/sqlScope.ts";
-import { SqlEditor } from "@/components/SqlEditor/SqlEditor.tsx";
-import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog.ts";
-import { PillEditPopover } from "./PillEditPopover.tsx";
+import { SqlEditor } from "@/components/SqlEditor/SqlEditor";
+import { useSqlDisplayCatalog } from "@/hooks/sql/useSqlDisplayCatalog";
 import css from "./AvaSqlBlock.module.css";
-import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension.ts";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
+import { PillEditPopover } from "./PillEditPopover";
+import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
 export type AvaSqlBlockProps = {
   value: string;
@@ -32,7 +32,7 @@ export type AvaSqlBlockProps = {
    * Only honored in the read-only HTML variant; the editable CodeMirror
    * path computes scope live (see {@link computeSqlScope}).
    */
-  outOfScopeColumns?: ReadonlyArray<string>;
+  outOfScopeColumns?: readonly string[];
   className?: string;
   "data-testid"?: string;
 };
@@ -59,10 +59,10 @@ export function AvaSqlBlock(props: AvaSqlBlockProps): JSX.Element {
   if (props.catalog !== undefined) {
     return <_AvaSqlBlockInner {...props} catalog={props.catalog} />;
   }
-  return <_AvaSqlBlockWithHookCatalog {...props} />;
+  return <AvaSqlBlockWithHookCatalog {...props} />;
 }
 
-function _AvaSqlBlockWithHookCatalog(props: AvaSqlBlockProps): JSX.Element {
+function AvaSqlBlockWithHookCatalog(props: AvaSqlBlockProps): JSX.Element {
   const { catalog } = useSqlDisplayCatalog();
   return <_AvaSqlBlockInner {...props} catalog={catalog} />;
 }
@@ -81,7 +81,7 @@ function _AvaSqlBlockInner({
 
   if (isEditable) {
     return (
-      <_AvaSqlBlockEditable
+      <AvaSqlBlockEditable
         value={value}
         catalog={catalog}
         onChange={onChange}
@@ -150,7 +150,7 @@ type EditableProps = {
   dataTestId: string | undefined;
 };
 
-function _AvaSqlBlockEditable({
+function AvaSqlBlockEditable({
   value,
   catalog,
   onChange,
@@ -188,10 +188,7 @@ function _AvaSqlBlockEditable({
   };
 
   return (
-    <div
-      className={clsx(css.editableWrap, className)}
-      data-testid={dataTestId}
-    >
+    <div className={clsx(css.editableWrap, className)} data-testid={dataTestId}>
       <SqlEditor
         value={value}
         onChange={onChange}

@@ -40,7 +40,7 @@ import {
 import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
 import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
 import { PlanStepNode } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
-import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode.tsx";
+import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode";
 import { RoughEdge } from "@/components/ChatPanel/PlanFlowView/RoughEdge";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import {

@@ -1,5 +1,5 @@
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types.ts";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
  * Builds a {@link SqlDisplayCatalog} from workspace dataset and column lists.

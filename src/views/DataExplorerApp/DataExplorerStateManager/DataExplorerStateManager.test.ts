@@ -12,10 +12,10 @@
  * source of truth.
  */
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { describe, expect, it } from "vitest";
 import { INITIAL_DATA_EXPLORER_STATE } from "./dataExplorerAppState";
 import type { DataExplorerAppState } from "./dataExplorerAppState";
-import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 
@@ -82,7 +82,11 @@ describe("Data Explorer state sync", () => {
 
     expect(afterRequery.vizConfig.vizType).toBe("bar");
     const bar = afterRequery.vizConfig as BarChartVizConfig;
-    expect(bar.series.map((s) => s.key)).toEqual(["count"]);
+    expect(
+      bar.series.map((s) => {
+        return s.key;
+      }),
+    ).toEqual(["count"]);
     expect(bar.xAxisKey).toBe("region");
   });
 
@@ -111,7 +115,11 @@ describe("Data Explorer state sync", () => {
     );
 
     const bar = afterRequery.vizConfig as BarChartVizConfig;
-    expect(bar.series.map((s) => s.key)).toEqual(["b"]);
+    expect(
+      bar.series.map((s) => {
+        return s.key;
+      }),
+    ).toEqual(["b"]);
   });
 
   it("records lastResultColumns so cross-cutting consumers see the live schema", () => {
@@ -152,6 +160,10 @@ describe("Data Explorer state sync", () => {
 
     const bar = afterRequery.vizConfig as BarChartVizConfig;
     expect(bar.xAxisKey).toBe("region");
-    expect(bar.series.map((s) => s.key)).toEqual(["count"]);
+    expect(
+      bar.series.map((s) => {
+        return s.key;
+      }),
+    ).toEqual(["count"]);
   });
 });

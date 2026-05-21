@@ -15,7 +15,7 @@ import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPB
 
 type Props = AvaPageFieldProps<readonly LocalFilter[]>;
 
-function _useModeOptions(): ReadonlyArray<{
+function useModeOptions(): ReadonlyArray<{
   value: LocalFilter["mode"];
   label: string;
 }> {
@@ -120,7 +120,7 @@ function LocalFilterEditor({
   onRemove: () => void;
 }): JSX.Element {
   const { t } = useLingui();
-  const modeOptions = _useModeOptions();
+  const modeOptions = useModeOptions();
   return (
     <Box
       p="xs"

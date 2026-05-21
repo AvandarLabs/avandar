@@ -1,6 +1,7 @@
 /**
- * The bundled whisper.cpp Emscripten build always uses `WebAssembly.Memory` with
- * `shared: true`, which requires a cross-origin isolated page (COOP + COEP).
+ * The bundled whisper.cpp Emscripten build always uses `WebAssembly.Memory`
+ * with `shared: true`, which requires a cross-origin isolated page (COOP +
+ * COEP).
  */
 export function assertWhisperCppCanRun(): void {
   if (typeof crossOriginIsolated !== "boolean") {

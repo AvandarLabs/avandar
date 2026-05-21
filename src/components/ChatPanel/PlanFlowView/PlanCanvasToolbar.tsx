@@ -42,7 +42,7 @@ export type PlanCanvasToolbarProps = {
  * Returns the localized list of annotation tool entries used to render the
  * canvas toolbar.
  */
-function _useAnnotationTools(): Array<{
+function useAnnotationTools(): Array<{
   tool: AnnotationTool;
   label: string;
   icon: () => JSX.Element;
@@ -98,7 +98,7 @@ export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
   const state: PlanAnnotationState = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
   const { t } = useLingui();
-  const tools = _useAnnotationTools();
+  const tools = useAnnotationTools();
 
   return (
     <Stack
