@@ -38,6 +38,7 @@ export type SubscriptionsAPI = APITypeDef<
   "subscriptions",
   [
     "/fetch-and-sync",
+    "/create-free",
     "/:subscriptionId/product",
     "/:subscriptionId/seats",
     "/products",
@@ -58,6 +59,17 @@ export type SubscriptionsAPI = APITypeDef<
         };
         returnType: {
           subscriptions: Array<Tables<"subscriptions">>;
+        };
+      };
+    };
+
+    "/create-free": {
+      POST: {
+        body: {
+          workspaceId: string;
+        };
+        returnType: {
+          subscription: Tables<"subscriptions">;
         };
       };
     };

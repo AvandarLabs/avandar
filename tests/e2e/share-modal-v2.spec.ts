@@ -36,7 +36,6 @@ import {
 /** Display name seeded for the workspace owner profile. */
 const OWNER_DISPLAY_NAME = "E2E Test Workspace";
 
-/** Workspace name shown in the v2 summary line for workspace shares. */
 test.describe("Share modal v2: Drive-style flows", () => {
   test("1. Drive-style direct user share grants editor access", async ({
     page,

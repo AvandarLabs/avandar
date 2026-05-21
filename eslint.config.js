@@ -178,11 +178,13 @@ export default [
      * The desktop shell runs on Bun in the main process. Bun built-ins
      * like `bun:sqlite` and `bun:test` aren't resolvable by the standard
      * TS/Node import resolver, so ignore them here. Source files use
-     * `bun:sqlite`; integration tests use `bun:test`.
+     * `bun:sqlite`; integration tests use `bun:test`. The native `duckdb`
+     * binding is a desktop-workspace dependency only; the repo-root ESLint
+     * resolver does not see it.
      */
     files: ["apps/desktop/**/*.{ts,tsx}"],
     rules: {
-      "import-x/no-unresolved": ["error", { ignore: ["^bun:"] }],
+      "import-x/no-unresolved": ["error", { ignore: ["^bun:", "^duckdb$"] }],
     },
   },
   {

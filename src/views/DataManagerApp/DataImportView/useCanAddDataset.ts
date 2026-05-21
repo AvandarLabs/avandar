@@ -20,7 +20,7 @@ export function useCanAddDataset(): boolean {
   const [canAddDatasets] = useQuery({
     queryKey: [
       "subscriptionPermission",
-      workspace.subscription?.polarSubscriptionId,
+      workspace.subscription?.id,
       "permissions",
       "can_add_datasets",
     ],
@@ -28,12 +28,12 @@ export function useCanAddDataset(): boolean {
       return await APIClient.get({
         route: "subscriptions/:subscriptionId/permissions/:permissionType",
         pathParams: {
-          subscriptionId: workspace.subscription?.polarSubscriptionId ?? "",
+          subscriptionId: workspace.subscription?.id ?? "",
           permissionType: "can_add_datasets",
         },
       });
     },
-    enabled: !!workspace.subscription?.polarSubscriptionId,
+    enabled: !!workspace.subscription?.id,
   });
 
   if (canAddDatasets !== undefined) {

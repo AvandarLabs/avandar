@@ -6,3 +6,6 @@ export const MEDIUM_WAIT = 15_000;
 
 /** Parse previews, post-auth routing, storage `expect.poll`. */
 export const LONG_WAIT = 30_000;
+
+/** Polar sandbox checkout + fetch-and-sync round trip. */
+export const CHECKOUT_WAIT = 90_000;

@@ -1,8 +1,6 @@
 import type { UUID } from "@utils/types/common.types.ts";
-import type { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
-import type { SetOptional } from "type-fest";
 
 export type WorkspaceId = UUID<"Workspace">;
 
@@ -29,25 +27,6 @@ export type WorkspaceRead = {
   updatedAt: string;
 };
 
-/**
- * CRUD type definitions for the Workspace model.
- */
-export type WorkspaceModel = SupabaseCrudModelSpec<
-  {
-    tableName: "workspaces";
-    modelName: "Workspace";
-    modelPrimaryKeyType: WorkspaceId;
-    modelTypes: {
-      Read: WorkspaceRead;
-      Insert: SetOptional<WorkspaceRead, "id" | "createdAt" | "updatedAt">;
-      Update: Partial<WorkspaceRead>;
-    };
-  },
-  {
-    dbTablePrimaryKey: "id";
-  }
->;
-
 export type WorkspaceWithSubscription = WorkspaceRead & {
-  subscription: Subscription.T | undefined;
+  subscription: SubscriptionRead | undefined;
 };

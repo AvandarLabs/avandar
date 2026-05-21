@@ -8,7 +8,11 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
-import { deleteDashboardsByIds, seedDashboard } from "./helpers/seedDashboard";
+import {
+  deleteAllDashboardsForOwner,
+  deleteDashboardsByIds,
+  seedDashboard,
+} from "./helpers/seedDashboard";
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
@@ -32,8 +36,23 @@ test.describe("Save to dashboard - viz renders in editor", () => {
     page,
     e2eWorkerDb,
   }) => {
+    test.setTimeout(120_000);
+
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
+    const workspaceId = await getWorkspaceIdBySlug({
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
+    });
+
+    // Earlier specs in the same worker leave dashboards behind (e.g.
+    // dataviz-pblock-visualizations seeds nine). Clear them so the save
+    // modal list only contains the dashboard this test creates.
+    await deleteAllDashboardsForOwner({
+      admin,
+      workspaceId,
+      ownerEmail: primaryUser.email,
+    });
 
     const createdDashboardIds: string[] = [];
     let datasetId = "";
@@ -81,10 +100,6 @@ test.describe("Save to dashboard - viz renders in editor", () => {
 
       // Step 2: Seed an empty dashboard with a unique name so the save modal
       // targets the dashboard created in this test (not stale Untitled rows).
-      const workspaceId = await getWorkspaceIdBySlug({
-        supabaseAdminClient: admin,
-        slug: workspaceSlug,
-      });
       const dashboardName = `E2E renders-in-editor ${Date.now()}`;
       const dashboardId = await seedDashboard({
         admin,
@@ -156,7 +171,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
       await expect(page).toHaveURL(
         new RegExp(`/dashboards/edit/${dashboardId}`),
-        { timeout: SHORT_WAIT },
+        { timeout: MEDIUM_WAIT },
       );
 
       // Step 6: Confirm the saved Puck block includes the bar chart

@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
@@ -10,17 +11,39 @@ import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   hideTitle?: boolean;
   hideIntroText?: boolean;
+  /** When set (e.g. billing modal), avoids route hooks in a portal. */
+  workspace?: Workspace.WithSubscription;
 };
 
-export function WorkspaceBillingView({
+export function WorkspaceBillingView(props: Props): JSX.Element {
+  if (props.workspace) {
+    return (
+      <WorkspaceBillingViewContent {...props} workspace={props.workspace} />
+    );
+  }
+
+  return <WorkspaceBillingViewFromRoute {...props} />;
+}
+
+function WorkspaceBillingViewFromRoute(
+  props: Omit<Props, "workspace">,
+): JSX.Element {
+  const workspace = useCurrentWorkspace();
+  return <WorkspaceBillingViewContent {...props} workspace={workspace} />;
+}
+
+function WorkspaceBillingViewContent({
   hideTitle,
   hideIntroText,
-}: Props): JSX.Element {
-  const currentWorkspace = useCurrentWorkspace();
+  workspace: currentWorkspace,
+}: Props & {
+  workspace: Workspace.WithSubscription;
+}): JSX.Element {
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
@@ -120,9 +143,26 @@ export function WorkspaceBillingView({
   );
 
   const currentSubscribedPlan = allPlans.find((plan) => {
-    return (
-      plan.polarProductId === currentWorkspace.subscription?.polarProductId
-    );
+    const subscription = currentWorkspace.subscription;
+    if (subscription === undefined) {
+      return false;
+    }
+
+    if (
+      subscription.polarProductId !== undefined &&
+      plan.polarProductId === subscription.polarProductId
+    ) {
+      return true;
+    }
+
+    if (
+      SubscriptionModule.isNativeFreeSubscription(subscription) &&
+      plan.priceType === "free"
+    ) {
+      return true;
+    }
+
+    return false;
   });
 
   const hasSubscription = !!currentWorkspace.subscription;
@@ -142,6 +182,8 @@ export function WorkspaceBillingView({
                   key={group.featurePlan.type}
                   type="free"
                   planGroup={group}
+                  workspaceId={currentWorkspace.id}
+                  workspaceSlug={currentWorkspace.slug}
                   currentSubscription={currentWorkspace.subscription}
                   currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant={group.payWhatYouWantPlan ? "custom" : "free"}
@@ -154,6 +196,8 @@ export function WorkspaceBillingView({
                   key={group.featurePlan.type}
                   type="paid"
                   planGroup={group}
+                  workspaceId={currentWorkspace.id}
+                  workspaceSlug={currentWorkspace.slug}
                   currentSubscription={currentWorkspace.subscription}
                   currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant="year"

@@ -226,7 +226,9 @@ function AppShellComponent({
 export function AppShell(props: Props): JSX.Element {
   return (
     <AppShellStateManager.Provider>
-      <AppShellComponent {...props} />
+      <ChatPanelStateManager.Provider>
+        <AppShellComponent {...props} />
+      </ChatPanelStateManager.Provider>
     </AppShellStateManager.Provider>
   );
 }

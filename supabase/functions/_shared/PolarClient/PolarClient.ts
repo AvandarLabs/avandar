@@ -62,6 +62,13 @@ export type PolarClient = {
   }) => Promise<Subscription>;
 
   /**
+   * Revokes (cancels immediately) a Polar subscription.
+   */
+  revokeSubscription: (options: {
+    subscriptionId: string;
+  }) => Promise<Subscription>;
+
+  /**
    * Get the Polar products, but with a simplified structure.
    */
   getProducts: () => Promise<Product[]>;
@@ -243,6 +250,16 @@ function createPolarClient(): PolarClient {
         subscriptionUpdate: {
           seats: options.newTotalSeats,
         },
+      });
+      return subscription;
+    },
+
+    revokeSubscription: async (options: { subscriptionId: string }) => {
+      console.log("[PolarClient] Revoking Polar subscription", {
+        subscriptionId: options.subscriptionId,
+      });
+      const subscription = await polar.subscriptions.revoke({
+        id: options.subscriptionId,
       });
       return subscription;
     },

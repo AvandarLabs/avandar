@@ -35,6 +35,10 @@ export function PurchaseSeatsModalContents({
 
   const [purchaseSeats, isPurchasing] = useMutation({
     mutationFn: (variables: { seatsToAdd: number }) => {
+      if (subscription.polarSubscriptionId === undefined) {
+        throw new Error("Seat purchases require a Polar-backed subscription.");
+      }
+
       return APIClient.patch({
         route: "subscriptions/:subscriptionId/seats",
         pathParams: {
