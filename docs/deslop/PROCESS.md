@@ -78,28 +78,39 @@ The mechanical loop is driven by two short commands handled by the
 `deslop` skill. See `.claude/skills/deslop/SKILL.md` for the full
 procedure each command runs.
 
-1. Operator: `/deslop migrate <feature-slug>`.
-2. Agent reads `NNN-feature-slug.md` (which follows
-   `FEATURE_TEMPLATE.md`). Everything needed is in that file.
-3. Agent creates `refactor-NNN/<feature-slug>` from current `develop`
-   (regular branch — no worktree dance).
-4. Agent ports the code from `feat/ict4d-demo` per the doc's "Files
-   to copy" / "Files to edit" / "Files to delete" sections.
-5. Agent creates any new `*Client` / TS model files the feature needs
-   for tables that Phase 1 added but didn't wrap.
-6. Agent runs the doc's automated verification (`tsc`, lint, vitest,
-   playwright if applicable). All must be green.
-7. Agent runs the doc's manual verification where it can. Steps it
+1. Operator: `/deslop migrate <feature-slug>`. (Or `/deslop continue`
+   once planning is done — same procedure, slug picked
+   automatically.)
+2. Agent checks the hard preconditions: the slug exists in
+   `ALL_FEATURES.md`, the per-feature markdown
+   `NNN-feature-slug.md` exists, Phase 1 is complete per
+   `STATE.md`, and the row is `[ ]`. If any precondition fails,
+   the migration is refused.
+3. Agent re-verifies the per-feature plan against current
+   `develop`: paths, dependencies, prerequisite features.
+   `develop` keeps moving, so the plan may need updates. If it
+   does, the agent edits and pushes the updated plan to
+   `feat/ict4d-demo` before opening the refactor branch.
+4. Agent creates `refactor-NNN/<feature-slug>` from current
+   `develop` (regular branch — no worktree dance).
+5. Agent ports the code from `feat/ict4d-demo` per the doc's
+   "Files to copy" / "Files to edit" / "Files to delete" sections.
+6. Agent creates any new `*Client` / TS model files the feature
+   needs for tables that Phase 1 added but didn't wrap.
+7. Agent runs the doc's automated verification (`tsc`, lint,
+   vitest, playwright if applicable). All must be green.
+8. Agent runs the doc's manual verification where it can. Steps it
    cannot do in this environment are flagged for the operator
    instead of claimed.
-8. Agent pushes the refactor branch and updates `STATE.md`'s
+9. Agent pushes the refactor branch and updates `STATE.md`'s
    `In-flight migrations` table. **No PR.** The operator opens the
    PR, reviews, pushes fix-ups, and merges to `develop` manually.
-9. Operator: `/deslop complete <feature-slug>`.
-10. Agent verifies the merge with
+10. Operator: `/deslop complete <feature-slug>`.
+11. Agent verifies the merge with
     `git merge-base --is-ancestor refactor-branch origin/develop`.
-    If not merged, agent stops and reports — no destructive action.
-11. On confirmed merge, agent runs the cleanup ritual: delete the
+    If not merged, agent stops and reports — no destructive
+    action.
+12. On confirmed merge, agent runs the cleanup ritual: delete the
     local + remote refactor branch, delete `NNN-feature-slug.md`,
     flip the row in `ALL_FEATURES.md` to `[x] (<merge-sha>)`, move
     the entry from `STATE.md`'s `In-flight migrations` to the

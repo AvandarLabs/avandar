@@ -33,7 +33,11 @@ if one exists. Link to the relevant checkpoint section in
 
 ## Steps to migrate
 
-Mechanical, in order:
+Mechanical, in order. **Step 0 is run by the `deslop` skill before
+this list executes — do not skip it:** re-verify every path,
+dependency, and prerequisite below against the current state of
+`develop`. If anything no longer matches reality, update this file
+and push the update to `feat/ict4d-demo` first, then continue.
 
 1. From the current `develop` HEAD, create
    `refactor-{{NNN}}/{{feature-slug}}`:
