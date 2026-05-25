@@ -4,8 +4,9 @@
 first.** This document tells you exactly what to do next based on
 what's already been done.
 
-When the operator says something like "read this markdown and
-continue the work," this is that markdown.
+When the operator runs `/deslop continue`, the `deslop` skill points
+the agent at this file. Read `STATE.md` alongside it for the live
+state of the inventory.
 
 ## What we're trying to produce
 
@@ -210,13 +211,15 @@ When every row in `ALL_FEATURES.md` has a matching `NNN-feature-slug.md`:
 
 1. Add the line `## Phase 2 ready` to the bottom of this file.
 2. Update `ALL_FEATURES.md` header to say `Ready for Phase 2`.
-3. Commit + push.
-4. **Tell the operator**: "Planning is done. Every feature in
-   `ALL_FEATURES.md` has a migration doc. You can start Phase 2
-   by saying `migrate <feature-slug>`."
+3. Update `STATE.md` to reflect the new planning status.
+4. Commit + push.
+5. **Tell the operator**: "Planning is done. Every feature in
+   `ALL_FEATURES.md` has a migration doc. You can start Phase 2 by
+   running `/deslop migrate <feature-slug>`."
 
 The operator will then start running Phase 2 from
-`PROCESS.md`'s "Phase 2 — Feature parity" workflow.
+`PROCESS.md`'s "Phase 2 — Feature parity" workflow, one
+`/deslop migrate` invocation per feature.
 
 ---
 

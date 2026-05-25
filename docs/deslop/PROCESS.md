@@ -74,37 +74,36 @@ that Phase 1 added, that is expected and in-scope for the feature.
 Goal: bring every feature listed in `ALL_FEATURES.md` over to
 `develop`, one feature per day, via reviewed PRs.
 
-For each feature, the agent follows the
-`FEATURE_TEMPLATE.md` shape. The mechanical loop:
+The mechanical loop is driven by two short commands handled by the
+`deslop` skill. See `.claude/skills/deslop/SKILL.md` for the full
+procedure each command runs.
 
-1. Operator says: `migrate <feature-slug>`.
-2. Agent reads `NNN-feature-slug.md` from this directory. Everything
-   needed is in that file.
-3. Agent creates branch `refactor-NNN/<feature-slug>` from current
-   `develop`. (No worktree dance — this is a regular branch.)
-4. Agent ports the code from `feat/ict4d-demo`. The migration doc
-   spells out which files, which surgery, and what to leave behind.
-5. Agent runs the test + lint + typecheck commands listed in the
-   migration doc and gets them green.
-6. Agent does the manual-test checklist from the migration doc.
-   If the agent can't manually test (no browser, no live LLM, etc.),
-   the doc says so and the agent flags it instead of claiming it
-   worked.
-7. Agent pushes the branch. **Does not open a PR.** The operator
-   opens the PR, reviews it, may push fix-ups, then merges to
-   `develop` manually.
-8. Operator says: `mark <feature-slug> as completed`.
-9. Agent verifies the merge actually happened (`git log
-   origin/develop` shows the branch's commits, or `git merge-base
-   --is-ancestor refactor-branch origin/develop` returns true).
-10. On confirmed merge, agent:
-    - Deletes the `refactor-NNN/<feature-slug>` branch (local + remote).
-    - Deletes `NNN-feature-slug.md` from this directory.
-    - Changes the status in `ALL_FEATURES.md` to `[x] completed`.
-    - Commits + pushes the housekeeping change.
-
-If the merge isn't confirmed, the agent says so and does nothing
-destructive.
+1. Operator: `/deslop migrate <feature-slug>`.
+2. Agent reads `NNN-feature-slug.md` (which follows
+   `FEATURE_TEMPLATE.md`). Everything needed is in that file.
+3. Agent creates `refactor-NNN/<feature-slug>` from current `develop`
+   (regular branch — no worktree dance).
+4. Agent ports the code from `feat/ict4d-demo` per the doc's "Files
+   to copy" / "Files to edit" / "Files to delete" sections.
+5. Agent creates any new `*Client` / TS model files the feature needs
+   for tables that Phase 1 added but didn't wrap.
+6. Agent runs the doc's automated verification (`tsc`, lint, vitest,
+   playwright if applicable). All must be green.
+7. Agent runs the doc's manual verification where it can. Steps it
+   cannot do in this environment are flagged for the operator
+   instead of claimed.
+8. Agent pushes the refactor branch and updates `STATE.md`'s
+   `In-flight migrations` table. **No PR.** The operator opens the
+   PR, reviews, pushes fix-ups, and merges to `develop` manually.
+9. Operator: `/deslop complete <feature-slug>`.
+10. Agent verifies the merge with
+    `git merge-base --is-ancestor refactor-branch origin/develop`.
+    If not merged, agent stops and reports — no destructive action.
+11. On confirmed merge, agent runs the cleanup ritual: delete the
+    local + remote refactor branch, delete `NNN-feature-slug.md`,
+    flip the row in `ALL_FEATURES.md` to `[x] (<merge-sha>)`, move
+    the entry from `STATE.md`'s `In-flight migrations` to the
+    `Completed migrations log`, commit + push.
 
 #### Why we delete the per-feature markdown on completion
 
@@ -152,12 +151,16 @@ Two sub-cases:
 ### `feat/ict4d-demo` gets a new feature that isn't on `develop`
 
 This happens when an emergency hotfix lands on the production branch
-directly (because that's where prod points today). When this happens:
+directly (because that's where prod points today). Catch it with:
 
-1. Operator tells the agent to add the new feature to
-   `ALL_FEATURES.md` with the next available index.
-2. Agent writes a new `NNN-feature-slug.md` migration doc for it.
-3. The feature now waits in the queue like any other.
+1. Operator: `/deslop update`. The skill walks every commit since
+   `STATE.md`'s `Last analyzed commit on feat/ict4d-demo`, decides
+   which ones are features vs. noise, adds new feature rows to
+   `ALL_FEATURES.md`, and writes the matching `NNN-feature-slug.md`
+   migration docs.
+2. The agent bumps the analyzed-commit SHA in `STATE.md`.
+3. New features sit in the queue like any other until the operator
+   runs `/deslop migrate <feature-slug>`.
 
 This pattern is the unfortunate cost of having production point at a
 long-lived feature branch. Once Phase 3 lands we go back to the

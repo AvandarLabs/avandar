@@ -129,26 +129,32 @@ flag it to the operator instead of skipping it.
 
 ## How to mark this feature completed
 
-When the operator says `mark {{feature-slug}} as completed`:
+When the operator runs `/deslop complete {{feature-slug}}`:
 
 1. Verify the merge:
    ```sh
    git fetch origin develop
-   git merge-base --is-ancestor refactor-{{NNN}}/{{feature-slug}} origin/develop && echo merged || echo NOT-merged
+   git merge-base --is-ancestor origin/refactor-{{NNN}}/{{feature-slug}} origin/develop \
+     && echo merged \
+     || echo NOT-merged
    ```
    If `NOT-merged`, stop and tell the operator. Do nothing else.
 2. If merged:
-   - Delete the local branch:
-     `git branch -D refactor-{{NNN}}/{{feature-slug}}`
+   - Capture the merge SHA:
+     `MERGE_SHA=$(git rev-parse --short origin/develop)`
+   - Delete the local branch (if present):
+     `git branch -D refactor-{{NNN}}/{{feature-slug}} 2>/dev/null || true`
    - Delete the remote branch:
      `git push origin --delete refactor-{{NNN}}/{{feature-slug}}`
    - Delete this file: `rm docs/deslop/{{NNN}}-{{feature-slug}}.md`
    - Edit `docs/deslop/ALL_FEATURES.md`: change the status for
-     index `{{NNN}}` from `[ ]` to `[x]` and add the merge SHA
-     in parentheses (`git rev-parse --short origin/develop`).
+     index `{{NNN}}` from `[~]` (or `[ ]`) to `[x] ($MERGE_SHA)`.
+   - Edit `docs/deslop/STATE.md`: remove the entry from
+     `In-flight migrations`; append to
+     `Completed migrations log` with today's date and `$MERGE_SHA`.
    - Commit:
-     `chore(deslop): mark {{NNN}} {{feature-slug}} as completed`
-   - Push.
+     `chore(deslop): mark {{feature-slug}} as completed ($MERGE_SHA)`
+   - Push to `feat/ict4d-demo`.
 
 ## Notes for future you
 

@@ -6,6 +6,10 @@
 > on the delta, and `git diff --stat` of the 896-file diff. It has
 > **not yet been validated against the codebase** — Session 2 (see
 > `PLAN_OF_PLANS.md`) does that pass.
+>
+> The live "last analyzed commit" SHA and in-flight / completed
+> migration logs live in `STATE.md`, not here. Update both files
+> together whenever a status flips.
 
 ## How to read this
 
