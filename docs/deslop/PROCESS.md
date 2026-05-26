@@ -80,17 +80,16 @@ procedure each command runs.
 
 1. Operator: `/deslop migrate <feature-slug>`. (Or `/deslop continue`
    once planning is done — same procedure, slug picked
-   automatically.)
+   automatically with operator confirmation.)
 2. Agent checks the hard preconditions: the slug exists in
    `ALL_FEATURES.md`, the per-feature markdown
    `NNN-feature-slug.md` exists, Phase 1 is complete per
    `STATE.md`, and the row is `[ ]`. If any precondition fails,
    the migration is refused.
-3. Agent re-verifies the per-feature plan against current
-   `develop`: paths, dependencies, prerequisite features.
-   `develop` keeps moving, so the plan may need updates. If it
-   does, the agent edits and pushes the updated plan to
-   `feat/ict4d-demo` before opening the refactor branch.
+3. Agent runs `/deslop undrift <feature-slug>` internally — the
+   plan is re-verified against current `develop` and any drift is
+   patched + pushed to `feat/ict4d-demo` before the refactor
+   branch opens.
 4. Agent creates `refactor-NNN/<feature-slug>` from current
    `develop` (regular branch — no worktree dance).
 5. Agent ports the code from `feat/ict4d-demo` per the doc's
@@ -105,16 +104,23 @@ procedure each command runs.
 9. Agent pushes the refactor branch and updates `STATE.md`'s
    `In-flight migrations` table. **No PR.** The operator opens the
    PR, reviews, pushes fix-ups, and merges to `develop` manually.
-10. Operator: `/deslop complete <feature-slug>`.
+10. Operator: `/deslop complete [<feature-slug>]`. The slug is
+    optional; if it isn't given or isn't an exact match, the
+    agent resolves it with `AskUserQuestion`.
 11. Agent verifies the merge with
     `git merge-base --is-ancestor refactor-branch origin/develop`.
     If not merged, agent stops and reports — no destructive
     action.
 12. On confirmed merge, agent runs the cleanup ritual: delete the
-    local + remote refactor branch, delete `NNN-feature-slug.md`,
+    local + remote refactor branch, **delete
+    `NNN-feature-slug.md`** (stale plans rot — always delete),
     flip the row in `ALL_FEATURES.md` to `[x] (<merge-sha>)`, move
     the entry from `STATE.md`'s `In-flight migrations` to the
     `Completed migrations log`, commit + push.
+13. As the final step of `/deslop complete`, the agent runs
+    `/deslop undrift <next-slug>` against the next feature in the
+    queue. Each completion absorbs a little drift so subsequent
+    migrations have less to fix.
 
 #### Why we delete the per-feature markdown on completion
 

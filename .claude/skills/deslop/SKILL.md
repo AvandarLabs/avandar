@@ -50,14 +50,19 @@ with one-line descriptions. Do not perform any other action.
 
 - `/deslop list` — show this list.
 - `/deslop status` — current planning + migration state.
-- `/deslop continue` — continue planning from where the last session
-  left off.
+- `/deslop continue` — confirm with the operator, then continue
+  planning or migrate the next feature (whichever the state
+  warrants).
 - `/deslop update` — scan new commits on `feat/ict4d-demo` since the
   last analysis and add any new features to the inventory.
+- `/deslop undrift [<feature-slug>]` — re-verify one (or all)
+  per-feature migration plans against the current `develop` and
+  patch any drift.
 - `/deslop migrate <feature-slug>` — execute one feature migration
   into a refactor branch off `develop`.
-- `/deslop complete <feature-slug>` — verify a migration merged into
-  `develop` and run the cleanup ritual.
+- `/deslop complete [<feature-slug>]` — verify a refactor branch
+  merged into `develop`, clean up, log completion, and refresh the
+  next plan in the queue.
 
 ### `/deslop status`
 
@@ -81,8 +86,9 @@ No file edits.
 ### `/deslop continue`
 
 Routes between two modes based on the state of `ALL_FEATURES.md` and
-`STATE.md`. Always read both files first to decide which mode to
-enter — do not guess.
+`STATE.md`. **Always confirm with the operator before doing any
+work.** Read both files first to decide which mode you are in, tell
+the operator what you would do, and only proceed after they agree.
 
 **Mode A — planning is not yet complete.**
 
@@ -95,8 +101,16 @@ You are in Mode A if any of these are true:
 - `PLAN_OF_PLANS.md`'s "Current state" section names an unfinished
   planning task.
 
-Action: execute the next planning step `PLAN_OF_PLANS.md`
-identifies (Session N work). When you finish:
+In Mode A, tell the operator (concise — 2-3 sentences):
+
+> "Planning is not yet complete. Per `PLAN_OF_PLANS.md`, the next
+> step is **<one-line summary of the next session's task>**. I would
+> work on that now. Sound good?"
+
+Use `AskUserQuestion` with options: "Yes, continue" / "No, hold" /
+"Different task". Proceed only on yes.
+
+When you finish the planning step:
 
 1. Update `PLAN_OF_PLANS.md`'s "Current state" section.
 2. Update `STATE.md` if the planning status advanced.
@@ -109,26 +123,29 @@ You are in Mode B if every row in `ALL_FEATURES.md` has a matching
 `NNN-<slug>.md` file AND the header says `validated` or
 `Ready for Phase 2`.
 
-Action:
+In Mode B:
 
 1. Read `STATE.md`'s `In-flight migrations` table. List the slugs
    already in flight (refactor branches open).
 2. Walk `ALL_FEATURES.md` top to bottom. Find the first row whose
    status is `[ ]` (not started) AND whose slug is **not** in the
    in-flight list. Call this the *next slug*.
-3. If at least one in-flight migration exists, do not proceed
-   silently. Use `AskUserQuestion` to ask the operator:
-   > "There are N migration(s) already in flight: <slug-1>,
-   > <slug-2>, ... The next available slug to migrate is
-   > `<next-slug>`. Proceed?"
-   Offer answers: "Yes, migrate `<next-slug>`" / "Wait" /
-   "Pick a different slug" (which sends them to
-   `/deslop migrate <slug>`).
-4. If no in-flight migrations exist, proceed directly.
-5. When the operator confirms (or no in-flight migrations exist),
-   carry out the same procedure as `/deslop migrate <next-slug>`
-   below. The precondition check still applies — the per-feature
-   markdown must exist.
+3. Tell the operator:
+   > "Planning is complete. The next slug to migrate is
+   > **`<next-slug>`** (index `<NNN>`).
+   > <If N>0 in-flight: There are also <N> in-flight migration(s):
+   > `<slug-1>`, `<slug-2>`, ... I'd skip those and pick
+   > `<next-slug>` as the next one to land.>
+   > Sound good?"
+
+   Use `AskUserQuestion` with options:
+   - "Yes, migrate `<next-slug>`"
+   - "Pick a different slug" (operator can then tell you which)
+   - "Wait"
+
+4. On confirmation, run the **same procedure as
+   `/deslop migrate <next-slug>`** — including the
+   `/deslop undrift <next-slug>` step that lives inside it.
 
 If no `[ ]` rows remain in `ALL_FEATURES.md`, tell the operator that
 all features are migrated or in flight and recommend `/deslop status`
@@ -180,6 +197,67 @@ Procedure:
 Be conservative. When in doubt, ask via `AskUserQuestion` whether a
 commit qualifies as its own feature row.
 
+### `/deslop undrift [<feature-slug>]`
+
+Re-verify per-feature migration plan(s) against the current state of
+`develop` and patch any drift. This is the shared building block —
+both `/deslop migrate` and `/deslop complete` call this internally.
+
+#### When called with a slug
+
+Re-verify exactly one plan.
+
+1. Resolve `<feature-slug>` to `docs/deslop/<NNN>-<feature-slug>.md`
+   via `ALL_FEATURES.md`. If the slug isn't in the inventory or the
+   plan file doesn't exist, stop with the same error messages
+   `/deslop migrate`'s preconditions use.
+2. `git fetch origin develop`
+3. Read the plan end-to-end.
+4. Cross-check every item in the plan against current `develop`:
+   - For every path in **Files to copy verbatim**: confirm it still
+     does not exist on `develop` (or, if it does, that the content
+     already matches what's intended).
+   - For every path in **Files to surgically edit on `develop`**:
+     confirm the file still exists and the described anchor lines /
+     call sites still look the way the plan assumes.
+   - For every path in **Files to delete**: confirm the file still
+     exists on `develop`.
+   - For every entry in **Dependency changes**: confirm the state
+     in `develop`'s `package.json` matches the plan's assumption
+     (not already installed, not already removed).
+   - For every entry in **Depends on**: confirm those features are
+     now `[x]` in `ALL_FEATURES.md`. If any prerequisite is still
+     `[ ]` or `[~]`, surface this — the dependency hasn't landed
+     yet, so the plan cannot be executed as written.
+5. If drift is found:
+   - Edit the plan to reflect current reality. Be explicit in the
+     "Notes for future you" section about what changed and why.
+   - Commit + push to `feat/ict4d-demo`:
+     `docs(deslop): refresh <feature-slug> plan against current develop`
+6. If no drift, do nothing.
+7. Report a 2–3 sentence summary: drift found or not, what changed
+   if anything, whether prerequisites are blocking.
+
+#### When called without a slug
+
+Re-verify every outstanding plan.
+
+1. Count the plans:
+   ```sh
+   ls docs/deslop/[0-9]*-*.md 2>/dev/null | wc -l
+   ```
+2. Use `AskUserQuestion`:
+   > "There are <N> outstanding migration plans in `docs/deslop/`.
+   > Undrift all of them?"
+   Options: "Yes, undrift all <N>" / "No, cancel" / "Pick specific
+   slugs" (which sends them back to `/deslop undrift <slug>`).
+3. On yes, iterate every `NNN-<slug>.md` file in numeric order and
+   run the same per-slug procedure for each. Batch commits — one
+   commit per plan that actually drifted, no commit at all for
+   plans that were already fresh.
+4. Report a summary: how many plans were checked, how many drifted,
+   how many were already fresh.
+
 ### `/deslop migrate <feature-slug>`
 
 Execute one feature migration into a refactor branch off `develop`.
@@ -209,37 +287,10 @@ the operator, and do nothing else.**
 
 **Procedure** (only when all preconditions pass):
 
-1. **Re-verify the plan first.** Plans were written against
-   `develop` at the time they were authored. `develop` keeps
-   moving. Before doing anything else:
-   - `git fetch origin develop`
-   - Read `docs/deslop/<NNN>-<feature-slug>.md` end-to-end.
-   - Cross-check each item in the plan against current `develop`:
-     - For every path in "Files to copy verbatim", confirm it
-       still does not exist on `develop` (or if it does, that the
-       content matches what's intended).
-     - For every path in "Files to surgically edit on `develop`",
-       confirm the file still exists on `develop` and the
-       described anchor lines / call sites still look the way the
-       plan assumes.
-     - For every path in "Files to delete", confirm the file still
-       exists on `develop`.
-     - For every dependency in "Dependency changes", confirm the
-       state in `develop`'s `package.json` matches the plan's
-       assumption (not already installed, not already removed).
-     - For every entry in "Depends on", confirm those features
-       are now `[x]` in `ALL_FEATURES.md`. If any prerequisite is
-       still `[ ]` or `[~]`, stop and tell the operator they need
-       to land those first.
-   - If the plan needs updates:
-     - Edit `docs/deslop/<NNN>-<feature-slug>.md` to reflect the
-       current reality. Be explicit in the "Notes for future you"
-       section about what changed and why.
-     - Commit + push the plan update to `feat/ict4d-demo` BEFORE
-       starting the refactor branch:
-       `docs(deslop): refresh <feature-slug> plan against current develop`
-     - Then proceed with the (now-accurate) plan.
-   - If the plan looks fine as written, proceed directly.
+1. **Refresh the plan first** by running the
+   `/deslop undrift <feature-slug>` procedure (above). If undrift
+   surfaces a blocking prerequisite that hasn't landed on `develop`
+   yet, stop and report — do not start the refactor branch.
 
 2. Create the refactor branch off the latest `develop`:
    ```sh
@@ -278,13 +329,43 @@ the operator, and do nothing else.**
    verification results, whether the plan needed an update, and
    what the operator still needs to verify manually.
 
-### `/deslop complete <feature-slug>`
+### `/deslop complete [<feature-slug>]`
 
 Run only when the operator has merged the refactor branch into
-`develop` and tells you to mark it complete. Verification before
-mutation is non-negotiable.
+`develop`. Verification before mutation is non-negotiable.
 
-Procedure:
+#### Resolving which feature to complete
+
+The argument is optional and may be inexact. Resolve it before
+doing anything destructive.
+
+1. **No argument given.** Read `STATE.md`'s `In-flight migrations`
+   table. If empty, stop and tell the operator there is nothing to
+   complete. Otherwise use `AskUserQuestion`:
+   > "Which in-flight migration are we marking complete?"
+   Offer up to 4 options drawn from the in-flight table; if more
+   than 4 exist, show the four most recent and add an option
+   "Other" so the operator can name one explicitly.
+
+2. **Argument is an exact slug match** for a row in
+   `ALL_FEATURES.md` whose status is `[~]`. Use it directly.
+
+3. **Argument is a non-exact match** (description, partial slug,
+   different casing, etc.). Make your best guess by scoring the
+   argument against in-flight slugs and against `[~]` rows in
+   `ALL_FEATURES.md` (substring, token overlap, edit distance).
+   Then confirm via `AskUserQuestion`:
+   > "Best match for `<argument>` is `<guessed-slug>` (index
+   > `<NNN>`, branch `refactor-<NNN>/<guessed-slug>`). Complete
+   > this one?"
+   Options: "Yes, that's the one" / "No, pick a different one"
+   (then re-prompt with the full in-flight list) / "Cancel".
+
+4. **Argument matches a row whose status isn't `[~]`** — e.g. `[ ]`
+   (never started) or `[x]` (already completed). Stop and tell the
+   operator the row's current status; do not mutate anything.
+
+#### Procedure (after the slug is resolved and confirmed)
 
 1. Fetch develop:
    ```sh
@@ -292,26 +373,48 @@ Procedure:
    ```
 2. Verify the merge:
    ```sh
-   git merge-base --is-ancestor origin/refactor-NNN/<feature-slug> origin/develop \
+   git merge-base --is-ancestor origin/refactor-<NNN>/<feature-slug> origin/develop \
      && echo merged \
      || echo NOT-merged
    ```
-   If `NOT-merged`, **stop**. Tell the user the branch is not on
-   `develop` yet. Take no destructive action.
+   If `NOT-merged`, **stop**. Tell the operator the branch is not
+   on `develop` yet. Take no destructive action.
+
 3. If merged:
    - Capture the merge SHA: `git rev-parse --short origin/develop`.
    - Delete the local branch (if present):
-     `git branch -D refactor-NNN/<feature-slug> 2>/dev/null || true`
+     `git branch -D refactor-<NNN>/<feature-slug> 2>/dev/null || true`
    - Delete the remote branch:
-     `git push origin --delete refactor-NNN/<feature-slug>`
-   - Delete `docs/deslop/NNN-<feature-slug>.md`.
+     `git push origin --delete refactor-<NNN>/<feature-slug>`
+   - **Delete the per-feature markdown:**
+     `rm docs/deslop/<NNN>-<feature-slug>.md`.
+     Once merged into `develop`, the code is the source of truth.
+     Stale plans rot. **Always delete.**
    - Update `ALL_FEATURES.md`: change the row's status from `[~]`
-     (or `[ ]`) to `[x] (<merge-sha>)`.
+     to `[x] (<merge-sha>)`.
    - Update `STATE.md`: remove the row from the `In-flight
-     migrations` table; append to the `Completed migrations` log
-     with date + merge SHA.
+     migrations` table; append a row to the `Completed migrations
+     log` with date + merge SHA.
+
 4. Commit + push to `feat/ict4d-demo`:
    `chore(deslop): mark <feature-slug> as completed (<merge-sha>)`
+
+5. **Refresh the next plan in the queue.** This keeps subsequent
+   migrations cheap: every completion absorbs a little of the drift
+   so `/deslop migrate` later won't have to.
+   - Find the next slug to migrate by the same rule as
+     `/deslop continue`'s Mode B: first `[ ]` row in
+     `ALL_FEATURES.md` whose slug is not in `STATE.md`'s
+     `In-flight migrations`.
+   - Run `/deslop undrift <next-slug>` against it. If undrift
+     pushes a plan refresh, that's another commit on
+     `feat/ict4d-demo`; that's expected.
+   - If there is no next slug (no `[ ]` rows left), skip this step
+     and tell the operator that all features are now migrated or
+     in flight.
+
+6. Report a summary: feature completed, merge SHA, next slug in
+   the queue (with note on whether its plan was refreshed).
 
 ---
 

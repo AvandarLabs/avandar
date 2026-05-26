@@ -26,15 +26,22 @@ short slash commands handled by the `deslop` skill at
 
 - `/deslop list` — show the command list.
 - `/deslop status` — current planning + migration state.
-- `/deslop continue` — pick up planning where the previous session
-  stopped (reads `PLAN_OF_PLANS.md`).
+- `/deslop continue` — confirm with the operator, then continue
+  planning or migrate the next feature (whichever the state
+  warrants).
 - `/deslop update` — scan `feat/ict4d-demo` for commits since the
   last analyzed SHA in `STATE.md` and add any new features to
   `ALL_FEATURES.md`.
+- `/deslop undrift [<feature-slug>]` — re-verify one (or all
+  outstanding) per-feature migration plans against current
+  `develop` and patch any drift.
 - `/deslop migrate <feature-slug>` — port one feature into
-  `refactor-NNN/<feature-slug>` off `develop`.
-- `/deslop complete <feature-slug>` — verify the refactor branch
-  merged into `develop`, run the cleanup ritual, log completion.
+  `refactor-NNN/<feature-slug>` off `develop`. Calls `undrift`
+  internally before opening the branch.
+- `/deslop complete [<feature-slug>]` — verify the refactor branch
+  merged into `develop`, delete the per-feature markdown, log
+  completion, and `undrift` the next plan in the queue. Asks which
+  feature to complete if the slug isn't exact or wasn't given.
 
 The full procedure for each command lives in the skill file. The
 prose below is the human-facing context that the skill points at.
