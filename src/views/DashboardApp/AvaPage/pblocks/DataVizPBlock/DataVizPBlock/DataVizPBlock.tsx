@@ -149,16 +149,6 @@ export function DataVizPBlock({
       }}
     >
       <Stack gap="sm">
-        {prompt.trim().length > 0 ?
-          <Text
-            size="sm"
-            fw={500}
-            c="neutral.7"
-            style={{ letterSpacing: "0.01em" }}
-          >
-            {prompt}
-          </Text>
-        : null}
         <DataVizLocalFilters
           localFilters={filterProps.localFilters}
           state={localFilterState}
