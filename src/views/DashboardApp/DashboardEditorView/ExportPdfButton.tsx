@@ -8,6 +8,8 @@ import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEdi
 import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
+const HIDE_EXPORT_AS_PDF = true;
+
 type Props = {
   dashboard: Dashboard.T | undefined;
   hasUnsavedChanges: boolean;
@@ -25,8 +27,11 @@ type Props = {
 export function ExportPdfButton({
   dashboard,
   hasUnsavedChanges,
-}: Props): JSX.Element {
+}: Props): JSX.Element | null {
   const { t } = useLingui();
+  if (HIDE_EXPORT_AS_PDF) {
+    return null;
+  }
   const isDisabled = !dashboard || hasUnsavedChanges;
 
   return (
