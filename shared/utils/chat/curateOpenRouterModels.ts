@@ -1,10 +1,6 @@
 import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
-import type {
-  ChatModelLicenseTier,
-  ChatModelOption,
-  ChatModelOptionGroup,
-} from "$/types/chat.types.ts";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 /** Raw OpenRouter model row used when curating the picker catalog. */
 export type OpenRouterModelInput = {
@@ -91,7 +87,7 @@ function _isAllowedModel(model: OpenRouterModelInput): boolean {
 
 function _classifyLicenseTier(
   model: OpenRouterModelInput,
-): ChatModelLicenseTier | undefined {
+): ChatModelOption.LicenseTier | undefined {
   const isProprietary = AppConfig.chat.proprietaryModelClasses.some(
     (classToken) => {
       return modelMatchesClass(model, classToken);
@@ -138,7 +134,7 @@ function _formatProviderLabel(providerSlug: string): string {
 }
 
 function _buildGroupLabel(
-  licenseTier: ChatModelLicenseTier,
+  licenseTier: ChatModelOption.LicenseTier,
   providerSlug: string,
 ): string {
   const tierLabel = licenseTier === "open" ? "Open models" : "Proprietary";
@@ -147,8 +143,8 @@ function _buildGroupLabel(
 
 function _toChatModelOption(
   model: OpenRouterModelInput,
-  licenseTier: ChatModelLicenseTier,
-): ChatModelOption {
+  licenseTier: ChatModelOption.LicenseTier,
+): ChatModelOption.T {
   return {
     id: model.id,
     name: model.name,
@@ -179,7 +175,7 @@ function _pickLatestPerDedupeKey(
  */
 export function curateOpenRouterModels(
   models: readonly OpenRouterModelInput[],
-): ChatModelOptionGroup[] {
+): ChatModelOption.OptionGroup[] {
   const eligible = models.filter((model) => {
     if (
       !_supportsTextOutput(model) ||
@@ -197,7 +193,7 @@ export function curateOpenRouterModels(
 
   const deduped = _pickLatestPerDedupeKey(eligible);
 
-  const grouped = new Map<string, ChatModelOption[]>();
+  const grouped = new Map<string, ChatModelOption.T[]>();
   deduped.forEach((model) => {
     const licenseTier = _classifyLicenseTier(model);
     if (!licenseTier) {
@@ -232,7 +228,7 @@ export function curateOpenRouterModels(
 
 /** Flattens grouped picker models for lookups and storage resolution. */
 export function flattenChatModelGroups(
-  groups: readonly ChatModelOptionGroup[],
-): ChatModelOption[] {
+  groups: readonly ChatModelOption.OptionGroup[],
+): ChatModelOption.T[] {
   return groups.flatMap(prop("models"));
 }

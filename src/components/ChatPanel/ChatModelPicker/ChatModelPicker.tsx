@@ -11,7 +11,7 @@ import {
 import { useChatModels } from "@/components/ChatPanel/useChatModels";
 import { useRegisterChatModelContext } from "@/components/ChatPanel/useRegisterChatModelContext";
 import css from "./ChatModelPicker.module.css";
-import type { ChatModelOption } from "$/types/chat.types";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 type Props = {
   disabled?: boolean;
@@ -50,7 +50,7 @@ export function ChatModelPicker({
     });
   }, [models, selectedModelId]);
 
-  const selectedModel = useMemo((): ChatModelOption | undefined => {
+  const selectedModel = useMemo((): ChatModelOption.T | undefined => {
     if (!resolvedModelId) {
       return undefined;
     }

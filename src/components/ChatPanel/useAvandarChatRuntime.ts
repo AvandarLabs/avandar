@@ -7,7 +7,7 @@ import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
-import type { ChatClientMessage } from "$/types/chat.types";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 
 function extractText(parts: ReadonlyArray<{ type: string }>): string {
   return parts
@@ -21,7 +21,7 @@ function extractText(parts: ReadonlyArray<{ type: string }>): string {
 /**
  * The Assistant UI runtime for the Avandar chat panel.
  *
- * On every user turn it serializes the thread into our `ChatClientMessage`
+ * On every user turn it serializes the thread into our `ChatClientMessage.T`
  * shape, posts to the `chat/:workspaceId/messages` edge function along with
  * the current page context, and renders the assistant reply. If the model
  * called `generateSql`, the SQL and prompt are pushed into
@@ -37,7 +37,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     return {
       async run({ messages, context }): Promise<ChatModelRunResult> {
         const model = context.config?.modelName;
-        const apiMessages: ChatClientMessage[] = messages
+        const apiMessages: ChatClientMessage.T[] = messages
           .map((chatMsg) => {
             const content = extractText(chatMsg.content);
             if (!content) {
@@ -55,7 +55,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               })
               .exhaustive();
           })
-          .filter((message): message is ChatClientMessage => {
+          .filter((message): message is ChatClientMessage.T => {
             return isNotNull(message);
           });
 

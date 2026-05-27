@@ -68,6 +68,19 @@ Implement functionality using red/green TDD.
 
 [See our TypeScript rules](docs/rules/typescript.md)
 
+### Models (`shared/models`, `src/models`)
+
+- Import the main model entry (`$/models/.../MyModel/MyModel.ts`), not
+  `MyModel.types.ts`.
+- Use the model namespace and dot notation for variants and related types. Do
+  not import `MyModelRead`, `MyModelId`, or other symbols from `*.types.ts` in
+  app, edge, or shared utility code.
+- Default read shape: `MyModel.T` (same as `MyModel.T<"Read">`)
+- Other exports on the namespace: `MyModel.Id`, `MyModel.SomeEnum`, nested DTOs
+  re-exported from the namespace (for example `ChatResponse.ChatGeneratedSql`).
+- Exception: files inside the model folder (`*.types.ts`, parsers, modules) may
+  import sibling type files as needed to define the namespace.
+
 ## SQL
 
 [See our SQL rules](docs/rules/sql.md)

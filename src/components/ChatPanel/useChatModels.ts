@@ -1,11 +1,11 @@
 import { useQuery } from "@hooks";
 import { flattenChatModelGroups } from "$/utils/chat/curateOpenRouterModels";
 import { APIClient } from "@/clients/APIClient";
-import type { ChatModelOption, ChatModelOptionGroup } from "$/types/chat.types";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 type UseChatModelsResult = {
-  groups: ChatModelOptionGroup[];
-  models: ChatModelOption[];
+  groups: ChatModelOption.ChatModelOptionGroup[];
+  models: ChatModelOption.T[];
   isLoading: boolean;
   isError: boolean;
 };

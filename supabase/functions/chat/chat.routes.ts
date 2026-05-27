@@ -11,12 +11,9 @@ import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
-import type {
-  ChatAPI,
-  ChatGeneratedSQL,
-  ChatModelsResponse,
-  ChatResponse,
-} from "@sbfn/chat/chat.types.ts";
+import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
@@ -125,24 +122,26 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
    * proprietary) for the chat panel model picker.
    */
   "/models": {
-    GET: GET("/models").action(async (): Promise<ChatModelsResponse> => {
-      const response = await fetch(OPENROUTER_MODELS_URL, {
-        headers: {
-          Authorization: `Bearer ${openRouterApiKey}`,
-          "HTTP-Referer": openRouterReferer,
-          "X-Title": "Avandar",
-        },
-      });
+    GET: GET("/models").action(
+      async (): Promise<{ groups: ChatModelOption.OptionGroup[] }> => {
+        const response = await fetch(OPENROUTER_MODELS_URL, {
+          headers: {
+            Authorization: `Bearer ${openRouterApiKey}`,
+            "HTTP-Referer": openRouterReferer,
+            "X-Title": "Avandar",
+          },
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenRouter models API error: ${errorText}`);
-      }
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`OpenRouter models API error: ${errorText}`);
+        }
 
-      const payload = (await response.json()) as OpenRouterModelsResponse;
-      const groups = curateOpenRouterModels(payload.data ?? []);
-      return { groups };
-    }),
+        const payload = (await response.json()) as OpenRouterModelsResponse;
+        const groups = curateOpenRouterModels(payload.data ?? []);
+        return { groups };
+      },
+    ),
   },
   /**
    * Handles a chat turn for the Ask Avandar panel in a workspace.
@@ -278,7 +277,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         const message = data.choices?.[0]?.message;
         const text = (message?.content ?? "").trim();
 
-        let generatedSql: ChatGeneratedSQL | undefined;
+        let generatedSql: ChatResponse.GeneratedSql | undefined;
         const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
         const generateSqlToolCall = toolCalls.find((tc) => {
           return tc?.function?.name === "generateSql";
@@ -306,7 +305,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             "Here is the SQL I ran. Results are on the canvas to the left."
           : "I could not generate a query for that. Try rephrasing.");
 
-        const result: ChatResponse = {
+        const result: ChatResponse.T = {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
         };
