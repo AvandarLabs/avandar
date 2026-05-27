@@ -175,8 +175,19 @@ directly (because that's where prod points today). Catch it with:
    which ones are features vs. noise, adds new feature rows to
    `ALL_FEATURES.md`, and writes the matching `NNN-feature-slug.md`
    migration docs.
-2. The agent bumps the analyzed-commit SHA in `STATE.md`.
-3. New features sit in the queue like any other until the operator
+2. **The agent filters out work that already exists on `develop`.**
+   Not every new commit on `feat/ict4d-demo` originated there. When
+   we forward-port a `develop` feature into `feat/ict4d-demo` (the
+   case above), those commits show up in the scan but the feature
+   already exists in both branches — there is nothing to migrate.
+   `/deslop update` excludes them via `git cherry origin/develop
+   origin/feat/ict4d-demo` (patch-equivalence) and a per-feature
+   `git diff origin/develop..origin/feat/ict4d-demo -- <paths>`
+   (empty diff ⇒ already on develop ⇒ skip). A feature is only
+   added to `ALL_FEATURES.md` when its paths genuinely differ
+   between the two branches.
+3. The agent bumps the analyzed-commit SHA in `STATE.md`.
+4. New features sit in the queue like any other until the operator
    runs `/deslop migrate <feature-slug>`.
 
 This pattern is the unfortunate cost of having production point at a

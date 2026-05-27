@@ -120,10 +120,21 @@ subject lines. It is likely:
    ```
    to confirm the work actually happened on this delta. If
    `--stat` shows zero changes for the paths the feature claims to
-   touch, the feature is misattributed.
+   touch, the feature already exists identically on `develop` (or
+   never existed) — **remove the row**. A feature only belongs in
+   `ALL_FEATURES.md` if there is a real, non-empty diff between
+   `develop` and `feat/ict4d-demo` for its paths. Features that
+   were built on `develop` and later forward-ported into
+   `feat/ict4d-demo` produce zero diff and must NOT be listed.
 5. For each commit that looks substantial but isn't represented in
-   any row, investigate it (`git show <sha> --stat`) and either
-   attach it to an existing row or add a new row.
+   any row, investigate it (`git show <sha> --stat`). Before adding
+   a row, confirm the work is genuinely unique to
+   `feat/ict4d-demo`: run
+   `git diff origin/develop..feat/ict4d-demo -- <paths>` and only
+   add the row if the diff is non-empty. Use
+   `git cherry origin/develop feat/ict4d-demo` to spot
+   forward-ported commits (lines prefixed `-` are already on
+   `develop`). Otherwise attach the commit to an existing row.
 6. When done:
    - Re-number indices so they are dense (1..N).
    - Replace the `DRAFT — Session 1` marker in the

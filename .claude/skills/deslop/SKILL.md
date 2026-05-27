@@ -161,22 +161,58 @@ Procedure:
 
 1. Read the `Last analyzed commit on feat/ict4d-demo` value from
    `docs/deslop/STATE.md`.
-2. Fetch:
+2. Fetch both branches — you need `develop` to filter out features
+   that already live there:
    ```sh
-   git fetch origin feat/ict4d-demo
+   git fetch origin feat/ict4d-demo develop
    ```
-3. List new commits since the marker:
+3. List candidate commits since the marker:
    ```sh
    git log --oneline <last-sha>..origin/feat/ict4d-demo --no-merges
    ```
    If the list is empty, tell the user "no new commits since
    `<last-sha>`" and stop.
-4. For each new commit, decide whether it introduces a new feature,
-   extends an existing row in `ALL_FEATURES.md`, or is plain noise
-   (e.g. typo fixes, formatter runs, dependency bumps). Use:
+4. **Filter out commits whose work already exists on `develop`.**
+   This is critical. Some commits on `feat/ict4d-demo` did not
+   originate there — they were built on `develop`, merged into
+   `develop`, and then forward-ported into `feat/ict4d-demo` (see
+   the drift rules in `PROCESS.md`). Those are NOT new features to
+   migrate; the feature already exists in both branches. Do not add
+   them to `ALL_FEATURES.md`.
+
+   Detect them two ways, and treat a hit from EITHER as "already on
+   develop, skip it":
+
+   a. **Patch-equivalence sweep** (catches cherry-picks /
+      forward-ports that got a new SHA on `feat/ict4d-demo`):
+      ```sh
+      git cherry origin/develop origin/feat/ict4d-demo
+      ```
+      Lines prefixed `-` are commits whose patch is already present
+      on `develop`. Lines prefixed `+` are genuinely unique to
+      `feat/ict4d-demo`. Only `+` commits are migration candidates.
+
+   b. **Per-feature diff check** (the decisive test once you've
+      grouped commits into a candidate feature): for the paths the
+      feature touches,
+      ```sh
+      git diff origin/develop..origin/feat/ict4d-demo -- <paths>
+      ```
+      If this diff is empty, the code is byte-identical on both
+      branches — the feature already exists on `develop`. Skip it.
+
+   When in doubt, the per-feature diff in (b) wins: a non-empty
+   diff means there is real work to migrate; an empty diff means
+   there is nothing to do regardless of what the commit log
+   suggests.
+5. For each remaining candidate commit, decide whether it
+   introduces a new feature, extends an existing row in
+   `ALL_FEATURES.md`, or is plain noise (e.g. typo fixes, formatter
+   runs, dependency bumps). Use:
    - `git show <sha> --stat` for scope.
    - `git show <sha>` for intent.
-5. For each genuinely new feature:
+6. For each genuinely new feature (survived the step-4 filter AND
+   has a non-empty develop-vs-ict4d diff for its paths):
    - Add a row at the next available index in `ALL_FEATURES.md`
      under the right category. Use the same shape as existing rows.
    - Write a new `NNN-feature-slug.md` using
@@ -184,18 +220,22 @@ Procedure:
      and we are tracking these as backlog rather than authoring docs
      immediately, ask the user — `AskUserQuestion` — before writing
      the per-feature doc.)
-6. For each commit that just extends an existing row, append a note
+7. For each commit that just extends an existing row, append a note
    to that row's "Sources" cell with the new commit SHA.
-7. Update `docs/deslop/STATE.md`:
+8. Update `docs/deslop/STATE.md`:
    - `Last analyzed commit on feat/ict4d-demo` →
      `git rev-parse origin/feat/ict4d-demo`.
    - `Last update run on` → today's date.
-   - Note any added feature indices in the running log section.
-8. Commit + push to `feat/ict4d-demo`:
+   - Note any added feature indices, and any candidates skipped
+     because they already exist on `develop`, in the running log
+     section.
+9. Commit + push to `feat/ict4d-demo`:
    `docs(deslop): update inventory — <N> new features since <short-sha>`
 
-Be conservative. When in doubt, ask via `AskUserQuestion` whether a
-commit qualifies as its own feature row.
+Be conservative. When in doubt about whether a commit is a genuinely
+new feature (vs. already on `develop`, vs. noise), run the
+per-feature diff check in step 4b and ask via `AskUserQuestion`
+before adding a row.
 
 ### `/deslop undrift [<feature-slug>]`
 
@@ -211,9 +251,29 @@ Re-verify exactly one plan.
    via `ALL_FEATURES.md`. If the slug isn't in the inventory or the
    plan file doesn't exist, stop with the same error messages
    `/deslop migrate`'s preconditions use.
-2. `git fetch origin develop`
+2. `git fetch origin develop feat/ict4d-demo`
 3. Read the plan end-to-end.
-4. Cross-check every item in the plan against current `develop`:
+4. **Already-on-develop check first.** Diff the feature's paths
+   between the two branches:
+   ```sh
+   git diff origin/develop..origin/feat/ict4d-demo -- <feature-paths>
+   ```
+   If this is **empty**, the feature already exists identically on
+   `develop` — there is nothing left to migrate. This happens when
+   a feature was built on `develop` and later forward-ported into
+   `feat/ict4d-demo`. Do not silently "fix" the plan; instead
+   surface it:
+   > "`<feature-slug>` appears to already exist on `develop` (no
+   > diff across its paths). It looks like this feature was never
+   > unique to `feat/ict4d-demo`, or has already landed. Mark it
+   > `[x]` and delete the plan?"
+   Use `AskUserQuestion`. On confirmation, flip the row to `[x]`
+   in `ALL_FEATURES.md`, delete the plan file, log it in
+   `STATE.md`'s `Completed migrations log` (note "already on
+   develop, no migration needed"), commit + push, and stop. If the
+   operator declines, leave everything as-is and report.
+5. Otherwise (diff is non-empty), cross-check every item in the
+   plan against current `develop`:
    - For every path in **Files to copy verbatim**: confirm it still
      does not exist on `develop` (or, if it does, that the content
      already matches what's intended).
@@ -229,14 +289,15 @@ Re-verify exactly one plan.
      now `[x]` in `ALL_FEATURES.md`. If any prerequisite is still
      `[ ]` or `[~]`, surface this — the dependency hasn't landed
      yet, so the plan cannot be executed as written.
-5. If drift is found:
+6. If drift is found:
    - Edit the plan to reflect current reality. Be explicit in the
      "Notes for future you" section about what changed and why.
    - Commit + push to `feat/ict4d-demo`:
      `docs(deslop): refresh <feature-slug> plan against current develop`
-6. If no drift, do nothing.
-7. Report a 2–3 sentence summary: drift found or not, what changed
-   if anything, whether prerequisites are blocking.
+7. If no drift, do nothing.
+8. Report a 2–3 sentence summary: already-on-develop or not, drift
+   found or not, what changed if anything, whether prerequisites
+   are blocking.
 
 #### When called without a slug
 
