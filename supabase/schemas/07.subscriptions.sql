@@ -25,18 +25,26 @@ create type public.subscriptions__update_status as enum(
 -- Table representing existing susbscriptions which associates a subscription
 -- to a workspace and a billing manager (the workspace owner).
 create table public.subscriptions (
-  -- Primary key: Polar subscription id.
-  polar_subscription_id uuid primary key not null,
+  -- Primary key: Avandar subscription row id (not the Polar subscription id).
+  id uuid primary key not null default gen_random_uuid(),
+  -- Polar subscription id when the subscription is billed through Polar; null
+  -- for native free subscriptions that never touched Polar.
+  polar_subscription_id uuid,
   -- Workspace this subscription belongs to
   workspace_id uuid not null unique references public.workspaces (id) on update cascade on delete restrict,
   -- User who is the billing manager for this subscription
   subscription_owner_id uuid not null references auth.users (id) on update cascade on delete restrict,
-  -- The customer id for this subscription in Polar
-  polar_customer_id uuid not null,
-  -- The customer email for this subscription in Polar
-  polar_customer_email text not null,
-  -- The Polar product id that the user is subscribed to
-  polar_product_id uuid not null,
+  -- The Polar customer id for this subscription (null when not in Polar,
+  -- which is the case for Free subscriptions)
+  polar_customer_id uuid,
+  -- The Polar customer email for this subscription (null when not in Polar,
+  -- which is the case for Free subscriptions)
+  polar_customer_email text,
+  -- The Polar product id that the user is subscribed to (null when not in
+  -- Polar, which is the case for Free subscriptions). A 'product' is
+  -- Polar's general term for anything that is purchasable. In our case,
+  -- it means a subscription plan.
+  polar_product_id uuid,
   -- Timestamp when this row was created
   created_at timestamptz not null default now(),
   -- Timestamp for last update of this row
@@ -74,7 +82,10 @@ create table public.subscriptions (
   -- This number changes based on the feature plan type. If on a paid plan,
   -- this should be kept in sync with the number of paid seats.
   -- Use `null` to indicate unlimited.
-  max_shareable_dashboards_allowed integer
+  max_shareable_dashboards_allowed integer,
+  constraint subscriptions_polar_subscription_id_key unique (
+    polar_subscription_id
+  )
 );
 
 -- Indexes to improve performance

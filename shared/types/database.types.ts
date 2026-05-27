@@ -505,6 +505,7 @@ export type Database = {
           created_at: string
           dataset_id: string
           id: string
+          plan_steps: Json | null
           raw_sql: string
           updated_at: string
           workspace_id: string
@@ -513,6 +514,7 @@ export type Database = {
           created_at?: string
           dataset_id: string
           id?: string
+          plan_steps?: Json | null
           raw_sql: string
           updated_at?: string
           workspace_id: string
@@ -521,6 +523,7 @@ export type Database = {
           created_at?: string
           dataset_id?: string
           id?: string
+          plan_steps?: Json | null
           raw_sql?: string
           updated_at?: string
           workspace_id?: string
@@ -912,14 +915,15 @@ export type Database = {
           ended_at: string | null
           ends_at: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id: string
           max_dashboards_allowed: number | null
           max_datasets_allowed: number | null
           max_seats_allowed: number
           max_shareable_dashboards_allowed: number | null
-          polar_customer_email: string
-          polar_customer_id: string
-          polar_product_id: string
-          polar_subscription_id: string
+          polar_customer_email: string | null
+          polar_customer_id: string | null
+          polar_product_id: string | null
+          polar_subscription_id: string | null
           started_at: string | null
           subscription_owner_id: string
           subscription_status: Database["public"]["Enums"]["subscriptions__status"]
@@ -933,14 +937,15 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
           max_dashboards_allowed?: number | null
           max_datasets_allowed?: number | null
           max_seats_allowed: number
           max_shareable_dashboards_allowed?: number | null
-          polar_customer_email: string
-          polar_customer_id: string
-          polar_product_id: string
-          polar_subscription_id: string
+          polar_customer_email?: string | null
+          polar_customer_id?: string | null
+          polar_product_id?: string | null
+          polar_subscription_id?: string | null
           started_at?: string | null
           subscription_owner_id: string
           subscription_status: Database["public"]["Enums"]["subscriptions__status"]
@@ -954,14 +959,15 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
           max_dashboards_allowed?: number | null
           max_datasets_allowed?: number | null
           max_seats_allowed?: number
           max_shareable_dashboards_allowed?: number | null
-          polar_customer_email?: string
-          polar_customer_id?: string
-          polar_product_id?: string
-          polar_subscription_id?: string
+          polar_customer_email?: string | null
+          polar_customer_id?: string | null
+          polar_product_id?: string | null
+          polar_subscription_id?: string | null
           started_at?: string | null
           subscription_owner_id?: string
           subscription_status?: Database["public"]["Enums"]["subscriptions__status"]
@@ -1016,6 +1022,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      usage_analytics_events: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"] | null
+          created_at: string
+          event_name: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_analytics_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_group_memberships: {
         Row: {
@@ -1516,35 +1560,66 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rpc_datasets__add_virtual_dataset: {
-        Args: {
-          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
-          p_dataset_description: string
-          p_dataset_id: string
-          p_dataset_name: string
-          p_raw_sql: string
-          p_workspace_id: string
-        }
-        Returns: {
-          created_at: string
-          date_of_last_sync: string | null
-          description: string | null
-          id: string
-          is_restricted: boolean
-          name: string
-          owner_id: string
-          owner_profile_id: string
-          source_type: Database["public"]["Enums"]["datasets__source_type"]
-          updated_at: string
-          workspace_id: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "datasets"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      rpc_datasets__add_virtual_dataset:
+        | {
+            Args: {
+              p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+              p_dataset_description: string
+              p_dataset_id: string
+              p_dataset_name: string
+              p_raw_sql: string
+              p_workspace_id: string
+            }
+            Returns: {
+              created_at: string
+              date_of_last_sync: string | null
+              description: string | null
+              id: string
+              is_restricted: boolean
+              name: string
+              owner_id: string
+              owner_profile_id: string
+              source_type: Database["public"]["Enums"]["datasets__source_type"]
+              updated_at: string
+              workspace_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "datasets"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: {
+              p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+              p_dataset_description: string
+              p_dataset_id: string
+              p_dataset_name: string
+              p_plan_steps?: Json
+              p_raw_sql: string
+              p_workspace_id: string
+            }
+            Returns: {
+              created_at: string
+              date_of_last_sync: string | null
+              description: string | null
+              id: string
+              is_restricted: boolean
+              name: string
+              owner_id: string
+              owner_profile_id: string
+              source_type: Database["public"]["Enums"]["datasets__source_type"]
+              updated_at: string
+              workspace_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "datasets"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       rpc_datasets__add_xlsx_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]

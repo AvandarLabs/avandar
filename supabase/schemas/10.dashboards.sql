@@ -23,11 +23,7 @@ create table public.dashboards (
   -- The dashboard's full config as a JSON blob
   config jsonb not null,
   -- When true, tag-based app roles do not apply; shares still can
-  is_restricted boolean not null default false,
-  constraint dashboards__workspace_id_slug unique (
-    workspace_id,
-    slug
-  )
+  is_restricted boolean not null default false
 );
 
 -- Enable row level security
@@ -42,3 +38,13 @@ execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
 create index idx_dashboards__slug on public.dashboards (slug);
+
+-- Globally unique vanity slug for public dashboards. Non-public dashboards
+-- can hold any slug (or repeat one) freely; the constraint only kicks in
+-- when `is_public = true` so vanity URLs like `/d/<slug>` resolve to at
+-- most one dashboard. Publishing with a colliding slug therefore fails at
+-- the DB level if the frontend check has been bypassed.
+create unique index dashboards__slug_unique_when_public on public.dashboards (slug)
+where
+  is_public = true and
+  slug is not null;

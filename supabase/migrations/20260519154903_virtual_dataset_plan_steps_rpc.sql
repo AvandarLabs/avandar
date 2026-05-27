@@ -1,20 +1,7 @@
-/**
- * Add a virtual dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__virtual.
- *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_raw_sql: The raw SQL query that generates the dataset
- * @param p_plan_steps: Optional JSON blob of the multi-step analytic
- *   plan that produced the dataset, used to reopen the canvas. NULL
- *   for one-shot SQL saves.
- *
- * @returns: The created dataset
- */
+-- Phase 3 — extend rpc_datasets__add_virtual_dataset with an optional
+-- p_plan_steps argument so saving a multi-step analysis persists the
+-- plan onto the new virtual dataset row. Default NULL keeps existing
+-- callers (one-shot SQL saves) working without changes.
 create or replace function public.rpc_datasets__add_virtual_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,
