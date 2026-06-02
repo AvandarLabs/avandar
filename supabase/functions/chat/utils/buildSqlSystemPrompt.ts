@@ -29,7 +29,7 @@ function isSpatialPrompt(prompt: string): boolean {
  * The schema is sent as a compact listing (one line per dataset + one line
  * per column), not as JSON, to keep token cost low.
  */
-export function buildSQLSystemPrompt(args: {
+export function buildSqlSystemPrompt(args: {
   prompt: string;
   datasets: readonly Dataset[];
   columns: readonly DatasetColumn[];
@@ -77,7 +77,7 @@ ${DuckDBSpatialExtensionDocumentation}`
  * Strip markdown fencing and stray prefixes that LLMs sometimes wrap around
  * generated SQL.
  */
-export function cleanGeneratedSQL(raw: string): string {
+export function cleanGeneratedSql(raw: string): string {
   return raw
     .replace(/^\n?/i, "")
     .replace(/^```\n?/i, "")

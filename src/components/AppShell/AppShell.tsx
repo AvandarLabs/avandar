@@ -74,7 +74,8 @@ function AppShellComponent({
   currentWorkspace,
   utilityLinks = [],
 }: Props): JSX.Element {
-  const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
+  const { isNavbarSidebarCollapsed: isDesktopNavbarCollapsed } =
+    AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
   const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
@@ -96,7 +97,7 @@ function AppShellComponent({
     [
       "mod+.",
       () => {
-        appShellDispatch.toggleDesktopNavbar();
+        appShellDispatch.toggleNavbarSidebar();
       },
     ],
   ]);

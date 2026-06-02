@@ -1,11 +1,11 @@
 import {
   buildModelDedupeKey,
   curateOpenRouterModels,
-  flattenChatModelGroups,
   modelMatchesClass,
-} from "$/utils/chat/curateOpenRouterModels.ts";
+} from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
+import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { describe, expect, it } from "vitest";
-import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
+import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 
 function createModel(
   overrides: Partial<OpenRouterModelInput> & Pick<OpenRouterModelInput, "id">,
@@ -86,12 +86,8 @@ describe("curateOpenRouterModels", () => {
       }),
     ]);
 
-    const models = flattenChatModelGroups(groups);
-    expect(
-      models.map((model) => {
-        return model.id;
-      }),
-    ).toEqual(["openai/gpt-4o"]);
+    const models = groups.flatMap(prop("models"));
+    expect(models.map(prop("id"))).toEqual(["openai/gpt-4o"]);
   });
 
   it("dedupes dated variants by keeping the newest created slug", () => {
@@ -108,7 +104,7 @@ describe("curateOpenRouterModels", () => {
       }),
     ]);
 
-    const models = flattenChatModelGroups(groups);
+    const models = groups.flatMap(prop("models"));
     expect(models).toHaveLength(1);
     expect(models[0]?.id).toBe("openai/gpt-4o");
   });
@@ -127,14 +123,11 @@ describe("curateOpenRouterModels", () => {
       }),
     ]);
 
-    const models = flattenChatModelGroups(groups);
-    expect(
-      models
-        .map((model) => {
-          return model.id;
-        })
-        .sort(),
-    ).toEqual(["openai/gpt-5", "openai/gpt-5-mini"]);
+    const models = groups.flatMap(prop("models"));
+    expect(models.map(prop("id")).sort()).toEqual([
+      "openai/gpt-5",
+      "openai/gpt-5-mini",
+    ]);
   });
 
   it("keeps separate size tiers as separate picker entries", () => {
@@ -151,14 +144,11 @@ describe("curateOpenRouterModels", () => {
       }),
     ]);
 
-    const models = flattenChatModelGroups(groups);
-    expect(
-      models
-        .map((model) => {
-          return model.id;
-        })
-        .sort(),
-    ).toEqual(["openai/gpt-4o", "openai/gpt-4o-mini"]);
+    const models = groups.flatMap(prop("models"));
+    expect(models.map(prop("id")).sort()).toEqual([
+      "openai/gpt-4o",
+      "openai/gpt-4o-mini",
+    ]);
   });
 
   it("groups models by license tier and provider", () => {
@@ -175,11 +165,10 @@ describe("curateOpenRouterModels", () => {
       }),
     ]);
 
-    expect(
-      groups.map((entry) => {
-        return entry.group;
-      }),
-    ).toEqual(["Open models · Meta", "Proprietary · OpenAI"]);
+    expect(groups.map(prop("group"))).toEqual([
+      "Open models · Meta",
+      "Proprietary · OpenAI",
+    ]);
     expect(groups[0]?.models[0]?.licenseTier).toBe("open");
     expect(groups[1]?.models[0]?.licenseTier).toBe("proprietary");
   });

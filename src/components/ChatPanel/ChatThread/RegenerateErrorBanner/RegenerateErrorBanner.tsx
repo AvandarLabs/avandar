@@ -1,4 +1,4 @@
-import { useThreadRuntime } from "@assistant-ui/react";
+import { useAui } from "@assistant-ui/react";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -18,7 +18,7 @@ import css from "./RegenerateErrorBanner.module.css";
 export function RegenerateErrorBanner(): JSX.Element | null {
   const { lastQueryError, rawSQL } = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
-  const threadRuntime = useThreadRuntime();
+  const aui = useAui();
 
   if (!lastQueryError || !rawSQL) {
     return null;
@@ -51,7 +51,7 @@ export function RegenerateErrorBanner(): JSX.Element | null {
             // click. If the regenerated SQL also fails, useDataQuery will set
             // it again and the banner returns with the new error.
             dispatch.setLastQueryError(undefined);
-            threadRuntime.append({
+            aui.thread().append({
               role: "user",
               content: [
                 {

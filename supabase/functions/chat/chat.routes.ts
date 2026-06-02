@@ -4,17 +4,17 @@ import {
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import {
-  buildSQLSystemPrompt,
-  cleanGeneratedSQL,
-} from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
+  buildSqlSystemPrompt,
+  cleanGeneratedSql,
+} from "@sbfn/chat/utils/buildSqlSystemPrompt.ts";
+import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
-import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
 import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
+import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
-import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -191,7 +191,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
 
         const sqlSystemPrompt =
           isDataExplorer ?
-            buildSQLSystemPrompt({
+            buildSqlSystemPrompt({
               prompt: lastUserPrompt,
               datasets: schema.datasets,
               columns: schema.columns,
@@ -289,7 +289,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             );
             if (typeof args.sql === "string" && args.sql.trim()) {
               generatedSql = {
-                sql: cleanGeneratedSQL(args.sql),
+                sql: cleanGeneratedSql(args.sql),
                 prompt: lastUserPrompt,
               };
             }

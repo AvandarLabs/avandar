@@ -9,24 +9,24 @@ import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager
 /**
  * Toggle icon to control the navbar
  */
-export function NavbarDesktopToggle(): JSX.Element {
-  const [{ isDesktopNavbarCollapsed }, dispatch] =
+export function NavbarSidebarToggle(): JSX.Element {
+  const [{ isNavbarSidebarCollapsed }, dispatch] =
     AppShellStateManager.useContext();
 
   return (
     <Tooltip
-      label={isDesktopNavbarCollapsed ? "Open sidebar" : "Close sidebar"}
+      label={isNavbarSidebarCollapsed ? "Open sidebar" : "Close sidebar"}
     >
       <ActionIcon
         variant="subtle"
         size="md"
         color="neutral"
-        onClick={dispatch.toggleDesktopNavbar}
+        onClick={dispatch.toggleNavbarSidebar}
         aria-label="Close sidebar"
         // only visible in sizes larger than mobile
         visibleFrom="sm"
       >
-        {isDesktopNavbarCollapsed ?
+        {isNavbarSidebarCollapsed ?
           <IconLayoutSidebarLeftExpand size={18} />
         : <IconLayoutSidebarLeftCollapse size={18} />}
       </ActionIcon>

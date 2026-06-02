@@ -1,4 +1,4 @@
-import { assertIsDefined, objectKeys } from "@utils";
+import { assertIsDefined, objectKeys, objectValuesMap } from "@utils";
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 type GenericActionRegistry<State> = Record<
@@ -11,7 +11,7 @@ type GenericActionRegistry<State> = Record<
 type ActionFunctionRecord<ActionRegistry extends GenericActionRegistry<any>> = {
   [ActionType in keyof ActionRegistry]: Parameters<
     ActionRegistry[ActionType]
-  >["length"] extends 1 ?
+  >["length"] extends 0 | 1 ?
     () => void
   : (payload: Parameters<ActionRegistry[ActionType]>[1]) => void;
 };
@@ -64,7 +64,25 @@ type AppStateManager<
    */
   Provider: React.FC<{
     children: React.ReactNode;
+    /**
+     * Shallow-merged onto the manager's `initialState` when this Provider
+     * mounts. Only used when the manager was created with `initialState`
+     * (not `initArg` / `initFn`). Keys from this object win over the manager's
+     * `initialState`.
+     *
+     * This is a useful way to dynamically override the initial state based on
+     * other values that were not available when the state manager was created.
+     */
     initialStateOverrides?: State;
+    /**
+     * Shallow-merged onto the manager's `initArg` before `initFn` runs when
+     * this Provider mounts. Only used when the manager was created with
+     * `initArg` and `initFn` (not `initialState`). Later keys from this
+     * object win over the manager's `initArg`.
+     *
+     * This is a useful way to dynamically override the initArg based on other
+     * values that were not available when the state manager was created.
+     */
     initArgOverrides?: InitArg;
   }>;
 };
@@ -115,6 +133,16 @@ type ActionPayload<ActionRegistry extends GenericActionRegistry<any>> =
  *
  * @param name - The name of the app state manager.
  * @param initialState - The initial state of the app state manager.
+ * @param defaultState - The default state returned if `Manager.useState()` is
+ *   called outside of a `<Provider>` tree. If `defaultState` is `undefined`
+ *   then `Manager.useState()` will throw an error if called outside of a
+ *   <Provider> tree.
+ *   **NOTE**: Regardless of the value of `defaultState`, all actions in the
+ *   dispatch will throw errors if called outside of a <Provider> tree.
+ * @param initArg - The initial argument passed to the `initFn`. If
+ *   `initialState` is provided then this will be ignored.
+ * @param initFn - The function used to initialize the state, using` initArg`
+ *   as its argument. If `initialState` is present then `initFn` is ignored.
  * @param actions - The actions of the app state manager.
  * @returns The app state manager.
  */
@@ -124,6 +152,7 @@ export function createAppStateManager<
 >(options: {
   name: string;
   initialState: State;
+  defaultState?: State | undefined;
   actions: ActionRegistry;
 }): AppStateManager<undefined, State, ActionRegistry>;
 export function createAppStateManager<
@@ -134,6 +163,7 @@ export function createAppStateManager<
   name: string;
   initArg: InitArg;
   initFn: (initArg: InitArg) => State;
+  defaultState?: State | undefined;
   actions: ActionRegistry;
 }): AppStateManager<InitArg, State, ActionRegistry>;
 export function createAppStateManager<
@@ -143,19 +173,31 @@ export function createAppStateManager<
 >({
   name,
   initialState,
+  defaultState,
   initArg,
   initFn,
   actions,
 }: {
   name: string;
   initialState?: State;
+  defaultState?: State | undefined;
   initArg?: InitArg;
   initFn?: (initArg: InitArg) => State;
   actions: ActionRegistry;
 }): AppStateManager<InitArg, State, ActionRegistry> {
+  // create the default action registry filled with error-throwing functions.
+  // this will be used if the manager is used outside of a <Provider> tree.
+  const defaultActions = objectValuesMap(actions, (_handler, actionKey) => {
+    return () => {
+      throw new Error(
+        `Dispatch cannot be called for action "${String(actionKey)}" outside of a <${name}.Provider>`,
+      );
+    };
+  }) as ActionFunctionRecord<ActionRegistry>;
+
   const AppStateContext = createContext<
     AppStateContextTuple<State, ActionRegistry> | undefined
-  >(undefined);
+  >(defaultState !== undefined ? [defaultState, defaultActions] : undefined);
 
   const reducer = (
     state: State,
@@ -186,21 +228,21 @@ export function createAppStateManager<
     },
 
     useState: () => {
-      const [state] = useContext(AppStateContext) ?? [];
+      const context = useContext(AppStateContext);
       assertIsDefined(
-        state,
+        context,
         `${name}.useState() must be called within a <${name}.Provider>`,
       );
-      return state;
+      return context[0];
     },
 
     useDispatch: () => {
-      const [, dispatch] = useContext(AppStateContext) ?? [];
+      const context = useContext(AppStateContext);
       assertIsDefined(
-        dispatch,
+        context,
         `${name}.useDispatch() must be called within a <${name}.Provider>`,
       );
-      return dispatch;
+      return context[1];
     },
 
     Provider: ({ children, initialStateOverrides, initArgOverrides }) => {

@@ -1,14 +1,11 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { describe, expect, it } from "vitest";
-import {
-  isDefaultExplorerState,
-  parseURLSearch,
-  serializeStateToURL,
-} from "@/views/DataExplorerApp/DataExplorerURLState";
+import { buildDataExplorerStateFromUrl } from "@/views/DataExplorerApp/buildDataExplorerStateFromUrl/buildDataExplorerStateFromUrl";
+import { serializeDataExplorerStateToUrl } from "@/views/DataExplorerApp/serializeDataExplorerStateToUrl/serializeDataExplorerStateToUrl";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
@@ -69,112 +66,17 @@ const DS_ID = "2d527857-010e-498f-99af-a7a7c70cef5a";
 const MOCK_DS = { id: DS_ID } as QueryDataSource;
 
 // ---------------------------------------------------------------------------
-// parseURLSearch
-// ---------------------------------------------------------------------------
-
-describe("parseURLSearch", () => {
-  it("returns an empty object for an empty search", () => {
-    expect(parseURLSearch({})).toEqual({});
-  });
-
-  it("parses ds into dsId", () => {
-    const result = parseURLSearch({ ds: DS_ID });
-    expect(result.dsId).toBe(DS_ID);
-  });
-
-  it("parses cols into an array of column names", () => {
-    const result = parseURLSearch({ cols: "month,total_cases" });
-    expect(result.colNames).toEqual(["month", "total_cases"]);
-  });
-
-  it("filters empty strings out of cols", () => {
-    const result = parseURLSearch({ cols: "" });
-    expect(result.colNames).toBeUndefined();
-  });
-
-  it("parses agg into an aggregations record", () => {
-    const result = parseURLSearch({ agg: "total_cases:sum,month:group_by" });
-    expect(result.aggregations).toEqual({
-      total_cases: "sum",
-      month: "group_by",
-    });
-  });
-
-  it("ignores agg pairs with no colon", () => {
-    const result = parseURLSearch({ agg: "nocolon" });
-    expect(result.aggregations).toBeUndefined();
-  });
-
-  it("ignores agg pairs with an unrecognised aggregation type", () => {
-    const result = parseURLSearch({ agg: "col:not_a_real_agg" });
-    expect(result.aggregations).toBeUndefined();
-  });
-
-  it("parses orderBy and orderDir", () => {
-    const result = parseURLSearch({ orderBy: "month", orderDir: "asc" });
-    expect(result.orderByColName).toBe("month");
-    expect(result.orderDir).toBe("asc");
-  });
-
-  it("parses sql into rawSQL", () => {
-    const result = parseURLSearch({ sql: "SELECT 1" });
-    expect(result.rawSQL).toBe("SELECT 1");
-  });
-
-  it("parses ds, cols, and sql together (legacy combined URLs)", () => {
-    const result = parseURLSearch({
-      ds: DS_ID,
-      cols: "month,total_cases",
-      sql: "SELECT 1",
-    });
-    expect(result.dsId).toBe(DS_ID);
-    expect(result.colNames).toEqual(["month", "total_cases"]);
-    expect(result.rawSQL).toBe("SELECT 1");
-  });
-
-  it("parses a valid vc JSON string into vizConfig", () => {
-    const vc = JSON.stringify({ vizType: "bar", xAxisKey: "month" });
-    const result = parseURLSearch({ vc });
-    expect(result.vizConfig).toMatchObject({ vizType: "bar" });
-  });
-
-  it("silently ignores a malformed vc JSON string", () => {
-    const result = parseURLSearch({ vc: "not-valid-json{{" });
-    expect(result.vizConfig).toBeUndefined();
-  });
-
-  it("parses a valid od JSON string into openDataset", () => {
-    const od = JSON.stringify({
-      did: "did-1",
-      name: "My Dataset",
-      vid: "vid-1",
-    });
-    const result = parseURLSearch({ od });
-    expect(result.openDataset).toEqual({
-      datasetId: "did-1",
-      name: "My Dataset",
-      virtualDatasetId: "vid-1",
-    });
-  });
-
-  it("silently ignores a malformed od JSON string", () => {
-    const result = parseURLSearch({ od: "{bad-json" });
-    expect(result.openDataset).toBeUndefined();
-  });
-});
-
-// ---------------------------------------------------------------------------
 // serializeStateToURL
 // ---------------------------------------------------------------------------
 
 describe("serializeStateToURL", () => {
   it("produces an empty param object for the initial empty state", () => {
-    const result = serializeStateToURL(_makeState({}));
+    const result = serializeDataExplorerStateToUrl(_makeState({}));
     expect(result).toEqual({});
   });
 
   it("serializes the data source id into ds", () => {
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({
         query: _makeQueryWithColumns(MOCK_DS, []),
       }),
@@ -185,7 +87,7 @@ describe("serializeStateToURL", () => {
   it("serializes column names as a comma-separated cols string", () => {
     const col1 = _mockQueryColumn("q1", "b1", "month");
     const col2 = _mockQueryColumn("q2", "b2", "total_cases");
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({
         query: _makeQueryWithColumns(MOCK_DS, [col1, col2]),
       }),
@@ -194,7 +96,7 @@ describe("serializeStateToURL", () => {
   });
 
   it("omits cols when no columns are selected", () => {
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({ query: _makeQueryWithColumns(MOCK_DS, []) }),
     );
     expect(result.cols).toBeUndefined();
@@ -206,7 +108,7 @@ describe("serializeStateToURL", () => {
       ..._makeQueryWithColumns(MOCK_DS, [col]),
       aggregations: { ["q1" as QueryColumnId]: "none" as const },
     } as unknown as PartialStructuredQuery;
-    const result = serializeStateToURL(_makeState({ query }));
+    const result = serializeDataExplorerStateToUrl(_makeState({ query }));
     expect(result.agg).toBeUndefined();
   });
 
@@ -216,12 +118,12 @@ describe("serializeStateToURL", () => {
       ..._makeQueryWithColumns(MOCK_DS, [col]),
       aggregations: { ["q1" as QueryColumnId]: "sum" as const },
     } as unknown as PartialStructuredQuery;
-    const result = serializeStateToURL(_makeState({ query }));
+    const result = serializeDataExplorerStateToUrl(_makeState({ query }));
     expect(result.agg).toBe("total_cases:sum");
   });
 
   it("serializes rawSQL into the sql param", () => {
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({ rawSQL: "SELECT * FROM t" }),
     );
     expect(result.sql).toBe("SELECT * FROM t");
@@ -235,7 +137,7 @@ describe("serializeStateToURL", () => {
       withLegend: false,
       curveType: "monotone",
     };
-    const result = serializeStateToURL(_makeState({ vizConfig }));
+    const result = serializeDataExplorerStateToUrl(_makeState({ vizConfig }));
     expect(result.vc).toBeDefined();
     expect(JSON.parse(result.vc!)).toMatchObject({
       vizType: "line",
@@ -244,7 +146,7 @@ describe("serializeStateToURL", () => {
   });
 
   it("omits vc when vizType is the default table", () => {
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({ vizConfig: { vizType: "table" } }),
     );
     expect(result.vc).toBeUndefined();
@@ -258,7 +160,7 @@ describe("serializeStateToURL", () => {
       orderByColumn: "q1" as QueryColumnId,
       orderByDirection: "desc" as const,
     } as unknown as PartialStructuredQuery;
-    const result = serializeStateToURL(
+    const result = serializeDataExplorerStateToUrl(
       _makeState({ query, rawSQL: "SELECT 1" }),
     );
     expect(result.sql).toBe("SELECT 1");
@@ -275,7 +177,7 @@ describe("serializeStateToURL", () => {
       name: "My Dataset",
       virtualDatasetId: "vid-1" as VirtualDatasetId,
     };
-    const result = serializeStateToURL(_makeState({ openDataset }));
+    const result = serializeDataExplorerStateToUrl(_makeState({ openDataset }));
     expect(result.od).toBeDefined();
     const parsed = JSON.parse(result.od!);
     expect(parsed).toEqual({ did: "did-1", name: "My Dataset", vid: "vid-1" });
@@ -283,42 +185,7 @@ describe("serializeStateToURL", () => {
 });
 
 // ---------------------------------------------------------------------------
-// isDefaultExplorerState
-// ---------------------------------------------------------------------------
-
-describe("isDefaultExplorerState", () => {
-  it("returns true for the initial blank state", () => {
-    expect(isDefaultExplorerState(_makeState({}))).toBe(true);
-  });
-
-  it("returns false when a data source is set", () => {
-    expect(
-      isDefaultExplorerState(
-        _makeState({ query: _makeQueryWithColumns(MOCK_DS, []) }),
-      ),
-    ).toBe(false);
-  });
-
-  it("returns false when queryColumns are non-empty", () => {
-    const col = _mockQueryColumn("q1", "b1", "month");
-    expect(
-      isDefaultExplorerState(
-        _makeState({
-          query: _makeQueryWithColumns(MOCK_DS, [col]),
-        }),
-      ),
-    ).toBe(false);
-  });
-
-  it("returns false when rawSQL is set", () => {
-    expect(isDefaultExplorerState(_makeState({ rawSQL: "SELECT 1" }))).toBe(
-      false,
-    );
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Round-trip: serializeStateToURL → parseURLSearch
+// Round-trip: serializeStateToURL → buildDataExplorerStateFromUrl
 // ---------------------------------------------------------------------------
 
 describe("round-trip: serialize then parse", () => {
@@ -329,7 +196,9 @@ describe("round-trip: serialize then parse", () => {
       query: _makeQueryWithColumns(MOCK_DS, [col1, col2]),
     });
 
-    const parsed = parseURLSearch(serializeStateToURL(state));
+    const parsed = buildDataExplorerStateFromUrl(
+      serializeDataExplorerStateToUrl(state),
+    );
 
     expect(parsed.dsId).toBe(DS_ID);
     expect(parsed.colNames).toEqual(["month", "total_cases"]);
@@ -337,10 +206,10 @@ describe("round-trip: serialize then parse", () => {
 
   it("preserves rawSQL through a serialize/parse cycle", () => {
     const sql = "SELECT month, total_cases FROM t";
-    const parsed = parseURLSearch(
-      serializeStateToURL(_makeState({ rawSQL: sql })),
+    const parsed = buildDataExplorerStateFromUrl(
+      serializeDataExplorerStateToUrl(_makeState({ rawSQL: sql })),
     );
-    expect(parsed.rawSQL).toBe(sql);
+    expect(parsed.rawSql).toBe(sql);
   });
 
   it("does not put structured keys in URL when rawSQL is set", () => {
@@ -349,8 +218,10 @@ describe("round-trip: serialize then parse", () => {
       query: _makeQueryWithColumns(MOCK_DS, [col1]),
       rawSQL: 'SELECT * FROM "dummy"',
     });
-    const parsed = parseURLSearch(serializeStateToURL(state));
-    expect(parsed.rawSQL).toBe('SELECT * FROM "dummy"');
+    const parsed = buildDataExplorerStateFromUrl(
+      serializeDataExplorerStateToUrl(state),
+    );
+    expect(parsed.rawSql).toBe('SELECT * FROM "dummy"');
     expect(parsed.dsId).toBeUndefined();
     expect(parsed.colNames).toBeUndefined();
   });
@@ -362,8 +233,8 @@ describe("round-trip: serialize then parse", () => {
       yAxisKey: "total_cases",
       withLegend: true,
     };
-    const parsed = parseURLSearch(
-      serializeStateToURL(_makeState({ vizConfig })),
+    const parsed = buildDataExplorerStateFromUrl(
+      serializeDataExplorerStateToUrl(_makeState({ vizConfig })),
     );
     expect(parsed.vizConfig?.vizType).toBe("bar");
   });

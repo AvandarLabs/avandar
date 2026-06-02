@@ -1,7 +1,6 @@
 import { useLocalRuntime } from "@assistant-ui/react";
-import { isNotNull, prop } from "@utils";
+import { isDefined, isNotNull, matchLiteral, prop } from "@utils";
 import { useMemo } from "react";
-import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -33,9 +32,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const pageContext = useChatPageContext();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
 
-  const adapter = useMemo<ChatModelAdapter>(() => {
+  const adapter: ChatModelAdapter = useMemo(() => {
     return {
-      async run({ messages, context }): Promise<ChatModelRunResult> {
+      run: async ({ messages, context }): Promise<ChatModelRunResult> => {
         const model = context.config?.modelName;
         const apiMessages: ChatClientMessage.T[] = messages
           .map((chatMsg) => {
@@ -43,17 +42,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             if (!content) {
               return null;
             }
-            return match(chatMsg.role)
-              .with("system", () => {
-                return { role: "system" as const, content };
-              })
-              .with("assistant", () => {
-                return { role: "assistant" as const, content };
-              })
-              .with("user", () => {
-                return { role: "user" as const, content };
-              })
-              .exhaustive();
+            return matchLiteral(chatMsg.role, {
+              system: { role: "system", content },
+              assistant: { role: "assistant", content },
+              user: { role: "user", content },
+            } as const);
           })
           .filter((message): message is ChatClientMessage.T => {
             return isNotNull(message);
@@ -65,29 +58,35 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           body: {
             messages: apiMessages,
             context: pageContext,
-            ...(model ? { model } : {}),
+            model: model ?? undefined,
           },
         });
 
+        // if we have received SQL from the backend, we will dispatch this to
+        // the data explorer so it can run the query locally
         if (response.generatedSql) {
           dataExplorerDispatch.setRawSql(response.generatedSql.sql);
           dataExplorerDispatch.setNlPrompt(response.generatedSql.prompt);
         }
 
-        const assistantParts: Array<{ type: "text"; text: string }> = [
-          { type: "text", text: response.assistantText },
-        ];
-        if (response.generatedSql) {
-          assistantParts.push({
-            type: "text",
-            text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
-          });
-        }
+        const assistantParts = [
+          { type: "text" as const, text: response.assistantText },
+          response.generatedSql ?
+            {
+              type: "text" as const,
+
+              // render sql as markdown code block
+              text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
+            }
+          : undefined,
+        ].filter(isDefined);
 
         return { content: assistantParts };
       },
     };
   }, [workspace.id, pageContext, dataExplorerDispatch]);
 
+  // `useLocalRuntime` builds an Assistant UI runtime that keeps thread state
+  // in the browser and routes each turn through the adapter's `run` function.
   return useLocalRuntime(adapter);
 }

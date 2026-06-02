@@ -1,4 +1,3 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -21,6 +20,7 @@ export type DataExplorerAppState = {
    * If raw SQL was generated, we should use that for our query instead of
    * the structured query.
    */
+  // TODO(jpsyx): for consistency, rename this to `rawSql`
   rawSQL: string | undefined;
 
   /**
@@ -42,15 +42,4 @@ export type DataExplorerAppState = {
    * the auto-applied SQL turned out to be invalid.
    */
   lastQueryError: string | undefined;
-};
-
-export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
-  query: StructuredQuery.makeEmpty(),
-  vizConfig: {
-    vizType: "table",
-  },
-  rawSQL: undefined,
-  nlPrompt: undefined,
-  openDataset: undefined,
-  lastQueryError: undefined,
 };

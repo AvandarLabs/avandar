@@ -1,6 +1,6 @@
 import { useRouterState } from "@tanstack/react-router";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 /**
  * Returns the chat's view of the current page. Used both to drive the empty
@@ -18,18 +18,17 @@ export function useChatPageContext(): ChatPageContext.T {
     DataExplorerStateManager.useState();
 
   if (pathname.includes("/data-explorer")) {
-    return {
-      app: "data-explorer",
-      ...(openDataset ? { openDatasetId: openDataset.datasetId } : {}),
-      ...(rawSQL ? { lastSql: rawSQL } : {}),
-      ...(lastQueryError ? { lastError: lastQueryError } : {}),
-    };
+    return ChatPageContext.createDataExplorerViewContext({
+      openDatasetId: openDataset?.datasetId,
+      lastSql: rawSQL,
+      lastError: lastQueryError,
+    });
   }
   if (pathname.includes("/data-import") || pathname.includes("/data-sources")) {
-    return { app: "data-sources" };
+    return ChatPageContext.createDataSourcesViewContext();
   }
   if (pathname.includes("/dashboards")) {
-    return { app: "dashboards" };
+    return ChatPageContext.createDashboardsViewContext();
   }
-  return { app: "other" };
+  return ChatPageContext.createOtherViewContext();
 }

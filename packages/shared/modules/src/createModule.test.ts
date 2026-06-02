@@ -2,8 +2,8 @@ import { createModule } from "@modules/createModule.ts";
 import { withNewMembers } from "@modules/mixins/withNewMembers/withNewMembers.ts";
 import { describe, expect, it } from "vitest";
 
-describe("createModule mixin cumulativeness", () => {
-  it("preserves members from the object mixin is invoked on (wide receiver)", () => {
+describe("createModule: applying mixins adds to a module without losing existing members or state", () => {
+  it("keeps all existing members, including ones added after the module was created, when a mixin is applied", () => {
     const base = createModule("WideReceiver", {
       builder: () => {
         return {
@@ -37,7 +37,7 @@ describe("createModule mixin cumulativeness", () => {
     expect(mixed.fromMixin()).toBe("mixin");
   });
 
-  it("passes the full receiver into the mixin callback", () => {
+  it("gives the mixin callback the complete current module, including members added after creation", () => {
     const base = createModule("MixinArg", {
       builder: () => {
         return {
@@ -76,7 +76,7 @@ describe("createModule mixin cumulativeness", () => {
     expect(mixed.gamma()).toBe(3);
   });
 
-  it("chains mixins without dropping prior mixin members", () => {
+  it("applying several mixins in a row keeps the members added by every earlier mixin", () => {
     const base = createModule("Chain", {
       builder: () => {
         return {
@@ -108,7 +108,7 @@ describe("createModule mixin cumulativeness", () => {
     expect(second.c()).toBe("c");
   });
 
-  it("merges mixin state with prior module state", () => {
+  it("merges a mixin's state into the module's existing state", () => {
     const base = createModule("Stateful", {
       state: { count: 1 },
       builder: () => {

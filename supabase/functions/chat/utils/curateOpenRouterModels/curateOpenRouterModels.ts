@@ -1,4 +1,3 @@
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
@@ -99,10 +98,7 @@ function _classifyLicenseTier(
   const isOpen = AppConfig.chat.openModelClasses.some((classToken) => {
     return modelMatchesClass(model, classToken);
   });
-  if (isOpen) {
-    return "open";
-  }
-  return undefined;
+  return isOpen ? "open" : undefined;
 }
 
 /**
@@ -156,6 +152,38 @@ function _toChatModelOption(
   };
 }
 
+/**
+ * Given a list of OpenRouter models, returns the latest model for each
+ * deduplicated key. The dedupe key is computed by `buildModelDedupeKey`,
+ * which is the model's canonical_slug lowercased, with any date suffixes
+ * removed. Variants with different dates collapse to the same dedupe key,
+ * but separate size tiers (like 'mini', 'turbo') remain distinct.
+ *
+ * @example
+ * [
+ *   { id: 'provider1/model-1-20231201',
+ *     canonical_slug: 'model-1-20231201',
+ *     created: 100 },
+ *   { id: 'provider1/model-1-20240220',
+ *     canonical_slug: 'model-1-20240220',
+ *     created: 200 },
+ *   { id: 'provider1/model-2-mini',
+ *     canonical_slug: 'model-2-mini',
+ *     created: 130 }
+ * ]
+ *
+ * // The two 'model-1' entries collapse to one dedupe key, so only the later
+ * // (larger 'created' value) remains. The result would be:
+ *
+ * [
+ *   { id: 'provider1/model-1-20240220',
+ *     canonical_slug: 'model-1-20240220',
+ *     created: 200 },
+ *   { id: 'provider1/model-2-mini',
+ *     canonical_slug: 'model-2-mini',
+ *     created: 130 }
+ * ]
+ */
 function _pickLatestPerDedupeKey(
   models: OpenRouterModelInput[],
 ): OpenRouterModelInput[] {
@@ -224,11 +252,4 @@ export function curateOpenRouterModels(
       }
       return left.group.localeCompare(right.group);
     });
-}
-
-/** Flattens grouped picker models for lookups and storage resolution. */
-export function flattenChatModelGroups(
-  groups: readonly ChatModelOption.OptionGroup[],
-): ChatModelOption.T[] {
-  return groups.flatMap(prop("models"));
 }

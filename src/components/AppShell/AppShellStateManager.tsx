@@ -1,21 +1,21 @@
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 type AppShellState = {
-  isDesktopNavbarCollapsed: boolean;
+  isNavbarSidebarCollapsed: boolean;
 };
 
 const initialState: AppShellState = {
-  isDesktopNavbarCollapsed: false,
+  isNavbarSidebarCollapsed: false,
 };
 
 export const AppShellStateManager = createAppStateManager({
   name: "AppShell",
   initialState,
   actions: {
-    toggleDesktopNavbar: (state: AppShellState) => {
+    toggleNavbarSidebar: (state: AppShellState) => {
       return {
         ...state,
-        isDesktopNavbarCollapsed: !state.isDesktopNavbarCollapsed,
+        isNavbarSidebarCollapsed: !state.isNavbarSidebarCollapsed,
       };
     },
   },

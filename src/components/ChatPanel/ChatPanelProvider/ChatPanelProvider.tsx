@@ -3,10 +3,10 @@ import {
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { ChatPanelAvailableContext } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import type { ReactNode } from "react";
 
-function _readInitialOpen(): boolean {
+function _readInitialChatPanelOpenState(): boolean {
+  // wrap in try-catch in case localStorage is not available
   try {
     const raw = window.localStorage.getItem(CHAT_PANEL_LOCAL_STORAGE_KEY);
     return raw === "true";
@@ -27,11 +27,12 @@ type Props = {
 export function ChatPanelProvider({ children }: Props): JSX.Element {
   return (
     <ChatPanelStateManager.Provider
-      initialStateOverrides={{ isOpen: _readInitialOpen() }}
+      initialStateOverrides={{
+        isOpen: _readInitialChatPanelOpenState(),
+        isAvailable: true,
+      }}
     >
-      <ChatPanelAvailableContext.Provider value={true}>
-        <ChatPanelContents>{children}</ChatPanelContents>
-      </ChatPanelAvailableContext.Provider>
+      <ChatPanelContents>{children}</ChatPanelContents>
     </ChatPanelStateManager.Provider>
   );
 }

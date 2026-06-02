@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
   ChatApp as ChatAppT,
   ChatPageContextId,
   ChatPageContextModel,
 } from "$/models/chat/ChatPageContext/ChatPageContext.types.ts";
+
+export { ChatPageContextModule as ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContextModule.ts";
 
 export namespace ChatPageContext {
   export type T<K extends keyof ChatPageContextModel = "Read"> =

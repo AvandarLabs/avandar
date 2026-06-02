@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import css from "./GeneratedPromptBadge.module.css";
+import css from "./GeneratedPromptBanner.module.css";
 
 /**
  * Thin attribution bar that sits between the Data Explorer toolbar and the
@@ -18,7 +18,7 @@ import css from "./GeneratedPromptBadge.module.css";
  * "Show SQL" popover so the user always sees the link between what they
  * asked and what is on the canvas. Renders nothing when no prompt is set.
  */
-export function GeneratedPromptBadge(): JSX.Element | null {
+export function GeneratedPromptBanner(): JSX.Element | null {
   const { nlPrompt, rawSQL } = DataExplorerStateManager.useState();
 
   if (!nlPrompt) {
