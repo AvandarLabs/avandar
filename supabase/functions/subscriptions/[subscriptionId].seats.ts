@@ -40,12 +40,17 @@ export const UpdateSubscriptionSeats = PATCH({
       .single()
       .throwOnError();
 
+    const polarSubscriptionId = subscription.polar_subscription_id;
+    if (!polarSubscriptionId) {
+      throw new Error("Subscription is missing Polar subscription id.");
+    }
+
     // compute the new total from the DB value (single source of truth)
     const newTotalSeats = subscription.max_seats_allowed + seatsToAdd;
 
     // send the update request to Polar
     const updatedSubscription = await PolarClient.updateSubscriptionSeats({
-      subscriptionId: subscription.polar_subscription_id,
+      subscriptionId: polarSubscriptionId,
       newTotalSeats,
     });
 

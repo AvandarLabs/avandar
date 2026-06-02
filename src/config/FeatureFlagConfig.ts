@@ -54,15 +54,6 @@ export enum FeatureFlag {
    * This requires a Featurebase account and organization setup.
    */
   EnableUserFeedback = "enable-user-feedback",
-
-  /**
-   * Enable the "Shared with me" nav item and page.
-   *
-   * When this is on, workspace members can open the shared-with-me route and
-   * follow "See all shared items" links from share-only resource banners.
-   * Disabled by default until the feature is ready for general use.
-   */
-  EnableSharedWithMe = "enable-shared-with-me",
 }
 
 export const FeatureFlagConfig = {
@@ -74,7 +65,6 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableGeoExplorer]: undefined,
   [FeatureFlag.DisableProfileManager]: undefined,
   [FeatureFlag.EnableUserFeedback]: undefined,
-  [FeatureFlag.EnableSharedWithMe]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

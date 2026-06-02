@@ -77,7 +77,8 @@ function AppShellComponent({
   const { isNavbarSidebarCollapsed: isDesktopNavbarCollapsed } =
     AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
-  const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
+  const { isOpen: isChatPanelOpen, isAvailable: isChatPanelAvailable } =
+    ChatPanelStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
@@ -175,7 +176,9 @@ function AppShellComponent({
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
-          <ChatPanel />
+          {isChatPanelAvailable ?
+            <ChatPanel />
+          : null}
         </MantineAppShell.Aside>
       </MantineAppShell>
 

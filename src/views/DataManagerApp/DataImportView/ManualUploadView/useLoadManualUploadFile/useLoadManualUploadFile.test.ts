@@ -178,6 +178,64 @@ describe("useLoadManualUploadFile", () => {
     expect(notifySuccessMock).toHaveBeenCalled();
   });
 
+  it("keeps user csv parse options after load instead of sniff overrides", async () => {
+    useGetPreviewDataMock.mockReturnValue([[]]);
+    storeLocalCSVMock.mockResolvedValue({
+      id: uuid(),
+      type: "csv",
+      csvName: "cities.csv",
+      numRows: 99,
+      columns: [_columnSchema("city", "VARCHAR")],
+      numRejectedRows: 0,
+      errors: {
+        rejectedRows: [],
+        rejectedScans: [],
+      },
+      csvSniff: {
+        Delimiter: "|",
+        Quote: '"',
+        Escape: '"',
+        NewLineDelimiter: "\n",
+        Comment: "",
+        SkipRows: 0,
+        HasHeader: true,
+        Columns: [{ name: "city", type: "VARCHAR" }],
+        DateFormat: null,
+        TimestampFormat: null,
+        UserArguments: "",
+        Prompt: "",
+        table_name: "dataset_csv",
+      },
+      tableName: "dataset_csv",
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useLoadManualUploadFile();
+      },
+      { wrapper: _wrapper },
+    );
+    const file = new File(["city\nLA"], "cities.csv", {
+      type: "text/csv",
+    });
+
+    await act(async () => {
+      await result.current.loadFile.async({
+        type: "csv_file",
+        file,
+        datasetId: "dataset_csv" as Dataset.Id,
+        numRowsToSkip: 1,
+        delimiter: ",",
+      });
+    });
+
+    expect(result.current.dataSourceMetadata?.parseOptions).toEqual({
+      type: "csv_file",
+      numRowsToSkip: 1,
+      delimiter: ",",
+    });
+  });
+
   it("loads xlsx files and includes available sheet names", async () => {
     const previewRows: UnknownObject[] = [{ city: "LA" }];
     useGetPreviewDataMock.mockReturnValue([previewRows]);

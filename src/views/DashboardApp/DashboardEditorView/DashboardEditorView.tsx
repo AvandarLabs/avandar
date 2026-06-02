@@ -1,13 +1,12 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { Alert, Flex, Text } from "@mantine/core";
-import { Link, notifyDevAlert, notifySuccess } from "@ui";
+import { notifyDevAlert, notifySuccess } from "@ui";
 import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
@@ -135,17 +134,6 @@ export function DashboardEditorView({
           <Alert color="blue" variant="light" title="Shared with you" m="sm">
             <Text size="sm">
               You can view this dashboard because it was shared with you.
-              {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
-                <>
-                  {" "}
-                  <Link
-                    to="/$workspaceSlug/shared-with-me"
-                    params={{ workspaceSlug }}
-                  >
-                    See all shared items
-                  </Link>
-                </>
-              : null}
             </Text>
           </Alert>
         : null}

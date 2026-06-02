@@ -1424,15 +1424,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      rpc__list_shared_with_me: {
-        Args: { p_workspace_id: string }
-        Returns: {
-          effective_role: Database["public"]["Enums"]["role_level"]
-          name: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-        }[]
-      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1560,66 +1551,36 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rpc_datasets__add_virtual_dataset:
-        | {
-            Args: {
-              p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
-              p_dataset_description: string
-              p_dataset_id: string
-              p_dataset_name: string
-              p_raw_sql: string
-              p_workspace_id: string
-            }
-            Returns: {
-              created_at: string
-              date_of_last_sync: string | null
-              description: string | null
-              id: string
-              is_restricted: boolean
-              name: string
-              owner_id: string
-              owner_profile_id: string
-              source_type: Database["public"]["Enums"]["datasets__source_type"]
-              updated_at: string
-              workspace_id: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "datasets"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
-              p_dataset_description: string
-              p_dataset_id: string
-              p_dataset_name: string
-              p_plan_steps?: Json
-              p_raw_sql: string
-              p_workspace_id: string
-            }
-            Returns: {
-              created_at: string
-              date_of_last_sync: string | null
-              description: string | null
-              id: string
-              is_restricted: boolean
-              name: string
-              owner_id: string
-              owner_profile_id: string
-              source_type: Database["public"]["Enums"]["datasets__source_type"]
-              updated_at: string
-              workspace_id: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "datasets"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      rpc_datasets__add_virtual_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_plan_steps?: Json
+          p_raw_sql: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_datasets__add_xlsx_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]

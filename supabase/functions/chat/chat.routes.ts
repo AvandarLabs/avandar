@@ -1,3 +1,4 @@
+import { Model } from "@models/Model/Model.ts";
 import {
   defineRoutes,
   GET,
@@ -305,10 +306,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             "Here is the SQL I ran. Results are on the canvas to the left."
           : "I could not generate a query for that. Try rephrasing.");
 
-        const result: ChatResponse.T = {
+        const result = Model.make("ChatResponse", {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
-        };
+        });
         return result;
       }),
   },

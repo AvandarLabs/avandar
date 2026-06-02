@@ -173,9 +173,14 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           return { success: false };
         }
 
+        const customerId = subscriptions[0]!.polar_customer_id;
+        if (!customerId) {
+          return { success: false };
+        }
+
         // They have one, so we can create a customer session for them
         const customerSession = await PolarClient.createCustomerSessions({
-          customerId: subscriptions[0]!.polar_customer_id,
+          customerId,
           returnURL: queryParams.returnURL,
         });
         return {

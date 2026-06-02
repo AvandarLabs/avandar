@@ -21,8 +21,16 @@ export type ChatAPI = APITypeDef<
           workspaceId: string;
         };
         body: {
-          messages: ChatClientMessage.T[];
-          context: ChatPageContext.T;
+          messages: Array<{
+            role: ChatClientMessage.ChatMessageRole;
+            content: string;
+          }>;
+          context: {
+            app: ChatPageContext.ChatApp;
+            openDatasetId?: string;
+            lastSql?: string;
+            lastError?: string;
+          };
           model: string | undefined;
         };
         returnType: ChatResponse.T;

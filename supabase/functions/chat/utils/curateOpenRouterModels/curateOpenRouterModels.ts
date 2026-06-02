@@ -1,3 +1,4 @@
+import { Model } from "@models/Model/Model.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
@@ -141,7 +142,7 @@ function _toChatModelOption(
   model: OpenRouterModelInput,
   licenseTier: ChatModelOption.LicenseTier,
 ): ChatModelOption.T {
-  return {
+  return Model.make("ChatModelOption", {
     id: model.id,
     name: model.name,
     nameWithoutProvider: model.name.split(":").slice(1).join(" "),
@@ -149,7 +150,7 @@ function _toChatModelOption(
     supportsTools: _supportsTools(model),
     licenseTier,
     provider: _getProviderSlug(model),
-  };
+  });
 }
 
 /**

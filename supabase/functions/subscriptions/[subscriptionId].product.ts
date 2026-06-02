@@ -42,9 +42,14 @@ export const UpdateSubscriptionProduct = PATCH({
       .single()
       .throwOnError();
 
+    const polarSubscriptionId = subscription.polar_subscription_id;
+    if (!polarSubscriptionId) {
+      throw new Error("Subscription is missing Polar subscription id.");
+    }
+
     // send the update request to Polar
     const updatedSubscription = await PolarClient.updateSubscriptionProduct({
-      subscriptionId: subscription.polar_subscription_id,
+      subscriptionId: polarSubscriptionId,
       newProductId: newPolarProductId,
     });
 

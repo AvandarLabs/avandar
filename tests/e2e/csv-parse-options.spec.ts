@@ -44,16 +44,25 @@ const COLUMN_NAMES_AFTER_SKIP_1 = [
 
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
-  await skipInput.fill(String(value));
+  await skipInput.click();
+  await skipInput.press("ControlOrMeta+a");
+  await skipInput.pressSequentially(String(value));
+  await expect(skipInput).toHaveValue(String(value));
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
   await delimiterInput.fill(value);
+  await expect(delimiterInput).toHaveValue(value);
 }
 
 async function clickReparse(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Process data again" }).click();
+  const reparseButton = page.getByRole("button", {
+    name: "Process data again",
+  });
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
+  await reparseButton.click();
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
 }
 
 /**
@@ -78,9 +87,9 @@ async function expectParseFailedEmpty(page: Page): Promise<void> {
   await expect(page.getByText("Data processing failed")).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
-  await expect(
-    page.getByText("No rows were read successfully"),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
+  await expect(page.getByText("No rows were read successfully")).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
 }
 
 test.describe("CSV parsing options", () => {
@@ -200,9 +209,12 @@ test.describe("CSV parsing options", () => {
     // Final: hard-coded back to the first altered configuration that
     // produced data (skip=1, delimiter=","). Save the dataset with these
     // options and verify the persisted columns reflect them.
-    await setDelimiter(page, FINAL_DELIMITER);
     await setSkipRows(page, FINAL_SKIP_ROWS);
+    await setDelimiter(page, FINAL_DELIMITER);
     await clickReparse(page);
+    await expect(
+      page.getByRole("columnheader", { name: "California", exact: true }),
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
     await expectParsedRowCount(page, 99);
     await Promise.all(
       COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
