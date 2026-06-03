@@ -8,6 +8,7 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { mantineColorVar } from "@/lib/utils/browser/css";
 import css from "./ChatPanel.module.css";
 
 /**
@@ -35,7 +36,7 @@ export function ChatPanel(): JSX.Element {
       >
         <Group px="md" py="sm" justify="space-between" className={css.header}>
           <Group gap="xs">
-            <IconSparkles size={16} color="var(--mantine-color-primary-6)" />
+            <IconSparkles size={16} color={mantineColorVar("primary.6")} />
             <Text size="sm" fw={600} c="neutral.9">
               <Trans>Ask Avandar</Trans>
             </Text>

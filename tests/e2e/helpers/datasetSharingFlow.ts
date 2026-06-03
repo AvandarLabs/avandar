@@ -1,12 +1,12 @@
 import { expect } from "@playwright/test";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./constants";
-import {
-  addShareV2,
-  closeShareModalV2,
-  openShareModalV2,
-  setGeneralAccessV2,
-} from "./datasetSharingFlowV2";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
+import {
+  addShare,
+  closeShareModal,
+  openShareModal,
+  setGeneralAccess,
+} from "./shareModalFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -62,9 +62,9 @@ export async function uploadCaliforniaCsvDataset(options: {
 export async function restrictDatasetWithNoWorkspaceAccess(
   page: Page,
 ): Promise<void> {
-  await openShareModalV2(page);
-  await setGeneralAccessV2(page, "Restricted");
-  await closeShareModalV2(page);
+  await openShareModal(page);
+  await setGeneralAccess(page, "Restricted");
+  await closeShareModal(page);
 }
 
 /**
@@ -139,16 +139,16 @@ export async function expectDatasetMetaPageAccessible(
 
 /**
  * Opens share modal, adds a direct principal share, and closes the modal.
- * Composite helper: delegates to the v2 helpers for the actual modal driving.
+ * Composite helper: open modal, add principal, close.
  */
 export async function shareDatasetWithPrincipal(options: {
   page: Page;
   principalLabel: string;
   role?: RoleLevel;
 }): Promise<void> {
-  await openShareModalV2(options.page);
-  await addShareV2(options);
-  await closeShareModalV2(options.page);
+  await openShareModal(options.page);
+  await addShare(options);
+  await closeShareModal(options.page);
 }
 
 /** Display name seeded for the secondary E2E viewer membership. */

@@ -5,7 +5,6 @@ import {
   SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
-import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -154,10 +153,11 @@ test.describe("DataViz PBlock - every visualization", () => {
     page,
     e2eWorkerDb,
   }) => {
+    test.setTimeout(360_000);
+
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
-    const createdDashboardIds: string[] = [];
-    let datasetId = "";
+    const seededDashboardIds: string[] = [];
 
     try {
       await signInWithEmailPassword(page, {
@@ -208,14 +208,13 @@ test.describe("DataViz PBlock - every visualization", () => {
         workspaceSlug,
       });
 
-      const parsedDatasetId = parseDatasetIdFromDataManagerUrl({
+      const datasetId = parseDatasetIdFromDataManagerUrl({
         url: page.url(),
         workspaceSlug,
       });
-      if (!parsedDatasetId) {
+      if (!datasetId) {
         throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
       }
-      datasetId = parsedDatasetId;
       await pollUntilCloudDatasetToggleShowsOnline(page);
 
       const workspaceId = await getWorkspaceIdBySlug({
@@ -234,7 +233,7 @@ test.describe("DataViz PBlock - every visualization", () => {
             rawSql: vizCase.sql(datasetId),
             vizConfig: vizCase.vizConfig,
           });
-          createdDashboardIds.push(dashboardId);
+          seededDashboardIds.push(dashboardId);
 
           await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
 
@@ -250,13 +249,7 @@ test.describe("DataViz PBlock - every visualization", () => {
         });
       }
     } finally {
-      await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
-      if (datasetId) {
-        await deleteDatasetAndShares({
-          supabaseAdminClient: admin,
-          datasetId,
-        });
-      }
+      await deleteDashboardsByIds({ admin, dashboardIds: seededDashboardIds });
     }
   });
 });

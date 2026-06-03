@@ -14,6 +14,11 @@ import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudCh
 import { useIsVoicePromptAvailable } from "@/lib/voice/useIsVoicePromptAvailable";
 import css from "./Composer.module.css";
 
+/**
+ * The message input at the bottom of the thread: a text input, the model
+ * picker, and the send button. Input and actions are disabled outside the Data
+ * Explorer app, where chat actions are not yet available.
+ */
 export function Composer(): JSX.Element {
   const { isOpen } = ChatPanelStateManager.useState();
   const panelRef = useRef<HTMLDivElement>(null);

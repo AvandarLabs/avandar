@@ -91,7 +91,7 @@ function _buildDataSourceMetadataFromLoadResult({
 }): ManualUploadDataSourceMetadata {
   return match(loadResult)
     .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
-      const csvRequest =
+      const csvParseRequest =
         loadAndParseOptions?.type === "csv_file" ?
           loadAndParseOptions
         : undefined;
@@ -103,8 +103,9 @@ function _buildDataSourceMetadataFromLoadResult({
         parseOptions: {
           type: "csv_file",
           numRowsToSkip:
-            csvRequest?.numRowsToSkip ?? csvLoadResult.csvSniff.SkipRows,
-          delimiter: csvRequest?.delimiter ?? csvLoadResult.csvSniff.Delimiter,
+            csvParseRequest?.numRowsToSkip ?? csvLoadResult.csvSniff.SkipRows,
+          delimiter:
+            csvParseRequest?.delimiter ?? csvLoadResult.csvSniff.Delimiter,
         },
       };
     })

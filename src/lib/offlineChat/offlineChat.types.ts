@@ -1,9 +1,7 @@
 import type { LocalChatModelId } from "./localChatModelCatalog";
-import type {
-  ChatClarifyRequest,
-  ChatGeneratedSql,
-  ChatPageContext,
-} from "$/types/chat.types";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { ChatGeneratedSql } from "$/models/chat/ChatResponse/ChatResponse.types";
+import type { ChatClarifyRequest } from "$/types/chat.types";
 
 /** Compact schema slice sent to offline prompts. */
 export type OfflineChatSchemaDataset = {
@@ -52,7 +50,7 @@ export type OfflineAnalyzeResult = {
 export type OfflineChatPipelineArgs = {
   engine: OfflineChatEngine;
   schema: OfflineChatSchema;
-  pageContext: ChatPageContext;
+  pageContext: ChatPageContext.T;
   messages: readonly OfflineChatMessage[];
   lastUserPrompt: string;
   lastSql?: string;

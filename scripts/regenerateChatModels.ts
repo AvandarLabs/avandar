@@ -3,7 +3,6 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { hasCachedChatModels } from "$/utils/chat/chatModelsCache";
 import dotenv from "dotenv";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { AuthClient } from "@/clients/AuthClient";
@@ -54,10 +53,16 @@ async function _fetchLiveChatModels(): Promise<ChatModelsResponse> {
   return (await response.json()) as ChatModelsResponse;
 }
 
+function _hasCachedChatModels(response: ChatModelsResponse): boolean {
+  return response.groups.some((group) => {
+    return group.models.length > 0;
+  });
+}
+
 async function _writeChatModelsCache(
   response: ChatModelsResponse,
 ): Promise<void> {
-  if (!hasCachedChatModels(response)) {
+  if (!_hasCachedChatModels(response)) {
     throw new Error(
       "Refusing to overwrite chat models cache with an empty list",
     );

@@ -8,12 +8,13 @@ import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
 import type { LocalChatModelId } from "./localChatModelCatalog";
 import type { OfflineChatTurnResult } from "./offlineChat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatClientMessage, ChatPageContext } from "$/types/chat.types";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 export type RunOfflineChatTurnArgs = {
   workspace: Workspace.T;
-  pageContext: ChatPageContext;
-  messages: readonly ChatClientMessage[];
+  pageContext: ChatPageContext.T;
+  messages: readonly ChatClientMessage.T[];
   navigatorOnLine: boolean;
   localChatModelId?: LocalChatModelId;
   executeSql?: (

@@ -1,10 +1,11 @@
+import { Model } from "@models";
 import { formatModelSelectDescription } from "@/lib/localModels/formatModelPickerCopy";
 import {
   findLocalChatModel,
   isLocalChatModelId,
 } from "./localChatModelCatalog";
 import type { LocalChatModelId } from "./localChatModelCatalog";
-import type { ChatModelOption, ChatModelOptionGroup } from "$/types/chat.types";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 /** Prefix for offline model ids in the shared chat model picker. */
 export const OFFLINE_CHAT_PICKER_ID_PREFIX = "offline:" as const;
@@ -43,11 +44,11 @@ function localChatModelDisplayNameForPicker(displayName: string): string {
 /** Maps downloaded local models to chat picker options. */
 export function buildOfflineChatPickerOptions(
   downloadedIds: readonly LocalChatModelId[],
-): ChatModelOption[] {
+): ChatModelOption.T[] {
   return downloadedIds.map((localModelId) => {
     const model = findLocalChatModel(localModelId);
     const name = localChatModelDisplayNameForPicker(model.displayName);
-    return {
+    return Model.make("ChatModelOption", {
       id: buildOfflineChatPickerModelId(localModelId),
       name,
       nameWithoutProvider: name,
@@ -59,14 +60,14 @@ export function buildOfflineChatPickerOptions(
       supportsTools: false,
       licenseTier: "open",
       provider: "offline",
-    };
+    });
   });
 }
 
 /** Offline models group for the chat picker (empty when none downloaded). */
 export function buildOfflineChatPickerGroup(
   downloadedIds: readonly LocalChatModelId[],
-): ChatModelOptionGroup | null {
+): ChatModelOption.OptionGroup | null {
   const models = buildOfflineChatPickerOptions(downloadedIds);
   if (models.length === 0) {
     return null;

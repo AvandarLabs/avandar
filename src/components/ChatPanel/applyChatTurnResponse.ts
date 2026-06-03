@@ -1,15 +1,15 @@
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
 import type { ChatModelRunResult } from "@assistant-ui/react";
-import type { ChatResponse } from "$/types/chat.types";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 
 export type ApplyChatTurnResponseArgs = {
-  response: ChatResponse;
+  response: ChatResponse.T;
   sqlApplied: boolean;
   handlers: {
     queueDashboardBlock: (
-      block: NonNullable<ChatResponse["dashboardBlock"]>,
+      block: NonNullable<ChatResponse.T["dashboardBlock"]>,
     ) => void;
-    loadPlan: (plan: NonNullable<ChatResponse["plan"]>) => void;
+    loadPlan: (plan: NonNullable<ChatResponse.T["plan"]>) => void;
     setPendingClarification: (
       clarification: ChatClarifyRequestWithAudit | undefined,
     ) => void;

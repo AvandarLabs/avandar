@@ -9,9 +9,9 @@ test.describe("Dashboards — create via UI", () => {
     page,
     e2eWorkerDb,
   }) => {
-    const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const admin = createSupabaseAdminClient();
-    let createdDashboardId = "";
+    const { workspaceSlug, primaryUser } = e2eWorkerDb;
+    const createdDashboardIds: string[] = [];
 
     try {
       await signInWithEmailPassword(page, {
@@ -32,17 +32,15 @@ test.describe("Dashboards — create via UI", () => {
         { timeout: LONG_WAIT },
       );
 
-      const dashboardIdMatch = page
+      const dashboardEditUrlMatch = page
         .url()
-        .match(new RegExp(`/${workspaceSlug}/dashboards/edit/([^/?]+)`));
-      createdDashboardId = dashboardIdMatch?.[1] ?? "";
-    } finally {
-      if (createdDashboardId) {
-        await deleteDashboardsByIds({
-          admin,
-          dashboardIds: [createdDashboardId],
-        });
+        .match(/dashboards\/edit\/([0-9a-f-]{36})/i);
+      const dashboardId = dashboardEditUrlMatch?.[1];
+      if (dashboardId) {
+        createdDashboardIds.push(dashboardId);
       }
+    } finally {
+      await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }
   });
 });

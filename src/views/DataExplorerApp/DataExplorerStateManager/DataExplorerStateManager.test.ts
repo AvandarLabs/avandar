@@ -14,8 +14,8 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { describe, expect, it } from "vitest";
-import { INITIAL_DATA_EXPLORER_STATE } from "./dataExplorerAppState";
-import type { DataExplorerAppState } from "./dataExplorerAppState";
+import { INITIAL_DATA_EXPLORER_STATE } from "./DataExplorerAppState.types";
+import type { DataExplorerAppState } from "./DataExplorerAppState.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 

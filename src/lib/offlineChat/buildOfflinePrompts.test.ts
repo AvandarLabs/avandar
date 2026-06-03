@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,
@@ -22,10 +23,9 @@ describe("buildOfflineSqlPrompt", () => {
   it("requires resolved dataset FROM and SQL-only output", () => {
     const prompt = buildOfflineSqlPrompt({
       schema: SCHEMA,
-      pageContext: {
-        app: "data-explorer",
+      pageContext: ChatPageContext.createDataExplorerViewContext({
         openDatasetId: DEATHS_TABLE_ID,
-      },
+      }),
       analysisSummary: "Filter rows",
       lastUserPrompt: "covid deaths top 100",
       resolvedDataset: {
@@ -63,7 +63,7 @@ describe("buildOfflineAnalyzePrompt", () => {
   it("includes optional tableName in JSON shape", () => {
     const prompt = buildOfflineAnalyzePrompt({
       schema: SCHEMA,
-      pageContext: { app: "data-explorer" },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
       lastUserPrompt: "deaths",
     });
 

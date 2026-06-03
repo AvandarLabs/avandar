@@ -1,4 +1,4 @@
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type DashboardEditorPendingBlock = {

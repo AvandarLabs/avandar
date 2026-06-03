@@ -1,8 +1,7 @@
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { Expect, IsEqual } from "@utils";
+import { uuid } from "$/lib/uuid";
 import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -15,18 +14,33 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
 
-const { startCsvImportMock, startXlsxImportMock } = vi.hoisted(() => {
+const {
+  storeLocalCSVMock,
+  storeLocalExcelMock,
+  useGetPreviewDataMock,
+  notifySuccessMock,
+} = vi.hoisted(() => {
   return {
-    startCsvImportMock: vi.fn(),
-    startXlsxImportMock: vi.fn(),
+    storeLocalCSVMock: vi.fn(),
+    storeLocalExcelMock: vi.fn(),
+    useGetPreviewDataMock: vi.fn(),
+    notifySuccessMock: vi.fn(),
   };
 });
 
 vi.mock("@/clients/datasets/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
-      startCsvImport: startCsvImportMock,
-      startXlsxImport: startXlsxImportMock,
+      storeLocalCSV: storeLocalCSVMock,
+      storeLocalExcel: storeLocalExcelMock,
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/DatasetQueryClient", () => {
+  return {
+    DatasetQueryClient: {
+      useGetPreviewData: useGetPreviewDataMock,
     },
   };
 });
@@ -47,10 +61,16 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-vi.mock("@utils", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@utils")>();
+vi.mock("@ui", () => {
   return {
-    ...actual,
+    notifySuccess: notifySuccessMock,
+    notifyError: vi.fn(),
+    notifyWarning: vi.fn(),
+  };
+});
+
+vi.mock("@utils", () => {
+  return {
     formatNumber: (value: number) => {
       return String(value);
     },
@@ -89,20 +109,24 @@ function _wrapper({ children }: { children: ReactNode }) {
       },
     },
   });
-  return createElement(
-    I18nProvider,
-    { i18n },
-    createElement(QueryClientProvider, { client: queryClient }, children),
-  );
+  return createElement(QueryClientProvider, { client: queryClient }, children);
 }
 
 describe("useLoadManualUploadFile", () => {
   it("loads csv files and stores returned metadata", async () => {
     const previewRows: UnknownObject[] = [{ city: "LA" }];
-    const columns = [_columnSchema("city", "VARCHAR")];
-    startCsvImportMock.mockResolvedValue({
-      columns,
-      previewRows,
+    useGetPreviewDataMock.mockReturnValue([previewRows]);
+    storeLocalCSVMock.mockResolvedValue({
+      id: uuid(),
+      type: "csv",
+      csvName: "cities.csv",
+      numRows: 10,
+      columns: [_columnSchema("city", "VARCHAR")],
+      numRejectedRows: 0,
+      errors: {
+        rejectedRows: [],
+        rejectedScans: [],
+      },
       csvSniff: {
         Delimiter: ",",
         Quote: '"',
@@ -118,6 +142,7 @@ describe("useLoadManualUploadFile", () => {
         Prompt: "",
         table_name: "dataset_csv",
       },
+      tableName: "dataset_csv",
     });
 
     const { result } = renderHook(
@@ -141,29 +166,87 @@ describe("useLoadManualUploadFile", () => {
     });
 
     await waitFor(() => {
-      expect(startCsvImportMock).toHaveBeenCalledWith(
+      expect(storeLocalCSVMock).toHaveBeenCalledWith(
         expect.objectContaining({
           datasetId: "dataset_csv",
-          parseOptions: expect.objectContaining({
-            numRowsToSkip: 1,
-            delimiter: ",",
-          }),
         }),
       );
     });
     expect(
       result.current.dataSourceMetadata?.datasetLoadResult?.datasetId,
     ).toBe("dataset_csv");
-    expect(result.current.previewRows).toEqual(previewRows);
+    expect(notifySuccessMock).toHaveBeenCalled();
+  });
+
+  it("keeps user csv parse options after load instead of sniff overrides", async () => {
+    useGetPreviewDataMock.mockReturnValue([[]]);
+    storeLocalCSVMock.mockResolvedValue({
+      id: uuid(),
+      type: "csv",
+      csvName: "cities.csv",
+      numRows: 99,
+      columns: [_columnSchema("city", "VARCHAR")],
+      numRejectedRows: 0,
+      errors: {
+        rejectedRows: [],
+        rejectedScans: [],
+      },
+      csvSniff: {
+        Delimiter: "|",
+        Quote: '"',
+        Escape: '"',
+        NewLineDelimiter: "\n",
+        Comment: "",
+        SkipRows: 0,
+        HasHeader: true,
+        Columns: [{ name: "city", type: "VARCHAR" }],
+        DateFormat: null,
+        TimestampFormat: null,
+        UserArguments: "",
+        Prompt: "",
+        table_name: "dataset_csv",
+      },
+      tableName: "dataset_csv",
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useLoadManualUploadFile();
+      },
+      { wrapper: _wrapper },
+    );
+    const file = new File(["city\nLA"], "cities.csv", {
+      type: "text/csv",
+    });
+
+    await act(async () => {
+      await result.current.loadFile.async({
+        type: "csv_file",
+        file,
+        datasetId: "dataset_csv" as Dataset.Id,
+        numRowsToSkip: 1,
+        delimiter: ",",
+      });
+    });
+
+    expect(result.current.dataSourceMetadata?.parseOptions).toEqual({
+      type: "csv_file",
+      numRowsToSkip: 1,
+      delimiter: ",",
+    });
   });
 
   it("loads xlsx files and includes available sheet names", async () => {
     const previewRows: UnknownObject[] = [{ city: "LA" }];
-    startXlsxImportMock.mockResolvedValue({
-      sheets: ["Sheet1", "Sheet2"],
-      defaultSheet: "Sheet2",
-      columns: ["city"],
-      previewRows,
+    useGetPreviewDataMock.mockReturnValue([previewRows]);
+    storeLocalExcelMock.mockResolvedValue({
+      id: uuid(),
+      type: "xlsx",
+      xlsxName: "cities.xlsx",
+      tableName: "dataset_xlsx",
+      numRows: 3,
+      columns: [_columnSchema("city", "VARCHAR")],
+      sheet: "Sheet2",
     });
 
     const { result } = renderHook(
@@ -190,11 +273,12 @@ describe("useLoadManualUploadFile", () => {
     });
 
     await waitFor(() => {
-      expect(startXlsxImportMock).toHaveBeenCalledWith(
+      expect(storeLocalExcelMock).toHaveBeenCalledWith(
         expect.objectContaining({
           datasetId: "dataset_xlsx",
-          parseOptions: expect.objectContaining({
+          xlsxParseOptions: expect.objectContaining({
             sheet: "Sheet2",
+            hasHeader: undefined,
           }),
         }),
       );

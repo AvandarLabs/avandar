@@ -14,7 +14,7 @@ create table public.datasets__csv_file (
   -- When a dataset is deleted from the Supabase storage (or has not yet
   -- finished uploading), we set this to false.
   is_in_cloud_storage boolean not null default false,
-  -- Size of the CSV in bytes (bigint: files can exceed 2 GiB)
+  -- Size of the CSV in bytes (we use bigint because files can exceed 2 GiB)
   size_in_bytes bigint not null,
   -- Number of rows to skip at the start of the file
   rows_to_skip integer not null default 0,

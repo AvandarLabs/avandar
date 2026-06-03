@@ -1,4 +1,4 @@
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 type EntityConfigCreatorState = {
   entityConfigName: string;

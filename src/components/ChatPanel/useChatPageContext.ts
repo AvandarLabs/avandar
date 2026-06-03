@@ -1,8 +1,8 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { ChatPageContext } from "$/types/chat.types";
 
 /**
  * Returns the chat's view of the current page. Used both to drive the empty
@@ -18,7 +18,7 @@ import type { ChatPageContext } from "$/types/chat.types";
  * assistant returning correct SQL" — traces back to this object
  * instability.
  */
-export function useChatPageContext(): ChatPageContext {
+export function useChatPageContext(): ChatPageContext.T {
   const pathname = useRouterState({
     select: (s) => {
       return s.location.pathname;
@@ -29,34 +29,31 @@ export function useChatPageContext(): ChatPageContext {
   const { activeDashboardId } = DashboardEditorStateManager.useState();
   const openDatasetId = openDataset?.datasetId;
 
-  return useMemo<ChatPageContext>(() => {
+  return useMemo<ChatPageContext.T>(() => {
     if (pathname.includes("/data-explorer")) {
-      const resultColumns = lastResultColumns?.map((c) => {
-        return { name: c.name, dataType: c.dataType };
+      const resultColumns: ChatPageContext.ResultColumn[] | undefined =
+        lastResultColumns?.map((c) => {
+          return { name: c.name, dataType: c.dataType };
+        });
+      return ChatPageContext.createDataExplorerViewContext({
+        openDatasetId,
+        lastSql: rawSQL,
+        lastResultColumns: resultColumns,
+        lastError: lastQueryError,
       });
-      return {
-        app: "data-explorer",
-        ...(openDatasetId ? { openDatasetId } : {}),
-        ...(rawSQL ? { lastSql: rawSQL } : {}),
-        ...(resultColumns && resultColumns.length > 0 ?
-          { lastResultColumns: resultColumns }
-        : {}),
-        ...(lastQueryError ? { lastError: lastQueryError } : {}),
-      };
     }
     if (
       pathname.includes("/data-import") ||
       pathname.includes("/data-sources")
     ) {
-      return { app: "data-sources" };
+      return ChatPageContext.createDataSourcesViewContext();
     }
     if (pathname.includes("/dashboards")) {
-      return {
-        app: "dashboards",
-        ...(activeDashboardId ? { dashboardId: activeDashboardId } : {}),
-      };
+      return ChatPageContext.createDashboardsViewContext({
+        dashboardId: activeDashboardId,
+      });
     }
-    return { app: "other" };
+    return ChatPageContext.createOtherViewContext();
   }, [
     pathname,
     openDatasetId,

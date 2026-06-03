@@ -1,4 +1,4 @@
-import { useThreadRuntime } from "@assistant-ui/react";
+import { useAui } from "@assistant-ui/react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
@@ -19,7 +19,7 @@ import css from "./RegenerateErrorBanner.module.css";
 export function RegenerateErrorBanner(): JSX.Element | null {
   const { lastQueryError, rawSQL } = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
-  const threadRuntime = useThreadRuntime();
+  const aui = useAui();
   const { t } = useLingui();
 
   if (!lastQueryError || !rawSQL) {
@@ -53,7 +53,7 @@ export function RegenerateErrorBanner(): JSX.Element | null {
             // click. If the regenerated SQL also fails, useDataQuery will set
             // it again and the banner returns with the new error.
             dispatch.setLastQueryError(undefined);
-            threadRuntime.append({
+            aui.thread().append({
               role: "user",
               content: [
                 {

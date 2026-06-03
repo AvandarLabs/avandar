@@ -26,6 +26,7 @@ import type { Page } from "@playwright/test";
  * column names like "California" / "Alameda" / "37.64629437".
  */
 const FINAL_SKIP_ROWS = 1;
+const FINAL_DELIMITER = ",";
 
 /**
  * Column names that should appear after parsing
@@ -54,17 +55,17 @@ async function uploadSmallCaliforniaCsv(page: Page): Promise<void> {
 
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
-  await skipInput.click({ clickCount: 3 });
+  await skipInput.click();
+  await skipInput.press("ControlOrMeta+a");
   await skipInput.fill(String(value));
-  await skipInput.press("Tab");
   await expect(skipInput).toHaveValue(String(value));
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
-  await delimiterInput.click({ clickCount: 3 });
+  await delimiterInput.click();
+  await delimiterInput.selectText();
   await delimiterInput.fill(value);
-  await delimiterInput.press("Tab");
   await expect(delimiterInput).toHaveValue(value);
 }
 
@@ -72,6 +73,7 @@ async function clickReparse(page: Page): Promise<void> {
   const reparseButton = page.getByRole("button", {
     name: "Process data again",
   });
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
   await reparseButton.click();
   await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
 }
@@ -117,8 +119,9 @@ test.describe("CSV parsing options", () => {
       workspaceSlug,
     });
 
-    await page.goto(`/${workspaceSlug}/data-manager/data-import`, {
-      waitUntil: "domcontentloaded",
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await expect(page.getByText("No datasets added yet")).toBeVisible({
+      timeout: MEDIUM_WAIT,
     });
 
     await uploadSmallCaliforniaCsv(page);
@@ -211,11 +214,20 @@ test.describe("CSV parsing options", () => {
       }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Final: re-upload so delimiter resets to sniffed "," after the wrong-
-    // delimiter variations, then apply skip=1 and save.
-    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-    await uploadSmallCaliforniaCsv(page);
+    // Final: restore sniffed comma delimiter, then apply skip=1 (same sequence
+    // as the mid-test recovery + variation 1, which avoids cross-focus resets).
+    await setSkipRows(page, 0);
+    await setDelimiter(page, FINAL_DELIMITER);
+    await clickReparse(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
+
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
     await expectParsedRowCount(

@@ -11,6 +11,9 @@ export function cssVar(name: string): string {
   return `var(--${name})`;
 }
 
+type ColorVarError =
+  "ERROR: This is not a valid Mantine color variable. Try using a dot separator instead of a dash.";
+
 /**
  * Returns a string that references a Mantine color variable.
  *
@@ -23,7 +26,9 @@ export function cssVar(name: string): string {
  * @param {string} color - The theme color to reference.
  * @returns {string} The Mantine color var string that references the color.
  */
-export function mantineColorVar(color: `${string}.${number}` | string): string {
+export function mantineColorVar<const T extends string>(
+  color: T extends `${string}-${number}` ? ColorVarError : T,
+): string {
   if (color.includes(".")) {
     const [colorName, shade] = color.split(".");
     return `var(--mantine-color-${colorName}-${shade})`;

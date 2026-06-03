@@ -5,6 +5,12 @@ import { IconRefresh } from "@tabler/icons-react";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
 import css from "../ChatThread.module.css";
 
+/**
+ * Renders a single assistant turn in the thread: the message row and its
+ * bubble. Selected by `ThreadPrimitive.Messages` for messages with the
+ * `assistant` role. Shows a typing loader while the turn has no content yet,
+ * then delegates content rendering to `MessagePrimitive.Parts`.
+ */
 export function AssistantMessage(): JSX.Element {
   const { t } = useLingui();
   return (

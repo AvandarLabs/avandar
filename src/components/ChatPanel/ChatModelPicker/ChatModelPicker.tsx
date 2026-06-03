@@ -1,20 +1,15 @@
+import { useAui } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
-import {
-  readStoredChatModelId,
-  resolveChatModelId,
-  writeStoredChatModelId,
-} from "@/components/ChatPanel/chatModelStorage/chatModelStorage";
+import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
-import { useRegisterChatModelContext } from "@/components/ChatPanel/useRegisterChatModelContext";
 import { writeStoredLocalChatModelId } from "@/lib/offlineChat/localChatModelStore";
 import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
 import css from "./ChatModelPicker.module.css";
-import type { ChatModelOption } from "$/types/chat.types";
 
 type Props = {
   disabled?: boolean;
@@ -32,11 +27,12 @@ export function ChatModelPicker({
     useChatModelCatalog();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>(
     () => {
-      return readStoredChatModelId();
+      return ChatModelStorage.readStoredChatModelId();
     },
   );
   const [search, setSearch] = useState("");
   const { t } = useLingui();
+  const assistantClient = useAui();
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -53,12 +49,12 @@ export function ChatModelPicker({
     if (models.length === 0) {
       return selectedModelId;
     }
-    const storedModelId = selectedModelId;
     const storedMissingFromCatalog =
-      storedModelId !== undefined && !models.some(propEq("id", storedModelId));
-    return resolveChatModelId({
+      selectedModelId !== undefined &&
+      !models.some(propEq("id", selectedModelId));
+    return ChatModelStorage.resolveChatModelId({
       availableModels: models,
-      storedModelId,
+      selectedModelId,
       honorStoredWhenMissing: isLoading && storedMissingFromCatalog,
     });
   }, [models, selectedModelId, isLoading]);
@@ -73,32 +69,48 @@ export function ChatModelPicker({
     }
   }, [resolvedModelId]);
 
-  const selectedModel = useMemo((): ChatModelOption | undefined => {
-    if (!resolvedModelId) {
-      return undefined;
-    }
-    return models.find(propEq("id", resolvedModelId));
-  }, [models, resolvedModelId]);
+  useEffect(
+    function writeResolvedModelIdToStorage() {
+      if (!resolvedModelId) {
+        return;
+      }
+      const storedModelId = ChatModelStorage.readStoredChatModelId();
+      if (
+        isLoading &&
+        storedModelId &&
+        !models.some(propEq("id", storedModelId))
+      ) {
+        return;
+      }
+      if (storedModelId === resolvedModelId) {
+        return;
+      }
+      ChatModelStorage.writeStoredChatModelId(resolvedModelId);
+    },
+    [resolvedModelId, models, isLoading],
+  );
 
-  useEffect(() => {
-    if (!resolvedModelId) {
-      return;
-    }
-    const storedModelId = readStoredChatModelId();
-    if (
-      isLoading &&
-      storedModelId &&
-      !models.some(propEq("id", storedModelId))
-    ) {
-      return;
-    }
-    if (storedModelId === resolvedModelId) {
-      return;
-    }
-    writeStoredChatModelId(resolvedModelId);
-  }, [resolvedModelId, models, isLoading]);
+  // Register the resolved model id with assistant-ui's ModelContext so the
+  // chat adapter can read `context.config.modelName` on each run.
+  useEffect(
+    function registerResolvedModelIdWithAssistantUi() {
+      if (resolvedModelId) {
+        assistantClient.modelContext().register({
+          getModelContext: () => {
+            return {
+              config: {
+                modelName: resolvedModelId,
+              },
+            };
+          },
+        });
+      }
+    },
+    [assistantClient, resolvedModelId],
+  );
 
-  useRegisterChatModelContext(resolvedModelId);
+  const selectedModel =
+    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
 
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();

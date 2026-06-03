@@ -1,8 +1,8 @@
 import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
-import { isNotNull, prop } from "@utils";
+import { Model } from "@models";
+import { isNotNull, matchLiteral, prop } from "@utils";
 import { useMemo, useRef } from "react";
-import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -36,10 +36,10 @@ import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSq
 import type { LocalChatModelId } from "@/lib/offlineChat/localChatModelCatalog";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { User } from "$/models/User/User";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type {
   ChatClarifyRequest,
-  ChatClientMessage,
-  ChatResponse,
   ChatRetryContext,
   ConsentAck,
 } from "$/types/chat.types";
@@ -58,7 +58,7 @@ const CLARIFICATION_ANSWER_RE = /^\[Clarification answer:/;
  * runtime adapter never sees structured metadata that would change
  * without the content also changing.
  */
-function chatMessagesKey(messages: readonly ChatClientMessage[]): string {
+function chatMessagesKey(messages: readonly ChatClientMessage.T[]): string {
   return messages
     .map((m) => {
       return `${m.role}\u0001${m.content}`;
@@ -72,7 +72,7 @@ function chatMessagesKey(messages: readonly ChatClientMessage[]): string {
  * previous turn produced nothing worth telling the model about.
  */
 function buildRetryContext(
-  response: ChatResponse,
+  response: ChatResponse.T,
 ): ChatRetryContext | undefined {
   const ctx: ChatRetryContext = {};
   if (response.assistantText && response.assistantText.trim().length > 0) {
@@ -108,7 +108,7 @@ function extractText(parts: ReadonlyArray<{ type: string }>): string {
 /**
  * The Assistant UI runtime for the Avandar chat panel.
  *
- * On every user turn it serializes the thread into our `ChatClientMessage`
+ * On every user turn it serializes the thread into our `ChatClientMessage.T`
  * shape, posts to the `chat/:workspaceId/messages` edge function along with
  * the current page context, and renders the assistant reply. If the model
  * called `generateSql`, the SQL and prompt are pushed into
@@ -160,32 +160,26 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   // request so the backend can nudge the model to a different output.
   const lastTurnRef = useRef<{
     messagesKey: string;
-    response: ChatResponse;
+    response: ChatResponse.T;
   } | null>(null);
 
-  const adapter = useMemo<ChatModelAdapter>(() => {
+  const adapter: ChatModelAdapter = useMemo(() => {
     return {
-      async run({ messages, context }): Promise<ChatModelRunResult> {
+      run: async ({ messages, context }): Promise<ChatModelRunResult> => {
         const model = context.config?.modelName;
-        const apiMessages: ChatClientMessage[] = messages
+        const apiMessages: ChatClientMessage.T[] = messages
           .map((chatMsg) => {
             const content = extractText(chatMsg.content);
             if (!content) {
               return null;
             }
-            return match(chatMsg.role)
-              .with("system", () => {
-                return { role: "system" as const, content };
-              })
-              .with("assistant", () => {
-                return { role: "assistant" as const, content };
-              })
-              .with("user", () => {
-                return { role: "user" as const, content };
-              })
-              .exhaustive();
+            return matchLiteral(chatMsg.role, {
+              system: { role: "system", content },
+              assistant: { role: "assistant", content },
+              user: { role: "user", content },
+            } as const);
           })
-          .filter((message): message is ChatClientMessage => {
+          .filter((message): message is ChatClientMessage.T => {
             return isNotNull(message);
           });
 
@@ -309,7 +303,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         };
 
         const applyResponse = async (
-          response: ChatResponse,
+          response: ChatResponse.T,
         ): Promise<ChatModelRunResult> => {
           let sqlApplied = false;
           if (response.generatedSql) {
@@ -410,11 +404,17 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 tryExecuteOfflineSql
               : undefined,
           });
-          return applyResponse({
-            assistantText: offlineResult.assistantText,
-            generatedSql: offlineResult.generatedSql,
-            clarification: offlineResult.clarification,
-          });
+          return applyResponse(
+            Model.make("ChatResponse", {
+              assistantText: offlineResult.assistantText,
+              ...(offlineResult.generatedSql ?
+                { generatedSql: offlineResult.generatedSql }
+              : {}),
+              ...(offlineResult.clarification ?
+                { clarification: offlineResult.clarification }
+              : {}),
+            }),
+          );
         };
 
         const mode = resolveOfflineChatMode({
@@ -492,12 +492,14 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     planDispatch,
   ]);
 
+  // `useLocalRuntime` builds an Assistant UI runtime that keeps thread state
+  // in the browser and routes each turn through the adapter's `run` function.
   return useLocalRuntime(adapter);
 }
 
 function assumptionNeedsSignInOrApproval(
-  response: ChatResponse,
-  messages: readonly ChatClientMessage[],
+  response: ChatResponse.T,
+  messages: readonly ChatClientMessage.T[],
 ): boolean {
   if (!response.generatedSql) {
     return false;

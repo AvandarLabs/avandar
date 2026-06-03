@@ -6,10 +6,10 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
-import { ChatPanelAvailableContext } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import type { ReactNode } from "react";
 
-function _readInitialOpen(): boolean {
+function _readInitialChatPanelOpenState(): boolean {
+  // wrap in try-catch in case localStorage is not available
   try {
     const raw = window.localStorage.getItem(CHAT_PANEL_LOCAL_STORAGE_KEY);
     return raw === "true";
@@ -33,8 +33,8 @@ type Props = {
  * whenever it changes so the panel state survives page reloads.
  *
  * The `PlanStateManager` is nested here so that Phase 3 multi-step plans
- * share the same lifetime as the chat panel itself — closing or
- * remounting the panel clears plan state.
+ * share the same lifetime as the chat panel itself — closing or remounting
+ * the panel clears plan state.
  */
 export function ChatPanelProvider({
   children,
@@ -43,7 +43,8 @@ export function ChatPanelProvider({
   return (
     <ChatPanelStateManager.Provider
       initialStateOverrides={{
-        isOpen: _readInitialOpen(),
+        isOpen: _readInitialChatPanelOpenState(),
+        isAvailable: isChatAvailable,
         pendingClarification: undefined,
       }}
     >
@@ -51,16 +52,11 @@ export function ChatPanelProvider({
         <PlanStateManager.Provider>
           <PlanBranchStateManager.Provider>
             <PlanAnnotationStateManager.Provider>
-              <ChatPanelAvailableContext.Provider value={true}>
-                <ChatPanelContents>{children}</ChatPanelContents>
-              </ChatPanelAvailableContext.Provider>
+              <ChatPanelContents>{children}</ChatPanelContents>
             </PlanAnnotationStateManager.Provider>
           </PlanBranchStateManager.Provider>
         </PlanStateManager.Provider>
-      : <ChatPanelAvailableContext.Provider value={false}>
-          <ChatPanelContents>{children}</ChatPanelContents>
-        </ChatPanelAvailableContext.Provider>
-      }
+      : <ChatPanelContents>{children}</ChatPanelContents>}
     </ChatPanelStateManager.Provider>
   );
 }

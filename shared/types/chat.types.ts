@@ -1,53 +1,13 @@
 /**
- * Shared chat types used by both the frontend (`src/`) and the edge function
+ * Auxiliary chat types not yet promoted to dedicated models under
+ * `shared/models/chat/`. These cover plans, clarifications, dashboard-block
+ * generation, retry context, voice hints, schema-drift regen, session
+ * secrets, consent acks, and the OpenRouter models endpoint envelope.
+ *
+ * Shared by both the frontend (`src/`) and the edge function
  * (`supabase/functions/chat/`). The frontend imports through the `$/` alias
  * and the edge function through Deno's path alias of the same name.
  */
-
-export type ChatMessageRole = "user" | "assistant" | "system";
-
-export type ChatClientMessage = {
-  role: ChatMessageRole;
-  content: string;
-};
-
-export type ChatApp = "data-explorer" | "data-sources" | "dashboards" | "other";
-
-export type ChatPageContext = {
-  app: ChatApp;
-  openDatasetId?: string;
-  /**
-   * The SQL that's currently driving the canvas — whether the assistant
-   * generated it, the user typed it, or it came from a manual form edit.
-   * Always reflects the live document, not just the last assistant
-   * generation. The backend uses this so the next turn knows what the
-   * user is looking at right now.
-   */
-  lastSql?: string;
-  /**
-   * The columns of the result the user is currently looking at. Sent
-   * alongside `lastSql` so the model can reason about the current result
-   * schema (which may differ from the dataset schema when the SQL contains
-   * `SELECT`-list projections, aggregations, or `AS` aliases).
-   */
-  lastResultColumns?: ReadonlyArray<{
-    name: string;
-    /** DuckDB type id, e.g. "bigint", "double", "varchar". */
-    dataType: string;
-  }>;
-  /**
-   * Runtime error message from the most recent SQL execution, if any. Sent
-   * so the model can offer to fix the prior SQL when the user asks to
-   * regenerate.
-   */
-  lastError?: string;
-  /**
-   * Set when the user is currently editing a dashboard. The chat panel uses
-   * this to offer the `addDashboardBlock` tool and to attach the dashboard
-   * id to analytics events. Only present when `app === "dashboards"`.
-   */
-  dashboardId?: string;
-};
 
 export type ChatDashboardVizType =
   | "table"
@@ -121,11 +81,6 @@ export type ChatGeneratedDashboardBlock =
       kind: "Card";
       title: string;
     };
-
-export type ChatGeneratedSql = {
-  prompt: string;
-  sql: string;
-};
 
 /**
  * The shape of a clarification request the LLM may emit instead of, or
@@ -224,30 +179,6 @@ export type ChatRetryContext = {
   priorDashboardBlockKind?: string;
 };
 
-export type ChatResponse = {
-  assistantText: string;
-  generatedSql?: ChatGeneratedSql;
-  /**
-   * Present when the model called the `clarify` tool. The client renders
-   * the clarification UI inline in the thread; on answer it issues a new
-   * turn with a `[Clarification answer: ...]` user message (preset,
-   * custom, or none of the listed options).
-   */
-  clarification?: ChatClarifyRequest;
-  /**
-   * Present when the model called the `proposePlan` tool. The frontend
-   * switches the canvas to the plan view (xyflow DAG) and runs each
-   * step in DuckDB.
-   */
-  plan?: ChatPlan;
-  /**
-   * Present when the model called the `addDashboardBlock` tool while the
-   * user was editing a dashboard. The frontend appends the block to the
-   * Puck data via `DashboardEditorStateManager.queuePendingBlock`.
-   */
-  dashboardBlock?: ChatGeneratedDashboardBlock;
-};
-
 /**
  * Phase 4 — Schema-Drift Regen. After a plan step executes, the
  * frontend diffs `actualSchema` against the LLM's `predictedSchema`.
@@ -321,24 +252,22 @@ export type ConsentAck = {
     | { kind: "values"; sourceColumn?: string };
 };
 
-export type ChatModelLicenseTier = "open" | "proprietary";
-
-/** A chat-capable model returned from OpenRouter via our edge function. */
-export type ChatModelOption = {
-  id: string;
-  name: string; // e.g. MoonshotAI: Kimi K2.6
-  nameWithoutProvider: string; // e.g. Kimi K2.6
-  description?: string;
-  supportsTools: boolean;
-  licenseTier: ChatModelLicenseTier;
-  provider: string;
-};
-
-export type ChatModelOptionGroup = {
-  group: string;
-  models: ChatModelOption[];
-};
-
+/**
+ * Wire envelope returned by `GET /chat/models`. The frontend hydrates this
+ * into `ChatModelOption.OptionGroup[]` (with namespaced model types) at the
+ * boundary.
+ */
 export type ChatModelsResponse = {
-  groups: ChatModelOptionGroup[];
+  groups: Array<{
+    group: string;
+    models: Array<{
+      id: string;
+      name: string;
+      nameWithoutProvider: string;
+      description?: string;
+      supportsTools: boolean;
+      licenseTier: "open" | "proprietary";
+      provider: string;
+    }>;
+  }>;
 };

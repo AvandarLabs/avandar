@@ -19,12 +19,12 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ChatApp } from "$/types/chat.types";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 /**
  * Returns the localized label for the page chip shown in the empty state.
  */
-function usePageLabel(app: ChatApp): string {
+function usePageLabel(app: ChatPageContext.ChatApp): string {
   const { t } = useLingui();
   return match(app)
     .with("data-explorer", () => {
@@ -153,7 +153,7 @@ export function ChatEmptyState(): JSX.Element {
   ]);
 
   const sendPrompt = (text: string) => {
-    threadRuntime.append({
+    threadRuntime?.append({
       role: "user",
       content: [{ type: "text", text }],
     });

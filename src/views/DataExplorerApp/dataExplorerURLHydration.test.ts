@@ -3,7 +3,7 @@ import {
   shouldDeferURLHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerURLHydration";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ParsedURLState } from "@/views/DataExplorerApp/DataExplorerURLState";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 

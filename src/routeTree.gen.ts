@@ -25,7 +25,6 @@ import { Route as AuthWorkspaceSlugMapRouteImport } from "./routes/_auth/$worksp
 import { Route as AuthWorkspaceSlugDataExplorerRouteImport } from "./routes/_auth/$workspaceSlug/data-explorer";
 import { Route as AuthWorkspaceSlugCheckoutRouteImport } from "./routes/_auth/$workspaceSlug/checkout";
 import { Route as AuthWorkspaceSlugAccessDeniedRouteImport } from "./routes/_auth/$workspaceSlug/access-denied";
-import { Route as AuthWorkspaceSlugSharedWithMeRouteRouteImport } from "./routes/_auth/$workspaceSlug/shared-with-me/route";
 import { Route as AuthWorkspaceSlugSettingsRouteRouteImport } from "./routes/_auth/$workspaceSlug/settings/route";
 import { Route as AuthWorkspaceSlugEntityDesignerRouteRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/route";
 import { Route as AuthWorkspaceSlugDataManagerRouteRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/route";
@@ -129,12 +128,6 @@ const AuthWorkspaceSlugAccessDeniedRoute =
   AuthWorkspaceSlugAccessDeniedRouteImport.update({
     id: "/access-denied",
     path: "/access-denied",
-    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
-  } as any);
-const AuthWorkspaceSlugSharedWithMeRouteRoute =
-  AuthWorkspaceSlugSharedWithMeRouteRouteImport.update({
-    id: "/shared-with-me",
-    path: "/shared-with-me",
     getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
 const AuthWorkspaceSlugSettingsRouteRoute =
@@ -278,7 +271,6 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRouteRouteWithChildren;
-  "/$workspaceSlug/shared-with-me": typeof AuthWorkspaceSlugSharedWithMeRouteRoute;
   "/$workspaceSlug/access-denied": typeof AuthWorkspaceSlugAccessDeniedRoute;
   "/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
@@ -311,7 +303,6 @@ export interface FileRoutesByTo {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/d/$slug": typeof DSlugRoute;
-  "/$workspaceSlug/shared-with-me": typeof AuthWorkspaceSlugSharedWithMeRouteRoute;
   "/$workspaceSlug/access-denied": typeof AuthWorkspaceSlugAccessDeniedRoute;
   "/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
@@ -350,7 +341,6 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/_auth/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
   "/_auth/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRouteRouteWithChildren;
-  "/_auth/$workspaceSlug/shared-with-me": typeof AuthWorkspaceSlugSharedWithMeRouteRoute;
   "/_auth/$workspaceSlug/access-denied": typeof AuthWorkspaceSlugAccessDeniedRoute;
   "/_auth/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/_auth/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
@@ -391,7 +381,6 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
     | "/$workspaceSlug/settings"
-    | "/$workspaceSlug/shared-with-me"
     | "/$workspaceSlug/access-denied"
     | "/$workspaceSlug/checkout"
     | "/$workspaceSlug/data-explorer"
@@ -424,7 +413,6 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/d/$slug"
-    | "/$workspaceSlug/shared-with-me"
     | "/$workspaceSlug/access-denied"
     | "/$workspaceSlug/checkout"
     | "/$workspaceSlug/data-explorer"
@@ -462,7 +450,6 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/data-manager"
     | "/_auth/$workspaceSlug/entity-designer"
     | "/_auth/$workspaceSlug/settings"
-    | "/_auth/$workspaceSlug/shared-with-me"
     | "/_auth/$workspaceSlug/access-denied"
     | "/_auth/$workspaceSlug/checkout"
     | "/_auth/$workspaceSlug/data-explorer"
@@ -612,13 +599,6 @@ declare module "@tanstack/react-router" {
       path: "/access-denied";
       fullPath: "/$workspaceSlug/access-denied";
       preLoaderRoute: typeof AuthWorkspaceSlugAccessDeniedRouteImport;
-      parentRoute: typeof AuthWorkspaceSlugRouteRoute;
-    };
-    "/_auth/$workspaceSlug/shared-with-me": {
-      id: "/_auth/$workspaceSlug/shared-with-me";
-      path: "/shared-with-me";
-      fullPath: "/$workspaceSlug/shared-with-me";
-      preLoaderRoute: typeof AuthWorkspaceSlugSharedWithMeRouteRouteImport;
       parentRoute: typeof AuthWorkspaceSlugRouteRoute;
     };
     "/_auth/$workspaceSlug/settings": {
@@ -874,7 +854,6 @@ interface AuthWorkspaceSlugRouteRouteChildren {
   AuthWorkspaceSlugDataManagerRouteRoute: typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   AuthWorkspaceSlugEntityDesignerRouteRoute: typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
   AuthWorkspaceSlugSettingsRouteRoute: typeof AuthWorkspaceSlugSettingsRouteRouteWithChildren;
-  AuthWorkspaceSlugSharedWithMeRouteRoute: typeof AuthWorkspaceSlugSharedWithMeRouteRoute;
   AuthWorkspaceSlugAccessDeniedRoute: typeof AuthWorkspaceSlugAccessDeniedRoute;
   AuthWorkspaceSlugCheckoutRoute: typeof AuthWorkspaceSlugCheckoutRoute;
   AuthWorkspaceSlugDataExplorerRoute: typeof AuthWorkspaceSlugDataExplorerRoute;
@@ -895,8 +874,6 @@ const AuthWorkspaceSlugRouteRouteChildren: AuthWorkspaceSlugRouteRouteChildren =
       AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren,
     AuthWorkspaceSlugSettingsRouteRoute:
       AuthWorkspaceSlugSettingsRouteRouteWithChildren,
-    AuthWorkspaceSlugSharedWithMeRouteRoute:
-      AuthWorkspaceSlugSharedWithMeRouteRoute,
     AuthWorkspaceSlugAccessDeniedRoute: AuthWorkspaceSlugAccessDeniedRoute,
     AuthWorkspaceSlugCheckoutRoute: AuthWorkspaceSlugCheckoutRoute,
     AuthWorkspaceSlugDataExplorerRoute: AuthWorkspaceSlugDataExplorerRoute,

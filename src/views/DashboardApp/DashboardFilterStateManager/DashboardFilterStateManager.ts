@@ -1,4 +1,4 @@
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 /**
  * Value a viewer chose for a filter. Single-select stores a single primitive;

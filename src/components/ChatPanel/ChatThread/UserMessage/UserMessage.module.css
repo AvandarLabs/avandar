@@ -1,0 +1,13 @@
+.userMessageRow {
+  align-self: flex-end;
+  display: flex;
+  justify-content: flex-end;
+  max-width: 85%;
+}
+
+.userMessageBubble {
+  background: var(--mantine-color-primary-6);
+  border-radius: var(--mantine-radius-md);
+  color: var(--mantine-color-white);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}

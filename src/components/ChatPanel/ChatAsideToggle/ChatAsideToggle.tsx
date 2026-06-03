@@ -10,7 +10,7 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 /**
  * Toggle button for the AppShell's right-side chat panel. Rendered in the
  * AppToolbar so it's available across every app view. The keyboard shortcut
- * (Cmd/Ctrl+J) lives on the AppShell itself.
+ * (Cmd/Ctrl+/) lives on the AppShell itself.
  */
 export function ChatAsideToggle(): JSX.Element {
   const [{ isOpen }, dispatch] = ChatPanelStateManager.useContext();

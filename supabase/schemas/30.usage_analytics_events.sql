@@ -1,9 +1,8 @@
 -- Usage analytics events.
 -- Captures product-instrumentation events for first-party analytics. Kept
 -- inside our own Postgres so we don't ship telemetry to a third party and
--- so beta users running on workspaces with sensitive data don't have to
--- trust an external analytics vendor.
---
+-- so users running on workspaces with sensitive data don't have to trust
+-- an external analytics vendor.
 -- Rows are intentionally not editable. The only valid operation is INSERT
 -- by an authenticated workspace member, scoped to a workspace they belong
 -- to. Reads are restricted to workspace owners + global admins via RLS so
@@ -11,8 +10,8 @@
 -- exposing one user's session to another.
 create table public.usage_analytics_events (
   id uuid primary key default gen_random_uuid(),
-  -- The workspace the event is scoped to. Most events have a workspace; a
-  -- few (signup, login) may not — for those we allow NULL.
+  -- The workspace the event is scoped to. Most events have a workspace. A
+  -- few (signup, login) may not and may be NULL.
   workspace_id uuid references public.workspaces (id) on update cascade on delete cascade,
   -- The user that triggered the event. NULL for anonymous public dashboard
   -- views.
@@ -26,7 +25,8 @@ create table public.usage_analytics_events (
   -- bound to a specific app surface.
   app public.app_type,
   -- Optional free-form JSON payload. Keep payloads small and scrubbed of
-  -- PII — anything that lands here will be readable by workspace owners.
+  -- PII. RLS allows anything that lands here to be readable by workspace
+  -- owners.
   payload jsonb,
   created_at timestamptz not null default now()
 );

@@ -26,7 +26,7 @@ import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanSt
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";

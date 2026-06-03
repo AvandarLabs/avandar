@@ -56,15 +56,6 @@ export enum FeatureFlag {
   EnableUserFeedback = "enable-user-feedback",
 
   /**
-   * Enable the "Shared with me" nav item and page.
-   *
-   * When this is on, workspace members can open the shared-with-me route and
-   * follow "See all shared items" links from share-only resource banners.
-   * Disabled by default until the feature is ready for general use.
-   */
-  EnableSharedWithMe = "enable-shared-with-me",
-
-  /**
    * Disable the DuckDB-WASM spatial extension.
    *
    * DuckDB-WASM fetches the spatial extension binary at runtime from
@@ -87,7 +78,6 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableGeoExplorer]: undefined,
   [FeatureFlag.DisableProfileManager]: undefined,
   [FeatureFlag.EnableUserFeedback]: undefined,
-  [FeatureFlag.EnableSharedWithMe]: undefined,
   [FeatureFlag.DisableDuckDbSpatial]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 

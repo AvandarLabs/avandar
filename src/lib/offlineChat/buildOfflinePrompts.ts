@@ -20,7 +20,7 @@ import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "./offlineChat.types";
-import type { ChatPageContext } from "$/types/chat.types";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 const REFINEMENT_HINTS =
   /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;
@@ -56,7 +56,7 @@ function formatResolvedDatasetRequirement(
 }
 
 function formatOpenDatasetHint(
-  pageContext: ChatPageContext,
+  pageContext: ChatPageContext.T,
   schema: OfflineChatSchema,
 ): string {
   const openDatasetId = pageContext.openDatasetId;
@@ -109,7 +109,7 @@ function formatSqlTurnContext(args: {
   return `\n${parts.join("\n\n")}\n`;
 }
 
-function formatSqlOutputInstruction(pageContext: ChatPageContext): string {
+function formatSqlOutputInstruction(pageContext: ChatPageContext.T): string {
   if (pageContext.app === "dashboards") {
     return "Output one short chart label line, then a single DuckDB SELECT in a ```sql fence. No other prose.";
   }
@@ -118,7 +118,7 @@ function formatSqlOutputInstruction(pageContext: ChatPageContext): string {
 
 export function buildOfflineAnalyzePrompt(args: {
   schema: OfflineChatSchema;
-  pageContext: ChatPageContext;
+  pageContext: ChatPageContext.T;
   lastUserPrompt: string;
 }): string {
   const surface =
@@ -147,7 +147,7 @@ Respond with ONLY valid JSON (no markdown fence):
 
 export function buildOfflineSqlPrompt(args: {
   schema: OfflineChatSchema;
-  pageContext: ChatPageContext;
+  pageContext: ChatPageContext.T;
   analysisSummary: string;
   lastUserPrompt: string;
   resolvedDataset?: OfflineChatSchemaDataset;

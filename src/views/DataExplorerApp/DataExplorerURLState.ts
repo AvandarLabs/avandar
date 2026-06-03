@@ -2,7 +2,7 @@ import { z } from "zod";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";

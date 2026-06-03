@@ -1,5 +1,5 @@
 import { uuid } from "$/lib/uuid";
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 /**
  * Phase 9 — Canvas Annotation + Export.

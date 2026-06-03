@@ -1,3 +1,4 @@
+import { Model } from "@models/Model/Model.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import {
@@ -14,36 +15,36 @@ import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
 } from "@sbfn/_shared/privacy/discoveryQuery.ts";
-import {
-  buildSQLSystemPrompt,
-  cleanGeneratedSQL,
-  extractSqlFromAssistantText,
-} from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
 import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with { type: "json" };
-import { AppConfig } from "$/config/AppConfig.ts";
-import { getAppURL } from "$/env/getAppURL.ts";
+import {
+  buildSqlSystemPrompt,
+  cleanGeneratedSql,
+  extractSqlFromAssistantText,
+} from "@sbfn/chat/utils/buildSqlSystemPrompt.ts";
 import {
   parseUseCacheFromURL,
   resolveChatModelsResponse,
-} from "$/utils/chat/chatModelsCache.ts";
-import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
+} from "@sbfn/chat/utils/curateOpenRouterModels/chatModelsCache.ts";
+import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
+import { AppConfig } from "$/config/AppConfig.ts";
+import { getAppURL } from "$/env/getAppURL.ts";
 import { z } from "zod";
+import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
+import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
-  ChatAPI,
   ChatClarifyRequest,
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
-  ChatGeneratedSQL,
   ChatModelsResponse,
   ChatPlan,
   ChatPlanStep,
-  ChatResponse,
   ChatRetryContext,
   ChatSessionSecretResponse,
   ChatVoiceLanguage,
   RegeneratePlanResponse,
-} from "@sbfn/chat/chat.types.ts";
-import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
+} from "$/types/chat.types.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -379,7 +380,7 @@ function _parseAddDashboardBlock(
       if (!prompt || !sqlRaw || !vizTypeRaw) {
         return undefined;
       }
-      const sql = cleanGeneratedSQL(sqlRaw).trim();
+      const sql = cleanGeneratedSql(sqlRaw).trim();
       const vizType = vizTypeRaw as ChatDashboardVizType;
       if (sql.length === 0 || !ALLOWED_DASHBOARD_VIZ_TYPES.has(vizType)) {
         return undefined;
@@ -906,7 +907,9 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
    */
   "/models": {
     GET: GET("/models").action(
-      async ({ request }): Promise<ChatModelsResponse> => {
+      async ({
+        request,
+      }): Promise<{ groups: ChatModelOption.OptionGroup[] }> => {
         return await resolveChatModelsResponse({
           useCache: parseUseCacheFromURL(request.url),
           cachedResponse: cachedChatModelsResponse,
@@ -1037,7 +1040,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
 
         const sqlSystemPrompt =
           needsSchema ?
-            buildSQLSystemPrompt({
+            buildSqlSystemPrompt({
               prompt: lastUserPrompt,
               datasets: schema.datasets,
               columns: schema.columns,
@@ -1425,7 +1428,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
 
         type ParsedAttempt = {
           text: string;
-          generatedSql?: ChatGeneratedSQL;
+          generatedSql?: ChatResponse.GeneratedSql;
           clarification?: ChatClarifyRequest;
           plan?: ChatPlan;
           dashboardBlock?: ChatGeneratedDashboardBlock;
@@ -1443,7 +1446,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           attemptText: string,
         ): ParsedAttempt => {
           const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
-          let sql: ChatGeneratedSQL | undefined;
+          let sql: ChatResponse.GeneratedSql | undefined;
           let clar: ChatClarifyRequest | undefined;
           let pln: ChatPlan | undefined;
           let block: ChatGeneratedDashboardBlock | undefined;
@@ -1456,7 +1459,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
               const args = JSON.parse(sqlCall.function.arguments ?? "{}");
               if (typeof args.sql === "string" && args.sql.trim()) {
                 sql = {
-                  sql: cleanGeneratedSQL(args.sql),
+                  sql: cleanGeneratedSql(args.sql),
                   prompt: lastUserPrompt,
                 };
               }
@@ -1508,7 +1511,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             const extracted = extractSqlFromAssistantText(attemptText);
             if (extracted) {
               sql = {
-                sql: cleanGeneratedSQL(extracted),
+                sql: cleanGeneratedSql(extracted),
                 prompt: lastUserPrompt,
               };
             }
@@ -1591,13 +1594,13 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           : dashboardBlock ? _dashboardBlockSummary(dashboardBlock)
           : "I could not generate a query for that. Try rephrasing.");
 
-        const result: ChatResponse = {
+        const result: ChatResponse.T = Model.make("ChatResponse", {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
           ...(clarification ? { clarification } : {}),
           ...(plan ? { plan } : {}),
           ...(dashboardBlock ? { dashboardBlock } : {}),
-        };
+        });
         return result;
       }),
   },

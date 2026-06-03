@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { createMockOfflineChatEngine } from "./createMockOfflineChatEngine";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
 
@@ -23,7 +24,9 @@ describe("runOfflineChatPipeline", () => {
     const result = await runOfflineChatPipeline({
       engine,
       schema: SCHEMA,
-      pageContext: { app: "data-explorer", openDatasetId: "ds-1" },
+      pageContext: ChatPageContext.createDataExplorerViewContext({
+        openDatasetId: "ds-1",
+      }),
       messages: [{ role: "user", content: "How many rows?" }],
       lastUserPrompt: "How many rows?",
     });
@@ -46,7 +49,7 @@ describe("runOfflineChatPipeline", () => {
     const result = await runOfflineChatPipeline({
       engine,
       schema: SCHEMA,
-      pageContext: { app: "data-explorer" },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
       messages: [{ role: "user", content: "Trends this year" }],
       lastUserPrompt: "Trends this year",
     });

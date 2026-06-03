@@ -1,15 +1,9 @@
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage.ts";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
-  ChatClarifyRequest,
-  ChatClientMessage,
-  ChatDashboardVizType,
-  ChatGeneratedDashboardBlock,
-  ChatGeneratedSql,
-  ChatModelsResponse,
-  ChatPageContext,
-  ChatPlan,
-  ChatPlanStep,
-  ChatResponse,
   ChatRetryContext,
   ChatSessionSecretResponse,
   ChatVoiceLanguage,
@@ -17,25 +11,6 @@ import type {
   RegeneratePlanResponse,
   SchemaDriftReport,
 } from "$/types/chat.types.ts";
-
-export type {
-  ChatClarifyRequest,
-  ChatClientMessage,
-  ChatDashboardVizType,
-  ChatGeneratedDashboardBlock,
-  ChatGeneratedSql as ChatGeneratedSQL,
-  ChatModelsResponse,
-  ChatPageContext,
-  ChatPlan,
-  ChatPlanStep,
-  ChatResponse,
-  ChatRetryContext,
-  ChatSessionSecretResponse,
-  ChatVoiceLanguage,
-  ConsentAck,
-  RegeneratePlanResponse,
-  SchemaDriftReport,
-};
 
 export type ChatAPI = APITypeDef<
   "chat",
@@ -51,7 +26,9 @@ export type ChatAPI = APITypeDef<
         queryParams?: {
           useCache?: boolean;
         };
-        returnType: ChatModelsResponse;
+        returnType: {
+          groups: ChatModelOption.OptionGroup[];
+        };
       };
     };
     "/:workspaceId/messages": {
@@ -60,14 +37,14 @@ export type ChatAPI = APITypeDef<
           workspaceId: string;
         };
         body: {
-          messages: ChatClientMessage[];
-          context: ChatPageContext;
+          messages: ChatClientMessage.T[];
+          context: ChatPageContext.T;
           model?: string;
           consentAcks?: ConsentAck[];
           retryContext?: ChatRetryContext;
           voiceLanguage?: ChatVoiceLanguage;
         };
-        returnType: ChatResponse;
+        returnType: ChatResponse.T;
       };
     };
     "/:workspaceId/regenerate-plan": {
