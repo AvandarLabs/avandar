@@ -5,9 +5,17 @@ import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
 } from "./helpers/manualUploadCloudSyncFlow";
-import { deleteDashboardsByIds } from "./helpers/seedDashboard";
-import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
+import {
+  deleteAllDashboardsForOwner,
+  deleteDashboardsByIds,
+} from "./helpers/seedDashboard";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+
+const TARGET_DASHBOARD_NAME = "Untitled dashboard";
 
 /**
  * End-to-end check that a bar chart saved from the Data Explorer actually
@@ -28,6 +36,16 @@ test.describe("Data Explorer: save viz to dashboard", () => {
   }) => {
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
+    const workspaceId = await getWorkspaceIdBySlug({
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
+    });
+
+    await deleteAllDashboardsForOwner({
+      admin,
+      workspaceId,
+      ownerEmail: primaryUser.email,
+    });
 
     const createdDashboardIds: string[] = [];
 
@@ -142,7 +160,9 @@ test.describe("Data Explorer: save viz to dashboard", () => {
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
-      await listbox.getByRole("option").first().click();
+      await listbox
+        .getByRole("option", { name: TARGET_DASHBOARD_NAME })
+        .click();
 
       await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
@@ -150,7 +170,7 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       // sidebar (instead of the toast link) because Mantine notifications
       // auto-dismiss quickly and a slow CI click can miss them.
       await expect(
-        page.getByText(/added to "untitled dashboard"/i),
+        page.getByText(`Added to "${TARGET_DASHBOARD_NAME}"`),
       ).toBeVisible({ timeout: SHORT_WAIT });
 
       await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
