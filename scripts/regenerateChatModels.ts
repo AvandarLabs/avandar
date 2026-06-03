@@ -6,7 +6,7 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import dotenv from "dotenv";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { AuthClient } from "@/clients/AuthClient";
-import type { ChatModelsResponse } from "$/types/chat.types";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 const PROJECT_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -18,7 +18,7 @@ const CHAT_MODELS_JSON_PATH = path.join(
   "supabase",
   "functions",
   "chat",
-  "models.generated.json",
+  "chat-models-catalog.gen.json",
 );
 
 function _loadScriptEnv(): void {
@@ -30,7 +30,7 @@ function _loadScriptEnv(): void {
   });
 }
 
-async function _fetchLiveChatModels(): Promise<ChatModelsResponse> {
+async function _fetchLiveChatModels(): Promise<ChatModelOption.Catalog> {
   const { session } = await AuthClient.signIn({
     email: process.env.CHAT_MODELS_SCRIPT_EMAIL ?? TEST_USER_EMAIL,
     password: process.env.CHAT_MODELS_SCRIPT_PASSWORD ?? TEST_USER_PASSWORD,
@@ -50,19 +50,17 @@ async function _fetchLiveChatModels(): Promise<ChatModelsResponse> {
     throw new Error(`Failed to regenerate chat models: ${errorText}`);
   }
 
-  return (await response.json()) as ChatModelsResponse;
-}
-
-function _hasCachedChatModels(response: ChatModelsResponse): boolean {
-  return response.groups.some((group) => {
-    return group.models.length > 0;
-  });
+  return (await response.json()) as ChatModelOption.Catalog;
 }
 
 async function _writeChatModelsCache(
-  response: ChatModelsResponse,
+  chatModelCatalog: ChatModelOption.Catalog,
 ): Promise<void> {
-  if (!_hasCachedChatModels(response)) {
+  const isNonEmptyCatalog = chatModelCatalog.groups.some((group) => {
+    return group.models.length > 0;
+  });
+
+  if (!isNonEmptyCatalog) {
     throw new Error(
       "Refusing to overwrite chat models cache with an empty list",
     );
@@ -70,15 +68,15 @@ async function _writeChatModelsCache(
 
   await fs.writeFile(
     CHAT_MODELS_JSON_PATH,
-    JSON.stringify(response, null, 2) + "\n",
+    JSON.stringify(chatModelCatalog, null, 2) + "\n",
     "utf8",
   );
 }
 
 async function main(): Promise<void> {
   _loadScriptEnv();
-  const response = await _fetchLiveChatModels();
-  await _writeChatModelsCache(response);
+  const chatModelCatalog = await _fetchLiveChatModels();
+  await _writeChatModelsCache(chatModelCatalog);
   console.log(`Regenerated ${CHAT_MODELS_JSON_PATH}`);
 }
 

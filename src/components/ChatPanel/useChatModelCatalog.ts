@@ -1,7 +1,7 @@
 import { useQuery } from "@hooks";
 import { prop } from "@utils";
-import { useMemo } from "react";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
+import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { buildOfflineChatPickerGroup } from "@/lib/offlineChat/offlineChatPickerModels";
 import { useDownloadedLocalChatModelIds } from "@/lib/offlineChat/useDownloadedLocalChatModelIds";
@@ -24,6 +24,7 @@ export function useChatModelCatalog(): UseChatModelCatalogResult {
     queryFn: async () => {
       const response = await APIClient.get({
         route: "chat/models",
+        queryParams: { useCache: true },
       });
       return response.groups;
     },

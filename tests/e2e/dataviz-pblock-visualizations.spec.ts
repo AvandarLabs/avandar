@@ -153,8 +153,6 @@ test.describe("DataViz PBlock - every visualization", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(360_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const seededDashboardIds: string[] = [];

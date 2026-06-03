@@ -39,8 +39,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E direct user share";
@@ -98,8 +96,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E restricted";
@@ -151,8 +147,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
     const datasetName = "E2E intersection on";
@@ -260,8 +254,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
     const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
     const datasetName = "E2E intersection off";
@@ -351,8 +343,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const { admin, workspaceId } = e2eViewerMembership;
     const datasetName = "E2E summary mixed";
@@ -429,8 +419,6 @@ test.describe("Share modal", () => {
     e2eWorkerDb,
     e2eViewerMembership,
   }) => {
-    test.setTimeout(240_000);
-
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const { admin } = e2eViewerMembership;
     const datasetName = "E2E owner row";

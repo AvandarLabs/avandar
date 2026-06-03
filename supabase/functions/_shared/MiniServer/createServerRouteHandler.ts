@@ -19,17 +19,17 @@ import type {
   HTTPMethodActionFn,
   HTTPMethodActionFnOptions,
   InferBody,
-  MakeOptionalIfUndefined,
-  QueryParamsSchemaShape,
+  InferredRouteQueryParams,
   ServerRouteHandler,
   ValidBodySchema,
   ValidQueryParams,
+  ValidQueryParamsSchemaShape,
 } from "@sbfn/_shared/MiniServer/MiniServer.types.ts";
 import type {
   ValidPathParamsSchema,
   ValidPathParamsSchemaShape,
 } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
-import type { infer as ZodInfer, ZodObject } from "npm:zod@4";
+import type { z } from "npm:zod@4";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyZodType = ZodType<any, any>;
@@ -116,7 +116,7 @@ export function createServerRouteHandler<
         action: actionNotImplemented as HTTPMethodActionFn<
           PathParams,
           QueryParams,
-          ZodInfer<NewBodySchema>,
+          z.infer<NewBodySchema>,
           IsJWTVerificationDisabled,
           ReturnType
         >,
@@ -133,7 +133,7 @@ export function createServerRouteHandler<
     },
     querySchema: <
       NewQueryParamsSchemaShape extends
-        QueryParamsSchemaShape<ValidQueryParams>,
+        ValidQueryParamsSchemaShape<QueryParams>,
     >(
       newQueryParamsSchemaShape: NewQueryParamsSchemaShape,
     ): ServerRouteHandler<
@@ -141,7 +141,7 @@ export function createServerRouteHandler<
       Path,
       ReturnType,
       PathParams,
-      MakeOptionalIfUndefined<ZodInfer<ZodObject<NewQueryParamsSchemaShape>>>,
+      InferredRouteQueryParams<NewQueryParamsSchemaShape>,
       Body,
       IsJWTVerificationDisabled
     > => {
@@ -155,9 +155,7 @@ export function createServerRouteHandler<
         // then we need to reset the action to the not-implemented function
         action: actionNotImplemented as HTTPMethodActionFn<
           PathParams,
-          MakeOptionalIfUndefined<
-            ZodInfer<ZodObject<NewQueryParamsSchemaShape>>
-          >,
+          InferredRouteQueryParams<NewQueryParamsSchemaShape>,
           Body,
           IsJWTVerificationDisabled,
           ReturnType

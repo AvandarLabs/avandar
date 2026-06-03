@@ -251,23 +251,3 @@ export type ConsentAck = {
     | { kind: "message_index"; index: number }
     | { kind: "values"; sourceColumn?: string };
 };
-
-/**
- * Wire envelope returned by `GET /chat/models`. The frontend hydrates this
- * into `ChatModelOption.OptionGroup[]` (with namespaced model types) at the
- * boundary.
- */
-export type ChatModelsResponse = {
-  groups: Array<{
-    group: string;
-    models: Array<{
-      id: string;
-      name: string;
-      nameWithoutProvider: string;
-      description?: string;
-      supportsTools: boolean;
-      licenseTier: "open" | "proprietary";
-      provider: string;
-    }>;
-  }>;
-};

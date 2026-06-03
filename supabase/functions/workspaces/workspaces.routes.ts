@@ -13,6 +13,7 @@ import type {
   AppType,
   RoleLevel,
 } from "$/models/Permissions/Permissions.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
@@ -160,7 +161,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             workspaceId: workspaceId as WorkspaceId,
             permissionType: "can_invite_users",
             supabaseAdminClient,
-            userId: user.id,
+            userId: user.id as UserId,
           });
           if (!canInviteUsers) {
             throw new Error("Your workspace cannot invite any more members.");

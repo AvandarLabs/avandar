@@ -14,7 +14,7 @@ import { modals } from "@mantine/modals";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { capitalize } from "@utils";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

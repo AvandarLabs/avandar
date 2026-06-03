@@ -95,8 +95,6 @@ test.describe("CSV with quoted fields after sniff sample", () => {
   test("LONG_global_deaths.csv preview shows Afghanistan data", async ({
     page,
   }) => {
-    test.setTimeout(120_000);
-
     test.skip(
       !existsSync(FULL_GLOBAL_DEATHS_CSV_PATH),
       `Missing ${FULL_GLOBAL_DEATHS_CSV_PATH}`,

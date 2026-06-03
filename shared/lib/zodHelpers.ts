@@ -79,3 +79,27 @@ export const csvRowSchema: z.ZodType<RawDataRow, RawDataRow> = z.record(
 
 export const csvDataSchema: z.ZodType<RawDataRow[], RawDataRow[]> =
   z.array(csvRowSchema);
+
+/**
+ * Returns a Zod schema for a model.
+ *
+ * @param modelType - The type of the model.
+ * @param propsSchema - The schema for the model properties.
+ * @returns A Zod schema for the model.
+ */
+export function modelSchema<
+  MType extends string,
+  MPropsSchema extends Record<string, z.ZodType<unknown, unknown>>,
+>(
+  modelType: MType,
+  propsSchema: MPropsSchema,
+): z.ZodObject<
+  {
+    __type: z.ZodLiteral<MType>;
+  } & MPropsSchema
+> {
+  return z.object({
+    __type: z.literal(modelType),
+    ...propsSchema,
+  });
+}

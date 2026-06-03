@@ -34,8 +34,6 @@ test.describe("dashboard chat → P-block", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(180_000);
-
     let chatTurns = 0;
     await page.route("**/functions/v1/chat/*/messages", async (route) => {
       if (route.request().method() !== "POST") {

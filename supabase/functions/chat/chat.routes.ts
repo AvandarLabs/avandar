@@ -15,19 +15,16 @@ import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
 } from "@sbfn/_shared/privacy/discoveryQuery.ts";
-import cachedChatModelsResponseJSON from "@sbfn/chat/models.generated.json" with { type: "json" };
+import cachedChatModelsCatalogJSON from "@sbfn/chat/chat-models-catalog.gen.json" with { type: "json" };
 import {
   buildSqlSystemPrompt,
   cleanGeneratedSql,
   extractSqlFromAssistantText,
 } from "@sbfn/chat/utils/buildSqlSystemPrompt.ts";
-import {
-  parseUseCacheFromURL,
-  resolveChatModelsResponse,
-} from "@sbfn/chat/utils/curateOpenRouterModels/chatModelsCache.ts";
 import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
+import { modelSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
 import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
 import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
@@ -37,7 +34,6 @@ import type {
   ChatClarifyRequest,
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
-  ChatModelsResponse,
   ChatPlan,
   ChatPlanStep,
   ChatRetryContext,
@@ -63,8 +59,8 @@ type OpenRouterModelsResponse = {
   data?: OpenRouterModelInput[];
 };
 
-const cachedChatModelsResponse =
-  cachedChatModelsResponseJSON as ChatModelsResponse;
+const cachedChatModelsCatalog =
+  cachedChatModelsCatalogJSON as ChatModelOption.Catalog;
 
 function _resolveChatModel(model: string | undefined): string {
   if (model && OPENROUTER_MODEL_ID_PATTERN.test(model)) {
@@ -73,7 +69,7 @@ function _resolveChatModel(model: string | undefined): string {
   return AppConfig.chat.defaultModelId;
 }
 
-async function _loadLiveChatModelsResponse(): Promise<ChatModelsResponse> {
+async function _loadLiveChatModelsResponse(): Promise<ChatModelOption.Catalog> {
   const response = await fetch(OPENROUTER_MODELS_URL, {
     headers: {
       Authorization: `Bearer ${openRouterApiKey}`,
@@ -906,18 +902,27 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
    * proprietary) for the chat panel model picker.
    */
   "/models": {
-    GET: GET("/models").action(
-      async ({
-        request,
-      }): Promise<{ groups: ChatModelOption.OptionGroup[] }> => {
-        return await resolveChatModelsResponse({
-          useCache: parseUseCacheFromURL(request.url),
-          cachedResponse: cachedChatModelsResponse,
-          loadLiveResponse: _loadLiveChatModelsResponse,
+    GET: GET("/models")
+      .querySchema({
+        useCache: z
+          .enum(["true", "false", "0", "1", "yes", "no"])
+          .optional()
+          .transform((value) => {
+            return value === "true" || value === "1" || value === "yes";
+          }),
+      })
+      .action(async ({ queryParams }): Promise<ChatModelOption.Catalog> => {
+        const isCacheNonEmpty = cachedChatModelsCatalog.groups.some((group) => {
+          return group.models.length === 0;
         });
-      },
-    ),
+
+        if (queryParams.useCache && isCacheNonEmpty) {
+          return cachedChatModelsCatalog;
+        }
+        return await _loadLiveChatModelsResponse();
+      }),
   },
+
   /**
    * Handles a chat turn for the Ask Avandar panel in a workspace.
    * The client sends the thread, page context, and optional model id; we call
@@ -932,13 +937,11 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
       },
     })
       .bodySchema({
-        messages: z.array(
-          z.object({
-            role: z.enum(["user", "assistant", "system"]),
-            content: z.string(),
-          }),
-        ),
-        context: z.object({
+        messages: modelSchema("ChatClientMessage", {
+          role: z.enum(["user", "assistant", "system"]),
+          content: z.string(),
+        }).array(),
+        context: modelSchema("ChatPageContext", {
           app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
           openDatasetId: z.string().optional(),
           lastSql: z.string().optional(),

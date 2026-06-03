@@ -1,5 +1,6 @@
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { SubscriptionPermission } from "$/models/Subscription/Subscription.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 /**
@@ -66,7 +67,7 @@ export type SubscriptionsAPI = APITypeDef<
     "/create-free": {
       POST: {
         body: {
-          workspaceId: string;
+          workspaceId: Workspace.Id;
         };
         returnType: {
           subscription: Tables<"subscriptions">;

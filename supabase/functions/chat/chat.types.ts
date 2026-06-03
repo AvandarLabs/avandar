@@ -23,12 +23,10 @@ export type ChatAPI = APITypeDef<
   {
     "/models": {
       GET: {
-        queryParams?: {
+        queryParams: {
           useCache?: boolean;
         };
-        returnType: {
-          groups: ChatModelOption.OptionGroup[];
-        };
+        returnType: ChatModelOption.Catalog;
       };
     };
     "/:workspaceId/messages": {

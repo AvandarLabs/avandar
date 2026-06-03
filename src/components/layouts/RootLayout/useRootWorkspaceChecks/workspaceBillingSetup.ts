@@ -1,4 +1,4 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 /**
