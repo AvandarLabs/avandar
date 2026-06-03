@@ -2,8 +2,8 @@ import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
 import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
-import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
-import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { NavbarSidebarToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 
@@ -18,7 +18,8 @@ export function AppToolbar({
   floatingToolbar = false,
   title,
 }: Props): JSX.Element {
-  const isChatPanelAvailable = useIsChatPanelAvailable();
+  const { isAvailable: isChatPanelAvailable } =
+    ChatPanelStateManager.useState();
 
   return (
     <Group
@@ -41,7 +42,7 @@ export function AppToolbar({
           }
       }
     >
-      <NavbarDesktopToggle />
+      <NavbarSidebarToggle />
       {title ?
         <Title order={2} size="sm" fw={500}>
           {title}

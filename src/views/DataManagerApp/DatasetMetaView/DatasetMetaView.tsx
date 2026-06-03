@@ -14,7 +14,6 @@ import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import {
   EditableDisplayText,
-  Link,
   notifyError,
   notifySuccess,
   Paper,
@@ -28,7 +27,6 @@ import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -109,17 +107,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           <Alert color="blue" variant="light" title="Shared with you">
             <Text size="sm">
               You can view this dataset because it was shared with you.
-              {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
-                <>
-                  {" "}
-                  <Link
-                    to="/$workspaceSlug/shared-with-me"
-                    params={{ workspaceSlug: workspace.slug }}
-                  >
-                    See all shared items
-                  </Link>
-                </>
-              : null}
             </Text>
           </Alert>
         : null}

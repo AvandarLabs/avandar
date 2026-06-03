@@ -1,0 +1,14 @@
+.assistantMessageRow {
+  align-self: flex-start;
+  display: flex;
+  justify-content: flex-start;
+  max-width: 95%;
+}
+
+.assistantMessageBubble {
+  background: var(--mantine-color-neutral-0);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  color: var(--mantine-color-neutral-9);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}

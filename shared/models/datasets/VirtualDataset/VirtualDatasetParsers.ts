@@ -3,6 +3,7 @@ import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
+import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
 import type {
   Expect,
@@ -22,22 +23,25 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
   raw_sql: z.string(),
+  plan_steps: supabaseJSONSchema.nullable(),
 });
 
 export const VirtualDatasetParsers =
   makeParserRegistry<VirtualDatasetModel>().build({
     modelName: "VirtualDataset",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      const { rawSql, ...rest } = obj;
-      return Model.make("VirtualDataset", {
-        ...rest,
-        rawSQL: rawSql,
-        id: obj.id as VirtualDatasetId,
-        datasetId: obj.datasetId as DatasetId,
-        workspaceId: obj.workspaceId as Workspace.Id,
-      });
-    }),
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      ({ rawSql, planSteps, ...obj }) => {
+        return Model.make("VirtualDataset", {
+          ...obj,
+          rawSQL: rawSql,
+          id: obj.id as VirtualDatasetId,
+          datasetId: obj.datasetId as DatasetId,
+          workspaceId: obj.workspaceId as Workspace.Id,
+        });
+      },
+    ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

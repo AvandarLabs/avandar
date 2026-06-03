@@ -1,17 +1,12 @@
+import { useAui } from "@assistant-ui/react";
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
-import {
-  readStoredChatModelId,
-  resolveChatModelId,
-  writeStoredChatModelId,
-} from "@/components/ChatPanel/chatModelStorage/chatModelStorage";
-import { useChatModels } from "@/components/ChatPanel/useChatModels";
-import { useRegisterChatModelContext } from "@/components/ChatPanel/useRegisterChatModelContext";
+import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
+import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
 import css from "./ChatModelPicker.module.css";
-import type { ChatModelOption } from "$/types/chat.types";
 
 type Props = {
   disabled?: boolean;
@@ -25,9 +20,10 @@ type Props = {
 export function ChatModelPicker({
   disabled = false,
 }: Props): JSX.Element | null {
-  const { groups, models, isLoading, isError } = useChatModels();
+  const { groups, models, isLoading, isError } = useChatModelCatalog();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
   const [search, setSearch] = useState("");
+  const assistantClient = useAui();
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -40,31 +36,44 @@ export function ChatModelPicker({
     },
   });
 
-  const resolvedModelId = useMemo(() => {
-    if (models.length === 0) {
-      return selectedModelId;
-    }
-    return resolveChatModelId({
-      availableModels: models,
-      storedModelId: selectedModelId ?? readStoredChatModelId(),
-    });
-  }, [models, selectedModelId]);
+  const resolvedModelId =
+    models.length === 0 ?
+      selectedModelId
+    : ChatModelStorage.resolveChatModelId({
+        availableModels: models,
+        selectedModelId,
+      });
 
-  const selectedModel = useMemo((): ChatModelOption | undefined => {
-    if (!resolvedModelId) {
-      return undefined;
-    }
-    return models.find(propEq("id", resolvedModelId));
-  }, [models, resolvedModelId]);
+  const selectedModel =
+    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
 
-  useEffect(() => {
-    if (!resolvedModelId) {
-      return;
-    }
-    writeStoredChatModelId(resolvedModelId);
-  }, [resolvedModelId]);
+  useEffect(
+    function writeResolvedModelIdToStorage() {
+      if (resolvedModelId) {
+        ChatModelStorage.writeStoredChatModelId(resolvedModelId);
+      }
+    },
+    [resolvedModelId],
+  );
 
-  useRegisterChatModelContext(resolvedModelId);
+  // Register the resolved model id with assistant-ui's ModelContext so the
+  // chat adapter can read `context.config.modelName` on each run.
+  useEffect(
+    function registerResolvedModelIdWithAssistantUi() {
+      if (resolvedModelId) {
+        assistantClient.modelContext().register({
+          getModelContext: () => {
+            return {
+              config: {
+                modelName: resolvedModelId,
+              },
+            };
+          },
+        });
+      }
+    },
+    [assistantClient, resolvedModelId],
+  );
 
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();

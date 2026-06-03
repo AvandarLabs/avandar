@@ -1,6 +1,6 @@
 import { useRouterState } from "@tanstack/react-router";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { ChatPageContext } from "$/types/chat.types";
 
 /**
  * Returns the chat's view of the current page. Used both to drive the empty
@@ -8,7 +8,7 @@ import type { ChatPageContext } from "$/types/chat.types";
  * available on this turn. Reads from the router and the Data Explorer state
  * so the panel always reflects what the user is looking at right now.
  */
-export function useChatPageContext(): ChatPageContext {
+export function useChatPageContext(): ChatPageContext.T {
   const pathname = useRouterState({
     select: (s) => {
       return s.location.pathname;
@@ -18,18 +18,17 @@ export function useChatPageContext(): ChatPageContext {
     DataExplorerStateManager.useState();
 
   if (pathname.includes("/data-explorer")) {
-    return {
-      app: "data-explorer",
-      ...(openDataset ? { openDatasetId: openDataset.datasetId } : {}),
-      ...(rawSQL ? { lastSql: rawSQL } : {}),
-      ...(lastQueryError ? { lastError: lastQueryError } : {}),
-    };
+    return ChatPageContext.createDataExplorerViewContext({
+      openDatasetId: openDataset?.datasetId,
+      lastSql: rawSQL,
+      lastError: lastQueryError,
+    });
   }
   if (pathname.includes("/data-import") || pathname.includes("/data-sources")) {
-    return { app: "data-sources" };
+    return ChatPageContext.createDataSourcesViewContext();
   }
   if (pathname.includes("/dashboards")) {
-    return { app: "dashboards" };
+    return ChatPageContext.createDashboardsViewContext();
   }
-  return { app: "other" };
+  return ChatPageContext.createOtherViewContext();
 }

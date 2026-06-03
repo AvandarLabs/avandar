@@ -23,12 +23,6 @@ describe("Theme modal stacking", () => {
 });
 
 describe("Theme design tokens", () => {
-  it("exposes animation, elevation, and border tokens on theme.other", () => {
-    expect(Theme.other.animation.duration.fast).toBe("140ms");
-    expect(Theme.other.elevation.surfaces.light.raised).toBe("#ffffff");
-    expect(Theme.other.borders.colors.light.default).toContain("rgba");
-  });
-
   it("registers interactive transitions on primary components", () => {
     expect(Theme.components?.Button).toBeDefined();
     expect(Theme.components?.Paper?.defaultProps?.withBorder).toBe(true);

@@ -5,7 +5,10 @@ import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DatasetImportForm } from "./DatasetImportForm";
-import type { DataSourceMetadata } from "./DatasetImportForm";
+import type {
+  CsvDataSourceMetadata,
+  DataSourceMetadata,
+} from "./DatasetImportForm";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 const CSV_DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
@@ -63,7 +66,7 @@ function _columnSchema(
   };
 }
 
-function _csvDataSourceMetadata(): DataSourceMetadata {
+function _csvDataSourceMetadata(): CsvDataSourceMetadata {
   const columns = [_columnSchema("city", "VARCHAR")];
   return {
     sourceType: "csv_file",
@@ -137,6 +140,55 @@ function _xlsxDataSourceMetadata(sheetNames: string[]): DataSourceMetadata {
 describe("DatasetImportForm", () => {
   beforeEach(() => {
     saveDatasetMock.mockReset();
+  });
+
+  it("reparse uses parse options edited immediately before the click", () => {
+    const onRequestDataReparse = vi.fn();
+    const initialMetadata = _csvDataSourceMetadata();
+    const metadataWithColonDelimiter: CsvDataSourceMetadata = {
+      ...initialMetadata,
+      parseOptions: {
+        type: "csv_file",
+        numRowsToSkip: 0,
+        delimiter: ":",
+      },
+    };
+
+    function ControlledMetadataHarness(): JSX.Element {
+      const [currentMetadata, setCurrentMetadata] =
+        useState<DataSourceMetadata>(metadataWithColonDelimiter);
+
+      return (
+        <DatasetImportForm
+          rows={[{ city: "LA" }]}
+          initialDatasetName="cities.csv"
+          onRequestDataReparse={onRequestDataReparse}
+          onDataSourceMetadataChange={setCurrentMetadata}
+          dataSourceMetadata={currentMetadata}
+          parseOptions={currentMetadata.parseOptions}
+        />
+      );
+    }
+
+    render(
+      <AvandarUiProvider>
+        <ControlledMetadataHarness />
+      </AvandarUiProvider>,
+    );
+
+    fireEvent.change(screen.getByLabelText("Delimiter"), {
+      target: { value: "," },
+    });
+    fireEvent.change(screen.getByLabelText("Number of rows to skip"), {
+      target: { value: "1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Process data again" }));
+
+    expect(onRequestDataReparse).toHaveBeenCalledWith({
+      type: "csv_file",
+      numRowsToSkip: 1,
+      delimiter: ",",
+    });
   });
 
   it("renders CSV parse controls and updates metadata", () => {

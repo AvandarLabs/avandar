@@ -29,18 +29,13 @@ declare module "@mantine/core" {
   export interface MantineThemeOther {
     /** Primary color */
     primaryColor: string;
-
     zIndex: {
       appShellMain: number;
       modal: number;
     };
-
     elevation: typeof ElevationTheme;
-
     borders: typeof BorderTheme;
-
     animation: typeof AnimationTheme;
-
     navbar: {
       /** Navbar background color */
       backgroundColor: string;

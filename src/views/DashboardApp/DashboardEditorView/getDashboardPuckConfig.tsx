@@ -9,9 +9,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { Paper } from "@ui";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
-import { Paper } from "@ui";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import { buildDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
 import { buildContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";

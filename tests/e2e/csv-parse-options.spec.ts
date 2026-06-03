@@ -44,16 +44,27 @@ const COLUMN_NAMES_AFTER_SKIP_1 = [
 
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
+  await skipInput.click();
+  await skipInput.press("ControlOrMeta+a");
   await skipInput.fill(String(value));
+  await expect(skipInput).toHaveValue(String(value));
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
+  await delimiterInput.click();
+  await delimiterInput.selectText();
   await delimiterInput.fill(value);
+  await expect(delimiterInput).toHaveValue(value);
 }
 
 async function clickReparse(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Process data again" }).click();
+  const reparseButton = page.getByRole("button", {
+    name: "Process data again",
+  });
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
+  await reparseButton.click();
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
 }
 
 /**
@@ -78,9 +89,9 @@ async function expectParseFailedEmpty(page: Page): Promise<void> {
   await expect(page.getByText("Data processing failed")).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
-  await expect(
-    page.getByText("No rows were read successfully"),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
+  await expect(page.getByText("No rows were read successfully")).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
 }
 
 test.describe("CSV parsing options", () => {
@@ -100,6 +111,9 @@ test.describe("CSV parsing options", () => {
     });
 
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await expect(page.getByText("No datasets added yet")).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
@@ -197,10 +211,20 @@ test.describe("CSV parsing options", () => {
       }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Final: hard-coded back to the first altered configuration that
-    // produced data (skip=1, delimiter=","). Save the dataset with these
-    // options and verify the persisted columns reflect them.
+    // Final: restore sniffed comma delimiter, then apply skip=1 (same sequence
+    // as the mid-test recovery + variation 1, which avoids cross-focus resets).
+    await setSkipRows(page, 0);
     await setDelimiter(page, FINAL_DELIMITER);
+    await clickReparse(page);
+    await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
+
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
     await expectParsedRowCount(page, 99);
