@@ -312,9 +312,10 @@ describe("createAppStateManager", () => {
         },
       );
 
-      // @ts-expect-error Intentionally passing both `initialState` and `initArg`/`initFn`.
-      // The public overloads forbid this combination, but we assert runtime behavior:
-      // `initialState` wins and `initFn` is never invoked.
+      // @ts-expect-error Intentionally passing both `initialState` and
+      // `initArg`/`initFn`. The public overloads forbid this combination, but
+      // we assert runtime behavior: `initialState` wins and `initFn` is never
+      // invoked.
       const PrecedenceManager = createAppStateManager({
         name: "Precedence",
         initialState: { count: 10, label: "from-initial" },
