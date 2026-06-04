@@ -3,6 +3,7 @@ import "@puckeditor/core/puck.css";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Flex, Text } from "@mantine/core";
 import { notifyDevAlert, notifySuccess } from "@ui";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
@@ -13,7 +14,6 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import { DashboardChatPendingBlocksSync } from "@/views/DashboardApp/DashboardEditorView/DashboardChatPendingBlocksSync";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
@@ -70,6 +70,32 @@ export function DashboardEditorView({
   // persisted in the dashboard's `config`. Publishing copies the persisted
   // config to the public bucket, so we disable publish while dirty.
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const { pendingBlocks } = DashboardEditorStateManager.useState();
+
+  // Chat-queued P-blocks append through parent `data` so Puck receives the
+  // updated prop. `DashboardChatPendingBlocksSync` uses Puck dispatch, which
+  // is not mounted from `headerActions` overrides in the editor shell.
+  // TODO(jpsyx): refactor this. We should not be using `useEffect` to update
+  // state. Instead, we should lift the dashboard puck data into
+  // DashboardEditorStateManager and remove the concept of 'pending blocks'.
+  // Instead, when the chat receives a new block, it should just update the
+  // puck data directly.
+  useEffect(() => {
+    if (pendingBlocks.length === 0) {
+      return;
+    }
+
+    const blocksToAdd = pendingBlocks.map(prop("block"));
+
+    setData((previous) => {
+      return {
+        ...previous,
+        content: [...(previous.content ?? []), ...blocksToAdd],
+      };
+    });
+    setHasUnsavedChanges(true);
+    dashboardEditorDispatch.clearPendingBlocks();
+  }, [pendingBlocks, dashboardEditorDispatch]);
 
   useEffect(() => {
     if (lastDashboardIdRef.current === dashboard.id) {
@@ -176,7 +202,6 @@ export function DashboardEditorView({
               headerActions: () => {
                 return (
                   <>
-                    <DashboardChatPendingBlocksSync />
                     <SaveDashboardButton onSave={onSave} />
                     <ShareResourceButton
                       size={DASHBOARD_TOOLBAR_BUTTON_SIZE}

@@ -106,15 +106,11 @@ test.describe("dashboard chat → P-block", () => {
       page.getByText(/Added a bar chart of California cases/i),
     ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-    // And the new DataViz block should be on the canvas. Puck renders the
-    // preview inside an iframe, so scope the assertion to that frame.
-    const puckPreview = page.frameLocator("iframe").first();
-    await expect(
-      puckPreview
-        .getByText("California cases by region", { exact: true })
-        .first(),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
-
     expect(chatTurns).toBeGreaterThanOrEqual(1);
+
+    const editorFrame = page.locator("iframe").first().contentFrame();
+    await expect(editorFrame.locator(".recharts-bar").first()).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
   });
 });

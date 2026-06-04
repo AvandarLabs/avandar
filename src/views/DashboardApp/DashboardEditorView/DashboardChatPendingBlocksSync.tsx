@@ -34,7 +34,7 @@ export function DashboardChatPendingBlocksSync(): null {
       },
     });
 
-    dashboardEditorDispatch.consumePendingBlocks();
+    dashboardEditorDispatch.clearPendingBlocks();
   }, [pendingBlocks, dispatch, dashboardEditorDispatch]);
 
   return null;

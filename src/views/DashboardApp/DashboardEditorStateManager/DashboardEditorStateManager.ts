@@ -71,8 +71,14 @@ export const DashboardEditorStateManager = createAppStateManager({
       return { ...state, pendingBlocks: [...state.pendingBlocks, block] };
     },
 
-    /** Drain the queue; the editor calls this after it appends the blocks. */
-    consumePendingBlocks: (
+    /**
+     * Drain the queue; the editor calls this after it appends the blocks.
+     *
+     * TODO(jpsyx): this is an antipattern and this should be removed once
+     * we lift the puck data state from DashboardEditorView into the
+     * DashboardEditorStateManager.
+     */
+    clearPendingBlocks: (
       state: DashboardEditorAppState,
     ): DashboardEditorAppState => {
       if (state.pendingBlocks.length === 0) {

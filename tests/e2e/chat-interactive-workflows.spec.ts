@@ -73,6 +73,22 @@ async function mountMockChat(args: {
 }): Promise<void> {
   const { page, responder } = args;
   let turnIndex = 0;
+
+  await page.route("**/functions/v1/chat/*/session-secret", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.fallback();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        sessionSecret: Buffer.alloc(32, 0x42).toString("base64"),
+        issuedAt: Date.now(),
+      }),
+    });
+  });
+
   await page.route("**/functions/v1/chat/*/messages", async (route) => {
     if (route.request().method() !== "POST") {
       await route.fallback();
@@ -274,9 +290,10 @@ test.describe("chat interactive workflows", () => {
       .evaluate((node) => {
         (node as { click: () => void }).click();
       });
-    await page
-      .getByLabel("Custom clarification answer")
-      .fill("Western corridor");
+    const customAnswerInput = page.getByLabel("Custom clarification answer");
+    await expect(customAnswerInput).toBeVisible({ timeout: SHORT_WAIT });
+    await customAnswerInput.fill("Western corridor");
+    await expect(customAnswerInput).toHaveValue("Western corridor");
 
     const confirmButton = page.getByRole("button", { name: /^confirm$/i });
     await expect(confirmButton).toBeEnabled({ timeout: SHORT_WAIT });

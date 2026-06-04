@@ -20,7 +20,7 @@ export async function openShareModal(page: Page): Promise<void> {
   await shareButton.click();
   await expect(
     shareDialog(page).getByRole("combobox", {
-      name: "Add people, groups, or tags",
+      name: "Add people or user groups",
     }),
   ).toBeVisible({ timeout: LONG_WAIT });
 }
@@ -82,7 +82,7 @@ export async function addShare(options: {
   const dialog = shareDialog(page);
 
   const addCombobox = dialog.getByRole("combobox", {
-    name: "Add people, groups, or tags",
+    name: "Add people or user groups",
   });
   await addCombobox.click();
   await addCombobox.fill(principalLabel);

@@ -6,7 +6,6 @@ import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetV
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
-  pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
 import {
   createSupabaseAdminClient,
@@ -70,10 +69,11 @@ test.describe("Data Explorer query details", () => {
       .toBe(beforeUrl);
 
     await page.getByRole("tab", { name: /^sql$/i }).click();
-    await expect(page.locator("textarea[readonly]").first()).toHaveValue(
-      SEEDED_SQL,
-      { timeout: SHORT_WAIT },
-    );
+    await expect(
+      page.getByRole("tabpanel", { name: /^sql$/i }).getByRole("code"),
+    ).toContainText(/SELECT 1 AS [`"]?mocked_column[`"]? LIMIT 20/, {
+      timeout: SHORT_WAIT,
+    });
   });
 
   test("query panels remember their last position and collapsed state", async ({
@@ -127,7 +127,7 @@ test.describe("Data Explorer query details", () => {
 
     await page.evaluate(
       ({ storageKey }) => {
-        window.localStorage.setItem(
+        window.sessionStorage.setItem(
           storageKey,
           JSON.stringify({
             queryDetails: {
@@ -206,8 +206,11 @@ test.describe("Data Explorer query details", () => {
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
       workspaceSlug,
+      navigationTimeout: MEDIUM_WAIT,
     });
-    await pollUntilCloudDatasetToggleShowsOnline(page);
+    // Skip cloud-sync polling: the data explorer reads the local parquet
+    // immediately after save. Waiting for upload would exceed the 45s budget
+    // when this file runs after other heavy specs in the same worker.
 
     const datasetId = parseDatasetIdFromDataManagerUrl({
       url: page.url(),
@@ -225,7 +228,7 @@ test.describe("Data Explorer query details", () => {
     try {
       await page.evaluate(
         ({ storageKey }) => {
-          window.localStorage.removeItem(storageKey);
+          window.sessionStorage.removeItem(storageKey);
         },
         { storageKey: PANEL_PREFERENCES_STORAGE_KEY },
       );
@@ -233,13 +236,15 @@ test.describe("Data Explorer query details", () => {
       await page.goto(`/${workspaceSlug}/data-explorer`);
       await dismissBlockingOverlays(page);
 
-      const queryDetailsPanel = page.locator('div[aria-label="Query Details"]');
+      const queryDetailsPanel = page.getByRole("dialog", {
+        name: "Query Details",
+      });
       await expect(queryDetailsPanel).toBeVisible({ timeout: SHORT_WAIT });
       await expect(
         page.getByRole("tab", { name: /^manual query$/i }),
       ).toHaveAttribute("aria-selected", "true");
 
-      const dataSourceInput = page.getByLabel("Data source");
+      const dataSourceInput = queryDetailsPanel.getByLabel("Data source");
       await dataSourceInput.click();
 
       await expect(

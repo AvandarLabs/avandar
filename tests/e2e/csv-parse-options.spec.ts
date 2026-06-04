@@ -53,20 +53,39 @@ async function uploadSmallCaliforniaCsv(page: Page): Promise<void> {
     .click();
 }
 
+/** Yields so parse-option edits commit before "Process data again". */
+async function yieldForParseOptionsCommit(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    return new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
+    });
+  });
+}
+
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
+  const delimiterInput = page.getByLabel("Delimiter", { exact: true });
   await skipInput.click();
   await skipInput.press("ControlOrMeta+a");
-  await skipInput.fill(String(value));
-  await expect(skipInput).toHaveValue(String(value));
+  await skipInput.pressSequentially(String(value), { delay: 30 });
+  await delimiterInput.focus();
+  await expect(skipInput).toHaveValue(String(value), { timeout: MEDIUM_WAIT });
+  await yieldForParseOptionsCommit(page);
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
+  const skipInput = page.getByLabel("Number of rows to skip");
   await delimiterInput.click();
-  await delimiterInput.selectText();
-  await delimiterInput.fill(value);
-  await expect(delimiterInput).toHaveValue(value);
+  await delimiterInput.press("ControlOrMeta+a");
+  await page.keyboard.insertText(value);
+  await skipInput.focus();
+  await expect(delimiterInput).toHaveValue(value, { timeout: MEDIUM_WAIT });
+  await yieldForParseOptionsCommit(page);
 }
 
 async function clickReparse(page: Page): Promise<void> {
@@ -164,9 +183,12 @@ test.describe("CSV parsing options", () => {
     await clickReparse(page);
     await expectParsedRowCount(page, 95);
 
-    // Variation 3: skipping past the end of the file produces 0 rows and
-    // triggers the explicit "Data processing failed" callout.
-    await setSkipRows(page, 200);
+    // Variation 3: skipping past the end of the file (101 lines) produces 0
+    // rows and triggers the explicit "Data processing failed" callout.
+    await setSkipRows(page, 0);
+    await clickReparse(page);
+    await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+    await setSkipRows(page, 101);
     await clickReparse(page);
     await expectParseFailedEmpty(page);
 
