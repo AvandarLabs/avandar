@@ -1,5 +1,5 @@
 import { MantineProvider } from "@mantine/core";
-import { render } from "@testing-library/react";
+import { render } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { AuthLayout } from "./index";

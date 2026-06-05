@@ -1,7 +1,6 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, render  } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
-import { render } from "@/utils/testing-utils";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {

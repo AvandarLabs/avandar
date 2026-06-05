@@ -1,6 +1,6 @@
 import { I18nProvider } from "@lingui/react";
 import { MantineProvider } from "@mantine/core";
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { i18n } from "@/i18n/i18n";

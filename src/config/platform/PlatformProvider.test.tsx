@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen } from "@/test-utils";
 import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { afterEach, describe, expect, it } from "vitest";
 import { PlatformProvider, usePlatform } from "./PlatformProvider";

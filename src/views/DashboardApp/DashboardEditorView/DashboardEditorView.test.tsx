@@ -6,7 +6,7 @@ import {
   RenderOptions,
   render as renderRtl,
   screen,
-} from "@testing-library/react";
+} from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";

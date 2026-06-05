@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook } from "@/test-utils";
 import { useRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useChatPanelComposerAutoFocus } from "./useChatPanelComposerAutoFocus";

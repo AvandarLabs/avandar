@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook } from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";

@@ -1,6 +1,6 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { render } from "@testing-library/react";
+import { render } from "@/test-utils";
 import { describe, expect, it } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { FunnelChartForm } from "./FunnelChartForm";

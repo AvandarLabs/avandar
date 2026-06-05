@@ -8,7 +8,7 @@
  * value. This is the safety net behind the "every setting actually
  * changes the viz" guarantee.
  */
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { pathGet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";

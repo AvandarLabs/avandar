@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getIsOnline, useIsOnline } from "@/lib/offline/useIsOnline";
 

@@ -9,7 +9,7 @@ import {
   render as renderRtl,
   screen,
   waitFor,
-} from "@testing-library/react";
+} from "@/test-utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";

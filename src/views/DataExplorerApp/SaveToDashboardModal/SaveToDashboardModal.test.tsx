@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
   within,
-} from "@testing-library/react";
+} from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";

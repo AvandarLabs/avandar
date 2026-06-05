@@ -1,6 +1,6 @@
 import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";

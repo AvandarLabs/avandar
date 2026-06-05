@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook } from "@/test-utils";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
 import { useImportedColumns } from "./useImportedColumns";

@@ -6,7 +6,7 @@ import {
   render,
   screen,
   waitFor,
-} from "@testing-library/react";
+} from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { i18n } from "@/i18n/i18n";

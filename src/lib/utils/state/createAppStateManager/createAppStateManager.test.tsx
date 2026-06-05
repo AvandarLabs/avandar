@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type { ReactNode } from "react";

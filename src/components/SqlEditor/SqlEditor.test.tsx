@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test-utils";
 import { describe, expect, it } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { SqlEditor } from "./SqlEditor";

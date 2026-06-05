@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@/test-utils";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";

@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { useIsDesktopPlatform } from "@/hooks/usePlatformInfo/useIsDesktopPlatform/useIsDesktopPlatform";
 

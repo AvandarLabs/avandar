@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook } from "@/test-utils";
 import { describe, expect, test } from "vitest";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
