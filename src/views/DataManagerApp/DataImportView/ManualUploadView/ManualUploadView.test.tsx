@@ -1,17 +1,19 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render as renderRtl, RenderOptions } from "@testing-library/react";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { fireEvent, screen, waitFor } from "@/test-utils";
+import {
+  fireEvent,
+  render,
+  RenderOptions,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import type {
   DuckDbColumnSchema,
@@ -20,7 +22,7 @@ import type {
 import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),
@@ -109,7 +111,7 @@ vi.mock("@/lib/ui/viz/DataGrid", async () => {
 function renderWithProviders(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-): ReturnType<typeof renderRtl> {
+): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -118,14 +120,12 @@ function renderWithProviders(
     },
   });
 
-  return renderRtl(ui, {
-    wrapper: ({ children }) => {
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
       return (
-        <I18nProvider i18n={i18n}>
-          <QueryClientProvider client={queryClient}>
-            <AvandarUiProvider>{children}</AvandarUiProvider>
-          </QueryClientProvider>
-        </I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       );
     },
     ...options,

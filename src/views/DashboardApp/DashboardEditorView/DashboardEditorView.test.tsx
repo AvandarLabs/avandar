@@ -1,17 +1,13 @@
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render as renderRtl, RenderOptions } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import { fireEvent, screen } from "@/test-utils";
+import { fireEvent, render, RenderOptions, screen } from "@/test-utils";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfileId } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return {
@@ -226,22 +222,18 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 function renderWithProviders(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-): ReturnType<typeof renderRtl> {
+): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return renderRtl(ui, {
-    wrapper: ({ children }) => {
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
       return (
-        <I18nProvider i18n={i18n}>
-          <QueryClientProvider client={queryClient}>
-            <AvandarUiProvider>
-              <DashboardEditorStateManager.Provider>
-                {children}
-              </DashboardEditorStateManager.Provider>
-            </AvandarUiProvider>
-          </QueryClientProvider>
-        </I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <DashboardEditorStateManager.Provider>
+            {children}
+          </DashboardEditorStateManager.Provider>
+        </QueryClientProvider>
       );
     },
     ...options,
