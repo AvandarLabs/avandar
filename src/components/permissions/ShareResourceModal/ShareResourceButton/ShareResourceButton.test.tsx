@@ -1,6 +1,6 @@
-import { act, screen, waitFor, render  } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
+import { act, render, screen, waitFor } from "@/test-utils";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {

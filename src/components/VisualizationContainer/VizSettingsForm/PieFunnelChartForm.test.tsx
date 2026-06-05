@@ -1,8 +1,8 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { render } from "@/test-utils";
 import { describe, expect, it } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { render } from "@/test-utils";
 import { FunnelChartForm } from "./FunnelChartForm";
 import { PieChartForm } from "./PieChartForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

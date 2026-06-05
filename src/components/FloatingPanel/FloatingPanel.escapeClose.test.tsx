@@ -1,10 +1,10 @@
 import "@/config/Theme/animationPresets.css";
 import { Button } from "@mantine/core";
-import { act, fireEvent, screen, waitFor, render  } from "@/test-utils";
 import { useRef, useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { ANIMATION_PRESET } from "@/config/Theme";
+import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 
 function enableAnimationsForTest(): void {
   vi.stubGlobal(

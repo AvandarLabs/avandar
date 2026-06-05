@@ -1,6 +1,6 @@
-import { act, renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
+import { act, renderHook } from "@/test-utils";
 
 describe("usePlatformInfo", () => {
   afterEach(() => {

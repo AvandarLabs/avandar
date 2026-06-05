@@ -1,7 +1,7 @@
 import { MantineProvider } from "@mantine/core";
-import { render } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { render } from "@/test-utils";
 import { AuthLayout } from "./index";
 
 describe("AuthLayout", () => {

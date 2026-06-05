@@ -8,12 +8,12 @@
  * "changing a control updates the config"; these tests prove
  * "changing a config setting updates what the chart renders".
  */
-import { render } from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
+import { render } from "@/test-utils";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";

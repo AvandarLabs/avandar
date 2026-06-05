@@ -1,5 +1,5 @@
-import { act, renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
+import { act, renderHook } from "@/test-utils";
 import {
   clearLocalChatModelDownloaded,
   markLocalChatModelDownloaded,

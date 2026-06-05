@@ -1,10 +1,10 @@
 import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { i18n } from "@/i18n/i18n";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { openFileImportFlow } from "./openFileImportFlow";
 import type { ReactElement } from "react";
 

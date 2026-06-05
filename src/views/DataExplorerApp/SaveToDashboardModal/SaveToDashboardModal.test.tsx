@@ -1,13 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";

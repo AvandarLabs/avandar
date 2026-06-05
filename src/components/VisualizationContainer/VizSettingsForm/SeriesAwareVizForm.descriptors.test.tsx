@@ -8,12 +8,12 @@
  * value. This is the safety net behind the "every setting actually
  * changes the viz" guarantee.
  */
-import { fireEvent, render, screen, within } from "@/test-utils";
 import { pathGet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";

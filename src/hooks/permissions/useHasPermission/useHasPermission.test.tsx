@@ -1,7 +1,7 @@
-import { renderHook } from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
+import { renderHook } from "@/test-utils";
 
 vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return { useUserAppRoles: vi.fn() };

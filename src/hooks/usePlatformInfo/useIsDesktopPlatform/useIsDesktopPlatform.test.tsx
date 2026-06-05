@@ -1,6 +1,6 @@
-import { act, renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { useIsDesktopPlatform } from "@/hooks/usePlatformInfo/useIsDesktopPlatform/useIsDesktopPlatform";
+import { act, renderHook } from "@/test-utils";
 
 describe("useIsDesktopPlatform", () => {
   afterEach(() => {

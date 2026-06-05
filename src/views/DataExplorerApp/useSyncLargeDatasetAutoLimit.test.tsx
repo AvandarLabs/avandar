@@ -1,6 +1,6 @@
-import { renderHook, waitFor } from "@/test-utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook, waitFor } from "@/test-utils";
 import {
   clearDatasetRowCountCache,
   setCachedDatasetRowCount,

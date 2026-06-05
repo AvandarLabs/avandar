@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, within } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import {
   getMantineSelectDropdown,
   pickMantineSelectOption,

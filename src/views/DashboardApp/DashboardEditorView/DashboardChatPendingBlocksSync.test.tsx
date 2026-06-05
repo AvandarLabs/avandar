@@ -1,6 +1,6 @@
-import { render, waitFor } from "@/test-utils";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { render, waitFor } from "@/test-utils";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DashboardChatPendingBlocksSync } from "@/views/DashboardApp/DashboardEditorView/DashboardChatPendingBlocksSync";
 

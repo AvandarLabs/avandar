@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { fireEvent, render, screen } from "@/test-utils";
 import { PillEditPopover } from "./PillEditPopover";
 import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";

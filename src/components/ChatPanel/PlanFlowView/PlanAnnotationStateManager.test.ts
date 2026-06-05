@@ -1,6 +1,6 @@
-import { act, renderHook } from "@/test-utils";
 import { describe, expect, test } from "vitest";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import { act, renderHook } from "@/test-utils";
 import type {
   Annotation,
   TextAnnotation,

@@ -1,6 +1,6 @@
-import { fireEvent, screen, render  } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { SharePrincipalRow } from "@/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow";
+import { fireEvent, render, screen } from "@/test-utils";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 

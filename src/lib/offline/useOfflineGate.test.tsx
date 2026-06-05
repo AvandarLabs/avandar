@@ -1,8 +1,8 @@
 import { I18nProvider } from "@lingui/react";
-import { renderHook } from "@/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { i18n } from "@/i18n/i18n";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
+import { renderHook } from "@/test-utils";
 
 vi.mock("@ui", () => {
   return {

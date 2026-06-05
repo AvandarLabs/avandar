@@ -1,6 +1,6 @@
-import { render, screen } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { render, screen } from "@/test-utils";
 import { ChatSyntaxHighlighterRouter } from "./MarkdownTextPart";
 
 vi.mock("@/hooks/sql/useSqlDisplayCatalog", () => {

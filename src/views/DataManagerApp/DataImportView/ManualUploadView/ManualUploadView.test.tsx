@@ -3,13 +3,6 @@ import path from "node:path";
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  fireEvent,
-  RenderOptions,
-  render as renderRtl,
-  screen,
-  waitFor,
-} from "@/test-utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -17,6 +10,13 @@ import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import {
+  fireEvent,
+  RenderOptions,
+  render as renderRtl,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import type {
   DuckDbColumnSchema,

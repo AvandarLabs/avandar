@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from "@/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook, waitFor } from "@/test-utils";
 import { useIsVoicePromptAvailable } from "./useIsVoicePromptAvailable";
 
 const { isOnlineRef, isModelDownloadedMock, voiceManagerMock } = vi.hoisted(

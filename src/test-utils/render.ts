@@ -1,7 +1,7 @@
 import {
   RenderOptions,
-  RenderResult,
   render as renderReact,
+  RenderResult,
 } from "@testing-library/react";
 import { ReactElement } from "react";
 import { TestProviders } from "./TestProviders";

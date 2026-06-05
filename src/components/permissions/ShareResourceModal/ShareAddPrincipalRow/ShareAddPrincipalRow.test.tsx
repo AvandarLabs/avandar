@@ -1,6 +1,6 @@
-import { screen, render  } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { ShareAddPrincipalRow } from "@/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow";
+import { render, screen } from "@/test-utils";
 
 describe("ShareAddPrincipalRow", () => {
   it("disables the Share button until a target is selected", () => {

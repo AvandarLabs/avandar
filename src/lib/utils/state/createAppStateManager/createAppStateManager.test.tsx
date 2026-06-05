@@ -1,6 +1,6 @@
-import { act, renderHook } from "@/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
+import { act, renderHook } from "@/test-utils";
 import type { ReactNode } from "react";
 
 type CounterState = {
