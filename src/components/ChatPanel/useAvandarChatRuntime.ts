@@ -35,9 +35,9 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { LocalChatModelId } from "@/lib/offlineChat/localChatModelCatalog";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
-import type { User } from "$/models/User/User";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { User } from "$/models/User/User";
 import type {
   ChatClarifyRequest,
   ChatRetryContext,

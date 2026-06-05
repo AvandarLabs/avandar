@@ -7,9 +7,9 @@ import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
 import type { LocalChatModelId } from "./localChatModelCatalog";
 import type { OfflineChatTurnResult } from "./offlineChat.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type RunOfflineChatTurnArgs = {
   workspace: Workspace.T;

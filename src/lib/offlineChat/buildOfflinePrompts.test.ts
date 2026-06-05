@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import { describe, expect, it } from "vitest";
 import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,

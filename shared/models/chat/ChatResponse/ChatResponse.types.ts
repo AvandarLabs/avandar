@@ -1,10 +1,10 @@
 import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 import type {
   ChatClarifyRequest,
   ChatGeneratedDashboardBlock,
   ChatPlan,
 } from "$/types/chat.types.ts";
-import type { UUID } from "@utils/types/common.types.ts";
 
 type ModelType = "ChatResponse";
 

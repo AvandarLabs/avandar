@@ -1,3 +1,4 @@
+import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,9 +12,9 @@ const { fakeDbClient } = vi.hoisted(() => {
 });
 
 vi.mock("$/platform/isDesktop.ts", async () => {
-  const actual = await vi.importActual<typeof import("$/platform/isDesktop.ts")>(
-    "$/platform/isDesktop.ts",
-  );
+  const actual = await vi.importActual<
+    typeof import("$/platform/isDesktop.ts")
+  >("$/platform/isDesktop.ts");
   return {
     ...actual,
     isDesktop: vi.fn(() => {
@@ -31,8 +32,6 @@ vi.mock("$/db/supabase/AvaSupabase.ts", () => {
     },
   };
 });
-
-import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
 
 describe("createServerApiClient", () => {
   beforeEach(() => {

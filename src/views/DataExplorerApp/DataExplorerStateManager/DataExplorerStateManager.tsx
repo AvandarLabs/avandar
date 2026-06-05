@@ -8,8 +8,8 @@ import {
 } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
-import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,

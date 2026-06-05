@@ -59,9 +59,9 @@ export const ChatModelStorage = createModule("ChatModelStorage", {
         honorStoredWhenMissing?: boolean;
       }): string => {
         const resolvedStoredModelId =
-          storedModelId !== undefined ?
-            storedModelId
-          : _readStoredChatModelId();
+          storedModelId !== undefined ? storedModelId : (
+            _readStoredChatModelId()
+          );
         const candidate = selectedModelId ?? resolvedStoredModelId;
 
         if (candidate && availableModels.some(propEq("id", candidate))) {

@@ -18,8 +18,8 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /**
  * Returns the localized label for the page chip shown in the empty state.
