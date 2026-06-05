@@ -77,13 +77,35 @@ planning is complete.
   global indices minus the 4 retired #4/#5/#6/#7 plus the 1 added
   #96). Index numbering is intentionally non-dense — folded-in row
   numbers are not reused; rows have global IDs.
+- **Session 3a (2026-06-05)**: authored the first batch of five
+  per-feature migration plans by dispatching parallel Explore
+  agents to gather canonical paths, file lists, dependency wiring,
+  and risks for each row. Plans written for #1
+  `async-dataset-import-pipeline` (the foundational pipeline; rows
+  #2 and #3 depend on it), #2 `app-wide-dropzone`, #3
+  `dataset-drawer`, #8 `floating-query-windows`, and #9
+  `viz-multi-series-and-chart-types` (the largest single migration
+  in the queue, ~7.2k LoC added across ~80 files; ships
+  `AvaPageDataMigrationV3`). Notable finding folded into the #3
+  plan: the feature row in `ALL_FEATURES.md` claims a Drawer with
+  slide-from-bottom transitions, but the current `feat/ict4d-demo`
+  state has been refactored back to a centered Modal — the plan
+  flags this discrepancy in "Notes for future you" rather than
+  silently "fixing" the row.
 
-## Next: Session 3+ — write per-feature migration plans
+## Next: Session 3b+ — continue per-feature migration plans
+
+Outstanding: 87 plans (92 active rows − 5 authored). Recommended
+batching: ~5-10 plans per session. Next likely batch: #10
+`viz-settings-fieldsets`, #11 `codemirror-sql-editor`, #12
+`sql-pill-rendering`, #13 `chart-number-formatting`, #14
+`chart-color-picker-fix`, #96 `data-explorer-url-session-sync` —
+contiguous through the Data Explorer surface, with row #96 folded
+in because it shares the surface.
 
 Per the "Session 3+ — Write per-feature migration plans" section
-below. Recommended batching: ~5-10 plans per session. Per the
-operator rule, write each plan against the **current state** of
-`feat/ict4d-demo`, not the introduction-commit snapshot.
+below. Per the operator rule, write each plan against the **current
+state** of `feat/ict4d-demo`, not the introduction-commit snapshot.
 
 ## How to know which session number you are
 

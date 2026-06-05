@@ -49,9 +49,10 @@ let it drift.
 - **Active rows**: 92 (95 global indices minus retired #4/#5/#6/#7
   folded into #1, plus #96 added). Index numbering is intentionally
   non-dense.
-- **Next planning session**: Session 3+ — author per-feature
-  `NNN-<slug>.md` migration plans (one per row). Per
-  `PLAN_OF_PLANS.md`, recommended batching is ~5-10 plans per
+- **Next planning session**: Session 3b+ — continue authoring
+  per-feature `NNN-<slug>.md` migration plans. Session 3a (today,
+  2026-06-05) wrote 5 plans (#1, #2, #3, #8, #9); 87 outstanding.
+  Per `PLAN_OF_PLANS.md`, recommended batching is ~5-10 plans per
   session.
 
 `/deslop update` compares the analyzed-commit SHA above against
