@@ -1,51 +1,292 @@
-# Extra Checklist For `avandar-code-review`
+# Extra Checklist For `avandar-code-review` (Avandar Repo-Local)
 
-This document is intended to be used with the `avandar-code-review` skill.
+This file is used by the `avandar-code-review` skill as its final phase.
+It contains only rules that are specific to **this** repo (paths,
+directory conventions, monorepo layout, etc.).
 
-It contains additional review checks that are not included in the original
-skill. After finishing the skill's built-in checklist, the agent should also
-review code against the items in this file when it exists.
+General TypeScript / React / CSS / hooks / module rules live in the
+skill itself, under
+`~/projects/avandar-agent-skills/skills/avandar-code-review/docs/code-reviews/`.
 
-Whenever a user says to add a new common mistake, or says to "remember this in
-the future", append the new mistake to this document.
+Library-specific rules for the `@avandar/*` packages also live in the
+skill, under that same directory's `libraries/` subfolder. They are
+auto-gated on whether the package is present in this repo's
+`package.json`. In this repo, all three of `@avandar/utils`,
+`@avandar/models`, and `@avandar/modules` are present, so every
+library-gated phase should run.
 
-## Additional Mistakes
+## How to use this file
 
-- Dispatch on a string-literal or enum union with `match().exhaustive()` (from
-  `ts-pattern`) or `matchLiteral` (from `@utils`). These fail to compile when a
-  union case is unhandled. Plain `switch` (with or without `default`) and
-  `if`/`else if` chains do not check exhaustiveness, so don't use them for
-  union dispatch.
+1. Inspect the diff and classify which **gates** below match.
+2. For every gate that matches, apply the rules in that phase.
+3. Skip any phase whose gate does not match.
+4. In Pair Review mode, announce each phase before presenting its
+   findings, for example: "Phase: repo-local Deno paths".
 
-- Use block comments (`/** ... */`) only as documentation attached to an
-  identifier (functions, types, exports, etc.) or as a file-level header.
-  Any comment inside a function body must use `//` line comments, even when
-  it spans multiple lines.
+## Adding new rules
+
+Before adding a rule here, ask whether it is truly avandar-repo-specific.
+The rule belongs in the skill instead if:
+
+- The rule applies to any TypeScript / React / CSS / SQL project →
+  add to the relevant general checklist in the skill.
+- The rule is tied to an installable `@avandar/*` package → add to
+  the matching library checklist in the skill.
+
+A rule belongs **here** when it mentions:
+
+- A path that only exists in this repo (`supabase/functions/`,
+  `shared/`, `packages/shared/`, `src/views/`, etc.).
+- A directory layout convention that this repo enforces but a generic
+  consumer of the skill might not.
+- A repo-internal helper or pattern that has not been packaged.
+
+When you add a new rule, include a short bad/good example whenever the
+rule is non-obvious.
+
+## Phases
+
+Run these **in order** after the skill's built-in checklists, and only
+when the gate matches.
+
+### Phase: Deno-reachable directories
+
+- **Gate:** the diff modifies a `.ts` file under `supabase/functions/`,
+  `shared/`, or `packages/shared/`. Skip if none of those directories
+  are touched.
+- **Rule:** in this repo, those three directories are the
+  Deno-reachable code paths. Imports inside them must include explicit
+  file extensions (`./foo.ts`, not `./foo`). This is the repo-specific
+  expansion of the general "Deno-reachable code needs file extensions"
+  rule in the skill's TypeScript checklist.
+
+  **Find candidates** (relative imports that omit a file extension):
+
+  ```bash
+  grep -rEn 'from "(\.|\.\.)/[^"]+"' \
+    supabase/functions/ shared/ packages/shared/ \
+    --include="*.ts" \
+    | grep -Ev '\.(ts|tsx|js|jsx|json|css)"$'
+  ```
+
+  Misses imports under path aliases (`@something/foo`) that resolve into
+  Deno-reachable code. Spot-check alias imports in the diff by eye.
+
+### Phase: model directory layout
+
+- **Gate:** the diff touches any file under `shared/models/` or
+  `src/models/`. Skip if neither is touched.
+- **Rule:** new models go under one of those two roots:
+  - `shared/models/` — models used by both the app (`src/`) and edge
+    functions (`supabase/functions/`).
+  - `src/models/` — app-only models.
+    The `@avandar/models` library-gated phase in the skill covers the
+    per-file structure inside a model folder (namespace entry, `.types.ts`,
+    `Model.make` usage). This phase only enforces the choice of root
+    directory.
+
+### Phase: utils package reference
+
+- **Gate:** the diff would benefit from a `@avandar/utils` helper but
+  uses a hand-rolled version instead. Skip if no such opportunity is
+  visible.
+- **Rule:** in this repo, the canonical list of available `@avandar/utils`
+  helpers lives at `packages/shared/utils/README.md`. Point engineers
+  to that file in review comments when recommending a helper. The
+  general "utility reuse" principle is covered by the skill; this
+  phase just records the in-repo README path.
+
+### Phase: E2E tests (Playwright)
+
+- **Gate:** the diff includes any file under `tests/e2e/` (specs,
+  fixtures, or helpers). Skip this phase if no E2E file is touched.
+
+**Running E2E specs at the end of a review**
+
+- Never run the whole E2E suite for a code review.
+- Run only the exact `*.spec.ts` files that exercise the changed
+  behavior.
+- Run specs one at a time, sequentially, so each result is visible
+  without waiting for the full set first.
+- Use the repo's E2E script: `pnpm test:e2e <spec>.spec.ts`. Run each
+  spec in its own invocation rather than batching them.
+
+**Reviewing E2E test code**
+
+- E2E tests must drive behavior through the real product boundary.
+  Do not call the database directly to do work that the user flow
+  itself should perform (auth, permission checks, validation, mutation
+  endpoints, etc.).
+- Direct database writes (typically via `createSupabaseAdminClient()`)
+  are allowed **only** for setup / seed data that must exist before the
+  user flow starts: workspaces, users, memberships, owner profiles,
+  role groups, fixture datasets, etc.
+- Treat a direct database write that lands in the middle of an E2E
+  flow as a review finding even when the test is not explicitly about
+  permissions, because it can hide incorrect allow/deny behavior the
+  real flow should surface.
+
+  **Find candidates** (admin DB writes inside spec files):
+
+  ```bash
+  grep -rEn '\b(admin|supabaseAdmin)\.(from|rpc|auth)\b' \
+    tests/e2e/*.spec.ts
+  ```
+
+  Each hit is a candidate. The legitimate ones happen before the user
+  flow starts (or inside a `try` block immediately after sign-in for
+  setup). Flag the ones that interleave with `page.click()`,
+  `page.fill()`, or assertions that exercise the actual product
+  endpoint.
+
+**Cleanup**
+
+- Every E2E spec must leave the database in the same shape it was in
+  before the test ran. Resources created **during** the test (datasets,
+  dashboards, virtual datasets, resource_shares, role groups, profiles,
+  etc.) and state that the test **mutated** on existing resources
+  (membership role-group reassignments, permission matrix overrides,
+  feature-flag overrides, etc.) must both be cleaned up before the
+  spec returns.
+- Cleanup must run even when the spec fails or throws. Use one of the
+  two supported patterns:
+  1. **`try { … } finally { … }` around the test body**, calling the
+     repo's admin cleanup helpers (`deleteDashboardsByIds`,
+     `deleteDatasetAndShares`, `restoreE2ESecondaryMemberRoleGroup`,
+     etc.) from `tests/e2e/helpers/`. Track created ids in arrays
+     (`createdDashboardIds: string[]`) and push as you create.
+  2. **A Playwright fixture** that owns setup _and_ teardown for the
+     resource. Fixtures in `tests/e2e/fixtures/` already follow this
+     pattern (for example `e2eWithGlobalViewerMembership.fixture.ts`)
+     and should be extended rather than recreated when a new shared
+     resource needs the same lifecycle.
+- Setup-only `await admin.from(...).insert(...)` blocks with no matching
+  delete in `finally` (or in a fixture teardown) are a review finding,
+  even if the seed data is "small" or "harmless". Cross-spec leakage
+  causes flake that is expensive to diagnose later.
+- When a spec mutates state on a seeded user / membership / role group
+  that other specs will later read (the secondary user's role group is
+  the canonical example), the restore call belongs in `finally` so a
+  thrown assertion never leaves the user in a half-modified state.
+- Do not rely on `afterEach` / `afterAll` for resource cleanup that
+  was set up inside the test body. Those hooks run even when the body
+  threw before reaching the line that captured the resource id, which
+  leaves cleanup with nothing to delete. `try { … } finally { … }`
+  pairs the cleanup with the capture and is what the rest of the suite
+  uses.
+
+  **Find candidates** (specs in the diff that touch a delete helper or
+  admin write but never use `finally`):
+
+  ```bash
+  # Specs in the diff that look like they create resources but have no
+  # try/finally cleanup block.
+  for f in <files-in-diff-under-tests/e2e-ending-in-.spec.ts>; do
+    if grep -Eq '\b(admin|supabaseAdmin)\.(from|rpc)\b|createSupabaseAdminClient' "$f" \
+       && ! grep -q '\bfinally\b' "$f"; then
+      echo "no try/finally cleanup: $f"
+    fi
+  done
+
+  # Specs that import a delete helper but never call it inside a finally.
+  grep -rEn 'import .*(delete[A-Z][a-zA-Z]+|restoreE2E[A-Z][a-zA-Z]+)' \
+    tests/e2e/*.spec.ts
+  ```
+
+  False positives: specs that delegate all setup + teardown to a
+  fixture (e.g. `e2eWithGlobalViewerMembership`) won't have `finally`
+  and that's correct. Check whether the spec relies on such a fixture
+  before flagging.
 
   This is bad:
 
   ```ts
-  function load(id: string): Result {
-    /**
-     * We bail early on empty ids because the upstream cache treats them
-     * as wildcards and would return stale rows.
-     */
-    if (id === "") {
-      return emptyResult();
-    }
+  test("creates a dashboard", async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
     // ...
-  }
+    await page.getByRole("button", { name: "Create a dashboard" }).click();
+    // no try/finally, no fixture, no cleanup
+    // the dashboard row stays in the DB and leaks into the next spec
+  });
   ```
 
   This is good:
 
   ```ts
-  function load(id: string): Result {
-    // We bail early on empty ids because the upstream cache treats them
-    // as wildcards and would return stale rows.
-    if (id === "") {
-      return emptyResult();
+  test("creates a dashboard", async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const createdDashboardIds: string[] = [];
+
+    try {
+      // ...
+      await page.getByRole("button", { name: "Create a dashboard" }).click();
+      // ...
+      const dashboardId = parseDashboardIdFromUrl(page.url());
+      if (dashboardId) {
+        createdDashboardIds.push(dashboardId);
+      }
+      // ...assertions...
+    } finally {
+      await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }
-    // ...
-  }
+  });
   ```
+
+**Test timeouts**
+
+- Do not change the default test-level timeout from inside a spec.
+  Specifically, do not call `test.setTimeout(...)` and do not pass a
+  `timeout` option to `test(...)`, `test.describe(...)`, or
+  `test.beforeAll/Each(...)`. Test-level timeouts are configured
+  globally in `playwright.config.ts` (and the related project configs)
+  so the whole suite stays consistent and so flaky tests cannot mask
+  the underlying issue by raising their own ceiling.
+
+  If a spec is genuinely too slow under the global timeout,
+  investigate the root cause (a real bug, a missing wait, a costly
+  fixture) rather than overriding the timeout. Only the global config
+  should change, and only after the root cause is understood.
+
+  **Find candidates:**
+
+  ```bash
+  # Per-test or per-describe timeout overrides.
+  grep -rEn 'test\.setTimeout\(|\.configure\(\s*\{[^}]*timeout' \
+    tests/e2e/ --include="*.ts"
+
+  # `timeout:` passed directly into test() / test.describe() /
+  # test.beforeAll/beforeEach. Match the call-site option object.
+  grep -rEn '\btest(\.(describe|beforeAll|beforeEach|afterAll|afterEach))?\s*\([^)]*timeout *:' \
+    tests/e2e/ --include="*.ts"
+  ```
+
+  Locator-level timeouts (`expect(...).toBeVisible({ timeout: ... })`,
+  `await page.click(..., { timeout: ... })`) are allowed when they use
+  the shared `SHORT_WAIT` / `MEDIUM_WAIT` / `LONG_WAIT` constants — do
+  not flag those.
+
+  This is bad:
+
+  ```ts
+  test("uploads a CSV and renders the chart", async ({ page }) => {
+    test.setTimeout(240_000); // overrides the global default
+    // ...
+  });
+
+  test.describe.configure({ timeout: 180_000 }); // also bad
+  ```
+
+  This is good:
+
+  ```ts
+  test("uploads a CSV and renders the chart", async ({ page }) => {
+    // no test.setTimeout — relies on playwright.config.ts default
+    // ...
+  });
+  ```
+
+  This rule applies to test-level timeouts only. Locator-level
+  timeouts on `expect(...).toBeVisible({ timeout: MEDIUM_WAIT })` and
+  similar action assertions are fine, since those use the shared
+  `SHORT_WAIT` / `MEDIUM_WAIT` / `LONG_WAIT` constants and target a
+  specific action rather than the whole test.

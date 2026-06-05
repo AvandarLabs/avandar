@@ -17,7 +17,7 @@
       "source": "AvandarLabs/avandar-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/avandar-code-review/SKILL.md",
-      "computedHash": "dbb4bd937407505123e1263343d7e5eed2fc674e985fa22fcc32bfeff0ebd282"
+      "computedHash": "a6b5a04dc7e5f86d55575c122f78d686f7c40164488e31ea2d10afd8178dba99"
     },
     "brainstorming": {
       "source": "obra/superpowers",
@@ -185,7 +185,7 @@
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
-      "computedHash": "45a3cdccc364a4bbd6cdf700fc069e9f24ebc0428098746cbfbf8b18a5e160d2"
+      "computedHash": "598f357a3b6ecfbb96fac93c9ed0a5053f69191dbd7a333403c922df89a59056"
     },
     "supabase-declarative-schema": {
       "source": "AvandarLabs/avandar-agent-skills",
@@ -197,7 +197,7 @@
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
-      "computedHash": "d606a1146be6d54fb9e73f718b5320b9acac5ff2ba2d7230a555df4b5a923b4a"
+      "computedHash": "efc547df91cc56b69792532db54607027884cb5873718c7ca1ebf6d6f1e4cb53"
     },
     "systematic-debugging": {
       "source": "obra/superpowers",

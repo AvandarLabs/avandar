@@ -76,7 +76,8 @@
     "i18n:check": "lingui extract --overwrite && git diff --exit-code src/i18n/locales",
     "i18n:translate-llm": "pnpm vite-script scripts/i18n/translateWithLLM.ts",
     "i18n:update": "pnpm i18n:extract && pnpm i18n:translate-llm && pnpm i18n:compile",
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "doctor": "npx react-doctor@latest"
   },
   "preinstall": "npx only-allow pnpm",
   "//comments:dependencies": {
@@ -228,6 +229,7 @@
     "prettier": "^3.8.0",
     "prettier-plugin-sql": "^0.19.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "react-doctor": "^0.4.0",
     "react-email": "^5.0.5",
     "resend": "^6.5.2",
     "stylelint": "^17.4.0",

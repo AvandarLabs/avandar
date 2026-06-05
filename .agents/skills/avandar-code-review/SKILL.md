@@ -3,15 +3,16 @@ name: avandar-code-review
 description: Use when reviewing Avandar code changes, pull requests, or local diffs for repo-specific TypeScript, React, SQL, naming, documentation, and immutability conventions.
 metadata:
   author: jpsyx
-  version: "1.9.0"
+  version: "2.0.0"
   tags: avandar, code-review, typescript, react, sql, conventions, style
 ---
 
 # Avandar Code Review
 
-Use this skill when reviewing Avandar code for convention violations. Apply the
-general section to every review, then only apply the language-specific
-checklists when those languages are present in the diff.
+Use this skill when reviewing Avandar code for convention violations. Run
+the common-mistakes and general-checks sections on every review, then
+only apply the language-specific and library-gated phases when the diff
+matches their gate.
 
 ## Additional Checklist File
 
@@ -19,18 +20,29 @@ This skill ships with a template at
 `skills/avandar-code-review/docs/code-reviews/extra-checklist.md`.
 
 The actual repo-local checklist used during reviews lives at
-`docs/code-reviews/extra-checklist.md`.
+`docs/code-reviews/extra-checklist.md` in the repo under review.
 
-- Use the repo-local file as a second-pass checklist after finishing the
-  built-in review rules in this skill.
+- Use the repo-local file as a final phase after finishing the built-in
+  phases in this skill.
 - Only consult the repo-local file if it exists. If it does not exist, do
   nothing.
-- Treat the repo-local file as a list of additional common mistakes that
-  supplement this skill without replacing the main checklist.
+- Treat the repo-local file as additional repo-specific rules that
+  supplement this skill without replacing the main checklists.
 - If the user says to add a new common mistake, says "remember this in the
-  future", says "add this to common mistakes", or says "add this to my review
-  checklist", create the repo-local file if needed and append the described
-  issue there.
+  future", says "add this to common mistakes", or says "add this to my
+  review checklist":
+  - If the rule is **general** (applies to any TypeScript / React / CSS
+    project), the rule belongs in this skill. Add it to the appropriate
+    sub-checklist under
+    `skills/avandar-code-review/docs/code-reviews/` and update the phase
+    list in this file if it warrants a new phase.
+  - If the rule is **library-specific** (tied to one of the
+    `@avandar/*` packages or another installable package), add it to the
+    matching file under `docs/code-reviews/libraries/` in this skill, or
+    create a new library-gated phase there.
+  - If the rule is **repo-specific** (mentions paths or conventions
+    unique to one codebase), add it to the repo-local
+    `docs/code-reviews/extra-checklist.md`.
 - When creating the repo-local file for the first time, use the packaged
   template from this skill as the starting structure.
 
@@ -110,28 +122,29 @@ Goal: interactive review, user approves direction before edits.
 
 1. If the mode was not specified, prompt for it at the very start (see
    "Review Modes" for the interactive menu spec).
-2. Review the common mistakes checklist below first.
-3. Review the general checks in this file second.
-4. Review the language-specific phases next by referencing the supporting
-   files in `skills/avandar-code-review/docs/code-reviews/`:
-   `typescript-checklist.md` for TS or TSX diffs,
-   `module-checklist.md` for TS or TSX module hierarchy and file structure,
-   `react-checklist.md` for TSX React component diffs, and
-   `sql-checklist.md` for SQL diffs. Each checklist should be a separate phase.
-5. If `docs/code-reviews/extra-checklist.md` exists, review the diff against
-   those additional repo-local mistakes after finishing the built-in
-   checklists.
-6. Follow the active review mode for how to handle each finding.
-7. At the end of the review, run only the exact tests that are relevant to the
-   code changes.
-8. Report only concrete findings that are visible in the code under review.
+2. Review the **Most Common Mistakes** section in this file first.
+3. Review the **General Checks** section in this file second.
+4. Run each **language-specific phase** in the order listed under "Phase
+   Checklists" below, but only when that phase's gate matches the diff.
+5. Run each **library-gated phase** under "Library-Gated Phases" below,
+   gated on whether the package is present in the repo. Skip the phase
+   entirely if the package is absent.
+6. If `docs/code-reviews/extra-checklist.md` exists in the repo, run it
+   as the final repo-local phase.
+7. Follow the active review mode for how to handle each finding.
+8. At the end of the review, run only the exact tests that are relevant to
+   the code changes.
+9. Report only concrete findings that are visible in the code under review.
 
 In pair review mode, announce the phase explicitly as you move through the
-review, for example: "Phase: common mistakes", "Phase: general checks",
-"Phase: TypeScript checklist", "Phase: Module checklist",
-"Phase: React checklist",
-"Phase: SQL checklist", or
+review, for example: "Phase: comments", "Phase: TypeScript",
+"Phase: functional style", "Phase: `@avandar/utils`",
 "Phase: repo-local extra checklist".
+
+**Skipping phases is the rule, not the exception.** A diff that only
+touches SQL should not load the TypeScript, React, hooks, CSS, or any
+library-gated phase. Loading a phase file you will not use is wasted
+context.
 
 ## Testing At The End Of Review
 
@@ -154,27 +167,14 @@ After completing the review, run the narrowest relevant tests you can identify.
 
 ### E2E Tests
 
-- Never run the whole E2E suite for a code review.
-- Run only the exact E2E specs related to the changed behavior.
-- Run E2E specs one by one, sequentially, so each result is visible without
-  waiting for the full set first.
-- Prefer command shapes like `pnpm test:e2e spec-a.spec.ts` followed by
-  `pnpm test:e2e spec-b.spec.ts` rather than batching many E2E specs together.
-
-### Reviewing E2E Test Code
-
-- When reviewing an E2E test itself, make sure the test does not bypass the
-  end-to-end path by calling the database directly for behavior that should be
-  exercised through the real product boundary.
-- Direct database insertions are allowed only for test setup and seed data that
-  must exist before the user flow starts, such as workspaces, users,
-  memberships, and similar prerequisites.
-- Do not use direct database writes for steps that are part of the user flow
-  under test when that flow could fail at the application boundary, including
-  auth, permissions, validation, and other request-handling behavior.
-- Treat direct database writes in the middle of an E2E flow as a review
-  finding, even when the test is not explicitly about permissions, because they
-  can hide incorrect allow or deny behavior that the real flow should surface.
+E2E test handling is repo-specific (test runner, script names, and
+fixture conventions vary). When the repo under review has an E2E
+suite, see its `docs/code-reviews/extra-checklist.md` for the local
+phase that covers both how to run E2E specs and how to review E2E
+test code. If the extra-checklist.md does not contain E2E-specific
+instructions, then follow the same guidelines applied to Vitest and Unit
+tests, such as only narrowly running the relevant tests instead of the
+full test suite.
 
 ## Most Common Mistakes
 
@@ -194,13 +194,15 @@ Check these first because they are the most frequent review findings:
   still works.
 - Validation: type checking must pass.
 - Validation: linting must pass.
-- Utility reuse: avoid hand-writing common utility or data-transformation logic
-  when an internal package already provides it, especially in `@utils`. Common
-  examples include property mapping, bucketing, partitions, object reshaping,
-  filtering helpers, and lookup builders. For example, prefer
-  `users.map(prop("id"))` over a custom mapper that only returns `user.id`.
-  Reviewers should check `packages/shared/utils/README.md` for the available
-  shared utilities.
+- Utility reuse: avoid hand-writing common utility or data-transformation
+  logic when an internal package or installed library already provides it.
+  Common examples include property mapping, bucketing, partitions, object
+  reshaping, filtering helpers, and lookup builders. Before introducing a
+  bespoke helper, check the repo's first-party utility packages and
+  imported libraries for an existing equivalent. If the repo depends on
+  `@avandar/utils`, see the library phase under
+  `libraries/avandar-utils-checklist.md` for specific helpers worth
+  preferring.
 - Variable naming: avoid vague names like `matrix`, `count`, `next`, `prev`,
   `val`, or `n`. Use a business noun that explains what the value represents,
   such as `rolesMatrix`, `numUsers`, or `nextVizConfig`. The one acceptable
@@ -226,11 +228,9 @@ Check these first because they are the most frequent review findings:
 - Builder functions should use `create{Type}` naming.
 - Functions that create a type from seed data should use `create{Type}From...`.
 - Conversion or cast helpers should use `to...` naming.
-- Prefer reusing internal packages under `packages/` over introducing bespoke
-  local helpers when an equivalent shared abstraction already exists.
-- When review comments suggest utility reuse, point engineers at
-  `packages/shared/utils/README.md` to confirm whether `@utils` already has the
-  needed helper.
+- Prefer reusing existing internal libraries or first-party packages over
+  introducing bespoke local helpers when an equivalent shared abstraction
+  already exists.
 - If the code touches generated `*.gen.*` files, flag manual edits unless the
   change is clearly generated.
 - For UI code: keep accessibility strong with native semantics and ARIA where
@@ -242,17 +242,132 @@ Check these first because they are the most frequent review findings:
 - For UI code: use `clsx` for conditional classes.
 - For UI code: never introduce TailwindCSS.
 
-## Language-Specific Checklists
+## Phase Checklists
 
-Use these supporting files when the corresponding language appears in the diff:
+Run each phase below only when its gate matches the diff. Phase files
+live under `skills/avandar-code-review/docs/code-reviews/` next to this
+SKILL file.
 
-- TypeScript or TSX:
-  `skills/avandar-code-review/docs/code-reviews/typescript-checklist.md`
-- TypeScript or TSX module hierarchy and file structure:
-  `skills/avandar-code-review/docs/code-reviews/module-checklist.md`
-- React component rules for TSX:
-  `skills/avandar-code-review/docs/code-reviews/react-checklist.md`
-- SQL: `skills/avandar-code-review/docs/code-reviews/sql-checklist.md`
+### Phase: comments
+
+- **Gate:** the diff includes any source file that supports both
+  `/** ... */` and `//` comments (TypeScript, TSX, JavaScript, JSX, most
+  C-family languages).
+- **Reference:**
+  [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md)
+
+### Phase: TypeScript
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/typescript-checklist.md`](docs/code-reviews/typescript-checklist.md)
+
+### Phase: functional style
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/functional-style-checklist.md`](docs/code-reviews/functional-style-checklist.md)
+- **Covers:** nested positive returns vs. early-exit chains, ternaries
+  vs. `if`/`else` for value selection, building variable-length arrays
+  with `.filter(isDefined)`, using IIFEs for self-contained value
+  computations, and not gating `.message` access on `instanceof Error`
+  for already-typed errors.
+
+### Phase: module hierarchy
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/module-checklist.md`](docs/code-reviews/module-checklist.md)
+
+### Phase: React components
+
+- **Gate:** the diff includes at least one `.tsx` file with a React
+  component.
+- **Reference:**
+  [`docs/code-reviews/react-checklist.md`](docs/code-reviews/react-checklist.md)
+- **Additional tool:** always run every rule in the reference file.
+  When the `react-doctor` skill is also available in the current
+  host, run it in addition (not instead) during this phase. See the
+  reference file's "Also run `react-doctor` when available" section
+  for the combine workflow. When the skill is not available, just
+  run the rules as the full phase.
+
+### Phase: React hooks
+
+- **Gate:** the diff includes a `.tsx` file that uses React hooks
+  (`useEffect`, `useMemo`, `useState`, etc.) or a `.ts` file that exports
+  a custom hook. Skip this phase entirely for purely presentational
+  components with no hooks.
+- **Reference:**
+  [`docs/code-reviews/react-hooks-checklist.md`](docs/code-reviews/react-hooks-checklist.md)
+
+### Phase: CSS modules
+
+- **Gate:** the diff adds, modifies, or deletes a `*.module.css` file,
+  **or** a TSX/JSX file in the diff changes its `import ... from
+"*.module.css"` line.
+- **Reference:**
+  [`docs/code-reviews/css-modules-checklist.md`](docs/code-reviews/css-modules-checklist.md)
+
+### Phase: SQL
+
+- **Gate:** the diff includes at least one `.sql` file.
+- **Reference:**
+  [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+
+## Library-Gated Phases
+
+Each phase below applies only when the named package is present in the
+repo under review. Check `package.json` (or each `package.json` in a
+monorepo) for the dependency, OR grep for imports of the package, OR
+look for calls to the package's signature APIs (named below per phase).
+If the package is absent, skip the entire phase — do not even load the
+sub-checklist file.
+
+### Phase: `@avandar/utils`
+
+- **Gate:** repo depends on `@avandar/utils`, or source files import from
+  `@avandar/utils` / `@utils`, or the diff references `prop` / `propEq` /
+  `matchLiteral` / `isDefined` / `isNonNullish` from this package.
+- **Reference:**
+  [`docs/code-reviews/libraries/avandar-utils-checklist.md`](docs/code-reviews/libraries/avandar-utils-checklist.md)
+- **Covers:** preferring `prop` / `propEq` over inline lambdas;
+  exhaustive union dispatch via `matchLiteral` (or `ts-pattern`'s
+  `match().exhaustive()` when available); reusing helpers from the
+  `@avandar/utils` README instead of hand-rolling them.
+
+### Phase: `@avandar/models`
+
+- **Gate:** repo depends on `@avandar/models`, or source files import
+  from `@avandar/models` / `@models`, or the diff calls `Model.make` or
+  imports from a `*.types.ts` file that is paired with a `*.ts`
+  namespace entry.
+- **Reference:**
+  [`docs/code-reviews/libraries/avandar-models-checklist.md`](docs/code-reviews/libraries/avandar-models-checklist.md)
+- **Covers:** using `Model.make("ModelName", { ... })` instead of bare
+  object literals; importing the namespace entry rather than
+  `*.types.ts` from outside the model's own folder.
+
+### Phase: `@avandar/modules`
+
+- **Gate:** repo depends on `@avandar/modules`, or source files import
+  from `@avandar/modules` / `@modules`, or the diff calls `createModule`.
+- **Reference:**
+  [`docs/code-reviews/libraries/avandar-modules-checklist.md`](docs/code-reviews/libraries/avandar-modules-checklist.md)
+- **Covers:** grouping related free functions into a `createModule(...)`
+  module when they share a domain or storage backend.
+
+## Repo-Local Phase
+
+### Phase: repo-local extra checklist
+
+- **Gate:** the file `docs/code-reviews/extra-checklist.md` exists in the
+  repo under review.
+- **Reference:** open the file directly; it lists its own gates and any
+  further sub-checklists in `docs/code-reviews/references/` (or similar).
+- This is the final phase, always run last, and may add or override
+  rules for the specific repo. It is the only legitimate place for
+  rules that mention repo-internal paths.
 
 ## Review Output
 
