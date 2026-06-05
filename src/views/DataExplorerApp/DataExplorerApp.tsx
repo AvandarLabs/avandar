@@ -24,9 +24,9 @@ import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
@@ -280,10 +280,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   useEffect(() => {
     const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
-      if (!alreadyOpened) {
-        chatPanelDispatch.open();
-        sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
-      }
+    if (!alreadyOpened) {
+      chatPanelDispatch.open();
+      sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
+    }
   }, [chatPanelDispatch]);
 
   const queryResultData = queryResults?.data ?? [];
