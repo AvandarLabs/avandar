@@ -112,7 +112,7 @@ export function AvaForm<
       const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
       const improvedField = match(field)
         .with({ type: "text" }, (fieldSchema) => {
-          return hydrateTextFieldSchema(fieldSchema, t);
+          return hydrateTextFieldSchema(fieldSchema);
         })
         .with({ type: "select" }, (fieldSchema) => {
           return fieldSchema;

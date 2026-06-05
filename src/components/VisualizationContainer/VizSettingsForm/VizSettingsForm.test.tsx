@@ -292,8 +292,17 @@ describe("VizSettingsForm — bubble chart controls", () => {
 
   it("renders X, Y, and Size column pickers for each series", () => {
     renderForm({ vizConfig: baseConfig });
-    expect(screen.getByLabelText(/X column/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Y column/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Size column/i)).toBeInTheDocument();
+    // Use `combobox` role rather than `getByLabelText` because Mantine's
+    // Select renders both the input and the listbox dropdown with the same
+    // `aria-labelledby` target, so a plain label lookup matches two nodes.
+    expect(
+      screen.getByRole("combobox", { name: /X column/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /Y column/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /Size column/i }),
+    ).toBeInTheDocument();
   });
 });

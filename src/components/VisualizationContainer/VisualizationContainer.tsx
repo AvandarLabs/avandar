@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex, List, Text } from "@mantine/core";
 import { Callout, DangerText } from "@ui";
@@ -47,6 +48,9 @@ type Props = {
  * to the current Lingui locale.
  */
 function useVizConfigSchemas() {
+  // Hook-bound `t` intentionally shadows the module-level macro `t` so this
+  // React-render path stays subscribed to locale changes via `useLingui()`.
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const { t } = useLingui();
   return useMemo(() => {
     const XAxisKeySchema = string({
@@ -121,6 +125,9 @@ export function VisualizationContainer({
   dateColumns,
   vizConfig,
 }: Props): JSX.Element {
+  // Hook-bound `t` intentionally shadows the module-level macro `t` so this
+  // React-render path stays subscribed to locale changes via `useLingui()`.
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const { t } = useLingui();
   const schemas = useVizConfigSchemas();
   const columnNames = columns.map(prop("name"));
@@ -162,7 +169,7 @@ export function VisualizationContainer({
           </Box>
         );
       }
-      return _renderError(t`bar chart`, error, t);
+      return _renderError(t`bar chart`, error);
     })
     .with({ vizType: "line" }, (config) => {
       const {
@@ -325,7 +332,6 @@ export function VisualizationContainer({
 function _renderError(
   chartName: string,
   error: Parameters<typeof flattenError>[0],
-  t: ReturnType<typeof useLingui>["t"],
 ): JSX.Element {
   const errors = flattenError(error).fieldErrors as Record<
     string,

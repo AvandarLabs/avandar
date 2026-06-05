@@ -20,7 +20,6 @@ import type { ReactElement } from "react";
 const composerSetText = vi.fn();
 const composerGetState = vi.fn().mockReturnValue({ text: "" });
 const {
-  ensureModelDownloadedMock,
   ensureModelLoadedMock,
   deleteModelMock,
   isModelDownloadedMock,
@@ -274,7 +273,7 @@ describe("VoiceInputButton", () => {
     expect(ensureModelLoadedMock).not.toHaveBeenCalled();
   });
 
-  it("kicks off ensureModelDownloaded when the user confirms the download", async () => {
+  it("kicks off ensureModelLoaded when the user confirms the download", async () => {
     renderVoiceButton();
 
     await act(async () => {
@@ -290,11 +289,11 @@ describe("VoiceInputButton", () => {
       );
     });
 
-    expect(ensureModelDownloadedMock).toHaveBeenCalledWith("whisper-tiny");
+    expect(ensureModelLoadedMock).toHaveBeenCalledWith("whisper-tiny");
   });
 
   it("fires a success toast when the download completes", async () => {
-    ensureModelDownloadedMock.mockImplementation(async () => {
+    ensureModelLoadedMock.mockImplementation(async () => {
       isModelDownloadedMock.mockResolvedValue(true);
     });
     renderVoiceButton();
@@ -323,7 +322,7 @@ describe("VoiceInputButton", () => {
   });
 
   it("fires a danger toast when the download fails", async () => {
-    ensureModelDownloadedMock.mockRejectedValueOnce(new Error("disk full"));
+    ensureModelLoadedMock.mockRejectedValueOnce(new Error("disk full"));
     renderVoiceButton();
 
     await act(async () => {
