@@ -31,7 +31,7 @@ planning is complete.
 
 ## Current state (update this section at the end of every session)
 
-- **Session 1 (this one)**: created the directory, wrote
+- **Session 1 (2026-05-21)**: created the directory, wrote
   `README.md`, `PROCESS.md`, `FEATURE_TEMPLATE.md`, this
   `PLAN_OF_PLANS.md`, and an initial draft of `ALL_FEATURES.md`
   based on:
@@ -42,14 +42,48 @@ planning is complete.
   - `docs/ict4d-demo/random-thoughts.md` (skim only — these are
     future ideas, not built features)
   - `docs/superpowers/specs/` and `docs/superpowers/plans/` (titles
-    only; full reads are part of Session 2)
+    only; full reads done in Session 2)
   - `git log --no-merges origin/develop..feat/ict4d-demo` (78
     commits) and `git diff --stat origin/develop..feat/ict4d-demo`
     (896 files, +128k / −28k)
   - `git diff --name-only` on `supabase/migrations/` and
     `supabase/schemas/` (the schema delta Phase 1 covers)
-- **`ALL_FEATURES.md` status**: drafted. Marked **DRAFT** in its
-  header. Session 2 needs to validate it.
+- **Session 2 (2026-06-05)**: validated the inventory.
+  - Spawned an Explore agent to read all 22
+    `docs/superpowers/{specs,plans}/*` + `docs/demo-features/*` +
+    `docs/permissions-architecture.md` + supporting docs end-to-end
+    and map every doc-described feature to an inventory row. Agent
+    confirmed all 95 rows are doc-backed and no missing rows from
+    the spec corpus.
+  - Independently verified PTRCK uniqueness (`git cherry` —
+    zero `-` lines; all PTRCK commits unique to `feat/ict4d-demo`).
+    PTRCK series spans broader than billing: PTRCK-001/002 are
+    auth/navbar polish (skipped as develop-refactors);
+    PTRCK-009/010 was a missing feature → added row #96
+    `data-explorer-url-session-sync` (+838 LoC, 4 new files).
+  - Independently verified profile-page row #90 — real net diff
+    (+257/-79) in `src/routes/_auth/$workspaceSlug/profile.tsx`.
+  - Applied operator rule "migrate refactored code, not legacy":
+    folded rows #4 `dataset-upload-fixes`, #5
+    `xlsx-column-inference`, #6 `google-sheets-import-resilience`,
+    #7 `resync-dataset-card` into row #1
+    `async-dataset-import-pipeline`. Folded PTRCK-005/006/007/008
+    chart-suite expansion (pie/funnel/radar/area/bubble/curveType/
+    withLegend/auto-hydration) into row #9, renamed to
+    `viz-multi-series-and-chart-types`.
+  - Flipped header from `DRAFT — Session 1` to
+    `validated — Session 2 (2026-06-05)`.
+- **`ALL_FEATURES.md` status**: **validated.** 92 active rows (95
+  global indices minus the 4 retired #4/#5/#6/#7 plus the 1 added
+  #96). Index numbering is intentionally non-dense — folded-in row
+  numbers are not reused; rows have global IDs.
+
+## Next: Session 3+ — write per-feature migration plans
+
+Per the "Session 3+ — Write per-feature migration plans" section
+below. Recommended batching: ~5-10 plans per session. Per the
+operator rule, write each plan against the **current state** of
+`feat/ict4d-demo`, not the introduction-commit snapshot.
 
 ## How to know which session number you are
 

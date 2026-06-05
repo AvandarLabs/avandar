@@ -40,14 +40,19 @@ let it drift.
 
 ## ALL_FEATURES inventory
 
-- **Header status**: `DRAFT — Session 1 (2026-05-21)`
+- **Header status**: `validated — Session 2 (2026-06-05)`
 - **Last analyzed commit on `feat/ict4d-demo`**:
   `c9f909a903fb4a436b39f475813a7ec83bcb9747`
   (subject: _docs(deslop): mark Phase 1 complete (pending comment
   sync)_)
 - **Last update run on**: `2026-06-05`
-- **Next planning session**: Session 2 — validate the draft inventory
-  against the codebase per `PLAN_OF_PLANS.md`.
+- **Active rows**: 92 (95 global indices minus retired #4/#5/#6/#7
+  folded into #1, plus #96 added). Index numbering is intentionally
+  non-dense.
+- **Next planning session**: Session 3+ — author per-feature
+  `NNN-<slug>.md` migration plans (one per row). Per
+  `PLAN_OF_PLANS.md`, recommended batching is ~5-10 plans per
+  session.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -135,3 +140,39 @@ Append-only log of `/deslop update` runs.
     `google-sheets-import-resilience` likewise). All four read as
     refactors/extensions of the pipeline feature rather than
     standalone work.
+- `2026-06-05` — Session 2 validation completed.
+  - Spawned an Explore agent to read all 22 spec/plan/demo-feature
+    docs end-to-end. Agent confirmed all 95 inventory rows are
+    doc-backed.
+  - Verified PTRCK uniqueness via `git cherry origin/develop
+    origin/feat/ict4d-demo` — zero `-` lines; all PTRCK commits
+    unique to `feat/ict4d-demo`.
+  - Verified profile-page row #90 — real net diff +257/-79.
+  - **1 new row added.** #96 `data-explorer-url-session-sync`
+    (PTRCK-009 + PTRCK-010, +838 LoC across 4 new files).
+  - **4 rows folded into row #1.** Per the operator rule "migrate
+    refactored code, not legacy" (see memory file
+    `feedback_migrate_refactored_not_legacy`): #4
+    `dataset-upload-fixes`, #5 `xlsx-column-inference`, #6
+    `google-sheets-import-resilience`, #7 `resync-dataset-card`
+    absorbed into #1 `async-dataset-import-pipeline`. Row #1's
+    description was expanded to cover them; the deleted row
+    numbers are NOT reused (the header note allows non-dense
+    indices).
+  - **Row #9 expanded.** Now `viz-multi-series-and-chart-types`
+    (was `viz-multi-series`). Description covers pie/funnel/radar
+    chart types, area + bubble extensions, `CurveType`,
+    `withLegend`, auto-hydration, `hydratePieFromQuery` — all the
+    PTRCK-005/006/007/008 expansion (commits `517daefc` and
+    `7b738f13`). Per the operator rule, this is migrated as the
+    up-to-date chart suite rather than legacy + later expansion.
+  - **Header flipped** from `DRAFT — Session 1` to
+    `validated — Session 2 (2026-06-05)`.
+  - **Active row count**: 92 (95 global indices minus retired
+    #4/#5/#6/#7 plus added #96).
+  - **PTRCK-001/002 skipped.** Sign-in tweaks and navbar workspace
+    pill polish are small refactors of pre-existing develop code;
+    no new row warranted per operator rule.
+  - **Phase 1 PR status**: `chore/sync-datasets-virtual-comment`
+    (the 3-line schema comment sync from earlier today) still
+    pending operator review and merge.

@@ -1,11 +1,21 @@
 # `ALL_FEATURES.md` — features on `feat/ict4d-demo` not on `develop`
 
-> **Status: DRAFT — Session 1 (2026-05-21).** This list was assembled
-> from `docs/ict4d-demo/CHECKPOINTS.md`, `docs/ict4d-demo/FEATURE_CHECKLIST.md`,
-> the `docs/superpowers/` spec/plan titles, the 78-commit non-merge log
-> on the delta, and `git diff --stat` of the 896-file diff. It has
-> **not yet been validated against the codebase** — Session 2 (see
-> `PLAN_OF_PLANS.md`) does that pass.
+> **Status: validated — Session 2 (2026-06-05).** Session 2 walked the
+> full `docs/superpowers/` spec/plan set (22 docs) via an Explore agent
+> and confirmed every doc-described feature is covered by an inventory
+> row. PTRCK billing commits verified unique to `feat/ict4d-demo` via
+> `git cherry`. Profile-page row #90 confirmed via real net-diff
+> (+257/-79). One missing row added (#96 `data-explorer-url-session-sync`
+> from PTRCK-009/010). Per the operator rule "migrate refactored code,
+> not legacy", rows #4 `dataset-upload-fixes`, #5
+> `xlsx-column-inference`, #6 `google-sheets-import-resilience`, and #7
+> `resync-dataset-card` were folded into row #1
+> `async-dataset-import-pipeline`; PTRCK-005/006/007/008 chart-suite
+> expansion was folded into row #9 (now `viz-multi-series-and-chart-types`).
+>
+> Index numbering is intentionally non-dense — folded-in row numbers
+> (#4–#7) are not reused. Rows have global IDs so they can be
+> reshuffled without renumbering.
 >
 > The live "last analyzed commit" SHA and in-flight / completed
 > migration logs live in `STATE.md`, not here. Update both files
@@ -45,25 +55,22 @@ for those new tables exists yet.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 1 | `[ ]` | **async-dataset-import-pipeline** — Streaming CSV/XLSX import via Web Worker, parquet output, two-phase async import with resume + status tracking. Replaces the synchronous upload path. | CHECKPOINT 1 (PRs #234/#235/#236); `docs/superpowers/plans/2026-05-19-async-dataset-import.md`; many commits in the `claude/async-dataset-import` branch series |
+| 1 | `[ ]` | **async-dataset-import-pipeline** — Streaming CSV/XLSX import via Web Worker, parquet output, two-phase async import with resume + status tracking. Replaces the synchronous upload path. Bundles all downstream adaptations of the pipeline: the XLSX sniffer worker (`src/workers/xlsxSniff.worker.ts`) column-inference improvements, `GoogleSheetsImportView` adapted to the new `startCsvImport`/`startXlsxImport` entry points, `ResyncDatasetCard.tsx` rewritten against the new pipeline, dataset name/CSV name display + tooltips + import validation, and all subsequent parser/status-tracking fixes. Per the operator rule "migrate refactored code, not legacy", these are all migrated together with the pipeline itself. | CHECKPOINT 1 (PRs #234/#235/#236); `docs/superpowers/plans/2026-05-19-async-dataset-import.md`; the `claude/async-dataset-import` branch series; commits `da43443`, `673419e`, `2a67c767`, `6098c3ef` (PTRCK-004) |
 | 2 | `[ ]` | **app-wide-dropzone** — Drop a CSV/XLSX anywhere in the workspace to open the dataset-import flow. Mounted globally inside `<ChatPanelProvider>` in `WorkspaceLayout`. | CHECKPOINT 1 (PR #224) |
 | 3 | `[ ]` | **dataset-drawer** — Replace the modal "Open Dataset" with a tabbed drawer (Saved / Import), with per-virtual-dataset save guards. Slide-from-bottom transition variants. | CHECKPOINT 1 (PR #229); commits `2ce199a`, `09c24af` |
-| 4 | `[ ]` | **dataset-upload-fixes** — Misc fixes to the dataset upload path (parser, status tracking) discovered after the initial import landing. | Commits `da43443`, `673419e` |
-| 5 | `[ ]` | **xlsx-column-inference** — Improvements to XLSX sniffer worker (`src/workers/xlsxSniff.worker.ts`) so columns infer correctly. | CHECKPOINT 1 conflict-resolution notes; part of #234 stack |
-| 6 | `[ ]` | **google-sheets-import-resilience** — `GoogleSheetsImportView` updated for the new async pipeline (`startCsvImport` / `startXlsxImport`). | CHECKPOINT 1 type-error fixes (merge commit `2a67c767`) |
-| 7 | `[ ]` | **resync-dataset-card** — `ResyncDatasetCard.tsx` rewritten for the new async pipeline. | CHECKPOINT 1 type-error fixes |
 
 ## B. Data Explorer UX
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
 | 8 | `[ ]` | **floating-query-windows** — Draggable, collapsible Query Details and Visualization Settings floating windows on top of the Data Explorer canvas. | CHECKPOINT 1 (PR #228) |
-| 9 | `[ ]` | **viz-multi-series** — Multi-series visualizations: bar/line/area + scatter + bubble with per-series xKey/yKey/sizeKey; axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527` |
+| 9 | `[ ]` | **viz-multi-series-and-chart-types** — Multi-series visualizations across the full chart-type expansion: bar/line/area + scatter + bubble + **pie + funnel + radar**, all with per-series xKey/yKey/sizeKey (or nameKey/valueKey for pie-like configs); axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers; auto-hydration of viz axes from query results; `CurveType` shared type with `curveType` setting on Line/Area; `withLegend` setting across Bar/Line/Area; `hydratePieFromQuery`/`hydratePieFromQueryResult` utilities. Per the operator rule, the PTRCK-005/006/007/008 expansion is bundled into this row rather than split — migrate the up-to-date chart suite, not the original multi-series + later expansion. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527`, `517daefc` (PTRCK-005+006), `7b738f13` (PTRCK-007+008) |
 | 10 | `[ ]` | **viz-settings-fieldsets** — Visualization Settings restructured into labelled fieldsets matching the design doc. | `docs/superpowers/specs/2026-05-21-sql-pills-viz-settings-design.md`; commit `4e85af6` |
 | 11 | `[ ]` | **codemirror-sql-editor** — CodeMirror-based SQL editor in the Data Explorer (replaces the prior textarea), supporting dataset/column pills inline. | Commit `314f8a9`; sql-pills design spec |
 | 12 | `[ ]` | **sql-pill-rendering** — Render dataset names and column names as pills inside the read-only SQL block (`AvaSqlBlock`); editable pill dropdowns when the SQL is editable; widened dropdown. | Commits `4e85af6`, `6febbcf`, `a01db18` |
 | 13 | `[ ]` | **chart-number-formatting** — Centralized formatting helper used across the chart layer for big-number columns, locale-aware. | Commits `57c5803`, `c8fb6b6` |
 | 14 | `[ ]` | **chart-color-picker-fix** — Color picker behavior + chart rendering fixes for big-number columns. | Commit `c8fb6b6` |
+| 96 | `[ ]` | **data-explorer-url-session-sync** — Data Explorer state (`ds`, `cols`, `agg`, `orderBy`, `orderDir`, `sql`, `vc`, `od`) hydrates from and serializes back to the URL via `replace: true` navigation. Adds `DataExplorerURLState` parse/serialize helpers (+332 LoC), `dataExplorerURLHydration` deferral/hydrate-key checks (+54), `useDataExplorerURLSync` first-load hydration + ongoing sync (+299), and `remapColumnsByBaseId` in `QueryColumnMultiSelect` so URL-hydrated columns stay aligned with fetched metadata. Reset clears search params in one navigation so the query string can go bare. ~838 lines of new code; none of these files exist on `develop`. | Commit `7b738f13` (PTRCK-009 + PTRCK-010) |
 
 ## C. Chat panel core fixes & UX
 
@@ -239,45 +246,44 @@ docs migration; they are not features themselves.
 
 ---
 
-## Things Session 2 should specifically verify
+## Session 2 verification notes (2026-06-05)
 
-- [ ] Confirm whether every PTRCK-NN commit really is unique to
-  `feat/ict4d-demo`. Spot-checked `subscriptions_internal_id_pk`
-  migration — yes — but a full sweep is worth doing in case
-  some PTRCK work was already cherry-picked onto develop.
-- [ ] Confirm the profile-page redesign isn't already on develop by
-  another route (no commits found in Session 1, but worth a
-  re-check via `git log origin/develop -- src/views/Profile*`).
-- [ ] Check whether `docs/ict4d-demo/CHECKPOINTS.md` claims of
-  shipped features ("✅") are all really represented in the diff.
-  Two suspicious gaps:
-  - **#28 dataset types `datasets__pdf` / `datasets__image`** —
-    FEATURE_CHECKLIST has this as `[ ]` not started, so no
-    migration row is needed. Confirm none of the schema additions
-    on the delta accidentally ship a stub for it.
-  - **#11 dashboard media embed** — same; explicitly deferred.
-- [ ] Decide granularity for the chat workflows phases (currently
-  one row per "logical chunk" — e.g. Phase 0 is split into 7 rows
-  but Phase 9 is 2 rows). If Phase 0 should be one big-bang
-  migration instead, merge those rows.
-- [ ] Add any commit-only features that Session 1 missed. The 78
-  non-merge commits include many vague ones — `more fixes`,
-  `changes`, `fixes` — that may hide work. Walk each one and
-  attribute it (or confirm it's noise).
-- [ ] **Fold refactor-of-existing-feature rows into their originals.**
-  The operator rule: we migrate the up-to-date code, not legacy
-  followed by a refactor PR. Candidates flagged during the
-  2026-06-05 `/deslop update` for Session 2 to evaluate:
-  - Row #4 `dataset-upload-fixes` — "Misc fixes to the dataset
-    upload path discovered after the initial import landing." →
-    fold into #1 `async-dataset-import-pipeline`.
-  - Row #5 `xlsx-column-inference` — "part of #234 stack." → fold
-    into #1.
-  - Row #7 `resync-dataset-card` — "rewritten for the new async
-    pipeline." → fold into #1.
-  - Row #6 `google-sheets-import-resilience` — "updated for the
-    new async pipeline." → judgment call; Google Sheets is its own
-    surface but the diff is purely pipeline adaptation.
+- [x] **PTRCK uniqueness sweep.** `git cherry origin/develop
+  origin/feat/ict4d-demo` returned zero `-` lines — every PTRCK
+  commit is genuinely unique to `feat/ict4d-demo`. The PTRCK series
+  spans more than billing: PTRCK-001/002 are auth/navbar polish
+  (treated as develop-refactor and skipped per operator rule);
+  PTRCK-004 dataset/CSV display tweaks fold into row #1;
+  PTRCK-005/006/007/008 chart-suite expansion folds into row #9;
+  PTRCK-009/010 are the new row #96
+  `data-explorer-url-session-sync`; PTRCK-011/012 → #83;
+  PTRCK-013/014/016/020 → #84; PTRCK-015 → #85;
+  PTRCK-017/019/022/024 → #86; PTRCK-018/023 → #88; PTRCK-021 →
+  #89; PTRCK-025 series → #87.
+- [x] **Profile-page uniqueness.** No commits on `origin/develop`
+  touch `src/routes/_auth/$workspaceSlug/profile.tsx`. Real net
+  diff +257/-79. Row #90 stands.
+- [x] **`docs/ict4d-demo/CHECKPOINTS.md` "✅" claims.** Inventory
+  carries no row for `datasets__pdf` / `datasets__image` (#28) or
+  dashboard media embed (#11). Both confirmed deferred by Session
+  1; no stub schema sneaked onto the delta.
+- [x] **Chat-workflow phase granularity.** Explore-agent pass
+  confirmed current granularity (rows #22–43 mapping to Phases 0–9
+  with one row per logical chunk) matches the spec at
+  `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
+  No row-merge needed.
+- [x] **Commit-only features Session 1 missed.** Walked the 78
+  non-merge commits. Genuine new feature found: PTRCK-009 +
+  PTRCK-010 URL session sync → added as row #96. All other
+  vague-subject commits (`changes`, `more fixes`, `Fixed more
+  errors`, etc.) trace to existing rows or are noise (e.g. the
+  3-line `8f64724f` "changes" patch to
+  `OfflineChatResourceManager.ts` is a sub-feature of row #62).
+- [x] **Folded refactor-of-existing-feature rows into originals.**
+  Rows #4, #5, #6, #7 absorbed into row #1
+  `async-dataset-import-pipeline` (description expanded; row
+  numbers retired). Row #9 description expanded to include
+  pie/funnel/radar chart types and auto-hydration (PTRCK-005/006/007/008).
 
-When Session 2 has done these checks, update the header marker
-from `DRAFT — Session 1` to `validated — Session N (YYYY-MM-DD)`.
+Header flipped to `validated — Session 2 (2026-06-05)`. Session 3+
+(per `PLAN_OF_PLANS.md`) authors per-feature `NNN-<slug>.md` plans.
