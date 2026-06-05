@@ -6,6 +6,7 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
 import type { User } from "$/models/User/User";
+import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 
 /**
  * This function should be called from the root component of the app.
@@ -33,12 +34,12 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
     getSession();
 
     const subscription = AuthClient.onAuthStateChange((event, newSession) => {
-      if (
-        event === "SIGNED_OUT" &&
-        !AuthClient.isManuallySignedOut() &&
-        !navigator.onLine
-      ) {
-        return;
+      if (event === "SIGNED_OUT") {
+        if (!AuthClient.isManuallySignedOut() && !navigator.onLine) {
+          return;
+        }
+        // Clear the guard so the AI panel auto-opens again on next login
+        sessionStorage.removeItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY);
       }
 
       if (newSession?.user) {
