@@ -77,35 +77,43 @@ planning is complete.
   global indices minus the 4 retired #4/#5/#6/#7 plus the 1 added
   #96). Index numbering is intentionally non-dense — folded-in row
   numbers are not reused; rows have global IDs.
-- **Session 3a (2026-06-05)**: authored the first batch of five
-  per-feature migration plans by dispatching parallel Explore
-  agents to gather canonical paths, file lists, dependency wiring,
-  and risks for each row. Plans written for #1
-  `async-dataset-import-pipeline` (the foundational pipeline; rows
-  #2 and #3 depend on it), #2 `app-wide-dropzone`, #3
-  `dataset-drawer`, #8 `floating-query-windows`, and #9
-  `viz-multi-series-and-chart-types` (the largest single migration
-  in the queue, ~7.2k LoC added across ~80 files; ships
-  `AvaPageDataMigrationV3`). Notable finding folded into the #3
-  plan: the feature row in `ALL_FEATURES.md` claims a Drawer with
-  slide-from-bottom transitions, but the current `feat/ict4d-demo`
-  state has been refactored back to a centered Modal — the plan
-  flags this discrepancy in "Notes for future you" rather than
-  silently "fixing" the row.
+- **Session 3 (2026-06-05)**: authored **all 91 per-feature
+  migration plans** in a single push across the following batches:
+  - 3a: #1, #2, #3, #8, #9 (Data ingestion + Data Explorer
+    foundations) using parallel Explore-agent research.
+  - 3b: #10–#13, #96 (Data Explorer remainder).
+  - 3c: #15–#21, #94 (Chat panel core).
+  - 3d: #22–#28 (Privacy phase-0 guardrails).
+  - 3e: #29–#43 (Chat-interactive-workflows phases 1–9).
+  - 3f: #44–#49 (Manual SQL ↔ form sync).
+  - 3g: #50–#55 (Voice — web + desktop).
+  - 3h: #56–#63 (Desktop platform foundation + offline modes).
+  - 3i: #64–#75 (Dashboards — polish, filters, publishing).
+  - 3j: #76, #77 (Summary view + analytics events).
+  - 3k: #78–#82 (i18n / Lingui).
+  - 3l: #83–#89 (Billing — PTRCK series).
+  - 3m: #90 (Profile page).
+  - 3n: #91–#93 (Docs migration).
+  - 3o: #95 (Share resource modal redesign).
+  - **Skill rule update**: per operator direction, codified two
+    rules: (1) "Notes for future you" must live at the top of
+    every plan file (immediately after the metadata header), (2)
+    sequential-dependency features must be adjacent in
+    `ALL_FEATURES.md` and inseparable features must collapse into
+    one row. Updated `.claude/skills/deslop/SKILL.md` accordingly
+    and reorganized the 5 batch-3a plans.
+  - **Fold**: Row #14 `chart-color-picker-fix` folded into row #9
+    (color-picker fix ships in the same commit family as the
+    chart-suite expansion — inseparable). Active row count
+    92 → 91.
 
-## Next: Session 3b+ — continue per-feature migration plans
+## Phase 2 ready
 
-Outstanding: 87 plans (92 active rows − 5 authored). Recommended
-batching: ~5-10 plans per session. Next likely batch: #10
-`viz-settings-fieldsets`, #11 `codemirror-sql-editor`, #12
-`sql-pill-rendering`, #13 `chart-number-formatting`, #14
-`chart-color-picker-fix`, #96 `data-explorer-url-session-sync` —
-contiguous through the Data Explorer surface, with row #96 folded
-in because it shares the surface.
-
-Per the "Session 3+ — Write per-feature migration plans" section
-below. Per the operator rule, write each plan against the **current
-state** of `feat/ict4d-demo`, not the introduction-commit snapshot.
+Every row in `ALL_FEATURES.md` has a matching
+`docs/deslop/NNN-<slug>.md` plan. Header status flipped to
+`Ready for Phase 2`. The operator can begin migrations by running
+`/deslop migrate <feature-slug>` (or `/deslop continue` for the
+auto-picked next slug in `[ ]` order).
 
 ## How to know which session number you are
 

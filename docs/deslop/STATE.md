@@ -40,7 +40,7 @@ let it drift.
 
 ## ALL_FEATURES inventory
 
-- **Header status**: `validated — Session 2 (2026-06-05)`
+- **Header status**: `Ready for Phase 2 — Session 3 (2026-06-05)`
 - **Last analyzed commit on `feat/ict4d-demo`**:
   `c9f909a903fb4a436b39f475813a7ec83bcb9747`
   (subject: _docs(deslop): mark Phase 1 complete (pending comment
@@ -49,11 +49,10 @@ let it drift.
 - **Active rows**: 91 (95 global indices minus retired #4/#5/#6/#7
   folded into #1 and #14 folded into #9, plus #96 added). Index
   numbering is intentionally non-dense.
-- **Next planning session**: Session 3b+ — continue authoring
-  per-feature `NNN-<slug>.md` migration plans. Session 3a (today,
-  2026-06-05) wrote 5 plans (#1, #2, #3, #8, #9); 87 outstanding.
-  Per `PLAN_OF_PLANS.md`, recommended batching is ~5-10 plans per
-  session.
+- **Planning status**: **complete (2026-06-05).** All 91 active
+  rows have a matching `NNN-<slug>.md` plan in `docs/deslop/`. The
+  operator can begin Phase 2 migrations with `/deslop migrate
+  <feature-slug>` or `/deslop continue`.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
