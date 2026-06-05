@@ -20,10 +20,9 @@ create table public.datasets__virtual (
   raw_sql text not null,
   -- When the dataset was produced by a multi-step LLM-proposed analytic
   -- plan, we save the plan as JSON ({ steps, rootMessage }) matching the
-  -- ChatPlan shape from `shared/types/chat.types.ts`.
-  -- This is NULL for virtual datasets created by one-shot SQL.
-  -- `plan_steps` is used to reopen the full step-by-step analysis
-  -- when the dataset is opened again.
+  -- ChatPlan shape from `shared/types/chat.types.ts`. This is NULL for
+  -- virtual datasets created by one-shot SQL. `plan_steps` is used to
+  -- reopen the full step-by-step analysis when the dataset is opened.
   plan_steps jsonb
 );
 
