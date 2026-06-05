@@ -76,6 +76,7 @@ for those new tables exists yet.
 | 19 | `[ ]` | **chat-recover-sql-without-tool-call** — When the model returns SQL in its message body but skipped the `generateSql` tool, recover the SQL and apply it anyway. | Commit `381b07d` |
 | 20 | `[ ]` | **chat-multi-dataset-clarification** — When 2+ datasets could plausibly answer a question, force a clarification asking which dataset to use before generating SQL. | Commit `2359378` |
 | 21 | `[ ]` | **chat-better-pblock-generation** — Improvements to AI-driven P-block generation for chat-in-dashboards (column resolution, viz type heuristics). | Commits `c3e63d6`, `a01db18` |
+| 94 | `[ ]` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. The `Subscription*` portions of the same commits are refactors of files already covered by billing rows #83–89 and ride along when those migrate (no separate row). | Commits `09e1a97e`, `32ea53b6` |
 
 ## D. Chat interactive workflows — Phase 0 (privacy guardrails)
 
@@ -173,7 +174,7 @@ Phases 0-9 cumulatively land below.
 | 72 | `[ ]` | **dashboard-vanity-url** — Kebab-case slug input + live preview; `toVanitySlug` utility with 8 unit tests; public route `/d/<workspaceSlug>/<slug>` with workspace-scoped uniqueness. | CHECKPOINT 6 + 8 |
 | 73 | `[ ]` | **dashboard-share-url-row-qr** — `ShareUrlRow` shows canonical + vanity URLs with copy buttons; downloadable 256×256 QR PNG via `qrcode` library (client-side, no network). | CHECKPOINT 6 |
 | 74 | `[ ]` | **dashboard-slice-aware-publish** — `Data scope` section with `queried` (default, narrowest) / `all_columns` / `custom` modes; `node-sql-parser` `columnList` extracts referenced columns; `unparseable` sentinel for safe fallback; `buildSliceSql` materializes the slice; persists in `dashboard.config.__publishConfig`. | CHECKPOINT 13 |
-| 75 | `[ ]` | **dashboard-pdf-export-annotate** — `ExportPdfButton` next to Publish; two-step modal (export immediately / annotate then export); off-screen render via `<PuckPageRender>` + `html2canvas` 2× → `jspdf` paginated portrait letter; annotator with freehand/arrow/text (RoughJS), roughness/stroke/color sliders, undo+clear, composited before pagination. | CHECKPOINT 13 |
+| 75 | `[ ]` | **dashboard-pdf-export-annotate** — `ExportPdfButton` next to Publish; two-step modal (export immediately / annotate then export); off-screen render via `<PuckPageRender>` + `html2canvas` 2× → `jspdf` paginated portrait letter; annotator with freehand/arrow/text (RoughJS), roughness/stroke/color sliders, undo+clear, composited before pagination. Currently gated behind a local `HIDE_EXPORT_AS_PDF = true` flag — migrate the gate alongside the feature so it ships defaulted-off. | CHECKPOINT 13; commit `6fee1d3d` (HIDE_EXPORT_AS_PDF flag) |
 
 ## L. Dataset summary view
 
@@ -230,6 +231,12 @@ docs migration; they are not features themselves.
 | 92 | `[ ]` | **docs-superpowers-specs-plans** — Copy `docs/superpowers/specs/` and `docs/superpowers/plans/` to develop as the canonical spec/plan history. | Existing on source |
 | 93 | `[ ]` | **docs-demo-features** — Copy `docs/demo-features/` (web-offline-mode, sql-parser-filter-ui, desktop-offline-session) plus `docs/offline-chat-sql-hardening.md`, `docs/permissions-architecture.md`, `docs/avandar-packages.md`, `docs/adding-new-data-source-types.md`. | Existing on source |
 
+## R. Permissions & sharing
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 95 | `[ ]` | **share-resource-modal-redesign** — Implements the share-resource modal redesign already documented on both branches (`docs/superpowers/specs/2026-05-17-share-resource-modal-redesign-design.md` + matching plan). Rewrites `shared/permissions/ShareResourceModal/*` (ShareAddPrincipalRow, ShareGeneralAccess, SharePrincipalList, SharePrincipalRow, ShareResourceButton, ShareResourceModal, ShareSummaryLine, buildShareSummary, shareCopy — ~16 files, +220/-142 net), gates rollout behind the `enable-shared-with-me` feature flag (added to `playwright.config.ts` env, `src/lib/offline/isAppLinkAvailableOffline.ts`, README, and i18n catalogs in all 8 locales), and bundles the e2e infra it needs (Playwright `reducedMotion: "reduce"` context + `ensureE2eViteFeatureFlags` boot). The matching Supabase RPC migrations were added (`20260517204100_list_shared_with_me_rpc.sql`) and later dropped (`20260602172559_drop_list_shared_with_me_rpc.sql`) on **both** branches, so no schema work is owed here. | `docs/superpowers/specs/2026-05-17-share-resource-modal-redesign-design.md`; `docs/superpowers/plans/2026-05-17-share-resource-modal-redesign.md`; commit `54d7930d` |
+
 ---
 
 ## Things Session 2 should specifically verify
@@ -257,6 +264,20 @@ docs migration; they are not features themselves.
   non-merge commits include many vague ones — `more fixes`,
   `changes`, `fixes` — that may hide work. Walk each one and
   attribute it (or confirm it's noise).
+- [ ] **Fold refactor-of-existing-feature rows into their originals.**
+  The operator rule: we migrate the up-to-date code, not legacy
+  followed by a refactor PR. Candidates flagged during the
+  2026-06-05 `/deslop update` for Session 2 to evaluate:
+  - Row #4 `dataset-upload-fixes` — "Misc fixes to the dataset
+    upload path discovered after the initial import landing." →
+    fold into #1 `async-dataset-import-pipeline`.
+  - Row #5 `xlsx-column-inference` — "part of #234 stack." → fold
+    into #1.
+  - Row #7 `resync-dataset-card` — "rewritten for the new async
+    pipeline." → fold into #1.
+  - Row #6 `google-sheets-import-resilience` — "updated for the
+    new async pipeline." → judgment call; Google Sheets is its own
+    surface but the diff is purely pipeline adaptation.
 
 When Session 2 has done these checks, update the header marker
 from `DRAFT — Session 1` to `validated — Session N (YYYY-MM-DD)`.
