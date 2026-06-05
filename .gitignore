@@ -74,3 +74,8 @@ etl-output/
 # Large generated test files for memory/perf benchmarking (do not commit)
 tests/data/large/
 .claude/worktrees
+
+# Git worktrees must live under ~/projects/worktrees/<repo>/, never inside the repo.
+# These patterns are tripwires in case a tool drops a worktree directory here by mistake.
+worktrees/
+.worktrees/
