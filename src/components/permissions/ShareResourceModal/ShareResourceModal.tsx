@@ -209,7 +209,6 @@ export function ShareResourceModal({
     workspaceName: workspace.name,
     userById,
     groupById,
-    t,
   });
 
   const onGeneralAccessChange = (next: {

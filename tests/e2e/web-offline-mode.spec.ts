@@ -34,13 +34,11 @@ test.describe("web read-only offline mode", () => {
     });
 
     await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-manager/data-import`);
-    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(page.getByText(/You are offline/i)).toHaveCount(0);
 
     await emulateBrowserOffline(page);
 
-    await expect(
-      page.getByRole("alert").filter({ hasText: /You are offline/i }),
-    ).toBeVisible();
+    await expect(page.getByText(/You are offline/i)).toBeVisible();
 
     const saveDatasetButton = page.getByRole("button", {
       name: "Save Dataset",

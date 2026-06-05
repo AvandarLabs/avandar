@@ -130,6 +130,23 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(true);
   });
 
+  it("returns true when bar has xAxisKey but no series (incomplete config)", () => {
+    expect(
+      shouldHydrateVizFromQueryResult({
+        rawSQL: 'SELECT "Admin2", SUM("daily_new_cases") AS total_cases FROM t',
+        query: _makeQueryWithColumns([mockColumn("Admin2")]),
+        vizConfig: {
+          vizType: "bar",
+          xAxisKey: "Admin2",
+          series: [],
+          layout: "group",
+          withLegend: true,
+        },
+        resultColumnNames: new Set(["Admin2", "total_cases"]),
+      }),
+    ).toBe(true);
+  });
+
   it("returns false when structured overlaps result and axes are valid", () => {
     expect(
       shouldHydrateVizFromQueryResult({

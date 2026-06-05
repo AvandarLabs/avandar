@@ -35,10 +35,9 @@ const defaultTestTimeoutMs = isCI ? 90_000 : 45_000;
 
 export default defineConfig({
   testDir: "tests/e2e",
-  /**
-   * Default `workers: 1`; raising it is safe: each worker gets its own
-   * `e2e-test-workspace-w{n}` slug via the worker-scoped `e2eWorkerDb` fixture.
-   */
+
+  // Default `workers: 1`; raising it is safe: each worker gets its own
+  // `e2e-test-workspace-w{n}` slug via the worker-scoped `e2eWorkerDb` fixture.
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -50,6 +49,14 @@ export default defineConfig({
     baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+
+    // Sets `prefers-reduced-motion: reduce` on every page. The codebase's
+    // animation CSS (see `src/config/Theme/animationPresets.css`) collapses
+    // ooze-in/swipe-out to 120ms opacity fades with no position transforms
+    // under this media query, and Mantine transitions honor it too. This
+    // removes whole classes of geometry/timing races (panel `boundingBox`
+    // mid-morph, modal-open transitions, etc.) without changing product code.
+    contextOptions: { reducedMotion: "reduce" },
     ...devices["Desktop Chrome"],
   },
   webServer: {

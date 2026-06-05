@@ -150,7 +150,7 @@ async function uploadCsvAndOpenChat(args: {
 }
 
 test.describe("chat interactive workflows", () => {
-  test("Phase 1: fixed-options clarification appears inline and the answer is sent back", async ({
+  test("fixed-options clarification appears inline and the answer is sent back", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -223,7 +223,7 @@ test.describe("chat interactive workflows", () => {
     });
   });
 
-  test("Phase 1: fixed-options clarification accepts a custom Something else answer", async ({
+  test("fixed-options clarification accepts a custom Something else answer", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -309,7 +309,7 @@ test.describe("chat interactive workflows", () => {
     );
   });
 
-  test("Phase 3: proposePlan renders a multi-step plan that auto-runs against DuckDB", async ({
+  test("proposePlan renders a multi-step plan that auto-runs against DuckDB", async ({
     page,
     e2eWorkerDb,
   }) => {

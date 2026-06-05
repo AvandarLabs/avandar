@@ -1,10 +1,10 @@
+import { t } from "@lingui/core/macro";
 import { capitalize, propEq } from "@utils";
 import { appForResource, appLabel, resourceTypeLabel } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { useLingui } from "@lingui/react/macro";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
@@ -27,7 +27,6 @@ type BuildShareSummaryOptions = {
   workspaceName: string;
   userById: Record<string, string>;
   groupById: Record<string, string>;
-  t: ReturnType<typeof useLingui>["t"];
 };
 
 /**
@@ -49,9 +48,8 @@ export function hasPrincipalId(
 export function buildShareSummary(
   opts: Readonly<BuildShareSummaryOptions>,
 ): SummarySpan[] {
-  const { t } = opts;
-  const resource = resourceTypeLabel(opts.resourceType, t);
-  const app = appLabel(appForResource(opts.resourceType), t);
+  const resource = resourceTypeLabel(opts.resourceType);
+  const app = appLabel(appForResource(opts.resourceType));
 
   const userShares = opts.shares
     .filter(hasPrincipalId)
@@ -65,7 +63,7 @@ export function buildShareSummary(
 
   if (!hasAnyShares) {
     if (!opts.isRestricted) {
-      return buildGeneralAccessOnlySummary(resource, app, generalAccessRole, t);
+      return buildGeneralAccessOnlySummary(resource, app, generalAccessRole);
     }
 
     return [
@@ -111,7 +109,7 @@ export function buildShareSummary(
   });
 
   if (!opts.isRestricted) {
-    fragments.push(buildGeneralAccessFragment(app, generalAccessRole, t));
+    fragments.push(buildGeneralAccessFragment(app, generalAccessRole));
   }
 
   // Join fragments with commas; if there are 2+ fragments, the final
@@ -132,7 +130,6 @@ function buildGeneralAccessOnlySummary(
   resource: string,
   app: string,
   role: RoleLevel,
-  t: ReturnType<typeof useLingui>["t"],
 ): SummarySpan[] {
   return [
     {
@@ -145,7 +142,6 @@ function buildGeneralAccessOnlySummary(
 function buildGeneralAccessFragment(
   app: string,
   role: RoleLevel,
-  t: ReturnType<typeof useLingui>["t"],
 ): SummarySpan[] {
   return [
     { kind: "text", text: t`anyone with ` },

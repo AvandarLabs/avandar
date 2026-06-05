@@ -33,7 +33,7 @@ export function ShareResourceButton({
 
   const canManageShares = effectiveRole === "admin";
   const isDisabled = !resourceId || isLoadingRole || !canManageShares;
-  const resourceLabel = resourceTypeLabel(resourceType, t);
+  const resourceLabel = resourceTypeLabel(resourceType);
 
   return (
     <Tooltip

@@ -80,9 +80,7 @@ async function setSkipRows(page: Page, value: number): Promise<void> {
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
   const skipInput = page.getByLabel("Number of rows to skip");
-  await delimiterInput.click();
-  await delimiterInput.press("ControlOrMeta+a");
-  await page.keyboard.insertText(value);
+  await delimiterInput.fill(value);
   await skipInput.focus();
   await expect(delimiterInput).toHaveValue(value, { timeout: MEDIUM_WAIT });
   await yieldForParseOptionsCommit(page);

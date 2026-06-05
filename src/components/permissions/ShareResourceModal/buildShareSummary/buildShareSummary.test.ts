@@ -4,18 +4,10 @@ import type { SummarySpan } from "./buildShareSummary";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
-// A test stub for Lingui's `t` tag that returns the literal English template
-// with `${...}` interpolations inlined. The cast matches the
-// `ReturnType<typeof useLingui>["t"]` shape that `buildShareSummary` accepts.
-const tStub = ((
-  strings: TemplateStringsArray,
-  ...values: unknown[]
-): string => {
-  return strings.reduce((acc, str, i) => {
-    return acc + str + (i < values.length ? String(values[i]) : "");
-  }, "");
-}) as unknown as Parameters<typeof buildShareSummary>[0]["t"];
-
+// `buildShareSummary` uses the global `t` macro from `@lingui/core/macro`
+// internally, which reads from the active Lingui i18n singleton. The vitest
+// setup (`tests/vitest.setup.ts`) activates an empty English catalog, so
+// `t._({id, message})` calls return the source `message` here.
 const baseLookups = {
   workspaceName: "Avandar Labs",
   resourceType: "dataset" as const,
@@ -27,7 +19,6 @@ const baseLookups = {
     "g-1": "Analytics",
     "g-2": "Public datasets",
   },
-  t: tStub,
 };
 
 /** Flattens spans into a single plain string for easy substring asserts. */
@@ -191,7 +182,6 @@ describe("buildShareSummary", () => {
       resourceType: "dashboard",
       userById: {},
       groupById: {},
-      t: tStub,
     });
     expect(flat(spans)).toBe(
       "This dashboard is currently only accessible to its owner.",

@@ -52,8 +52,6 @@ export async function setGeneralAccess(
   }
 
   await generalSelect.click();
-  await page.getByRole("option", { name: "Restricted" }).click();
-  await generalSelect.click();
   await page.getByRole("option", { name: /^Anyone in/ }).click();
 
   const workspaceRole: RoleLevel = role ?? "viewer";

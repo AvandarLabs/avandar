@@ -48,8 +48,8 @@ export function SharePrincipalRow({
   const { t } = useLingui();
   const shareCopy = useShareCopy();
   const isGroup = share.principalType === "user_group";
-  const app = appLabel(appForResource(resourceType), t);
-  const resource = resourceTypeLabel(resourceType, t);
+  const app = appLabel(appForResource(resourceType));
+  const resource = resourceTypeLabel(resourceType);
 
   const roleOptions: Array<{ value: RoleLevel; label: string }> = [
     { value: "viewer", label: t`Viewer` },

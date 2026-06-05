@@ -11,8 +11,41 @@ the future", append the new mistake to this document.
 
 ## Additional Mistakes
 
-- In TypeScript, when matching against string literal or enum unions, use
-  `match()` (with `.exhaustive()`) from `ts-pattern`, or our internal
-  `matchLiteral` function, so cases are exhaustive. Avoid `switch` with a
-  `default` fallback or loose `if` chains; these will not throw type errors for
-  inexhaustive cases.
+- Dispatch on a string-literal or enum union with `match().exhaustive()` (from
+  `ts-pattern`) or `matchLiteral` (from `@utils`). These fail to compile when a
+  union case is unhandled. Plain `switch` (with or without `default`) and
+  `if`/`else if` chains do not check exhaustiveness, so don't use them for
+  union dispatch.
+
+- Use block comments (`/** ... */`) only as documentation attached to an
+  identifier (functions, types, exports, etc.) or as a file-level header.
+  Any comment inside a function body must use `//` line comments, even when
+  it spans multiple lines.
+
+  This is bad:
+
+  ```ts
+  function load(id: string): Result {
+    /**
+     * We bail early on empty ids because the upstream cache treats them
+     * as wildcards and would return stale rows.
+     */
+    if (id === "") {
+      return emptyResult();
+    }
+    // ...
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  function load(id: string): Result {
+    // We bail early on empty ids because the upstream cache treats them
+    // as wildcards and would return stale rows.
+    if (id === "") {
+      return emptyResult();
+    }
+    // ...
+  }
+  ```

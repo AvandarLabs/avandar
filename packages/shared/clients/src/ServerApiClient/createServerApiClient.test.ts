@@ -49,14 +49,10 @@ describe("createServerApiClient", () => {
     expect(typeof client.invokeFunction).toBe("function");
   });
 
-  it(
-    "also returns the browser-backed adapter on desktop in Phase 1 " +
-      "(Option A — Phase 2 wires the IPC adapter here)",
-    () => {
-      (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      const client = createServerApiClient();
-      expect(typeof client.rpc).toBe("function");
-      expect(typeof client.invokeFunction).toBe("function");
-    },
-  );
+  it("also returns the browser-backed adapter on desktop", () => {
+    (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const client = createServerApiClient();
+    expect(typeof client.rpc).toBe("function");
+    expect(typeof client.invokeFunction).toBe("function");
+  });
 });

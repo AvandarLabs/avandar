@@ -94,13 +94,26 @@ test.describe("Data Explorer query details", () => {
     const queryDetailsPanel = page.locator('div[aria-label="Query Details"]');
     await _ensureQueryPanelOpen(page);
 
+    // Collapse the panel before measuring initialBox so the bounding box is
+    // captured in the same (collapsed) state as the reopened panel below.
+    // Otherwise initialBox depends on whichever state the panel happens to be
+    // in (which can leak between tests): a wide expanded panel and a narrow
+    // collapsed panel have very different left X coordinates since the panel
+    // is right-anchored.
+    const collapseButton = queryDetailsPanel.getByLabel("Collapse panel");
+    if (await collapseButton.isVisible()) {
+      await collapseButton.click();
+    }
+    await expect(queryDetailsPanel.getByLabel("Expand panel")).toBeVisible({
+      timeout: SHORT_WAIT,
+    });
+
     const initialBox = await queryDetailsPanel.boundingBox();
     expect(initialBox).not.toBeNull();
     if (!initialBox) {
       return;
     }
 
-    await queryDetailsPanel.getByLabel("Collapse panel").click();
     await queryDetailsPanel
       .getByLabel("Close Query Details")
       .evaluate((node) => {

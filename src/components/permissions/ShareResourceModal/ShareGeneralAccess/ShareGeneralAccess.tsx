@@ -32,8 +32,8 @@ export function ShareGeneralAccess({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const shareCopy = useShareCopy();
-  const app = appLabel(appForResource(resourceType), t);
-  const resource = resourceTypeLabel(resourceType, t);
+  const app = appLabel(appForResource(resourceType));
+  const resource = resourceTypeLabel(resourceType);
 
   const generalValue: "restricted" | "workspace" =
     isRestricted ? "restricted" : "workspace";

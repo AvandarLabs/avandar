@@ -1,4 +1,6 @@
+import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { matchLiteral } from "@utils";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { AppType } from "$/models/Permissions/Permissions.types";
 
@@ -6,10 +8,7 @@ import type { AppType } from "$/models/Permissions/Permissions.types";
  * Returns the human-readable label for a resource type. Used in headings,
  * tooltip copy, and the summary line ("dataset" / "dashboard").
  */
-export function resourceTypeLabel(
-  type: ResourceType,
-  t: ReturnType<typeof useLingui>["t"],
-): string {
+export function resourceTypeLabel(type: ResourceType): string {
   return type === "dashboard" ? t`dashboard` : t`dataset`;
 }
 
@@ -17,20 +16,21 @@ export function resourceTypeLabel(
  * Returns the human-readable app label used in General-access copy and the
  * "Limit to app access" tooltip ("Data Sources", "Dashboards", …).
  */
-export function appLabel(
-  app: AppType,
-  t: ReturnType<typeof useLingui>["t"],
-): string {
-  switch (app) {
-    case "data_sources":
+export function appLabel(app: AppType): string {
+  return matchLiteral(app, {
+    data_sources: () => {
       return t`Data Sources`;
-    case "dashboards":
+    },
+    dashboards: () => {
       return t`Dashboards`;
-    case "data_explorer":
+    },
+    data_explorer: () => {
       return t`Data Explorer`;
-    case "settings":
+    },
+    settings: () => {
       return t`Settings`;
-  }
+    },
+  });
 }
 
 /**
@@ -65,6 +65,7 @@ export type ShareCopy = {
  * `ShareCopy` whose strings are localized via Lingui at call time.
  */
 export function useShareCopy(): ShareCopy {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const { t } = useLingui();
   return {
     addPlaceholder: t`Search by name or user group`,
