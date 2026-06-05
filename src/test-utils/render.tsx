@@ -26,19 +26,19 @@ export function render(
 ): RenderResult {
   const { wrapper: ExtraWrapper, ...rest } = options ?? {};
   const Wrapper =
-    ExtraWrapper === undefined
-      ? TestProviders
-      : function ComposedWrapper({
-          children,
-        }: {
-          children: ReactNode;
-        }): JSX.Element {
-          return (
-            <TestProviders>
-              <ExtraWrapper>{children}</ExtraWrapper>
-            </TestProviders>
-          );
-        };
+    ExtraWrapper === undefined ? TestProviders : (
+      function ComposedWrapper({
+        children,
+      }: {
+        children: ReactNode;
+      }): JSX.Element {
+        return (
+          <TestProviders>
+            <ExtraWrapper>{children}</ExtraWrapper>
+          </TestProviders>
+        );
+      }
+    );
   return renderReact(ui, {
     wrapper: Wrapper,
     ...rest,
