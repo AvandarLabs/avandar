@@ -7,6 +7,13 @@
 - **Depends on**: `001-async-dataset-import-pipeline` (the Import tab embeds `DataImportTabs` which uses `startCsvImport` / `startXlsxImport`).
 - **Estimated PR size**: ~8 files changed (7 new + 1 modified), ~609 lines added.
 
+## Notes for future you
+
+- **The row description is partially stale.** `ALL_FEATURES.md` row #3 promises a Drawer with "slide-from-bottom transition variants" (per commits `2ce199a`, `09c24af`, which did ship a Drawer). A later refactor swapped the Drawer for a Modal; the current `feat/ict4d-demo` state ships `OpenDatasetModal`, not a Drawer. **Don't try to "fix" it back to a Drawer during migration** — preserve the on-disk state of `feat/ict4d-demo`. A follow-up rename (Modal → Drawer or leave as Modal) can happen on `develop` once the migration lands. Reviewers may ask "where's the bottom slide?". Answer: gone, intentionally.
+- The folder name `OpenDatasetDrawer/` is preserved even though the component inside is `OpenDatasetModal`. Don't rename the folder during the migration — it would create a noisy diff for no functional benefit.
+- Soft dependency on row #36 (`chat-plan-virtual-dataset-persistence`): the rehydrate path inside `SavedDatasetsView` is only exercised when a virtual dataset has `plan_steps` saved on its `dataset.config`. Without row #36, virtual datasets exist but their plans don't persist — the drawer opens them as raw SQL with no plan, which is fine.
+- The `@ui` Tabs wrapper used inside the modal is the internal Avandar Tabs primitive, not the Mantine one. It already exists on `develop`.
+
 ## What this feature is
 
 Replaces the imperative Mantine `modals.open(...)` "Open Dataset" call in the Data Explorer with a declarative component, tabbed into **Saved datasets** and **Import**. The Saved tab lists the workspace's saved + virtual datasets with filter, delete, and rehydrate-on-open. The Import tab embeds the new `DataImportTabs` (from row #1) so users can import a fresh file without leaving the Data Explorer.
@@ -156,9 +163,3 @@ When the operator runs `/deslop complete dataset-drawer`:
    - `docs/deslop/ALL_FEATURES.md`: flip row #3 to `[x] ($MERGE_SHA)`.
    - `docs/deslop/STATE.md`: move the entry from `In-flight migrations` to `Completed migrations log`.
    - Commit `chore(deslop): mark dataset-drawer as completed ($MERGE_SHA)` and push to `feat/ict4d-demo`.
-
-## Notes for future you
-
-- The original PR #229 was titled `add-dataset-drawer-K0E1O` and it shipped as a Drawer. Commits `2ce199a` and `09c24af` are the slide-from-bottom transition commits. A later refactor (somewhere between then and the `feat/ict4d-demo` HEAD this plan was authored against) swapped the Drawer for a Modal. If you bisect the source branch you'll see the Drawer phase, but the migration target is the current Modal state.
-- Soft dependency on row #36 (`chat-plan-virtual-dataset-persistence`): the rehydrate path is only exercised when a virtual dataset has `plan_steps` saved on its `dataset.config`. Without row #36, virtual datasets exist but their plans don't persist — the drawer opens them as raw SQL with no plan, which is fine.
-- The `@ui` Tabs wrapper used inside the modal is the internal Avandar Tabs primitive, not the Mantine one. It already exists on `develop`.

@@ -7,6 +7,11 @@
 - **Depends on**: `001-async-dataset-import-pipeline` (uses `startCsvImport` / `startXlsxImport` via `useLoadManualUploadFile`).
 - **Estimated PR size**: ~10 files changed (7 new + 3 modified), ~480 lines added.
 
+## Notes for future you
+
+- The `ChatPanelProvider` already exists on `develop`; no migration is needed for it. The dropzone is mounted **inside** that provider so it can call into chat-aware modal helpers if needed in the future, but the current implementation does not reach into chat state.
+- Tests use Vitest's DOM environment + `@testing-library/react`. They mock `DataTransfer` for the drop event; no Playwright is involved.
+
 ## What this feature is
 
 Drop a CSV or XLSX anywhere in the workspace and the dataset-import flow opens immediately. A full-screen `<Dropzone.FullScreen>` from `@mantine/dropzone` (already installed) is mounted globally inside `<ChatPanelProvider>` in `WorkspaceLayout`. When a file is dropped:
@@ -124,8 +129,3 @@ When the operator runs `/deslop complete app-wide-dropzone`:
    - `docs/deslop/ALL_FEATURES.md`: flip row #2 to `[x] ($MERGE_SHA)`.
    - `docs/deslop/STATE.md`: move the entry from `In-flight migrations` to `Completed migrations log`.
    - Commit `chore(deslop): mark app-wide-dropzone as completed ($MERGE_SHA)` and push to `feat/ict4d-demo`.
-
-## Notes for future you
-
-- The `ChatPanelProvider` already exists on `develop`; no migration is needed for it. The dropzone is mounted **inside** that provider so it can call into chat-aware modal helpers if needed in the future, but the current implementation does not reach into chat state.
-- Tests use Vitest's DOM environment + `@testing-library/react`. They mock `DataTransfer` for the drop event; no Playwright is involved.

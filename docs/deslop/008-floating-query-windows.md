@@ -7,6 +7,12 @@
 - **Depends on**: `none` (the floating-window infrastructure is self-contained; rows #10 / #11 / #96 plug content into it but don't gate it).
 - **Estimated PR size**: ~7 files changed, +643 / −404 lines.
 
+## Notes for future you
+
+- This row provides the **container**. Rows #10 (`viz-settings-fieldsets`) and #11 (`codemirror-sql-editor`) provide the **content** that lives inside the windows. They can land in any order — the floating window will render whatever child you pass it. Until #11 lands, the SQL tab inside Query Details may use a plain textarea or the pre-existing SQL editor on `develop`; that's fine.
+- The Data Explorer URL session sync from row #96 is **independent** of panel state. URL serialization covers `ds`, `cols`, `sql`, etc. — not floating-window position/collapse. Don't try to merge the two storage stores.
+- The standalone `Drawer` wrapper at `packages/web/ui/src/Drawer/` ships with row #3 (`dataset-drawer`), not here.
+
 ## What this feature is
 
 Replaces the static left-sidebar that held **Query Details** (Manual + SQL editor) and **Visualization Settings** in the Data Explorer with two draggable, collapsible floating windows on top of the canvas. Each window:
@@ -162,9 +168,3 @@ When the operator runs `/deslop complete floating-query-windows`:
    - `docs/deslop/ALL_FEATURES.md`: flip row #8 to `[x] ($MERGE_SHA)`.
    - `docs/deslop/STATE.md`: move the entry from `In-flight migrations` to `Completed migrations log`.
    - Commit `chore(deslop): mark floating-query-windows as completed ($MERGE_SHA)` and push to `feat/ict4d-demo`.
-
-## Notes for future you
-
-- This row provides the **container**. Rows #10 (`viz-settings-fieldsets`) and #11 (`codemirror-sql-editor`) provide the **content** that lives inside the windows. They can land in any order — the floating window will render whatever child you pass it. Until #11 lands, the SQL tab inside Query Details may use a plain textarea or the pre-existing SQL editor on `develop`; that's fine.
-- The Data Explorer URL session sync from row #96 is **independent** of panel state. URL serialization covers `ds`, `cols`, `sql`, etc. — not floating-window position/collapse. Don't try to merge the two storage stores.
-- The standalone `Drawer` wrapper at `packages/web/ui/src/Drawer/` ships with row #3 (`dataset-drawer`), not here.

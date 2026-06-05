@@ -46,9 +46,9 @@ let it drift.
   (subject: _docs(deslop): mark Phase 1 complete (pending comment
   sync)_)
 - **Last update run on**: `2026-06-05`
-- **Active rows**: 92 (95 global indices minus retired #4/#5/#6/#7
-  folded into #1, plus #96 added). Index numbering is intentionally
-  non-dense.
+- **Active rows**: 91 (95 global indices minus retired #4/#5/#6/#7
+  folded into #1 and #14 folded into #9, plus #96 added). Index
+  numbering is intentionally non-dense.
 - **Next planning session**: Session 3b+ — continue authoring
   per-feature `NNN-<slug>.md` migration plans. Session 3a (today,
   2026-06-05) wrote 5 plans (#1, #2, #3, #8, #9); 87 outstanding.

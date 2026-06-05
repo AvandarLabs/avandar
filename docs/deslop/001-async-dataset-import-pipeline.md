@@ -7,6 +7,13 @@
 - **Depends on**: `none` (foundational; rows #2 and #3 depend on **this** one)
 - **Estimated PR size**: ~13 canonical files changed, +1.2k / −0.3k lines (excluding test-fixture churn already counted in the dependent rows)
 
+## Notes for future you
+
+- This row absorbs four retired ALL_FEATURES rows (#4 `dataset-upload-fixes`, #5 `xlsx-column-inference`, #6 `google-sheets-import-resilience`, #7 `resync-dataset-card`). If you find a commit on `feat/ict4d-demo` that looks like it belongs to one of those folded rows, it lives **here**, not as a separate migration.
+- The merge order for CHECKPOINT 1 was #234 → #235 → #236 → drop-in PRs. The diff is byte-clean as a single PR off `develop`, so the merge ordering doesn't have to be preserved in this migration.
+- Rows #2 (`app-wide-dropzone`) and #3 (`dataset-drawer`) both depend on the new `startCsvImport` / `startXlsxImport` entry points. They must land **after** this row merges into `develop`.
+- The full feature inventory line for this row also references PTRCK-004 (commit `6098c3ef`) — dataset-name / CSV-name display + tooltips + import validation. That commit's diff folds in here.
+
 ## What this feature is
 
 Replaces the synchronous CSV/XLSX → DuckDB TABLE → parquet export path with a two-phase streaming pipeline:
@@ -158,10 +165,3 @@ When the operator runs `/deslop complete async-dataset-import-pipeline`:
    - `docs/deslop/ALL_FEATURES.md`: flip row #1 from `[~]` (or `[ ]`) to `[x] ($MERGE_SHA)`.
    - `docs/deslop/STATE.md`: remove the entry from `In-flight migrations`; append to `Completed migrations log` with today's date and `$MERGE_SHA`.
    - Commit `chore(deslop): mark async-dataset-import-pipeline as completed ($MERGE_SHA)` and push to `feat/ict4d-demo`.
-
-## Notes for future you
-
-- This row absorbs four retired ALL_FEATURES rows (#4 `dataset-upload-fixes`, #5 `xlsx-column-inference`, #6 `google-sheets-import-resilience`, #7 `resync-dataset-card`). If you find a commit on `feat/ict4d-demo` that looks like it belongs to one of those folded rows, it lives **here**, not as a separate migration.
-- The merge order for CHECKPOINT 1 was #234 → #235 → #236 → drop-in PRs. The diff is byte-clean as a single PR off `develop`, so the merge ordering doesn't have to be preserved in this migration.
-- Rows #2 (`app-wide-dropzone`) and #3 (`dataset-drawer`) both depend on the new `startCsvImport` / `startXlsxImport` entry points. They must land **after** this row merges into `develop`.
-- The full feature inventory line for this row also references PTRCK-004 (commit `6098c3ef`) — dataset-name / CSV-name display + tooltips + import validation. That commit's diff folds in here.

@@ -13,8 +13,12 @@
 > `async-dataset-import-pipeline`; PTRCK-005/006/007/008 chart-suite
 > expansion was folded into row #9 (now `viz-multi-series-and-chart-types`).
 >
+> **Session 3 (2026-06-05) fold:** Row #14 `chart-color-picker-fix`
+> absorbed into row #9 (color-picker fix ships in the same commit
+> family as the chart-suite expansion — inseparable).
+>
 > Index numbering is intentionally non-dense — folded-in row numbers
-> (#4–#7) are not reused. Rows have global IDs so they can be
+> (#4–#7, #14) are not reused. Rows have global IDs so they can be
 > reshuffled without renumbering.
 >
 > The live "last analyzed commit" SHA and in-flight / completed
@@ -64,12 +68,11 @@ for those new tables exists yet.
 | # | Status | Feature | Sources |
 |---|---|---|---|
 | 8 | `[ ]` | **floating-query-windows** — Draggable, collapsible Query Details and Visualization Settings floating windows on top of the Data Explorer canvas. | CHECKPOINT 1 (PR #228) |
-| 9 | `[ ]` | **viz-multi-series-and-chart-types** — Multi-series visualizations across the full chart-type expansion: bar/line/area + scatter + bubble + **pie + funnel + radar**, all with per-series xKey/yKey/sizeKey (or nameKey/valueKey for pie-like configs); axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers; auto-hydration of viz axes from query results; `CurveType` shared type with `curveType` setting on Line/Area; `withLegend` setting across Bar/Line/Area; `hydratePieFromQuery`/`hydratePieFromQueryResult` utilities. Per the operator rule, the PTRCK-005/006/007/008 expansion is bundled into this row rather than split — migrate the up-to-date chart suite, not the original multi-series + later expansion. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527`, `517daefc` (PTRCK-005+006), `7b738f13` (PTRCK-007+008) |
+| 9 | `[ ]` | **viz-multi-series-and-chart-types** — Multi-series visualizations across the full chart-type expansion: bar/line/area + scatter + bubble + **pie + funnel + radar**, all with per-series xKey/yKey/sizeKey (or nameKey/valueKey for pie-like configs); axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers; auto-hydration of viz axes from query results; `CurveType` shared type with `curveType` setting on Line/Area; `withLegend` setting across Bar/Line/Area; `hydratePieFromQuery`/`hydratePieFromQueryResult` utilities. Per the operator rule, the PTRCK-005/006/007/008 expansion is bundled into this row rather than split — migrate the up-to-date chart suite, not the original multi-series + later expansion. **Also absorbs retired row #14 `chart-color-picker-fix`** (commit `c8fb6b6`): color picker behavior + chart rendering fixes for big-number columns ship in the same commit family and are inseparable. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527`, `517daefc` (PTRCK-005+006), `7b738f13` (PTRCK-007+008), `c8fb6b6` (color-picker fix, ex-#14) |
 | 10 | `[ ]` | **viz-settings-fieldsets** — Visualization Settings restructured into labelled fieldsets matching the design doc. | `docs/superpowers/specs/2026-05-21-sql-pills-viz-settings-design.md`; commit `4e85af6` |
 | 11 | `[ ]` | **codemirror-sql-editor** — CodeMirror-based SQL editor in the Data Explorer (replaces the prior textarea), supporting dataset/column pills inline. | Commit `314f8a9`; sql-pills design spec |
 | 12 | `[ ]` | **sql-pill-rendering** — Render dataset names and column names as pills inside the read-only SQL block (`AvaSqlBlock`); editable pill dropdowns when the SQL is editable; widened dropdown. | Commits `4e85af6`, `6febbcf`, `a01db18` |
 | 13 | `[ ]` | **chart-number-formatting** — Centralized formatting helper used across the chart layer for big-number columns, locale-aware. | Commits `57c5803`, `c8fb6b6` |
-| 14 | `[ ]` | **chart-color-picker-fix** — Color picker behavior + chart rendering fixes for big-number columns. | Commit `c8fb6b6` |
 | 96 | `[ ]` | **data-explorer-url-session-sync** — Data Explorer state (`ds`, `cols`, `agg`, `orderBy`, `orderDir`, `sql`, `vc`, `od`) hydrates from and serializes back to the URL via `replace: true` navigation. Adds `DataExplorerURLState` parse/serialize helpers (+332 LoC), `dataExplorerURLHydration` deferral/hydrate-key checks (+54), `useDataExplorerURLSync` first-load hydration + ongoing sync (+299), and `remapColumnsByBaseId` in `QueryColumnMultiSelect` so URL-hydrated columns stay aligned with fetched metadata. Reset clears search params in one navigation so the query string can go bare. ~838 lines of new code; none of these files exist on `develop`. | Commit `7b738f13` (PTRCK-009 + PTRCK-010) |
 
 ## C. Chat panel core fixes & UX

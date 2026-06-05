@@ -7,6 +7,15 @@
 - **Depends on**: `none` (foundational visualization stack; rows #10 / #14 / #21 build on top).
 - **Estimated PR size**: **large** — ~80 files changed, +7.2k / −1.5k lines.
 
+## Notes for future you
+
+- This row is the largest single migration in the deslop queue (~7.2k LoC added). Plan the review accordingly — a single PR is correct (it's one coherent feature), but expect multiple reviewer passes and possibly a couple of fixups.
+- This row also **absorbs row #14** (`chart-color-picker-fix`, commit `c8fb6b6`). Color rendering fixes for big-number columns ship in the same commit family as the chart-suite expansion and are inseparable from it. The retired #14 index is **not reused**.
+- The shared `shared/models/vizs/` tree is the source of truth for chart configs. The `src/lib/ui/viz/` tree is the render layer. The `src/components/VisualizationContainer/VizSettingsForm/` tree is the settings UI. Don't blur those layers — each chart-type's three files should change together.
+- Row #10 (`viz-settings-fieldsets`) is a **layout** refinement on the fieldsets — it can land before or after this row. If it lands first, this row will need a small fixup to use the refined layout primitives; if it lands after, it will fold cleanly on top of the fieldsets this row introduces.
+- The PTRCK-005/006/007/008 commits (`517daefc`, `7b738f13`) are the chart-suite expansion. Their diffs are bundled into this row by design (per the operator rule). If you grep the inventory for "pie" or "funnel" expecting a separate row, you won't find one — it lives here.
+- The "axis-mapping tooltip on Series header" is in `SeriesAwareVizForm.tsx`. The exact tooltip text varies by chart family (XY vs radar vs pie). Don't try to abstract those strings into a single helper during the migration — they're intentionally chart-specific.
+
 ## What this feature is
 
 Expands the visualization stack from a 4-chart-type stack (bar, line, scatter, table) to the **full 8-type suite**: bar, line, area, scatter, bubble, pie, funnel, radar. Adds:
@@ -256,11 +265,3 @@ When the operator runs `/deslop complete viz-multi-series-and-chart-types`:
    - `docs/deslop/ALL_FEATURES.md`: flip row #9 to `[x] ($MERGE_SHA)`.
    - `docs/deslop/STATE.md`: move the entry from `In-flight migrations` to `Completed migrations log`.
    - Commit `chore(deslop): mark viz-multi-series-and-chart-types as completed ($MERGE_SHA)` and push to `feat/ict4d-demo`.
-
-## Notes for future you
-
-- This row is the largest single migration in the deslop queue (~7.2k LoC added). Plan the review accordingly — a single PR is correct (it's one coherent feature), but expect multiple reviewer passes and possibly a couple of fixups.
-- The shared `shared/models/vizs/` tree is the source of truth for chart configs. The `src/lib/ui/viz/` tree is the render layer. The `src/components/VisualizationContainer/VizSettingsForm/` tree is the settings UI. Don't blur those layers — each chart-type's three files should change together.
-- Row #10 (`viz-settings-fieldsets`) is a **layout** refinement on the fieldsets — it can land before or after this row. If it lands first, this row will need a small fixup to use the refined layout primitives; if it lands after, it will fold cleanly on top of the fieldsets this row introduces.
-- The PTRCK-005/006/007/008 commits (`517daefc`, `7b738f13`) are the chart-suite expansion. Their diffs are bundled into this row by design (per the operator rule). If you grep the inventory for "pie" or "funnel" expecting a separate row, you won't find one — it lives here.
-- The "axis-mapping tooltip on Series header" is in `SeriesAwareVizForm.tsx`. The exact tooltip text varies by chart family (XY vs radar vs pie). Don't try to abstract those strings into a single helper during the migration — they're intentionally chart-specific.

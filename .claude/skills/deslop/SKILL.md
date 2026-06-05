@@ -479,6 +479,45 @@ doing anything destructive.
 
 ---
 
+## Per-feature plan authoring rules
+
+These rules apply whenever you write or refresh a
+`docs/deslop/NNN-<slug>.md` file. They override the order in
+`FEATURE_TEMPLATE.md` if there's a conflict — the template is the
+shape, these rules are the policy.
+
+- **"Notes for future you" goes at the TOP of every plan file**,
+  immediately after the metadata header (slug, branches, depends
+  on, estimated size). The operator reviews these plans by opening
+  the file and scanning the first screen — surprises and
+  drift-warnings belong above the mechanical steps, not buried at
+  the bottom. The bottom of the file is where mechanical procedure
+  lives ("How to mark this feature completed"). When you author
+  or update a plan, ensure Notes is first content section.
+- **Group sequential dependencies adjacent in `ALL_FEATURES.md`.**
+  If feature B depends on feature A landing first, put their rows
+  next to each other in the inventory and number their plan files
+  so they appear consecutively when listed (`NNN` and `NNN+1`).
+  Don't leave a sequential pair scattered across the file — it
+  makes the migration order ambiguous when an agent walks the
+  inventory top-to-bottom.
+- **Fold inseparable features into a single migration.** If two
+  rows would have to ship in the same PR to be reviewable (because
+  they touch the same files with interleaved edits, or one is just
+  a fixup of the other), collapse them into one row in
+  `ALL_FEATURES.md` and one plan file. Expand the row's description
+  to cover both, list both source-commit groups under Sources, and
+  retire the absorbed index — don't reuse it. The operator rule
+  "migrate refactored code, not legacy" is the same idea applied
+  to refactor-of-existing-feature pairs.
+- **Reordering and folding are docs-only changes.** They happen on
+  `feat/ict4d-demo` under `docs/deslop/`. They never touch source
+  code on either branch. When you reshuffle indices or fold rows,
+  update `ALL_FEATURES.md`, write/rename the affected plan files,
+  and commit on `feat/ict4d-demo` like any other deslop housekeeping
+  change. Don't touch source files; that's per-feature migration
+  work, not planning work.
+
 ## When *not* to do something
 
 - **Never open a PR.** The operator opens every PR. Pushing the

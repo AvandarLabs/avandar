@@ -24,6 +24,27 @@ migration doc was incomplete — fix the doc before the next session.**
 - **Estimated PR size**: rough lines-of-diff + file count from
   `git diff --stat origin/develop..feat/ict4d-demo -- <paths>`.
 
+## Notes for future you
+
+This section lives at the **top** of the plan (not the bottom) so
+that an operator reviewing the file sees surprises, drift warnings,
+and judgment calls before reading the mechanical steps below. Per
+the deslop skill's "Per-feature plan authoring rules", every plan
+must put Notes here.
+
+Use this section for anything an agent (or operator) landing cold
+should know before reading the steps:
+- Weird gotchas, hidden constraints, or non-obvious folds.
+- Why the row description in `ALL_FEATURES.md` may be stale or
+  drift-prone.
+- Cross-feature coupling that the dependency graph alone doesn't
+  capture.
+- Where the demo recording lives, where to find a corresponding
+  spec/plan, etc.
+
+Delete this section if (and only if) the feature genuinely has
+nothing surprising — but most features do.
+
 ## What this feature is
 
 One paragraph, plain language. What the user sees, why it matters.
