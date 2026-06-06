@@ -61,7 +61,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| _(none yet)_ | | | | |
+| 78 | `lingui-scaffold` | `refactor-078/lingui-scaffold` | 2026-06-06 | Pushed at `6b6f0c4b`. Frontend `tsc` clean, 362 frontend tests pass. Folds in #081's catalog-population portion per the operator rule. Operator opens the PR. |
 
 ---
 
