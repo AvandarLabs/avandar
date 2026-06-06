@@ -353,10 +353,29 @@ the operator, and do nothing else.**
    surfaces a blocking prerequisite that hasn't landed on `develop`
    yet, stop and report — do not start the refactor branch.
 
-2. Create the refactor branch off the latest `develop`:
+2. **Create the refactor branch in a worktree.** Per the user's
+   global rule, never modify the main checkout's branch for
+   feature work. The worktree path must mirror the branch name
+   exactly — including the `/` separator between `refactor-<NNN>`
+   and `<feature-slug>`, so the path component `refactor-<NNN>`
+   is a directory that contains the `<feature-slug>` directory.
+   Don't flatten it (`refactor-<NNN>-<feature-slug>`); don't use
+   a different separator. The branch is `refactor-<NNN>/<slug>`
+   so the worktree is `refactor-<NNN>/<slug>`.
+
    ```sh
-   git checkout -b refactor-<NNN>/<feature-slug> origin/develop
+   mkdir -p ~/projects/worktrees/avandar/refactor-<NNN>
+   git worktree add \
+     ~/projects/worktrees/avandar/refactor-<NNN>/<feature-slug> \
+     -b refactor-<NNN>/<feature-slug> \
+     origin/develop
    ```
+
+   All subsequent migration steps (port, install deps, tsc, lint,
+   vitest, commit, push) run **inside the worktree**, not the
+   main checkout. The main checkout stays on `feat/ict4d-demo`
+   so the housekeeping in steps 7–8 happens there without a
+   branch switch.
 
 3. Port code per the plan's "Files to copy" / "Files to edit" /
    "Files to delete" / "Dependency changes" sections. If the
@@ -517,6 +536,38 @@ shape, these rules are the policy.
   and commit on `feat/ict4d-demo` like any other deslop housekeeping
   change. Don't touch source files; that's per-feature migration
   work, not planning work.
+
+## Refactor-branch worktree convention
+
+Every `/deslop migrate` runs in a git worktree under
+`~/projects/worktrees/avandar/`, never in the main checkout. The
+**worktree path mirrors the branch name exactly**:
+
+| Branch | Worktree path |
+|---|---|
+| `refactor-001/async-dataset-import-pipeline` | `~/projects/worktrees/avandar/refactor-001/async-dataset-import-pipeline` |
+| `refactor-078/lingui-scaffold` | `~/projects/worktrees/avandar/refactor-078/lingui-scaffold` |
+
+Specifically:
+- The `/` in the branch name is a directory separator in the path.
+  `refactor-NNN` is a parent directory; `<feature-slug>` is the
+  worktree directory inside it.
+- **Don't flatten** to `refactor-NNN-<slug>` or use any other
+  separator. Tools that resolve worktree paths from branch names
+  (and humans skimming `git worktree list`) rely on the 1:1 match.
+- Create the parent dir with `mkdir -p` before adding the worktree;
+  `git worktree add` does not auto-create parent directories.
+
+```sh
+mkdir -p ~/projects/worktrees/avandar/refactor-<NNN>
+git worktree add \
+  ~/projects/worktrees/avandar/refactor-<NNN>/<feature-slug> \
+  -b refactor-<NNN>/<feature-slug> \
+  origin/develop
+```
+
+If you find an existing worktree with a flattened path, fix it
+before continuing: `git worktree move <flat-path> <slash-path>`.
 
 ## When *not* to do something
 
