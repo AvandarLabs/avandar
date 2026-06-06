@@ -16,6 +16,7 @@ import { createRoot } from "react-dom/client";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { AppI18nProvider } from "@/i18n/AppI18nProvider";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
@@ -33,9 +34,11 @@ function MainWrapper() {
   }, [user]);
 
   return (
-    <QueryClientProvider client={AvaQueryClient}>
-      <RouterProvider router={AvaRouter} context={context} />
-    </QueryClientProvider>
+    <AppI18nProvider>
+      <QueryClientProvider client={AvaQueryClient}>
+        <RouterProvider router={AvaRouter} context={context} />
+      </QueryClientProvider>
+    </AppI18nProvider>
   );
 }
 
