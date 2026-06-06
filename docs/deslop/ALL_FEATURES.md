@@ -55,6 +55,23 @@ for those new tables exists yet.
 
 ---
 
+## 0. Infrastructure prerequisites (foundational)
+
+This section sits above the feature-area sections because its rows
+are cross-cutting build/runtime prerequisites — almost every other
+row's modified UI files on `feat/ict4d-demo` import from these
+packages, so develop cannot type-check the rest of the inventory
+until they land.
+
+Per the skill's "Group sequential dependencies adjacent" rule, the
+row physically appears here even though its category-numbering
+(global index `#78`) was assigned during Session 1 in the i18n
+section. Index numbering is non-dense by design.
+
+| # | Status | Feature | Sources |
+|---|---|---|---|
+| 78 | `[ ]` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — discovered during the 2026-06-06 undrift of #001: every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`, and `develop` has no `@lingui` packages installed. Migrate this row first. | CHECKPOINT 12 |
+
 ## A. Data ingestion & dataset management
 
 | # | Status | Feature | Sources |
@@ -200,9 +217,13 @@ Phases 0-9 cumulatively land below.
 
 ## N. i18n / Lingui
 
+Row #78 `lingui-scaffold` is **physically listed in section 0
+(Infrastructure prerequisites)** because it's a cross-cutting
+build-time prerequisite for most other rows. The remaining i18n
+rows live here.
+
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 78 | `[ ]` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). | CHECKPOINT 12 |
 | 79 | `[ ]` | **workspace-language-picker** — Workspace Settings "Language" tab, `WorkspaceI18nProvider`, `useLanguagePreference` (per-workspace localStorage), Mantine `DirectionProvider` keyed on locale for RTL. | CHECKPOINT 12 |
 | 80 | `[ ]` | **i18n-translate-llm-script** — `scripts/i18n/translateWithLLM.ts` rewritten to use OpenAI Chat Completions; real CLI with `--help`/`--scope`/`--locale`/`--all`/`--model`/`--dry-run`; preserves PO comments + refs; 32 vitest tests. | CHECKPOINT 12.5 |
 | 81 | `[ ]` | **frontend-lingui-wiring** — Wire remaining frontend to Lingui beyond Workspace Settings; translations populated across all 7 non-source locales for the in-scope surfaces. | Commits `c93ad08`, `c3e63d6`, `b161920`, `4f8f00f`, `efa8211` |
