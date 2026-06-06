@@ -1,5 +1,5 @@
-import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { lingui } from "@lingui/vite-plugin";
+import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
