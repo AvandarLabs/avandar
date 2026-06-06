@@ -4,11 +4,22 @@
 - **Source branch**: `feat/ict4d-demo`
 - **Target branch**: `develop`
 - **Refactor branch**: `refactor-001/async-dataset-import-pipeline`
-- **Depends on**: `none` (foundational; rows #2 and #3 depend on **this** one)
-- **Estimated PR size**: ~13 canonical files changed, +1.2k / −0.3k lines (excluding test-fixture churn already counted in the dependent rows)
+- **Depends on**: `078-lingui-scaffold` — **added 2026-06-06 by undrift.** Every TSX file in this row's modified-files scope on `feat/ict4d-demo` (`DataImportView.tsx`, `DataImportTabs.tsx`, `ManualUploadView.tsx`, `DatasetImportForm.tsx`, `GoogleSheetsImportView.tsx`, `ResyncDatasetCard.tsx`, `DatasetNavbar.tsx`) uses `@lingui/react/macro`. `develop` has no `@lingui` dependency in `package.json`. Without #078 landing first, none of those files will type-check or build.
+- **Estimated PR size**: ~34 canonical files changed, +2.3k / −1.0k lines — **revised upward from the original ~13 files / +1.2k LoC estimate** based on the actual `git diff --stat` of feature paths on 2026-06-06. The original estimate undercounted the test-fixture churn (`*.test.ts` / `*.test.tsx`), the `OpenDataCatalogView` integration, the `DatasetLimitReachedModal`, and the `useImportedColumns` / `useSaveDataset` hook updates that all participate in the new pipeline.
 
 ## Notes for future you
 
+- **2026-06-06 undrift finding — blocking Lingui dependency.** Every TSX UI file in this row's modified-files scope on `feat/ict4d-demo` imports from `@lingui/react/macro`. `develop`'s `package.json` has no `@lingui` packages. Without row #078 (`lingui-scaffold`) landing first, this migration cannot even type-check. **Almost every later row that ports modified UI files from `feat/ict4d-demo` has the same cross-cutting prerequisite** — the operator may want to reorder the inventory so #078 migrates first (before #001/#002/#003 and the rest of the UI features). The clean files (workers, clients, CSS, the `DatasetParseStatusIndicator` itself) are Lingui-free and can land independently, but they aren't useful in isolation.
+- **2026-06-06 undrift finding — `DatasetParseStatusIndicator.tsx` path.** Original plan put the file under `src/views/DataManagerApp/DataImportView/`. Actual location on `feat/ict4d-demo` is `src/views/DataManagerApp/DatasetParseStatusIndicator.tsx` (one level up). Use the actual path when porting.
+- **2026-06-06 undrift finding — broader scope.** The original plan listed ~13 canonical files / ~1.2k LoC. Actual `git diff --stat origin/develop..origin/feat/ict4d-demo -- <feature paths>` shows **34 files / +2327 / −979** lines. Additional files in scope that the original plan missed:
+  - `src/models/LocalDataset/LocalDatasetParsers.ts` (modified, +27/-?)
+  - `src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx` (modified)
+  - `src/views/DataManagerApp/DataImportView/DatasetImportForm/useImportedColumns/useImportedColumns.test.ts` (modified)
+  - `src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts` (modified)
+  - `src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx` (modified)
+  - `src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx` + sub-files (modified)
+  - `src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts` (note the **subfolder** — `useLoadManualUploadFile/useLoadManualUploadFile.ts`, not the flat `useLoadManualUploadFile.ts` the original plan implied)
+  - `src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx` (modified)
 - This row absorbs four retired ALL_FEATURES rows (#4 `dataset-upload-fixes`, #5 `xlsx-column-inference`, #6 `google-sheets-import-resilience`, #7 `resync-dataset-card`). If you find a commit on `feat/ict4d-demo` that looks like it belongs to one of those folded rows, it lives **here**, not as a separate migration.
 - The merge order for CHECKPOINT 1 was #234 → #235 → #236 → drop-in PRs. The diff is byte-clean as a single PR off `develop`, so the merge ordering doesn't have to be preserved in this migration.
 - Rows #2 (`app-wide-dropzone`) and #3 (`dataset-drawer`) both depend on the new `startCsvImport` / `startXlsxImport` entry points. They must land **after** this row merges into `develop`.
