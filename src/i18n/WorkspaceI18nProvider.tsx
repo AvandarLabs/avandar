@@ -16,7 +16,7 @@ type Props = {
  * instance, and applies the matching text direction via Mantine's
  * `DirectionProvider` (so RTL locales like Arabic render correctly).
  *
- * While the initial catalog is loading we render nothing — switching is fast
+ * While the initial catalog is loading we render nothing: switching is fast
  * once a catalog has been resolved, since browser/V8 caches the dynamic
  * import.
  */
@@ -27,26 +27,33 @@ export function WorkspaceI18nProvider({ locale, children }: Props): ReactNode {
 
   useEffect(() => {
     let cancelled = false;
-    void activateLocale(locale)
-      .catch(() => {
-        if (locale === DEFAULT_LOCALE) return;
-        return activateLocale(DEFAULT_LOCALE);
-      })
-      .then(() => {
-        if (!cancelled) setActiveLocale(locale);
-        // Mantine reads direction from <html dir>, mirror it so global
-        // chrome (scrollbars, native form widgets) also flips for RTL.
-        if (typeof document !== "undefined") {
-          document.documentElement.dir = getLocaleDirection(locale);
-          document.documentElement.lang = locale;
+    const activateRequestedLocale = async () => {
+      try {
+        await activateLocale(locale);
+      } catch {
+        if (locale !== DEFAULT_LOCALE) {
+          await activateLocale(DEFAULT_LOCALE);
         }
-      });
+      }
+      if (!cancelled) {
+        setActiveLocale(locale);
+      }
+      // Mantine reads direction from <html dir>, mirror it so global
+      // chrome (scrollbars, native form widgets) also flips for RTL.
+      if (typeof document !== "undefined") {
+        document.documentElement.dir = getLocaleDirection(locale);
+        document.documentElement.lang = locale;
+      }
+    };
+    void activateRequestedLocale();
     return () => {
       cancelled = true;
     };
   }, [locale]);
 
-  if (!activeLocale) return null;
+  if (!activeLocale) {
+    return null;
+  }
 
   // Key on the locale so DirectionProvider remounts when switching between
   // LTR and RTL locales, picking up the freshly set `<html dir>`.

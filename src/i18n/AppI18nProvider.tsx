@@ -18,11 +18,13 @@ export function AppI18nProvider({ children }: Props): ReactNode {
 
   useEffect(() => {
     let cancelled = false;
-    void activateLocale(DEFAULT_LOCALE).then(() => {
+    const activateDefaultLocale = async () => {
+      await activateLocale(DEFAULT_LOCALE);
       if (!cancelled) {
         setIsReady(true);
       }
-    });
+    };
+    void activateDefaultLocale();
     return () => {
       cancelled = true;
     };
