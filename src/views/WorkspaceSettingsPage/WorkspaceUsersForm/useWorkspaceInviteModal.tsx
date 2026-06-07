@@ -108,7 +108,7 @@ export function useWorkspaceInviteModal({
       title: t`Invite a member`,
       transitionProps: {
         onEntered: () => {
-          fieldsRef.current?.notifyModalOpened(); 
+          fieldsRef.current?.notifyModalOpened();
         },
       },
       labels: {
