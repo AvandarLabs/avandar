@@ -25,6 +25,7 @@ export type WorkspaceInviteModalFieldsRef = {
     tagIds: string[];
   };
   validate: () => boolean;
+  notifyModalOpened: () => void;
 };
 
 type Props = {
@@ -52,6 +53,7 @@ export const WorkspaceInviteModalFields = forwardRef<
   const [builtinPresetType, setBuiltinPresetType] =
     useState<BuiltinPresetType>("global_viewer");
   const [tagIds, setTagIds] = useState<string[]>([]);
+  const [segmentedControlKey, setSegmentedControlKey] = useState(0);
 
   useImperativeHandle(ref, (): WorkspaceInviteModalFieldsRef => {
     return {
@@ -64,6 +66,11 @@ export const WorkspaceInviteModalFields = forwardRef<
           return false;
         }
         return !innerFormRef.current.getForm().validate().hasErrors;
+      },
+      notifyModalOpened: () => {
+        setSegmentedControlKey((k) => {
+          return k + 1;
+        });
       },
     };
   });
@@ -100,6 +107,7 @@ export const WorkspaceInviteModalFields = forwardRef<
         ])}
       />
       <WorkspaceAppRoleMatrixForm
+        key={segmentedControlKey}
         rolesMatrix={rolesMatrix}
         onRolesMatrixChange={(next) => {
           setROlesMatrix(next);
