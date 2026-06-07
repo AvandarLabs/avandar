@@ -13,7 +13,7 @@ type Props = {
  * Workspace routes additionally mount `WorkspaceI18nProvider` for per-workspace
  * locale and RTL.
  */
-export function AppI18nProvider({ children }: Props): ReactNode {
+export function AvandarI18nProvider({ children }: Props): ReactNode {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
