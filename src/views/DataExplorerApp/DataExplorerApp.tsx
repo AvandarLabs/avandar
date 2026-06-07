@@ -328,7 +328,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               });
             }}
           >
-            <Trans>Settings</Trans>
+            <Trans>Visualizations</Trans>
           </Button>
           <Button
             variant="outline"
