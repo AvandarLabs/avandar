@@ -66,3 +66,6 @@ etl-output/
 
 # Claude Code per-session runtime state
 .claude/scheduled_tasks*
+
+# Difit session comments
+.difit/
