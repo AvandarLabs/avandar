@@ -24,6 +24,7 @@ import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
@@ -67,6 +68,7 @@ const SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
 /** Defaults applied when there is no saved per-tab preference. */
 const DEFAULT_QUERY_DETAILS_OPENED = true;
 const DEFAULT_SETTINGS_OPENED = false;
+const AI_PANEL_SESSION_KEY = "ava.data-explorer.ai-panel-auto-opened";
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
@@ -95,6 +97,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const planState = PlanStateManager.useState();
+  const [, chatPanelDispatch] = ChatPanelStateManager.useContext();
   const [
     isOpenDatasetModalOpen,
     { open: openOpenDatasetModal, close: closeOpenDatasetModal },
@@ -274,6 +277,14 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     }
     wasFetchingRef.current = dataQuery.isFetching;
   }, [dataQuery.isFetching, dataQuery.isSuccess, setSettingsOpened]);
+
+  useEffect(function openChatPanelOnMount() {
+    const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
+    if (!alreadyOpened) {
+      chatPanelDispatch.open();
+      sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
+    }
+  }, [chatPanelDispatch]);
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);

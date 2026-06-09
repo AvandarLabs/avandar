@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
 import type { User } from "$/models/User/User";
@@ -33,12 +34,12 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
     getSession();
 
     const subscription = AuthClient.onAuthStateChange((event, newSession) => {
-      if (
-        event === "SIGNED_OUT" &&
-        !AuthClient.isManuallySignedOut() &&
-        !navigator.onLine
-      ) {
-        return;
+      if (event === "SIGNED_OUT") {
+        if (!AuthClient.isManuallySignedOut() && !navigator.onLine) {
+          return;
+        }
+        // Clear the guard so the AI panel auto-opens again on next login
+        sessionStorage.removeItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY);
       }
 
       if (newSession?.user) {
