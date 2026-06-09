@@ -278,7 +278,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     wasFetchingRef.current = dataQuery.isFetching;
   }, [dataQuery.isFetching, dataQuery.isSuccess, setSettingsOpened]);
 
-  useEffect(() => {
+  useEffect(function autoOpenAiPanel() {
     const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
     if (!alreadyOpened) {
       chatPanelDispatch.open();
