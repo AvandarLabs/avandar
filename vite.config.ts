@@ -5,6 +5,13 @@ import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defaultExclude, defineConfig } from "vitest/config";
 
+// Wraps `react()` with the Lingui macro babel plugin. This is required:
+// Lingui macros (<Trans>, t``, msg``, plural()) are compile-time transforms
+// that must run inside React's babel pipeline. Registering
+// `@lingui/babel-plugin-lingui-macro` as a standalone Vite plugin would not
+// see JSX/TSX, so the macros would survive into the bundle and crash at
+// runtime. Do not register `react()` separately; always use this wrapper so
+// both the test and prod plugin arrays below share one configured pipeline.
 const reactWithLinguiMacro = () => {
   return react({
     babel: {
