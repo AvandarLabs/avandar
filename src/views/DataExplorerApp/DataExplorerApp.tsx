@@ -278,13 +278,16 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     wasFetchingRef.current = dataQuery.isFetching;
   }, [dataQuery.isFetching, dataQuery.isSuccess, setSettingsOpened]);
 
-  useEffect(function openChatPanelOnMount() {
-    const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
-    if (!alreadyOpened) {
-      chatPanelDispatch.open();
-      sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
-    }
-  }, [chatPanelDispatch]);
+  useEffect(
+    function openChatPanelOnMount() {
+      const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
+      if (!alreadyOpened) {
+        chatPanelDispatch.open();
+        sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
+      }
+    },
+    [chatPanelDispatch],
+  );
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
