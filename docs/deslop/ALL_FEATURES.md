@@ -70,7 +70,7 @@ section. Index numbering is non-dense by design.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 78 | `[~]` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — discovered during the 2026-06-06 undrift of #001: every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`, and `develop` has no `@lingui` packages installed. Migrate this row first. **In flight: `refactor-078/lingui-scaffold` at `6b6f0c4b`, 2026-06-06.** | CHECKPOINT 12 |
+| 78 | `[x] (2881b0bb)` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`. Merged via PR #242. | CHECKPOINT 12 |
 
 ## A. Data ingestion & dataset management
 

@@ -61,7 +61,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| 78 | `lingui-scaffold` | `refactor-078/lingui-scaffold` | 2026-06-06 | Pushed at `6b6f0c4b`. Frontend `tsc` clean, 362 frontend tests pass. Folds in #081's catalog-population portion per the operator rule. Operator opens the PR. |
+| _(none)_ | | | | |
 
 ---
 
@@ -72,7 +72,7 @@ the durable record once the per-feature markdown has been deleted.
 
 | Feature index | Slug | Merge SHA on `develop` | Completed |
 |---|---|---|---|
-| _(none yet)_ | | | |
+| 78 | `lingui-scaffold` | `2881b0bb` (PR #242) | 2026-06-10 |
 
 ---
 
@@ -137,6 +137,10 @@ Append-only log of `/deslop update` runs.
   squash-merged into `develop` at `39d86322`. Phase 1 flipped to
   flat `complete`. Closes the last remaining diff under
   `supabase/schemas/` between `develop` and `feat/ict4d-demo`.
+- `2026-06-10` — `/deslop complete lingui-scaffold`. PR #242
+  squash-merged into `develop` at `2881b0bb`. First Phase 2
+  feature on the board. Refactor branch + worktree deleted; plan
+  file `078-lingui-scaffold.md` removed.
 - `2026-06-05` — Session 2 validation completed.
   - Spawned an Explore agent to read all 22 spec/plan/demo-feature
     docs end-to-end. Agent confirmed all 95 inventory rows are
