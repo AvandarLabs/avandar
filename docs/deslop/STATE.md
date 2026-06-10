@@ -141,6 +141,16 @@ Append-only log of `/deslop update` runs.
   squash-merged into `develop` at `2881b0bb`. First Phase 2
   feature on the board. Refactor branch + worktree deleted; plan
   file `078-lingui-scaffold.md` removed.
+- `2026-06-10` — `/deslop migrate async-dataset-import-pipeline`
+  attempted and abandoned. Worktree created off `2881b0bb`, all
+  40 listed paths ported byte-clean; `pnpm tsc` surfaced ~40+
+  errors from undocumented cross-feature imports. Five deps must
+  land first: `#061 web-offline-mode`, `#077 analytics-client-events`,
+  `#094 chat-models-catalog-regeneration`, and the `#083`-`#086`
+  PTRCK billing series. DuckDbClient scope expansion (12 files,
+  +1819/-322) also folded into #001's plan as in-scope. Worktree
+  + branch removed; row #001 stays `[ ]`. See plan file's Notes
+  section for the full sequencing implication.
 - `2026-06-05` — Session 2 validation completed.
   - Spawned an Explore agent to read all 22 spec/plan/demo-feature
     docs end-to-end. Agent confirmed all 95 inventory rows are
