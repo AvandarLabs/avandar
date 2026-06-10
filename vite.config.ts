@@ -29,6 +29,20 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const supabaseApiUrl = env.VITE_SUPABASE_API_URL ?? "";
 
+  // vite-plugin-pwa serializes `urlPattern` callbacks via `Function#toString`,
+  // which drops the surrounding closure and leaves any captured variable as a
+  // free reference in the emitted `sw.js` (it caused `supabaseApiUrl is not
+  // defined` on every routed fetch in prod). Use a RegExp instead: those are
+  // serialized by value, so the supabase origin is baked into `sw.js` as a
+  // literal.
+  const escapeRegExp = (s: string) => {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+  const supabaseRestPattern =
+    supabaseApiUrl ?
+      new RegExp(`^${escapeRegExp(supabaseApiUrl)}/rest/`)
+    : null;
+
   return {
     server: {
       // SharedArrayBuffer for whisper.cpp WASM (pthread build) needs cross-
@@ -76,15 +90,10 @@ export default defineConfig(({ mode }) => {
               navigateFallback: "/index.html",
               navigateFallbackDenylist: [/^\/functions\//, /^\/auth\//],
               runtimeCaching: [
-                ...(supabaseApiUrl ?
+                ...(supabaseRestPattern ?
                   [
                     {
-                      urlPattern: ({ url }: { url: URL }) => {
-                        return (
-                          url.origin === supabaseApiUrl &&
-                          url.pathname.startsWith("/rest/")
-                        );
-                      },
+                      urlPattern: supabaseRestPattern,
                       handler: "NetworkFirst" as const,
                       options: {
                         cacheName: "supabase-rest",
