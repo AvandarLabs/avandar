@@ -66,6 +66,7 @@ by `/deslop complete`.
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
 | 83 | `billing-ptrck-series` | `feature/patrick-work-vi` | 2026-06-10 | **Pre-existing branch** with an open PR against `develop`. Bundles folded rows #083+#084+#085+#086+#087+#088+#089. All 22 PTRCK driver commits confirmed reachable via `git merge-base --is-ancestor`. `feature/patrick-work-vi` is a strict ancestor of `feat/ict4d-demo` (`git rev-list --left-right --count` = `242 0`). Operator merges the PR when ready, then runs `/deslop complete billing-ptrck-series`. |
+| 61 | `web-offline-mode` | `refactor-061/web-offline-mode` | 2026-06-10 | PWA + service worker + React Query persistence + offline-aware hooks/components + new test-utils. tsc clean in src/, lint clean in src/, 65 test files / 377 tests pass. Caller files (Navbar, Composer, DataExplorerApp, etc.) intentionally NOT touched — each ride along with their parent feature row. `src/lib/offline/useOfflineBlocksCloudChat.ts` deferred to #062 (depends on offlineChat store). |
 
 ---
 
