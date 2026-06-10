@@ -9,7 +9,7 @@
   - **`061-web-offline-mode` — UNRESOLVED.** Ported TSX files import from `@/components/offline/OfflineGated`, `@/components/offline/OfflineUnavailableTooltipLabel`, `@/lib/offline/useOfflineGate`, `@/lib/offline/useIsOnline`, `@/lib/offline/useLocalDatasetIds`. None exist on develop. Confirmed by 2026-06-10 abandoned migration attempt.
   - **`077-analytics-client-events` — UNRESOLVED.** `useSaveDataset.ts` imports from `@/lib/analytics/analyticsClient`. Not on develop.
   - **`094-chat-models-catalog-regeneration` — UNRESOLVED.** `DatasetClient.ts` imports from `$/types/chat.types`. Not on develop.
-  - **`083`/`084`/`085`/`086` PTRCK billing series — UNRESOLVED.** `useCanAddDataset.ts` imports `$/models/Subscription/SubscriptionModule/SubscriptionModule` and reads `SubscriptionRead.id`. Neither exists on develop yet.
+  - **`#083 billing-ptrck-series` (folded 083+084+085+086+087+088+089) — UNRESOLVED.** `useCanAddDataset.ts` imports `$/models/Subscription/SubscriptionModule/SubscriptionModule` and reads `SubscriptionRead.id`. Neither exists on develop yet. **In flight on `feature/patrick-work-vi`** since 2026-06-10 — once that PR merges, this dep is resolved.
 - **Estimated PR size**: ~40 canonical files changed (8 added, 1 deleted, 31 modified), +2.4k / −1.0k lines — verified by 2026-06-10 migration attempt against `develop @ 2881b0bb`. Plus 12 files / +1.8k / −0.3k under `src/clients/DuckDbClient/` once that scope expansion lands (see Notes).
 
 ## Notes for future you
