@@ -19,6 +19,7 @@ IGNORE_PATTERNS=(
   '^shared/types/database\.types\.ts$'
   '^supabase/migrations/.*\.sql$'
   '\.gen\.[^/]+$'
+  '^src/i18n/locales/.+/messages\.ts$'
   '\.md$'
   '\.lock$'
   '(^|/)pnpm-lock\.yaml$'
