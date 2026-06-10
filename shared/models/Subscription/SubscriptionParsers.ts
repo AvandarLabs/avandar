@@ -7,7 +7,7 @@ import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOI
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { z } from "zod";
 import type {
   Expect,
@@ -17,8 +17,8 @@ import type {
   PolarCustomerId,
   PolarProductId,
   SubscriptionId,
+  SubscriptionPolarId,
   SubscriptionRead,
-  SubscriptionRowId,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
@@ -29,7 +29,7 @@ export type SubscriptionModel = SupabaseCrudModelSpec<
   {
     tableName: "subscriptions";
     modelName: "Subscription";
-    modelPrimaryKeyType: SubscriptionRowId;
+    modelPrimaryKeyType: SubscriptionId;
     modelTypes: {
       Read: SubscriptionRead;
       Insert: SetOptional<
@@ -97,7 +97,7 @@ export const SubscriptionParsers =
       (obj): SubscriptionRead => {
         return {
           ...obj,
-          id: obj.id as SubscriptionRowId,
+          id: obj.id as SubscriptionId,
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
           polarCustomerId:
@@ -112,7 +112,7 @@ export const SubscriptionParsers =
             : undefined,
           polarSubscriptionId:
             obj.polarSubscriptionId != null ?
-              (obj.polarSubscriptionId as SubscriptionId)
+              (obj.polarSubscriptionId as SubscriptionPolarId)
             : undefined,
         };
       },

@@ -1,8 +1,8 @@
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-import type { UUID } from "@utils/types/common.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 type SubscriptionPermissionOptions = {
@@ -11,12 +11,12 @@ type SubscriptionPermissionOptions = {
   userId: UserId;
 } & (
   | {
-      subscriptionId: Subscription.Id | Subscription.RowId;
+      subscriptionId: Subscription.PolarId | Subscription.Id;
       workspaceId?: undefined;
     }
   | {
       subscriptionId?: undefined;
-      workspaceId: UUID<"Workspace">;
+      workspaceId: Workspace.Id;
     }
 );
 
@@ -49,7 +49,7 @@ export async function hasSubscriptionPermission(
 
   const isMember = await _isWorkspaceMember({
     supabaseAdminClient,
-    workspaceId: dbSubscription.workspace_id,
+    workspaceId: dbSubscription.workspace_id as Workspace.Id,
     userId,
   });
 
@@ -110,7 +110,7 @@ export async function hasSubscriptionPermission(
 
 async function _loadSubscriptionByIdOrPolarId(options: {
   supabaseAdminClient: AvaSupabaseClient;
-  subscriptionId: Subscription.Id | Subscription.RowId;
+  subscriptionId: Subscription.PolarId | Subscription.Id;
 }): Promise<Tables<"subscriptions"> | null> {
   const { supabaseAdminClient, subscriptionId } = options;
 
@@ -137,7 +137,7 @@ async function _loadSubscriptionByIdOrPolarId(options: {
 
 async function _isWorkspaceMember(options: {
   supabaseAdminClient: AvaSupabaseClient;
-  workspaceId: UUID<"Workspace">;
+  workspaceId: Workspace.Id;
   userId: UserId;
 }): Promise<boolean> {
   const { supabaseAdminClient, workspaceId, userId } = options;

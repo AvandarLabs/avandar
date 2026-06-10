@@ -7,6 +7,7 @@ import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].se
 import { CreateFreeSubscription } from "@sbfn/subscriptions/create-free.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
+import { assertIsNonNullish } from "@utils/asserts/assertIsNonNullish/assertIsNonNullish.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
@@ -15,6 +16,7 @@ import type {
   AvaPolarProduct,
   SubscriptionsAPI,
 } from "@sbfn/subscriptions/subscriptions.routes.types.ts";
+import type { User } from "$/models/User/User.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
@@ -205,6 +207,11 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
             return { success: false };
           }
 
+          assertIsNonNullish(
+            subscriptionWithPolarCustomer.polar_customer_id,
+            "Subscription with Polar customer ID is required",
+          );
+
           const customerSession = await PolarClient.createCustomerSessions({
             customerId: subscriptionWithPolarCustomer.polar_customer_id,
             returnURL: queryParams.returnURL,
@@ -232,10 +239,12 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
       }) => {
         return {
           allowed: await hasSubscriptionPermission({
-            subscriptionId,
+            subscriptionId: subscriptionId as
+              | Subscription.PolarId
+              | Subscription.Id,
             permissionType,
             supabaseAdminClient,
-            userId: user.id,
+            userId: user.id as User.Id,
           }),
         };
       },

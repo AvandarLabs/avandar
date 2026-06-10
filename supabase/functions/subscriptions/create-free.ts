@@ -2,15 +2,17 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { CONFLICT, FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { uuidType } from "$/lib/zodHelpers.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
-import { z } from "zod";
+import type { User } from "$/models/User/User.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 /**
  * Creates a native free subscription for a workspace without involving Polar.
  */
 export const CreateFreeSubscription = POST("/create-free")
   .bodySchema({
-    workspaceId: z.uuid(),
+    workspaceId: uuidType<WorkspaceId>(),
   })
   .action(async ({ body, supabaseAdminClient, user }) => {
     const { workspaceId } = body;
@@ -31,16 +33,14 @@ export const CreateFreeSubscription = POST("/create-free")
 
     const { data: existingSubscription } = await supabaseAdminClient
       .from("subscriptions")
-      .select(
-        "id, polar_subscription_id, subscription_status, feature_plan_type",
-      )
+      .select("*")
       .eq("workspace_id", workspaceId)
       .maybeSingle()
       .throwOnError();
 
     const nativeFreeFields = Subscription.buildNativeFreeFieldsForDB({
       workspaceId,
-      subscriptionOwnerId: user.id,
+      subscriptionOwnerId: user.id as User.Id,
     });
 
     if (existingSubscription !== null) {

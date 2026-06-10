@@ -6,20 +6,20 @@ export type FeaturePlanType = Enums<"subscriptions__feature_plan_type">;
 export type PolarCustomerId = UUID<"PolarCustomer">;
 export type PolarProductId = UUID<"PolarProduct">;
 /** Polar subscription id when billed through Polar. */
-export type SubscriptionId = UUID<"PolarSubscription">;
+export type SubscriptionPolarId = UUID<"PolarSubscription">;
 /** Primary key of the `subscriptions` table in Supabase. */
-export type SubscriptionRowId = UUID<"Subscription">;
+export type SubscriptionId = UUID<"Subscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
 export type SubscriptionPermission = "can_add_datasets" | "can_invite_users";
 
 export type SubscriptionRead = {
   /** Primary key for this subscription row in Avandar. */
-  id: SubscriptionRowId;
+  id: SubscriptionId;
   /**
    * Polar subscription id when the row is linked to Polar; undefined for
    * native free subscriptions.
    */
-  polarSubscriptionId: SubscriptionId | undefined;
+  polarSubscriptionId: SubscriptionPolarId | undefined;
   workspaceId: UUID<"Workspace">;
   subscriptionOwnerId: UserId;
   createdAt: Date;

@@ -1,16 +1,19 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { describe, expect, it } from "vitest";
-import type { UUID } from "@utils/types/common.types";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
+import type {
+  SubscriptionId,
+  SubscriptionRead,
+} from "$/models/Subscription/Subscription.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},
 ): SubscriptionRead {
   return {
-    id: "00000000-0000-4000-8000-000000000001" as SubscriptionRead["id"],
-    workspaceId: "00000000-0000-4000-8000-000000000002" as UUID<"Workspace">,
-    subscriptionOwnerId:
-      "00000000-0000-4000-8000-000000000003" as SubscriptionRead["subscriptionOwnerId"],
+    id: "00000000-0000-4000-8000-000000000001" as SubscriptionId,
+    workspaceId: "00000000-0000-4000-8000-000000000002" as WorkspaceId,
+    subscriptionOwnerId: "00000000-0000-4000-8000-000000000003" as UserId,
     createdAt: new Date(),
     updatedAt: new Date(),
     polarSubscriptionId: undefined,
@@ -108,7 +111,7 @@ describe("SubscriptionModule billing lifecycle", () => {
 
   it("builds native free DB fields with null Polar columns", () => {
     const fields = SubscriptionModule.buildNativeFreeFieldsForDB({
-      workspaceId: "00000000-0000-4000-8000-000000000002" as UUID<"Workspace">,
+      workspaceId: "00000000-0000-4000-8000-000000000002" as WorkspaceId,
       subscriptionOwnerId:
         "00000000-0000-4000-8000-000000000003" as SubscriptionRead["subscriptionOwnerId"],
       startedAt: "2026-01-01T00:00:00.000Z",

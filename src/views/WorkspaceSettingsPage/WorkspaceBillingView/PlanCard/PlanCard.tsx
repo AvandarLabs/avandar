@@ -12,7 +12,7 @@ import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
 import { notifyError, notifyExpiredSession, notifySuccess } from "@ui";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { UserClient } from "@/clients/UserClient";

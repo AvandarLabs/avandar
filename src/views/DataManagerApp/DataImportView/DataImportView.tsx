@@ -2,7 +2,7 @@ import { useQuery } from "@hooks";
 import { Container, Stack, Title } from "@mantine/core";
 import { Paper, Tabs } from "@ui";
 import { where } from "@utils";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

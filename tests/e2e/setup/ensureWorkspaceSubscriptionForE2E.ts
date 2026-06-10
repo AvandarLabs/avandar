@@ -1,8 +1,16 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 import type { UUID } from "@utils/types/common.types";
 import type { UserId } from "$/models/User/User.types";
+
+/**
+ * Legacy shared id that collided across worker workspaces when the PK
+ * was `polar_subscription_id`. Cleared on every run so it cannot prevent
+ * a native free insert.
+ */
+const LEGACY_E2E_FAKE_POLAR_SUBSCRIPTION_ID =
+  "00000000-0000-4000-8000-000000000001";
 
 /**
  * Ensures the workspace has a native free `subscriptions` row (no Polar).
@@ -45,6 +53,12 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
   if (existingSubscription) {
     return;
   }
+
+  // Remove orphaned legacy rows that shared one polar_subscription_id globally.
+  await adminClient
+    .from("subscriptions")
+    .delete()
+    .eq("polar_subscription_id", LEGACY_E2E_FAKE_POLAR_SUBSCRIPTION_ID);
 
   const startedAt = new Date().toISOString();
 

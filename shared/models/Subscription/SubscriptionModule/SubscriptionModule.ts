@@ -10,8 +10,8 @@ import {
   PolarProductId,
   SubscriptionId,
   SubscriptionPermission,
+  SubscriptionPolarId,
   SubscriptionRead,
-  SubscriptionRowId,
   SubscriptionStatus,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
@@ -314,17 +314,21 @@ export const SubscriptionModule = {
 
   /**
    * Maps a `subscriptions` DB row to a SubscriptionRead model (edge-safe).
+   * Right now, SubscriptionParsers still imports functions from src/ which is
+   * not deno-compatible. Once SubscriptionParsers only imports filed from
+   * deno-compatible paths, we can stop using this function in Supabase
+   * edge functions and instead just call the SubscriptionParsers directly.
    */
   fromDbRowToRead: (row: Tables<"subscriptions">): SubscriptionRead => {
     return {
-      id: row.id as SubscriptionRowId,
+      id: row.id as SubscriptionId,
       workspaceId: row.workspace_id as SubscriptionRead["workspaceId"],
       subscriptionOwnerId: row.subscription_owner_id as UserId,
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
       polarSubscriptionId:
         row.polar_subscription_id != null ?
-          (row.polar_subscription_id as SubscriptionId)
+          (row.polar_subscription_id as SubscriptionPolarId)
         : undefined,
       polarProductId:
         row.polar_product_id != null ?
