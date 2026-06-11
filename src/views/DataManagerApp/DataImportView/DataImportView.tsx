@@ -11,6 +11,11 @@ import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/Go
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
 
+/**
+ * Data Manager import surface: upload, connectors, and the open data catalog.
+ * Resolves the workspace's add-dataset permission and gates the import tabs
+ * behind a "limit reached" modal once the subscription cap is hit.
+ */
 export function DataImportView(): JSX.Element {
   const workspace = useCurrentWorkspace();
 

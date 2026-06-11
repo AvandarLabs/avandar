@@ -11,6 +11,7 @@ import type {
   SubscriptionPlanGroup,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { SetRequired } from "type-fest";
 
 type Props = {
   hideTitle?: boolean;
@@ -40,9 +41,7 @@ function WorkspaceBillingViewContent({
   hideTitle,
   hideIntroText,
   workspace: currentWorkspace,
-}: Props & {
-  workspace: Workspace.WithSubscription;
-}): JSX.Element {
+}: SetRequired<Props, "workspace">): JSX.Element {
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
@@ -107,9 +106,10 @@ function WorkspaceBillingViewContent({
     );
   }
 
-  // Convert map to array and sort by price (cheapest first)
-  const sortedPlanGroups: SubscriptionPlanGroup[] = subscriptionPlanGroups.sort(
-    (planGroupA, planGroupB) => {
+  // Sort plan groups by price (cheapest first). Use toSorted so we don't
+  // mutate the array returned by the query hook.
+  const sortedPlanGroups: SubscriptionPlanGroup[] =
+    subscriptionPlanGroups.toSorted((planGroupA, planGroupB) => {
       const priceA =
         planGroupA.type === "free" ?
           0
@@ -119,8 +119,7 @@ function WorkspaceBillingViewContent({
           0
         : planGroupB.annualPlan.normalizedPricePerSeatPerMonth;
       return priceA - priceB;
-    },
-  );
+    });
 
   const allPlans = sortedPlanGroups.flatMap(
     (planGroup: SubscriptionPlanGroup): SubscriptionPlan[] => {
@@ -135,30 +134,19 @@ function WorkspaceBillingViewContent({
     },
   );
 
-  const currentSubscribedPlan = allPlans.find((plan) => {
-    const subscription = currentWorkspace.subscription;
-    if (subscription === undefined) {
-      return false;
-    }
-
-    if (
-      subscription.polarProductId !== undefined &&
-      plan.polarProductId === subscription.polarProductId
-    ) {
-      return true;
-    }
-
-    if (
-      SubscriptionModule.isNativeFreeSubscription(subscription) &&
-      plan.priceType === "free"
-    ) {
-      return true;
-    }
-
-    return false;
-  });
-
-  const hasSubscription = !!currentWorkspace.subscription;
+  const subscription = currentWorkspace.subscription;
+  const currentSubscribedPlan =
+    subscription ?
+      allPlans.find((plan) => {
+        // Polar-backed: match the Polar product id.
+        // Native free: any free plan card is the current plan.
+        return (
+          plan.polarProductId === subscription.polarProductId ||
+          (SubscriptionModule.isNativeFreeSubscription(subscription) &&
+            plan.priceType === "free")
+        );
+      })
+    : undefined;
 
   return (
     <Stack gap="lg">
@@ -200,7 +188,7 @@ function WorkspaceBillingViewContent({
             .exhaustive();
         })}
       </Group>
-      {hasSubscription && currentSubscribedPlan?.priceType !== "free" ?
+      {subscription && currentSubscribedPlan?.priceType !== "free" ?
         <>
           <Group gap="xxxs" align="center">
             <Text c="dimmed">
