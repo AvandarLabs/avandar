@@ -176,7 +176,7 @@ export function FloatingPanel({
           ...morph.panelAnimationStyle,
           ...(morph.isEnterPending ? { opacity: 0 } : undefined),
         }}
-        onAnimationEnd={morph.handleAnimationEnd}
+        onAnimationEnd={morph.onAnimationEnd}
         aria-label={title}
         role="dialog"
         aria-modal={false}

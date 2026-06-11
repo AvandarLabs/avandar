@@ -1,7 +1,7 @@
-import type { RefObject } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
+import type { RefObject } from "react";
 
 /**
  * Regression tests for the runEnter infinite-rAF loop (second-tab bug).
@@ -13,9 +13,9 @@ import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransiti
  * fallback timeout, and isEnterPending stays true permanently — holding the
  * panel at opacity:0.
  *
- * These tests assert the DESIRED behavior (panel becomes visible after a few
- * frames). They currently FAIL because of the bug and should go GREEN once
- * the fix lands.
+ * These tests assert the correct behavior: the panel becomes visible after a
+ * few frames. Fixed in _resolveTargetAnchor by preferring actual inline style
+ * over raw initialPosition values.
  */
 
 describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", () => {
@@ -35,7 +35,7 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
 
   function flushOneFrame(): void {
     const callbacks = pendingRafs.splice(0);
-    callbacks.forEach((cb) => cb(performance.now()));
+    callbacks.forEach((cb) => {return cb(performance.now())});
   }
 
   it("clears isEnterPending and starts the ooze-in animation when Mantine constrains the panel to a different position than initialPosition", () => {
@@ -46,7 +46,7 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     //
     // BUG: _isPanelAtTargetAnchor checks |panel.style.top - anchor.top|
     //      = |400 - 540| = 140 > POSITION_TOLERANCE_PX (2) → always false.
-    //      runEnter loops forever; isEnterPending never clears; panel invisible.
+    //      runEnter loops forever; isEnterPending stays true; panel invisible.
     //
     // After the fix: the anchor is derived from the actual inline style (400),
     // _isPanelAtTargetAnchor passes on the first frame, and the ooze-in
@@ -62,12 +62,12 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
 
     const { result, rerender } = renderHook(
       ({ opened }: { opened: boolean }) =>
-        useFloatingPanelMorphTransition({
+        {return useFloatingPanelMorphTransition({
           opened,
           originRef,
           panelRef,
           initialPosition: { top: 540, left: 32 },
-        }),
+        })},
       { initialProps: { opened: false } },
     );
 
@@ -77,16 +77,15 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     });
 
     // Flush 5 frames: 1 for runEnter to pass the position check, then
-    // 2 nested rAFs to commit the state (setIsEnterPending + setAnimationPhase).
+    // 2 nested rAFs to commit state (setIsEnterPending + setAnimationPhase).
     // Extra frames provide headroom for any additional React scheduling.
-    for (let i = 0; i < 5; i++) {
+    Array.from({ length: 5 }).forEach(() => {
       act(() => {
         flushOneFrame();
       });
-    }
+    });
 
     // The panel should now be visible and animating in.
-    // CURRENTLY FAILS: isEnterPending is still true (infinite loop, no fix yet).
     expect(result.current.isEnterPending).toBe(false);
     expect(result.current.animationPhase).toBe("enter");
     expect(result.current.isRendered).toBe(true);
@@ -103,14 +102,14 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
 
     const { rerender } = renderHook(
       ({ opened }: { opened: boolean }) =>
-        useFloatingPanelMorphTransition({
+        {return useFloatingPanelMorphTransition({
           opened,
           originRef: {
             current: document.createElement("div"),
           } as RefObject<HTMLElement>,
           panelRef: { current: panelEl } as RefObject<HTMLElement>,
           initialPosition: { top: 540, left: 32 },
-        }),
+        })},
       { initialProps: { opened: false } },
     );
 
@@ -119,15 +118,13 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     });
 
     // Flush enough frames to exhaust the rAF chain after a successful runEnter.
-    for (let i = 0; i < 5; i++) {
+    Array.from({ length: 5 }).forEach(() => {
       act(() => {
         flushOneFrame();
       });
-    }
+    });
 
-    // After the fix the queue should be empty — runEnter exited, the two nested
-    // rAFs completed, nothing left to process.
-    // CURRENTLY FAILS: queue still has 1 pending rAF (infinite loop, no fix yet).
+    // Queue should be empty — runEnter exited, the two nested rAFs completed.
     expect(pendingRafs).toHaveLength(0);
   });
 });

@@ -3,7 +3,7 @@ import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
 import type { AnimateTargetAnchor } from "@/config/Theme/buildAnimateOriginStyle";
 import type { AnimationEvent, CSSProperties, RefObject } from "react";
 
-export type FloatingPanelAnimationPhase = "enter" | "exit" | null;
+export type FloatingPanelAnimationPhase = "enter" | "exit" | undefined;
 
 type FloatingPanelInitialPosition = {
   top?: number;
@@ -30,7 +30,7 @@ type MorphTransitionState = {
   isAnimating: boolean;
   /** Panel is mounted but waiting for position + origin before ooze-in runs. */
   isEnterPending: boolean;
-  handleAnimationEnd: (event: AnimationEvent<HTMLElement>) => void;
+  onAnimationEnd: (event: AnimationEvent<HTMLElement>) => void;
 };
 
 const POSITION_TOLERANCE_PX = 2;
@@ -38,7 +38,7 @@ const POSITION_TOLERANCE_PX = 2;
 function _resolveTargetAnchor(
   initialPosition: FloatingPanelInitialPosition | undefined,
   panel: HTMLElement,
-): AnimateTargetAnchor | null {
+): AnimateTargetAnchor | undefined {
   const styleLeft = Number.parseFloat(panel.style.left);
   const styleTop = Number.parseFloat(panel.style.top);
   if (Number.isFinite(styleLeft) && Number.isFinite(styleTop)) {
@@ -59,7 +59,7 @@ function _resolveTargetAnchor(
 
   const panelRect = panel.getBoundingClientRect();
   if (panelRect.width <= 0 || panelRect.height <= 0) {
-    return null;
+    return undefined;
   }
 
   return { left: panelRect.left, top: panelRect.top };
@@ -113,7 +113,7 @@ export function useFloatingPanelMorphTransition({
 
   const [isRendered, setIsRendered] = useState(opened);
   const [animationPhase, setAnimationPhase] =
-    useState<FloatingPanelAnimationPhase>(null);
+    useState<FloatingPanelAnimationPhase>();
   const [panelAnimationStyle, setPanelAnimationStyle] = useState<CSSProperties>(
     {},
   );
@@ -121,26 +121,26 @@ export function useFloatingPanelMorphTransition({
 
   const prevOpenedRef = useRef(opened);
   const hasInitializedRef = useRef(false);
-  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const initialPositionRef = useRef(initialPosition);
   initialPositionRef.current = initialPosition;
 
   const clearFallbackTimeout = useCallback((): void => {
     if (fallbackTimeoutRef.current != null) {
       clearTimeout(fallbackTimeoutRef.current);
-      fallbackTimeoutRef.current = null;
+      fallbackTimeoutRef.current = undefined;
     }
   }, []);
 
   const finishEnter = useCallback((): void => {
-    setAnimationPhase(null);
+    setAnimationPhase(undefined);
     setIsEnterPending(false);
     setPanelAnimationStyle({});
   }, []);
 
   const finishExit = useCallback((): void => {
     setIsRendered(false);
-    setAnimationPhase(null);
+    setAnimationPhase(undefined);
     setIsEnterPending(false);
     setPanelAnimationStyle({});
   }, []);
@@ -156,12 +156,12 @@ export function useFloatingPanelMorphTransition({
     [],
   );
 
-  useLayoutEffect(() => {
+  useLayoutEffect(function runMorphTransition() {
     clearFallbackTimeout();
 
     if (!morphEnabled || !originRef) {
       setIsRendered(opened);
-      setAnimationPhase(null);
+      setAnimationPhase(undefined);
       setIsEnterPending(false);
       setPanelAnimationStyle({});
       prevOpenedRef.current = opened;
@@ -181,7 +181,7 @@ export function useFloatingPanelMorphTransition({
     if (opened && !wasOpened) {
       setIsRendered(true);
       setIsEnterPending(true);
-      setAnimationPhase(null);
+      setAnimationPhase(undefined);
 
       const runEnter = (): void => {
         const panel = panelRef.current;
@@ -252,7 +252,7 @@ export function useFloatingPanelMorphTransition({
     return clearFallbackTimeout;
   }, [clearFallbackTimeout]);
 
-  const handleAnimationEnd = useCallback(
+  const onAnimationEnd = useCallback(
     (event: AnimationEvent<HTMLElement>): void => {
       if (event.target !== panelRef.current) {
         return;
@@ -274,10 +274,10 @@ export function useFloatingPanelMorphTransition({
 
   return {
     isRendered: morphEnabled ? isRendered : opened,
-    animationPhase: morphEnabled ? animationPhase : null,
+    animationPhase: morphEnabled ? animationPhase : undefined,
     panelAnimationStyle: morphEnabled ? panelAnimationStyle : {},
     isAnimating: morphEnabled && animationPhase != null,
     isEnterPending: morphEnabled && isEnterPending,
-    handleAnimationEnd,
+    onAnimationEnd,
   };
 }
