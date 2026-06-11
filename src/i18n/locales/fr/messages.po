@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Les modifications de votre méthode de paiement peuvent être effectuées dans votre"
@@ -36,7 +37,7 @@ msgstr "Au moins une requête sur cet ensemble de données utilise <0>SELECT *</
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
-msgstr ""
+msgstr "Retour en ligne pour visualiser ou rendre la page disponible hors ligne."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -102,7 +103,7 @@ msgstr "Ou {0} pour être informé lorsque notre lancement public est prêt."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Count rows in {datasetName} by {pickedGroupBy}"
-msgstr ""
+msgstr "Comptez les lignes dans {datasetName} par {pickedGroupBy}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -152,6 +153,14 @@ msgstr "URL source"
 #~ msgid "Type"
 #~ msgstr "Type"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " access"
+msgstr " accès"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "The {chartName} cannot be displayed."
+msgstr "Le {chartName} ne peut pas être affiché."
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Autoriser la synchronisation en ligne"
@@ -159,7 +168,7 @@ msgstr "Autoriser la synchronisation en ligne"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
-msgstr ""
+msgstr "Paramètres du graphique"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Discovery is not available in this context."
@@ -173,7 +182,7 @@ msgstr "Tapez une question et je générerai le SQL et l'exécuterai sur le cane
 #. placeholder {1}: modelToDownload.systemRequirements
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
-msgstr ""
+msgstr "{0} nécessite {1} et n'est pas disponible dans le navigateur. Choisissez Tiny ou Base ici, ou utilisez un niveau de RAM plus petit."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
@@ -224,8 +233,8 @@ msgid "Notes"
 msgstr "Notes"
 
 #: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-msgid "Datasets"
-msgstr "Jeux de données"
+#~ msgid "Datasets"
+#~ msgstr "Jeux de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -293,9 +302,10 @@ msgstr "Erreur inconnue"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Add a line chart showing trends in {datasetName} over time"
-msgstr ""
+msgstr "Ajoutez un graphique linéaire montrant les tendances dans {datasetName} au fil du temps"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -307,7 +317,7 @@ msgstr "Exporter le PDF annoté"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
-msgstr ""
+msgstr "Modèle de chat hors ligne"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
@@ -328,7 +338,7 @@ msgstr "Exporter CSV"
 
 #: src/components/AppDropzone/ImportConfirmBody.tsx
 msgid "Do you want to import \"{fileName}\" as a new dataset?"
-msgstr ""
+msgstr "Voulez-vous importer \"{fileName}\" en tant que nouveau jeu de données ?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your subscription in your"
@@ -361,13 +371,17 @@ msgstr "← Retour"
 msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
 msgstr "Un enregistrement local de chaque question clarificatrice que l'IA a posée dans cet espace de travail. Seules les métadonnées sont stockées — jamais le texte de la question ou votre réponse."
 
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Cannot display {chartName}"
+msgstr "Impossible d'afficher {chartName}"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} lignes ont été rejetées"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Re-download"
-msgstr ""
+msgstr "Télécharger à nouveau"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow multiple values"
@@ -480,7 +494,7 @@ msgstr "Cet ensemble de données n'a pas de description."
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
-msgstr ""
+msgstr "La réinitialisation du mot de passe nécessite une connexion Internet."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol size"
@@ -526,7 +540,7 @@ msgstr "Veuillez vérifier votre e-mail pour un lien de confirmation. Cela peut 
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Remove offline chat model?"
-msgstr ""
+msgstr "Supprimer le modèle de chat hors ligne ?"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share “{resourceName}”"
@@ -572,7 +586,7 @@ msgstr "Ce champ ne peut pas être vide"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Transcription language: {selectedLanguageLabel}"
-msgstr ""
+msgstr "Langue de transcription : {selectedLanguageLabel}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -587,6 +601,10 @@ msgstr "Ensemble de données sauvegardé."
 msgid "There are no numeric columns"
 msgstr "Il n'y a pas de colonnes numériques"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " permission"
+msgstr " permission"
+
 #: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
 msgid "Discovery query failed."
 msgstr "Échec de la requête de découverte."
@@ -600,14 +618,15 @@ msgstr "Publier le tableau de bord"
 msgid "Container max width"
 msgstr "Largeur maximale du conteneur"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Fermer la barre latérale"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Unable to delete the offline chat model from cache."
-msgstr ""
+msgstr "Impossible de supprimer le modèle de chat hors ligne du cache."
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown user"
 msgstr "Utilisateur inconnu"
@@ -626,7 +645,7 @@ msgstr "Pipeline"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
-msgstr ""
+msgstr "Hors ligne"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
 msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
@@ -644,6 +663,10 @@ msgstr "Plage"
 msgid "Close branch"
 msgstr "Fermer la branche"
 
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+msgid "Enter email"
+msgstr "Entrez l'email"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -654,7 +677,7 @@ msgstr "Préréglage"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-msgstr ""
+msgstr "Ajoutez un graphique à barres de {datasetName} regroupé par {groupByColumn}"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -667,7 +690,7 @@ msgstr "Bienvenue dans votre premier espace de travail"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
-msgstr ""
+msgstr "Copié"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
@@ -725,7 +748,7 @@ msgstr "Approuvé"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Voice model not available"
-msgstr ""
+msgstr "Modèle vocal non disponible"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Loading plans..."
@@ -809,7 +832,7 @@ msgstr "Colonne de nom"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
-msgstr ""
+msgstr "Par défaut, \"Y contre X\""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -838,7 +861,7 @@ msgstr "Mot de passe"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Show the first 20 rows of {datasetName}"
-msgstr ""
+msgstr "Afficher les 20 premières lignes de {datasetName}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
@@ -868,6 +891,7 @@ msgstr "Toutes les colonnes"
 msgid "Data Summary"
 msgstr "Résumé des données"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "Ce {resource} est actuellement accessible uniquement à son propriétaire."
@@ -1021,7 +1045,7 @@ msgstr "Ajouter un nouveau jeu de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
-msgstr ""
+msgstr "Passer au plan gratuit"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -1071,6 +1095,10 @@ msgstr "Paramètres de voix"
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Used when transcribing; does not change the model download."
 msgstr "Utilisé lors de la transcription ; ne modifie pas le téléchargement du modèle."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " who also have "
+msgstr " qui ont également "
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1168,7 +1196,7 @@ msgstr "Le jeu de données ne correspondait pas au schéma attendu"
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "{0} is on this device. Tap the mic to dictate."
-msgstr ""
+msgstr "{0} est sur cet appareil. Appuyez sur le micro pour dicter."
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
@@ -1178,6 +1206,7 @@ msgstr "Se déconnecter"
 msgid "Analytic plan"
 msgstr "Plan analytique"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
 msgstr "Groupe inconnu"
@@ -1284,7 +1313,7 @@ msgstr "Arrêter et transcrire"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
-msgstr ""
+msgstr "Choisissez un jeu de données enregistré ou importez de nouvelles données dans votre espace de travail."
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
@@ -1403,9 +1432,9 @@ msgstr "Branches de plan"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
-msgstr ""
+msgstr "Chaque série est une colonne numérique tracée sur l'axe Y. Les valeurs sont regroupées par l'axe X (\"{axisKeyValue}\")."
 
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "Afficher SQL"
 
@@ -1430,6 +1459,10 @@ msgstr "Le nom du jeu de données est requis"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
 msgstr "Autoriser la création manuelle de nouveaux {pluralEntityConfigName}"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid ", and "
+msgstr ", et "
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -1602,7 +1635,7 @@ msgstr "Nous utiliserons ces colonnes pour fusionner les ensembles de données e
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Browser unavailable"
-msgstr ""
+msgstr "Navigateur indisponible"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Transcribing…"
@@ -1612,7 +1645,7 @@ msgstr "Transcription en cours..."
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
-msgstr ""
+msgstr "{0} (~{1} Mo) sera supprimé de ce navigateur pour libérer de l'espace. Vous pourrez le télécharger à nouveau plus tard."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -1767,7 +1800,7 @@ msgstr "Aperçu des données"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Voice model saved"
-msgstr ""
+msgstr "Modèle vocal enregistré"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
@@ -1818,7 +1851,7 @@ msgstr "Administrateur global"
 
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
-msgstr ""
+msgstr "L'inscription nécessite une connexion Internet."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 #~ msgid "Invalid size column selected"
@@ -1862,7 +1895,7 @@ msgstr "Traitement du jeu de données…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
-msgstr ""
+msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger à nouveau."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
@@ -1890,7 +1923,7 @@ msgstr "Ajouter des personnes ou des groupes d'utilisateurs"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 msgid "Size column"
-msgstr ""
+msgstr "Colonne de taille"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
@@ -1946,7 +1979,7 @@ msgstr "Invitation envoyée"
 
 #: src/components/offline/OfflineIndicator.tsx
 msgid "You are offline"
-msgstr ""
+msgstr "Vous êtes hors ligne"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -2066,7 +2099,7 @@ msgstr "Tableau de bord non prêt"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Downloaded on this browser"
-msgstr ""
+msgstr "Téléchargé sur ce navigateur"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
@@ -2123,7 +2156,7 @@ msgstr "Données"
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/offline/useOfflineGate.ts
 msgid "Unavailable offline"
-msgstr ""
+msgstr "Indisponible hors ligne"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
@@ -2135,6 +2168,7 @@ msgstr "Contrôle par défaut pour le reste de l'espace de travail. Les personne
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Save to dashboard"
 msgstr "Enregistrer dans le tableau de bord"
 
@@ -2148,7 +2182,7 @@ msgstr "Type d'étiquette"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Add a bar chart of row counts in {datasetName}"
-msgstr ""
+msgstr "Ajoutez un graphique à barres des comptes de lignes dans {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2163,13 +2197,17 @@ msgstr "Soumettre"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "See all shared items"
-msgstr "Voir tous les éléments partagés"
+#~ msgid "See all shared items"
+#~ msgstr "Voir tous les éléments partagés"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dashboard"
+msgstr "tableau de bord"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "{0} was deleted from this browser."
-msgstr ""
+msgstr "{0} a été supprimé de ce navigateur."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
@@ -2182,7 +2220,7 @@ msgstr "Envoyer l'invitation"
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Open {0}"
-msgstr ""
+msgstr "Ouvrir {0}"
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
 msgid "Manual Query"
@@ -2217,8 +2255,8 @@ msgid "Symbol size column must be numeric."
 msgstr "La colonne de taille du symbole doit être numérique."
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Loading shared resources"
-msgstr "Chargement des ressources partagées"
+#~ msgid "Loading shared resources"
+#~ msgstr "Chargement des ressources partagées"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -2284,7 +2322,7 @@ msgid "Clarification answer"
 msgstr "Réponse de clarification"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
 msgstr "SQL généré"
 
@@ -2318,7 +2356,7 @@ msgstr "Décrivez votre réponse…"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "What is the average {averageColumn} in {datasetName}?"
-msgstr ""
+msgstr "Quelle est la moyenne de {averageColumn} dans {datasetName} ?"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -2353,11 +2391,11 @@ msgstr "Exécutez d'abord une requête AI."
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "Y column"
-msgstr ""
+msgstr "Colonne Y"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Count how many rows there are in {datasetName}"
-msgstr ""
+msgstr "Comptez combien de lignes il y a dans {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 #~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
@@ -2365,7 +2403,7 @@ msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
-msgstr ""
+msgstr "Échec du téléchargement du modèle hors ligne"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Parsed {formattedNumRows} rows successfully"
@@ -2461,6 +2499,10 @@ msgstr "Format de l'horodatage"
 msgid "View"
 msgstr "Voir"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dataset"
+msgstr "jeu de données"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
@@ -2544,8 +2586,8 @@ msgid "Column Name"
 msgstr "Nom de la colonne"
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Nothing has been shared with you here."
-msgstr "Rien n'a été partagé avec vous ici."
+#~ msgid "Nothing has been shared with you here."
+#~ msgstr "Rien n'a été partagé avec vous ici."
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -2573,11 +2615,11 @@ msgstr "Créer un espace de travail"
 
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
-msgstr ""
+msgstr "Réessayer"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
-msgstr ""
+msgstr "Ne rafraîchissez pas et ne fermez pas cet onglet, sinon le téléchargement sera annulé."
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Forest"
@@ -2585,7 +2627,7 @@ msgstr "Forêt"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Choose the language you will speak when dictating."
-msgstr ""
+msgstr "Choisissez la langue que vous parlerez lors de la dictée."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
@@ -2632,6 +2674,10 @@ msgstr "Ouvrir sur le canevas"
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach out to support."
 msgstr "La page du gestionnaire de profil n'a pas pu se charger. Veuillez réessayer plus tard ou contacter le support."
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "The {chartName} cannot be displayed because there are missing axes or series."
+msgstr "Le {chartName} ne peut pas être affiché car il manque des axes ou des séries."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
@@ -2684,7 +2730,7 @@ msgstr "Tapez votre réponse..."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
-msgstr ""
+msgstr "Importer"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
 msgid "Yes"
@@ -2718,7 +2764,7 @@ msgstr "Vous vous êtes connecté avec succès à {0}"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "X column"
-msgstr ""
+msgstr "Colonne X"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the most frequent value"
@@ -2768,7 +2814,7 @@ msgstr "Les mots de passe ne correspondent pas"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
-msgstr ""
+msgstr "Chaque série est une colonne numérique tracée sur la valeur radiale. Les valeurs sont regroupées par l'axe de catégorie (\"{axisKeyValue}\")."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select longitude column"
@@ -2830,7 +2876,7 @@ msgstr "Aucune clarification pour le moment. Le journal se remplit au fur et à 
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model removed"
-msgstr ""
+msgstr "Modèle de chat hors ligne supprimé"
 
 #: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Preparing download…"
@@ -2872,7 +2918,7 @@ msgstr "Aucun champ n'a été ajouté"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
-msgstr ""
+msgstr "Qu'est-ce qu'une série ?"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Context"
@@ -2938,7 +2984,7 @@ msgstr "Temps de réponse"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not remove offline chat model"
-msgstr ""
+msgstr "Impossible de supprimer le modèle de chat hors ligne"
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -3036,7 +3082,7 @@ msgstr "Système sans"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "Series label"
-msgstr ""
+msgstr "Étiquette de série"
 
 #. placeholder {0}: props.name
 #: packages/web/ui/src/buttons/EditButton.tsx
@@ -3114,7 +3160,7 @@ msgstr "Esquisse"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
-msgstr ""
+msgstr "Copier le code"
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
@@ -3138,17 +3184,21 @@ msgstr "entre"
 msgid "Inactive"
 msgstr "Inactif"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "all members of "
+msgstr "tous les membres de "
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Certaines données doivent être saisies manuellement"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
-msgstr ""
+msgstr "Chaque série est une colonne numérique tracée sur l'axe Y. Choisissez l'axe X ci-dessous."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Pick a model to download. You can switch models or re-download later."
-msgstr ""
+msgstr "Choisissez un modèle à télécharger. Vous pouvez changer de modèle ou le re-télécharger plus tard."
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
@@ -3260,7 +3310,7 @@ msgstr "Impossible d'accéder au microphone."
 msgid "Dataset name must be at least 2 characters."
 msgstr "Le nom du jeu de données doit comporter au moins 2 caractères."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Ouvrir la barre latérale"
 
@@ -3312,6 +3362,10 @@ msgstr "Partager ce {resourceLabel}"
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select latitude column"
 msgstr "Sélectionner la colonne de latitude"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is shared with: "
+msgstr "Cette {resource} est partagée avec : "
 
 #: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -3376,7 +3430,7 @@ msgstr "Confirmer le mot de passe"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
-msgstr ""
+msgstr "Partiellement hors ligne"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -3384,6 +3438,7 @@ msgid "Edit query"
 msgstr "Modifier la requête"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -3391,11 +3446,11 @@ msgstr "Explorateur de données"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Count rows in {datasetName} by {secondGroupBy}"
-msgstr ""
+msgstr "Comptez les lignes dans {datasetName} par {secondGroupBy}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the category axis below."
-msgstr ""
+msgstr "Chaque série est une colonne numérique tracée sur la valeur radiale. Choisissez l'axe de catégorie ci-dessous."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -3482,7 +3537,7 @@ msgstr "Votre nom"
 #. placeholder {0}: model.displayName
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Downloading {0} for offline chat"
-msgstr ""
+msgstr "Téléchargement de {0} pour le chat hors ligne"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat panel"
@@ -3530,11 +3585,11 @@ msgstr "Choisissez quels filtres globaux s'appliquent à cette visualisation."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble radius."
-msgstr ""
+msgstr "Chaque série est un nuage de bulles. La colonne de taille détermine le rayon des bulles."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Download an offline chat model (cloud icon) to ask questions while offline."
-msgstr ""
+msgstr "Téléchargez un modèle de chat hors ligne (icône nuage) pour poser des questions hors ligne."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -3542,7 +3597,7 @@ msgstr "Cette entrée de catalogue n'a pas de métadonnées de colonne. Elle ne 
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
-msgstr ""
+msgstr "Modèle de chat hors ligne prêt"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
@@ -3690,7 +3745,7 @@ msgstr "Rendre uniquement hors ligne"
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "{0} is available when you are offline."
-msgstr ""
+msgstr "{0} est disponible lorsque vous êtes hors ligne."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Custom URL is available"
@@ -3725,8 +3780,8 @@ msgid "Please choose a password to complete your registration"
 msgstr "Veuillez choisir un mot de passe pour compléter votre inscription"
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Shared with me"
-msgstr "Partagé avec moi"
+#~ msgid "Shared with me"
+#~ msgstr "Partagé avec moi"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
@@ -3738,7 +3793,7 @@ msgstr "Tableau de bord publié !"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
-msgstr ""
+msgstr "La dictée s'exécute localement avec whisper.cpp. Nous téléchargeons d'abord un modèle ggml dans le stockage de l'appareil (sans bloquer l'onglet). Le modèle se charge lorsque vous dictez. La progression apparaît en bas à gauche."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3770,7 +3825,7 @@ msgstr "Choisissez la première valeur que nous voyons"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download offline chat model (WebLLM, not voice)"
-msgstr ""
+msgstr "Télécharger le modèle de chat hors ligne (WebLLM, pas de voix)"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -3959,7 +4014,7 @@ msgstr "Supprimer"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "No numeric columns"
-msgstr ""
+msgstr "Aucune colonne numérique"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
@@ -3991,7 +4046,7 @@ msgstr "Cet ensemble de données ne sera plus stocké en ligne et ne pourra êtr
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
-msgstr ""
+msgstr "Télécharger un autre modèle de chat hors ligne"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #~ msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
@@ -4064,7 +4119,7 @@ msgstr "Sélection multiple"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
-msgstr ""
+msgstr "Chaque série est un nuage de points (X, Y). Ajoutez-en plus pour comparer plusieurs paires de métriques sur le même graphique."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
@@ -4109,6 +4164,7 @@ msgstr "Dessin libre"
 msgid "Permanent link (use for QR codes)"
 msgstr "Lien permanent (à utiliser pour les codes QR)"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4232,11 +4288,16 @@ msgstr "Nouveau groupe d'utilisateurs"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-msgstr ""
+msgstr "Quelles sont les valeurs distinctes de {pickedGroupBy} dans {datasetName} ?"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 msgid "None of the above"
 msgstr "Aucun des éléments ci-dessus"
+
+#. placeholder {0}: capitalize(role)
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is accessible to anyone with {app} {0} permission."
+msgstr "Cette {resource} est accessible à toute personne ayant la permission {app} {0}."
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Amber"
@@ -4260,7 +4321,7 @@ msgstr "Colonnes de l'ensemble de données"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
-msgstr ""
+msgstr "Impossible de préparer le modèle de chat hors ligne."
 
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "Branches"
@@ -4269,7 +4330,7 @@ msgstr "Branches"
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
 msgid "Starting {0}…"
-msgstr ""
+msgstr "Démarrage de {0}…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
@@ -4277,7 +4338,7 @@ msgstr "Cet ensemble de données sera uniquement hors ligne."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y / Size series"
-msgstr ""
+msgstr "Ajoutez au moins une série X / Y / Taille"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -4372,7 +4433,7 @@ msgstr "Mettre à jour et republier"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid " · downloaded"
-msgstr ""
+msgstr " · téléchargé"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count rows in {name} by category"
@@ -4411,11 +4472,11 @@ msgstr "Régénérer avec l'erreur"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Add a table of the top 10 rows of {datasetName}"
-msgstr ""
+msgstr "Ajoutez un tableau des 10 premières lignes de {datasetName}"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
-msgstr ""
+msgstr "Cet ensemble de données est entièrement disponible hors ligne"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
@@ -4432,9 +4493,9 @@ msgid "Remove {0}"
 msgstr "Supprimer {0}"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/SharedWithMeView/SharedDashboardSection/SharedDashboardSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "Tableaux de bord"
@@ -4549,7 +4610,7 @@ msgstr "Synchronisation de l'ensemble de données en ligne..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
-msgstr ""
+msgstr "Ajoutez une série pour choisir quelle colonne numérique pilote le graphique."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
@@ -4568,7 +4629,7 @@ msgstr "Cela supprime le groupe d'utilisateurs des membres et des ressources qui
 msgid "Microphone access denied"
 msgstr "Accès au microphone refusé"
 
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "De votre invite :"
 
@@ -4602,7 +4663,7 @@ msgstr "Nom d'affichage mis à jour"
 
 #: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
 msgid "Loading voice model"
-msgstr ""
+msgstr "Chargement du modèle vocal"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
@@ -4631,7 +4692,7 @@ msgstr "Sélectionner l'ordre de tri"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import this file?"
-msgstr ""
+msgstr "Importer ce fichier ?"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
@@ -4646,6 +4707,7 @@ msgstr "Rechercher des tableaux de bord"
 #~ msgstr "Axe Y sélectionné invalide"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -4679,7 +4741,7 @@ msgstr "Votre espace de travail a utilisé tous les {currentSeatUsage} de ses {t
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add to your workspace."
-msgstr ""
+msgstr "Téléchargez des fichiers, connectez des sources externes ou parcourez des ensembles de données ouverts à ajouter à votre espace de travail."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not transcribe your audio."
@@ -4802,7 +4864,7 @@ msgstr "Veuillez confirmer que vous souhaitez procéder à ce changement de plan
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Speak"
-msgstr ""
+msgstr "Parler"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -4824,6 +4886,10 @@ msgstr "Trait ({strokeWidth}px)"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
 msgstr "Annuel"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "anyone with "
+msgstr "quiconque avec "
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
@@ -4903,7 +4969,7 @@ msgstr "Colonne de longitude"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
-msgstr ""
+msgstr "Pas hors ligne"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
@@ -4981,12 +5047,12 @@ msgstr "De la colonne : <0>{columnName}</0>"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
-msgstr ""
+msgstr "Prêt hors ligne"
 
 #. placeholder {0}: model.systemRequirements
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
-msgstr ""
+msgstr "Non disponible dans le navigateur ({0}, ~{sizeMb} Mo à télécharger)."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Set up voice prompting"
@@ -4998,7 +5064,7 @@ msgstr "Télécharger PNG"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y series"
-msgstr ""
+msgstr "Ajoutez au moins une série X / Y"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Show QR code"
