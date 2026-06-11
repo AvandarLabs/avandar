@@ -1,4 +1,3 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Badge,
   Button,
@@ -15,10 +14,10 @@ import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
+import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
@@ -60,7 +59,7 @@ type Props = {
     }
 );
 
-function getInitialSelectedVariant(
+function _getInitialSelectedVariant(
   options: Props,
 ): FreePlanVariants | PaidPlanVariants {
   const { type, planGroup, defaultVariant } = options;
@@ -109,23 +108,21 @@ export function PlanCard(props: Props): JSX.Element {
   const [userProfile] = UserClient.useGetProfile({ workspaceId });
   const [selectedVariant, setSelectedVariant] = useState<
     FreePlanVariants | PaidPlanVariants
-  >(getInitialSelectedVariant(props));
+  >(_getInitialSelectedVariant(props));
   const openChangePlanModal = useChangePlanModal();
-  const [createFreeSub, isCreatingFreeSub] = useMutation({
-    mutationFn: async () => {
-      await createFreeSubscription({ workspaceId });
-    },
-    onSuccess: () => {
-      modals.closeAll();
-      notifySuccess("You're on the Free plan");
-    },
-    onError: () => {
-      notifyError(
-        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
-      );
-    },
-    queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
-  });
+  const [createFreeSub, isCreatingFreeSub] =
+    SubscriptionClient.useCreateFreeSubscription({
+      onSuccess: () => {
+        modals.closeAll();
+        notifySuccess("You're on the Free plan");
+      },
+      onError: () => {
+        notifyError(
+          `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+        );
+      },
+      queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+    });
   const selectedPlan =
     type === "free" ?
       selectedVariant === "custom" ?
@@ -173,7 +170,7 @@ export function PlanCard(props: Props): JSX.Element {
     }
 
     if (planAction.type === "create_native_free") {
-      createFreeSub();
+      createFreeSub({ workspaceId });
       return;
     }
 
@@ -343,28 +340,15 @@ function _isCurrentSubscribedPlan(options: {
   selectedPlan: SubscriptionPlan;
 }): boolean {
   const { currentSubscription, currentSubscribedPlan, selectedPlan } = options;
-
-  if (
-    currentSubscribedPlan === undefined ||
-    currentSubscription === undefined
-  ) {
+  if (!currentSubscription || !currentSubscribedPlan) {
     return false;
   }
-
-  if (
-    currentSubscription.polarProductId !== undefined &&
-    selectedPlan.polarProductId === currentSubscription.polarProductId
-  ) {
-    return true;
-  }
-
-  if (
-    currentSubscription !== undefined &&
-    SubscriptionModule.isNativeFreeSubscription(currentSubscription) &&
-    selectedPlan.priceType === "free"
-  ) {
-    return true;
-  }
-
-  return false;
+  // Polar-backed subscription: the plan card is current when its Polar
+  // product id matches. Native free subscription: any free plan card is
+  // current (free is identity-less).
+  return (
+    selectedPlan.polarProductId === currentSubscription.polarProductId ||
+    (SubscriptionModule.isNativeFreeSubscription(currentSubscription) &&
+      selectedPlan.priceType === "free")
+  );
 }
