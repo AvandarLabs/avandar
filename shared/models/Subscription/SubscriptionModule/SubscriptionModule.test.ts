@@ -124,9 +124,9 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 
   it("treats only active and trialing statuses as entitled", () => {
-    expect(
-      SubscriptionModule.doesSubscriptionGrantEntitlements("active"),
-    ).toBe(true);
+    expect(SubscriptionModule.doesSubscriptionGrantEntitlements("active")).toBe(
+      true,
+    );
     expect(
       SubscriptionModule.doesSubscriptionGrantEntitlements("trialing"),
     ).toBe(true);
