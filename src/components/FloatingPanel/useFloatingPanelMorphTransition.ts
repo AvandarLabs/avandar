@@ -39,6 +39,12 @@ function _resolveTargetAnchor(
   initialPosition: FloatingPanelInitialPosition | undefined,
   panel: HTMLElement,
 ): AnimateTargetAnchor | null {
+  const styleLeft = Number.parseFloat(panel.style.left);
+  const styleTop = Number.parseFloat(panel.style.top);
+  if (Number.isFinite(styleLeft) && Number.isFinite(styleTop)) {
+    return { left: styleLeft, top: styleTop };
+  }
+
   if (
     initialPosition?.left != null &&
     initialPosition?.top != null &&
