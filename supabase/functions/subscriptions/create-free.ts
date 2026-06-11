@@ -50,7 +50,7 @@ export const CreateFreeSubscription = POST("/create-free")
       // nothing for this endpoint to do.
       if (
         Subscription.isNativeFreeSubscription(existingRead) &&
-        Subscription.grantsWorkspaceEntitlements(existingRead)
+        Subscription.doesSubscriptionGrantEntitlements(existingRead)
       ) {
         throw new AvaHTTPError(
           "This workspace is already on the native Free plan.",
@@ -63,7 +63,7 @@ export const CreateFreeSubscription = POST("/create-free")
       // before flipping the row to native free.
       if (
         existingRead.polarSubscriptionId !== undefined &&
-        Subscription.grantsWorkspaceEntitlements(existingRead)
+        Subscription.doesSubscriptionGrantEntitlements(existingRead)
       ) {
         await PolarClient.revokeSubscription({
           subscriptionId: existingRead.polarSubscriptionId,

@@ -124,11 +124,23 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 
   it("treats only active and trialing statuses as entitled", () => {
-    expect(SubscriptionModule.isEntitlementActiveStatus("active")).toBe(true);
-    expect(SubscriptionModule.isEntitlementActiveStatus("trialing")).toBe(true);
-    expect(SubscriptionModule.isEntitlementActiveStatus("canceled")).toBe(
-      false,
-    );
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements("active"),
+    ).toBe(true);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements("trialing"),
+    ).toBe(true);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements("canceled"),
+    ).toBe(false);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements(undefined),
+    ).toBe(false);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements(
+        _subscription({ subscriptionStatus: "active" }),
+      ),
+    ).toBe(true);
   });
 
   it("prompts billing setup when subscription is missing or inactive", () => {

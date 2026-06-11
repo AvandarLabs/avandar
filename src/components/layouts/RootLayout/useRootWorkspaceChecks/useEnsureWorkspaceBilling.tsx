@@ -67,7 +67,7 @@ export function useEnsureWorkspaceBilling(): void {
     });
 
     const hasEntitlements =
-      SubscriptionModule.grantsWorkspaceEntitlements(subscription);
+      SubscriptionModule.doesSubscriptionGrantEntitlements(subscription);
     if (hasEntitlements && modalId) {
       modals.close(modalId);
       setModalId(undefined);

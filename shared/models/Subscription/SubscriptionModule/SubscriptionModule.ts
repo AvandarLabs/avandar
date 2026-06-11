@@ -53,24 +53,32 @@ export const SubscriptionModule = {
   },
 
   /**
-   * Whether a subscription status grants paid/free plan entitlements.
+   * Whether this subscription state grants the workspace its plan
+   * entitlements.
+   *
+   * "Entitlements" is the SaaS-billing term for the features and numeric
+   * caps a subscription unlocks. In our `subscriptions` row those caps
+   * live in `max_seats_allowed`, `max_datasets_allowed`,
+   * `max_dashboards_allowed`, and `max_shareable_dashboards_allowed`;
+   * the `feature_plan_type` enum is just the human label they map to.
+   * This predicate decides whether those stored caps actually apply
+   * (`active`/`trialing`) or whether the workspace should be treated as
+   * `free` regardless of the row's label (every other status).
+   *
+   * Accepts a raw status, the full subscription row, or `undefined`
+   * (no subscription yet → no entitlements).
    */
-  isEntitlementActiveStatus: (status: SubscriptionStatus): boolean => {
-    return status === "active" || status === "trialing";
-  },
-
-  /**
-   * Whether the subscription row should grant workspace feature entitlements.
-   */
-  grantsWorkspaceEntitlements: (
-    subscription: Pick<SubscriptionRead, "subscriptionStatus"> | undefined,
+  doesSubscriptionGrantEntitlements: (
+    input:
+      | SubscriptionStatus
+      | Pick<SubscriptionRead, "subscriptionStatus">
+      | undefined,
   ): boolean => {
-    if (subscription) {
-      return SubscriptionModule.isEntitlementActiveStatus(
-        subscription.subscriptionStatus,
-      );
+    if (input === undefined) {
+      return false;
     }
-    return false;
+    const status = typeof input === "string" ? input : input.subscriptionStatus;
+    return status === "active" || status === "trialing";
   },
 
   /**
@@ -79,7 +87,7 @@ export const SubscriptionModule = {
   shouldPromptForBillingSetup: (
     subscription: SubscriptionRead | undefined,
   ): boolean => {
-    return !SubscriptionModule.grantsWorkspaceEntitlements(subscription);
+    return !SubscriptionModule.doesSubscriptionGrantEntitlements(subscription);
   },
 
   /**
@@ -95,7 +103,7 @@ export const SubscriptionModule = {
     if (subscription === undefined) {
       return { type: "no_subscription" };
     }
-    if (!SubscriptionModule.grantsWorkspaceEntitlements(subscription)) {
+    if (!SubscriptionModule.doesSubscriptionGrantEntitlements(subscription)) {
       return { type: "plan", featurePlanType: "free" };
     }
     return { type: "plan", featurePlanType: subscription.featurePlanType };
@@ -110,7 +118,7 @@ export const SubscriptionModule = {
     maxSeatsAllowed: number;
     maxDatasetsAllowed: number | undefined;
   } => {
-    if (SubscriptionModule.grantsWorkspaceEntitlements(subscription)) {
+    if (SubscriptionModule.doesSubscriptionGrantEntitlements(subscription)) {
       return {
         maxSeatsAllowed: subscription.maxSeatsAllowed,
         maxDatasetsAllowed: subscription.maxDatasetsAllowed,
