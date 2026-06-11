@@ -4,10 +4,11 @@ import {
   FreePlanLimitsConfig,
   PremiumPlanLimitsConfig,
 } from "$/config/FeaturePlansConfig.ts";
-import {
+import type {
   FeaturePlanType,
   PolarCustomerId,
   PolarProductId,
+  ResolvedFeaturePlanType,
   SubscriptionId,
   SubscriptionPermission,
   SubscriptionPolarId,
@@ -45,14 +46,9 @@ export const SubscriptionModule = {
     subscriptionFound: boolean;
     isWorkspaceMember: boolean;
   }): boolean => {
-    if (!options.subscriptionFound) {
+    if (!options.subscriptionFound || !options.isWorkspaceMember) {
       return false;
     }
-
-    if (!options.isWorkspaceMember) {
-      return false;
-    }
-
     return true;
   },
 
@@ -69,13 +65,12 @@ export const SubscriptionModule = {
   grantsWorkspaceEntitlements: (
     subscription: Pick<SubscriptionRead, "subscriptionStatus"> | undefined,
   ): boolean => {
-    if (subscription === undefined) {
-      return false;
+    if (subscription) {
+      return SubscriptionModule.isEntitlementActiveStatus(
+        subscription.subscriptionStatus,
+      );
     }
-
-    return SubscriptionModule.isEntitlementActiveStatus(
-      subscription.subscriptionStatus,
-    );
+    return false;
   },
 
   /**
@@ -85,6 +80,25 @@ export const SubscriptionModule = {
     subscription: SubscriptionRead | undefined,
   ): boolean => {
     return !SubscriptionModule.grantsWorkspaceEntitlements(subscription);
+  },
+
+  /**
+   * Resolves the workspace's effective feature plan. Returns
+   * `no_subscription` when the row is missing (UI should redirect), and
+   * collapses inactive/canceled paid rows to `free` so feature gates stay
+   * conservative when entitlements lapse.
+   */
+  resolveFeaturePlanTypeForWorkspace: (options: {
+    subscription: SubscriptionRead | undefined;
+  }): ResolvedFeaturePlanType => {
+    const { subscription } = options;
+    if (subscription === undefined) {
+      return { type: "no_subscription" };
+    }
+    if (!SubscriptionModule.grantsWorkspaceEntitlements(subscription)) {
+      return { type: "plan", featurePlanType: "free" };
+    }
+    return { type: "plan", featurePlanType: subscription.featurePlanType };
   },
 
   /**
@@ -135,15 +149,10 @@ export const SubscriptionModule = {
         >
       | undefined,
   ): boolean => {
-    if (subscription === undefined) {
-      return true;
-    }
-
-    if (subscription.subscriptionStatus === "canceled") {
-      return true;
-    }
-
-    return false;
+    return (
+      subscription === undefined ||
+      subscription.subscriptionStatus === "canceled"
+    );
   },
 
   /**
@@ -163,6 +172,12 @@ export const SubscriptionModule = {
 
   /**
    * DB fields for insert/update when creating a native free subscription.
+   *
+   * Lives on `SubscriptionModule` (not `SubscriptionParsers`) because this
+   * function is called from Supabase edge functions running on Deno, and
+   * `SubscriptionParsers` still imports from src/ paths that are not
+   * Deno-compatible. Keep this Deno-safe: depend only on
+   * `FeaturePlansConfig`, `database.types`, and pure helpers.
    */
   buildNativeFreeFieldsForDB: (options: {
     workspaceId: SubscriptionRead["workspaceId"];
@@ -209,17 +224,15 @@ export const SubscriptionModule = {
     subscription: SubscriptionRead | undefined;
     numDatasetsInWorkspace: number;
   }): boolean => {
-    if (subscription === undefined) {
-      return false;
+    if (subscription) {
+      const { maxDatasetsAllowed } =
+        SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+      return (
+        maxDatasetsAllowed === undefined ||
+        numDatasetsInWorkspace < maxDatasetsAllowed
+      );
     }
-
-    const { maxDatasetsAllowed } =
-      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
-
-    if (maxDatasetsAllowed === undefined) {
-      return true;
-    }
-    return numDatasetsInWorkspace < maxDatasetsAllowed;
+    return false;
   },
 
   /**
@@ -236,16 +249,19 @@ export const SubscriptionModule = {
     subscription: SubscriptionRead | undefined;
     numMembersInWorkspace: number;
   }): boolean => {
-    if (subscription === undefined) {
-      return false;
+    if (subscription) {
+      const { maxSeatsAllowed } =
+        SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+      return numMembersInWorkspace < maxSeatsAllowed;
     }
-
-    const { maxSeatsAllowed } =
-      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
-
-    return numMembersInWorkspace < maxSeatsAllowed;
+    return false;
   },
 
+  /**
+   * Returns used, max, and remaining seat counts for billing UI. Returns
+   * `undefined` for `maxSeats` / `remainingSeats` when no subscription row
+   * exists yet.
+   */
   getSeatInfo: ({
     subscription,
     numMembersInWorkspace,

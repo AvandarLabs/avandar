@@ -171,6 +171,38 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 });
 
+describe("SubscriptionModule.resolveFeaturePlanTypeForWorkspace", () => {
+  it("returns no_subscription when row is missing", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: undefined,
+      }),
+    ).toEqual({ type: "no_subscription" });
+  });
+
+  it("returns free when subscription is canceled", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: _subscription({
+          featurePlanType: "basic",
+          subscriptionStatus: "canceled",
+        }),
+      }),
+    ).toEqual({ type: "plan", featurePlanType: "free" });
+  });
+
+  it("returns the subscribed plan when active", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: _subscription({
+          featurePlanType: "premium",
+          subscriptionStatus: "active",
+        }),
+      }),
+    ).toEqual({ type: "plan", featurePlanType: "premium" });
+  });
+});
+
 describe("SubscriptionModule subscription permission access", () => {
   it("allows permission queries for workspace members when subscription exists", () => {
     expect(
