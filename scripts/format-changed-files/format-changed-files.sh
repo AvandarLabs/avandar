@@ -32,7 +32,7 @@ IGNORE_PATTERNS_FILE="$SCRIPT_DIR/ignore-patterns.txt"
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$REPO_ROOT" ]; then
-  echo "format: not inside a git repository; skipping." >&2
+  echo "Not inside a git repository; skipping." >&2
   exit 0
 fi
 cd "$REPO_ROOT"
@@ -45,7 +45,7 @@ cd "$REPO_ROOT"
 # matching paths from the changed-files list.
 # ---------------------------------------------------------------------------
 if [ ! -f "$IGNORE_PATTERNS_FILE" ]; then
-  echo "format: ignore patterns file not found at $IGNORE_PATTERNS_FILE" >&2
+  echo "Ignore patterns file not found at $IGNORE_PATTERNS_FILE" >&2
   exit 1
 fi
 
@@ -86,7 +86,7 @@ for ref in origin/develop origin/main; do
 done
 
 if [ -z "$BASE" ]; then
-  echo "format: could not resolve base branch (origin/develop or origin/main); skipping." >&2
+  echo "Could not resolve base branch (origin/develop or origin/main); skipping." >&2
   exit 0
 fi
 
@@ -125,7 +125,7 @@ if [ ${#EXISTING[@]} -eq 0 ]; then
   exit 0
 fi
 
-echo "format: formatting ${#EXISTING[@]} changed file(s)..." >&2
+echo "Formatting ${#EXISTING[@]} changed file(s)..." >&2
 
 # ---------------------------------------------------------------------------
 # Stage 5b: snapshot file contents before running the formatters
@@ -199,7 +199,7 @@ done
 
 if [ ${#REWRITTEN[@]} -gt 0 ]; then
   echo "" >&2
-  echo "format: formatters/linters modified the following files. Review and commit them:" >&2
+  echo "Formatters/linters modified the following files. Review and commit them:" >&2
   printf '%s\n' "${REWRITTEN[@]}" >&2
   exit 2
 fi
