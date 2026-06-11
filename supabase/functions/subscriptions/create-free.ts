@@ -46,6 +46,8 @@ export const CreateFreeSubscription = POST("/create-free")
     if (existingSubscription !== null) {
       const existingRead = Subscription.fromDbRowToRead(existingSubscription);
 
+      // The workspace is already on the native free plan, so there is
+      // nothing for this endpoint to do.
       if (
         Subscription.isNativeFreeSubscription(existingRead) &&
         Subscription.grantsWorkspaceEntitlements(existingRead)
@@ -56,6 +58,9 @@ export const CreateFreeSubscription = POST("/create-free")
         );
       }
 
+      // The workspace has an active Polar-backed subscription, so we
+      // first revoke it on Polar to stop billing and webhook activity
+      // before flipping the row to native free.
       if (
         existingRead.polarSubscriptionId !== undefined &&
         Subscription.grantsWorkspaceEntitlements(existingRead)
@@ -64,6 +69,8 @@ export const CreateFreeSubscription = POST("/create-free")
           subscriptionId: existingRead.polarSubscriptionId,
         });
       } else if (
+        // The row is in some other active paid state we cannot safely
+        // overwrite, so we reject the request rather than corrupt it.
         !Subscription.shouldCreateNativeFreeSubscription(existingRead)
       ) {
         throw new AvaHTTPError(
@@ -72,6 +79,8 @@ export const CreateFreeSubscription = POST("/create-free")
         );
       }
 
+      // Update the existing row in place so we preserve the Avandar
+      // subscription id and any foreign keys that already reference it.
       const { data: subscription } = await supabaseAdminClient
         .from("subscriptions")
         .update(nativeFreeFields)
