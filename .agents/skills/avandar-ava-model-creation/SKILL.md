@@ -22,11 +22,12 @@ Use this skill when the task is to add or update an Avandar model, especially wh
 ## Non-Negotiables
 
 1. Always start from the Ava CLI scaffold, then evaluate the generated files against current repo conventions and edit whatever is outdated or incomplete.
-2. If the model is backed by Supabase, start with the declarative schema workflow first. Use the `supabase-declarative-schema` skill before writing model code.
-3. If the model crosses a serialization boundary, add parsers. This includes Supabase-backed models and Dexie-backed models.
-4. If the model is persisted anywhere, add a client under `src/clients/` that matches existing conventions.
-5. If the model is backed by Dexie, add a Dexie schema version entry and migration in `src/db/dexie/dexieVersions.ts`.
-6. Do not trust the generator output blindly. The current CLI scaffold is older than the hand-maintained patterns in the repo.
+2. Keep the Ava CLI **type shell** in `<ModelName>.types.ts` and `<ModelName>.ts` (see [Ava CLI scaffold type shell](#ava-cli-scaffold-type-shell)). Refine fields inside that shell; do not replace it with ad hoc object types or a namespace-only DTO.
+3. If the model is backed by Supabase, start with the declarative schema workflow first. Use the `supabase-declarative-schema` skill before writing model code.
+4. If the model crosses a serialization boundary, add parsers. This includes Supabase-backed models and Dexie-backed models.
+5. If the model is persisted anywhere, add a client under `src/clients/` that matches existing conventions.
+6. If the model is backed by Dexie, add a Dexie schema version entry and migration in `src/db/dexie/dexieVersions.ts`.
+7. Do not trust the generator output blindly for **domain fields**, clients, parsers, or Supabase specs. The scaffold type shell is the baseline; hand-maintained examples show how to flesh out `Read` / `Insert` / `Update` and surrounding files.
 
 ## `@avandar/models` vs `shared/models`
 
@@ -53,9 +54,9 @@ Examples:
 
 Typical files:
 
-- `<ModelName>.ts` (merged **`export { …Module as … }`** + **`export namespace`**)
-- `<ModelName>.types.ts`
-- optional `<ModelName>Module.ts` (exact name; constants, registries, catalogs)
+- `<ModelName>.ts` (**`export namespace`** with **`T`**, **`Id`**, and any extra type aliases)
+- `<ModelName>.types.ts` (**`Model.Base`**, **`{ModelName}Model`**, branded **`{ModelName}Id`**)
+- optional `<ModelName>Module.ts` (exact name; constants, registries, catalogs) when using `--add-module`
 - no parsers unless the model has a serialized form
 
 ### 2. Shared Supabase-backed model
@@ -127,6 +128,37 @@ Important:
 - The current generator does not fully match the latest hand-written client conventions.
 - In the current repo snapshot, running bare `ava new model` errors because `modelName` is required. Use the explicit forms above and inspect `apps/ava-cli/src/DevCLI/NewBoilerplateCLI/NewTSModelCLI` if you need option details.
 
+## Ava CLI scaffold type shell
+
+Every `ava new model` run emits the same **type shell** (see `apps/ava-cli/src/DevCLI/NewBoilerplateCLI/NewTSModelCLI/templates/Model.types.ts.template` and `Model.main.ts.template`). Keep this structure for **all** models, including standalone DTOs and registries.
+
+### `<ModelName>.types.ts`
+
+- Import **`Model`** from **`@models/Model/Model.ts`** and **`UUID`** from **`@utils/types/common.types.ts`**.
+- Declare **`type ModelType = "<ModelName>"`** (string literal matching the model name).
+- Export **`{ModelName}Id = UUID<ModelType>`** (branded id), even when `Read` has no `id` field yet.
+- Export **`{ModelName}Read = Model.Base<ModelType, { ... }>`** with domain fields inside the second type argument. Replace the scaffold placeholder **`id`** with real fields; omit **`id`** from **`Read`** only when the concept has no stable identifier (for example API message DTOs).
+- Export **`{ModelName}Model`** with **at least** a **`Read`** key pointing at **`{ModelName}Read`**. Supabase- and Dexie-backed models add **`Insert`** and **`Update`** (and sometimes more) on the same object.
+- Put supporting unions or enums (for example **`ChatMessageRole`**) in the same file when they belong to the model.
+
+### `<ModelName>.ts`
+
+- **`export namespace {ModelName}`** with:
+  - **`export type T<K extends keyof {ModelName}Model = "Read"> = {ModelName}Model[K]`**
+  - **`export type Id = {ModelName}Id`**
+  - any extra type aliases re-exported from **`.types.ts`** (for example **`ChatMessageRole`** on **`ChatClientMessage`**)
+- When the model has runtime helpers, also **`export { {ModelName}Module as {ModelName} }`** from **`<ModelName>Module.ts`** (see **`AvaDataType`**, **`DatasetSource`**).
+
+### What to change after scaffold
+
+| Keep from scaffold                                                      | Refine after scaffold                                                     |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `Model.Base`, `{ModelName}Model`, `{ModelName}Id`, namespace `T` / `Id` | Fields inside `{ModelName}Read`                                           |
+| File names and folder layout                                            | `Insert` / `Update` on `{ModelName}Model` for persisted models            |
+|                                                                         | `SupabaseCRUDModelSpec` / `DexieCRUDModelSpec`, parsers, clients, modules |
+
+Reference: **`shared/models/chat/ChatClientMessage`** (standalone DTO with **`Read`** only).
+
 ## Supabase-Backed Workflow
 
 If the model is backed by Supabase, do this in order.
@@ -179,6 +211,7 @@ The scaffold is only a starting point. Compare it against the real patterns in:
 
 Bring the generated files up to current conventions:
 
+- keep the Ava CLI type shell (`Model.Base`, `{ModelName}Model`, branded `{ModelName}Id`, namespace `T` / `Id`)
 - flesh out the `Read`, `Insert`, and `Update` variants in `<ModelName>.types.ts`
 - use `SupabaseCRUDModelSpec`
 - define a branded ID type when appropriate
@@ -230,7 +263,7 @@ export const ExampleClient = createUsableServiceClient(
     tableName: "examples",
     dbTablePrimaryKey: "id",
     parsers: ExampleParsers,
-  })
+  }),
 );
 ```
 
@@ -254,13 +287,13 @@ Good references:
 Typical guidance:
 
 - create the model in the correct shared domain folder
-- keep `<ModelName>.types.ts` focused on types
-- add `<ModelName>Module.ts` only when you need factories, registries, or helper functions
+- keep the Ava CLI type shell in `<ModelName>.types.ts` and `<ModelName>.ts`; flesh out `{ModelName}Read` (and add `{ModelName}Module.ts` with `--add-module` when you need factories, registries, or helper functions)
 - do not add parsers unless the model has a real serialized representation
 - do not add a client if nothing is persisted
 
 Examples:
 
+- `ChatClientMessage` is a standalone API DTO: `Model.Base`, `{ModelName}Model` with `Read` only, namespace `T` / `Id` / `ChatMessageRole`, no module, parsers, or client
 - `AvaDataType` is shared and standalone, with a module but no parsers or client
 - `DatasetSource` is a shared type registry with a module but no direct persisted table
 
@@ -365,14 +398,15 @@ After running the generator, review and fix the output.
 
 1. Confirm the model lives in the correct root: `shared/models` vs `src/models`.
 2. Confirm the domain subdirectory matches nearby patterns.
-3. Confirm the types use the correct spec: `SupabaseCRUDModelSpec` vs `DexieCRUDModelSpec` vs standalone types only.
-4. Confirm parsers exist when serialization is involved.
-5. Confirm nullable DB columns are handled correctly in parser transforms.
-6. Confirm the client exists for persisted models.
-7. Confirm Supabase clients use `AvaSupabase.DB` and current `createUsableServiceClient(...)` conventions.
-8. Confirm Dexie models are registered in `src/db/dexie/dexieVersions.ts`.
-9. Confirm generated database types are up to date after Supabase schema changes.
-10. Confirm the generated scaffold has been edited to match the surrounding hand-written examples.
+3. Confirm the Ava CLI type shell is present: `Model.Base`, `{ModelName}Model` (at least `Read`), branded `{ModelName}Id`, namespace `T` / `Id`.
+4. Confirm persisted models use the correct spec: `SupabaseCRUDModelSpec` vs `DexieCRUDModelSpec`.
+5. Confirm parsers exist when serialization is involved.
+6. Confirm nullable DB columns are handled correctly in parser transforms.
+7. Confirm the client exists for persisted models.
+8. Confirm Supabase clients use `AvaSupabase.DB` and current `createUsableServiceClient(...)` conventions.
+9. Confirm Dexie models are registered in `src/db/dexie/dexieVersions.ts`.
+10. Confirm generated database types are up to date after Supabase schema changes.
+11. Confirm domain fields inside the type shell match surrounding hand-written examples.
 
 ## Integrated Examples
 
@@ -407,8 +441,17 @@ ava new model ExampleType --models-dir datasets --add-module
 Then:
 
 - keep it in `shared/models/datasets/ExampleType/`
-- add module helpers if needed
+- keep the Ava CLI type shell; replace placeholder `Read` fields with real domain props
+- add module helpers with `--add-module` if needed
 - skip parsers and clients unless a real serialized representation exists
+
+For a standalone DTO (no module):
+
+```bash
+ava new model ChatClientMessage --models-dir chat
+```
+
+Then flesh out `ChatClientMessageRead` (for example `role`, `content`) and export related types on the namespace (for example `ChatMessageRole`).
 
 ### Example: new Dexie-local cached model
 

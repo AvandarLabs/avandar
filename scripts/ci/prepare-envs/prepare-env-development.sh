@@ -18,7 +18,7 @@ declare -A _development_env=(
   [VITE_SUPABASE_API_URL]="$(get_supabase_env_var API_URL)"
   [VITE_SUPABASE_ANON_KEY]="$(get_supabase_env_var PUBLISHABLE_KEY)"
   [VITE_HIDE_DEV_TOOLS]="true"
-  [VITE_FEATURE_FLAGS]="enable-shared-with-me"
+  [VITE_FEATURE_FLAGS]=""
   [VITE_GOOGLE_PICKER_API_KEY]="$VITE_GOOGLE_PICKER_API_KEY"
 
   # Environment variables for scripts

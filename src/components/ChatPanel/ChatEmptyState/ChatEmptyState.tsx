@@ -1,44 +1,24 @@
-import { useThreadRuntime } from "@assistant-ui/react";
+import { useAui } from "@assistant-ui/react";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import { Link, TruncatedText } from "@ui";
-import { where } from "@utils";
+import { getRandomItem, matchLiteral, where } from "@utils";
 import { useMemo } from "react";
-import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ChatApp } from "$/types/chat.types";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
-function pageLabel(app: ChatApp): string {
-  return match(app)
-    .with("data-explorer", () => {
-      return "Data Explorer";
-    })
-    .with("data-sources", () => {
-      return "Data Sources";
-    })
-    .with("dashboards", () => {
-      return "Dashboards";
-    })
-    .with("other", () => {
-      return "Avandar";
-    })
-    .exhaustive();
-}
-
-function _pickRandomDatasetName(
-  datasets: readonly Dataset.T[],
-): string | undefined {
-  if (datasets.length === 0) {
-    return undefined;
-  }
-  const index = Math.floor(Math.random() * datasets.length);
-  return datasets[index]?.name;
+function pageLabel(app: ChatPageContext.ChatApp): string {
+  return matchLiteral(app, {
+    "data-explorer": "Data Explorer",
+    "data-sources": "Data Sources",
+    dashboards: "Dashboards",
+    other: "Avandar",
+  });
 }
 
 /**
@@ -50,7 +30,7 @@ export function ChatEmptyState(): JSX.Element {
   const context = useChatPageContext();
   const workspace = useCurrentWorkspace();
   const { openDataset } = DataExplorerStateManager.useState();
-  const threadRuntime = useThreadRuntime();
+  const aui = useAui();
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -74,14 +54,14 @@ export function ChatEmptyState(): JSX.Element {
     return promptTemplates.map((buildPrompt) => {
       const target =
         openDataset?.name ??
-        _pickRandomDatasetName(availableDatasets) ??
+        getRandomItem(availableDatasets)?.name ??
         "your dataset";
       return buildPrompt(target);
     });
   }, [context.app, datasets, openDataset]);
 
   const sendPrompt = (text: string) => {
-    threadRuntime.append({
+    aui.thread().append({
       role: "user",
       content: [{ type: "text", text }],
     });

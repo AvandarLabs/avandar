@@ -1,15 +1,31 @@
+import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defaultExclude, defineConfig } from "vitest/config";
 
+// Wraps `react()` with the Lingui macro babel plugin. This is required:
+// Lingui macros (<Trans>, t``, msg``, plural()) are compile-time transforms
+// that must run inside React's babel pipeline. Registering
+// `@lingui/babel-plugin-lingui-macro` as a standalone Vite plugin would not
+// see JSX/TSX, so the macros would survive into the bundle and crash at
+// runtime. Do not register `react()` separately; always use this wrapper so
+// both the test and prod plugin arrays below share one configured pipeline.
+const reactWithLinguiMacro = () => {
+  return react({
+    babel: {
+      plugins: ["@lingui/babel-plugin-lingui-macro"],
+    },
+  });
+};
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   return {
     plugins:
       mode === "test" ?
-        [react()]
+        [reactWithLinguiMacro(), lingui()]
       : [
           TanStackRouterVite({
             target: "react",
@@ -19,7 +35,8 @@ export default defineConfig(({ mode }) => {
             routesDirectory: "src/routes",
             generatedRouteTree: "src/routeTree.gen.ts",
           }),
-          react(),
+          reactWithLinguiMacro(),
+          lingui(),
           eslintPlugin(),
 
           // node polyfills are necessary to run `knex` in browser

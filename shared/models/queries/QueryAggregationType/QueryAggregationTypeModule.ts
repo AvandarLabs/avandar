@@ -1,4 +1,5 @@
 import { constant } from "@utils/misc/constant/constant.ts";
+import { QUERY_AGGREGATION_TYPES } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import { match } from "ts-pattern";
 import type {
   DuckDbQueryAggregationTypeT,
@@ -29,6 +30,14 @@ export const DuckDbQueryAggregations = {
 };
 
 export const QueryAggregationTypeModule = {
+  /** All valid aggregation values. */
+  values: QUERY_AGGREGATION_TYPES,
+
+  /** Type guard checking whether a string is a valid aggregation. */
+  isValid: (value: string): value is QueryAggregationTypeT => {
+    return (QUERY_AGGREGATION_TYPES as readonly string[]).includes(value);
+  },
+
   getAggregationColumnName: (
     aggregation: QueryAggregationTypeT,
     columnName: string,

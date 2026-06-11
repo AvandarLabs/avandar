@@ -17,6 +17,7 @@ import {
   IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -28,30 +29,27 @@ import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettings
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
-import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
+import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { useDataExplorerUrlSync } from "./useDataExplorerUrlSync/useDataExplorerUrlSync";
+import { DataExplorerUrlState } from "./useDataExplorerUrlSync/useHydrateDataExplorerStateFromUrl";
 
 const QUERY_FORM_WIDTH = 300;
 
 type Props = {
-  urlSearch: DataExplorerURLSearch;
-  navigate: (options: {
-    search: DataExplorerURLSearch;
-    replace: boolean;
-  }) => void;
+  initialUrlState: DataExplorerUrlState;
 };
 
-export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
+export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
+  const navigate = useNavigate({ from: "/$workspaceSlug/data-explorer" });
 
-  useDataExplorerURLSync({ urlSearch, navigate });
+  useDataExplorerUrlSync({ initialUrlState });
 
   const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -86,30 +84,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   // Mirror useDataQuery's runtime error onto state so the chat panel can
   // show a "Regenerate with the error" affordance when the auto-applied SQL
   // turned out to be invalid.
-  useEffect(() => {
-    const message =
-      dataQuery.isError ?
-        dataQuery.error instanceof Error ?
-          dataQuery.error.message
-        : String(dataQuery.error)
-      : undefined;
-    if (message !== state.lastQueryError) {
-      dispatch.setLastQueryError(message);
-    }
-  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
+  useEffect(
+    function updateAppStateOnQueryError() {
+      const message = dataQuery.isError ? dataQuery.error.message : undefined;
+      if (message !== state.lastQueryError) {
+        dispatch.setLastQueryError(message);
+      }
+    },
+    [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
+  );
+
   const queryResultColumns = queryResults?.columns ?? [];
-
-  const columnSignature = useMemo(() => {
-    if (!queryResults) {
-      return "";
-    }
-
-    return queryResults.columns
-      .map((col) => {
-        return `${col.name}:${col.dataType}`;
-      })
-      .join("|");
-  }, [queryResults]);
+  const columnSignature =
+    queryResults ?
+      queryResults.columns
+        .map((col) => {
+          return `${col.name}:${col.dataType}`;
+        })
+        .join("|")
+    : "";
 
   const querySyncSignature = useMemo(() => {
     return JSON.stringify({
@@ -128,23 +121,20 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   ]);
 
   useEffect(() => {
-    if (isLoadingResults) {
-      return;
+    if (!isLoadingResults && queryResults?.columns) {
+      dispatch.syncVizFromQueryResult(queryResults.columns);
     }
-
-    if (!queryResults) {
-      return;
-    }
-
-    dispatch.syncVizFromQueryResult(queryResults.columns);
+    // TODO(jpsyx): verify if all these dependencies are necessary or just
+    // legacy code
   }, [
     isLoadingResults,
     columnSignature,
     querySyncSignature,
     state.vizConfig.vizType,
-    queryResults,
+    queryResults?.columns,
     dispatch,
   ]);
+
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
 
@@ -360,7 +350,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               Export
             </Button>
           </Group>
-          <GeneratedPromptBadge />
+          <GeneratedPromptBanner />
           <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
             <LoadingOverlay visible={isLoadingResults} zIndex={99} />
             <VisualizationContainer

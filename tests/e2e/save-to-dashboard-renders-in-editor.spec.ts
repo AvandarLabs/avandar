@@ -29,7 +29,7 @@ const TARGET_DASHBOARD_NAME = "E2E renders-in-editor target";
  *   5. Navigate (client-side) back to the dashboard editor.
  *   6. Assert the bar chart is visible inside the Puck canvas iframe.
  */
-test.describe("Save to dashboard - viz renders in editor", () => {
+test.describe("Data Explorer: save viz to dashboard", () => {
   test("bar chart saved to an existing dashboard renders inside that dashboard's editor", async ({
     page,
     e2eWorkerDb,

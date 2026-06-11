@@ -1,16 +1,16 @@
 import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
-import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
@@ -21,6 +21,17 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
+const initialDataExplorerState: DataExplorerAppState = {
+  query: StructuredQuery.makeEmpty(),
+  vizConfig: {
+    vizType: "table",
+  },
+  rawSQL: undefined,
+  nlPrompt: undefined,
+  openDataset: undefined,
+  lastQueryError: undefined,
+};
+
 /**
  * This store is used to manage the state of the Data Explorer app.
  *
@@ -29,7 +40,7 @@ import type {
  */
 export const DataExplorerStateManager = createAppStateManager({
   name: "DataExplorer",
-  initialState: INITIAL_DATA_EXPLORER_STATE,
+  initialState: initialDataExplorerState,
   actions: {
     /** Set the data source for the query. */
     setDataSource: (
@@ -206,8 +217,8 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /** Reset the Data Explorer to its initial (blank) state. */
-    resetState: (_state: DataExplorerAppState): DataExplorerAppState => {
-      return INITIAL_DATA_EXPLORER_STATE;
+    resetState: (): DataExplorerAppState => {
+      return initialDataExplorerState;
     },
   },
 });

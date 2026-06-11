@@ -505,6 +505,7 @@ export type Database = {
           created_at: string
           dataset_id: string
           id: string
+          plan_steps: Json | null
           raw_sql: string
           updated_at: string
           workspace_id: string
@@ -513,6 +514,7 @@ export type Database = {
           created_at?: string
           dataset_id: string
           id?: string
+          plan_steps?: Json | null
           raw_sql: string
           updated_at?: string
           workspace_id: string
@@ -521,6 +523,7 @@ export type Database = {
           created_at?: string
           dataset_id?: string
           id?: string
+          plan_steps?: Json | null
           raw_sql?: string
           updated_at?: string
           workspace_id?: string
@@ -1020,6 +1023,44 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_analytics_events: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"] | null
+          created_at: string
+          event_name: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_analytics_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_group_memberships: {
         Row: {
           created_at: string
@@ -1383,15 +1424,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      rpc__list_shared_with_me: {
-        Args: { p_workspace_id: string }
-        Returns: {
-          effective_role: Database["public"]["Enums"]["role_level"]
-          name: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-        }[]
-      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1525,6 +1557,7 @@ export type Database = {
           p_dataset_description: string
           p_dataset_id: string
           p_dataset_name: string
+          p_plan_steps?: Json
           p_raw_sql: string
           p_workspace_id: string
         }

@@ -15,7 +15,7 @@ create table public.datasets__xlsx_file (
   -- finished uploading), we set this to false.
   is_in_cloud_storage boolean not null default false,
   -- Size of the spreadsheet file in bytes
-  size_in_bytes integer not null,
+  size_in_bytes bigint not null,
   -- Number of rows to skip at the start of the imported worksheet
   rows_to_skip integer not null default 0,
   -- Name of the worksheet that was read. Nullable when the default sheet was

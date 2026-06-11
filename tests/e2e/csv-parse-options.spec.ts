@@ -119,6 +119,9 @@ test.describe("CSV parsing options", () => {
     });
 
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await expect(page.getByText("No datasets added yet")).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
 
     await uploadSmallCaliforniaCsv(page);
 
@@ -215,6 +218,7 @@ test.describe("CSV parsing options", () => {
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
     await uploadSmallCaliforniaCsv(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
     await expectParsedRowCount(page, 99);

@@ -28,7 +28,7 @@ create or replace function public.rpc_datasets__add_csv_file_dataset (
   p_dataset_description text,
   p_columns public.dataset_column_input[],
   p_is_in_cloud_storage boolean,
-  p_size_in_bytes integer,
+  p_size_in_bytes bigint,
   p_rows_to_skip integer,
   p_quote_char public.util__nullable_text,
   p_escape_char public.util__nullable_text,

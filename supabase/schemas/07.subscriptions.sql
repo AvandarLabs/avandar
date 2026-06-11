@@ -34,11 +34,16 @@ create table public.subscriptions (
   workspace_id uuid not null unique references public.workspaces (id) on update cascade on delete restrict,
   -- User who is the billing manager for this subscription
   subscription_owner_id uuid not null references auth.users (id) on update cascade on delete restrict,
-  -- The customer id for this subscription in Polar (null when not in Polar)
+  -- The Polar customer id for this subscription (null when not in Polar,
+  -- which is the case for Free subscriptions)
   polar_customer_id uuid,
-  -- The customer email for this subscription in Polar (null when not in Polar)
+  -- The Polar customer email for this subscription (null when not in Polar,
+  -- which is the case for Free subscriptions)
   polar_customer_email text,
-  -- The Polar product id that the user is subscribed to (null when not in Polar)
+  -- The Polar product id that the user is subscribed to (null when not in
+  -- Polar, which is the case for Free subscriptions). A 'product' is
+  -- Polar's general term for anything that is purchasable. In our case,
+  -- it means a subscription plan.
   polar_product_id uuid,
   -- Timestamp when this row was created
   created_at timestamptz not null default now(),

@@ -5,8 +5,15 @@ import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatMode
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import css from "./Composer.module.css";
 
+/**
+ * The message input at the bottom of the thread: a text input, the model
+ * picker, and the send button. Input and actions are disabled outside the Data
+ * Explorer app, where chat actions are not yet available.
+ */
 export function Composer(): JSX.Element {
   const context = useChatPageContext();
+
+  // we only allow chat in the data explorer for now
   const disabled = context.app !== "data-explorer";
 
   return (

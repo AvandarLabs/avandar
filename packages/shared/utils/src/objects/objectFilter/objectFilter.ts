@@ -1,5 +1,5 @@
 import type { UnknownObject } from "@utils/types/common.types.ts";
-import type { IsObjectWithShape } from "@utils/types/IsObjectWithShape/IsObjectWithShape.ts";
+import type { IsObjectWithShape } from "@utils/types/IsObjectWithShape/IsObjectWithShape.types.ts";
 
 /**
  * Filters an object based on a function. Any key-value pairs where the function

@@ -1,19 +1,8 @@
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
-import type {
-  ChatClientMessage,
-  ChatGeneratedSql,
-  ChatModelsResponse,
-  ChatPageContext,
-  ChatResponse,
-} from "$/types/chat.types.ts";
-
-export type {
-  ChatClientMessage,
-  ChatGeneratedSql as ChatGeneratedSQL,
-  ChatModelsResponse,
-  ChatPageContext,
-  ChatResponse,
-};
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage.ts";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",
@@ -21,7 +10,9 @@ export type ChatAPI = APITypeDef<
   {
     "/models": {
       GET: {
-        returnType: ChatModelsResponse;
+        returnType: {
+          groups: ChatModelOption.OptionGroup[];
+        };
       };
     };
     "/:workspaceId/messages": {
@@ -30,11 +21,19 @@ export type ChatAPI = APITypeDef<
           workspaceId: string;
         };
         body: {
-          messages: ChatClientMessage[];
-          context: ChatPageContext;
+          messages: Array<{
+            role: ChatClientMessage.ChatMessageRole;
+            content: string;
+          }>;
+          context: {
+            app: ChatPageContext.ChatApp;
+            openDatasetId?: string;
+            lastSql?: string;
+            lastError?: string;
+          };
           model: string | undefined;
         };
-        returnType: ChatResponse;
+        returnType: ChatResponse.T;
       };
     };
   }
