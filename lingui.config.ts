@@ -7,9 +7,9 @@ import type { LinguiConfig } from "@lingui/conf";
  * To add a new language:
  * 1. Add the locale code below.
  * 2. Add a label + metadata entry in `src/i18n/locales.ts`.
- * 3. Run `pnpm i18n:extract` to scaffold the message catalog.
- * 4. Run `pnpm i18n:translate-llm` to generate translations via LLM.
- * 5. Run `pnpm i18n:compile` to compile the catalog into runtime JS.
+ * 3. Run `pnpm i18n:update-translations` to scaffold the catalog,
+ *    fill empty msgstr entries via LLM, and compile the runtime
+ *    `messages.ts` modules. See `scripts/i18n/update-translations.sh`.
  */
 const config: LinguiConfig = {
   locales: ["en", "es", "pt", "fr", "sw", "ar", "zh-Hans", "zh-Hant"],

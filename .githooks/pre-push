@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
-# Pre-push (pre-PR) hook: runs prettier, eslint --fix, and stylelint --fix on
-# files changed on this branch (vs the merge-base with origin/develop or
+# Pre-push hook: runs prettier, eslint --fix, and stylelint --fix on files
+# changed on this branch (vs the merge-base with origin/develop or
 # origin/main). Activated repo-wide by `core.hooksPath = .githooks`, which is
 # configured by the `prepare` script in package.json after `pnpm install`.
 #
 # If the fixers modify any files, the hook exits non-zero with a list of the
-# modified paths so the changes can be reviewed and committed before pushing
-# (and before the PR is created).
+# modified paths so the changes can be reviewed and committed before pushing.
 
 set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)" || exit 0
+
+# i18n translation pipeline: keep the Lingui catalogs in sync with the source
+# before pushing. The script no-ops fast when extract produces no catalog
+# changes; otherwise it runs the LLM translation step and recompiles, and we
+# exit 2 so the contributor can review and commit the regenerated files.
+echo "pre-push hook: running i18n:update-translations..." >&2
+if ! ./scripts/i18n/update-translations.sh all >&2; then
+  echo "pre-push hook: i18n:update-translations failed." >&2
+  exit 1
+fi
+if ! git diff --quiet -- src/i18n/locales 2>/dev/null; then
+  echo "" >&2
+  echo "pre-push hook: translation catalogs were updated. Review and commit before pushing:" >&2
+  git diff --name-only -- src/i18n/locales >&2
+  exit 2
+fi
 
 # Paths matching any of these extended regex patterns are skipped by the
 # formatters/linters below. Add new patterns here to keep this list readable.
@@ -36,7 +51,7 @@ for ref in origin/develop origin/main; do
 done
 
 if [ -z "$BASE" ]; then
-  echo "pre-PR hook: could not resolve base branch; skipping." >&2
+  echo "pre-push hook: could not resolve base branch; skipping." >&2
   exit 0
 fi
 
@@ -62,7 +77,7 @@ if [ ${#EXISTING[@]} -eq 0 ]; then
   exit 0
 fi
 
-echo "pre-PR hook: formatting ${#EXISTING[@]} changed file(s)..." >&2
+echo "pre-push hook: formatting ${#EXISTING[@]} changed file(s)..." >&2
 
 pnpm exec prettier --write --ignore-unknown --log-level warn "${EXISTING[@]}" >&2 || true
 
@@ -85,7 +100,7 @@ fi
 
 if ! git diff --quiet -- "${EXISTING[@]}" 2>/dev/null; then
   echo "" >&2
-  echo "pre-PR hook: formatters/linters modified the following files. Review and commit before creating the PR:" >&2
+  echo "pre-push hook: formatters/linters modified the following files. Review and commit before creating the PR:" >&2
   git diff --name-only -- "${EXISTING[@]}" >&2
   exit 2
 fi
