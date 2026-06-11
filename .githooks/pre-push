@@ -33,6 +33,7 @@ IGNORE_PATTERNS=(
   '^node_modules/'
   '^shared/types/database\.types\.ts$'
   '^supabase/migrations/.*\.sql$'
+  '^src/i18n/locales/.*/messages\.ts$'
   '\.gen\.[^/]+$'
   '\.md$'
   '\.lock$'
