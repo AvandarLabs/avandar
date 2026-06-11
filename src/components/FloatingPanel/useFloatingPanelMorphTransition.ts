@@ -121,7 +121,9 @@ export function useFloatingPanelMorphTransition({
 
   const prevOpenedRef = useRef(opened);
   const hasInitializedRef = useRef(false);
-  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const initialPositionRef = useRef(initialPosition);
   initialPositionRef.current = initialPosition;
 
@@ -156,97 +158,103 @@ export function useFloatingPanelMorphTransition({
     [],
   );
 
-  useLayoutEffect(function runMorphTransition() {
-    clearFallbackTimeout();
+  useLayoutEffect(
+    function runMorphTransition() {
+      clearFallbackTimeout();
 
-    if (!morphEnabled || !originRef) {
-      setIsRendered(opened);
-      setAnimationPhase(undefined);
-      setIsEnterPending(false);
-      setPanelAnimationStyle({});
+      if (!morphEnabled || !originRef) {
+        setIsRendered(opened);
+        setAnimationPhase(undefined);
+        setIsEnterPending(false);
+        setPanelAnimationStyle({});
+        prevOpenedRef.current = opened;
+        return;
+      }
+
+      if (!hasInitializedRef.current) {
+        hasInitializedRef.current = true;
+        prevOpenedRef.current = opened;
+        setIsRendered(opened);
+        return;
+      }
+
+      const wasOpened = prevOpenedRef.current;
       prevOpenedRef.current = opened;
-      return;
-    }
 
-    if (!hasInitializedRef.current) {
-      hasInitializedRef.current = true;
-      prevOpenedRef.current = opened;
-      setIsRendered(opened);
-      return;
-    }
+      if (opened && !wasOpened) {
+        setIsRendered(true);
+        setIsEnterPending(true);
+        setAnimationPhase(undefined);
 
-    const wasOpened = prevOpenedRef.current;
-    prevOpenedRef.current = opened;
+        const runEnter = (): void => {
+          const panel = panelRef.current;
+          if (!panel) {
+            requestAnimationFrame(runEnter);
+            return;
+          }
 
-    if (opened && !wasOpened) {
-      setIsRendered(true);
-      setIsEnterPending(true);
-      setAnimationPhase(undefined);
+          const anchor = _resolveTargetAnchor(
+            initialPositionRef.current,
+            panel,
+          );
+          if (!anchor) {
+            requestAnimationFrame(runEnter);
+            return;
+          }
 
-      const runEnter = (): void => {
-        const panel = panelRef.current;
-        if (!panel) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
+          if (!_isPanelAtTargetAnchor(panel, anchor)) {
+            requestAnimationFrame(runEnter);
+            return;
+          }
 
-        const anchor = _resolveTargetAnchor(initialPositionRef.current, panel);
-        if (!anchor) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
+          const style = _buildOozeOriginStyle(
+            originRef,
+            panelRef,
+            initialPositionRef.current,
+          );
+          if (Object.keys(style).length === 0) {
+            requestAnimationFrame(runEnter);
+            return;
+          }
 
-        if (!_isPanelAtTargetAnchor(panel, anchor)) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
+          setPanelAnimationStyle(style);
 
-        const style = _buildOozeOriginStyle(
-          originRef,
-          panelRef,
-          initialPositionRef.current,
-        );
-        if (Object.keys(style).length === 0) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
-
-        setPanelAnimationStyle(style);
-
-        requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            setIsEnterPending(false);
-            setAnimationPhase("enter");
-            scheduleFallback("enter", finishEnter);
+            requestAnimationFrame(() => {
+              setIsEnterPending(false);
+              setAnimationPhase("enter");
+              scheduleFallback("enter", finishEnter);
+            });
           });
-        });
-      };
+        };
 
-      runEnter();
-      return;
-    }
+        runEnter();
+        return;
+      }
 
-    if (!opened && wasOpened) {
-      setIsEnterPending(false);
-      setAnimationPhase("exit");
-      scheduleFallback("exit", finishExit);
-      return;
-    }
+      if (!opened && wasOpened) {
+        setIsEnterPending(false);
+        setAnimationPhase("exit");
+        scheduleFallback("exit", finishExit);
+        return;
+      }
 
-    if (opened) {
-      setIsRendered(true);
-      setIsEnterPending(false);
-    }
-  }, [
-    clearFallbackTimeout,
-    finishEnter,
-    finishExit,
-    morphEnabled,
-    opened,
-    originRef,
-    panelRef,
-    scheduleFallback,
-  ]);
+      if (opened) {
+        setIsRendered(true);
+        setIsEnterPending(false);
+      }
+    },
+    [
+      clearFallbackTimeout,
+      finishEnter,
+      finishExit,
+      morphEnabled,
+      opened,
+      originRef,
+      panelRef,
+      scheduleFallback,
+    ],
+  );
 
   useLayoutEffect(() => {
     return clearFallbackTimeout;

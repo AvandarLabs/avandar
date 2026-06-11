@@ -35,7 +35,9 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
 
   function flushOneFrame(): void {
     const callbacks = pendingRafs.splice(0);
-    callbacks.forEach((cb) => {return cb(performance.now())});
+    callbacks.forEach((cb) => {
+      return cb(performance.now());
+    });
   }
 
   it("clears isEnterPending and starts the ooze-in animation when Mantine constrains the panel to a different position than initialPosition", () => {
@@ -61,13 +63,14 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     };
 
     const { result, rerender } = renderHook(
-      ({ opened }: { opened: boolean }) =>
-        {return useFloatingPanelMorphTransition({
+      ({ opened }: { opened: boolean }) => {
+        return useFloatingPanelMorphTransition({
           opened,
           originRef,
           panelRef,
           initialPosition: { top: 540, left: 32 },
-        })},
+        });
+      },
       { initialProps: { opened: false } },
     );
 
@@ -101,15 +104,16 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     panelEl.style.top = "400px";
 
     const { rerender } = renderHook(
-      ({ opened }: { opened: boolean }) =>
-        {return useFloatingPanelMorphTransition({
+      ({ opened }: { opened: boolean }) => {
+        return useFloatingPanelMorphTransition({
           opened,
           originRef: {
             current: document.createElement("div"),
           } as RefObject<HTMLElement>,
           panelRef: { current: panelEl } as RefObject<HTMLElement>,
           initialPosition: { top: 540, left: 32 },
-        })},
+        });
+      },
       { initialProps: { opened: false } },
     );
 
