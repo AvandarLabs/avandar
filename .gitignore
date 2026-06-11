@@ -38,9 +38,6 @@ dist-ssr
 supabase/.temp
 supabase/.branches
 
-# Deno (local type-check only; breaks Supabase edge bundler when committed)
-deno.lock
-
 # Cursor
 .cursor/plans
 

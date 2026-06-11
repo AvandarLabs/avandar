@@ -34,8 +34,6 @@ test.describe("Data Explorer: save viz to dashboard", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const workspaceId = await getWorkspaceIdBySlug({

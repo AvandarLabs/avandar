@@ -18,7 +18,16 @@ type SyncPaidSubscriptionForE2EHybridResult = {
 
 /**
  * Upserts a paid subscription row after hybrid Polar checkout UI steps.
- * Uses a synthetic Polar subscription id (not revocable in Polar sandbox).
+ *
+ * "Hybrid" because the e2e flow drives Polar's hosted checkout for real
+ * (assertions on the redirect, Stripe card iframe, etc.) but then writes
+ * the resulting `subscriptions` row directly instead of waiting for
+ * Polar's `subscription.created` webhook. The webhook path is blocked
+ * by an automation gap in Polar sandbox's billing-address comboboxes;
+ * see the ROADBLOCK comment in `workspaceBillingFlow.ts` for details.
+ *
+ * The synthetic Polar subscription id this helper generates is not
+ * revocable in Polar sandbox, so cleanup is best-effort.
  */
 export async function syncPaidSubscriptionForE2EHybrid(
   options: SyncPaidSubscriptionForE2EHybridOptions,

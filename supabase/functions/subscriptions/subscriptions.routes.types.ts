@@ -49,7 +49,7 @@ export type SubscriptionsAPI = APITypeDef<
   ],
   {
     /**
-     * Search for subscriptions by a user's Avandar ID and udpate them in our
+     * Search for subscriptions by a user's Avandar ID and update them in our
      * Supabase database in case anything has changed in Polar.
      */
     "/fetch-and-sync": {
