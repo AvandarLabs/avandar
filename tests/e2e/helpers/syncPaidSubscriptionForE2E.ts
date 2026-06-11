@@ -3,7 +3,7 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-type SyncPaidSubscriptionForE2EHybridOptions = {
+type SyncPaidSubscriptionForE2EOptions = {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
   userId: string;
@@ -12,26 +12,25 @@ type SyncPaidSubscriptionForE2EHybridOptions = {
   checkoutEmail?: string;
 };
 
-type SyncPaidSubscriptionForE2EHybridResult = {
+type SyncPaidSubscriptionForE2EResult = {
   polarSubscriptionId: string;
 };
 
 /**
- * Upserts a paid subscription row after hybrid Polar checkout UI steps.
- *
- * "Hybrid" because the e2e flow drives Polar's hosted checkout for real
- * (assertions on the redirect, Stripe card iframe, etc.) but then writes
- * the resulting `subscriptions` row directly instead of waiting for
- * Polar's `subscription.created` webhook. The webhook path is blocked
- * by an automation gap in Polar sandbox's billing-address comboboxes;
- * see the ROADBLOCK comment in `workspaceBillingFlow.ts` for details.
+ * Upserts a paid subscription row after the e2e flow has driven Polar's
+ * hosted checkout UI for real (assertions on the redirect, Stripe card
+ * iframe, etc.). The DB write here replaces Polar's
+ * `subscription.created` webhook, which the e2e cannot reach: Polar
+ * sandbox's billing-address comboboxes are not automatable today (see
+ * the ROADBLOCK comment in `workspaceBillingFlow.ts` for the full
+ * explanation).
  *
  * The synthetic Polar subscription id this helper generates is not
  * revocable in Polar sandbox, so cleanup is best-effort.
  */
-export async function syncPaidSubscriptionForE2EHybrid(
-  options: SyncPaidSubscriptionForE2EHybridOptions,
-): Promise<SyncPaidSubscriptionForE2EHybridResult> {
+export async function syncPaidSubscriptionForE2E(
+  options: SyncPaidSubscriptionForE2EOptions,
+): Promise<SyncPaidSubscriptionForE2EResult> {
   const {
     supabaseAdminClient,
     workspaceId,
@@ -98,6 +97,8 @@ export async function syncPaidSubscriptionForE2EHybrid(
     );
   }
 
+  // Direct DB write substituting for Polar's `subscription.created`
+  // webhook, which we cannot wait for in e2e (see block comment above).
   const { error: insertError } = await supabaseAdminClient
     .from("subscriptions")
     .insert(polarFields);
