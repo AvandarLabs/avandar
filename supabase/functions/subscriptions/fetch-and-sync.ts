@@ -6,6 +6,7 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import { promiseMap } from "@utils/promises/promiseMap/promiseMap.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 import type { Tables } from "$/types/database.types.ts";
@@ -37,8 +38,7 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
     // Each Polar subscription has a distinct id, so the upsert calls don't
     // race with each other and we can run them in parallel.
     const upsertedSubscriptions: Array<Tables<"subscriptions">> =
-      await Promise.all(
-        subscriptions.map(async (subscription) => {
+      await promiseMap(subscriptions, async (subscription) => {
           const { product, metadata, status, customer } = subscription;
           const subscriptionMetadata =
             PolarSubscriptionMetadataSchema.parse(metadata);
@@ -131,8 +131,7 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
             .single()
             .throwOnError();
           return insertedRow;
-        }),
-      );
+        });
 
     return { subscriptions: upsertedSubscriptions };
   });

@@ -1,6 +1,6 @@
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { notifyError } from "@ui";
-import { assertIsDefined, prop, where } from "@utils";
+import { assertIsDefined, promiseMap, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
@@ -12,7 +12,6 @@ import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
-import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 

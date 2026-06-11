@@ -9,6 +9,8 @@ import {
   makeSet,
   objectEntries,
   objectKeys,
+  promiseFlatMap,
+  promiseMap,
   prop,
   sqlTemplate,
   where,
@@ -27,7 +29,6 @@ import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import type { ServiceClient } from "@clients";
 import type { WithQueryHooks } from "@hooks";

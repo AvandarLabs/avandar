@@ -7,8 +7,8 @@ import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfi
 import { match } from "ts-pattern";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
+import { promiseFlatMap } from "@utils/promises/promiseFlatMap/promiseFlatMap";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { promiseFlatMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type {
