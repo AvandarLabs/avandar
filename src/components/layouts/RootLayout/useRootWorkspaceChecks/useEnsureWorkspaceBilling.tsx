@@ -11,9 +11,9 @@ function _shouldOpenBillingSetupModal(options: {
   subscription: SubscriptionRead | undefined;
   isInCheckoutRoute: boolean;
 }): boolean {
-  return options.isInCheckoutRoute ?
-      false
-    : SubscriptionModule.shouldPromptForBillingSetup(options.subscription);
+  return options.isInCheckoutRoute ? false : (
+      SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
+    );
 }
 
 /**
