@@ -1,94 +1,19 @@
 #!/usr/bin/env bash
-# Pre-push (pre-PR) hook: runs prettier, eslint --fix, and stylelint --fix on
-# files changed on this branch (vs the merge-base with origin/develop or
-# origin/main). Activated repo-wide by `core.hooksPath = .githooks`, which is
-# configured by the `prepare` script in package.json after `pnpm install`.
+# Pre-push (pre-PR) hook: runs the shared formatter script on files changed
+# on this branch (vs origin/develop or origin/main). Activated repo-wide by
+# `core.hooksPath = .githooks`, configured by the `prepare` script in
+# package.json after `pnpm install`.
 #
-# If the fixers modify any files, the hook exits non-zero with a list of the
-# modified paths so the changes can be reviewed and committed before pushing
-# (and before the PR is created).
+# All formatting logic lives in scripts/format-changed-files/ so the same
+# behavior is available manually via `pnpm format`. If that script modifies
+# any files it exits non-zero, which blocks the push so the changes can be
+# reviewed and committed first.
 
 set -uo pipefail
 
-cd "$(git rev-parse --show-toplevel)" || exit 0
-
-# Paths matching any of these extended regex patterns are skipped by the
-# formatters/linters below. Add new patterns here to keep this list readable.
-IGNORE_PATTERNS=(
-  '^node_modules/'
-  '^shared/types/database\.types\.ts$'
-  '^supabase/migrations/.*\.sql$'
-  '\.gen\.[^/]+$'
-  '^src/i18n/locales/.+/messages\.ts$'
-  '\.md$'
-  '\.lock$'
-  '(^|/)pnpm-lock\.yaml$'
-)
-IGNORE_REGEX=$(IFS='|'; echo "${IGNORE_PATTERNS[*]}")
-
-BASE=""
-for ref in origin/develop origin/main; do
-  if git rev-parse --verify "$ref" >/dev/null 2>&1; then
-    if BASE=$(git merge-base HEAD "$ref" 2>/dev/null) && [ -n "$BASE" ]; then
-      break
-    fi
-    BASE=""
-  fi
-done
-
-if [ -z "$BASE" ]; then
-  echo "pre-PR hook: could not resolve base branch; skipping." >&2
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO_ROOT" ]; then
   exit 0
 fi
 
-CHANGED=()
-while IFS= read -r line; do
-  [ -n "$line" ] && CHANGED+=("$line")
-done < <(
-  git diff --name-only --diff-filter=ACMR "$BASE" HEAD \
-    | grep -Ev "$IGNORE_REGEX" \
-    || true
-)
-
-if [ ${#CHANGED[@]} -eq 0 ]; then
-  exit 0
-fi
-
-EXISTING=()
-for f in "${CHANGED[@]}"; do
-  [ -f "$f" ] && EXISTING+=("$f")
-done
-
-if [ ${#EXISTING[@]} -eq 0 ]; then
-  exit 0
-fi
-
-echo "pre-PR hook: formatting ${#EXISTING[@]} changed file(s)..." >&2
-
-pnpm exec prettier --write --ignore-unknown --log-level warn "${EXISTING[@]}" >&2 || true
-
-JSTS=()
-CSS=()
-for f in "${EXISTING[@]}"; do
-  case "$f" in
-    *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs) JSTS+=("$f") ;;
-    *.css) CSS+=("$f") ;;
-  esac
-done
-
-if [ ${#JSTS[@]} -gt 0 ]; then
-  pnpm exec eslint --fix --no-warn-ignored "${JSTS[@]}" >&2 || true
-fi
-
-if [ ${#CSS[@]} -gt 0 ]; then
-  pnpm exec stylelint --fix --allow-empty-input "${CSS[@]}" >&2 || true
-fi
-
-if ! git diff --quiet -- "${EXISTING[@]}" 2>/dev/null; then
-  echo "" >&2
-  echo "pre-PR hook: formatters/linters modified the following files. Review and commit before creating the PR:" >&2
-  git diff --name-only -- "${EXISTING[@]}" >&2
-  exit 2
-fi
-
-exit 0
+exec "$REPO_ROOT/scripts/format-changed-files/format-changed-files.sh"

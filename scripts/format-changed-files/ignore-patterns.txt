@@ -1,0 +1,31 @@
+# Ignore patterns for scripts/format-changed-files/format-changed-files.sh.
+#
+# Format: one extended regex per line (passed to `grep -E -v`).
+#   - Patterns match the repo-relative path of the file (forward slashes).
+#   - Blank lines and lines starting with `#` are ignored.
+#   - Escape special regex characters with a backslash (e.g. `\.` for a dot).
+#
+# Edit this file to add or remove paths that should be skipped by the
+# formatters/linters. No script changes are needed.
+
+# Dependencies
+^node_modules/
+
+# Generated Supabase types
+^shared/types/database\.types\.ts$
+
+# Raw SQL migrations
+^supabase/migrations/.*\.sql$
+
+# Any *.gen.* generated file
+\.gen\.[^/]+$
+
+# Lingui compiled message catalogs
+^src/i18n/locales/.+/messages\.ts$
+
+# Markdown
+\.md$
+
+# Lockfiles
+\.lock$
+(^|/)pnpm-lock\.yaml$

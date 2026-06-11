@@ -15,6 +15,10 @@ const idbStorage = {
   },
 };
 
+/**
+ * React Query async persister backed by IndexedDB (via `idb-keyval`). Writes
+ * are throttled to avoid thrashing storage on bursty cache activity.
+ */
 export const queryPersister = createAsyncStoragePersister({
   storage: idbStorage,
   key: STORE_KEY,

@@ -11,6 +11,12 @@ type Gate = {
   guard: <T extends (...args: never[]) => unknown>(fn: T) => T;
 };
 
+/**
+ * Returns an `isBlocked` flag for offline-aware UI plus a `guard` wrapper
+ * that short-circuits an onClick handler and toasts when offline. Use
+ * `isBlocked` to drive `<OfflineGated>` or a Button `disabled` prop, and
+ * wrap any onClick that should not run offline with `guard(...)`.
+ */
 export function useOfflineGate(): Gate {
   const { t } = useLingui();
   const isOnline = useIsOnline();

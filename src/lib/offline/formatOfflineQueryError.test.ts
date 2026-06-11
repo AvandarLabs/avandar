@@ -11,13 +11,11 @@ describe("formatOfflineQueryError", () => {
 
   it("returns undefined when online", () => {
     vi.stubGlobal("navigator", { onLine: true });
-    expect(formatOfflineQueryError(new Error("boom"))).toBeUndefined();
+    expect(formatOfflineQueryError()).toBeUndefined();
   });
 
   it("returns offline message when offline", () => {
     vi.stubGlobal("navigator", { onLine: false });
-    expect(formatOfflineQueryError(new Error("Catalog Error"))).toBe(
-      OFFLINE_UNCACHED_MESSAGE,
-    );
+    expect(formatOfflineQueryError()).toBe(OFFLINE_UNCACHED_MESSAGE);
   });
 });

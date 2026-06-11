@@ -46,6 +46,7 @@ supabase/.branches
 /test-results/
 
 # Common scratch or temp files
+*.ignore.md
 todo.md
 TODO.md
 testplan*.md

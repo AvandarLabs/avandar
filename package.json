@@ -38,6 +38,7 @@
     "build:desktop": "pnpm build && pnpm --filter @avandar/desktop build",
     "lint": "eslint . && stylelint \"src/**/*.css\"",
     "lint:css": "stylelint \"src/**/*.css\"",
+    "format": "./scripts/format-changed-files/format-changed-files.sh",
     "i18n:extract": "lingui extract --overwrite",
     "i18n:extract-clean": "lingui extract --clean",
     "i18n:compile": "lingui compile --typescript",

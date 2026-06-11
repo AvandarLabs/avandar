@@ -1,7 +1,7 @@
 import { I18nProvider } from "@lingui/react";
-import { ReactNode } from "react";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { i18n } from "@/i18n/i18n";
+import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
