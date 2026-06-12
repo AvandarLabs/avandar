@@ -7,7 +7,7 @@ import {
   expectPaidPolarSubscription,
 } from "./helpers/subscriptionAssertions";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { syncPaidSubscriptionForE2E } from "./helpers/syncPaidSubscriptionForE2E";
+import { upsertPaidSubscriptionForE2E } from "./helpers/upsertPaidSubscriptionForE2E";
 import { LONG_WAIT } from "./helpers/timeouts";
 import {
   beginPolarCheckoutWait,
@@ -138,7 +138,7 @@ test.describe("workspace billing", () => {
       });
 
       const admin = createSupabaseAdminClient();
-      await syncPaidSubscriptionForE2E({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -240,7 +240,7 @@ test.describe("workspace billing", () => {
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2E({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -337,7 +337,7 @@ test.describe("workspace billing", () => {
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2E({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -449,7 +449,7 @@ test.describe("workspace billing", () => {
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2E({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,

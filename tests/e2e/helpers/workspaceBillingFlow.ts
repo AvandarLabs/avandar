@@ -233,7 +233,7 @@ export async function fillPolarStripeCardFieldsOnly(page: Page): Promise<void> {
  *
  * Until that is solved, this helper only asserts our checkout-url redirect and
  * Polar/Stripe form load (plus card fields). Callers simulate the paid DB row
- * via `syncPaidSubscriptionForE2E`.
+ * via `upsertPaidSubscriptionForE2E`.
  */
 export async function finishPolarPaidCheckoutForE2E(options: {
   page: Page;

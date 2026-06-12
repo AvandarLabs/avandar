@@ -3,7 +3,7 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-type SyncPaidSubscriptionForE2EOptions = {
+type UpsertPaidSubscriptionForE2EOptions = {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
   userId: string;
@@ -12,7 +12,7 @@ type SyncPaidSubscriptionForE2EOptions = {
   checkoutEmail?: string;
 };
 
-type SyncPaidSubscriptionForE2EResult = {
+type UpsertPaidSubscriptionForE2EResult = {
   polarSubscriptionId: string;
 };
 
@@ -28,9 +28,9 @@ type SyncPaidSubscriptionForE2EResult = {
  * The synthetic Polar subscription id this helper generates is not
  * revocable in Polar sandbox, so cleanup is best-effort.
  */
-export async function syncPaidSubscriptionForE2E(
-  options: SyncPaidSubscriptionForE2EOptions,
-): Promise<SyncPaidSubscriptionForE2EResult> {
+export async function upsertPaidSubscriptionForE2E(
+  options: UpsertPaidSubscriptionForE2EOptions,
+): Promise<UpsertPaidSubscriptionForE2EResult> {
   const {
     supabaseAdminClient,
     workspaceId,
