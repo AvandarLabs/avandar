@@ -97,6 +97,16 @@ Playwright runs against the app URL in `playwright.config.ts` (default
 `http://127.0.0.1:5173`). The config can start Vite automatically unless a
 server is already running.
 
+**Install browsers once** (and again after upgrading `@playwright/test`):
+
+```bash
+pnpm exec playwright install chromium
+```
+
+Without this step, e2e tests fail with `browserType.launch: Executable doesn't
+exist`. Browsers are stored under `~/Library/Caches/ms-playwright/` on macOS
+(not in the repo).
+
 E2E tests expect a **full local Supabase stack**: `supabase start`, seeded DB
 (`pnpm db:reset` or equivalent), **Edge Functions served** (e.g. `pnpm fns:serve`
 after `pnpm fns:update-env`), and `.env.development` filled in (including
@@ -105,6 +115,7 @@ routes; they do not stub Supabase APIs.
 
 | Command                | What it does                                                                      |
 | ---------------------- | --------------------------------------------------------------------------------- |
+| `pnpm test`            | Full suite (unit + integration + e2e). Use `pnpm test -- --quick` to skip e2e. |
 | `pnpm test:e2e`        | **Headless** run: no browser window, best for CI and quick passes.                |
 | `pnpm test:e2e:headed` | Same tests with a **visible** browser; useful to watch flows and failures.        |
 | `pnpm test:e2e:ui`     | **Playwright UI mode**: pick tests, debug with time travel, live DOM, and traces. |

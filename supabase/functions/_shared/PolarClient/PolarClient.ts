@@ -62,6 +62,13 @@ export type PolarClient = {
   }) => Promise<Subscription>;
 
   /**
+   * Revokes (cancels immediately) a Polar subscription.
+   */
+  revokeSubscription: (options: {
+    subscriptionId: string;
+  }) => Promise<Subscription>;
+
+  /**
    * Get the Polar products, but with a simplified structure.
    */
   getProducts: () => Promise<Product[]>;
@@ -69,7 +76,7 @@ export type PolarClient = {
   /**
    * Create a checkout session for a single Polar product.
    * @param options The options for the checkout
-   * @param options.avandarMetadata The Avandar-relatedmetadata for the checkout
+   * @param options.avandarMetadata Avandar-related metadata for the checkout
    * @param options.avandarMetadata.userId The Avandar User ID
    * @param options.avandarMetadata.workspaceId The Avandar Workspace ID
    * @param options.productId The ID of the product to checkout
@@ -86,7 +93,7 @@ export type PolarClient = {
    */
   createCheckoutSession: (options: {
     /**
-     * Metadata that is specific to Avandar, to send with the Polar API reques
+     * Metadata that is specific to Avandar, to send with the Polar API request
      */
     avandarMetadata: {
       /**
@@ -122,7 +129,7 @@ export type PolarClient = {
     checkoutEmail: string;
 
     /**
-     * Number of seats to purchase in the checkout. This is require
+     * Number of seats to purchase in the checkout. This is required
      * if the product being checked out has seat-based pricing.
      */
     numSeats?: number;
@@ -242,6 +249,16 @@ function createPolarClient(): PolarClient {
         subscriptionUpdate: {
           seats: options.newTotalSeats,
         },
+      });
+      return subscription;
+    },
+
+    revokeSubscription: async (options: { subscriptionId: string }) => {
+      console.log("[PolarClient] Revoking Polar subscription", {
+        subscriptionId: options.subscriptionId,
+      });
+      const subscription = await polar.subscriptions.revoke({
+        id: options.subscriptionId,
       });
       return subscription;
     },

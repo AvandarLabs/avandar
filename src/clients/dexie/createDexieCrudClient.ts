@@ -3,14 +3,19 @@ import {
   ModelCrudParserRegistry,
   UpsertOptions,
 } from "@clients";
-import { assertIsDefined, isDefined, isEmptyFiltersObject } from "@utils";
+import {
+  assertIsDefined,
+  isDefined,
+  isEmptyFiltersObject,
+  promiseMapSequential,
+  promiseReduce,
+} from "@utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import {
   buildFilteredDexieCollection,
   findFirstConflictingRowByIndexedColumns,
 } from "@/clients/dexie/dexieFilteredCollection";
-import { promiseMapSequential, promiseReduce } from "@/lib/utils/promises";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type { ClientReturningOnlyPromises, ModelCrudClient } from "@clients";
 import type { ILogger } from "@logger";

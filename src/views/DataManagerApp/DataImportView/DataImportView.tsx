@@ -1,8 +1,8 @@
 import { useQuery } from "@hooks";
 import { Container, Stack, Title } from "@mantine/core";
-import { Tabs, Paper  } from "@ui";
+import { Paper, Tabs } from "@ui";
 import { where } from "@utils";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -11,6 +11,11 @@ import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/Go
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
 
+/**
+ * Data Manager import surface: upload, connectors, and the open data catalog.
+ * Resolves the workspace's add-dataset permission and gates the import tabs
+ * behind a "limit reached" modal once the subscription cap is hit.
+ */
 export function DataImportView(): JSX.Element {
   const workspace = useCurrentWorkspace();
 
@@ -20,10 +25,12 @@ export function DataImportView(): JSX.Element {
 
   // we should check if the user is allowed to add more datasets based on their
   // subscription plan
+  const subscriptionId = workspace.subscription?.id;
+
   const [canAddDatasets] = useQuery({
     queryKey: [
       "subscriptionPermission",
-      workspace.subscription?.polarSubscriptionId,
+      subscriptionId,
       "permissions",
       "can_add_datasets",
     ],
@@ -31,12 +38,12 @@ export function DataImportView(): JSX.Element {
       return await APIClient.get({
         route: "subscriptions/:subscriptionId/permissions/:permissionType",
         pathParams: {
-          subscriptionId: workspace.subscription?.polarSubscriptionId ?? "",
+          subscriptionId: subscriptionId ?? "",
           permissionType: "can_add_datasets",
         },
       });
     },
-    enabled: !!workspace.subscription?.polarSubscriptionId,
+    enabled: subscriptionId !== undefined,
   });
 
   const isAddAllowed =

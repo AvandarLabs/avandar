@@ -4,6 +4,8 @@ import {
   makeBucketRecord,
   makeIdLookupRecord,
   objectKeys,
+  promiseFlatMap,
+  promiseMap,
   prop,
   propEq,
   where,
@@ -24,7 +26,6 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
-import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import type { Module } from "@modules";
 import type { UnknownObject } from "@utils";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";

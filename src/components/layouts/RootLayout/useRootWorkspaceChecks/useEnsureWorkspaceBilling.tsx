@@ -1,9 +1,20 @@
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useEffect, useState } from "react";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+
+function _shouldOpenBillingSetupModal(options: {
+  subscription: SubscriptionRead | undefined;
+  isInCheckoutRoute: boolean;
+}): boolean {
+  return options.isInCheckoutRoute ? false : (
+      SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
+    );
+}
 
 /**
  * Hook to ensure that the workspace has a billing setup.
@@ -27,9 +38,12 @@ export function useEnsureWorkspaceBilling(): void {
     // we use queue microtask to ensure that the Mantine ModalsProvider is
     // ready before opening a modal
     queueMicrotask(() => {
-      // if this workspace has no subscription, we are not in the checkout
-      // route, and the billing modal is not already open
-      if (!subscription && !isInCheckoutRoute && !modalId) {
+      const openBillingModal = _shouldOpenBillingSetupModal({
+        subscription,
+        isInCheckoutRoute,
+      });
+
+      if (openBillingModal && !modalId) {
         setModalId(
           modals.open({
             title: (
@@ -38,7 +52,7 @@ export function useEnsureWorkspaceBilling(): void {
               </Text>
             ),
             size: "100%",
-            children: <WorkspaceBillingView hideTitle />,
+            children: <WorkspaceBillingView hideTitle workspace={workspace} />,
             styles: {
               content: {
                 height: "100%",
@@ -52,10 +66,11 @@ export function useEnsureWorkspaceBilling(): void {
       }
     });
 
-    // if we have a subscription now and the modal is open, then we need to
-    // close it
-    if (subscription && modalId) {
+    const hasEntitlements =
+      SubscriptionModule.doesSubscriptionGrantEntitlements(subscription);
+    if (hasEntitlements && modalId) {
       modals.close(modalId);
+      setModalId(undefined);
     }
-  }, [subscription, isInCheckoutRoute, modalId]);
+  }, [subscription, isInCheckoutRoute, modalId, workspace]);
 }

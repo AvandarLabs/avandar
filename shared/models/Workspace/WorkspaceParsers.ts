@@ -10,12 +10,29 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
-  WorkspaceModel,
   WorkspaceRead,
 } from "$/models/Workspace/Workspace.types.ts";
+import type { SetOptional } from "type-fest";
+
+export type WorkspaceModel = SupabaseCrudModelSpec<
+  {
+    tableName: "workspaces";
+    modelName: "Workspace";
+    modelPrimaryKeyType: WorkspaceId;
+    modelTypes: {
+      Read: WorkspaceRead;
+      Insert: SetOptional<WorkspaceRead, "id" | "createdAt" | "updatedAt">;
+      Update: Partial<WorkspaceRead>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
