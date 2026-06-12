@@ -7,8 +7,8 @@ import {
   expectPaidPolarSubscription,
 } from "./helpers/subscriptionAssertions";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { upsertPaidSubscriptionForE2E } from "./helpers/upsertPaidSubscriptionForE2E";
 import { LONG_WAIT } from "./helpers/timeouts";
+import { upsertPaidSubscriptionForE2E } from "./helpers/upsertPaidSubscriptionForE2E";
 import {
   beginPolarCheckoutWait,
   createWorkspaceViaNavbar,
