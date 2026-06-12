@@ -22,7 +22,7 @@ import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillin
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
 import css from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
-import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
+import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { PlanSwitch } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
@@ -156,25 +156,25 @@ export function PlanCard(props: Props): JSX.Element {
     }
     const { userId, email } = userProfile;
 
-    const planAction = resolvePlanSelectAction({
+    const billingAction = getBillingActionFromSelectedPlan({
       currentSubscription,
       currentSubscribedPlan,
       selectedPlan,
     });
 
-    if (planAction.type === "billing_error") {
+    if (billingAction.type === "billing_error") {
       notifyError(
         `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
       );
       return;
     }
 
-    if (planAction.type === "create_native_free") {
+    if (billingAction.type === "create_native_free") {
       createFreeSub({ workspaceId });
       return;
     }
 
-    if (planAction.type === "polar_checkout") {
+    if (billingAction.type === "polar_checkout") {
       const currentURL = getCurrentURL();
       const successURL = router.buildLocation({
         to: "/$workspaceSlug/checkout",
