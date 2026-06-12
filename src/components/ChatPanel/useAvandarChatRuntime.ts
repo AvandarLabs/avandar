@@ -1,4 +1,5 @@
 import { useLocalRuntime } from "@assistant-ui/react";
+import { Model } from "@models";
 import { isDefined, isNotNull, matchLiteral, prop } from "@utils";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
