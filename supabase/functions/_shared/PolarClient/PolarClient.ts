@@ -224,7 +224,6 @@ function createPolarClient(): PolarClient {
         id: options.subscriptionId,
         subscriptionUpdate: {
           productId: options.newProductId,
-          prorationBehavior: "prorate",
         },
       });
       return subscription;
