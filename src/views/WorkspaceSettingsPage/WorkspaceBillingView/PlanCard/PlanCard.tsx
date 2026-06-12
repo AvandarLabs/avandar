@@ -150,66 +150,66 @@ export function PlanCard(props: Props): JSX.Element {
   const isRecommended = planGroup.featurePlan.metadata.isRecommendedPlan;
 
   const onSelectPlan = async () => {
-    if (!userProfile) {
+    if (userProfile) {
+      const { userId, email } = userProfile;
+      const billingAction = getBillingActionFromSelectedPlan({
+        currentSubscription,
+        currentSubscribedPlan,
+        selectedPlan,
+      });
+
+      await match(billingAction)
+        .with({ type: "billing_error" }, () => {
+          notifyError(
+            `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+          );
+        })
+        .with({ type: "create_native_free" }, () => {
+          createFreeSub({ workspaceId });
+        })
+        .with({ type: "polar_checkout" }, async () => {
+          const currentURL = getCurrentURL();
+          const successURL = router.buildLocation({
+            to: "/$workspaceSlug/checkout",
+            params: { workspaceSlug },
+            search: { success: true },
+          });
+
+          setIsLoadingCheckoutPage(true);
+          await goToPolarCheckout({
+            polarProductId: selectedPlan.polarProductId,
+            userId,
+            workspaceId,
+            returnURL: currentURL,
+            successURL: `${window.location.origin}${successURL.href}&checkout_id={CHECKOUT_ID}`,
+            checkoutEmail: currentSubscription?.polarCustomerEmail ?? email,
+            currentPolarSubscriptionId:
+              currentSubscription?.polarSubscriptionId,
+            currentCustomerId: currentSubscription?.polarCustomerId,
+            numSeats: selectedPlan.priceType === "seat_based" ? 1 : undefined,
+          });
+        })
+        .with({ type: "change_plan" }, () => {
+          if (
+            currentSubscribedPlan &&
+            currentSubscription?.polarSubscriptionId
+          ) {
+            openChangePlanModal({
+              workspaceId,
+              newPlan: selectedPlan,
+              currentPlan: currentSubscribedPlan,
+              currentSubscriptionId: currentSubscription.polarSubscriptionId,
+            });
+          } else {
+            notifyError(
+              `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+            );
+          }
+        })
+        .exhaustive();
+    } else {
       notifyExpiredSession();
-      return;
     }
-    const { userId, email } = userProfile;
-
-    const billingAction = getBillingActionFromSelectedPlan({
-      currentSubscription,
-      currentSubscribedPlan,
-      selectedPlan,
-    });
-
-    if (billingAction.type === "billing_error") {
-      notifyError(
-        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
-      );
-      return;
-    }
-
-    if (billingAction.type === "create_native_free") {
-      createFreeSub({ workspaceId });
-      return;
-    }
-
-    if (billingAction.type === "polar_checkout") {
-      const currentURL = getCurrentURL();
-      const successURL = router.buildLocation({
-        to: "/$workspaceSlug/checkout",
-        params: { workspaceSlug },
-        search: { success: true },
-      });
-
-      setIsLoadingCheckoutPage(true);
-      await goToPolarCheckout({
-        polarProductId: selectedPlan.polarProductId,
-        userId,
-        workspaceId,
-        returnURL: currentURL,
-        successURL: `${window.location.origin}${successURL.href}&checkout_id={CHECKOUT_ID}`,
-        checkoutEmail: currentSubscription?.polarCustomerEmail ?? email,
-        currentPolarSubscriptionId: currentSubscription?.polarSubscriptionId,
-        currentCustomerId: currentSubscription?.polarCustomerId,
-        numSeats: selectedPlan.priceType === "seat_based" ? 1 : undefined,
-      });
-      return;
-    }
-
-    if (currentSubscribedPlan === undefined) {
-      notifyError(
-        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
-      );
-      return;
-    }
-
-    openChangePlanModal({
-      workspaceId,
-      newPlan: selectedPlan,
-      currentPlan: currentSubscribedPlan,
-      currentSubscriptionId: currentSubscription!.polarSubscriptionId!,
-    });
   };
 
   const elements = {
