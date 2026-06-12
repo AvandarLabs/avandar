@@ -6,7 +6,11 @@ on:
       - develop
 
 env:
-  NODE_VERSION: 24
+  # Pinned to 24.15.0: Node 24.16.0 causes `playwright install` to hang
+  # indefinitely after the Chromium download completes (verified against the
+  # last green run on 2026-05-18 vs. five consecutive 6h cancellations on
+  # 24.16.0). Bump deliberately after re-verifying against this workflow.
+  NODE_VERSION: 24.15.0
 
 jobs:
   lint-typecheck-test:
