@@ -68,7 +68,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           body: {
             messages: apiMessages,
             context: pageContext,
-            model: model ?? undefined,
+            model,
           },
         });
 

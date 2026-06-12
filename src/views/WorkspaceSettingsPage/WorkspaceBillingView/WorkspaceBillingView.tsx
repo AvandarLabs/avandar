@@ -1,25 +1,47 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { match } from "ts-pattern";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
 import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
 import { useSubscriptionPlans } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { SetRequired } from "type-fest";
 
 type Props = {
   hideTitle?: boolean;
   hideIntroText?: boolean;
+  /** When set (e.g. billing modal), avoids route hooks in a portal. */
+  workspace?: Workspace.WithSubscription;
 };
 
-export function WorkspaceBillingView({
+export function WorkspaceBillingView(props: Props): JSX.Element {
+  if (props.workspace) {
+    return (
+      <WorkspaceBillingViewContent {...props} workspace={props.workspace} />
+    );
+  }
+
+  return <WorkspaceBillingViewFromRoute {...props} />;
+}
+
+function WorkspaceBillingViewFromRoute(
+  props: Omit<Props, "workspace">,
+): JSX.Element {
+  const workspace = useCurrentWorkspace();
+  return <WorkspaceBillingViewContent {...props} workspace={workspace} />;
+}
+
+function WorkspaceBillingViewContent({
   hideTitle,
   hideIntroText,
-}: Props): JSX.Element {
-  const currentWorkspace = useCurrentWorkspace();
+  workspace: currentWorkspace,
+}: SetRequired<Props, "workspace">): JSX.Element {
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
@@ -84,9 +106,10 @@ export function WorkspaceBillingView({
     );
   }
 
-  // Convert map to array and sort by price (cheapest first)
-  const sortedPlanGroups: SubscriptionPlanGroup[] = subscriptionPlanGroups.sort(
-    (planGroupA, planGroupB) => {
+  // Sort plan groups by price (cheapest first). Use toSorted so we don't
+  // mutate the array returned by the query hook.
+  const sortedPlanGroups: SubscriptionPlanGroup[] =
+    subscriptionPlanGroups.toSorted((planGroupA, planGroupB) => {
       const priceA =
         planGroupA.type === "free" ?
           0
@@ -96,8 +119,7 @@ export function WorkspaceBillingView({
           0
         : planGroupB.annualPlan.normalizedPricePerSeatPerMonth;
       return priceA - priceB;
-    },
-  );
+    });
 
   const allPlans = sortedPlanGroups.flatMap(
     (planGroup: SubscriptionPlanGroup): SubscriptionPlan[] => {
@@ -112,13 +134,19 @@ export function WorkspaceBillingView({
     },
   );
 
-  const currentSubscribedPlan = allPlans.find((plan) => {
-    return (
-      plan.polarProductId === currentWorkspace.subscription?.polarProductId
-    );
-  });
-
-  const hasSubscription = !!currentWorkspace.subscription;
+  const subscription = currentWorkspace.subscription;
+  const currentSubscribedPlan =
+    subscription ?
+      allPlans.find((plan) => {
+        // Polar-backed: match the Polar product id.
+        // Native free: any free plan card is the current plan.
+        return (
+          plan.polarProductId === subscription.polarProductId ||
+          (SubscriptionModule.isNativeFreeSubscription(subscription) &&
+            plan.priceType === "free")
+        );
+      })
+    : undefined;
 
   return (
     <Stack gap="lg">
@@ -135,6 +163,8 @@ export function WorkspaceBillingView({
                   key={group.featurePlan.type}
                   type="free"
                   planGroup={group}
+                  workspaceId={currentWorkspace.id}
+                  workspaceSlug={currentWorkspace.slug}
                   currentSubscription={currentWorkspace.subscription}
                   currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant={group.payWhatYouWantPlan ? "custom" : "free"}
@@ -147,6 +177,8 @@ export function WorkspaceBillingView({
                   key={group.featurePlan.type}
                   type="paid"
                   planGroup={group}
+                  workspaceId={currentWorkspace.id}
+                  workspaceSlug={currentWorkspace.slug}
                   currentSubscription={currentWorkspace.subscription}
                   currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant="year"
@@ -156,7 +188,7 @@ export function WorkspaceBillingView({
             .exhaustive();
         })}
       </Group>
-      {hasSubscription && currentSubscribedPlan?.priceType !== "free" ?
+      {subscription && currentSubscribedPlan?.priceType !== "free" ?
         <>
           <Group gap="xxxs" align="center">
             <Text c="dimmed">

@@ -1,5 +1,6 @@
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { SubscriptionPermission } from "$/models/Subscription/Subscription.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 /**
@@ -38,6 +39,7 @@ export type SubscriptionsAPI = APITypeDef<
   "subscriptions",
   [
     "/fetch-and-sync",
+    "/create-free",
     "/:subscriptionId/product",
     "/:subscriptionId/seats",
     "/products",
@@ -47,7 +49,7 @@ export type SubscriptionsAPI = APITypeDef<
   ],
   {
     /**
-     * Search for subscriptions by a user's Avandar ID and udpate them in our
+     * Search for subscriptions by a user's Avandar ID and update them in our
      * Supabase database in case anything has changed in Polar.
      */
     "/fetch-and-sync": {
@@ -58,6 +60,17 @@ export type SubscriptionsAPI = APITypeDef<
         };
         returnType: {
           subscriptions: Array<Tables<"subscriptions">>;
+        };
+      };
+    };
+
+    "/create-free": {
+      POST: {
+        body: {
+          workspaceId: Workspace.Id;
+        };
+        returnType: {
+          subscription: Tables<"subscriptions">;
         };
       };
     };

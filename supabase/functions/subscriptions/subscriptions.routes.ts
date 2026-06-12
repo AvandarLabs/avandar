@@ -1,9 +1,13 @@
+import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
+import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
 import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
+import { CreateFreeSubscription } from "@sbfn/subscriptions/create-free.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
+import { assertIsNonNullish } from "@utils/asserts/assertIsNonNullish/assertIsNonNullish.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
@@ -12,6 +16,7 @@ import type {
   AvaPolarProduct,
   SubscriptionsAPI,
 } from "@sbfn/subscriptions/subscriptions.routes.types.ts";
+import type { User } from "$/models/User/User.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
@@ -19,6 +24,10 @@ import type {
 export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   "/fetch-and-sync": {
     GET: FetchAndSyncUserSubscriptions,
+  },
+
+  "/create-free": {
+    POST: CreateFreeSubscription,
   },
 
   "/:subscriptionId/product": {
@@ -120,7 +129,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
             return val ? Number(val) : undefined;
           }),
       })
-      .action(async ({ pathParams, queryParams }) => {
+      .action(async ({ pathParams, queryParams, user }) => {
         const { productId } = pathParams;
         const {
           returnURL,
@@ -132,6 +141,13 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           currentPolarSubscriptionId,
           currentCustomerId,
         } = queryParams;
+
+        if (userId !== user.id) {
+          throw new AvaHTTPError(
+            "Cannot create a checkout session for another user.",
+            FORBIDDEN,
+          );
+        }
 
         // In dev, use a Polar-acceptable email (e.g. delivered@resend.dev)
         // since Polar rejects test domains like test@test.com
@@ -163,31 +179,49 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
       .querySchema({
         returnURL: z.url(),
       })
-      .action(async ({ pathParams, queryParams, supabaseAdminClient }) => {
-        // first check if the user has a subscription
-        const { data: subscriptions } = await supabaseAdminClient
-          .from("subscriptions")
-          .select("polar_subscription_id, polar_customer_id")
-          .eq("subscription_owner_id", pathParams.userId);
-        if (!subscriptions || subscriptions.length === 0) {
-          return { success: false };
-        }
+      .action(
+        async ({ pathParams, queryParams, supabaseAdminClient, user }) => {
+          if (pathParams.userId !== user.id) {
+            throw new AvaHTTPError(
+              "Cannot open the billing portal for another user.",
+              FORBIDDEN,
+            );
+          }
 
-        const customerId = subscriptions[0]!.polar_customer_id;
-        if (!customerId) {
-          return { success: false };
-        }
+          // first check if the user has a subscription
+          const { data: subscriptions } = await supabaseAdminClient
+            .from("subscriptions")
+            .select("polar_subscription_id, polar_customer_id")
+            .eq("subscription_owner_id", pathParams.userId);
+          if (!subscriptions || subscriptions.length === 0) {
+            return { success: false };
+          }
 
-        // They have one, so we can create a customer session for them
-        const customerSession = await PolarClient.createCustomerSessions({
-          customerId,
-          returnURL: queryParams.returnURL,
-        });
-        return {
-          success: true,
-          customerPortalURL: customerSession.customerPortalUrl,
-        };
-      }),
+          const subscriptionWithPolarCustomer = subscriptions.find(
+            (subscriptionRow) => {
+              return subscriptionRow.polar_customer_id != null;
+            },
+          );
+
+          if (subscriptionWithPolarCustomer === undefined) {
+            return { success: false };
+          }
+
+          assertIsNonNullish(
+            subscriptionWithPolarCustomer.polar_customer_id,
+            "Subscription with Polar customer ID is required",
+          );
+
+          const customerSession = await PolarClient.createCustomerSessions({
+            customerId: subscriptionWithPolarCustomer.polar_customer_id,
+            returnURL: queryParams.returnURL,
+          });
+          return {
+            success: true,
+            customerPortalURL: customerSession.customerPortalUrl,
+          };
+        },
+      ),
   },
 
   "/:subscriptionId/permissions/:permissionType": {
@@ -201,12 +235,16 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
       async ({
         pathParams: { subscriptionId, permissionType },
         supabaseAdminClient,
+        user,
       }) => {
         return {
           allowed: await hasSubscriptionPermission({
-            subscriptionId: subscriptionId as Subscription.Id,
+            subscriptionId: subscriptionId as
+              | Subscription.PolarId
+              | Subscription.Id,
             permissionType,
             supabaseAdminClient,
+            userId: user.id as User.Id,
           }),
         };
       },

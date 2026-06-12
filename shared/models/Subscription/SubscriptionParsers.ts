@@ -7,7 +7,7 @@ import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOI
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { z } from "zod";
 import type {
   Expect,
@@ -17,11 +17,43 @@ import type {
   PolarCustomerId,
   PolarProductId,
   SubscriptionId,
-  SubscriptionModel,
+  SubscriptionPolarId,
   SubscriptionRead,
 } from "$/models/Subscription/Subscription.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { SetOptional } from "type-fest";
+
+export type SubscriptionModel = SupabaseCrudModelSpec<
+  {
+    tableName: "subscriptions";
+    modelName: "Subscription";
+    modelPrimaryKeyType: SubscriptionId;
+    modelTypes: {
+      Read: SubscriptionRead;
+      Insert: SetOptional<
+        SubscriptionRead,
+        | "createdAt"
+        | "currentPeriodEnd"
+        | "currentPeriodStart"
+        | "endedAt"
+        | "endsAt"
+        | "id"
+        | "polarCustomerEmail"
+        | "polarCustomerId"
+        | "polarProductId"
+        | "polarSubscriptionId"
+        | "startedAt"
+        | "updatedAt"
+      >;
+      Update: Partial<SubscriptionRead>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
 
 const DBReadSchema = z.object({
   id: z.uuid(),
@@ -62,16 +94,26 @@ export const SubscriptionParsers =
         "currentPeriodStart",
         "currentPeriodEnd",
       ]),
-      ({ id, ...obj }): SubscriptionRead => {
+      (obj): SubscriptionRead => {
         return {
           ...obj,
+          id: obj.id as SubscriptionId,
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
-          polarCustomerId: (obj.polarCustomerId ?? "") as PolarCustomerId,
-          polarSubscriptionId: (obj.polarSubscriptionId ??
-            "") as SubscriptionId,
-          polarProductId: (obj.polarProductId ?? "") as PolarProductId,
-          polarCustomerEmail: obj.polarCustomerEmail ?? "",
+          polarCustomerId:
+            obj.polarCustomerId != null ?
+              (obj.polarCustomerId as PolarCustomerId)
+            : undefined,
+          polarCustomerEmail:
+            obj.polarCustomerEmail != null ? obj.polarCustomerEmail : undefined,
+          polarProductId:
+            obj.polarProductId != null ?
+              (obj.polarProductId as PolarProductId)
+            : undefined,
+          polarSubscriptionId:
+            obj.polarSubscriptionId != null ?
+              (obj.polarSubscriptionId as SubscriptionPolarId)
+            : undefined,
         };
       },
     ),

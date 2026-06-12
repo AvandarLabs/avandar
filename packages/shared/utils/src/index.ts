@@ -83,6 +83,12 @@ export { sleep } from "@utils/misc/sleep/sleep.ts";
 export { traverse } from "@utils/misc/traverse/traverse.ts";
 export { pipe } from "@utils/misc/pipe/pipe.ts";
 
+// promises
+export { promiseMap } from "@utils/promises/promiseMap/promiseMap.ts";
+export { promiseFlatMap } from "@utils/promises/promiseFlatMap/promiseFlatMap.ts";
+export { promiseMapSequential } from "@utils/promises/promiseMapSequential/promiseMapSequential.ts";
+export { promiseReduce } from "@utils/promises/promiseReduce/promiseReduce.ts";
+
 // sets
 export { makeSet } from "@utils/sets/makeSet/makeSet.ts";
 

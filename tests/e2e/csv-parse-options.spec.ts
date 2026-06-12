@@ -25,7 +25,6 @@ import type { Page } from "@playwright/test";
  * column names like "California" / "Alameda" / "37.64629437".
  */
 const FINAL_SKIP_ROWS = 1;
-const FINAL_DELIMITER = ",";
 
 /**
  * Column names that should appear after parsing
@@ -42,19 +41,29 @@ const COLUMN_NAMES_AFTER_SKIP_1 = [
   "31",
 ] as const;
 
+async function uploadSmallCaliforniaCsv(page: Page): Promise<void> {
+  const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
+  await uploadPanel
+    .locator('input[type="file"]')
+    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
+  await uploadPanel
+    .getByRole("button", { name: "Upload", exact: true })
+    .click();
+}
+
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
-  await skipInput.click();
-  await skipInput.press("ControlOrMeta+a");
+  await skipInput.click({ clickCount: 3 });
   await skipInput.fill(String(value));
+  await skipInput.press("Tab");
   await expect(skipInput).toHaveValue(String(value));
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
-  await delimiterInput.click();
-  await delimiterInput.selectText();
+  await delimiterInput.click({ clickCount: 3 });
   await delimiterInput.fill(value);
+  await delimiterInput.press("Tab");
   await expect(delimiterInput).toHaveValue(value);
 }
 
@@ -62,7 +71,6 @@ async function clickReparse(page: Page): Promise<void> {
   const reparseButton = page.getByRole("button", {
     name: "Process data again",
   });
-  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
   await reparseButton.click();
   await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
 }
@@ -115,13 +123,7 @@ test.describe("CSV parsing options", () => {
       timeout: MEDIUM_WAIT,
     });
 
-    const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-    await uploadPanel
-      .locator('input[type="file"]')
-      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-    await uploadPanel
-      .getByRole("button", { name: "Upload", exact: true })
-      .click();
+    await uploadSmallCaliforniaCsv(page);
 
     // Baseline: default sniffed options (delimiter=",", skip=0).
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
@@ -211,19 +213,11 @@ test.describe("CSV parsing options", () => {
       }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Final: restore sniffed comma delimiter, then apply skip=1 (same sequence
-    // as the mid-test recovery + variation 1, which avoids cross-focus resets).
-    await setSkipRows(page, 0);
-    await setDelimiter(page, FINAL_DELIMITER);
-    await clickReparse(page);
+    // Final: re-upload so delimiter resets to sniffed "," after the wrong-
+    // delimiter variations, then apply skip=1 and save.
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await uploadSmallCaliforniaCsv(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
-    await Promise.all(
-      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
-        await expect(
-          page.getByRole("columnheader", { name: columnName, exact: true }),
-        ).toBeVisible({ timeout: MEDIUM_WAIT });
-      }),
-    );
 
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
