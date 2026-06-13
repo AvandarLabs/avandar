@@ -2,7 +2,7 @@ import { Box } from "@mantine/core";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { Children, cloneElement, isValidElement } from "react";
-import css from "@/components/offline/OfflineGated.module.css";
+import css from "@/components/offline/OfflineGated/OfflineGated.module.css";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import type { MouseEvent, ReactElement, ReactNode } from "react";
 
