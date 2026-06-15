@@ -33,8 +33,6 @@ type MorphTransitionState = {
   onAnimationEnd: (event: AnimationEvent<HTMLElement>) => void;
 };
 
-const POSITION_TOLERANCE_PX = 2;
-
 function _resolveTargetAnchor(
   initialPosition: FloatingPanelInitialPosition | undefined,
   panel: HTMLElement,
@@ -63,21 +61,6 @@ function _resolveTargetAnchor(
   }
 
   return { left: panelRect.left, top: panelRect.top };
-}
-
-function _isPanelAtTargetAnchor(
-  panel: HTMLElement,
-  anchor: AnimateTargetAnchor,
-): boolean {
-  const styleLeft = Number.parseFloat(panel.style.left);
-  const styleTop = Number.parseFloat(panel.style.top);
-
-  return (
-    Number.isFinite(styleLeft) &&
-    Number.isFinite(styleTop) &&
-    Math.abs(styleLeft - anchor.left) <= POSITION_TOLERANCE_PX &&
-    Math.abs(styleTop - anchor.top) <= POSITION_TOLERANCE_PX
-  );
 }
 
 function _buildOozeOriginStyle(
@@ -149,6 +132,9 @@ export function useFloatingPanelMorphTransition({
 
   const scheduleFallback = useCallback(
     (phase: FloatingPanelAnimationPhase, onComplete: () => void): void => {
+      if (fallbackTimeoutRef.current != null) {
+        clearTimeout(fallbackTimeoutRef.current);
+      }
       const durationMs =
         phase === "enter" ?
           ANIMATION_PRESET.oozeIn.durationMs
@@ -161,6 +147,10 @@ export function useFloatingPanelMorphTransition({
   useLayoutEffect(
     function runMorphTransition() {
       clearFallbackTimeout();
+      let aborted = false;
+      const cleanup = (): void => {
+        aborted = true;
+      };
 
       if (!morphEnabled || !originRef) {
         setIsRendered(opened);
@@ -168,81 +158,85 @@ export function useFloatingPanelMorphTransition({
         setIsEnterPending(false);
         setPanelAnimationStyle({});
         prevOpenedRef.current = opened;
-        return;
+        return cleanup;
       }
 
       if (!hasInitializedRef.current) {
         hasInitializedRef.current = true;
         prevOpenedRef.current = opened;
         setIsRendered(opened);
-        return;
+        return cleanup;
       }
 
       const wasOpened = prevOpenedRef.current;
       prevOpenedRef.current = opened;
+      const isOpening = opened && !wasOpened;
+      const isClosing = !opened && wasOpened;
+      const isAlreadyOpen = opened && wasOpened;
 
-      if (opened && !wasOpened) {
+      const scheduleFrame = (fn: () => void): void => {
+        requestAnimationFrame(() => {
+          if (!aborted) {
+            fn();
+          }
+        });
+      };
+
+      const commitEnter = (): void => {
+        setIsEnterPending(false);
+        setAnimationPhase("enter");
+        scheduleFallback("enter", finishEnter);
+      };
+
+      const runEnter = (): void => {
+        if (aborted) {
+          return;
+        }
+        const panel = panelRef.current;
+        const anchor =
+          panel ?
+            _resolveTargetAnchor(initialPositionRef.current, panel)
+          : undefined;
+
+        if (!panel || !anchor) {
+          scheduleFrame(runEnter);
+          return;
+        }
+
+        const style = _buildOozeOriginStyle(
+          originRef,
+          panelRef,
+          initialPositionRef.current,
+        );
+        const hasOrigin = Object.keys(style).length > 0;
+
+        if (hasOrigin) {
+          setPanelAnimationStyle(style);
+          scheduleFrame(() => {
+            scheduleFrame(commitEnter);
+          });
+        } else {
+          // Origin button isn't in the DOM yet (re-render race). Skip the
+          // morph animation rather than polling forever; the panel still opens.
+          commitEnter();
+        }
+      };
+
+      if (isOpening) {
         setIsRendered(true);
         setIsEnterPending(true);
         setAnimationPhase(undefined);
-
-        const runEnter = (): void => {
-          const panel = panelRef.current;
-          if (!panel) {
-            requestAnimationFrame(runEnter);
-            return;
-          }
-
-          const anchor = _resolveTargetAnchor(
-            initialPositionRef.current,
-            panel,
-          );
-          if (!anchor) {
-            requestAnimationFrame(runEnter);
-            return;
-          }
-
-          if (!_isPanelAtTargetAnchor(panel, anchor)) {
-            requestAnimationFrame(runEnter);
-            return;
-          }
-
-          const style = _buildOozeOriginStyle(
-            originRef,
-            panelRef,
-            initialPositionRef.current,
-          );
-          if (Object.keys(style).length === 0) {
-            requestAnimationFrame(runEnter);
-            return;
-          }
-
-          setPanelAnimationStyle(style);
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              setIsEnterPending(false);
-              setAnimationPhase("enter");
-              scheduleFallback("enter", finishEnter);
-            });
-          });
-        };
-
         runEnter();
-        return;
-      }
-
-      if (!opened && wasOpened) {
+      } else if (isClosing) {
         setIsEnterPending(false);
         setAnimationPhase("exit");
         scheduleFallback("exit", finishExit);
-        return;
-      }
-
-      if (opened) {
+      } else if (isAlreadyOpen) {
         setIsRendered(true);
         setIsEnterPending(false);
       }
+
+      return cleanup;
     },
     [
       clearFallbackTimeout,
@@ -284,7 +278,7 @@ export function useFloatingPanelMorphTransition({
     isRendered: morphEnabled ? isRendered : opened,
     animationPhase: morphEnabled ? animationPhase : undefined,
     panelAnimationStyle: morphEnabled ? panelAnimationStyle : {},
-    isAnimating: morphEnabled && animationPhase != null,
+    isAnimating: morphEnabled && animationPhase !== undefined,
     isEnterPending: morphEnabled && isEnterPending,
     onAnimationEnd,
   };

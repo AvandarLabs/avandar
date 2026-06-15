@@ -54,7 +54,7 @@ import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorer
 import type { ChatPlan } from "$/types/chat.types";
 
 const QUERY_DETAILS_WIDTH = 380;
-const SETTINGS_WIDTH = 340;
+const VISUALIZATION_SETTINGS_WIDTH = 340;
 
 /**
  * Default stacked layout: Query Details near the top-left of the canvas
@@ -62,11 +62,11 @@ const SETTINGS_WIDTH = 340;
  * they share the same column.
  */
 const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
-const SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
+const VISUALIZATION_SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
 
 /** Defaults applied when there is no saved per-tab preference. */
 const DEFAULT_QUERY_DETAILS_OPENED = true;
-const DEFAULT_SETTINGS_OPENED = false;
+const DEFAULT_VISUALIZATION_SETTINGS_OPENED = false;
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
@@ -106,11 +106,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   const isQueryDetailsOpened =
     panelPreferences.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
-  const isSettingsOpened =
-    panelPreferences.settings?.opened ?? DEFAULT_SETTINGS_OPENED;
+  const isVisualizationSettingsOpened =
+    panelPreferences.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
   const isQueryDetailsCollapsed =
     panelPreferences.queryDetails?.collapsed ?? false;
-  const isSettingsCollapsed = panelPreferences.settings?.collapsed ?? false;
+  const isVisualizationSettingsCollapsed = panelPreferences.settings?.collapsed ?? false;
 
   const setQueryDetailsOpened = useCallback(
     (next: boolean | ((prev: boolean) => boolean)): void => {
@@ -126,10 +126,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     [],
   );
 
-  const setSettingsOpened = useCallback(
+  const setVisualizationSettingsOpened = useCallback(
     (next: boolean | ((prev: boolean) => boolean)): void => {
       setPanelPreferences((prev) => {
-        const current = prev.settings?.opened ?? DEFAULT_SETTINGS_OPENED;
+        const current = prev.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
         const resolved = typeof next === "function" ? next(current) : next;
         return _updatePanelPreferences(prev, "settings", { opened: resolved });
       });
@@ -252,13 +252,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   ]);
 
   const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
-  const settingsPanelButtonRef = useRef<HTMLButtonElement>(null);
+  const visualizationSettingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
   /**
    * Auto-open settings once on the first successful query when nothing is in
    * session storage yet.
    */
-  const hasAutoOpenedSettingsRef = useRef(
+  const hasAutoOpenedVisualizationSettingsRef = useRef(
     hasDataExplorerPanelPreferencesInSessionStorage(),
   );
   useEffect(() => {
@@ -267,13 +267,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     if (
       justFinishedFetching &&
       dataQuery.isSuccess &&
-      !hasAutoOpenedSettingsRef.current
+      !hasAutoOpenedVisualizationSettingsRef.current
     ) {
-      setSettingsOpened(true);
-      hasAutoOpenedSettingsRef.current = true;
+      setVisualizationSettingsOpened(true);
+      hasAutoOpenedVisualizationSettingsRef.current = true;
     }
     wasFetchingRef.current = dataQuery.isFetching;
-  }, [dataQuery.isFetching, dataQuery.isSuccess, setSettingsOpened]);
+  }, [dataQuery.isFetching, dataQuery.isSuccess, setVisualizationSettingsOpened]);
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
@@ -317,13 +317,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             <Trans>Query</Trans>
           </Button>
           <Button
-            ref={settingsPanelButtonRef}
-            variant={isSettingsOpened ? "filled" : "outline"}
+            ref={visualizationSettingsPanelButtonRef}
+            variant={isVisualizationSettingsOpened ? "filled" : "outline"}
             color="neutral"
             leftSection={<IconAdjustmentsHorizontal size={16} />}
             size="compact-sm"
             onClick={() => {
-              setSettingsOpened((prev) => {
+              setVisualizationSettingsOpened((prev) => {
                 return !prev;
               });
             }}
@@ -563,19 +563,19 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
       </FloatingPanel>
       <FloatingPanel
         title={t`Visualization Settings`}
-        opened={isSettingsOpened}
-        collapsed={isSettingsCollapsed}
-        openOriginRef={settingsPanelButtonRef}
+        opened={isVisualizationSettingsOpened}
+        collapsed={isVisualizationSettingsCollapsed}
+        openOriginRef={visualizationSettingsPanelButtonRef}
         onClose={() => {
-          setSettingsOpened(false);
+          setVisualizationSettingsOpened(false);
         }}
         onRequestClose={() => {
-          setSettingsOpened(false);
+          setVisualizationSettingsOpened(false);
         }}
         onToggleCollapse={() => {
           setPanelPreferences((prev) => {
             return _updatePanelPreferences(prev, "settings", {
-              collapsed: !isSettingsCollapsed,
+              collapsed: !isVisualizationSettingsCollapsed,
             });
           });
         }}
@@ -590,9 +590,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           });
         }}
         initialPosition={
-          panelPreferences.settings?.position ?? SETTINGS_INITIAL_POSITION
+          panelPreferences.settings?.position ?? VISUALIZATION_SETTINGS_INITIAL_POSITION
         }
-        width={SETTINGS_WIDTH}
+        width={VISUALIZATION_SETTINGS_WIDTH}
       >
         <VizSettingsForm
           columns={queryResultColumns}

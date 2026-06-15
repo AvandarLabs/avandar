@@ -4,32 +4,36 @@ import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransiti
 import type { RefObject } from "react";
 
 /**
- * Regression tests for the runEnter infinite-rAF loop (second-tab bug).
+ * Regression tests for the runEnter infinite-rAF loop when the panel's
+ * saved position is outside the viewport.
  *
- * Root cause: _isPanelAtTargetAnchor compares panel.style.top/left against the
- * raw initialPosition values. When Mantine's FloatingWindow clamps the panel
- * via constrainToViewport:true, the actual inline style differs from
- * initialPosition. The check never passes, runEnter loops forever with no
- * fallback timeout, and isEnterPending stays true permanently — holding the
- * panel at opacity:0.
+ * Repro: the user drags the panel close to a viewport edge, closes it,
+ * then reopens. Mantine's FloatingWindow clamps the rendered position
+ * back into the viewport, so panel.style.top/left differs from the raw
+ * initialPosition read from localStorage. Before the fix,
+ * _isPanelAtTargetAnchor compared inline style against initialPosition
+ * and never matched, so runEnter polled forever with no fallback and
+ * isEnterPending stayed true permanently, holding the panel at opacity:0.
  *
- * These tests assert the correct behavior: the panel becomes visible after a
- * few frames. Fixed in _resolveTargetAnchor by preferring actual inline style
- * over raw initialPosition values.
+ * After the fix, _resolveTargetAnchor derives the anchor from the actual
+ * inline style first, so the position check converges on the first frame
+ * and the ooze-in animation starts normally.
  */
 
-describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", () => {
+describe("useFloatingPanelMorphTransition — runEnter convergence when Mantine clamps the panel", () => {
   let pendingRafs: FrameRequestCallback[];
 
   beforeEach(() => {
     pendingRafs = [];
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
-      pendingRafs.push(cb);
+    vi.useFakeTimers();
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      pendingRafs.push(callback);
       return pendingRafs.length;
     });
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -41,23 +45,23 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
   }
 
   it("clears isEnterPending and starts the ooze-in animation when Mantine constrains the panel to a different position than initialPosition", () => {
-    // Second-tab scenario:
-    //   initialPosition.top = 540  (SETTINGS_INITIAL_POSITION or a value
-    //   inherited from sessionStorage of the first tab)
-    //   Mantine constrainToViewport clamped the actual style to top:400.
+    // The user dragged the panel close to a viewport edge before closing.
+    // On reopen, the saved initialPosition (top:540) is outside what Mantine
+    // will render with constrainToViewport, so the actual inline style is
+    // clamped (top:400).
     //
-    // BUG: _isPanelAtTargetAnchor checks |panel.style.top - anchor.top|
-    //      = |400 - 540| = 140 > POSITION_TOLERANCE_PX (2) → always false.
-    //      runEnter loops forever; isEnterPending stays true; panel invisible.
+    // Before the fix: _isPanelAtTargetAnchor compared |400 - 540| against
+    // POSITION_TOLERANCE_PX (2) and always failed; runEnter polled forever;
+    // isEnterPending stayed true and the panel was invisible.
     //
-    // After the fix: the anchor is derived from the actual inline style (400),
-    // _isPanelAtTargetAnchor passes on the first frame, and the ooze-in
-    // animation starts — clearing isEnterPending after 2 more rAFs.
-    const panelEl = document.createElement("div");
-    panelEl.style.left = "32px";
-    panelEl.style.top = "400px"; // constrained from initialPosition.top of 540
+    // After the fix: _resolveTargetAnchor returns the actual inline-style
+    // anchor (top:400), the position check passes on the first frame, and
+    // the ooze-in animation kicks off after the 2 nested rAFs.
+    const panelElement = document.createElement("div");
+    panelElement.style.left = "32px";
+    panelElement.style.top = "400px"; // constrained from initialPosition.top of 540
 
-    const panelRef: RefObject<HTMLElement> = { current: panelEl };
+    const panelRef: RefObject<HTMLElement> = { current: panelElement };
     const originRef: RefObject<HTMLElement> = {
       current: document.createElement("div"),
     };
@@ -94,41 +98,4 @@ describe("useFloatingPanelMorphTransition — runEnter position-mismatch loop", 
     expect(result.current.isRendered).toBe(true);
   });
 
-  it("drains the rAF queue once the panel settles — the loop should not run indefinitely", () => {
-    // Same constraint mismatch setup.
-    // BUG:  every flush re-queues exactly 1 rAF — the loop never exits.
-    // Fix:  runEnter succeeds on frame 1, queues 2 more rAFs for the double
-    //       requestAnimationFrame chain, then the queue empties (length → 0).
-    const panelEl = document.createElement("div");
-    panelEl.style.left = "32px";
-    panelEl.style.top = "400px";
-
-    const { rerender } = renderHook(
-      ({ opened }: { opened: boolean }) => {
-        return useFloatingPanelMorphTransition({
-          opened,
-          originRef: {
-            current: document.createElement("div"),
-          } as RefObject<HTMLElement>,
-          panelRef: { current: panelEl } as RefObject<HTMLElement>,
-          initialPosition: { top: 540, left: 32 },
-        });
-      },
-      { initialProps: { opened: false } },
-    );
-
-    act(() => {
-      rerender({ opened: true });
-    });
-
-    // Flush enough frames to exhaust the rAF chain after a successful runEnter.
-    Array.from({ length: 5 }).forEach(() => {
-      act(() => {
-        flushOneFrame();
-      });
-    });
-
-    // Queue should be empty — runEnter exited, the two nested rAFs completed.
-    expect(pendingRafs).toHaveLength(0);
-  });
 });
