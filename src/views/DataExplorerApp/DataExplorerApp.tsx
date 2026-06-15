@@ -110,7 +110,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     panelPreferences.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
   const isQueryDetailsCollapsed =
     panelPreferences.queryDetails?.collapsed ?? false;
-  const isVisualizationSettingsCollapsed = panelPreferences.settings?.collapsed ?? false;
+  const isVisualizationSettingsCollapsed =
+    panelPreferences.settings?.collapsed ?? false;
 
   const setQueryDetailsOpened = useCallback(
     (next: boolean | ((prev: boolean) => boolean)): void => {
@@ -129,7 +130,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const setVisualizationSettingsOpened = useCallback(
     (next: boolean | ((prev: boolean) => boolean)): void => {
       setPanelPreferences((prev) => {
-        const current = prev.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
+        const current =
+          prev.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
         const resolved = typeof next === "function" ? next(current) : next;
         return _updatePanelPreferences(prev, "settings", { opened: resolved });
       });
@@ -273,7 +275,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
       hasAutoOpenedVisualizationSettingsRef.current = true;
     }
     wasFetchingRef.current = dataQuery.isFetching;
-  }, [dataQuery.isFetching, dataQuery.isSuccess, setVisualizationSettingsOpened]);
+  }, [
+    dataQuery.isFetching,
+    dataQuery.isSuccess,
+    setVisualizationSettingsOpened,
+  ]);
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
@@ -590,7 +596,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           });
         }}
         initialPosition={
-          panelPreferences.settings?.position ?? VISUALIZATION_SETTINGS_INITIAL_POSITION
+          panelPreferences.settings?.position ??
+          VISUALIZATION_SETTINGS_INITIAL_POSITION
         }
         width={VISUALIZATION_SETTINGS_WIDTH}
       >

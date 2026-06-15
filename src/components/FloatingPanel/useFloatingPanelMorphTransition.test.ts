@@ -97,5 +97,4 @@ describe("useFloatingPanelMorphTransition — runEnter convergence when Mantine 
     expect(result.current.animationPhase).toBe("enter");
     expect(result.current.isRendered).toBe(true);
   });
-
 });
