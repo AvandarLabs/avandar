@@ -25,6 +25,5 @@
     "**/*.less",
     "node_modules/@mantine/core/styles.css",
     "node_modules/mantine/styles/global.css"
-  ],
-  "python.languageServer": "None"
+  ]
 }

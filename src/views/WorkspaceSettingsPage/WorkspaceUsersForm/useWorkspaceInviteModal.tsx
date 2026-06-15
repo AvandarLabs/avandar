@@ -106,6 +106,11 @@ export function useWorkspaceInviteModal({
 
     modalId = modals.openConfirmModal({
       title: t`Invite a member`,
+      transitionProps: {
+        onEntered: () => {
+          fieldsRef.current?.notifyModalOpened();
+        },
+      },
       labels: {
         confirm: t`Send invite`,
         cancel: t`Cancel`,

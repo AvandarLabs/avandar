@@ -10,7 +10,10 @@
  * can write each translation back into the catalog without re-ordering
  * or losing comments.
  *
- * Run `pnpm i18n:translate-llm --help` to see the full CLI usage.
+ * Most callers should use the higher-level `pnpm i18n:update-translations`
+ * orchestrator (extract → translate → compile). Run this script directly via
+ * `pnpm vite-script scripts/i18n/translateWithLLM.ts --help` for ad-hoc /
+ * scoped runs without re-extracting or recompiling.
  *
  * Env:
  *   OPENAI_API_KEY  required. Loaded from .env.development (and, as a
@@ -203,7 +206,7 @@ export function entryMatchesScope(entry: PoEntry, scopes: string[]): boolean {
  */
 export function buildHelpText(): string {
   return [
-    "Usage: pnpm i18n:translate-llm [options]",
+    "Usage: pnpm vite-script scripts/i18n/translateWithLLM.ts [options]",
     "",
     "Translate missing Lingui catalog entries into one or more locales using",
     "the OpenAI Chat Completions API. Reads .po files from src/i18n/locales/,",
@@ -236,13 +239,14 @@ export function buildHelpText(): string {
     "",
     "Examples:",
     "  # Translate ONLY the Workspace Settings page, ONLY into Spanish.",
-    "  pnpm i18n:translate-llm --scope WorkspaceSettingsPage --locale es",
+    "  pnpm vite-script scripts/i18n/translateWithLLM.ts \\",
+    "      --scope WorkspaceSettingsPage --locale es",
     "",
     "  # Translate every empty msgstr in every locale (full run).",
-    "  pnpm i18n:translate-llm --all",
+    "  pnpm vite-script scripts/i18n/translateWithLLM.ts --all",
     "",
     "  # Dry-run Spanish translations for two scopes without writing.",
-    "  pnpm i18n:translate-llm \\",
+    "  pnpm vite-script scripts/i18n/translateWithLLM.ts \\",
     "      --scope WorkspaceSettingsPage --scope src/views/Dashboard \\",
     "      --locale es --dry-run",
     "",
@@ -442,7 +446,9 @@ export async function processLocale(args: {
   try {
     raw = await fs.readFile(poPath, "utf8");
   } catch {
-    console.warn(`  · no catalog at ${poPath}, run pnpm i18n:extract first`);
+    console.warn(
+      `  · no catalog at ${poPath}, run pnpm i18n:update-translations first`,
+    );
     return { translated: 0, remaining: 0 };
   }
   const parsed = parsePo(raw);
@@ -610,7 +616,7 @@ async function main(): Promise<void> {
     }
   }
   console.log(
-    "\nDone. Run `pnpm i18n:compile` to regenerate runtime catalogs.",
+    "\nDone. Run `pnpm exec lingui compile --typescript` to regenerate runtime catalogs (or use `pnpm i18n:update-translations` for the full extract → translate → compile pipeline).",
   );
 }
 

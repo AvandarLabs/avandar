@@ -174,10 +174,19 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               return null;
             }
             return matchLiteral(chatMsg.role, {
-              system: { role: "system", content },
-              assistant: { role: "assistant", content },
-              user: { role: "user", content },
-            } as const);
+              system: Model.make("ChatClientMessage", {
+                role: "system" as const,
+                content,
+              }),
+              assistant: Model.make("ChatClientMessage", {
+                role: "assistant" as const,
+                content,
+              }),
+              user: Model.make("ChatClientMessage", {
+                role: "user" as const,
+                content,
+              }),
+            });
           })
           .filter((message): message is ChatClientMessage.T => {
             return isNotNull(message);

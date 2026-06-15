@@ -39,11 +39,15 @@ let it drift.
   (subject: _docs(deslop): mark Phase 1 complete (pending comment
   sync)_)
 - **Last update run on**: `2026-06-05`
-- **Active rows**: 91 (95 global indices minus retired #4/#5/#6/#7
-  folded into #1 and #14 folded into #9, plus #96 added). Index
-  numbering is intentionally non-dense.
-- **Planning status**: **complete (2026-06-05).** All 91 active
-  rows have a matching `NNN-<slug>.md` plan in `docs/deslop/`. The
+- **Active rows**: 85 (96 global indices minus retired #4/#5/#6/#7
+  folded into #1, #14 folded into #9, #084..#089 folded into #083,
+  #094 relocated to Section 0, #061 relocated to Section 0, #077
+  relocated to Section 0, plus #96 added; #078 already in Section 0).
+  Index numbering is intentionally non-dense.
+- **Planning status**: **complete (2026-06-05; reshuffled 2026-06-10).**
+  All 85 active rows have a matching `NNN-<slug>.md` plan in
+  `docs/deslop/`. Section 0 (Infrastructure prerequisites) now contains
+  5 rows (#078 done, #083 in flight, #061/#077/#094 pending). The
   operator can begin Phase 2 migrations with `/deslop migrate
   <feature-slug>` or `/deslop continue`.
 
@@ -61,7 +65,8 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| 78 | `lingui-scaffold` | `refactor-078/lingui-scaffold` | 2026-06-06 | Pushed at `6b6f0c4b`. Frontend `tsc` clean, 362 frontend tests pass. Folds in #081's catalog-population portion per the operator rule. Operator opens the PR. |
+| 83 | `billing-ptrck-series` | `feature/patrick-work-vi` | 2026-06-10 | **Pre-existing branch** with open PR #237 against `develop`. Bundles folded rows #083+#084+#085+#086+#087+#088+#089. All 22 PTRCK driver commits confirmed reachable via `git merge-base --is-ancestor`. **2026-06-10 follow-on:** forward-ported billing-scope drift from `feat/ict4d-demo` onto the branch (`6f69e9d2`) — SubscriptionModule directory reorg + 7 caller import-path updates + subscription edge fn refactors (`subscriptions.routes.ts`, `hasSubscriptionPermission.ts`, `[subscriptionId].product.ts`, `[subscriptionId].seats.ts`, `create-free.ts`) + e2e billing helpers (`dismissBillingModal.ts`, `dismissDatasetLimitModal.ts`, `auth.ts` updates, `syncPaidSubscriptionForE2EHybrid.ts`, `ensureWorkspaceSubscriptionForE2E.ts`). tsc + lint clean; 64 test files / 379 tests pass. Non-billing test helpers (chatPanelFlow, dataExplorerFlow, shareModalFlow, constants.ts dataset-import additions, etc.) skipped — belong to other rows. Operator merges PR #237 when ready, then runs `/deslop complete billing-ptrck-series`. |
+| 61 | `web-offline-mode` | `refactor-061/web-offline-mode` | 2026-06-10 | PWA + service worker + React Query persistence + offline-aware hooks/components + new test-utils. tsc clean in src/, lint clean in src/, 65 test files / 377 tests pass. Caller files (Navbar, Composer, DataExplorerApp, etc.) intentionally NOT touched — each ride along with their parent feature row. `src/lib/offline/useOfflineBlocksCloudChat.ts` deferred to #062 (depends on offlineChat store). |
 
 ---
 
@@ -72,7 +77,7 @@ the durable record once the per-feature markdown has been deleted.
 
 | Feature index | Slug | Merge SHA on `develop` | Completed |
 |---|---|---|---|
-| _(none yet)_ | | | |
+| 78 | `lingui-scaffold` | `2881b0bb` (PR #242) | 2026-06-10 |
 
 ---
 
@@ -137,6 +142,43 @@ Append-only log of `/deslop update` runs.
   squash-merged into `develop` at `39d86322`. Phase 1 flipped to
   flat `complete`. Closes the last remaining diff under
   `supabase/schemas/` between `develop` and `feat/ict4d-demo`.
+- `2026-06-10` — `/deslop complete lingui-scaffold`. PR #242
+  squash-merged into `develop` at `2881b0bb`. First Phase 2
+  feature on the board. Refactor branch + worktree deleted; plan
+  file `078-lingui-scaffold.md` removed.
+- `2026-06-10` — `/deslop migrate async-dataset-import-pipeline`
+  attempted and abandoned. Worktree created off `2881b0bb`, all
+  40 listed paths ported byte-clean; `pnpm tsc` surfaced ~40+
+  errors from undocumented cross-feature imports. Five deps must
+  land first: `#061 web-offline-mode`, `#077 analytics-client-events`,
+  `#094 chat-models-catalog-regeneration`, and the `#083`-`#086`
+  PTRCK billing series. DuckDbClient scope expansion (12 files,
+  +1819/-322) also folded into #001's plan as in-scope. Worktree
+  + branch removed; row #001 stays `[ ]`. See plan file's Notes
+  section for the full sequencing implication.
+- `2026-06-10` — **inventory reshuffle + PTRCK fold + in-flight registration.**
+  Operator request: order /deslop continue so blockers come first.
+  - **Folded #083+#084+#085+#086+#087+#088+#089 into a single
+    `billing-ptrck-series` row at index #083.** All 22 PTRCK driver
+    commits confirmed reachable from `origin/feature/patrick-work-vi`
+    via `git merge-base --is-ancestor`. Plans `084..089` deleted; plan
+    `083-billing-native-free.md` renamed to `083-billing-ptrck-series.md`
+    and rewritten end-to-end. Section O of ALL_FEATURES (Billing PTRCK
+    series) retired.
+  - **Marked #083 `[~]` in-flight on `feature/patrick-work-vi`.**
+    Non-standard refactor branch (pre-existing operator branch with an
+    open PR), not a freshly-cut `refactor-NNN/<slug>`. The completion
+    procedure was annotated in the plan accordingly.
+  - **Promoted four rows to Section 0** (cross-cutting prerequisites
+    for #001 and likely other UI rows): #083 (folded billing), #061
+    `web-offline-mode`, #077 `analytics-client-events`, #094
+    `chat-models-catalog-regeneration`. The new walk order under
+    Section 0 is #078 (done), #083 (in flight), #061, #077, #094.
+    Once those merge, /deslop continue falls through to Section A
+    starting with #001.
+  - **Retired Section M** (Analytics — sole row #077 relocated).
+    Section O was already retired by the fold above.
+  - **Active row count**: 91 → 85 (six rows folded into billing-series).
 - `2026-06-05` — Session 2 validation completed.
   - Spawned an Explore agent to read all 22 spec/plan/demo-feature
     docs end-to-end. Agent confirmed all 95 inventory rows are

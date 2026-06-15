@@ -159,14 +159,30 @@ export function makeSubscriptionPlanFromPolarProduct(
     recurringInterval,
     id: polarProductId,
   } = product;
-  const firstPrice = prices[0];
-  if (!firstPrice) {
-    return undefined;
-  }
   const basePlanName = getBasePlanName(product.name);
   const featurePlan = _getFeaturePlanType(product);
 
   if (!featurePlan) {
+    return undefined;
+  }
+
+  // Free plans are native (no Polar checkout) so we don't need a Polar price
+  // to render the Free card. Polar has deprecated `LegacyRecurringProductPriceFree`
+  // and now ships some free recurring products without any price object, which
+  // would otherwise cause the product to be dropped below.
+  if (featurePlan.type === "free") {
+    return {
+      priceType: "free" as const,
+      polarProductId,
+      isArchived,
+      description: description ?? "",
+      planFullName: name,
+      featurePlan,
+    };
+  }
+
+  const firstPrice = prices[0];
+  if (!firstPrice) {
     return undefined;
   }
 

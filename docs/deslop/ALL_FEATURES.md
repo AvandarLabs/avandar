@@ -17,9 +17,31 @@
 > absorbed into row #9 (color-picker fix ships in the same commit
 > family as the chart-suite expansion — inseparable).
 >
+> **2026-06-10 reshuffle (cross-cutting prereqs).** Triggered by the
+> abandoned `/deslop migrate async-dataset-import-pipeline` attempt
+> against `develop @ 2881b0bb`, which exposed five undocumented deps
+> that block #001 from type-checking. Changes:
+>
+> - **Folded rows #083 through #089** into a single
+>   `billing-ptrck-series` row (`#083`). All 22 PTRCK driver commits
+>   confirmed reachable from `feature/patrick-work-vi`, the in-flight
+>   refactor branch.
+> - **Relocated four rows to Section 0** (cross-cutting prerequisites):
+>   the new folded `#083 billing-ptrck-series`, `#061 web-offline-mode`,
+>   `#077 analytics-client-events`, `#094 chat-models-catalog-regeneration`.
+>   Each is required by `#001 async-dataset-import-pipeline`.
+> - **Retired Section M** (Analytics — its only row moved up) and
+>   **gutted Section O** (Billing PTRCK series — all rows folded).
+> - **Dep-discovery rule.** When a future migration surfaces a
+>   previously-undocumented import dependency, the responsible row(s)
+>   get promoted to Section 0 in the same `/deslop continue` /
+>   `/deslop migrate` cycle. The inventory's top-to-bottom walk order
+>   is the authoritative migration order — `/deslop continue` should
+>   never propose a slug that is provably blocked.
+>
 > Index numbering is intentionally non-dense — folded-in row numbers
-> (#4–#7, #14) are not reused. Rows have global IDs so they can be
-> reshuffled without renumbering.
+> (#4–#7, #14, #84–#89) are not reused. Rows have global IDs so they
+> can be reshuffled without renumbering.
 >
 > The live "last analyzed commit" SHA and in-flight / completed
 > migration logs live in `STATE.md`, not here. Update both files
@@ -57,20 +79,26 @@ for those new tables exists yet.
 
 ## 0. Infrastructure prerequisites (foundational)
 
-This section sits above the feature-area sections because its rows
-are cross-cutting build/runtime prerequisites — almost every other
-row's modified UI files on `feat/ict4d-demo` import from these
-packages, so develop cannot type-check the rest of the inventory
-until they land.
+These rows are cross-cutting build/runtime prerequisites that must
+land on `develop` before the bulk of the inventory can be
+type-checked or shipped. **`/deslop continue` walks this section
+top-to-bottom and will only fall through to the feature-area
+sections (A onwards) once every row here is `[x]` or `[~]`.**
 
-Per the skill's "Group sequential dependencies adjacent" rule, the
-row physically appears here even though its category-numbering
-(global index `#78`) was assigned during Session 1 in the i18n
-section. Index numbering is non-dense by design.
+When a future migration surfaces a previously-undocumented
+dependency (e.g. a port that fails `pnpm tsc` because it imports
+from an unmigrated module), promote the responsible row(s) into
+this section. Index numbering across sections is intentionally
+non-dense — moving a row into Section 0 keeps its original global
+index.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 78 | `[~]` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — discovered during the 2026-06-06 undrift of #001: every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`, and `develop` has no `@lingui` packages installed. Migrate this row first. **In flight: `refactor-078/lingui-scaffold` at `6b6f0c4b`, 2026-06-06.** | CHECKPOINT 12 |
+| 78 | `[x] (2881b0bb)` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`. Merged via PR #242. | CHECKPOINT 12 |
+| 83 | `[~]` | **billing-ptrck-series** (folded 083+084+085+086+087+088+089) — Full PTRCK billing migration: native-free subscriptions on workspace creation, subscription permission authz, internal subscription `id` (uuid) primary key + nullable Polar fields, Polar checkout merge onto existing native-free rows, Playwright e2e coverage + native-free workspace fixture, Supabase Preview shared/ import map + edge function bundling fixes, post-rebase lint/type-check fixes, Playwright browser install docs. **Required by #001** — `useCanAddDataset` imports `SubscriptionModule` and reads `SubscriptionRead.id`. Likely required by other UI rows that consume subscription state (surface via each row's own undrift). **In flight on `feature/patrick-work-vi`** — pre-existing branch with an open PR against develop (2026-06-10). | Commits `7accd7f`, `dae6bfb`, `062659e`, `680f551`, `a8d1b38`, `be2bdeb`, `ed5b52d`, `56dddde`, `1f574f1`, `3f9f08c`, `504eb8c`, `3b2c171`, `c278a42`, `7fdff75`, `2eda2d4`, `1293836`, `c24a38c`, `0a1eb30`, `72ec020`, `331e6ae`, `5543169`, `eda9bd7` (PTRCK-011..025); migration `20260511120000_subscriptions_internal_id_pk.sql` |
+| 61 | `[~]` | **web-offline-mode** — PWA + service worker, React Query persistence (`avandar-react-query-cache`), UI gates / disabled controls when offline, offline banners. **Required by #001** — ported TSX files import from `@/lib/offline/useOfflineGate`, `@/lib/offline/useIsOnline`, `@/lib/offline/useLocalDatasetIds`, `@/components/offline/OfflineGated`, `@/components/offline/OfflineUnavailableTooltipLabel`. **In flight: `refactor-061/web-offline-mode`, 2026-06-10.** | `docs/demo-features/web-offline-mode.md`; `docs/superpowers/plans/2026-05-20-web-read-only-offline-mode-demo.md`; commits `c597869`, `7740537`, `207d422` |
+| 77 | `[ ]` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. **Required by #001** — `useSaveDataset` imports from `@/lib/analytics/analyticsClient`. | CHECKPOINT 3 + 9 + 13 |
+| 94 | `[ ]` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. **Required by #001** — `DatasetClient` imports from `shared/types/chat.types` (extended types from this row). The `Subscription*` portions of the same commits are refactors of files already covered by the folded billing series (#083 here) and ride along when that lands (no separate row). | Commits `09e1a97e`, `32ea53b6` |
 
 ## A. Data ingestion & dataset management
 
@@ -103,7 +131,8 @@ section. Index numbering is non-dense by design.
 | 19 | `[ ]` | **chat-recover-sql-without-tool-call** — When the model returns SQL in its message body but skipped the `generateSql` tool, recover the SQL and apply it anyway. | Commit `381b07d` |
 | 20 | `[ ]` | **chat-multi-dataset-clarification** — When 2+ datasets could plausibly answer a question, force a clarification asking which dataset to use before generating SQL. | Commit `2359378` |
 | 21 | `[ ]` | **chat-better-pblock-generation** — Improvements to AI-driven P-block generation for chat-in-dashboards (column resolution, viz type heuristics). | Commits `c3e63d6`, `a01db18` |
-| 94 | `[ ]` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. The `Subscription*` portions of the same commits are refactors of files already covered by billing rows #83–89 and ride along when those migrate (no separate row). | Commits `09e1a97e`, `32ea53b6` |
+
+*Row #94 `chat-models-catalog-regeneration` was relocated to Section 0 on 2026-06-10 — it is a cross-cutting prerequisite for #001 and other UI rows that consume `shared/types/chat.types`.*
 
 ## D. Chat interactive workflows — Phase 0 (privacy guardrails)
 
@@ -172,7 +201,6 @@ Phases 0-9 cumulatively land below.
 | 58 | `[ ]` | **desktop-offline-session** — `AuthClient` desktop polyfill routing through keychain-backed `DesktopAuthProvider`; cached access token survives offline relaunch; `signOut` clears both keychain entries. | CHECKPOINT 9 (desktop) |
 | 59 | `[ ]` | **desktop-bootstrap-snapshot** — `onAuthenticated` hook in `registerAuthHandlers`; first-launch fetches every syncable table into local SQLite. Idempotent. | CHECKPOINT 9 (desktop) |
 | 60 | `[ ]` | **desktop-duckdb-offline-fix** — Fixes so duckdb-wasm works correctly on the desktop offline path. | Commit `2e26626` |
-| 61 | `[ ]` | **web-offline-mode** — PWA + service worker, React Query persistence (`avandar-react-query-cache`), UI gates / disabled controls when offline, offline banners. | `docs/demo-features/web-offline-mode.md`; `docs/superpowers/plans/2026-05-20-web-read-only-offline-mode-demo.md`; commits `c597869`, `7740537`, `207d422` |
 | 62 | `[ ]` | **web-offline-webllm-chat** — Local WebLLM-based chat with multi-pass local inference. `releaseLoadedPipeline` lifecycle. E2E verification fixtures. | `docs/superpowers/plans/2026-05-20-offline-webllm-chat.md`; commits `d515040`, `2d60b41`, `8744137` |
 | 63 | `[ ]` | **offline-chat-sql-hardening** — Misc hardening on the offline-chat SQL path (validation, fallback). | `docs/offline-chat-sql-hardening.md` |
 
@@ -209,11 +237,7 @@ Phases 0-9 cumulatively land below.
 |---|---|---|---|
 | 76 | `[ ]` | **summary-view-redesign** — `DatasetSummaryView` doc-style outline with sticky TOC, one section per column with plain-language headline + type-appropriate viz (text/number/date), missing-rate `RingProgress` when nonzero, lazy `getColumnSummary` via `useIntersection` 200px margin. New `getDatasetMeta`/`getColumnSummary` on `DatasetQueryClient`. | CHECKPOINT 6 |
 
-## M. Analytics
-
-| # | Status | Feature | Sources |
-|---|---|---|---|
-| 77 | `[ ]` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. | CHECKPOINT 3 + 9 + 13 |
+*Section M (Analytics) was retired on 2026-06-10 — its only row (#77 `analytics-client-events`) was relocated to Section 0 as a cross-cutting prerequisite for #001 and any other feature emitting analytics events.*
 
 ## N. i18n / Lingui
 
@@ -229,20 +253,7 @@ rows live here.
 | 81 | `[ ]` | **frontend-lingui-wiring** — Wire remaining frontend to Lingui beyond Workspace Settings; translations populated across all 7 non-source locales for the in-scope surfaces. | Commits `c93ad08`, `c3e63d6`, `b161920`, `4f8f00f`, `efa8211` |
 | 82 | `[ ]` | **i18n-catalogs-formatter** — Pre-PR formatter applied to i18n catalogs so prettier doesn't fight regeneration. | Commit `31a166d` |
 
-## O. Billing / subscriptions (PTRCK series)
-
-This whole series only exists on `feat/ict4d-demo` — develop has no
-matching PTRCK history.
-
-| # | Status | Feature | Sources |
-|---|---|---|---|
-| 83 | `[ ]` | **billing-native-free** — Create native free subscriptions without Polar checkout; subscription permission authz; merge fetch-and-sync onto native free rows. | Commits `7accd7f`, `dae6bfb`, `062659e` |
-| 84 | `[ ]` | **billing-internal-subscription-id** — Internal subscription row id added; permission checks use internal id; nullable Polar fields. | Commits `680f551`, `a8d1b38`, `be2bdeb`, migration `20260511120000_subscriptions_internal_id_pk.sql` |
-| 85 | `[ ]` | **billing-polar-checkout-merge** — Merge Polar checkout onto existing native free subscription rows. | Commit `ed5b52d` |
-| 86 | `[ ]` | **billing-e2e-coverage** — Playwright coverage for native free + Polar checkout flows; E2E workspace seeded with native free subscription. | Commits `56dddde`, `1f574f1`, `3f9f08c`, `504eb8c` |
-| 87 | `[ ]` | **supabase-preview-shared-import-map** — Fixes Supabase Preview shared/ import map resolution + edge function bundling so the billing edge worker boots in Preview. | Commits `3b2c171`, `c278a42`, `7fdff75` |
-| 88 | `[ ]` | **billing-qa-regression-fixes** — Misc QA regressions on native free billing + edge workers (test fixtures, formatter, phantom shared/lib/types fix). | Commits `2eda2d4`, `1293836`, `c24a38c`, `0a1eb30`, `72ec020`, `331e6ae`, `5543169`, `eda9bd7` |
-| 89 | `[ ]` | **playwright-install-docs** — Document Playwright browser install for local e2e runs. | Commit `eda9bd7` |
+*Section O (Billing / subscriptions PTRCK series) was retired on 2026-06-10 — all seven rows (#083 + #084 + #085 + #086 + #087 + #088 + #089) were folded into a single `billing-ptrck-series` row now living in Section 0, and that row is in flight on `feature/patrick-work-vi`. Per the operator rule "fold inseparable features into a single migration".*
 
 ## P. Profile page
 

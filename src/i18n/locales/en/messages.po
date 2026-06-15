@@ -152,6 +152,14 @@ msgstr "Source URL"
 #~ msgid "Type"
 #~ msgstr "Type"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " access"
+msgstr " access"
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "The {chartName} cannot be displayed."
+msgstr "The {chartName} cannot be displayed."
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Allow online syncing"
@@ -224,8 +232,8 @@ msgid "Notes"
 msgstr "Notes"
 
 #: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-msgid "Datasets"
-msgstr "Datasets"
+#~ msgid "Datasets"
+#~ msgstr "Datasets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -296,6 +304,7 @@ msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "Add a line chart showing trends in {datasetName} over time"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -360,6 +369,10 @@ msgstr "← Back"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
 msgstr "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "Cannot display {chartName}"
+msgstr "Cannot display {chartName}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -587,6 +600,10 @@ msgstr "Dataset saved."
 msgid "There are no numeric columns"
 msgstr "There are no numeric columns"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " permission"
+msgstr " permission"
+
 #: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
 msgid "Discovery query failed."
 msgstr "Discovery query failed."
@@ -600,7 +617,7 @@ msgstr "Publish dashboard"
 msgid "Container max width"
 msgstr "Container max width"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Close sidebar"
 
@@ -608,6 +625,7 @@ msgstr "Close sidebar"
 msgid "Unable to delete the offline chat model from cache."
 msgstr "Unable to delete the offline chat model from cache."
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown user"
 msgstr "Unknown user"
@@ -643,6 +661,10 @@ msgstr "Range"
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "Close branch"
 msgstr "Close branch"
+
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+msgid "Enter email"
+msgstr "Enter email"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -868,6 +890,7 @@ msgstr "All columns"
 msgid "Data Summary"
 msgstr "Data Summary"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "This {resource} is currently only accessible to its owner."
@@ -1072,6 +1095,10 @@ msgstr "Voice settings"
 msgid "Used when transcribing; does not change the model download."
 msgstr "Used when transcribing; does not change the model download."
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " who also have "
+msgstr " who also have "
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
 msgstr "avg"
@@ -1178,6 +1205,7 @@ msgstr "Sign Out"
 msgid "Analytic plan"
 msgstr "Analytic plan"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
 msgstr "Unknown group"
@@ -1405,7 +1433,7 @@ msgstr "Plan branches"
 msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
 
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "Show SQL"
 
@@ -1430,6 +1458,10 @@ msgstr "Dataset name is required"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
 msgstr "Allow new {pluralEntityConfigName} to be created manually"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid ", and "
+msgstr ", and "
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -2135,6 +2167,7 @@ msgstr "Controls the default for the rest of the workspace. People without app a
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Save to dashboard"
 msgstr "Save to dashboard"
 
@@ -2163,8 +2196,12 @@ msgstr "Submit"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "See all shared items"
-msgstr "See all shared items"
+#~ msgid "See all shared items"
+#~ msgstr "See all shared items"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dashboard"
+msgstr "dashboard"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2217,8 +2254,8 @@ msgid "Symbol size column must be numeric."
 msgstr "Symbol size column must be numeric."
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Loading shared resources"
-msgstr "Loading shared resources"
+#~ msgid "Loading shared resources"
+#~ msgstr "Loading shared resources"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -2284,7 +2321,7 @@ msgid "Clarification answer"
 msgstr "Clarification answer"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
 msgstr "Generated SQL"
 
@@ -2461,6 +2498,10 @@ msgstr "Timestamp format"
 msgid "View"
 msgstr "View"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dataset"
+msgstr "dataset"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
@@ -2544,8 +2585,8 @@ msgid "Column Name"
 msgstr "Column Name"
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Nothing has been shared with you here."
-msgstr "Nothing has been shared with you here."
+#~ msgid "Nothing has been shared with you here."
+#~ msgstr "Nothing has been shared with you here."
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -2632,6 +2673,10 @@ msgstr "Open on canvas"
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach out to support."
 msgstr "The profile manager page failed to load. Please try again later or reach out to support."
+
+#: src/components/VisualizationContainer/VisualizationContainer.tsx
+msgid "The {chartName} cannot be displayed because there are missing axes or series."
+msgstr "The {chartName} cannot be displayed because there are missing axes or series."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
@@ -3138,6 +3183,10 @@ msgstr "between"
 msgid "Inactive"
 msgstr "Inactive"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "all members of "
+msgstr "all members of "
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Some data should be manually entered"
@@ -3260,7 +3309,7 @@ msgstr "Could not access the microphone."
 msgid "Dataset name must be at least 2 characters."
 msgstr "Dataset name must be at least 2 characters."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Open sidebar"
 
@@ -3312,6 +3361,10 @@ msgstr "Share this {resourceLabel}"
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select latitude column"
 msgstr "Select latitude column"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is shared with: "
+msgstr "This {resource} is shared with: "
 
 #: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -3384,6 +3437,7 @@ msgid "Edit query"
 msgstr "Edit query"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -3725,8 +3779,8 @@ msgid "Please choose a password to complete your registration"
 msgstr "Please choose a password to complete your registration"
 
 #: src/views/SharedWithMeView/SharedWithMeView.tsx
-msgid "Shared with me"
-msgstr "Shared with me"
+#~ msgid "Shared with me"
+#~ msgstr "Shared with me"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
@@ -4109,6 +4163,7 @@ msgstr "Freehand"
 msgid "Permanent link (use for QR codes)"
 msgstr "Permanent link (use for QR codes)"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4237,6 +4292,11 @@ msgstr "What are the distinct values of {pickedGroupBy} in {datasetName}?"
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 msgid "None of the above"
 msgstr "None of the above"
+
+#. placeholder {0}: capitalize(role)
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is accessible to anyone with {app} {0} permission."
+msgstr "This {resource} is accessible to anyone with {app} {0} permission."
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Amber"
@@ -4432,9 +4492,9 @@ msgid "Remove {0}"
 msgstr "Remove {0}"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/SharedWithMeView/SharedDashboardSection/SharedDashboardSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "Dashboards"
@@ -4568,7 +4628,7 @@ msgstr "This removes the user group from members and resources that use it."
 msgid "Microphone access denied"
 msgstr "Microphone access denied"
 
-#: src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx
+#: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "From your prompt:"
 
@@ -4646,6 +4706,7 @@ msgstr "Search dashboards"
 #~ msgstr "Invalid Y axis selected"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -4824,6 +4885,10 @@ msgstr "Stroke ({strokeWidth}px)"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
 msgstr "Annual"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "anyone with "
+msgstr "anyone with "
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."

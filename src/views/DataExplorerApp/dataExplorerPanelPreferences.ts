@@ -25,6 +25,14 @@ export type DataExplorerPanelPreferences = Partial<{
 export const DATA_EXPLORER_PANEL_PREFERENCES_STORAGE_KEY =
   "ava.data-explorer.panel-preferences" as const;
 
+/**
+ * Session-storage key that guards the one-time auto-open of the AI chat panel
+ * when the user first visits the Data Explorer. Must be cleared on sign-out so
+ * the panel auto-opens again on the next login.
+ */
+export const DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY =
+  "ava.data-explorer.ai-panel-auto-opened" as const;
+
 function _sanitizePosition(
   value: unknown,
 ): FloatingPanelStoredPosition | undefined {

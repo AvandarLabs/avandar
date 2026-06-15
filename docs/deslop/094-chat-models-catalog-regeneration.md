@@ -4,13 +4,16 @@
 - **Source branch**: `feat/ict4d-demo`
 - **Target branch**: `develop`
 - **Refactor branch**: `refactor-094/chat-models-catalog-regeneration`
-- **Depends on**: `none` directly (but interacts with billing rows #083–089 because `Subscription*` files are touched by the same commits — see Notes).
+- **Depends on**: `#083 billing-ptrck-series` *(soft — see Notes)*. The same source commits also touch `Subscription*` files; those portions ride along with #083, not here. **Relocated to Section 0** of `ALL_FEATURES.md` on 2026-06-10 as a cross-cutting prerequisite.
+- **Required by**: `#001 async-dataset-import-pipeline` (confirmed 2026-06-10 — `DatasetClient.ts` imports from `shared/types/chat.types`, which gains new types in this row). Likely required by other chat-touching rows in section C/D/E — surface during each consumer's undrift.
 - **Estimated PR size**: medium — generated JSON + script + helper types + ModelModule directory reorg, ~400–600 lines.
 
 ## Notes for future you
 
+- **2026-06-10 — promoted to Section 0 (cross-cutting prerequisite).** The abandoned `/deslop migrate async-dataset-import-pipeline` attempt confirmed that `DatasetClient.ts` imports types from `shared/types/chat.types` that don't exist on develop. Walk order in `ALL_FEATURES.md` is now: #078 (done) → #083 (in flight) → #061 → #077 → **#094 (this row)** → Section A onwards.
+- **Soft order dependency on #083 `billing-ptrck-series`.** The driver commits (`09e1a97e`, `32ea53b6`) touch `Subscription*` files that should ride along with the billing series migration. If #094 lands BEFORE #083 merges, the `Subscription*` deltas need to be excluded here and reconciled on the billing branch — manageable but requires care. If #083 lands FIRST (the planned order), the `Subscription*` deltas are already on develop and this row is purely the chat-models work.
 - Driver commits: `09e1a97e`, `32ea53b6`.
-- The `Subscription*` portions of these commits refactor files already covered by billing rows #083–089. **They ride along when those rows migrate, not here.** This row is strictly the chat-models catalog regeneration + ModelModule reorg.
+- The `Subscription*` portions of these commits refactor files already covered by the folded billing series (#083). **They ride along when that row's PR merges, not here.** This row is strictly the chat-models catalog regeneration + ModelModule reorg.
 - The catalog JSON is generated; don't hand-edit it. If a model needs to be added, run the regen script.
 
 ## What this feature is
