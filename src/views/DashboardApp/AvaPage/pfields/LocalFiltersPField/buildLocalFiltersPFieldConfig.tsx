@@ -13,14 +13,11 @@ export function useLocalFiltersPFieldConfig(): CustomField<
   readonly LocalFilter[]
 > {
   const { t } = useLingui();
-  return useMemo(
-    () => {
-      return {
-        label: t`Local filters (viewer-editable, this chart only)`,
-        type: "custom",
-        render: LocalFiltersPField,
-      };
-    },
-    [t],
-  );
+  return useMemo(() => {
+    return {
+      label: t`Local filters (viewer-editable, this chart only)`,
+      type: "custom",
+      render: LocalFiltersPField,
+    };
+  }, [t]);
 }

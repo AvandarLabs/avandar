@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
-import { useCallback, useMemo } from "react";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
+import { useCallback, useMemo } from "react";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -41,14 +41,11 @@ export function useVizConfigPFieldConfig(options: {
     [workspaceId, dashboardId],
   );
 
-  return useMemo(
-    () => {
-      return {
-        label: t`Visualization Settings`,
-        type: "custom",
-        render,
-      };
-    },
-    [t, render],
-  );
+  return useMemo(() => {
+    return {
+      label: t`Visualization Settings`,
+      type: "custom",
+      render,
+    };
+  }, [t, render]);
 }

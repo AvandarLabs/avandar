@@ -14,14 +14,11 @@ import {
  */
 export function useNLQueryPFieldConfig(): CustomField<NLQuery> {
   const { t } = useLingui();
-  return useMemo(
-    () => {
-      return {
-        label: t`Prompt`,
-        type: "custom",
-        render: NLQueryPField,
-      };
-    },
-    [t],
-  );
+  return useMemo(() => {
+    return {
+      label: t`Prompt`,
+      type: "custom",
+      render: NLQueryPField,
+    };
+  }, [t]);
 }

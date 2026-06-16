@@ -25,14 +25,11 @@ export function useContainerMaxWidthPFieldConfig(): CustomField<ContainerMaxWidt
     [],
   );
 
-  return useMemo(
-    () => {
-      return {
-        label: t`Container max width`,
-        type: "custom",
-        render,
-      };
-    },
-    [t, render],
-  );
+  return useMemo(() => {
+    return {
+      label: t`Container max width`,
+      type: "custom",
+      render,
+    };
+  }, [t, render]);
 }

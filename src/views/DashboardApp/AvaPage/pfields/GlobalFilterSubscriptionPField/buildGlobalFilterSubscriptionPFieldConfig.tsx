@@ -12,14 +12,11 @@ import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblo
 // eslint-disable-next-line max-len
 export function useGlobalFilterSubscriptionPFieldConfig(): CustomField<GlobalFilterSubscription> {
   const { t } = useLingui();
-  return useMemo(
-    () => {
-      return {
-        label: t`Global filters`,
-        type: "custom",
-        render: GlobalFilterSubscriptionPField,
-      };
-    },
-    [t],
-  );
+  return useMemo(() => {
+    return {
+      label: t`Global filters`,
+      type: "custom",
+      render: GlobalFilterSubscriptionPField,
+    };
+  }, [t]);
 }
