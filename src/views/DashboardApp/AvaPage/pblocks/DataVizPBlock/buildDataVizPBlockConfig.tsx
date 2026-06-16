@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
+import { useMemo } from "react";
 import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps";
@@ -57,34 +58,40 @@ export function useDataVizPBlockConfig(options: {
     useGlobalFilterSubscriptionPFieldConfig();
   const localFiltersFieldConfig = useLocalFiltersPFieldConfig();
 
-  const vizTypeOptions = VizTypes.map((vizType) => {
+  return useMemo(() => {
     return {
-      label: VizConfigs.getDisplayName(vizType),
-      value: vizType,
-    };
-  });
-
-  return {
-    label: puckDrawerLabel("Data Visualization"),
-    fields: {
-      nlQuery: nlQueryFieldConfig,
-      vizType: {
-        label: t`Visualization Type`,
-        type: "select",
-        options: vizTypeOptions,
+      label: puckDrawerLabel("Data Visualization"),
+      fields: {
+        nlQuery: nlQueryFieldConfig,
+        vizType: {
+          label: t`Visualization Type`,
+          type: "select",
+          options: VizTypes.map((vizType) => {
+            return {
+              label: VizConfigs.getDisplayName(vizType),
+              value: vizType,
+            };
+          }),
+        },
+        vizConfig: vizConfigFieldConfig,
+        globalFilterSubscription: globalFilterSubscriptionFieldConfig,
+        localFilters: localFiltersFieldConfig,
       },
-      vizConfig: vizConfigFieldConfig,
-      globalFilterSubscription: globalFilterSubscriptionFieldConfig,
-      localFilters: localFiltersFieldConfig,
-    },
-    defaultProps,
-    resolveData: (data, { changed }) => {
-      const nextProps = resolveDataVizPBlockProps({
-        props: data.props,
-        changed,
-      });
-      return { props: nextProps };
-    },
-    render: DataVizPBlock,
-  };
+      defaultProps,
+      resolveData: (data, { changed }) => {
+        const nextProps = resolveDataVizPBlockProps({
+          props: data.props,
+          changed,
+        });
+        return { props: nextProps };
+      },
+      render: DataVizPBlock,
+    };
+  }, [
+    t,
+    nlQueryFieldConfig,
+    vizConfigFieldConfig,
+    globalFilterSubscriptionFieldConfig,
+    localFiltersFieldConfig,
+  ]);
 }

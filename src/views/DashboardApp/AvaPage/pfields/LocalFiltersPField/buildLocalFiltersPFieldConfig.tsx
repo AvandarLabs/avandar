@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useMemo } from "react";
 import { LocalFiltersPField } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
@@ -12,9 +13,11 @@ export function useLocalFiltersPFieldConfig(): CustomField<
   readonly LocalFilter[]
 > {
   const { t } = useLingui();
-  return {
-    label: t`Local filters (viewer-editable, this chart only)`,
-    type: "custom",
-    render: LocalFiltersPField,
-  };
+  return useMemo(() => {
+    return {
+      label: t`Local filters (viewer-editable, this chart only)`,
+      type: "custom",
+      render: LocalFiltersPField,
+    };
+  }, [t]);
 }
