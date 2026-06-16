@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useMemo } from "react";
 import {
   NLQuery,
   NLQueryPField,
@@ -13,9 +14,14 @@ import {
  */
 export function useNLQueryPFieldConfig(): CustomField<NLQuery> {
   const { t } = useLingui();
-  return {
-    label: t`Prompt`,
-    type: "custom",
-    render: NLQueryPField,
-  };
+  return useMemo(
+    () => {
+      return {
+        label: t`Prompt`,
+        type: "custom",
+        render: NLQueryPField,
+      };
+    },
+    [t],
+  );
 }

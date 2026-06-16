@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useMemo } from "react";
 import { GlobalFilterSubscriptionPField } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField";
 import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
@@ -11,9 +12,14 @@ import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblo
 // eslint-disable-next-line max-len
 export function useGlobalFilterSubscriptionPFieldConfig(): CustomField<GlobalFilterSubscription> {
   const { t } = useLingui();
-  return {
-    label: t`Global filters`,
-    type: "custom",
-    render: GlobalFilterSubscriptionPField,
-  };
+  return useMemo(
+    () => {
+      return {
+        label: t`Global filters`,
+        type: "custom",
+        render: GlobalFilterSubscriptionPField,
+      };
+    },
+    [t],
+  );
 }

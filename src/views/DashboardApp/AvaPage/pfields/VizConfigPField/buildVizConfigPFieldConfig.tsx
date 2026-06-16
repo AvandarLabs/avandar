@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useCallback, useMemo } from "react";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
@@ -18,18 +19,36 @@ export function useVizConfigPFieldConfig(options: {
   dashboardId: DashboardId;
 }): CustomField<VizConfig> {
   const { t } = useLingui();
-  return {
-    label: t`Visualization Settings`,
-    type: "custom",
-    render: ({ value, onChange }) => {
+  const { workspaceId, dashboardId } = options;
+
+  const render = useCallback(
+    ({
+      value,
+      onChange,
+    }: {
+      value: VizConfig;
+      onChange: (value: VizConfig) => void;
+    }) => {
       return (
         <VizConfigPField
           value={value}
           onChange={onChange}
-          workspaceId={options.workspaceId}
-          dashboardId={options.dashboardId}
+          workspaceId={workspaceId}
+          dashboardId={dashboardId}
         />
       );
     },
-  };
+    [workspaceId, dashboardId],
+  );
+
+  return useMemo(
+    () => {
+      return {
+        label: t`Visualization Settings`,
+        type: "custom",
+        render,
+      };
+    },
+    [t, render],
+  );
 }
