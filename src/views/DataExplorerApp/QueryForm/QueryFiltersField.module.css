@@ -1,0 +1,7 @@
+/* Allow the header row (combinator + "+ Rule" / "+ Group" buttons) and each
+   rule row (field + operator + value + remove button) to wrap onto multiple
+   lines in narrow containers instead of overflowing. */
+.queryFiltersField :global(.ruleGroup-header),
+.queryFiltersField :global(.rule) {
+  flex-wrap: wrap;
+}
