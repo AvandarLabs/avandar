@@ -10,9 +10,10 @@ import {
 import { IconInfoCircle } from "@tabler/icons-react";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type {
-  GlobalFilterSubscription,
-  GlobalFilterSubscriptionMode,
+import {
+  DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+  type GlobalFilterSubscription,
+  type GlobalFilterSubscriptionMode,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
@@ -43,17 +44,25 @@ export function GlobalFilterSubscriptionPField({
   const { filtersById } = DashboardFilterStateManager.useState();
   const registeredFilters = Object.values(filtersById);
 
+  // Guard against Puck rendering the field before resolveData backfills the
+  // default - can happen when a block enters the store without this field
+  // (e.g. saved from the Data Explorer) and is then selected before the
+  // initial resolveData pass runs, or when undo restores that
+  // pre-resolve state.
+  const subscription = value ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION;
+
   const _setMode = (mode: GlobalFilterSubscriptionMode): void => {
     onChange({
       mode,
       // Reset the explicit subscription list when leaving "selected" so
       // future toggles start clean.
-      subscribedFilterIds: mode === "selected" ? value.subscribedFilterIds : [],
+      subscribedFilterIds:
+        mode === "selected" ? subscription.subscribedFilterIds : [],
     });
   };
 
   const _toggleFilter = (filterId: string, checked: boolean): void => {
-    const next = new Set(value.subscribedFilterIds);
+    const next = new Set(subscription.subscribedFilterIds);
     if (checked) next.add(filterId);
     else next.delete(filterId);
     onChange({
@@ -66,7 +75,7 @@ export function GlobalFilterSubscriptionPField({
     <Stack gap={6}>
       <SegmentedControl
         size="xs"
-        value={value.mode}
+        value={subscription.mode}
         onChange={(m) => {
           _setMode(m as GlobalFilterSubscriptionMode);
         }}
@@ -78,10 +87,10 @@ export function GlobalFilterSubscriptionPField({
         fullWidth
       />
       <Text size="xs" c="dimmed">
-        {modeDescriptions[value.mode]}
+        {modeDescriptions[subscription.mode]}
       </Text>
 
-      {value.mode === "selected" ?
+      {subscription.mode === "selected" ?
         registeredFilters.length === 0 ?
           <Alert
             color="blue"
@@ -110,7 +119,9 @@ export function GlobalFilterSubscriptionPField({
                         </Text>
                       </Text>
                     }
-                    checked={value.subscribedFilterIds.includes(f.filterId)}
+                    checked={subscription.subscribedFilterIds.includes(
+                      f.filterId,
+                    )}
                     onChange={(e) => {
                       _toggleFilter(f.filterId, e.currentTarget.checked);
                     }}
