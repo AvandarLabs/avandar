@@ -8,6 +8,7 @@ import {
 import { useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
+import classes from "./QueryFiltersField.module.css";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type {
   QueryFilterCombinator,
@@ -233,7 +234,10 @@ export function QueryFiltersField({
   }
 
   return (
-    <Box data-testid="query-filters-field">
+    <Box
+      data-testid="query-filters-field"
+      className={classes.queryFiltersField}
+    >
       <QueryBuilderMantine>
         <QueryBuilder
           fields={fields}
