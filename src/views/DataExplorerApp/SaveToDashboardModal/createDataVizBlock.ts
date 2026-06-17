@@ -1,4 +1,9 @@
 import { uuid } from "$/lib/uuid";
+import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+import type {
+  GlobalFilterSubscription,
+  LocalFilter,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import type {
   VizConfig,
   VizType,
@@ -34,6 +39,8 @@ export type DataVizDashboardBlock = {
     };
     vizType: VizType;
     vizConfig: VizConfig;
+    globalFilterSubscription: GlobalFilterSubscription;
+    localFilters: readonly LocalFilter[];
   };
 };
 
@@ -71,6 +78,8 @@ export function createDataVizBlock(args: {
       },
       vizType: args.vizType,
       vizConfig: args.vizConfig,
+      globalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+      localFilters: [],
     },
   };
 }
