@@ -8,12 +8,12 @@ import {
   Text,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import {
-  DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
-  type GlobalFilterSubscription,
-  type GlobalFilterSubscriptionMode,
+import type {
+  GlobalFilterSubscription,
+  GlobalFilterSubscriptionMode,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
