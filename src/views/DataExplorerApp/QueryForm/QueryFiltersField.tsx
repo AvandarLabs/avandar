@@ -234,7 +234,10 @@ export function QueryFiltersField({
   }
 
   return (
-    <Box data-testid="query-filters-field" className={classes.queryFiltersField}>
+    <Box
+      data-testid="query-filters-field"
+      className={classes.queryFiltersField}
+    >
       <QueryBuilderMantine>
         <QueryBuilder
           fields={fields}
