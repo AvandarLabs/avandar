@@ -192,7 +192,7 @@ function ManualQueryFormView({
   };
 
   return (
-    <form>
+    <div>
       <Stack px="sm">
         {pendingChange ?
           <Alert
@@ -368,6 +368,6 @@ function ManualQueryFormView({
           </Group>
         </Fieldset>
       </Stack>
-    </form>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Box, Text } from "@mantine/core";
-import { usePuck } from "@puckeditor/core";
+import { createUsePuck } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
@@ -9,6 +9,8 @@ import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSett
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+
+const usePuckSelector = createUsePuck();
 
 type Props = {
   /** Current viz config. */
@@ -43,7 +45,9 @@ export function VizConfigPField({
   workspaceId,
   dashboardId,
 }: Props): JSX.Element {
-  const { selectedItem } = usePuck();
+  const selectedItem = usePuckSelector((state) => {
+    return state.selectedItem;
+  });
   const rawSql =
     (selectedItem?.props as { nlQuery?: NLQuery } | undefined)?.nlQuery
       ?.rawSql ?? "";
