@@ -84,6 +84,11 @@ export function AreaChart({
     return applyChartStyle(chartStyle, baseXAxisProps);
   }, [chartStyle, baseXAxisProps]);
 
+  const xLabelText = chartStyle?.xAxis?.label;
+  const yLabelText = chartStyle?.yAxis?.label;
+  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
+  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
+
   const allAreas = useMemo(() => {
     return series.every((s) => {
       return s.renderAs === "area";
@@ -130,7 +135,12 @@ export function AreaChart({
       <ResponsiveContainer width="100%" height="100%">
         <RechartsAreaChart
           data={data as Array<Record<string, unknown>>}
-          margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
+          margin={{
+            top: 10,
+            right: 10,
+            bottom: hasXLabel ? 30 : 0,
+            left: hasYLabel ? 10 : 0,
+          }}
           stackOffset={stackOffset}
         >
           <defs>
@@ -168,6 +178,16 @@ export function AreaChart({
               interval="preserveStartEnd"
               minTickGap={5}
               {...styleProps.xAxisProps}
+              label={
+                hasXLabel ?
+                  {
+                    value: xLabelText,
+                    position: "insideBottom",
+                    offset: -10,
+                    fill: chartStyle?.xAxis?.labelColor,
+                  }
+                : undefined
+              }
             />
           : null}
           {styleProps.withYAxis !== false ?
@@ -176,6 +196,16 @@ export function AreaChart({
               stroke=""
               tickLine={false}
               {...styleProps.yAxisProps}
+              label={
+                hasYLabel ?
+                  {
+                    value: yLabelText,
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: chartStyle?.yAxis?.labelColor,
+                  }
+                : undefined
+              }
             />
           : null}
           {withLegend ?

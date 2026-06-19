@@ -47,16 +47,55 @@ export function ScatterChart({
 
   const isSingleSeries = series.length === 1;
   const firstSeries = series[0];
+  const xLabel =
+    isSingleSeries && firstSeries !== undefined ? firstSeries.xKey : undefined;
+  const yLabel =
+    isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
 
   return (
     <MantineScatterChart
       h={height}
       data={scatterSeries}
       dataKey={{ x: "x", y: "y" }}
-      xAxisLabel={isSingleSeries && firstSeries ? firstSeries.xKey : undefined}
-      yAxisLabel={isSingleSeries && firstSeries ? firstSeries.key : undefined}
       withLegend
       valueFormatter={formatChartNumber}
+      xAxisProps={
+        xLabel !== undefined
+          ? {
+              label: {
+                value: xLabel,
+                position: "insideBottom",
+                offset: -15,
+                fontSize: 12,
+              },
+            }
+          : undefined
+      }
+      yAxisProps={
+        yLabel !== undefined
+          ? {
+              width: 80,
+              label: {
+                value: yLabel,
+                angle: -90,
+                position: "insideLeft",
+                offset: -15,
+                fontSize: 12,
+              },
+            }
+          : undefined
+      }
+      scatterChartProps={
+        xLabel !== undefined || yLabel !== undefined
+          ? {
+              margin: {
+                bottom: xLabel !== undefined ? 40 : undefined,
+                left: yLabel !== undefined ? 30 : undefined,
+                right: yLabel !== undefined ? 5 : undefined,
+              },
+            }
+          : undefined
+      }
     />
   );
 }

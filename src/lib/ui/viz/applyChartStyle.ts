@@ -1,5 +1,6 @@
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle";
+import type { CSSProperties } from "react";
 import type {
   CartesianGridProps,
   LegendProps,
@@ -8,7 +9,6 @@ import type {
 } from "recharts";
 
 const DEFAULT_TICK_FONT_SIZE = 12;
-const DEFAULT_AXIS_LABEL_OFFSET = -10;
 
 /**
  * Default Y-axis width that fits compact-formatted ticks (`1.5M`, `999.99B`)
@@ -36,6 +36,22 @@ export type ChartStyleProps = {
   gridProps?: Omit<CartesianGridProps, "ref">;
   gridColor?: string;
   legendProps?: Omit<LegendProps, "ref">;
+  /**
+   * Mantine-native prop: triggers automatic bottom-margin so the label is
+   * visible.
+   */
+  xAxisLabel?: string;
+  /**
+   * Mantine-native prop: triggers automatic left-margin so the label is
+   * visible.
+   */
+  yAxisLabel?: string;
+  /**
+   * Passed to Mantine's `styles` prop. Used to apply axis label color via the
+   * `axisLabel` slot (shared by both x and y labels). X-axis labelColor takes
+   * priority over y-axis when both are set.
+   */
+  styles?: Partial<Record<string, CSSProperties>>;
 };
 
 /**
@@ -62,14 +78,6 @@ export function applyChartStyle(
       fontSize: DEFAULT_TICK_FONT_SIZE,
     };
   }
-  if (xAxisStyle?.label !== undefined && xAxisStyle.label !== "") {
-    xAxisProps.label = {
-      value: xAxisStyle.label,
-      position: "insideBottom",
-      offset: DEFAULT_AXIS_LABEL_OFFSET,
-      fill: xAxisStyle.labelColor,
-    };
-  }
 
   const yAxisProps: Omit<YAxisProps, "ref"> = {
     tickFormatter: _formatYAxisTick,
@@ -79,14 +87,6 @@ export function applyChartStyle(
     yAxisProps.tick = {
       fill: yAxisStyle.tickColor,
       fontSize: DEFAULT_TICK_FONT_SIZE,
-    };
-  }
-  if (yAxisStyle?.label !== undefined && yAxisStyle.label !== "") {
-    yAxisProps.label = {
-      value: yAxisStyle.label,
-      angle: -90,
-      position: "insideLeft",
-      fill: yAxisStyle.labelColor,
     };
   }
 
@@ -113,6 +113,21 @@ export function applyChartStyle(
       : "center",
   };
 
+  const xAxisLabel =
+    xAxisStyle?.label !== undefined && xAxisStyle.label !== ""
+      ? xAxisStyle.label
+      : undefined;
+  const yAxisLabel =
+    yAxisStyle?.label !== undefined && yAxisStyle.label !== ""
+      ? yAxisStyle.label
+      : undefined;
+
+  const axisLabelColor = xAxisStyle?.labelColor ?? yAxisStyle?.labelColor;
+  const styles: Partial<Record<string, CSSProperties>> | undefined =
+    axisLabelColor !== undefined
+      ? { axisLabel: { fill: axisLabelColor } }
+      : undefined;
+
   return {
     withXAxis: !(xAxisStyle?.hide ?? false),
     withYAxis: !(yAxisStyle?.hide ?? false),
@@ -121,5 +136,8 @@ export function applyChartStyle(
     gridProps,
     gridColor: gridStyle?.color,
     legendProps,
+    xAxisLabel,
+    yAxisLabel,
+    styles,
   };
 }
