@@ -119,7 +119,11 @@ export function PairSeriesFieldset({
                 padding="sm"
               >
                 <Stack gap="xs">
-                  <Group justify="space-between" wrap="nowrap" align="flex-start">
+                  <Group
+                    justify="space-between"
+                    wrap="nowrap"
+                    align="flex-start"
+                  >
                     <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
                       <Select
                         allowDeselect={false}
