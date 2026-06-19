@@ -60,41 +60,41 @@ export function ScatterChart({
       withLegend
       valueFormatter={formatChartNumber}
       xAxisProps={
-        xLabel !== undefined
-          ? {
-              label: {
-                value: xLabel,
-                position: "insideBottom",
-                offset: -15,
-                fontSize: 12,
-              },
-            }
-          : undefined
+        xLabel !== undefined ?
+          {
+            label: {
+              value: xLabel,
+              position: "insideBottom",
+              offset: -15,
+              fontSize: 12,
+            },
+          }
+        : undefined
       }
       yAxisProps={
-        yLabel !== undefined
-          ? {
-              width: 80,
-              label: {
-                value: yLabel,
-                angle: -90,
-                position: "insideLeft",
-                offset: -15,
-                fontSize: 12,
-              },
-            }
-          : undefined
+        yLabel !== undefined ?
+          {
+            width: 80,
+            label: {
+              value: yLabel,
+              angle: -90,
+              position: "insideLeft",
+              offset: -15,
+              fontSize: 12,
+            },
+          }
+        : undefined
       }
       scatterChartProps={
-        xLabel !== undefined || yLabel !== undefined
-          ? {
-              margin: {
-                bottom: xLabel !== undefined ? 40 : undefined,
-                left: yLabel !== undefined ? 30 : undefined,
-                right: yLabel !== undefined ? 5 : undefined,
-              },
-            }
-          : undefined
+        xLabel !== undefined || yLabel !== undefined ?
+          {
+            margin: {
+              bottom: xLabel !== undefined ? 40 : undefined,
+              left: yLabel !== undefined ? 30 : undefined,
+              right: yLabel !== undefined ? 5 : undefined,
+            },
+          }
+        : undefined
       }
     />
   );

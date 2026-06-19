@@ -114,19 +114,19 @@ export function applyChartStyle(
   };
 
   const xAxisLabel =
-    xAxisStyle?.label !== undefined && xAxisStyle.label !== ""
-      ? xAxisStyle.label
-      : undefined;
+    xAxisStyle?.label !== undefined && xAxisStyle.label !== "" ?
+      xAxisStyle.label
+    : undefined;
   const yAxisLabel =
-    yAxisStyle?.label !== undefined && yAxisStyle.label !== ""
-      ? yAxisStyle.label
-      : undefined;
+    yAxisStyle?.label !== undefined && yAxisStyle.label !== "" ?
+      yAxisStyle.label
+    : undefined;
 
   const axisLabelColor = xAxisStyle?.labelColor ?? yAxisStyle?.labelColor;
   const styles: Partial<Record<string, CSSProperties>> | undefined =
-    axisLabelColor !== undefined
-      ? { axisLabel: { fill: axisLabelColor } }
-      : undefined;
+    axisLabelColor !== undefined ?
+      { axisLabel: { fill: axisLabelColor } }
+    : undefined;
 
   return {
     withXAxis: !(xAxisStyle?.hide ?? false),
