@@ -45,7 +45,7 @@ export function OfflineGated({
   return (
     <Tooltip label={<OfflineUnavailableTooltipLabel />}>
       <Box
-        className={clsx(css.offlineGated, className)}
+        className={clsx(css.offlineGatedContainer, className)}
         component="span"
         display="block"
         onClickCapture={blockPointerEvent}
