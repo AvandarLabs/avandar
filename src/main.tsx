@@ -5,7 +5,6 @@ import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
 import "@mantine/charts/styles.css";
 import "@/index.css";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { RouterProvider } from "@tanstack/react-router";
 import {
   ModuleRegistry as AGGridModuleRegistry,
@@ -13,15 +12,12 @@ import {
 } from "ag-grid-community";
 import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
+import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
-import {
-  makeCacheBuster,
-  queryPersister,
-} from "@/lib/offline/queryPersister/queryPersister";
 import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
@@ -42,21 +38,9 @@ function MainWrapper() {
 
   return (
     <AvandarI18nProvider>
-      <PersistQueryClientProvider
-        client={AvaQueryClient}
-        persistOptions={{
-          persister: queryPersister,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          buster: makeCacheBuster(user?.id),
-          dehydrateOptions: {
-            shouldDehydrateQuery: (query) => {
-              return query.state.status === "success";
-            },
-          },
-        }}
-      >
+      <AvandarQueryClientProvider userId={user?.id}>
         <RouterProvider router={AvaRouter} context={context} />
-      </PersistQueryClientProvider>
+      </AvandarQueryClientProvider>
     </AvandarI18nProvider>
   );
 }
