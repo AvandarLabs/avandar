@@ -27,13 +27,8 @@ export function OfflineGated({
   children,
   className,
 }: Props): JSX.Element {
-  if (!isBlocked) {
-    return <>{children}</>;
-  }
-
   const child = Children.only(children);
-
-  if (!isValidElement(child)) {
+  if (!isBlocked || !isValidElement(child)) {
     return <>{children}</>;
   }
 
@@ -50,7 +45,7 @@ export function OfflineGated({
   return (
     <Tooltip label={<OfflineUnavailableTooltipLabel />}>
       <Box
-        className={clsx(css.gated, css.gatedInteractive, className)}
+        className={clsx(css.offlineGated, className)}
         component="span"
         display="block"
         onClickCapture={blockPointerEvent}

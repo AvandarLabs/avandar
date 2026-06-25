@@ -1,10 +1,7 @@
-.gated {
+.offlineGated {
   cursor: not-allowed;
   display: block;
   opacity: 0.45;
-  width: 100%;
-}
-
-.gatedInteractive {
   pointer-events: auto;
+  width: 100%;
 }
