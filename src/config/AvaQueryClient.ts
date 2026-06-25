@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { getIsOnline } from "@/lib/offline/useIsOnline";
+import { getIsOnline } from "@/lib/utils/browser/getIsOnline/getIsOnline";
 
 export const AvaQueryClient = new QueryClient({
   defaultOptions: {

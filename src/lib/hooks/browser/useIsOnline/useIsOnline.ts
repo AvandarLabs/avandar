@@ -21,8 +21,3 @@ function getServerSnapshot(): boolean {
 export function useIsOnline(): boolean {
   return useSyncExternalStore(subscribe, getOnlineSnapshot, getServerSnapshot);
 }
-
-/** Imperative online check for code outside React. */
-export function getIsOnline(): boolean {
-  return navigator.onLine;
-}

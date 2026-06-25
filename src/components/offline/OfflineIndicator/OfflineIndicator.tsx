@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Group, Text } from "@mantine/core";
 import { IconWifiOff } from "@tabler/icons-react";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 /**
  * Compact offline status in the app toolbar (replaces the full-width banner).

@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { notifyError } from "@ui";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 type Gate = {
   /** True when offline: wire to a Button `disabled` prop or `OfflineGated`. */

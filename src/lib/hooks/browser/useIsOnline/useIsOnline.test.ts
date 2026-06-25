@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getIsOnline, useIsOnline } from "@/lib/offline/useIsOnline";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { renderHook } from "@/test-utils";
 
 describe("useIsOnline", () => {
@@ -21,12 +21,5 @@ describe("useIsOnline", () => {
       return useIsOnline();
     });
     expect(result.current).toBe(false);
-  });
-});
-
-describe("getIsOnline", () => {
-  it("reads navigator.onLine", () => {
-    vi.stubGlobal("navigator", { onLine: false });
-    expect(getIsOnline()).toBe(false);
   });
 });
