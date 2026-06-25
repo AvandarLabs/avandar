@@ -15,10 +15,7 @@ const OFFLINE_AVAILABLE_LINK_KEYS = new Set<string>([
  */
 export function isAppLinkAvailableOffline(link: AppLink): boolean {
   const key = String(link.key);
-
-  if (OFFLINE_AVAILABLE_LINK_KEYS.has(key)) {
-    return true;
-  }
-
-  return key.startsWith("data-manager-");
+  return (
+    OFFLINE_AVAILABLE_LINK_KEYS.has(key) || key.startsWith("data-manager-")
+  );
 }

@@ -8,17 +8,12 @@ import { useIsOnline } from "@/lib/offline/useIsOnline";
  */
 export function OfflineIndicator(): JSX.Element | null {
   const isOnline = useIsOnline();
-
-  if (isOnline) {
-    return null;
-  }
-
-  return (
-    <Group gap={4} wrap="nowrap" aria-live="polite">
-      <IconWifiOff size={14} stroke={1.5} aria-hidden />
-      <Text size="xs" c="dimmed" fw={500}>
-        <Trans>You are offline</Trans>
-      </Text>
-    </Group>
-  );
+  return isOnline ? null : (
+      <Group gap={4} wrap="nowrap" aria-live="polite">
+        <IconWifiOff size={14} stroke={1.5} aria-hidden />
+        <Text size="xs" c="dimmed" fw={500}>
+          <Trans>You are offline</Trans>
+        </Text>
+      </Group>
+    );
 }

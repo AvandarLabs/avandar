@@ -12,10 +12,7 @@ export const AvaQueryClient = new QueryClient({
       },
       gcTime: 24 * 60 * 60 * 1000,
       retry: (failureCount: number) => {
-        if (!getIsOnline()) {
-          return false;
-        }
-        return failureCount < 1;
+        return getIsOnline() ? failureCount < 1 : false;
       },
       networkMode: "offlineFirst",
     },

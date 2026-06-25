@@ -7,8 +7,5 @@ export const OFFLINE_UNCACHED_MESSAGE =
  * when online so callers fall back to the original error.
  */
 export function formatOfflineQueryError(): string | undefined {
-  if (navigator.onLine) {
-    return undefined;
-  }
-  return OFFLINE_UNCACHED_MESSAGE;
+  return navigator.onLine ? undefined : OFFLINE_UNCACHED_MESSAGE;
 }
