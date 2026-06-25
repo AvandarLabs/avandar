@@ -4,11 +4,10 @@ import clsx from "clsx";
 import { Children, cloneElement, isValidElement } from "react";
 import css from "@/components/offline/OfflineGated/OfflineGated.module.css";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import type { MouseEvent, ReactElement, ReactNode } from "react";
 
 type Props = {
-  /** When true, the child is grayed out and shows the offline tooltip. */
-  isBlocked: boolean;
   children: ReactNode;
   className?: string;
 };
@@ -19,16 +18,15 @@ function blockPointerEvent(event: MouseEvent): void {
 }
 
 /**
- * Wraps a single interactive child with muted styling and the standard
- * offline-unavailable tooltip when blocked.
+ * Wraps a single interactive child with muted styling and the
+ * offline-unavailable tooltip when the browser is offline. Pass-through
+ * (no wrapper) when online. Self-contained: callers do not pass any
+ * offline state in.
  */
-export function OfflineGated({
-  isBlocked,
-  children,
-  className,
-}: Props): JSX.Element {
+export function OfflineGated({ children, className }: Props): JSX.Element {
+  const isOnline = useIsOnline();
   const child = Children.only(children);
-  if (!isBlocked || !isValidElement(child)) {
+  if (isOnline || !isValidElement(child)) {
     return <>{children}</>;
   }
 

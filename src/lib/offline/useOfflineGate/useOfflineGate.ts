@@ -3,8 +3,14 @@ import { notifyError } from "@ui";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 type Gate = {
-  /** True when offline: wire to a Button `disabled` prop or `OfflineGated`. */
+  /**
+   * True when offline. Wire this to a Button's `disabled` prop or other
+   * offline-aware UI that needs a boolean. For wrapping a child in the
+   * muted-and-tooltip-on-hover treatment, use `<OfflineGated>` directly —
+   * it reads the offline state itself.
+   */
   isBlocked: boolean;
+
   /**
    * Wrap an onClick handler so it short-circuits with a toast when offline.
    */
@@ -13,9 +19,9 @@ type Gate = {
 
 /**
  * Returns an `isBlocked` flag for offline-aware UI plus a `guard` wrapper
- * that short-circuits an onClick handler and toasts when offline. Use
- * `isBlocked` to drive `<OfflineGated>` or a Button `disabled` prop, and
- * wrap any onClick that should not run offline with `guard(...)`.
+ * that short-circuits an onClick handler and toasts when offline. Wrap
+ * any onClick that should not run offline with `guard(...)`, and use
+ * `isBlocked` for `disabled` props or conditional rendering.
  */
 export function useOfflineGate(): Gate {
   const { t } = useLingui();
@@ -24,7 +30,7 @@ export function useOfflineGate(): Gate {
 
   return {
     isBlocked: !isOnline,
-    guard: ((fn) => {
+    guard: (fn) => {
       return ((...args) => {
         if (!navigator.onLine) {
           notifyError(offlineToastMessage);
@@ -32,6 +38,6 @@ export function useOfflineGate(): Gate {
         }
         return fn(...args);
       }) as typeof fn;
-    }) as Gate["guard"],
+    },
   };
 }
