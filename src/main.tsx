@@ -18,7 +18,10 @@ import { AvaRouter } from "@/config/AvaRouter";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
-import { makeCacheBuster, queryPersister } from "@/lib/offline/queryPersister";
+import {
+  makeCacheBuster,
+  queryPersister,
+} from "@/lib/offline/queryPersister/queryPersister";
 import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 

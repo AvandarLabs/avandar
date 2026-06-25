@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeCacheBuster } from "@/lib/offline/queryPersister";
+import { makeCacheBuster } from "@/lib/offline/queryPersister/queryPersister";
 
 describe("makeCacheBuster", () => {
   it("includes user id in the buster", () => {

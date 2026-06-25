@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AppLinks } from "@/config/AppLinks";
-import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline";
+import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline/isAppLinkAvailableOffline";
 
 describe("isAppLinkAvailableOffline", () => {
   it("allows core read-only workspace apps", () => {
