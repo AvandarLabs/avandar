@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { makeCacheBuster } from "@/components/providers/AvandarQueryClientProvider/queryPersister";
+import { makeCacheBuster } from "@/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister";
+import type { User } from "$/models/User/User";
 
 describe("makeCacheBuster", () => {
   it("includes user id in the buster", () => {
-    expect(makeCacheBuster("user-123")).toContain("user-123");
+    expect(makeCacheBuster("user-123" as User.Id)).toContain("user-123");
   });
 
   it("uses anon when user id is undefined", () => {

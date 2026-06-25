@@ -1,7 +1,36 @@
+import { createContext, useContext } from "react";
 import { render as renderReact } from "@testing-library/react";
 import { TestProviders } from "./TestProviders";
 import type { RenderOptions, RenderResult } from "@testing-library/react";
-import type { ReactElement, ReactNode } from "react";
+import type { ComponentType, ReactElement, ReactNode } from "react";
+
+const ExtraWrapperContext = createContext<ComponentType<{
+  children: ReactNode;
+}> | null>(null);
+
+/**
+ * Stable wrapper component nesting an optional caller-supplied
+ * `ExtraWrapper` (read from React context, since RTL only accepts a
+ * single `wrapper`) inside the always-required `TestProviders`.
+ * Defined at module scope so React sees a stable component type
+ * across every `render()` call, instead of remounting a fresh
+ * anonymous component each time.
+ */
+function RenderWithWrappers({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
+  const ExtraWrapper = useContext(ExtraWrapperContext);
+  if (ExtraWrapper === null) {
+    return <TestProviders>{children}</TestProviders>;
+  }
+  return (
+    <TestProviders>
+      <ExtraWrapper>{children}</ExtraWrapper>
+    </TestProviders>
+  );
+}
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -19,21 +48,16 @@ import type { ReactElement, ReactNode } from "react";
  */
 export function render(
   ui: ReactElement,
-  options?: RenderOptions,
+  options: RenderOptions = {},
 ): RenderResult {
-  const { wrapper: ExtraWrapper, ...rest } = options ?? {};
-  const Wrapper =
-    ExtraWrapper === undefined ? TestProviders : (
-      ({ children }: { children: ReactNode }): JSX.Element => {
-        return (
-          <TestProviders>
-            <ExtraWrapper>{children}</ExtraWrapper>
-          </TestProviders>
-        );
-      }
-    );
-  return renderReact(ui, {
-    wrapper: Wrapper,
-    ...rest,
-  });
+  const { wrapper: ExtraWrapper, ...rest } = options;
+  return renderReact(
+    <ExtraWrapperContext.Provider value={ExtraWrapper ?? null}>
+      {ui}
+    </ExtraWrapperContext.Provider>,
+    {
+      wrapper: RenderWithWrappers,
+      ...rest,
+    },
+  );
 }

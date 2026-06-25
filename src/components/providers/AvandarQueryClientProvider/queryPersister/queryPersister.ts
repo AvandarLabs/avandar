@@ -1,5 +1,6 @@
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { del, get, set } from "idb-keyval";
+import type { User } from "$/models/User/User";
 
 const STORE_KEY = "avandar-react-query-cache";
 
@@ -46,7 +47,7 @@ export const queryPersister = createAsyncStoragePersister({
  * Includes the user id so two users on the same browser do not read each
  * other's cached data.
  */
-export function makeCacheBuster(userId: string | undefined): string {
+export function makeCacheBuster(userId: User.Id | undefined): string {
   const appVersion = import.meta.env.VITE_APP_VERSION ?? "dev";
   return `${CACHE_SCHEMA_VERSION}:${appVersion}:${userId ?? "anon"}`;
 }
