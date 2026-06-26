@@ -1,10 +1,9 @@
 import { createServiceClient } from "@clients";
 import { WithQueryHooks, withQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
-import { isDefined } from "@utils";
+import { isDefined, promiseMap } from "@utils";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { promiseMap } from "@/lib/utils/promises";
 import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 import type { ServiceClient } from "@clients";
 import type { WithLogger } from "@logger";

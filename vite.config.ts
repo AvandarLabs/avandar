@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -16,6 +17,13 @@ const whisperLibmainPath = path.join(
   "node_modules/@timur00kh/whisper.wasm/dist/libmain-D9-QM3iM.mjs",
 );
 
+// Wraps `react()` with the Lingui macro babel plugin. This is required:
+// Lingui macros (<Trans>, t``, msg``, plural()) are compile-time transforms
+// that must run inside React's babel pipeline. Registering
+// `@lingui/babel-plugin-lingui-macro` as a standalone Vite plugin would not
+// see JSX/TSX, so the macros would survive into the bundle and crash at
+// runtime. Do not register `react()` separately; always use this wrapper so
+// both the test and prod plugin arrays below share one configured pipeline.
 const reactWithLinguiMacro = () => {
   return react({
     babel: {
@@ -68,7 +76,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins:
       mode === "test" ?
-        [reactWithLinguiMacro()]
+        [reactWithLinguiMacro(), lingui()]
       : [
           TanStackRouterVite({
             target: "react",
@@ -79,6 +87,7 @@ export default defineConfig(({ mode }) => {
             generatedRouteTree: "src/routeTree.gen.ts",
           }),
           reactWithLinguiMacro(),
+          lingui(),
           eslintPlugin(),
           nodePolyfills(),
           VitePWA({

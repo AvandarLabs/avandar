@@ -7,12 +7,12 @@ import {
   expectPaidPolarSubscription,
 } from "./helpers/subscriptionAssertions";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { syncPaidSubscriptionForE2EHybrid } from "./helpers/syncPaidSubscriptionForE2EHybrid";
 import { LONG_WAIT } from "./helpers/timeouts";
+import { upsertPaidSubscriptionForE2E } from "./helpers/upsertPaidSubscriptionForE2E";
 import {
   beginPolarCheckoutWait,
   createWorkspaceViaNavbar,
-  finishHybridPolarPaidCheckout,
+  finishPolarPaidCheckoutForE2E,
   getBillingPlanModal,
   selectPlanFromBillingModal,
   selectPlanFromSettingsBilling,
@@ -132,13 +132,13 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      const checkoutParams = await finishHybridPolarPaidCheckout({
+      const checkoutParams = await finishPolarPaidCheckoutForE2E({
         page,
         ...polarWait,
       });
 
       const admin = createSupabaseAdminClient();
-      await syncPaidSubscriptionForE2EHybrid({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -234,13 +234,13 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      const checkoutParams = await finishHybridPolarPaidCheckout({
+      const checkoutParams = await finishPolarPaidCheckoutForE2E({
         page,
         ...polarWait,
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2EHybrid({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -331,13 +331,13 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      const checkoutParams = await finishHybridPolarPaidCheckout({
+      const checkoutParams = await finishPolarPaidCheckoutForE2E({
         page,
         ...polarWait,
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2EHybrid({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,
@@ -443,13 +443,13 @@ test.describe("workspace billing", () => {
         planHeading: STARTER_PLAN_HEADING,
       });
 
-      const checkoutParams = await finishHybridPolarPaidCheckout({
+      const checkoutParams = await finishPolarPaidCheckoutForE2E({
         page,
         ...polarWait,
         expectMissingPolarSubscriptionId: true,
       });
 
-      await syncPaidSubscriptionForE2EHybrid({
+      await upsertPaidSubscriptionForE2E({
         supabaseAdminClient: admin,
         workspaceId: checkoutParams.workspaceId,
         userId: checkoutParams.userId,

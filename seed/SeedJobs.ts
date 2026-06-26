@@ -1,4 +1,4 @@
-import { promiseMap } from "@/lib/utils/promises";
+import { promiseMap } from "@utils";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { GenericSeedJob } from "scripts/SeedRunner";

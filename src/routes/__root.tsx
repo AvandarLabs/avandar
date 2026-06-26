@@ -1,8 +1,7 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import { AppI18nProvider } from "@/i18n/AppI18nProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 /**
@@ -15,9 +14,7 @@ export const Route = createRootRouteWithContext<AvaRouterRootContext>()({
 function RouterRootComponent() {
   return (
     <AvandarUiProvider>
-      <AppI18nProvider>
-        <Outlet />
-      </AppI18nProvider>
+      <Outlet />
       {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
         <>
           <TanStackRouterDevtools />

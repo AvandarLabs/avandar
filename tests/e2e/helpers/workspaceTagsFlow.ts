@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
@@ -50,8 +50,12 @@ export async function assignWorkspaceTagToMember(options: {
   await expect(drawer).toBeVisible({ timeout: LONG_WAIT });
 
   const tagsField = drawer.getByLabel("User groups");
-  await tagsField.click();
-  await page.getByRole("option", { name: tagName }).click();
+  await expect(async () => {
+    await tagsField.click();
+    const tagOption = page.getByRole("option", { name: tagName });
+    await expect(tagOption).toBeVisible({ timeout: SHORT_WAIT });
+    await tagOption.click();
+  }).toPass({ timeout: LONG_WAIT });
   await page.keyboard.press("Escape");
   await drawer.getByRole("button", { name: "Save changes" }).click();
 

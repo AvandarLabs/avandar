@@ -2,13 +2,20 @@ import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useEffect, useState } from "react";
-import {
-  shouldCloseBillingSetupModal,
-  shouldOpenBillingSetupModal,
-} from "@/components/layouts/RootLayout/useRootWorkspaceChecks/workspaceBillingSetup";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+
+function _shouldOpenBillingSetupModal(options: {
+  subscription: SubscriptionRead | undefined;
+  isInCheckoutRoute: boolean;
+}): boolean {
+  return options.isInCheckoutRoute ? false : (
+      SubscriptionModule.shouldPromptForBillingSetup(options.subscription)
+    );
+}
 
 /**
  * Hook to ensure that the workspace has a billing setup.
@@ -32,7 +39,7 @@ export function useEnsureWorkspaceBilling(): void {
     // we use queue microtask to ensure that the Mantine ModalsProvider is
     // ready before opening a modal
     queueMicrotask(() => {
-      const openBillingModal = shouldOpenBillingSetupModal({
+      const openBillingModal = _shouldOpenBillingSetupModal({
         subscription,
         isInCheckoutRoute,
       });
@@ -60,11 +67,9 @@ export function useEnsureWorkspaceBilling(): void {
       }
     });
 
-    const closeBillingModal = shouldCloseBillingSetupModal({
-      subscription,
-    });
-
-    if (closeBillingModal && modalId) {
+    const hasEntitlements =
+      SubscriptionModule.doesSubscriptionGrantEntitlements(subscription);
+    if (hasEntitlements && modalId) {
       modals.close(modalId);
       setModalId(undefined);
     }

@@ -5,6 +5,7 @@ import {
   makeIdLookupMap,
   makeIdLookupRecord,
   objectEntries,
+  promiseFlatMap,
   prop,
   sqlTemplate,
   where,
@@ -16,7 +17,6 @@ import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigCli
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { promiseFlatMap } from "@/lib/utils/promises";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";

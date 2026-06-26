@@ -1,6 +1,6 @@
 import { BasicPlanConfig, FreePlanConfig } from "$/config/FeaturePlansConfig";
 import { describe, expect, it } from "vitest";
-import { resolvePlanSelectAction } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/planSelectAction";
+import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UUID } from "@utils/types/common.types";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
@@ -62,10 +62,10 @@ function _subscription(
   };
 }
 
-describe("resolvePlanSelectAction", () => {
+describe("getBillingActionFromSelectedPlan", () => {
   it("creates native free for new workspaces", () => {
     expect(
-      resolvePlanSelectAction({
+      getBillingActionFromSelectedPlan({
         currentSubscription: undefined,
         currentSubscribedPlan: undefined,
         selectedPlan: FREE_PLAN,
@@ -84,7 +84,7 @@ describe("resolvePlanSelectAction", () => {
     });
 
     expect(
-      resolvePlanSelectAction({
+      getBillingActionFromSelectedPlan({
         currentSubscription,
         currentSubscribedPlan: STARTER_PLAN,
         selectedPlan: FREE_PLAN,
@@ -94,7 +94,7 @@ describe("resolvePlanSelectAction", () => {
 
   it("creates native free when the existing row is canceled", () => {
     expect(
-      resolvePlanSelectAction({
+      getBillingActionFromSelectedPlan({
         currentSubscription: _subscription({
           subscriptionStatus: "canceled",
           polarSubscriptionId:
@@ -108,7 +108,7 @@ describe("resolvePlanSelectAction", () => {
 
   it("returns billing_error for inconsistent paid rows without Polar id", () => {
     expect(
-      resolvePlanSelectAction({
+      getBillingActionFromSelectedPlan({
         currentSubscription: _subscription({
           featurePlanType: "basic",
           subscriptionStatus: "active",
@@ -121,7 +121,7 @@ describe("resolvePlanSelectAction", () => {
 
   it("uses polar checkout for paid upgrades from native free", () => {
     expect(
-      resolvePlanSelectAction({
+      getBillingActionFromSelectedPlan({
         currentSubscription: _subscription(),
         currentSubscribedPlan: FREE_PLAN,
         selectedPlan: STARTER_PLAN,

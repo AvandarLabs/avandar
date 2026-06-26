@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { ChatSyntaxHighlighterRouter } from "./MarkdownTextPart";
 

@@ -43,14 +43,12 @@ export function usePaidChoices(): readonly SegmentedControlItem[] {
   ];
 }
 
-/** Checks whether a value is a valid free-plan variant identifier. */
 export function isValidFreePlanVariant(
   choice: string,
 ): choice is FreePlanVariants {
   return isOneOf(choice, FREE_CHOICE_VALUES);
 }
 
-/** Checks whether a value is a valid paid-plan variant identifier. */
 export function isValidPaidPlanVariant(
   choice: string,
 ): choice is PaidPlanVariants {
@@ -167,9 +165,10 @@ export function makeSubscriptionPlanFromPolarProduct(
   }
 
   // Free plans are native (no Polar checkout) so we don't need a Polar price
-  // to render the Free card. Polar has deprecated `LegacyRecurringProductPriceFree`
-  // and now ships some free recurring products without any price object, which
-  // would otherwise cause the product to be dropped below.
+  // to render the Free card. Polar has deprecated
+  // `LegacyRecurringProductPriceFree` and now ships some free recurring
+  // products without any price object, which would otherwise cause the
+  // product to be dropped below.
   if (featurePlan.type === "free") {
     return {
       priceType: "free" as const,

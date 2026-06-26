@@ -1,5 +1,5 @@
 import { notifyError } from "@ui";
-import { assertIsDefined, prop, where } from "@utils";
+import { assertIsDefined, promiseMap, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { DEFAULT_PUBLISH_SLICE } from "$/models/Dashboard/PublishSliceConfig";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
@@ -21,7 +21,6 @@ import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
-import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardPublishConfig } from "$/models/Dashboard/PublishSliceConfig";

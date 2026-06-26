@@ -3,7 +3,7 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-type SyncPaidSubscriptionForE2EHybridOptions = {
+type UpsertPaidSubscriptionForE2EOptions = {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
   userId: string;
@@ -12,17 +12,25 @@ type SyncPaidSubscriptionForE2EHybridOptions = {
   checkoutEmail?: string;
 };
 
-type SyncPaidSubscriptionForE2EHybridResult = {
+type UpsertPaidSubscriptionForE2EResult = {
   polarSubscriptionId: string;
 };
 
 /**
- * Upserts a paid subscription row after hybrid Polar checkout UI steps.
- * Uses a synthetic Polar subscription id (not revocable in Polar sandbox).
+ * Upserts a paid subscription row after the e2e flow has driven Polar's
+ * hosted checkout UI for real (assertions on the redirect, Stripe card
+ * iframe, etc.). The DB write here replaces Polar's
+ * `subscription.created` webhook, which the e2e cannot reach: Polar
+ * sandbox's billing-address comboboxes are not automatable today (see
+ * the ROADBLOCK comment in `workspaceBillingFlow.ts` for the full
+ * explanation).
+ *
+ * The synthetic Polar subscription id this helper generates is not
+ * revocable in Polar sandbox, so cleanup is best-effort.
  */
-export async function syncPaidSubscriptionForE2EHybrid(
-  options: SyncPaidSubscriptionForE2EHybridOptions,
-): Promise<SyncPaidSubscriptionForE2EHybridResult> {
+export async function upsertPaidSubscriptionForE2E(
+  options: UpsertPaidSubscriptionForE2EOptions,
+): Promise<UpsertPaidSubscriptionForE2EResult> {
   const {
     supabaseAdminClient,
     workspaceId,
@@ -89,6 +97,8 @@ export async function syncPaidSubscriptionForE2EHybrid(
     );
   }
 
+  // Direct DB write substituting for Polar's `subscription.created`
+  // webhook, which we cannot wait for in e2e (see block comment above).
   const { error: insertError } = await supabaseAdminClient
     .from("subscriptions")
     .insert(polarFields);

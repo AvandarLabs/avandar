@@ -2,7 +2,7 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
-export type PlanSelectAction =
+export type BillingAction =
   | { type: "create_native_free" }
   | { type: "polar_checkout" }
   | { type: "change_plan" }
@@ -11,11 +11,11 @@ export type PlanSelectAction =
 /**
  * Resolves which billing action the plan card should take for a selection.
  */
-export function resolvePlanSelectAction(options: {
+export function getBillingActionFromSelectedPlan(options: {
   currentSubscription: SubscriptionRead | undefined;
   currentSubscribedPlan: SubscriptionPlan | undefined;
   selectedPlan: SubscriptionPlan;
-}): PlanSelectAction {
+}): BillingAction {
   const { currentSubscription, currentSubscribedPlan, selectedPlan } = options;
 
   if (selectedPlan.priceType === "free") {

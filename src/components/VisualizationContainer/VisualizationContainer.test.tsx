@@ -1,6 +1,6 @@
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { render, screen } from "@/test-utils";
 import type { UnknownDataFrame } from "@utils";

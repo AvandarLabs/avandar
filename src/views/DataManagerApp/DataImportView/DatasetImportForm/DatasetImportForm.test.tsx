@@ -4,8 +4,8 @@ import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { fireEvent, render, screen } from "@/test-utils";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { DatasetImportForm } from "./DatasetImportForm";
 import type {
   CsvDataSourceMetadata,

@@ -12,6 +12,15 @@ export type SubscriptionId = UUID<"Subscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
 export type SubscriptionPermission = "can_add_datasets" | "can_invite_users";
 
+/**
+ * Workspace feature plan resolution. `no_subscription` means the workspace
+ * has no `subscriptions` row yet; the UI must redirect or block on this
+ * state because there's no plan to gate against.
+ */
+export type ResolvedFeaturePlanType =
+  | { type: "plan"; featurePlanType: FeaturePlanType }
+  | { type: "no_subscription" };
+
 export type SubscriptionRead = {
   /** Primary key for this subscription row in Avandar. */
   id: SubscriptionId;

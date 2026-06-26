@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { OfflineChatDownloadIndicator } from "./OfflineChatDownloadIndicator";
 import type { OfflineChatManagerStatus } from "@/lib/offlineChat/OfflineChatResourceManager";

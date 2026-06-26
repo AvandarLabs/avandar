@@ -9,7 +9,7 @@
  * "changing a config setting updates what the chart renders".
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";

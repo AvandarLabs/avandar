@@ -4,10 +4,11 @@ import {
   FreePlanLimitsConfig,
   PremiumPlanLimitsConfig,
 } from "$/config/FeaturePlansConfig.ts";
-import {
+import type {
   FeaturePlanType,
   PolarCustomerId,
   PolarProductId,
+  ResolvedFeaturePlanType,
   SubscriptionId,
   SubscriptionPermission,
   SubscriptionPolarId,
@@ -45,37 +46,39 @@ export const SubscriptionModule = {
     subscriptionFound: boolean;
     isWorkspaceMember: boolean;
   }): boolean => {
-    if (!options.subscriptionFound) {
+    if (!options.subscriptionFound || !options.isWorkspaceMember) {
       return false;
     }
-
-    if (!options.isWorkspaceMember) {
-      return false;
-    }
-
     return true;
   },
 
   /**
-   * Whether a subscription status grants paid/free plan entitlements.
+   * Whether this subscription state grants the workspace its plan
+   * entitlements.
+   *
+   * "Entitlements" is the SaaS-billing term for the features and numeric
+   * caps a subscription unlocks. In our `subscriptions` row those caps
+   * live in `max_seats_allowed`, `max_datasets_allowed`,
+   * `max_dashboards_allowed`, and `max_shareable_dashboards_allowed`;
+   * the `feature_plan_type` enum is just the human label they map to.
+   * This predicate decides whether those stored caps actually apply
+   * (`active`/`trialing`) or whether the workspace should be treated as
+   * `free` regardless of the row's label (every other status).
+   *
+   * Accepts a raw status, the full subscription row, or `undefined`
+   * (no subscription yet → no entitlements).
    */
-  isEntitlementActiveStatus: (status: SubscriptionStatus): boolean => {
-    return status === "active" || status === "trialing";
-  },
-
-  /**
-   * Whether the subscription row should grant workspace feature entitlements.
-   */
-  grantsWorkspaceEntitlements: (
-    subscription: Pick<SubscriptionRead, "subscriptionStatus"> | undefined,
+  doesSubscriptionGrantEntitlements: (
+    input:
+      | SubscriptionStatus
+      | Pick<SubscriptionRead, "subscriptionStatus">
+      | undefined,
   ): boolean => {
-    if (subscription === undefined) {
+    if (input === undefined) {
       return false;
     }
-
-    return SubscriptionModule.isEntitlementActiveStatus(
-      subscription.subscriptionStatus,
-    );
+    const status = typeof input === "string" ? input : input.subscriptionStatus;
+    return status === "active" || status === "trialing";
   },
 
   /**
@@ -84,7 +87,26 @@ export const SubscriptionModule = {
   shouldPromptForBillingSetup: (
     subscription: SubscriptionRead | undefined,
   ): boolean => {
-    return !SubscriptionModule.grantsWorkspaceEntitlements(subscription);
+    return !SubscriptionModule.doesSubscriptionGrantEntitlements(subscription);
+  },
+
+  /**
+   * Resolves the workspace's effective feature plan. Returns
+   * `no_subscription` when the row is missing (UI should redirect), and
+   * collapses inactive/canceled paid rows to `free` so feature gates stay
+   * conservative when entitlements lapse.
+   */
+  resolveFeaturePlanTypeForWorkspace: (options: {
+    subscription: SubscriptionRead | undefined;
+  }): ResolvedFeaturePlanType => {
+    const { subscription } = options;
+    if (subscription === undefined) {
+      return { type: "no_subscription" };
+    }
+    if (!SubscriptionModule.doesSubscriptionGrantEntitlements(subscription)) {
+      return { type: "plan", featurePlanType: "free" };
+    }
+    return { type: "plan", featurePlanType: subscription.featurePlanType };
   },
 
   /**
@@ -96,7 +118,7 @@ export const SubscriptionModule = {
     maxSeatsAllowed: number;
     maxDatasetsAllowed: number | undefined;
   } => {
-    if (SubscriptionModule.grantsWorkspaceEntitlements(subscription)) {
+    if (SubscriptionModule.doesSubscriptionGrantEntitlements(subscription)) {
       return {
         maxSeatsAllowed: subscription.maxSeatsAllowed,
         maxDatasetsAllowed: subscription.maxDatasetsAllowed,
@@ -135,15 +157,10 @@ export const SubscriptionModule = {
         >
       | undefined,
   ): boolean => {
-    if (subscription === undefined) {
-      return true;
-    }
-
-    if (subscription.subscriptionStatus === "canceled") {
-      return true;
-    }
-
-    return false;
+    return (
+      subscription === undefined ||
+      subscription.subscriptionStatus === "canceled"
+    );
   },
 
   /**
@@ -163,6 +180,12 @@ export const SubscriptionModule = {
 
   /**
    * DB fields for insert/update when creating a native free subscription.
+   *
+   * Lives on `SubscriptionModule` (not `SubscriptionParsers`) because this
+   * function is called from Supabase edge functions running on Deno, and
+   * `SubscriptionParsers` still imports from src/ paths that are not
+   * Deno-compatible. Keep this Deno-safe: depend only on
+   * `FeaturePlansConfig`, `database.types`, and pure helpers.
    */
   buildNativeFreeFieldsForDB: (options: {
     workspaceId: SubscriptionRead["workspaceId"];
@@ -209,17 +232,15 @@ export const SubscriptionModule = {
     subscription: SubscriptionRead | undefined;
     numDatasetsInWorkspace: number;
   }): boolean => {
-    if (subscription === undefined) {
-      return false;
+    if (subscription) {
+      const { maxDatasetsAllowed } =
+        SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+      return (
+        maxDatasetsAllowed === undefined ||
+        numDatasetsInWorkspace < maxDatasetsAllowed
+      );
     }
-
-    const { maxDatasetsAllowed } =
-      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
-
-    if (maxDatasetsAllowed === undefined) {
-      return true;
-    }
-    return numDatasetsInWorkspace < maxDatasetsAllowed;
+    return false;
   },
 
   /**
@@ -236,16 +257,19 @@ export const SubscriptionModule = {
     subscription: SubscriptionRead | undefined;
     numMembersInWorkspace: number;
   }): boolean => {
-    if (subscription === undefined) {
-      return false;
+    if (subscription) {
+      const { maxSeatsAllowed } =
+        SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+      return numMembersInWorkspace < maxSeatsAllowed;
     }
-
-    const { maxSeatsAllowed } =
-      SubscriptionModule.getEffectiveEntitlementLimits(subscription);
-
-    return numMembersInWorkspace < maxSeatsAllowed;
+    return false;
   },
 
+  /**
+   * Returns used, max, and remaining seat counts for billing UI. Returns
+   * `undefined` for `maxSeats` / `remainingSeats` when no subscription row
+   * exists yet.
+   */
   getSeatInfo: ({
     subscription,
     numMembersInWorkspace,

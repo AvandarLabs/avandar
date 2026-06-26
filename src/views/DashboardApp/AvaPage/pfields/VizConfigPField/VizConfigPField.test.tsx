@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";

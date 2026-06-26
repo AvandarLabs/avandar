@@ -1,0 +1,7 @@
+.offlineGatedContainer {
+  cursor: not-allowed;
+  display: block;
+  opacity: 0.45;
+  pointer-events: auto;
+  width: 100%;
+}

@@ -13,9 +13,9 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
-import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
-const TARGET_DASHBOARD_NAME = "Untitled dashboard";
+const TARGET_DASHBOARD_NAME = "E2E renders-in-editor target";
 
 /**
  * End-to-end check that a bar chart saved from the Data Explorer actually
@@ -41,6 +41,9 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       slug: workspaceSlug,
     });
 
+    // Earlier specs in the same worker leave dashboards behind (e.g.
+    // dataviz-pblock-visualizations seeds nine). Clear them so the save
+    // modal list only contains the dashboard this test creates.
     await deleteAllDashboardsForOwner({
       admin,
       workspaceId,
@@ -116,6 +119,16 @@ test.describe("Data Explorer: save viz to dashboard", () => {
         { timeout: MEDIUM_WAIT },
       );
 
+      const { error: renameError } = await admin
+        .from("dashboards")
+        .update({ name: TARGET_DASHBOARD_NAME })
+        .eq("id", dashboardId);
+      if (renameError) {
+        throw new Error(
+          `Failed to rename dashboard for e2e: ${renameError.message}`,
+        );
+      }
+
       // Step 3: Go to data explorer. Mock the AI generate route as a safety
       // net (we drive SQL through the URL instead, but a stray click on the
       // AI form must never hit a paid endpoint).
@@ -171,22 +184,39 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       // auto-dismiss quickly and a slow CI click can miss them.
       await expect(
         page.getByText(`Added to "${TARGET_DASHBOARD_NAME}"`),
-      ).toBeVisible({ timeout: SHORT_WAIT });
+      ).toBeVisible({ timeout: LONG_WAIT });
 
-      await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
+      await page.getByRole("link", { name: /^dashboards$/i }).click();
       await expect(page).toHaveURL(
-        new RegExp(`/dashboards/edit/${dashboardId}`),
+        new RegExp(`/${workspaceSlug}/dashboards/?$`),
         { timeout: SHORT_WAIT },
       );
+      // The dashboard card wraps the title text in a Mantine Card with a
+      // JS onClick (no link role), so target the card root and click that.
+      const dashboardCard = page
+        .locator('[class*="mantine-Card-root"]')
+        .filter({ hasText: TARGET_DASHBOARD_NAME })
+        .first();
+      await dashboardCard.click();
+      await expect(page).toHaveURL(
+        new RegExp(`/dashboards/edit/${dashboardId}`),
+        { timeout: MEDIUM_WAIT },
+      );
+
+      await expect(page.getByLabel("loading")).toBeHidden({
+        timeout: LONG_WAIT,
+      });
 
       // Step 6: The DataViz block we appended should render inside the
       // Puck canvas iframe. If the block was saved without a usable
       // `nlQuery.prompt`, DataVizPBlock short-circuits to its "add a
       // prompt" placeholder and the bar chart never appears.
-      const editorFrame = page.locator("iframe").first().contentFrame();
-      await expect(editorFrame.locator(".recharts-bar").first()).toBeVisible({
-        timeout: MEDIUM_WAIT,
-      });
+      await expect(async () => {
+        const editorFrame = page.locator("iframe").first().contentFrame();
+        await expect(editorFrame.locator(".recharts-bar").first()).toBeVisible({
+          timeout: SHORT_WAIT,
+        });
+      }).toPass({ timeout: LONG_WAIT });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: createdDashboardIds });
     }

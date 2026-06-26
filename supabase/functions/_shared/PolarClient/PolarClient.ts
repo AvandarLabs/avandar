@@ -76,7 +76,7 @@ export type PolarClient = {
   /**
    * Create a checkout session for a single Polar product.
    * @param options The options for the checkout
-   * @param options.avandarMetadata The Avandar-relatedmetadata for the checkout
+   * @param options.avandarMetadata Avandar-related metadata for the checkout
    * @param options.avandarMetadata.userId The Avandar User ID
    * @param options.avandarMetadata.workspaceId The Avandar Workspace ID
    * @param options.productId The ID of the product to checkout
@@ -93,7 +93,7 @@ export type PolarClient = {
    */
   createCheckoutSession: (options: {
     /**
-     * Metadata that is specific to Avandar, to send with the Polar API reques
+     * Metadata that is specific to Avandar, to send with the Polar API request
      */
     avandarMetadata: {
       /**
@@ -129,7 +129,7 @@ export type PolarClient = {
     checkoutEmail: string;
 
     /**
-     * Number of seats to purchase in the checkout. This is require
+     * Number of seats to purchase in the checkout. This is required
      * if the product being checked out has seat-based pricing.
      */
     numSeats?: number;

@@ -85,6 +85,49 @@ when the gate matches.
     `Model.make` usage). This phase only enforces the choice of root
     directory.
 
+### Phase: persisted-cache schema bumps
+
+- **Gate:** the diff modifies a file under `shared/models/` or its
+  `.types.ts` counterpart. Skip otherwise.
+- **Rule:** if the change alters the *serialized shape* of any model
+  that gets returned from a React Query `queryFn`, bump
+  `CACHE_SCHEMA_VERSION` in
+  `src/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister.ts`.
+  Otherwise old persisted-cache blobs (still on disk in users'
+  browsers from the previous release) will rehydrate against the new
+  code and may crash or render wrong.
+
+  **Bump required:**
+  - Removing or renaming a field that downstream code now assumes is
+    present.
+  - Adding a *required* field with no default.
+  - Narrowing a type (e.g. `string` → string-literal union) so old
+    values become invalid.
+  - Renaming an enum value (e.g. `"active"` → `"ACTIVE"`).
+  - Restructuring nesting (flattening, un-flattening, moving fields
+    between sibling models).
+  - Anything where running the new code against an old blob would
+    throw or produce wrong output.
+
+  **Bump NOT required:**
+  - Adding an *optional* field.
+  - Widening a type (e.g. `string` → `string | null`).
+  - Adding an entirely new model (old caches just don't have it).
+  - Adding new methods, parsers, or namespace helpers that don't
+    change the serialized shape.
+  - JSDoc / comment / formatting changes.
+
+  **Find candidates** (any model file in the diff):
+
+  ```bash
+  git diff --name-only <base>...HEAD -- 'shared/models/**/*.ts'
+  ```
+
+  For each hit, classify the change against the lists above before
+  signing off. Bumping when not strictly required is safe but
+  invalidates every user's persisted cache on next boot, so prefer to
+  bump only when actually needed.
+
 ### Phase: utils package reference
 
 - **Gate:** the diff would benefit from a `@avandar/utils` helper but

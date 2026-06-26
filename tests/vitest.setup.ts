@@ -19,6 +19,12 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 // via `ensureE2eViteFeatureFlags` instead.
 delete process.env.VITE_FEATURE_FLAGS;
 
+// Activate the Lingui singleton with an empty English catalog so any test
+// that mounts a component using `t`/`Trans` can resolve message ids without
+// having to load a real compiled catalog. Tests that wrap their tree in
+// `<I18nProvider i18n={i18n}>` will see this active locale.
+i18n.loadAndActivate({ locale: "en", messages: {} });
+
 const noop = (): void => {
   return;
 };

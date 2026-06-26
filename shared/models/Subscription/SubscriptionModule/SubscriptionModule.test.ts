@@ -124,11 +124,23 @@ describe("SubscriptionModule billing lifecycle", () => {
   });
 
   it("treats only active and trialing statuses as entitled", () => {
-    expect(SubscriptionModule.isEntitlementActiveStatus("active")).toBe(true);
-    expect(SubscriptionModule.isEntitlementActiveStatus("trialing")).toBe(true);
-    expect(SubscriptionModule.isEntitlementActiveStatus("canceled")).toBe(
-      false,
+    expect(SubscriptionModule.doesSubscriptionGrantEntitlements("active")).toBe(
+      true,
     );
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements("trialing"),
+    ).toBe(true);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements("canceled"),
+    ).toBe(false);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements(undefined),
+    ).toBe(false);
+    expect(
+      SubscriptionModule.doesSubscriptionGrantEntitlements(
+        _subscription({ subscriptionStatus: "active" }),
+      ),
+    ).toBe(true);
   });
 
   it("prompts billing setup when subscription is missing or inactive", () => {
@@ -168,6 +180,38 @@ describe("SubscriptionModule billing lifecycle", () => {
         numMembersInWorkspace: 2,
       }),
     ).toBe(false);
+  });
+});
+
+describe("SubscriptionModule.resolveFeaturePlanTypeForWorkspace", () => {
+  it("returns no_subscription when row is missing", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: undefined,
+      }),
+    ).toEqual({ type: "no_subscription" });
+  });
+
+  it("returns free when subscription is canceled", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: _subscription({
+          featurePlanType: "basic",
+          subscriptionStatus: "canceled",
+        }),
+      }),
+    ).toEqual({ type: "plan", featurePlanType: "free" });
+  });
+
+  it("returns the subscribed plan when active", () => {
+    expect(
+      SubscriptionModule.resolveFeaturePlanTypeForWorkspace({
+        subscription: _subscription({
+          featurePlanType: "premium",
+          subscriptionStatus: "active",
+        }),
+      }),
+    ).toEqual({ type: "plan", featurePlanType: "premium" });
   });
 });
 

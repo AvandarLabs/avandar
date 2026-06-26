@@ -50,6 +50,7 @@ deno.lock
 /test-results/
 
 # Common scratch or temp files
+*.ignore.md
 todo.md
 TODO.md
 testplan*.md
@@ -79,3 +80,6 @@ tests/data/large/
 # These patterns are tripwires in case a tool drops a worktree directory here by mistake.
 worktrees/
 .worktrees/
+
+# Difit session comments
+.difit/

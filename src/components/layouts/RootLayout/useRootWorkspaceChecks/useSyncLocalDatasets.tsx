@@ -1,7 +1,7 @@
 import { useQuery } from "@hooks";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
-import { assertIsDefined, isNullish, prop, propEq } from "@utils";
+import { assertIsDefined, isNullish, promiseMap, prop, propEq } from "@utils";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -11,7 +11,6 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { isEmptyArray, or } from "@/lib/utils/guards/guards";
-import { promiseMap } from "@/lib/utils/promises";
 import { ResyncDatasetsBlock } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock";
 
 /**

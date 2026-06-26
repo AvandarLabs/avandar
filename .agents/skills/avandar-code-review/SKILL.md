@@ -118,23 +118,81 @@ Goal: interactive review, user approves direction before edits.
 - Stay inside the requested review scope.
 - After resolving one finding, continue to the next until the review is done.
 
+## Base Branch Detection
+
+Before computing any diff, determine the base branch:
+
+1. Run `git branch --show-current` to get the current (head) branch.
+2. If the user specified a base branch in their prompt, use it directly.
+3. If no base branch was specified, run `git branch` to list local branches,
+   then prompt with options (see "Asking The User"):
+   - Question: "Which branch should I diff against?"
+   - Header (Claude Code only): "Base branch"
+   - Options: up to 4 branches from `git branch` output (prioritise
+     `main`, `master`, `develop`, and the most recently checked-out
+     branches); always include an "Other" fallback so the user can type a
+     custom name.
+4. Compute the diff with:
+   ```
+   git diff <base>...<head>
+   ```
+   The three-dot form diffs from the common ancestor, which is the correct
+   scope for a feature or fix branch review.
+
+Never assume a default base branch. Always confirm with the user when it
+is not explicitly stated.
+
+## Files To Skip
+
+Before any review work begins, filter the diff and skip these files
+entirely. Do not load their contents, do not run any phase against them,
+and do not report findings for them:
+
+- Files matched by the repo's `.gitignore` (check with `git
+  check-ignore -v <path>` when in doubt).
+- Auto-generated files, typically identified by `*.gen.*` in the
+  filename (e.g. `schema.gen.ts`, `routes.gen.tsx`).
+- Markdown files (`*.md`, `*.mdx`).
+- Gettext translation files (`*.po`).
+
+If the entire diff consists only of skipped files, say so explicitly and
+stop — there is nothing to review.
+
+## Review Scope
+
+Only flag findings on lines that appear as `+` lines in the diff (added or
+modified by the author under review). Do not flag issues on context lines
+(unchanged lines shown for surrounding context) or `-` lines.
+
+- Read context lines to understand intent, call sites, and surrounding logic.
+- If a violation exists only on an unchanged line, do not report it — even if
+  it is in the same file as a changed line.
+- When a finding spans both changed and unchanged lines (e.g. a function
+  signature is unchanged but its body was modified), only flag it if the
+  violation is locatable on one or more `+` lines.
+
 ## Review Order
 
 1. If the mode was not specified, prompt for it at the very start (see
    "Review Modes" for the interactive menu spec).
-2. Review the **Most Common Mistakes** section in this file first.
-3. Review the **General Checks** section in this file second.
-4. Run each **language-specific phase** in the order listed under "Phase
+2. Determine the base branch and compute the diff (see **Base Branch
+   Detection** above). Extract the exact `+` line ranges per file — these
+   are the only lines eligible for findings in every subsequent phase.
+3. Apply the **Files To Skip** filter above and narrow the diff to only
+   reviewable files before doing anything else.
+4. Review the **Most Common Mistakes** section in this file first.
+5. Review the **General Checks** section in this file second.
+6. Run each **language-specific phase** in the order listed under "Phase
    Checklists" below, but only when that phase's gate matches the diff.
-5. Run each **library-gated phase** under "Library-Gated Phases" below,
+7. Run each **library-gated phase** under "Library-Gated Phases" below,
    gated on whether the package is present in the repo. Skip the phase
    entirely if the package is absent.
-6. If `docs/code-reviews/extra-checklist.md` exists in the repo, run it
+8. If `docs/code-reviews/extra-checklist.md` exists in the repo, run it
    as the final repo-local phase.
-7. Follow the active review mode for how to handle each finding.
-8. At the end of the review, run only the exact tests that are relevant to
-   the code changes.
-9. Report only concrete findings that are visible in the code under review.
+9. Follow the active review mode for how to handle each finding.
+10. At the end of the review, run only the exact tests that are relevant to
+    the code changes.
+11. Report only concrete findings that are visible in the code under review.
 
 In pair review mode, announce the phase explicitly as you move through the
 review, for example: "Phase: comments", "Phase: TypeScript",
@@ -231,8 +289,6 @@ Check these first because they are the most frequent review findings:
 - Prefer reusing existing internal libraries or first-party packages over
   introducing bespoke local helpers when an equivalent shared abstraction
   already exists.
-- If the code touches generated `*.gen.*` files, flag manual edits unless the
-  change is clearly generated.
 - For UI code: keep accessibility strong with native semantics and ARIA where
   needed.
 - For UI code: prefer Mantine theme tokens and shorthand props instead of ad

@@ -220,7 +220,7 @@ export async function fillPolarStripeCardFieldsOnly(page: Page): Promise<void> {
 }
 
 /**
- * Hybrid Polar paid checkout for e2e.
+ * Drives Polar's hosted paid checkout as far as the e2e can.
  *
  * ROADBLOCK: Polar sandbox billing address uses Radix comboboxes (country,
  * province/state) that Playwright cannot drive reliably. Geo defaults vary per
@@ -233,9 +233,9 @@ export async function fillPolarStripeCardFieldsOnly(page: Page): Promise<void> {
  *
  * Until that is solved, this helper only asserts our checkout-url redirect and
  * Polar/Stripe form load (plus card fields). Callers simulate the paid DB row
- * via `syncPaidSubscriptionForE2EHybrid`.
+ * via `upsertPaidSubscriptionForE2E`.
  */
-export async function finishHybridPolarPaidCheckout(options: {
+export async function finishPolarPaidCheckoutForE2E(options: {
   page: Page;
   checkoutResponsePromise: Promise<Response>;
   navigationPromise: Promise<void>;

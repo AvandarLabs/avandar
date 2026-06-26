@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { act, render } from "@/test-utils";
 import { VoiceModelLoadingNotification } from "./VoiceModelLoadingNotification";
 import type { VoiceManagerStatus } from "@/lib/voice/voiceManagerInterface";

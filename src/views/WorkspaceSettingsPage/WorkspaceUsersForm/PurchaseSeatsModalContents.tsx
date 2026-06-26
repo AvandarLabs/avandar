@@ -17,19 +17,23 @@ import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillin
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { UserId } from "$/models/User/User.types";
 
-type PurchaseSeatsModalContentsProps = {
+type Props = {
   subscription: SubscriptionRead;
   currentSeatUsage: number;
   userId: UserId;
   onSeatsAdded: () => void;
 };
 
+/**
+ * Modal body that lets a workspace owner buy additional seats on a Polar
+ * subscription, or open the Polar billing portal to manage seats there.
+ */
 export function PurchaseSeatsModalContents({
   subscription,
   currentSeatUsage,
   userId,
   onSeatsAdded,
-}: PurchaseSeatsModalContentsProps): JSX.Element {
+}: Props): JSX.Element {
   const { t } = useLingui();
   const [seatsToAdd, setSeatsToAdd] = useState(1);
 

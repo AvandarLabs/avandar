@@ -1,7 +1,7 @@
 import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { i18n } from "@/i18n/i18n";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import { VoiceInputButton } from "./VoiceInputButton";
