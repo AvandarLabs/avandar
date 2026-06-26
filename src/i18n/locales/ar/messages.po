@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
@@ -1977,6 +1978,7 @@ msgid "Invite sent"
 msgstr "تم إرسال الدعوة"
 
 #: src/components/offline/OfflineIndicator.tsx
+#: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "أنت غير متصل"
 
@@ -3998,6 +4000,7 @@ msgid "Upload a spreadsheet"
 msgstr "قم بتحميل جدول بيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال بـ {SUPPORT_EMAIL}"
 
@@ -4524,6 +4527,11 @@ msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} �
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
 msgstr "المطالبة"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "أنت على الخطة المجانية"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"

@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "您可以在您的支付方式中进行更改"
@@ -1977,6 +1978,7 @@ msgid "Invite sent"
 msgstr "邀请已发送"
 
 #: src/components/offline/OfflineIndicator.tsx
+#: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "您处于离线状态"
 
@@ -3998,6 +4000,7 @@ msgid "Upload a spreadsheet"
 msgstr "上传电子表格"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 msgstr "我们无法更新您的订阅。请联系 {SUPPORT_EMAIL}"
 
@@ -4524,6 +4527,11 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的�
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
 msgstr "提示"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "您正在使用免费计划"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"

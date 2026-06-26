@@ -1977,6 +1977,7 @@ msgid "Invite sent"
 msgstr "Invite sent"
 
 #: src/components/offline/OfflineIndicator.tsx
+#: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "You are offline"
 
@@ -3998,6 +3999,7 @@ msgid "Upload a spreadsheet"
 msgstr "Upload a spreadsheet"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 msgstr "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 
@@ -4524,6 +4526,11 @@ msgstr "Your current plan only supports up to {0} datasets. Upgrade to our Start
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
 msgstr "Prompt"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "You're on the Free plan"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"

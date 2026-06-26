@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "As alterações no seu método de pagamento podem ser feitas em seu"
@@ -1977,6 +1978,7 @@ msgid "Invite sent"
 msgstr "Convite enviado"
 
 #: src/components/offline/OfflineIndicator.tsx
+#: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "Você está offline"
 
@@ -3998,6 +4000,7 @@ msgid "Upload a spreadsheet"
 msgstr "Carregar uma planilha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 msgstr "Não conseguimos atualizar sua assinatura. Por favor, entre em contato com {SUPPORT_EMAIL}"
 
@@ -4524,6 +4527,11 @@ msgstr "Seu plano atual suporta apenas até {0} conjuntos de dados. Faça upgrad
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
 msgstr "Prompt"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "Você está no plano Gratuito"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"

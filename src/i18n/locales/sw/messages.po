@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
@@ -1977,6 +1978,7 @@ msgid "Invite sent"
 msgstr "Mwaliko umetumwa"
 
 #: src/components/offline/OfflineIndicator.tsx
+#: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "Uko bila mtandao"
 
@@ -3998,6 +4000,7 @@ msgid "Upload a spreadsheet"
 msgstr "Pakia karatasi ya kazi"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
 msgstr "Hatukuweza kuboresha usajili wako. Tafadhali wasiliana na {SUPPORT_EMAIL}"
 
@@ -4524,6 +4527,11 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Pandisha hadhi kwenye m
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Prompt"
 msgstr "Kichocheo"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "Uko kwenye mpango wa Bure"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"
