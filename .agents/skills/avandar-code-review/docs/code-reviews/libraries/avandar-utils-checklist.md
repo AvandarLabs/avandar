@@ -3,12 +3,14 @@
 Use this checklist when the repo under review depends on
 `@avandar/utils`. Confirm by checking `package.json` (or any `package.json`
 in a monorepo) for a `@avandar/utils` dependency, OR by grepping the diff
-and surrounding code for imports from `@avandar/utils` or its short alias
-`@utils`.
+and surrounding code for imports from `@avandar/utils`. A short alias such
+as `@utils` counts only when the repo config shows that it resolves to
+`@avandar/utils`.
 
 If `@avandar/utils` is not present in the repo, **skip this entire
-checklist**. The general functional-style and TypeScript checklists still
-apply; only the helpers below are package-specific.
+checklist**, even if the repo has unrelated helpers with the same names.
+The general functional-style and TypeScript checklists still apply; only
+the helpers below are package-specific.
 
 ## Higher-order property helpers (`prop`, `propEq`)
 
@@ -65,8 +67,9 @@ apply; only the helpers below are package-specific.
 ## Exhaustive union dispatch (`matchLiteral`)
 
 - Dispatch on a string-literal or enum union with `matchLiteral` (from
-  `@avandar/utils`) or `match().exhaustive()` (from `ts-pattern`, if the
-  repo uses it). Both fail to compile when a union case is unhandled.
+  `@avandar/utils`) or `match().exhaustive()` (from `ts-pattern`, only if
+  the repo depends on `ts-pattern`). Both fail to compile when a union case
+  is unhandled.
   Plain `switch` (with or without `default`) and `if`/`else if` chains do
   not check exhaustiveness, so don't use them for union dispatch.
 
@@ -87,18 +90,18 @@ apply; only the helpers below are package-specific.
   user input, etc.).
 
   Also scan `if (x === "a") { ... } else if (x === "b") { ... }` chains
-  by eye — they are not cleanly greppable but are the same anti-pattern.
+  by eye; they are not cleanly greppable but are the same anti-pattern.
 
   This is bad:
 
   ```ts
-  function pageLabel(app: ChatApp): string {
-    switch (app) {
-      case "data-explorer":
-        return "Data Explorer";
-      case "data-sources":
-        return "Data Sources";
-      // forgot dashboards + other — compiles silently
+  function statusLabel(status: JobStatus): string {
+    switch (status) {
+      case "queued":
+        return "Queued";
+      case "running":
+        return "Running";
+      // forgot complete + failed; compiles silently
     }
   }
   ```
@@ -106,25 +109,25 @@ apply; only the helpers below are package-specific.
   This is good:
 
   ```ts
-  function pageLabel(app: ChatApp): string {
-    return matchLiteral(app, {
-      "data-explorer": "Data Explorer",
-      "data-sources": "Data Sources",
-      dashboards: "Dashboards",
-      other: "Avandar",
+  function statusLabel(status: JobStatus): string {
+    return matchLiteral(status, {
+      queued: "Queued",
+      running: "Running",
+      complete: "Complete",
+      failed: "Failed",
     });
   }
   ```
 
 ## Utility reuse
 
-- Avoid hand-writing common utility or data-transformation logic when
-  `@avandar/utils` already provides it. Common examples include property
-  mapping, bucketing, partitions, object reshaping, filtering helpers,
-  and lookup builders. For example, prefer `users.map(prop("id"))` over
-  a custom mapper that only returns `user.id`.
+- Avoid hand-writing common utility or data-transformation logic when the
+  installed `@avandar/utils` package already provides it. Common examples
+  include property mapping, bucketing, partitions, object reshaping,
+  filtering helpers, and lookup builders. For example, prefer
+  `items.map(prop("id"))` over a custom mapper that only returns `item.id`.
 
 - The `@avandar/utils` package README enumerates the available helpers.
-  Reviewers and authors should consult the README on the package's
-  source path in the repo (typically `packages/shared/utils/README.md`
-  in an Avandar monorepo) before introducing a bespoke helper.
+  Reviewers and authors should consult the installed package docs, package
+  README, or local source for the package when it exists in the repo before
+  introducing a bespoke helper.

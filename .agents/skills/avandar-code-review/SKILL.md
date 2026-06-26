@@ -1,6 +1,6 @@
 ---
 name: avandar-code-review
-description: Use when reviewing Avandar code changes, pull requests, or local diffs for repo-specific TypeScript, React, SQL, naming, documentation, and immutability conventions.
+description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions.
 metadata:
   author: jpsyx
   version: "2.0.0"
@@ -9,10 +9,25 @@ metadata:
 
 # Avandar Code Review
 
-Use this skill when reviewing Avandar code for convention violations. Run
-the common-mistakes and general-checks sections on every review, then
-only apply the language-specific and library-gated phases when the diff
-matches their gate.
+Use this skill when reviewing any repo that wants Avandar's review rules
+and style conventions. The core skill must make sense outside the
+Avandar product repo. Run the common-mistakes and general-checks sections
+on every review, then only apply the language-specific and
+library-gated phases when the diff matches their gate.
+
+## Public Core And Repo-Local Rules
+
+- The built-in checklists may encode Avandar style, but they must not
+  rely on private business logic, private product concepts, private
+  repo paths, or files that only exist in one checkout.
+- Rules that mention repo-internal paths, private business concepts,
+  local architecture boundaries, or product-specific test commands
+  belong in the repo-local `docs/code-reviews/extra-checklist.md`
+  file, not in this skill.
+- References to installable libraries are allowed, including
+  `@avandar/models`, `@avandar/utils`, and `@avandar/modules`, but every
+  library-specific rule must be behind a package-presence gate. If the
+  repo does not use the library, skip that phase entirely.
 
 ## Additional Checklist File
 
@@ -50,7 +65,7 @@ The actual repo-local checklist used during reviews lives at
 
 When this skill says "prompt with options", use the host agent's interactive
 menu tool if one is available, otherwise fall back to a plain-text question.
-Never error out because a menu tool is missing — just ask in chat.
+Never error out because a menu tool is missing; just ask in chat.
 
 - Claude Code: call `AskUserQuestion` with the listed options.
 - Codex CLI or any other host without an interactive menu tool: write the
@@ -66,9 +81,9 @@ review work:
 - Question: "Which review mode?"
 - Header (Claude Code only): "Review mode"
 - Options:
-  - `Report` — write a paste-ready review, no edits
-  - `Auto` — fix violations as you find them
-  - `Pair Review` — discuss each finding before editing
+  - `Report`: write a paste-ready review, no edits
+  - `Auto`: fix violations as you find them
+  - `Pair Review`: discuss each finding before editing
 
 Do not default silently.
 
@@ -104,9 +119,9 @@ Goal: interactive review, user approves direction before edits.
   - Question: "Apply the recommended fix?"
   - Header (Claude Code only): "Apply fix?"
   - Options:
-    - `Yes` — apply the recommended fix
-    - `No` — skip this finding and move on
-    - `Let's chat about this` — wait for the user's next message before
+    - `Yes`: apply the recommended fix
+    - `No`: skip this finding and move on
+    - `Let's chat about this`: wait for the user's next message before
       proceeding. Omit this option when the host provides an interactive
       menu tool with a built-in free-text input (for example, Claude Code's
       `AskUserQuestion`, which already exposes a "Type something" field).
@@ -152,11 +167,15 @@ and do not report findings for them:
   check-ignore -v <path>` when in doubt).
 - Auto-generated files, typically identified by `*.gen.*` in the
   filename (e.g. `schema.gen.ts`, `routes.gen.tsx`).
+- `messages.ts` files when a sibling `messages.po` file exists in the
+  same directory. The paired `.po` file indicates the TypeScript file is
+  translation output and should be treated as review-skipped translation
+  content.
 - Markdown files (`*.md`, `*.mdx`).
 - Gettext translation files (`*.po`).
 
 If the entire diff consists only of skipped files, say so explicitly and
-stop — there is nothing to review.
+stop; there is nothing to review.
 
 ## Review Scope
 
@@ -165,7 +184,7 @@ modified by the author under review). Do not flag issues on context lines
 (unchanged lines shown for surrounding context) or `-` lines.
 
 - Read context lines to understand intent, call sites, and surrounding logic.
-- If a violation exists only on an unchanged line, do not report it — even if
+- If a violation exists only on an unchanged line, do not report it, even if
   it is in the same file as a changed line.
 - When a finding spans both changed and unchanged lines (e.g. a function
   signature is unchanged but its body was modified), only flag it if the
@@ -176,7 +195,7 @@ modified by the author under review). Do not flag issues on context lines
 1. If the mode was not specified, prompt for it at the very start (see
    "Review Modes" for the interactive menu spec).
 2. Determine the base branch and compute the diff (see **Base Branch
-   Detection** above). Extract the exact `+` line ranges per file — these
+   Detection** above). Extract the exact `+` line ranges per file; these
    are the only lines eligible for findings in every subsequent phase.
 3. Apply the **Files To Skip** filter above and narrow the diff to only
    reviewable files before doing anything else.
@@ -253,14 +272,14 @@ Check these first because they are the most frequent review findings:
 - Validation: type checking must pass.
 - Validation: linting must pass.
 - Utility reuse: avoid hand-writing common utility or data-transformation
-  logic when an internal package or installed library already provides it.
+  logic when a first-party package or installed library already provides it.
   Common examples include property mapping, bucketing, partitions, object
   reshaping, filtering helpers, and lookup builders. Before introducing a
-  bespoke helper, check the repo's first-party utility packages and
-  imported libraries for an existing equivalent. If the repo depends on
-  `@avandar/utils`, see the library phase under
+  bespoke helper, check only packages and imported libraries that are
+  actually present in the repo for an existing equivalent. If the repo
+  depends on `@avandar/utils`, see the library phase under
   `libraries/avandar-utils-checklist.md` for specific helpers worth
-  preferring.
+  preferring. If it does not, skip every `@avandar/utils`-specific rule.
 - Variable naming: avoid vague names like `matrix`, `count`, `next`, `prev`,
   `val`, or `n`. Use a business noun that explains what the value represents,
   such as `rolesMatrix`, `numUsers`, or `nextVizConfig`. The one acceptable
@@ -286,16 +305,17 @@ Check these first because they are the most frequent review findings:
 - Builder functions should use `create{Type}` naming.
 - Functions that create a type from seed data should use `create{Type}From...`.
 - Conversion or cast helpers should use `to...` naming.
-- Prefer reusing existing internal libraries or first-party packages over
-  introducing bespoke local helpers when an equivalent shared abstraction
-  already exists.
+- Prefer reusing existing repo-local helpers, first-party packages, or
+  installed libraries over introducing bespoke local helpers when an
+  equivalent shared abstraction already exists.
 - For UI code: keep accessibility strong with native semantics and ARIA where
   needed.
-- For UI code: prefer Mantine theme tokens and shorthand props instead of ad
-  hoc styling.
+- For UI code in repos that use Mantine: prefer theme tokens and shorthand
+  props instead of ad hoc styling. Skip this rule when Mantine is absent.
 - For UI code: prefer CSS Modules over inline `style={}` or `styles={}` unless
   the styles are dynamically computed.
-- For UI code: use `clsx` for conditional classes.
+- For UI code in repos that use `clsx`: use it for conditional classes.
+  Skip this rule when `clsx` is absent.
 - For UI code: never introduce TailwindCSS.
 
 ## Phase Checklists
@@ -375,16 +395,19 @@ SKILL file.
 
 Each phase below applies only when the named package is present in the
 repo under review. Check `package.json` (or each `package.json` in a
-monorepo) for the dependency, OR grep for imports of the package, OR
-look for calls to the package's signature APIs (named below per phase).
-If the package is absent, skip the entire phase — do not even load the
+monorepo) for the dependency, OR grep for imports of the package.
+Documented aliases count only when the repo config shows that they resolve
+to the named package.
+If the package is absent, skip the entire phase; do not even load the
 sub-checklist file.
 
 ### Phase: `@avandar/utils`
 
 - **Gate:** repo depends on `@avandar/utils`, or source files import from
-  `@avandar/utils` / `@utils`, or the diff references `prop` / `propEq` /
-  `matchLiteral` / `isDefined` / `isNonNullish` from this package.
+  `@avandar/utils`, or the repo defines a documented alias such as
+  `@utils` that resolves to `@avandar/utils`. If the package is absent,
+  skip this phase even if the diff contains helper names such as `prop`,
+  `propEq`, `matchLiteral`, `isDefined`, or `isNonNullish`.
 - **Reference:**
   [`docs/code-reviews/libraries/avandar-utils-checklist.md`](docs/code-reviews/libraries/avandar-utils-checklist.md)
 - **Covers:** preferring `prop` / `propEq` over inline lambdas;
@@ -395,9 +418,10 @@ sub-checklist file.
 ### Phase: `@avandar/models`
 
 - **Gate:** repo depends on `@avandar/models`, or source files import
-  from `@avandar/models` / `@models`, or the diff calls `Model.make` or
-  imports from a `*.types.ts` file that is paired with a `*.ts`
-  namespace entry.
+  from `@avandar/models`, or the repo defines a documented alias such as
+  `@models` that resolves to `@avandar/models`. If the package is absent,
+  skip this phase even if the diff calls `Model.make` or imports from a
+  `*.types.ts` file.
 - **Reference:**
   [`docs/code-reviews/libraries/avandar-models-checklist.md`](docs/code-reviews/libraries/avandar-models-checklist.md)
 - **Covers:** using `Model.make("ModelName", { ... })` instead of bare
@@ -407,7 +431,9 @@ sub-checklist file.
 ### Phase: `@avandar/modules`
 
 - **Gate:** repo depends on `@avandar/modules`, or source files import
-  from `@avandar/modules` / `@modules`, or the diff calls `createModule`.
+  from `@avandar/modules`, or the repo defines a documented alias such as
+  `@modules` that resolves to `@avandar/modules`. If the package is
+  absent, skip this phase even if the diff calls `createModule`.
 - **Reference:**
   [`docs/code-reviews/libraries/avandar-modules-checklist.md`](docs/code-reviews/libraries/avandar-modules-checklist.md)
 - **Covers:** grouping related free functions into a `createModule(...)`
