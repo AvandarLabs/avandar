@@ -4166,11 +4166,14 @@ msgid "Permanent link (use for QR codes)"
 msgstr "Permanent link (use for QR codes)"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Settings"
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Visualizations"
+msgstr "Visualizations"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"

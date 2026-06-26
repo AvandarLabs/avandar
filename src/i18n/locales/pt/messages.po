@@ -13,6 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "As alterações no seu método de pagamento podem ser feitas em seu"
@@ -4166,11 +4167,14 @@ msgid "Permanent link (use for QR codes)"
 msgstr "Link permanente (use para códigos QR)"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Configurações"
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Visualizations"
+msgstr "Visualizações"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
