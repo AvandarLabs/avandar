@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useCallback, useMemo } from "react";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import {
   ContainerMaxWidthPField,
@@ -16,11 +17,19 @@ import {
 // eslint-disable-next-line max-len
 export function useContainerMaxWidthPFieldConfig(): CustomField<ContainerMaxWidthValue> {
   const { t } = useLingui();
-  return {
-    label: t`Container max width`,
-    type: "custom",
-    render: (props: AvaPageFieldProps<ContainerMaxWidthValue>) => {
+
+  const render = useCallback(
+    (props: AvaPageFieldProps<ContainerMaxWidthValue>) => {
       return <ContainerMaxWidthPField {...props} />;
     },
-  };
+    [],
+  );
+
+  return useMemo(() => {
+    return {
+      label: t`Container max width`,
+      type: "custom",
+      render,
+    };
+  }, [t, render]);
 }

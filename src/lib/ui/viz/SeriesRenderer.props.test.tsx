@@ -175,16 +175,17 @@ describe("BarChart — chart-level settings reach Mantine", () => {
     expect(props.withYAxis).toBe(false);
   });
 
-  it("applies axis label color via xAxisProps.label.fill", () => {
+  it("applies axis label via xAxisLabel and color via styles.axisLabel.fill", () => {
     renderBar({
       ...BAR_BASELINE,
       chartStyle: { xAxis: { label: "Month", labelColor: "#ff0000" } },
     });
     const props = lastProps<{
-      xAxisProps?: { label?: { value?: string; fill?: string } };
+      xAxisLabel?: string;
+      styles?: { axisLabel?: { fill?: string } };
     }>(mantineBarChartMock);
-    expect(props.xAxisProps?.label?.value).toBe("Month");
-    expect(props.xAxisProps?.label?.fill).toBe("#ff0000");
+    expect(props.xAxisLabel).toBe("Month");
+    expect(props.styles?.axisLabel?.fill).toBe("#ff0000");
   });
 
   it("applies tick color via xAxisProps.tick.fill", () => {

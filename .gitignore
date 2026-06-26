@@ -83,3 +83,5 @@ worktrees/
 
 # Difit session comments
 .difit/
+
+supabase/snippets/

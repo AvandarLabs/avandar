@@ -164,8 +164,8 @@ export function makeSubscriptionPlanFromPolarProduct(
     return undefined;
   }
 
-  // Free plans are native (no Polar checkout) so we don't need a Polar price
-  // to render the Free card. Polar has deprecated
+  // Free plans are native (no Polar checkout) so we don't need a Polar
+  // price to render the Free card. Polar has deprecated
   // `LegacyRecurringProductPriceFree` and now ships some free recurring
   // products without any price object, which would otherwise cause the
   // product to be dropped below.

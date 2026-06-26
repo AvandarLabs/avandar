@@ -14,18 +14,20 @@ const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000002" as DashboardId;
 
 vi.mock("@puckeditor/core", () => {
   return {
-    usePuck: () => {
-      return {
-        selectedItem: {
-          props: {
-            id: "viz-block",
-            nlQuery: {
-              prompt: "find data",
-              rawSql: "SELECT * FROM foo",
-              generations: [],
+    createUsePuck: () => {
+      return (selector: (state: unknown) => unknown) => {
+        return selector({
+          selectedItem: {
+            props: {
+              id: "viz-block",
+              nlQuery: {
+                prompt: "find data",
+                rawSql: "SELECT * FROM foo",
+                generations: [],
+              },
             },
           },
-        },
+        });
       };
     },
   };

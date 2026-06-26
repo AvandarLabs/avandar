@@ -124,12 +124,12 @@ export function BubbleSeriesFieldset({
                 padding="sm"
               >
                 <Stack gap="xs">
-                  <Group justify="space-between" wrap="nowrap">
-                    <Group
-                      gap="xs"
-                      style={{ flex: 1, minWidth: 0 }}
-                      wrap="nowrap"
-                    >
+                  <Group
+                    justify="space-between"
+                    wrap="nowrap"
+                    align="flex-start"
+                  >
+                    <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
                       <Select
                         allowDeselect={false}
                         label={t`X column`}
@@ -146,7 +146,6 @@ export function BubbleSeriesFieldset({
                             updateAt(idx, { xKey: next });
                           }
                         }}
-                        style={{ flex: 1 }}
                       />
                       <Select
                         allowDeselect={false}
@@ -164,7 +163,6 @@ export function BubbleSeriesFieldset({
                             updateAt(idx, { key: next });
                           }
                         }}
-                        style={{ flex: 1 }}
                       />
                       <Select
                         allowDeselect={false}
@@ -182,9 +180,8 @@ export function BubbleSeriesFieldset({
                             updateAt(idx, { sizeKey: next });
                           }
                         }}
-                        style={{ flex: 1 }}
                       />
-                    </Group>
+                    </Stack>
                     <ActionIcon
                       aria-label={t`Remove series`}
                       variant="subtle"
