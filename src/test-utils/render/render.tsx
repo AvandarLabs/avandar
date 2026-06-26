@@ -1,9 +1,7 @@
 import { render as renderReact } from "@testing-library/react";
 import { TestProviders } from "../TestProviders";
-import { ExtraWrapperContext } from "./ExtraWrapperContext";
-import { RenderWithWrappers } from "./RenderWithWrappers";
 import type { RenderOptions, RenderResult } from "@testing-library/react";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -11,7 +9,7 @@ import type { ReactElement } from "react";
  * pulling from `useLingui()` or rendering `<Trans>` must use this `render`
  * instead of the raw one from `@testing-library/react`.
  *
- * When `options.wrapper` is provided, it is composed *inside*
+ * When `options.wrapper` is provided, it is composed inside
  * `TestProviders` so the test wrapper can add extra providers (for
  * example `QueryClientProvider`) on top of the always-required ones.
  *
@@ -24,13 +22,22 @@ export function render(
   options: RenderOptions = {},
 ): RenderResult {
   const { wrapper: ExtraWrapper, ...rest } = options;
-  return renderReact(
-    <ExtraWrapperContext.Provider value={ExtraWrapper}>
-      {ui}
-    </ExtraWrapperContext.Provider>,
-    {
-      wrapper: RenderWithWrappers,
-      ...rest,
-    },
-  );
+  const Wrapper =
+    ExtraWrapper === undefined ? TestProviders : (
+      function ComposedWrapper({
+        children,
+      }: {
+        children: ReactNode;
+      }): JSX.Element {
+        return (
+          <TestProviders>
+            <ExtraWrapper>{children}</ExtraWrapper>
+          </TestProviders>
+        );
+      }
+    );
+  return renderReact(ui, {
+    wrapper: Wrapper,
+    ...rest,
+  });
 }
