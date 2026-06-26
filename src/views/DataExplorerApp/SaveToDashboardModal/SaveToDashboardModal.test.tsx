@@ -7,7 +7,7 @@ import {
   within,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
@@ -169,19 +169,21 @@ function renderModal(props: Partial<ModalProps> = {}): {
     defaultOptions: { queries: { retry: false } },
   });
   render(
-    <QueryClientProvider client={queryClient}>
-      <AvandarUiProvider>
-        <SaveToDashboardModal
-          rawSQL="SELECT 1"
-          prompt="Show one"
-          vizType="table"
-          vizConfig={{ vizType: "table" }}
-          workspaceSlug="test-ws"
-          onClose={onClose}
-          {...props}
-        />
-      </AvandarUiProvider>
-    </QueryClientProvider> as ReactElement,
+    (
+      <QueryClientProvider client={queryClient}>
+        <AvandarUiProvider>
+          <SaveToDashboardModal
+            rawSQL="SELECT 1"
+            prompt="Show one"
+            vizType="table"
+            vizConfig={{ vizType: "table" }}
+            workspaceSlug="test-ws"
+            onClose={onClose}
+            {...props}
+          />
+        </AvandarUiProvider>
+      </QueryClientProvider>
+    ) as ReactElement,
   );
   return { onClose };
 }
@@ -217,7 +219,9 @@ describe("SaveToDashboardModal", () => {
     it("prefills the name with 'Untitled dashboard'", () => {
       renderModal();
 
-      const input = screen.getByLabelText(/dashboard name/i) as HTMLInputElement;
+      const input = screen.getByLabelText(
+        /dashboard name/i,
+      ) as HTMLInputElement;
       expect(input.value).toBe("Untitled dashboard");
     });
 

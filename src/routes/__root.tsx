@@ -1,7 +1,7 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 /**

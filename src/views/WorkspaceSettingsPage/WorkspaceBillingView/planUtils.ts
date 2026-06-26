@@ -6,6 +6,8 @@ import {
   PremiumPlanConfig,
 } from "$/config/FeaturePlansConfig";
 import { match } from "ts-pattern";
+import { isOneOf } from "@/lib/utils/guards/guards";
+import { Logger } from "@/utils/Logger";
 import {
   AnnualPaidSeatsPlan,
   FeaturePlan,
@@ -15,8 +17,6 @@ import {
   PaidPlanVariants,
   SubscriptionPlan,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import { isOneOf } from "@/lib/utils/guards/guards";
-import { Logger } from "@/utils/Logger";
 import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.types";
 
 type AvaPolarProduct =
@@ -154,9 +154,10 @@ export function makeSubscriptionPlanFromPolarProduct(
   }
 
   // Free plans are native (no Polar checkout) so we don't need a Polar price
-  // to render the Free card. Polar has deprecated `LegacyRecurringProductPriceFree`
-  // and now ships some free recurring products without any price object, which
-  // would otherwise cause the product to be dropped below.
+  // to render the Free card. Polar has deprecated
+  // `LegacyRecurringProductPriceFree` and now ships some free recurring
+  // products without any price object, which would otherwise cause the
+  // product to be dropped below.
   if (featurePlan.type === "free") {
     return {
       priceType: "free" as const,

@@ -1,27 +1,48 @@
 import { QueryClient } from "@tanstack/react-query";
+import { getIsOnline } from "@/lib/utils/browser/getIsOnline/getIsOnline";
+
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
 
 export const AvaQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Minimize surprise refetching and heavy local work (with DuckDB)
-      // Queries that can benefit from refetching should be explicitly set.
+      // No background refetches: queries that should re-fetch on focus or
+      // reconnect must opt in explicitly per `useQuery` call.
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
 
-      // Only fetch on mount if the query is stale or not in the cache
+      // Still fetch on mount if the query is stale or absent.
       refetchOnMount: true,
 
-      // Performance/cache
-      staleTime: 6 * 60 * 1000, // 5 minutes
-      gcTime: 30 * 60 * 1000, // 30 minutes
+      // Online: 6 minutes (the prior baseline). Offline: never stale, so
+      // React Query serves the persisted cache and does not try to refetch.
+      staleTime: () => {
+        return getIsOnline() ? 6 * MINUTE_MS : Number.POSITIVE_INFINITY;
+      },
 
-      // Avoids duplicate error toasts from retries in dev
-      retry: 0,
+      // Keep unused query data around for 24h so navigating back to a
+      // recently-visited screen does not re-fetch from scratch.
+      gcTime: 24 * HOUR_MS,
+
+      // Online: 1 retry on failure. Offline: do not retry at all — the call
+      // is guaranteed to fail and the user already sees the offline banner.
+      retry: (failureCount: number) => {
+        return getIsOnline() ? failureCount < 1 : false;
+      },
+
+      // "offlineFirst" lets the query lifecycle proceed with no network
+      // (drawing from the persisted cache) instead of pausing in
+      // React Query's default "online" mode.
+      networkMode: "offlineFirst",
     },
     mutations: {
-      // Many mutations are not idempotent and so we should not automatically
-      // retry them. Retries should be explicit.
+      // Most mutations are not idempotent: do not auto-retry.
       retry: 0,
+
+      // Same rationale as queries — let mutations enqueue offline instead
+      // of immediately erroring out.
+      networkMode: "offlineFirst",
     },
   },
 });

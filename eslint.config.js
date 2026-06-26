@@ -94,6 +94,8 @@ export default [
           },
         ],
         "import-x/no-duplicates": "error",
+        // Vite virtual modules (e.g. vite-plugin-pwa's virtual:pwa-register)
+        "import-x/no-unresolved": ["error", { ignore: ["^virtual:"] }],
         "import-x/prefer-default-export": "off",
         "jsx-a11y/anchor-is-valid": [
           "error",
