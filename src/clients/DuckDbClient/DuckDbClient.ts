@@ -71,10 +71,6 @@ function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
 }
 
-class DuckDbWasmInitCancelled extends Error {
-  override readonly name = "DuckDbWasmInitCancelled";
-}
-
 function _formatDuckDbWorkerError(event: ErrorEvent): string {
   if (event.message) {
     return event.message;
@@ -316,7 +312,6 @@ function arrowTableToJS<RowObject extends UnknownRow>(
  */
 class DuckDbClientImpl {
   #db?: Promise<duckdb.AsyncDuckDB>;
-  #wasmGeneration = 0;
 
   /**
    * Tracking open connections. This is useful for debugging if we ever need to
@@ -333,20 +328,7 @@ class DuckDbClientImpl {
     await db.terminate().catch(() => {});
   }
 
-  async #assertInitStillCurrent(
-    initGeneration: number,
-    db: duckdb.AsyncDuckDB,
-    worker: Worker,
-  ): Promise<void> {
-    if (initGeneration === this.#wasmGeneration) {
-      return;
-    }
-    await this.#disposeDuckDbInstance(db, worker);
-    throw new DuckDbWasmInitCancelled();
-  }
-
   async #initialize(): Promise<duckdb.AsyncDuckDB> {
-    const initGeneration = this.#wasmGeneration;
     const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
 
     const worker = new Worker(bundle.mainWorker!);
@@ -361,8 +343,6 @@ class DuckDbClientImpl {
       await this.#disposeDuckDbInstance(db, worker);
       throw error;
     }
-
-    await this.#assertInitStillCurrent(initGeneration, db, worker);
 
     const conn = await db.connect();
     const loadNetworkExtensions = shouldLoadDuckDbNetworkExtensions({
@@ -399,7 +379,6 @@ class DuckDbClientImpl {
     }
     await conn.close();
 
-    await this.#assertInitStillCurrent(initGeneration, db, worker);
     return db;
   }
 
@@ -411,35 +390,6 @@ class DuckDbClientImpl {
       });
     }
     return this.#db;
-  }
-
-  /**
-   * Tears down the DuckDB-WASM worker so another large WASM runtime (e.g.
-   * whisper.cpp) can allocate. The next query call re-initializes lazily.
-   */
-  async releaseWasmRuntime(): Promise<void> {
-    this.#wasmGeneration += 1;
-    const pendingInit = this.#db;
-    this.#db = undefined;
-    if (!pendingInit) {
-      return;
-    }
-    try {
-      const db = await pendingInit;
-      const openConnections = [...this.#openConnections];
-      await Promise.all(
-        openConnections.map((connection) => {
-          return this.#closeConnection(connection);
-        }),
-      );
-      await db.terminate();
-    } catch (error) {
-      if (error instanceof DuckDbWasmInitCancelled) {
-        return;
-      }
-      this.#logger.warn("DuckDB WASM release failed", { error });
-    }
-    this.#openConnections.clear();
   }
 
   async #connect(): Promise<duckdb.AsyncDuckDBConnection> {

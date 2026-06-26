@@ -125,9 +125,6 @@ importers:
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.9.1
-      '@timur00kh/whisper.wasm':
-        specifier: 0.1.0-canary.52de4c5
-        version: 0.1.0-canary.52de4c5
       '@tiptap/core':
         specifier: ^3.23.4
         version: 3.23.4(@tiptap/pm@3.23.4)
@@ -526,9 +523,6 @@ importers:
       electrobun:
         specifier: latest
         version: 1.18.1
-      smart-whisper:
-        specifier: ^0.8.1
-        version: 0.8.1
     devDependencies:
       typescript:
         specifier: ~5.9.3
@@ -4781,10 +4775,6 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
-
-  '@timur00kh/whisper.wasm@0.1.0-canary.52de4c5':
-    resolution: {integrity: sha512-+E/CKq1kdN/TxRC/P+cnFd6n1zzorDPME6qnmerJoyi+I8arbu2CndtYRiGvBbeyUrcZidr8RpIonPVfYSMlnw==}
-    engines: {node: '>=18.0.0'}
 
   '@tiptap/core@3.23.4':
     resolution: {integrity: sha512-ni2LWE52bVeSt3L2HVBSmbBw+elc32ATej9C68EyKzN/8vR5ILxFn6RCdDTKm4asmwZyq2jys12dKmBdWMr9QA==}
@@ -10096,9 +10086,6 @@ packages:
     resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
     engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
 
-  smart-whisper@0.8.1:
-    resolution: {integrity: sha512-0DnhD6Hq7kTpWAJxv057o8rkcZ2Sv2/ZpJZJjj/DT+8Ll/zH5EHQM1lSwk+W15AvfDPD3K2ku+MD2KCXD51z5A==}
-
   smob@1.6.2:
     resolution: {integrity: sha512-RQsvleCbF8cVHEv+xuDGaA4pOizFqJ0GgjtMSRo6oP8pnN7WsigHgVGey6aILRBKv4W2YOMHLqbKdnB6hpB9fw==}
     engines: {node: '>=20.0.0'}
@@ -11067,9 +11054,6 @@ packages:
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
-
-  wasm-feature-detect@1.8.0:
-    resolution: {integrity: sha512-zksaLKM2fVlnB5jQQDqKXXwYHLQUVH9es+5TOOHwGOVJOCeRBCiPjwSg+3tN2AdTCzjgli4jijCH290kXb/zWQ==}
 
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
@@ -15371,10 +15355,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  '@timur00kh/whisper.wasm@0.1.0-canary.52de4c5':
-    dependencies:
-      wasm-feature-detect: 1.8.0
 
   '@tiptap/core@3.23.4(@tiptap/pm@3.23.4)':
     dependencies:
@@ -21609,10 +21589,6 @@ snapshots:
 
   smart-buffer@4.2.0: {}
 
-  smart-whisper@0.8.1:
-    dependencies:
-      node-addon-api: 7.1.1
-
   smob@1.6.2: {}
 
   socket.io-adapter@2.5.6:
@@ -22869,8 +22845,6 @@ snapshots:
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
-
-  wasm-feature-detect@1.8.0: {}
 
   web-streams-polyfill@3.3.3: {}
 

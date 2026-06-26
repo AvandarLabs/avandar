@@ -9,9 +9,7 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
-import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudChat";
-import { useIsVoicePromptAvailable } from "@/lib/voice/useIsVoicePromptAvailable";
 import css from "./Composer.module.css";
 
 /**
@@ -32,13 +30,9 @@ export function Composer(): JSX.Element {
   const context = useChatPageContext();
   const { t } = useLingui();
   const offlineBlocksCloudChat = useOfflineBlocksCloudChat();
-  const { isAvailable: isVoicePromptAvailable, isChecking: isVoiceChecking } =
-    useIsVoicePromptAvailable();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
   const chatDisabled = !isChatEnabled || offlineBlocksCloudChat;
-  const voiceDisabled =
-    !isChatEnabled || (!isVoicePromptAvailable && !isVoiceChecking);
 
   const placeholder =
     offlineBlocksCloudChat ?
@@ -66,7 +60,6 @@ export function Composer(): JSX.Element {
         />
         <Group gap="xs">
           <OfflineChatDownloadControl disabled={!isChatEnabled} />
-          <VoiceInputButton disabled={voiceDisabled} />
           <ChatModelPicker disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon

@@ -59,7 +59,7 @@ plans (with verified real paths — they supersede the per-feature
 2. `GROUP-2-data-explorer-querying.md` — #008–#013, #096, #097, #044–#047, #049
 3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows)
 4. `GROUP-4-dashboards.md` — #064–#076, #048
-5. `GROUP-5-platform-i18n-standalone.md` — #050–#063, #079–#082, #090, #095, #091–#093
+5. `GROUP-5-platform-i18n-standalone.md` — #056–#063, #079–#082, #090, #095, #091–#093
 
 **Migration order is 1 → 2 → 3 → 4 → 5** (dependency-ordered; e.g.
 the AvaPage schema chain V2→V3 (G2 #009)→V4 (G4 #069), G4 #065 needs
@@ -198,17 +198,6 @@ Phases 0-9 cumulatively land below.
 | 47 | `[ ]` | **sql-form-sync-data-explorer** — Bidirectional sync: `applySqlMapping` updates `isStructuredQueryInSync` + `sqlSyncWarnings`, manual edits regenerate SQL, out-of-sync confirmation Alert. | CHECKPOINT 7 |
 | 48 | `[ ]` | **sql-form-sync-dashboards** — Per-block `useDashboardManualQueryState` hook giving DataViz blocks the same SQL ↔ form parity as Data Explorer; 3-tab `NLQueryPField` (Prompt / Manual / SQL). | CHECKPOINT 16 |
 | 49 | `[ ]` | **duckdb-sql-parser-updates** — Parser-side updates so DuckDB-specific SQL parses correctly. | Commit `673419e` |
-
-## G. Multilingual voice dictation
-
-| # | Status | Feature | Sources |
-|---|---|---|---|
-| 50 | `[ ]` | **voice-web-whisper** — Mic button in chat composer, `@huggingface/transformers` Whisper (tiny/base/small), IndexedDB-backed `AvandarVoiceModelCache`, MediaRecorder → 16 kHz Float32 pipeline, consent modal with language picker, floating bottom-left progress indicator. | CHECKPOINT 11 |
-| 51 | `[ ]` | **voice-desktop-whispercpp** — `smart-whisper` (whisper.cpp via N-API) in Bun-main; disk-backed cache under `<userData>/whisper-models/`; IPC contracts (`VoiceContracts.*`); `DesktopVoiceModelManager` polling `voice.getStatus`; Medium / Large v3 / Large v3 Turbo gated to desktop. | CHECKPOINT 12 (desktop voice) |
-| 52 | `[ ]` | **voice-platform-factory** — `voiceModelManagerFactory.ts` returns the right backend so React code stays platform-agnostic. | CHECKPOINT 12 (desktop voice) |
-| 53 | `[ ]` | **voice-per-file-progress** — Per-file download progress tracking in the voice download indicator. | Commit `82fdc1b` |
-| 54 | `[ ]` | **voice-wasm-worker-path** — Parallel whisper.cpp WASM voice pipeline running in a Web Worker (alternative web path with better isolation). | Commit `ef5bd0a` |
-| 55 | `[ ]` | **voice-ui-polish** — Voice transcription UI updates (modal styling, badges, swahili-specific hint). | Commits `5a1a3bb`, `a8f96c9`, `1e7d335` (swahili hint), `91137e6` (offline badges) |
 
 ## H. Desktop platform & offline (web + desktop)
 

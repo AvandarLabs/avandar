@@ -6,7 +6,6 @@ import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
   ChatRetryContext,
   ChatSessionSecretResponse,
-  ChatVoiceLanguage,
   ConsentAck,
   RegeneratePlanResponse,
   SchemaDriftReport,
@@ -40,7 +39,6 @@ export type ChatAPI = APITypeDef<
           model?: string;
           consentAcks?: ConsentAck[];
           retryContext?: ChatRetryContext;
-          voiceLanguage?: ChatVoiceLanguage;
         };
         returnType: ChatResponse.T;
       };

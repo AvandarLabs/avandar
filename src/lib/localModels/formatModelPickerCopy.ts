@@ -1,5 +1,5 @@
 /**
- * Shared copy helpers for voice and offline chat model pickers.
+ * Shared copy helpers for offline chat model pickers.
  */
 
 /** Option label: name, RAM tier, and optional download size. */

@@ -1,10 +1,10 @@
 /**
  * RAM tiers we surface for on-device model pickers. Upper bound is 32 GB per
- * product guidance for offline chat + voice coexistence with DuckDB.
+ * product guidance for offline chat coexistence with DuckDB.
  */
 export type ModelRamTierGb = 4 | 8 | 12 | 16 | 24 | 32;
 
-/** User-facing RAM guidance attached to local voice and chat model entries. */
+/** User-facing RAM guidance attached to local chat model entries. */
 export type ModelSystemRequirements = {
   /** Minimum system RAM (GB) we recommend for this model. */
   minRamGb: ModelRamTierGb;

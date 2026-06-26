@@ -54,7 +54,10 @@ else
 fi
 
 printf '\n%s\n' "${BOLD}${CYAN}[1/3] Extracting translation keys from source...${RESET}"
-if ! pnpm exec lingui extract --overwrite; then
+# --clean (not --overwrite) so msgids no longer present in source are removed
+# outright rather than retained as obsolete `#~` entries. This keeps the .po
+# catalogs from accumulating dangling translations when UI strings are deleted.
+if ! pnpm exec lingui extract --clean; then
   printf '\n%s\n' "${BOLD}${YELLOW}lingui extract failed.${RESET}" >&2
   exit 1
 fi
@@ -103,9 +106,10 @@ done
 # preserving the translations we just filled, so the committed files match
 # exactly what the next `lingui extract` would produce. Without this, the
 # pre-push hook re-wraps the catalogs on the following push and reports a
-# spurious diff even when no source strings changed.
+# spurious diff even when no source strings changed. --clean here mirrors the
+# extract in step 1 so the normalized output is identical to the next run.
 printf '\n%s\n' "${BOLD}${CYAN}[3/4] Normalizing catalog formatting (Lingui canonical PO)...${RESET}"
-if ! pnpm exec lingui extract --overwrite; then
+if ! pnpm exec lingui extract --clean; then
   printf '\n%s\n' "${BOLD}${YELLOW}lingui extract (normalize) failed.${RESET}" >&2
   exit 1
 fi

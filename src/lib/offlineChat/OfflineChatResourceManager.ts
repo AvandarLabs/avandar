@@ -1,5 +1,3 @@
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { releaseAllVoiceRuntimes } from "@/lib/voiceWhisperCpp/releaseAllVoiceRuntimes";
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "./deleteLocalChatModelCache";
 import {
@@ -23,10 +21,7 @@ export type OfflineChatManagerStatus =
 type Listener = (status: OfflineChatManagerStatus) => void;
 
 /**
- * Singleton that owns the resident WebLLM engine. Voice transcription must call
- * `releaseForVoice()` before loading Whisper. Chat calls
- * `releaseAllVoiceRuntimes`
- * before WebLLM so voice and LLM are never resident together.
+ * Singleton that owns the resident WebLLM engine used for offline chat.
  */
 class OfflineChatResourceManagerImpl {
   private status: OfflineChatManagerStatus = { kind: "idle" };
@@ -54,7 +49,6 @@ class OfflineChatResourceManagerImpl {
   }
 
   async ensureEngine(modelId: LocalChatModelId): Promise<OfflineChatEngine> {
-    await releaseAllVoiceRuntimes();
     if (this.engine && this.loadedModelId === modelId) {
       return this.engine;
     }
@@ -91,11 +85,6 @@ class OfflineChatResourceManagerImpl {
       this.setStatus({ kind: "error", modelId, message });
       throw error;
     }
-  }
-
-  async releaseForVoice(): Promise<void> {
-    await this.unload();
-    await DuckDbClient.releaseWasmRuntime();
   }
 
   /**

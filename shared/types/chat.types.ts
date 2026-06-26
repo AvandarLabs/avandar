@@ -151,15 +151,6 @@ export type ChatPlan = {
 };
 
 /**
- * Language hint attached to a chat turn when the user just dictated their
- * message. Intentionally narrow for now: we only forward Swahili because
- * the cloud LLMs often fail to identify low-resource Bantu languages from
- * the transcribed text alone, while English / Spanish / French etc. are
- * already detected reliably and we don't want a hint to regress them.
- */
-export type ChatVoiceLanguage = "swahili";
-
-/**
  * Sent on the next turn when the user clicks "Try Again" on a prior
  * assistant message. The backend uses these fields to inject a system
  * note telling the model NOT to repeat the same output. Only the field
