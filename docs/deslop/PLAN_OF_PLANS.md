@@ -106,6 +106,19 @@ planning is complete.
     (color-picker fix ships in the same commit family as the
     chart-suite expansion — inseparable). Active row count
     92 → 91.
+- **2026-06-25 — migration progress + update run** (after merging
+  `origin/develop` tip PR #252 back into `feat/ict4d-demo`):
+  - **3 features now merged into `develop`:** #078 `lingui-scaffold`
+    (PR #242, earlier), #083 `billing-ptrck-series` (PR #237,
+    `a40d64a3`), #061 `web-offline-mode` (PR #252, `50fb7884`). Their
+    plan files were deleted; rows flipped to `[x]`; in-flight table
+    emptied. Section 0 prerequisites remaining: #077
+    `analytics-client-events`, #094 `chat-models-catalog-regeneration`.
+  - **1 new row added (`/deslop update`):** #097
+    `data-explorer-auto-open-ai-panel` (PR #240). Needs a plan
+    authored (run `/deslop continue` once its scope is confirmed).
+  - The next `/deslop continue` should drain #077 and #094, after
+    which Section A (#001) becomes unblocked.
 
 ## Phase 2 ready
 

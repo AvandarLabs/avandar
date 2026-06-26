@@ -35,21 +35,23 @@ let it drift.
 
 - **Header status**: `Ready for Phase 2 — Session 3 (2026-06-05)`
 - **Last analyzed commit on `feat/ict4d-demo`**:
-  `c9f909a903fb4a436b39f475813a7ec83bcb9747`
-  (subject: _docs(deslop): mark Phase 1 complete (pending comment
-  sync)_)
-- **Last update run on**: `2026-06-05`
-- **Active rows**: 85 (96 global indices minus retired #4/#5/#6/#7
-  folded into #1, #14 folded into #9, #084..#089 folded into #083,
-  #094 relocated to Section 0, #061 relocated to Section 0, #077
-  relocated to Section 0, plus #96 added; #078 already in Section 0).
-  Index numbering is intentionally non-dense.
+  `eb86cfc9d159c0984c58198127927bd911506c54`
+  (subject: _fix: use createUsePuck selector for selectedItem and
+  remove nested form in ManualQueryForm (#251)_)
+- **Last update run on**: `2026-06-25`
+- **Active rows**: 86 (was 85; #97 `data-explorer-auto-open-ai-panel`
+  added on the 2026-06-25 update run). Index numbering is
+  intentionally non-dense (retired #4/#5/#6/#7 folded into #1, #14
+  into #9, #084..#089 into #083).
 - **Planning status**: **complete (2026-06-05; reshuffled 2026-06-10).**
-  All 85 active rows have a matching `NNN-<slug>.md` plan in
-  `docs/deslop/`. Section 0 (Infrastructure prerequisites) now contains
-  5 rows (#078 done, #083 in flight, #061/#077/#094 pending). The
-  operator can begin Phase 2 migrations with `/deslop migrate
-  <feature-slug>` or `/deslop continue`.
+  All active rows except the newly-added #097 have a matching
+  `NNN-<slug>.md` plan in `docs/deslop/`. Section 0 (Infrastructure
+  prerequisites) is now mostly drained: #078, #061, and #083 are all
+  merged into `develop`; #077 and #094 remain pending. The operator
+  can continue Phase 2 migrations with `/deslop migrate
+  <feature-slug>` or `/deslop continue`. **#097 still needs a plan
+  authored** (`/deslop continue` will pick it up; operator should
+  confirm its scope first).
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -65,8 +67,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| 83 | `billing-ptrck-series` | `feature/patrick-work-vi` | 2026-06-10 | **Pre-existing branch** with open PR #237 against `develop`. Bundles folded rows #083+#084+#085+#086+#087+#088+#089. All 22 PTRCK driver commits confirmed reachable via `git merge-base --is-ancestor`. **2026-06-10 follow-on:** forward-ported billing-scope drift from `feat/ict4d-demo` onto the branch (`6f69e9d2`) — SubscriptionModule directory reorg + 7 caller import-path updates + subscription edge fn refactors (`subscriptions.routes.ts`, `hasSubscriptionPermission.ts`, `[subscriptionId].product.ts`, `[subscriptionId].seats.ts`, `create-free.ts`) + e2e billing helpers (`dismissBillingModal.ts`, `dismissDatasetLimitModal.ts`, `auth.ts` updates, `syncPaidSubscriptionForE2EHybrid.ts`, `ensureWorkspaceSubscriptionForE2E.ts`). tsc + lint clean; 64 test files / 379 tests pass. Non-billing test helpers (chatPanelFlow, dataExplorerFlow, shareModalFlow, constants.ts dataset-import additions, etc.) skipped — belong to other rows. Operator merges PR #237 when ready, then runs `/deslop complete billing-ptrck-series`. |
-| 61 | `web-offline-mode` | `refactor-061/web-offline-mode` | 2026-06-10 | PWA + service worker + React Query persistence + offline-aware hooks/components + new test-utils. tsc clean in src/, lint clean in src/, 65 test files / 377 tests pass. Caller files (Navbar, Composer, DataExplorerApp, etc.) intentionally NOT touched — each ride along with their parent feature row. `src/lib/offline/useOfflineBlocksCloudChat.ts` deferred to #062 (depends on offlineChat store). |
+| _(none)_ | | | | Both prior in-flight migrations (#083 billing-ptrck-series, #061 web-offline-mode) merged into `develop` and were closed out on the 2026-06-25 update run. |
 
 ---
 
@@ -78,6 +79,8 @@ the durable record once the per-feature markdown has been deleted.
 | Feature index | Slug | Merge SHA on `develop` | Completed |
 |---|---|---|---|
 | 78 | `lingui-scaffold` | `2881b0bb` (PR #242) | 2026-06-10 |
+| 83 | `billing-ptrck-series` | `a40d64a3` (PR #237) | 2026-06-25 |
+| 61 | `web-offline-mode` | `50fb7884` (PR #252) | 2026-06-25 |
 
 ---
 
@@ -215,3 +218,41 @@ Append-only log of `/deslop update` runs.
   - **Phase 1 PR status**: `chore/sync-datasets-virtual-comment`
     (the 3-line schema comment sync from earlier today) still
     pending operator review and merge.
+- `2026-06-25` — `/deslop update` run + two completions, after merging
+  the latest `origin/develop` (tip PR #252) back into `feat/ict4d-demo`.
+  Marker bumped `c9f909a9` → `eb86cfc9`. 42 non-merge commits scanned.
+  - **2 in-flight migrations completed.** Both landed on `develop` and
+    their refactor branches are gone from origin:
+    - **#083 `billing-ptrck-series`** — PR #237 squash-merged at
+      `a40d64a3`. Row flipped `[~]` → `[x]`; plan
+      `083-billing-ptrck-series.md` deleted; removed from in-flight.
+    - **#061 `web-offline-mode`** — PR #252 (`refactor 061/web offline
+      mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
+      plan `061-web-offline-mode.md` deleted; removed from in-flight.
+      **Drift:** a later feat/ict4d-demo-only service-worker tweak
+      (`1a436512`) is not on `develop` — flagged on the row.
+  - **1 new feature row added.** #097
+    `data-explorer-auto-open-ai-panel` (PR #240, commit `6d3841b6`;
+    new file `dataExplorerPanelPreferences.ts` + `DataExplorerApp.tsx`
+    effect + `useAuth.ts` tweak). No plan authored yet — operator to
+    confirm scope before `/deslop migrate`.
+  - **Skipped — already on `develop`** (`git cherry` `-` lines):
+    `98695647` (Model.make #244), `35ef962f`/`adb9f52a` (Polar free
+    plan + proration — ride with #083, now done), `4cbd5748`/`9a930e19`
+    (CI/Playwright tooling).
+  - **Skipped — subsumed by existing not-yet-migrated rows** (per the
+    "migrate refactored code, not legacy" rule; the current
+    feat/ict4d-demo state of each row already includes these fixes, so
+    they migrate when the parent row does): the 7 UI hot-fixes
+    `eb86cfc9` #251 (ManualQueryForm → §F manual querying),
+    `2bdedf2b` #250 / `469ac02c` #249 (chart settings/axes → #9),
+    `aca06851` #248 / `75e3a7d3` #247 / `daa0f768` #246 (dashboard
+    scroll/crash/filter overflow → §I/§J dashboard rows),
+    `101ecbe6` #245 (pfield render-ref stability → §B/§F);
+    i18n pipeline + catalogs `6d7e2b02`/`4d74cace`/`3747d15e`/`ba6b0c85`
+    (→ §N i18n rows #079–#082); `3a2445fc` (cors methods → edge-fn
+    rows); `d18e880b` #241 (invite-modal SegmentedControl fix — small
+    fix to pre-existing develop code, no row per the PTRCK-001/002
+    precedent).
+  - **Skipped — noise/tooling:** `86bfdcea` (formatter), `0c559f79`
+    (gitignore worktrees).
