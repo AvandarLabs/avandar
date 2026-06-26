@@ -31,8 +31,10 @@ msgid "ID field is required"
 msgstr "ID field is required"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
-msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
+msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
+"parsed safely, so all columns will be published."
+msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
+"parsed safely, so all columns will be published."
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
@@ -55,8 +57,10 @@ msgid "Dashboard name"
 msgstr "Dashboard name"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
-msgstr "This will allow the dataset to be stored online so it can be accessed in other devices."
+msgid "This will allow the dataset to be stored online so it can be accessed in "
+"other devices."
+msgstr "This will allow the dataset to be stored online so it can be accessed "
+"in other devices."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Run a query to see results."
@@ -109,8 +113,10 @@ msgid "Search datasets..."
 msgstr "Search datasets..."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
-msgid "The dataset failed to load. Please try again later or reach out to support."
-msgstr "The dataset failed to load. Please try again later or reach out to support."
+msgid "The dataset failed to load. Please try again later or reach out to "
+"support."
+msgstr "The dataset failed to load. Please try again later or reach out to "
+"support."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose chat model"
@@ -180,20 +186,26 @@ msgstr "Type a question and I will generate the SQL and run it on the canvas."
 #. placeholder {0}: modelToDownload.displayName
 #. placeholder {1}: modelToDownload.systemRequirements
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
-msgstr "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
+msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
+"here, or use a smaller RAM tier."
+msgstr "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
+"here, or use a smaller RAM tier."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
-msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
-msgstr "No filters yet. Add one to let viewers refine this chart without affecting any others."
+msgid "No filters yet. Add one to let viewers refine this chart without "
+"affecting any others."
+msgstr "No filters yet. Add one to let viewers refine this chart without "
+"affecting any others."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
 msgstr "Excel files"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-msgid "Enter your question or instructions in natural language to generate a SQL query"
-msgstr "Enter your question or instructions in natural language to generate a SQL query"
+msgid "Enter your question or instructions in natural language to generate a "
+"SQL query"
+msgstr "Enter your question or instructions in natural language to generate a "
+"SQL query"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query"
@@ -340,8 +352,10 @@ msgid "Do you want to import \"{fileName}\" as a new dataset?"
 msgstr "Do you want to import \"{fileName}\" as a new dataset?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-msgid "For more control over your subscription, you can manage your subscription in your"
-msgstr "For more control over your subscription, you can manage your subscription in your"
+msgid "For more control over your subscription, you can manage your "
+"subscription in your"
+msgstr "For more control over your subscription, you can manage your "
+"subscription in your"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -367,8 +381,12 @@ msgid "← Back"
 msgstr "← Back"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
-msgstr "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
+msgid "A local record of every clarifying question the AI has asked in this "
+"workspace. Only metadata is stored — never the question text or your "
+"answer."
+msgstr "A local record of every clarifying question the AI has asked in this "
+"workspace. Only metadata is stored — never the question text or your "
+"answer."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Cannot display {chartName}"
@@ -387,21 +405,35 @@ msgid "Allow multiple values"
 msgstr "Allow multiple values"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
-#~ msgstr "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
+#~ "number of datasets you can add to your workspace you can purchase more "
+#~ "seats. Each seat allows you to add 10 more datasets!"
+#~ msgstr "Your current plan only supports up to{0} datasets. To increase the "
+#~ "number of datasets you can add to your workspace you can purchase more "
+#~ "seats. Each seat allows you to add 10 more datasets!"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "No datasets added yet"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
-msgstr "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
+msgid "Choose how much of each dataset to publish. The default — \"Only what's "
+"queried\" — uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+msgstr "Choose how much of each dataset to publish. The default — \"Only what's "
+"queried\" — uploads just the columns your visualizations read. Widen "
+"the scope if you've added viewer-editable filters and want viewers to "
+"be able to filter beyond your defaults."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
-msgstr "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+msgid "Your current plan only supports up to {0} datasets. To increase the "
+"number of datasets you can add to your workspace you can purchase more "
+"seats. Each seat allows you to add 10 more datasets!"
+msgstr "Your current plan only supports up to {0} datasets. To increase the "
+"number of datasets you can add to your workspace you can purchase more "
+"seats. Each seat allows you to add 10 more datasets!"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
@@ -458,8 +490,10 @@ msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Search the data catalog to add open datasets to your workspace."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data Explorer</0>."
-msgstr "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data Explorer</0>."
+msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
+"Explorer</0>."
+msgstr "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
+"Explorer</0>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group updated"
@@ -530,12 +564,16 @@ msgid "PDF (multi-page)"
 msgstr "PDF (multi-page)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
-msgstr "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
+msgid "You cannot add more datasets on your current plan. Upgrade to add this "
+"catalog dataset."
+msgstr "You cannot add more datasets on your current plan. Upgrade to add this "
+"catalog dataset."
 
 #: src/routes/register.tsx
-msgid "Please check your email for a confirmation link. It may take a few minutes to arrive."
-msgstr "Please check your email for a confirmation link. It may take a few minutes to arrive."
+msgid "Please check your email for a confirmation link. It may take a few "
+"minutes to arrive."
+msgstr "Please check your email for a confirmation link. It may take a few "
+"minutes to arrive."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Remove offline chat model?"
@@ -575,8 +613,14 @@ msgstr "However, we are not allowing new registrations at the moment."
 
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
-msgstr "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
+msgid "These are the first {0} rows of your dataset. Check to see if the data "
+"is correct. If they are not, it's possible your dataset does not start "
+"on the first row or the CSV uses a different delimiter. Try adjusting "
+"those settings here."
+msgstr "These are the first {0} rows of your dataset. Check to see if the data "
+"is correct. If they are not, it's possible your dataset does not start "
+"on the first row or the CSV uses a different delimiter. Try adjusting "
+"those settings here."
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
@@ -647,8 +691,12 @@ msgid "Offline"
 msgstr "Offline"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
-msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
-msgstr "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
+msgid "These datasets are listed in your workspace, but their source data could "
+"not be found in your local storage. In order to continue, you need to "
+"either re-upload the dataset or delete it from your workspace."
+msgstr "These datasets are listed in your workspace, but their source data "
+"could not be found in your local storage. In order to continue, you "
+"need to either re-upload the dataset or delete it from your workspace."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -692,8 +740,10 @@ msgid "Copied"
 msgstr "Copied"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
-msgstr "Add a member or a user group to grant access. Use General access below to share more broadly."
+msgid "Add a member or a user group to grant access. Use General access below "
+"to share more broadly."
+msgstr "Add a member or a user group to grant access. Use General access below "
+"to share more broadly."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -718,8 +768,10 @@ msgid "Your question contains language that may bias the AI's answer."
 msgstr "Your question contains language that may bias the AI's answer."
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
-#~ msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
+#~ "add more datasets, upgrade to a paid plan."
+#~ msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. To "
+#~ "add more datasets, upgrade to a paid plan."
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -765,8 +817,12 @@ msgid "Type your answer…"
 msgstr "Type your answer…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
-msgstr "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
+msgid "Publishing makes this dashboard viewable by anyone with the link — no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
+msgstr "Publishing makes this dashboard viewable by anyone with the link — no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -812,8 +868,10 @@ msgid "Create a dashboard"
 msgstr "Create a dashboard"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
-msgstr "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
+msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
+"canvas."
+msgstr "Plan rejected. Ask the chat to propose a different plan, or close this "
+"canvas."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -848,8 +906,10 @@ msgid "{0} was deleted from this device."
 msgstr "{0} was deleted from this device."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-msgid "It's time to create your first workspace. Don't think for too long—you can always change these later!"
-msgstr "It's time to create your first workspace. Don't think for too long—you can always change these later!"
+msgid "It's time to create your first workspace. Don't think for too long—you "
+"can always change these later!"
+msgstr "It's time to create your first workspace. Don't think for too long—you "
+"can always change these later!"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 #: src/routes/register.tsx
@@ -863,8 +923,10 @@ msgid "Show the first 20 rows of {datasetName}"
 msgstr "Show the first 20 rows of {datasetName}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
-msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
-msgstr "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
+msgid "The invitation you are trying to accept is not valid. Please contact the "
+"workspace owner to get a new invitation."
+msgstr "The invitation you are trying to accept is not valid. Please contact "
+"the workspace owner to get a new invitation."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Enter a description for this profile type"
@@ -998,8 +1060,12 @@ msgid "Choose a plan that works best for your workspace."
 msgstr "Choose a plan that works best for your workspace."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
-msgstr "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
+msgid "The public open data catalog is still in <0/><1/>We are adding more open "
+"datasets as users tell us which datasets they want in Avandar. If there "
+"is a dataset you would like to see here, <2>tell us</2>!"
+msgstr "The public open data catalog is still in <0/><1/>We are adding more "
+"open datasets as users tell us which datasets they want in Avandar. If "
+"there is a dataset you would like to see here, <2>tell us</2>!"
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "Erase"
@@ -1108,8 +1174,10 @@ msgid "Generating…"
 msgstr "Generating…"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-msgid "Are you sure you want to proceed with this action? This cannot be undone."
-msgstr "Are you sure you want to proceed with this action? This cannot be undone."
+msgid "Are you sure you want to proceed with this action? This cannot be "
+"undone."
+msgstr "Are you sure you want to proceed with this action? This cannot be "
+"undone."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
@@ -1133,12 +1201,18 @@ msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Are you sure you want to remove this user from the workspace?"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
-msgid "Configure this filter: set its id, label, and column name in the side panel."
-msgstr "Configure this filter: set its id, label, and column name in the side panel."
+msgid "Configure this filter: set its id, label, and column name in the side "
+"panel."
+msgstr "Configure this filter: set its id, label, and column name in the side "
+"panel."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
-msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
-msgstr "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
+msgid "The current SQL contains parts that the form could not represent. "
+"Continuing will overwrite that SQL with one generated from the form. "
+"This cannot be undone (unless you re-run your previous chat prompt)."
+msgstr "The current SQL contains parts that the form could not represent. "
+"Continuing will overwrite that SQL with one generated from the form. "
+"This cannot be undone (unless you re-run your previous chat prompt)."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Select the columns you want in this {entityConfigName}"
@@ -1164,8 +1238,12 @@ msgstr "Complete"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
+msgid "{0} to be notified when it's your turn to register! If you are already "
+"on our waitlist and have not received a sign-up code, we appreciate your "
+"patience. You will receive a sign-up code soon. We promise!"
+msgstr "{0} to be notified when it's your turn to register! If you are already "
+"on our waitlist and have not received a sign-up code, we appreciate "
+"your patience. You will receive a sign-up code soon. We promise!"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
@@ -1173,8 +1251,10 @@ msgstr "Bias detected:"
 
 #. placeholder {0}: planSnapshot.steps.length
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
+msgid "The {0}-step analysis that produced this result will be saved with the "
+"dataset, so it can be reopened on the canvas."
+msgstr "The {0}-step analysis that produced this result will be saved with the "
+"dataset, so it can be reopened on the canvas."
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
@@ -1228,8 +1308,10 @@ msgstr "No values were returned from {column}. Describe what you need instead."
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
-msgstr "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
+msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
+"<2>{avg}</2>{0}"
+msgstr "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
+"<2>{avg}</2>{0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -1246,12 +1328,22 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
-msgstr "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
+msgid "Connecting to Google Sheets and other data sources are in the works and "
+"will be available very soon. If there is a database or service you use "
+"that you need to connect to, <0>please let us know so we can prioritize "
+"it</0>."
+msgstr "Connecting to Google Sheets and other data sources are in the works and "
+"will be available very soon. If there is a database or service you use "
+"that you need to connect to, <0>please let us know so we can prioritize "
+"it</0>."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
-msgstr "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
+msgid "A local record of every time you approved (or cancelled) sending data to "
+"an AI provider in this workspace. Last 90 days, stored on this device "
+"only."
+msgstr "A local record of every time you approved (or cancelled) sending data "
+"to an AI provider in this workspace. Last 90 days, stored on this "
+"device only."
 
 #. placeholder {0}: b.parentStepId
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
@@ -1291,8 +1383,10 @@ msgid "Restriction update failed"
 msgstr "Restriction update failed"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Use the Data Explorer to analyze your datasets, create visualizations, and discover insights from your data."
-msgstr "Use the Data Explorer to analyze your datasets, create visualizations, and discover insights from your data."
+msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
+"and discover insights from your data."
+msgstr "Use the Data Explorer to analyze your datasets, create visualizations, "
+"and discover insights from your data."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
@@ -1329,8 +1423,12 @@ msgid "Tell us which open dataset you want via feedback"
 msgstr "Tell us which open dataset you want via feedback"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
-msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
-msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
+msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
+"support text, arrows, and freehand drawing with adjustable roughness "
+"(RoughJS)."
+msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
+"support text, arrows, and freehand drawing with adjustable roughness "
+"(RoughJS)."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "No speech detected"
@@ -1430,8 +1528,10 @@ msgid "Plan branches"
 msgstr "Plan branches"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
-msgstr "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the Y axis. Values are "
+"grouped by the X axis (\"{axisKeyValue}\")."
+msgstr "Each series is a numeric column plotted on the Y axis. Values are "
+"grouped by the X axis (\"{axisKeyValue}\")."
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
@@ -1540,8 +1640,10 @@ msgid "You do not have access to this dashboard"
 msgstr "You do not have access to this dashboard"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
-msgstr "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
+msgid "Could not summarize this column. The query may have failed for an "
+"unsupported value or a malformed cell."
+msgstr "Could not summarize this column. The query may have failed for an "
+"unsupported value or a malformed cell."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Data scope"
@@ -1600,8 +1702,10 @@ msgid "Search open data catalog"
 msgstr "Search open data catalog"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the billing portal.<0/>The button below will take you there."
-msgstr "Upgrading to a \"Pay What You Want\" plan can only be done through the billing portal.<0/>The button below will take you there."
+msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
+"billing portal.<0/>The button below will take you there."
+msgstr "Upgrading to a \"Pay What You Want\" plan can only be done through the "
+"billing portal.<0/>The button below will take you there."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete entity"
@@ -1629,8 +1733,10 @@ msgid "Sheet name"
 msgstr "Sheet name"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {entityConfigName}."
-msgstr "We will use those columns to merge datasets into a single {entityConfigName}."
+msgid "We will use those columns to merge datasets into a single "
+"{entityConfigName}."
+msgstr "We will use those columns to merge datasets into a single "
+"{entityConfigName}."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Browser unavailable"
@@ -1643,8 +1749,10 @@ msgstr "Transcribing…"
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
-msgstr "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
+msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+"download it again later."
+msgstr "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+"download it again later."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -1652,7 +1760,8 @@ msgstr "Go to Data Explorer"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-msgstr "This dashboard is <0>public</0>. Anyone with the link below can view it."
+msgstr "This dashboard is <0>public</0>. Anyone with the link below can view "
+"it."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
@@ -1679,16 +1788,20 @@ msgid "Using {0}"
 msgstr "Using {0}"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
-msgstr "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
+msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
+"generate SQL."
+msgstr "No SQL yet. Ask Avandar a question or build a query in the Manual tab "
+"to generate SQL."
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a text field"
 msgstr "Received a non-string value for a text field"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come from..."
-msgstr "Tell us about where the {singularEntityConfigName} data should come from..."
+msgid "Tell us about where the {singularEntityConfigName} data should come "
+"from..."
+msgstr "Tell us about where the {singularEntityConfigName} data should come "
+"from..."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -1769,8 +1882,10 @@ msgid "Google authentication error"
 msgstr "Google authentication error"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly viewable."
-msgstr "This dashboard is private. This dashboard has not been made publicly viewable."
+msgid "This dashboard is private. This dashboard has not been made publicly "
+"viewable."
+msgstr "This dashboard is private. This dashboard has not been made publicly "
+"viewable."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -1778,8 +1893,10 @@ msgstr "Derived"
 
 #. placeholder {0}: columns.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct."
-msgstr "{0} columns were detected. Review the column info below to make sure they are correct."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct."
+msgstr "{0} columns were detected. Review the column info below to make sure "
+"they are correct."
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
@@ -1818,8 +1935,10 @@ msgid "Register"
 msgstr "Register"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
-msgstr "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
+msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
+"the SQL, and drop a block onto the page."
+msgstr "Ask me to add a chart to this dashboard. I will pick a viz type, write "
+"the SQL, and drop a block onto the page."
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: top.count.toLocaleString()
@@ -1945,8 +2064,10 @@ msgid "Could not remove voice model"
 msgstr "Could not remove voice model"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
-msgstr "Add a Filter block to the dashboard to enable global filtering for this visualization."
+msgid "Add a Filter block to the dashboard to enable global filtering for this "
+"visualization."
+msgstr "Add a Filter block to the dashboard to enable global filtering for this "
+"visualization."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2055,8 +2176,10 @@ msgid "Export"
 msgstr "Export"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
-msgstr "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
+msgid "Create groups for your workspace members. Datasets and dashboards can be "
+"configured to only share with (or restrict) certain user groups."
+msgstr "Create groups for your workspace members. Datasets and dashboards can "
+"be configured to only share with (or restrict) certain user groups."
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
@@ -2065,8 +2188,14 @@ msgstr "Preview:"
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
+msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
+"whether a Python or R step would express this more cleanly. You can "
+"still approve as-is. Nothing has run yet. Click each node to read it; "
+"approve to execute."
+msgstr "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
+"whether a Python or R step would express this more cleanly. You can "
+"still approve as-is. Nothing has run yet. Click each node to read it; "
+"approve to execute."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2074,16 +2203,20 @@ msgstr "Select your plan"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
-msgstr "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
+msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
+"{0})."
+msgstr "Dataset name must be under {maxDatasetNameLength} characters (current: "
+"{0})."
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
 msgstr "Re-run query"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
-msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
-msgstr "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
+msgid "Choose the language used across this workspace. Right-to-left languages "
+"flip the layout automatically."
+msgstr "Choose the language used across this workspace. Right-to-left languages "
+"flip the layout automatically."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "No plans available."
@@ -2163,8 +2296,10 @@ msgid "Back to the login page"
 msgstr "Back to the login page"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app access still need a direct share above."
-msgstr "Controls the default for the rest of the workspace. People without app access still need a direct share above."
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share above."
+msgstr "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share above."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2173,8 +2308,11 @@ msgid "Save to dashboard"
 msgstr "Save to dashboard"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
-#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
+#~ "plan to increase the number of datasets you can add to your workspace."
+#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our "
+#~ "Impact plan to increase the number of datasets you can add to your "
+#~ "workspace."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
@@ -2235,8 +2373,10 @@ msgid "Fields that come from datasets"
 msgstr "Fields that come from datasets"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be added into this {entityConfigName}."
-msgstr "This is where you select which columns from which datasets should be added into this {entityConfigName}."
+msgid "This is where you select which columns from which datasets should be "
+"added into this {entityConfigName}."
+msgstr "This is where you select which columns from which datasets should be "
+"added into this {entityConfigName}."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
@@ -2247,8 +2387,10 @@ msgid "Create your first dashboard to track key metrics and insights."
 msgstr "Create your first dashboard to track key metrics and insights."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Are you sure you want to delete this dataset? This action cannot be undone."
-msgstr "Are you sure you want to delete this dataset? This action cannot be undone."
+msgid "Are you sure you want to delete this dataset? This action cannot be "
+"undone."
+msgstr "Are you sure you want to delete this dataset? This action cannot be "
+"undone."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol size column must be numeric."
@@ -2263,8 +2405,10 @@ msgid "Avandar (default)"
 msgstr "Avandar (default)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
-msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
+msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
+msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2306,8 +2450,10 @@ msgid "Choose the maximum value"
 msgstr "Choose the maximum value"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do not have access to it."
-msgstr "The workspace you are trying to access either does not exist or you do not have access to it."
+msgid "The workspace you are trying to access either does not exist or you do "
+"not have access to it."
+msgstr "The workspace you are trying to access either does not exist or you do "
+"not have access to it."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
@@ -2335,8 +2481,10 @@ msgid "Password update failed"
 msgstr "Password update failed"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
-msgstr "A step failed. Click the red node to retry, or use Re-run to restart from the top."
+msgid "A step failed. Click the red node to retry, or use Re-run to restart "
+"from the top."
+msgstr "A step failed. Click the red node to retry, or use Re-run to restart "
+"from the top."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2398,8 +2546,12 @@ msgid "Count how many rows there are in {datasetName}"
 msgstr "Count how many rows there are in {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
+#~ "Starter or Impact plan to increase the number of datasets you can add to "
+#~ "your workspace."
+#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our "
+#~ "Starter or Impact plan to increase the number of datasets you can add "
+#~ "to your workspace."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2656,8 +2808,10 @@ msgstr "Not yet published. Public viewers will not see this."
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to support."
-msgstr "The entity failed to load. Please try again later or reach out to support."
+msgid "The entity failed to load. Please try again later or reach out to "
+"support."
+msgstr "The entity failed to load. Please try again later or reach out to "
+"support."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "We didn't catch anything — try again a bit closer to the mic."
@@ -2672,16 +2826,22 @@ msgid "Open on canvas"
 msgstr "Open on canvas"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach out to support."
-msgstr "The profile manager page failed to load. Please try again later or reach out to support."
+msgid "The profile manager page failed to load. Please try again later or reach "
+"out to support."
+msgstr "The profile manager page failed to load. Please try again later or "
+"reach out to support."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "The {chartName} cannot be displayed because there are missing axes or series."
-msgstr "The {chartName} cannot be displayed because there are missing axes or series."
+msgid "The {chartName} cannot be displayed because there are missing axes or "
+"series."
+msgstr "The {chartName} cannot be displayed because there are missing axes or "
+"series."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
-msgstr "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
+msgid "Permanently delete all consent decisions on this device? This action "
+"cannot be undone, and the log on other devices is not affected."
+msgstr "Permanently delete all consent decisions on this device? This action "
+"cannot be undone, and the log on other devices is not affected."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Let AI decide (legacy)"
@@ -2813,8 +2973,10 @@ msgid "Passwords do not match"
 msgstr "Passwords do not match"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
-msgstr "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the radial value. Values are "
+"grouped by the category axis (\"{axisKeyValue}\")."
+msgstr "Each series is a numeric column plotted on the radial value. Values are "
+"grouped by the category axis (\"{axisKeyValue}\")."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select longitude column"
@@ -2833,8 +2995,10 @@ msgid "No custom groups yet."
 msgstr "No custom groups yet."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan for unlimited seats."
-msgstr "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan for unlimited seats."
+msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
+"invite more team members, upgrade to a paid plan for unlimited seats."
+msgstr "Your workspace is on the Free plan, which supports up to 2 seats. To "
+"invite more team members, upgrade to a paid plan for unlimited seats."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
@@ -2846,8 +3010,10 @@ msgid "Owner"
 msgstr "Owner"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
-msgstr "Never changes, so QR codes printed from here keep working even if the custom URL changes."
+msgid "Never changes, so QR codes printed from here keep working even if the "
+"custom URL changes."
+msgstr "Never changes, so QR codes printed from here keep working even if the "
+"custom URL changes."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -2871,8 +3037,10 @@ msgid "You don't have any dashboards yet."
 msgstr "You don't have any dashboards yet."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "No clarifications yet. The log fills in as the chat asks clarifying questions."
-msgstr "No clarifications yet. The log fills in as the chat asks clarifying questions."
+msgid "No clarifications yet. The log fills in as the chat asks clarifying "
+"questions."
+msgstr "No clarifications yet. The log fills in as the chat asks clarifying "
+"questions."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model removed"
@@ -2896,8 +3064,10 @@ msgstr "Ask a workspace settings administrator to update your roles."
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the {entityConfigName} ID"
-msgstr "For dataset <0>{0}</0>, choose the column to use as the {entityConfigName} ID"
+msgid "For dataset <0>{0}</0>, choose the column to use as the "
+"{entityConfigName} ID"
+msgstr "For dataset <0>{0}</0>, choose the column to use as the "
+"{entityConfigName} ID"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -3011,8 +3181,10 @@ msgid "No saved datasets found."
 msgstr "No saved datasets found."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this {resource}, in addition to whatever's listed above."
-msgstr "Every workspace member who can open the {app} app gets this role on this {resource}, in addition to whatever's listed above."
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed above."
+msgstr "Every workspace member who can open the {app} app gets this role on "
+"this {resource}, in addition to whatever's listed above."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -3041,16 +3213,20 @@ msgid "Download"
 msgstr "Download"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "No members or user groups yet. Invite members or create user groups in Workspace settings."
-msgstr "No members or user groups yet. Invite members or create user groups in Workspace settings."
+msgid "No members or user groups yet. Invite members or create user groups in "
+"Workspace settings."
+msgstr "No members or user groups yet. Invite members or create user groups in "
+"Workspace settings."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "SQL"
 msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
-msgstr "No row filters. The slice will include every row in the dataset (for the selected columns)."
+msgid "No row filters. The slice will include every row in the dataset (for the "
+"selected columns)."
+msgstr "No row filters. The slice will include every row in the dataset (for "
+"the selected columns)."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Turn"
@@ -3090,16 +3266,20 @@ msgid "Edit {0}"
 msgstr "Edit {0}"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
-msgstr "We detected both potential personal information and language that may bias the AI's answer. Review both below."
+msgid "We detected both potential personal information and language that may "
+"bias the AI's answer. Review both below."
+msgstr "We detected both potential personal information and language that may "
+"bias the AI's answer. Review both below."
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
 msgstr "Select aggregation"
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
-msgstr "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
+msgid "While Avandar is in beta, we are only allowing registration if you are "
+"on our waitlist and have received a sign-up code in your email."
+msgstr "While Avandar is in beta, we are only allowing registration if you are "
+"on our waitlist and have received a sign-up code in your email."
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
@@ -3193,8 +3373,10 @@ msgid "Some data should be manually entered"
 msgstr "Some data should be manually entered"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
-msgstr "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
+msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
+"below."
+msgstr "Each series is a numeric column plotted on the Y axis. Pick the X axis "
+"below."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Pick a model to download. You can switch models or re-download later."
@@ -3253,8 +3435,10 @@ msgstr "Change"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
-msgstr "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL above is what actually runs."
+msgstr "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL above is what actually runs."
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Looking up values in {column}…"
@@ -3348,12 +3532,17 @@ msgid "Add column as a field"
 msgstr "Add column as a field"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
-msgstr "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
+msgid "This data appears to contain health or patient information. Sending it "
+"to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
+"etc.)."
+msgstr "This data appears to contain health or patient information. Sending it "
+"to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
+"etc.)."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Get started by exploring your workspace or uploading your first dataset."
-msgstr "Get started by exploring your workspace or uploading your first dataset."
+msgstr "Get started by exploring your workspace or uploading your first "
+"dataset."
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
@@ -3449,8 +3638,10 @@ msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "Count rows in {datasetName} by {secondGroupBy}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Pick the category axis below."
-msgstr "Each series is a numeric column plotted on the radial value. Pick the category axis below."
+msgid "Each series is a numeric column plotted on the radial value. Pick the "
+"category axis below."
+msgstr "Each series is a numeric column plotted on the radial value. Pick the "
+"category axis below."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -3497,8 +3688,10 @@ msgid "Your checkout was successful!"
 msgstr "Your checkout was successful!"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Import spreadsheets, connect to Google Sheets, or add data from other sources to start analyzing your information."
-msgstr "Import spreadsheets, connect to Google Sheets, or add data from other sources to start analyzing your information."
+msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
+"sources to start analyzing your information."
+msgstr "Import spreadsheets, connect to Google Sheets, or add data from other "
+"sources to start analyzing your information."
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
@@ -3584,12 +3777,16 @@ msgid "Pick which global filters apply to this visualization."
 msgstr "Pick which global filters apply to this visualization."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-msgid "Each series is one cloud of bubbles. The size column determines bubble radius."
-msgstr "Each series is one cloud of bubbles. The size column determines bubble radius."
+msgid "Each series is one cloud of bubbles. The size column determines bubble "
+"radius."
+msgstr "Each series is one cloud of bubbles. The size column determines bubble "
+"radius."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while offline."
-msgstr "Download an offline chat model (cloud icon) to ask questions while offline."
+msgid "Download an offline chat model (cloud icon) to ask questions while "
+"offline."
+msgstr "Download an offline chat model (cloud icon) to ask questions while "
+"offline."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -3632,8 +3829,10 @@ msgid "This feature is not implemented yet."
 msgstr "This feature is not implemented yet."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
-msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
-msgstr "This dataset is large, so we applied a 100-row limit. You can change it anytime."
+msgid "This dataset is large, so we applied a 100-row limit. You can change it "
+"anytime."
+msgstr "This dataset is large, so we applied a 100-row limit. You can change it "
+"anytime."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets — nothing to publish."
@@ -3669,8 +3868,12 @@ msgid "Warning"
 msgstr "Warning"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
-msgstr "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
+msgid "When on, members of this group only get access if they already have "
+"{app} access in the workspace. When off, every member of the group gets "
+"access here, even if they normally can't open {app}."
+msgstr "When on, members of this group only get access if they already have "
+"{app} access in the workspace. When off, every member of the group gets "
+"access here, even if they normally can't open {app}."
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Auto"
@@ -3682,8 +3885,12 @@ msgstr "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Impact plan to increase the number of datasets you can add to your "
+"workspace."
+msgstr "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Impact plan to increase the number of datasets you can add to your "
+"workspace."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
@@ -3698,8 +3905,10 @@ msgid "Role for {displayName}"
 msgstr "Role for {displayName}"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
-msgid "Public queries are not supported for structured queries. Use raw SQL instead."
-msgstr "Public queries are not supported for structured queries. Use raw SQL instead."
+msgid "Public queries are not supported for structured queries. Use raw SQL "
+"instead."
+msgstr "Public queries are not supported for structured queries. Use raw SQL "
+"instead."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "CSV file"
@@ -3792,8 +4001,12 @@ msgstr "Dashboard published!"
 #~ msgstr "Add a bar chart of {target} grouped by category"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
-msgstr "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
+msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
+"device storage first (without freezing the tab). The model loads when "
+"you dictate. Progress appears bottom-left."
+msgstr "Dictation runs locally with whisper.cpp. We download a ggml model into "
+"device storage first (without freezing the tab). The model loads when "
+"you dictate. Progress appears bottom-left."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3808,8 +4021,10 @@ msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "There was an error while trying to authenticate with Google Sheets."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "The owner always has admin access. To change owner, use the {resource} settings."
-msgstr "The owner always has admin access. To change owner, use the {resource} settings."
+msgid "The owner always has admin access. To change owner, use the {resource} "
+"settings."
+msgstr "The owner always has admin access. To change owner, use the {resource} "
+"settings."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
@@ -3851,8 +4066,10 @@ msgstr "If each {0} can only have one {fieldName} value, check this box."
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
-msgstr "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
+msgid "Description must be under {maxDatasetDescriptionLength} characters "
+"(current: {0})."
+msgstr "Description must be under {maxDatasetDescriptionLength} characters "
+"(current: {0})."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
@@ -3876,8 +4093,10 @@ msgid "Enter dataset name"
 msgstr "Enter dataset name"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-msgid "This name only applies in {workspaceName}. Your other workspaces keep their own."
-msgstr "This name only applies in {workspaceName}. Your other workspaces keep their own."
+msgid "This name only applies in {workspaceName}. Your other workspaces keep "
+"their own."
+msgstr "This name only applies in {workspaceName}. Your other workspaces keep "
+"their own."
 
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
@@ -4000,12 +4219,16 @@ msgstr "Upload a spreadsheet"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
-msgstr "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
+msgid "We were unable to update your subscription. Please contact "
+"{SUPPORT_EMAIL}"
+msgstr "We were unable to update your subscription. Please contact "
+"{SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under maintenance."
-msgstr "Google sheets connector is disabled while this feature is under maintenance."
+msgid "Google sheets connector is disabled while this feature is under "
+"maintenance."
+msgstr "Google sheets connector is disabled while this feature is under "
+"maintenance."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -4042,16 +4265,26 @@ msgstr "Google Sheets"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
-msgstr "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
+msgid "This dataset will no longer be stored online and can only be accessed as "
+"long as it is on your personal computer. Nobody on your team will be "
+"able to access this data. This is recommended only for very sensitive "
+"data."
+msgstr "This dataset will no longer be stored online and can only be accessed "
+"as long as it is on your personal computer. Nobody on your team will be "
+"able to access this data. This is recommended only for very sensitive "
+"data."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
 msgstr "Download a different offline chat model"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
-#~ msgstr "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
+#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
+#~ "download a Whisper model from Hugging Face once. The download runs in "
+#~ "the background; progress appears in the bottom-left corner."
+#~ msgstr "Voice prompts run entirely on your device. To dictate, we need to "
+#~ "download a Whisper model from Hugging Face once. The download runs in "
+#~ "the background; progress appears in the bottom-left corner."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4119,8 +4352,10 @@ msgid "Multi-select"
 msgstr "Multi-select"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
-msgstr "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
+msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
+"metric pairs on the same chart."
+msgstr "Each series is one (X, Y) cloud of points. Add more to compare multiple "
+"metric pairs on the same chart."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
@@ -4219,8 +4454,12 @@ msgid "Loading sharing settings…"
 msgstr "Loading sharing settings…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your workspace is on the Free plan, which supports up to 5 datasets. "
+"Upgrade to our Starter or Impact plan to increase the number of datasets "
+"you can add to your workspace."
+msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. "
+"Upgrade to our Starter or Impact plan to increase the number of "
+"datasets you can add to your workspace."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -4376,16 +4615,20 @@ msgstr "Profile"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
-msgstr "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
+msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
+"undone."
+msgstr "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
+"undone."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
 msgstr "Column outline"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."
-msgstr "What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."
+msgid "What this person or group can do. Viewer = read only, Editor = edit "
+"content, Admin = full control including sharing."
+msgstr "What this person or group can do. Viewer = read only, Editor = edit "
+"content, Admin = full control including sharing."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
@@ -4522,8 +4765,12 @@ msgstr "Custom clarification answer"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Starter or Impact plan to increase the number of datasets you can add to "
+"your workspace."
+msgstr "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Starter or Impact plan to increase the number of datasets you can add "
+"to your workspace."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
@@ -4544,8 +4791,12 @@ msgid "Some datasets are missing data"
 msgstr "Some datasets are missing data"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
-msgid "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
-msgstr "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
+msgid "Avandar is still in beta. Some features may not work as expected and "
+"some may still be under construction. We appreciate your patience and "
+"feedback as we work to improve the product."
+msgstr "Avandar is still in beta. Some features may not work as expected and "
+"some may still be under construction. We appreciate your patience and "
+"feedback as we work to improve the product."
 
 #: src/routes/register.tsx
 msgid "Thank you for your interest!"
@@ -4594,8 +4845,10 @@ msgid "Members"
 msgstr "Members"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
-msgstr "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
+msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
+"type is kebab-cased automatically."
+msgstr "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
+"type is kebab-cased automatically."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Value"
@@ -4675,16 +4928,20 @@ msgid "Loading voice model"
 msgstr "Loading voice model"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
-msgstr "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
+msgid "Choose a workspace preset or customize per app. User groups control "
+"dataset and dashboard access intersections."
+msgstr "Choose a workspace preset or customize per app. User groups control "
+"dataset and dashboard access intersections."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "Dataset saved"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
-msgstr "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {entityConfigName}."
+msgstr "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {entityConfigName}."
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -4741,16 +4998,24 @@ msgstr "No workspace was found"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
-msgstr "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct. If they are not, change the import options above and "
+"click Upload again."
+msgstr "{0} columns were detected. Review the column info below to make sure "
+"they are correct. If they are not, change the import options above and "
+"click Upload again."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
-msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seats."
+msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seats."
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload files, connect external sources, or browse open datasets to add to your workspace."
-msgstr "Upload files, connect external sources, or browse open datasets to add to your workspace."
+msgid "Upload files, connect external sources, or browse open datasets to add "
+"to your workspace."
+msgstr "Upload files, connect external sources, or browse open datasets to add "
+"to your workspace."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not transcribe your audio."
@@ -4868,8 +5133,10 @@ msgid "Distinct values"
 msgstr "Distinct values"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
-msgstr "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
+msgid "Please confirm that you would like to proceed with this plan change. "
+"Your subscription will be updated accordingly."
+msgstr "Please confirm that you would like to proceed with this plan change. "
+"Your subscription will be updated accordingly."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Speak"
@@ -4885,8 +5152,10 @@ msgid "Search..."
 msgstr "Search..."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
-msgstr "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
+msgid "Please take a look at the data and make sure it is correct. Once you "
+"confirm, the dataset will be synced with this data."
+msgstr "Please take a look at the data and make sure it is correct. Once you "
+"confirm, the dataset will be synced with this data."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Stroke ({strokeWidth}px)"
@@ -4901,8 +5170,10 @@ msgid "anyone with "
 msgstr "anyone with "
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
-msgstr "The values you selected may contain personal information. The AI provider will receive them and may log the request."
+msgid "The values you selected may contain personal information. The AI "
+"provider will receive them and may log the request."
+msgstr "The values you selected may contain personal information. The AI "
+"provider will receive them and may log the request."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Selected"
@@ -4933,8 +5204,10 @@ msgid "Fix these issues before saving"
 msgstr "Fix these issues before saving"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
-msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
+msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
+"redirects here."
+msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
+"redirects here."
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
 msgid "Hello DateValueItem"
@@ -4965,7 +5238,8 @@ msgstr "Close"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
-msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
+msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seat."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -5004,8 +5278,10 @@ msgstr "Invalid date"
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
+msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
+"node to read it; approve to execute."
+msgstr "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
+"node to read it; approve to execute."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
@@ -5080,8 +5356,10 @@ msgid "Show QR code"
 msgstr "Show QR code"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
-msgstr "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
+msgid "By default we use a permanent UUID-based link. Add a custom path below "
+"for a nicer URL."
+msgstr "By default we use a permanent UUID-based link. Add a custom path below "
+"for a nicer URL."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"

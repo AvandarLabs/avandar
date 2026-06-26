@@ -96,7 +96,21 @@ for locale in "${TARGET_LOCALES[@]}"; do
   fi
 done
 
-printf '\n%s\n' "${BOLD}${CYAN}[3/3] Compiling .po catalogs into runtime .ts modules...${RESET}"
+# Step 3 re-canonicalizes the catalogs. translateWithLLM.ts writes msgstr
+# entries with its own minimal serializer, which does NOT reproduce Lingui's
+# PO line-wrapping (long strings wrapped at ~76 columns by @lingui/format-po).
+# Re-running extract rewrites every catalog in Lingui's canonical format while
+# preserving the translations we just filled, so the committed files match
+# exactly what the next `lingui extract` would produce. Without this, the
+# pre-push hook re-wraps the catalogs on the following push and reports a
+# spurious diff even when no source strings changed.
+printf '\n%s\n' "${BOLD}${CYAN}[3/4] Normalizing catalog formatting (Lingui canonical PO)...${RESET}"
+if ! pnpm exec lingui extract --overwrite; then
+  printf '\n%s\n' "${BOLD}${YELLOW}lingui extract (normalize) failed.${RESET}" >&2
+  exit 1
+fi
+
+printf '\n%s\n' "${BOLD}${CYAN}[4/4] Compiling .po catalogs into runtime .ts modules...${RESET}"
 if ! pnpm exec lingui compile --typescript; then
   printf '\n%s\n' "${BOLD}${YELLOW}lingui compile failed.${RESET}" >&2
   exit 1

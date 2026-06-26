@@ -31,7 +31,8 @@ msgid "ID field is required"
 msgstr "ID 欄位為必填"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
+msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
+"parsed safely, so all columns will be published."
 msgstr "此資料集中的至少一個查詢使用了 <0>SELECT *</0> 或無法安全解析，因此所有欄位將被發布。"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
@@ -55,7 +56,8 @@ msgid "Dashboard name"
 msgstr "儀表板名稱"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
+msgid "This will allow the dataset to be stored online so it can be accessed in "
+"other devices."
 msgstr "這將允許資料集在線儲存，以便在其他設備上訪問。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
@@ -109,7 +111,8 @@ msgid "Search datasets..."
 msgstr "搜尋資料集..."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
-msgid "The dataset failed to load. Please try again later or reach out to support."
+msgid "The dataset failed to load. Please try again later or reach out to "
+"support."
 msgstr "數據集加載失敗。請稍後再試或聯繫支持。"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -180,11 +183,13 @@ msgstr "輸入問題，我將生成 SQL 並在畫布上運行它。"
 #. placeholder {0}: modelToDownload.displayName
 #. placeholder {1}: modelToDownload.systemRequirements
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
+msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
+"here, or use a smaller RAM tier."
 msgstr "{0} 需要 {1}，並且在瀏覽器中不可用。請在此選擇 Tiny 或 Base，或使用較小的 RAM 等級。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
-msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
+msgid "No filters yet. Add one to let viewers refine this chart without "
+"affecting any others."
 msgstr "尚未添加過濾器。添加一個以讓觀眾在不影響其他圖表的情況下精煉此圖表。"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
@@ -192,7 +197,8 @@ msgid "Excel files"
 msgstr "Excel 檔案"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-msgid "Enter your question or instructions in natural language to generate a SQL query"
+msgid "Enter your question or instructions in natural language to generate a "
+"SQL query"
 msgstr "以自然語言輸入您的問題或指示以生成 SQL 查詢"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -340,7 +346,8 @@ msgid "Do you want to import \"{fileName}\" as a new dataset?"
 msgstr "您想將 \"{fileName}\" 匯入為新資料集嗎？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-msgid "For more control over your subscription, you can manage your subscription in your"
+msgid "For more control over your subscription, you can manage your "
+"subscription in your"
 msgstr "要更好地控制您的訂閱，您可以在您的訂閱中進行管理"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
@@ -367,7 +374,9 @@ msgid "← Back"
 msgstr "← 返回"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
+msgid "A local record of every clarifying question the AI has asked in this "
+"workspace. Only metadata is stored — never the question text or your "
+"answer."
 msgstr "在此工作區中，AI 所提出的每個澄清問題的本地記錄。僅儲存元數據 — 永遠不會儲存問題文本或您的回答。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
@@ -387,7 +396,9 @@ msgid "Allow multiple values"
 msgstr "允許多個值"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
+#~ "number of datasets you can add to your workspace you can purchase more "
+#~ "seats. Each seat allows you to add 10 more datasets!"
 #~ msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
@@ -395,12 +406,18 @@ msgid "No datasets added yet"
 msgstr "尚未添加任何資料集"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
-msgstr "選擇要發布的每個資料集的數量。預設為「僅查詢的內容」— 僅上傳您的視覺化所需的欄位。如果您添加了可供觀眾編輯的過濾器並希望觀眾能夠超越您的預設進行過濾，請擴大範圍。"
+msgid "Choose how much of each dataset to publish. The default — \"Only what's "
+"queried\" — uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+msgstr "選擇要發布的每個資料集的數量。預設為「僅查詢的內容」— "
+"僅上傳您的視覺化所需的欄位。如果您添加了可供觀眾編輯的過濾器並希望觀眾能夠超越您的預設進行過濾，請擴大範圍。"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+msgid "Your current plan only supports up to {0} datasets. To increase the "
+"number of datasets you can add to your workspace you can purchase more "
+"seats. Each seat allows you to add 10 more datasets!"
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
@@ -458,7 +475,8 @@ msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data Explorer</0>."
+msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
+"Explorer</0>."
 msgstr "在數據探索器和儀表板中啟用了聊天。<0>打開數據探索器</0>。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
@@ -530,11 +548,13 @@ msgid "PDF (multi-page)"
 msgstr "PDF（多頁）"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
+msgid "You cannot add more datasets on your current plan. Upgrade to add this "
+"catalog dataset."
 msgstr "您當前的計劃無法添加更多數據集。升級以添加此目錄數據集。"
 
 #: src/routes/register.tsx
-msgid "Please check your email for a confirmation link. It may take a few minutes to arrive."
+msgid "Please check your email for a confirmation link. It may take a few "
+"minutes to arrive."
 msgstr "請檢查您的電子郵件以獲取確認鏈接。可能需要幾分鐘才能到達。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -575,8 +595,12 @@ msgstr "不過，我們目前不允許新的註冊。"
 
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
-msgstr "這是您的數據集的前 {0} 行。檢查數據是否正確。如果不正確，可能是您的數據集沒有從第一行開始，或 CSV 使用了不同的分隔符。請嘗試在這裡調整這些設置。"
+msgid "These are the first {0} rows of your dataset. Check to see if the data "
+"is correct. If they are not, it's possible your dataset does not start "
+"on the first row or the CSV uses a different delimiter. Try adjusting "
+"those settings here."
+msgstr "這是您的數據集的前 {0} 行。檢查數據是否正確。如果不正確，可能是您的數據集沒有從第一行開始，或 CSV "
+"使用了不同的分隔符。請嘗試在這裡調整這些設置。"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
@@ -647,7 +671,9 @@ msgid "Offline"
 msgstr "離線"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
-msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
+msgid "These datasets are listed in your workspace, but their source data could "
+"not be found in your local storage. In order to continue, you need to "
+"either re-upload the dataset or delete it from your workspace."
 msgstr "這些數據集在您的工作區中列出，但其源數據在您的本地存儲中找不到。為了繼續，您需要重新上傳數據集或將其從工作區中刪除。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -692,7 +718,8 @@ msgid "Copied"
 msgstr "已複製"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
+msgid "Add a member or a user group to grant access. Use General access below "
+"to share more broadly."
 msgstr "添加成員或用戶組以授予訪問權限。使用下方的一般訪問來更廣泛地分享。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -718,7 +745,8 @@ msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的問題包含可能會影響 AI 回答的語言。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
+#~ "add more datasets, upgrade to a paid plan."
 #~ msgstr ""
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
@@ -765,7 +793,9 @@ msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
+msgid "Publishing makes this dashboard viewable by anyone with the link — no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
 msgstr "發布後，任何擁有鏈接的人都可以查看此儀表板 — 無需 Avandar 帳戶。儀表板引用的數據集在發布時會複製到公共存儲。"
 
 #: src/routes/forgot-password.tsx
@@ -812,7 +842,8 @@ msgid "Create a dashboard"
 msgstr "創建儀表板"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
+msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
+"canvas."
 msgstr "計劃被拒絕。請要求聊天提出不同的計劃，或關閉此畫布。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
@@ -848,7 +879,8 @@ msgid "{0} was deleted from this device."
 msgstr "{0} 已從此設備中刪除。"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-msgid "It's time to create your first workspace. Don't think for too long—you can always change these later!"
+msgid "It's time to create your first workspace. Don't think for too long—you "
+"can always change these later!"
 msgstr "是時候創建您的第一個工作區了。不要想太久—您隨時可以稍後更改這些！"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -863,7 +895,8 @@ msgid "Show the first 20 rows of {datasetName}"
 msgstr "顯示 {datasetName} 的前 20 行"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
-msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
+msgid "The invitation you are trying to accept is not valid. Please contact the "
+"workspace owner to get a new invitation."
 msgstr "您嘗試接受的邀請無效。請聯繫工作區擁有者以獲取新的邀請。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
@@ -998,8 +1031,11 @@ msgid "Choose a plan that works best for your workspace."
 msgstr "選擇最適合您工作區的計劃。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
-msgstr "公共開放資料目錄仍在 <0/><1/> 我們正在根據用戶告訴我們想要的資料集來添加更多開放資料集。如果您希望在這裡看到某個資料集，<2>告訴我們</2>！"
+msgid "The public open data catalog is still in <0/><1/>We are adding more open "
+"datasets as users tell us which datasets they want in Avandar. If there "
+"is a dataset you would like to see here, <2>tell us</2>!"
+msgstr "公共開放資料目錄仍在 <0/><1/> "
+"我們正在根據用戶告訴我們想要的資料集來添加更多開放資料集。如果您希望在這裡看到某個資料集，<2>告訴我們</2>！"
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "Erase"
@@ -1108,7 +1144,8 @@ msgid "Generating…"
 msgstr "生成中…"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-msgid "Are you sure you want to proceed with this action? This cannot be undone."
+msgid "Are you sure you want to proceed with this action? This cannot be "
+"undone."
 msgstr "您確定要繼續此操作嗎？此操作無法撤銷。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
@@ -1133,11 +1170,14 @@ msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "您確定要將此用戶從工作區中移除嗎？"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
-msgid "Configure this filter: set its id, label, and column name in the side panel."
+msgid "Configure this filter: set its id, label, and column name in the side "
+"panel."
 msgstr "配置此過濾器：在側邊面板中設置其 ID、標籤和列名稱。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
-msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
+msgid "The current SQL contains parts that the form could not represent. "
+"Continuing will overwrite that SQL with one generated from the form. "
+"This cannot be undone (unless you re-run your previous chat prompt)."
 msgstr "當前 SQL 包含表單無法表示的部分。繼續將用從表單生成的 SQL 覆蓋該 SQL。這無法撤銷（除非您重新運行之前的聊天提示）。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
@@ -1164,7 +1204,9 @@ msgstr "完成"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
+msgid "{0} to be notified when it's your turn to register! If you are already "
+"on our waitlist and have not received a sign-up code, we appreciate your "
+"patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候補名單上並且尚未收到註冊代碼，我們感謝您的耐心。您將很快收到註冊代碼。我們保證！"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
@@ -1173,7 +1215,8 @@ msgstr "檢測到偏見："
 
 #. placeholder {0}: planSnapshot.steps.length
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
+msgid "The {0}-step analysis that produced this result will be saved with the "
+"dataset, so it can be reopened on the canvas."
 msgstr "生成此結果的 {0} 步驟分析將與資料集一起保存，以便可以在畫布上重新打開。"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -1228,7 +1271,8 @@ msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
+msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
+"<2>{avg}</2>{0}"
 msgstr "範圍從 <0>{numericLow}</0> 到 <1>{numericHigh}</1>，平均 <2>{avg}</2>{0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -1246,11 +1290,17 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
-msgstr "正在開發連接 Google Sheets 和其他數據來源的功能，將很快提供。如果您需要連接的數據庫或服務，<0>請告訴我們，以便我們優先處理</0>。"
+msgid "Connecting to Google Sheets and other data sources are in the works and "
+"will be available very soon. If there is a database or service you use "
+"that you need to connect to, <0>please let us know so we can prioritize "
+"it</0>."
+msgstr "正在開發連接 Google Sheets "
+"和其他數據來源的功能，將很快提供。如果您需要連接的數據庫或服務，<0>請告訴我們，以便我們優先處理</0>。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
+msgid "A local record of every time you approved (or cancelled) sending data to "
+"an AI provider in this workspace. Last 90 days, stored on this device "
+"only."
 msgstr "您在此工作區中每次批准（或取消）向 AI 提供者發送數據的本地記錄。最近 90 天，僅存儲在此設備上。"
 
 #. placeholder {0}: b.parentStepId
@@ -1291,7 +1341,8 @@ msgid "Restriction update failed"
 msgstr "限制更新失敗"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Use the Data Explorer to analyze your datasets, create visualizations, and discover insights from your data."
+msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
+"and discover insights from your data."
 msgstr "使用數據探索器分析您的數據集，創建可視化，並從您的數據中發現洞察。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -1329,7 +1380,9 @@ msgid "Tell us which open dataset you want via feedback"
 msgstr "通過反饋告訴我們您想要的開放資料集"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
-msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
+msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
+"support text, arrows, and freehand drawing with adjustable roughness "
+"(RoughJS)."
 msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持文本、箭頭和可調粗糙度的手繪（RoughJS）。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -1430,7 +1483,8 @@ msgid "Plan branches"
 msgstr "計劃分支"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the Y axis. Values are "
+"grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
@@ -1540,7 +1594,8 @@ msgid "You do not have access to this dashboard"
 msgstr "您無法訪問此儀表板"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
+msgid "Could not summarize this column. The query may have failed for an "
+"unsupported value or a malformed cell."
 msgstr "無法總結此列。查詢可能因不支持的值或格式錯誤的單元格而失敗。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
@@ -1600,7 +1655,8 @@ msgid "Search open data catalog"
 msgstr "搜索開放數據目錄"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the billing portal.<0/>The button below will take you there."
+msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
+"billing portal.<0/>The button below will take you there."
 msgstr "升級到「隨您所願付費」計劃只能通過計費入口網站進行。<0/>下面的按鈕將帶您前往那裡。"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -1629,7 +1685,8 @@ msgid "Sheet name"
 msgstr "工作表名稱"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {entityConfigName}."
+msgid "We will use those columns to merge datasets into a single "
+"{entityConfigName}."
 msgstr "我們將使用這些欄位將數據集合併為單一 {entityConfigName}。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -1643,7 +1700,8 @@ msgstr "轉錄中…"
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
+msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+"download it again later."
 msgstr "{0} (~{1} MB) 將從此瀏覽器中刪除以釋放空間。您可以稍後再次下載。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
@@ -1679,7 +1737,8 @@ msgid "Using {0}"
 msgstr "使用 {0}"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
+msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
+"generate SQL."
 msgstr "尚未生成 SQL。請向 Avandar 提問或在手動標籤中構建查詢以生成 SQL。"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
@@ -1687,7 +1746,8 @@ msgid "Received a non-string value for a text field"
 msgstr "收到非字串值的文本欄位"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come from..."
+msgid "Tell us about where the {singularEntityConfigName} data should come "
+"from..."
 msgstr "告訴我們 {singularEntityConfigName} 數據應該來自哪裡..."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -1769,7 +1829,8 @@ msgid "Google authentication error"
 msgstr "Google 認證錯誤"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly viewable."
+msgid "This dashboard is private. This dashboard has not been made publicly "
+"viewable."
 msgstr "此儀表板為私人儀表板，尚未公開可見。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -1778,7 +1839,8 @@ msgstr "衍生"
 
 #. placeholder {0}: columns.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct."
 msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確。"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
@@ -1818,7 +1880,8 @@ msgid "Register"
 msgstr "註冊"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
+msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
+"the SQL, and drop a block onto the page."
 msgstr "請求我將圖表添加到此儀表板。我將選擇可視化類型，編寫 SQL，並將區塊放到頁面上。"
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
@@ -1945,7 +2008,8 @@ msgid "Could not remove voice model"
 msgstr "無法移除語音模型"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
+msgid "Add a Filter block to the dashboard to enable global filtering for this "
+"visualization."
 msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾。"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
@@ -2055,7 +2119,8 @@ msgid "Export"
 msgstr "匯出"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
+msgid "Create groups for your workspace members. Datasets and dashboards can be "
+"configured to only share with (or restrict) certain user groups."
 msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置為僅與某些用戶群組共享（或限制）。"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
@@ -2065,8 +2130,12 @@ msgstr "預覽："
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "AI 提出了 {0} 步驟計劃——這是很多 SQL。考慮是否使用 Python 或 R 步驟會更清晰。您仍然可以按原樣批准。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
+msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
+"whether a Python or R step would express this more cleanly. You can "
+"still approve as-is. Nothing has run yet. Click each node to read it; "
+"approve to execute."
+msgstr "AI 提出了 {0} 步驟計劃——這是很多 SQL。考慮是否使用 Python 或 R "
+"步驟會更清晰。您仍然可以按原樣批准。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2074,7 +2143,8 @@ msgstr "選擇您的計劃"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
+msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
+"{0})."
 msgstr "數據集名稱必須少於 {maxDatasetNameLength} 個字符（當前：{0}）。"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -2082,7 +2152,8 @@ msgid "Re-run query"
 msgstr "重新執行查詢"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
-msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
+msgid "Choose the language used across this workspace. Right-to-left languages "
+"flip the layout automatically."
 msgstr "選擇此工作區中使用的語言。從右到左的語言會自動翻轉佈局。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
@@ -2163,7 +2234,8 @@ msgid "Back to the login page"
 msgstr "返回登錄頁面"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app access still need a direct share above."
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share above."
 msgstr "控制工作區其餘部分的預設。沒有應用訪問權限的人仍然需要直接共享以上內容。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -2173,7 +2245,8 @@ msgid "Save to dashboard"
 msgstr "儲存到儀表板"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
+#~ "plan to increase the number of datasets you can add to your workspace."
 #~ msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -2235,7 +2308,8 @@ msgid "Fields that come from datasets"
 msgstr "來自數據集的欄位"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be added into this {entityConfigName}."
+msgid "This is where you select which columns from which datasets should be "
+"added into this {entityConfigName}."
 msgstr "這是您選擇應該添加到此 {entityConfigName} 的數據集中的哪些列的地方。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
@@ -2247,7 +2321,8 @@ msgid "Create your first dashboard to track key metrics and insights."
 msgstr "建立您的第一個儀表板以追蹤關鍵指標和洞察。"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Are you sure you want to delete this dataset? This action cannot be undone."
+msgid "Are you sure you want to delete this dataset? This action cannot be "
+"undone."
 msgstr "您確定要刪除此資料集嗎？此操作無法撤銷。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
@@ -2263,7 +2338,8 @@ msgid "Avandar (default)"
 msgstr "Avandar（預設）"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
+msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
 msgstr "{numCols, plural, one {將發佈 # 列：} other {將發佈 # 列：}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
@@ -2306,7 +2382,8 @@ msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do not have access to it."
+msgid "The workspace you are trying to access either does not exist or you do "
+"not have access to it."
 msgstr "您嘗試訪問的工作區不存在或您沒有訪問權限。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
@@ -2335,7 +2412,8 @@ msgid "Password update failed"
 msgstr "密碼更新失敗"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
+msgid "A step failed. Click the red node to retry, or use Re-run to restart "
+"from the top."
 msgstr "步驟失敗。點擊紅色節點重試，或使用重新執行從頭開始。"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -2398,7 +2476,9 @@ msgid "Count how many rows there are in {datasetName}"
 msgstr "計算 {datasetName} 中有多少行"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
+#~ "Starter or Impact plan to increase the number of datasets you can add to "
+#~ "your workspace."
 #~ msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2656,7 +2736,8 @@ msgstr "尚未發布。公眾觀眾將無法看到此內容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to support."
+msgid "The entity failed to load. Please try again later or reach out to "
+"support."
 msgstr "實體加載失敗。請稍後再試或聯繫支持。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -2672,15 +2753,18 @@ msgid "Open on canvas"
 msgstr "在畫布上打開"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach out to support."
+msgid "The profile manager page failed to load. Please try again later or reach "
+"out to support."
 msgstr "配置文件管理頁面加載失敗。請稍後再試或聯繫支持。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "The {chartName} cannot be displayed because there are missing axes or series."
+msgid "The {chartName} cannot be displayed because there are missing axes or "
+"series."
 msgstr "因缺少軸或系列，無法顯示 {chartName}。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
+msgid "Permanently delete all consent decisions on this device? This action "
+"cannot be undone, and the log on other devices is not affected."
 msgstr "是否永久刪除此設備上的所有同意決策？此操作無法撤銷，其他設備上的日誌不受影響。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -2813,7 +2897,8 @@ msgid "Passwords do not match"
 msgstr "密碼不匹配"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the radial value. Values are "
+"grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。值按類別軸（\"{axisKeyValue}\"）分組。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
@@ -2833,7 +2918,8 @@ msgid "No custom groups yet."
 msgstr "尚無自定義群組。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan for unlimited seats."
+msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
+"invite more team members, upgrade to a paid plan for unlimited seats."
 msgstr "您的工作區目前使用免費計劃，最多支持 2 個席位。要邀請更多團隊成員，請升級到付費計劃以獲得無限制席位。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
@@ -2846,7 +2932,8 @@ msgid "Owner"
 msgstr "擁有者"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
+msgid "Never changes, so QR codes printed from here keep working even if the "
+"custom URL changes."
 msgstr "從這裡打印的 QR 碼不會改變，即使自定義 URL 變更也能正常使用。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -2871,7 +2958,8 @@ msgid "You don't have any dashboards yet."
 msgstr "您尚未擁有任何儀表板。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "No clarifications yet. The log fills in as the chat asks clarifying questions."
+msgid "No clarifications yet. The log fills in as the chat asks clarifying "
+"questions."
 msgstr "尚無澄清。當聊天提出澄清問題時，日誌會填寫。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2896,7 +2984,8 @@ msgstr "請向工作區設置管理員請求更新您的角色。"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the {entityConfigName} ID"
+msgid "For dataset <0>{0}</0>, choose the column to use as the "
+"{entityConfigName} ID"
 msgstr "對於數據集 <0>{0}</0>，選擇用作 {entityConfigName} ID 的欄位"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
@@ -3011,7 +3100,8 @@ msgid "No saved datasets found."
 msgstr "未找到已保存的資料集。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this {resource}, in addition to whatever's listed above."
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed above."
 msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource} 上獲得此角色，此外還包括上述列出的內容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
@@ -3041,7 +3131,8 @@ msgid "Download"
 msgstr "下載"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "No members or user groups yet. Invite members or create user groups in Workspace settings."
+msgid "No members or user groups yet. Invite members or create user groups in "
+"Workspace settings."
 msgstr "尚無成員或用戶組。請在工作區設置中邀請成員或創建用戶組。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
@@ -3049,7 +3140,8 @@ msgid "SQL"
 msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
+msgid "No row filters. The slice will include every row in the dataset (for the "
+"selected columns)."
 msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選列）。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -3090,7 +3182,8 @@ msgid "Edit {0}"
 msgstr "編輯 {0}"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
+msgid "We detected both potential personal information and language that may "
+"bias the AI's answer. Review both below."
 msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語言。請在下方查看兩者。"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -3098,7 +3191,8 @@ msgid "Select aggregation"
 msgstr "選擇聚合"
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
+msgid "While Avandar is in beta, we are only allowing registration if you are "
+"on our waitlist and have received a sign-up code in your email."
 msgstr "在 Avandar 還處於測試階段時，我們僅允許在您在候補名單上並且已在電子郵件中收到註冊代碼的情況下進行註冊。"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
@@ -3193,7 +3287,8 @@ msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
+msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
+"below."
 msgstr "每個系列都是一個繪製在 Y 軸上的數值欄。請選擇下面的 X 軸。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3253,7 +3348,8 @@ msgstr "更改"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努力的近似值；上面的 SQL 是實際執行的內容。"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
@@ -3348,7 +3444,9 @@ msgid "Add column as a field"
 msgstr "將列添加為字段"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
+msgid "This data appears to contain health or patient information. Sending it "
+"to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
+"etc.)."
 msgstr "這些數據似乎包含健康或病人信息。將其發送給 AI 提供者可能會有法律和倫理上的影響（HIPAA、GDPR 等）。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
@@ -3449,7 +3547,8 @@ msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "按 {secondGroupBy} 計算 {datasetName} 中的行數"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Pick the category axis below."
+msgid "Each series is a numeric column plotted on the radial value. Pick the "
+"category axis below."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。請選擇下面的類別軸。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
@@ -3497,7 +3596,8 @@ msgid "Your checkout was successful!"
 msgstr "您的結帳成功！"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Import spreadsheets, connect to Google Sheets, or add data from other sources to start analyzing your information."
+msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
+"sources to start analyzing your information."
 msgstr "導入電子表格，連接到 Google Sheets，或從其他來源添加數據以開始分析您的信息。"
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
@@ -3584,11 +3684,13 @@ msgid "Pick which global filters apply to this visualization."
 msgstr "選擇適用於此視覺化的全域篩選。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-msgid "Each series is one cloud of bubbles. The size column determines bubble radius."
+msgid "Each series is one cloud of bubbles. The size column determines bubble "
+"radius."
 msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while offline."
+msgid "Download an offline chat model (cloud icon) to ask questions while "
+"offline."
 msgstr "下載離線聊天模型（雲圖標），以便在離線時提問。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -3632,7 +3734,8 @@ msgid "This feature is not implemented yet."
 msgstr "此功能尚未實現。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
-msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
+msgid "This dataset is large, so we applied a 100-row limit. You can change it "
+"anytime."
 msgstr "此資料集很大，因此我們應用了 100 行的限制。您可以隨時更改此限制。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
@@ -3669,8 +3772,11 @@ msgid "Warning"
 msgstr "警告"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
-msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {app} 訪問權限時才能訪問。當禁用時，該組的每個成員都可以在此訪問，即使他們通常無法打開 {app}。"
+msgid "When on, members of this group only get access if they already have "
+"{app} access in the workspace. When off, every member of the group gets "
+"access here, even if they normally can't open {app}."
+msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {app} 訪問權限時才能訪問。當禁用時，該組的每個成員都可以在此訪問，即使他們通常無法打開 "
+"{app}。"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Auto"
@@ -3682,7 +3788,9 @@ msgstr "成功解析 {numSuccessRows} 行，但 {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Impact plan to increase the number of datasets you can add to your "
+"workspace."
 msgstr "您目前的計劃僅支援最多 {0} 個資料集。升級到我們的 Impact 計劃以增加您可以添加到工作區的資料集數量。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
@@ -3698,7 +3806,8 @@ msgid "Role for {displayName}"
 msgstr "{displayName} 的角色"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
-msgid "Public queries are not supported for structured queries. Use raw SQL instead."
+msgid "Public queries are not supported for structured queries. Use raw SQL "
+"instead."
 msgstr "結構化查詢不支援公共查詢。請改用原始 SQL。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -3792,8 +3901,11 @@ msgstr "儀表板已發佈！"
 #~ msgstr "新增一個按類別分組的 {target} 條形圖"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
-msgstr "口述在本地運行，使用 whisper.cpp。我們首先將 ggml 模型下載到設備存儲中（不會凍結標籤）。當您口述時，模型會加載。進度顯示在左下角。"
+msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
+"device storage first (without freezing the tab). The model loads when "
+"you dictate. Progress appears bottom-left."
+msgstr "口述在本地運行，使用 whisper.cpp。我們首先將 ggml "
+"模型下載到設備存儲中（不會凍結標籤）。當您口述時，模型會加載。進度顯示在左下角。"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3808,7 +3920,8 @@ msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "嘗試與 Google 表單驗證時發生錯誤。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "The owner always has admin access. To change owner, use the {resource} settings."
+msgid "The owner always has admin access. To change owner, use the {resource} "
+"settings."
 msgstr "擁有者始終具有管理員訪問權限。要更改擁有者，請使用 {resource} 設定。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
@@ -3851,7 +3964,8 @@ msgstr "如果每個 {0} 只能有一個 {fieldName} 值，請勾選此框。"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
+msgid "Description must be under {maxDatasetDescriptionLength} characters "
+"(current: {0})."
 msgstr "描述必須少於 {maxDatasetDescriptionLength} 個字符（當前：{0}）。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -3876,7 +3990,8 @@ msgid "Enter dataset name"
 msgstr "輸入數據集名稱"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-msgid "This name only applies in {workspaceName}. Your other workspaces keep their own."
+msgid "This name only applies in {workspaceName}. Your other workspaces keep "
+"their own."
 msgstr "此名稱僅適用於 {workspaceName}。您的其他工作區保持自己的名稱。"
 
 #. placeholder {0}: model.displayName
@@ -4000,11 +4115,13 @@ msgstr "上傳電子表格"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
+msgid "We were unable to update your subscription. Please contact "
+"{SUPPORT_EMAIL}"
 msgstr "我們無法更新您的訂閱。請聯絡 {SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under maintenance."
+msgid "Google sheets connector is disabled while this feature is under "
+"maintenance."
 msgstr "在此功能維護期間，Google Sheets 連接器已被禁用。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -4042,7 +4159,10 @@ msgstr "Google Sheets"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
+msgid "This dataset will no longer be stored online and can only be accessed as "
+"long as it is on your personal computer. Nobody on your team will be "
+"able to access this data. This is recommended only for very sensitive "
+"data."
 msgstr "此數據集將不再在線存儲，僅能在您的個人電腦上訪問。您的團隊中的任何人都無法訪問此數據。這僅建議用於非常敏感的數據。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
@@ -4050,8 +4170,11 @@ msgid "Download a different offline chat model"
 msgstr "下載不同的離線聊天模型"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
-#~ msgstr "語音提示完全在您的設備上運行。要進行口述，我們需要從 Hugging Face 下載一次 Whisper 模型。下載在背景中進行；進度顯示在左下角。"
+#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
+#~ "download a Whisper model from Hugging Face once. The download runs in "
+#~ "the background; progress appears in the bottom-left corner."
+#~ msgstr "語音提示完全在您的設備上運行。要進行口述，我們需要從 Hugging Face 下載一次 Whisper "
+#~ "模型。下載在背景中進行；進度顯示在左下角。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4119,7 +4242,8 @@ msgid "Multi-select"
 msgstr "多選"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
+msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
+"metric pairs on the same chart."
 msgstr "每個系列是一個 (X, Y) 點雲。添加更多以在同一圖表上比較多個指標對。"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -4219,7 +4343,9 @@ msgid "Loading sharing settings…"
 msgstr "加載共享設置中…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your workspace is on the Free plan, which supports up to 5 datasets. "
+"Upgrade to our Starter or Impact plan to increase the number of datasets "
+"you can add to your workspace."
 msgstr "您的工作區在免費計劃中，最多支持 5 個數據集。升級到我們的入門或影響計劃以增加可以添加到工作區的數據集數量。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
@@ -4376,7 +4502,8 @@ msgstr "個人資料"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
+msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
+"undone."
 msgstr "您確定要永久刪除 <0>{0}</0> 嗎？此操作無法撤銷。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
@@ -4384,7 +4511,8 @@ msgid "Column outline"
 msgstr "欄位大綱"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."
+msgid "What this person or group can do. Viewer = read only, Editor = edit "
+"content, Admin = full control including sharing."
 msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯內容，管理員 = 完全控制，包括共享。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
@@ -4522,7 +4650,9 @@ msgstr "自定義澄清答案"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Starter or Impact plan to increase the number of datasets you can add to "
+"your workspace."
 msgstr "您目前的計畫僅支援最多 {0} 個資料集。升級到我們的入門或影響計畫以增加您可以添加到工作區的資料集數量。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
@@ -4544,7 +4674,9 @@ msgid "Some datasets are missing data"
 msgstr "某些數據集缺少數據"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
-msgid "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
+msgid "Avandar is still in beta. Some features may not work as expected and "
+"some may still be under construction. We appreciate your patience and "
+"feedback as we work to improve the product."
 msgstr "Avandar 仍在測試階段。某些功能可能無法按預期工作，某些功能可能仍在建設中。我們感謝您的耐心和反饋，幫助我們改進產品。"
 
 #: src/routes/register.tsx
@@ -4594,7 +4726,8 @@ msgid "Members"
 msgstr "成員"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
+msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
+"type is kebab-cased automatically."
 msgstr "一個簡短且易記的 URL 用於傳單、報告和 QR 碼。您輸入的任何內容都會自動轉換為 kebab-case。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -4675,7 +4808,8 @@ msgid "Loading voice model"
 msgstr "正在加載語音模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
+msgid "Choose a workspace preset or customize per app. User groups control "
+"dataset and dashboard access intersections."
 msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據集和儀表板的訪問交集。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
@@ -4683,7 +4817,8 @@ msgid "Dataset saved"
 msgstr "資料集已儲存"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {entityConfigName}."
 msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {entityConfigName}。"
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
@@ -4741,15 +4876,19 @@ msgstr "未找到工作區"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct. If they are not, change the import options above and "
+"click Upload again."
 msgstr "{0} 列已被檢測到。請檢查下面的列資訊以確保其正確。如果不正確，請更改上面的匯入選項並再次點擊上傳。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seats."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座位。"
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload files, connect external sources, or browse open datasets to add to your workspace."
+msgid "Upload files, connect external sources, or browse open datasets to add "
+"to your workspace."
 msgstr "上傳文件、連接外部來源或瀏覽開放數據集以添加到您的工作區。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -4868,7 +5007,8 @@ msgid "Distinct values"
 msgstr "不同的值"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
+msgid "Please confirm that you would like to proceed with this plan change. "
+"Your subscription will be updated accordingly."
 msgstr "請確認您是否希望繼續進行此計劃變更。您的訂閱將相應更新。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -4885,7 +5025,8 @@ msgid "Search..."
 msgstr "搜索..."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
+msgid "Please take a look at the data and make sure it is correct. Once you "
+"confirm, the dataset will be synced with this data."
 msgstr "請查看數據並確保其正確。一旦確認，數據集將與此數據同步。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -4901,7 +5042,8 @@ msgid "anyone with "
 msgstr "任何擁有 "
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
+msgid "The values you selected may contain personal information. The AI "
+"provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -4933,7 +5075,8 @@ msgid "Fix these issues before saving"
 msgstr "在保存之前修正這些問題"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
+msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
+"redirects here."
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
@@ -5004,7 +5147,8 @@ msgstr "無效的日期"
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
+msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
+"node to read it; approve to execute."
 msgstr "AI 提出了 {0} 步計劃。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
@@ -5080,7 +5224,8 @@ msgid "Show QR code"
 msgstr "顯示 QR 碼"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
+msgid "By default we use a permanent UUID-based link. Add a custom path below "
+"for a nicer URL."
 msgstr "默認情況下，我們使用基於永久 UUID 的連結。請在下面添加自定義路徑以獲得更美觀的 URL。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx

@@ -31,8 +31,10 @@ msgid "ID field is required"
 msgstr "حقل المعرف مطلوب"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be parsed safely, so all columns will be published."
-msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
+msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
+"parsed safely, so all columns will be published."
+msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو "
+"لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
@@ -40,7 +42,8 @@ msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها مت�
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
-msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى جميع الأعمدة."
+msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى "
+"جميع الأعمدة."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Sort by"
@@ -55,8 +58,10 @@ msgid "Dashboard name"
 msgstr "اسم لوحة التحكم"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This will allow the dataset to be stored online so it can be accessed in other devices."
-msgstr "سيسمح ذلك بتخزين مجموعة البيانات على الإنترنت بحيث يمكن الوصول إليها من أجهزة أخرى."
+msgid "This will allow the dataset to be stored online so it can be accessed in "
+"other devices."
+msgstr "سيسمح ذلك بتخزين مجموعة البيانات على الإنترنت بحيث يمكن الوصول إليها من "
+"أجهزة أخرى."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Run a query to see results."
@@ -109,8 +114,10 @@ msgid "Search datasets..."
 msgstr "بحث في مجموعات البيانات..."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
-msgid "The dataset failed to load. Please try again later or reach out to support."
-msgstr "فشل تحميل مجموعة البيانات. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
+msgid "The dataset failed to load. Please try again later or reach out to "
+"support."
+msgstr "فشل تحميل مجموعة البيانات. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع "
+"الدعم."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose chat model"
@@ -180,19 +187,24 @@ msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله عل�
 #. placeholder {0}: modelToDownload.displayName
 #. placeholder {1}: modelToDownload.systemRequirements
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base here, or use a smaller RAM tier."
-msgstr "{0} يحتاج إلى {1} وليس متاحًا في المتصفح. اختر Tiny أو Base هنا، أو استخدم مستوى ذاكرة وصول عشوائي أصغر."
+msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
+"here, or use a smaller RAM tier."
+msgstr "{0} يحتاج إلى {1} وليس متاحًا في المتصفح. اختر Tiny أو Base هنا، أو "
+"استخدم مستوى ذاكرة وصول عشوائي أصغر."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
-msgid "No filters yet. Add one to let viewers refine this chart without affecting any others."
-msgstr "لا توجد فلاتر حتى الآن. أضف واحدة للسماح للمشاهدين بتصفية هذا الرسم البياني دون التأثير على أي رسومات أخرى."
+msgid "No filters yet. Add one to let viewers refine this chart without "
+"affecting any others."
+msgstr "لا توجد فلاتر حتى الآن. أضف واحدة للسماح للمشاهدين بتصفية هذا الرسم "
+"البياني دون التأثير على أي رسومات أخرى."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
 msgstr "ملفات Excel"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
-msgid "Enter your question or instructions in natural language to generate a SQL query"
+msgid "Enter your question or instructions in natural language to generate a "
+"SQL query"
 msgstr "أدخل سؤالك أو تعليماتك بلغة طبيعية لإنشاء استعلام SQL"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -340,7 +352,8 @@ msgid "Do you want to import \"{fileName}\" as a new dataset?"
 msgstr "هل تريد استيراد \"{fileName}\" كبيانات جديدة؟"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-msgid "For more control over your subscription, you can manage your subscription in your"
+msgid "For more control over your subscription, you can manage your "
+"subscription in your"
 msgstr "للحصول على مزيد من التحكم في اشتراكك، يمكنك إدارة اشتراكك في"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
@@ -367,8 +380,11 @@ msgid "← Back"
 msgstr "← العودة"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every clarifying question the AI has asked in this workspace. Only metadata is stored — never the question text or your answer."
-msgstr "سجل محلي لكل سؤال توضيحي طرحه الذكاء الاصطناعي في هذه المساحة العمل. يتم تخزين البيانات الوصفية فقط — وليس نص السؤال أو إجابتك."
+msgid "A local record of every clarifying question the AI has asked in this "
+"workspace. Only metadata is stored — never the question text or your "
+"answer."
+msgstr "سجل محلي لكل سؤال توضيحي طرحه الذكاء الاصطناعي في هذه المساحة العمل. "
+"يتم تخزين البيانات الوصفية فقط — وليس نص السؤال أو إجابتك."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Cannot display {chartName}"
@@ -387,7 +403,9 @@ msgid "Allow multiple values"
 msgstr "السماح بقيم متعددة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
+#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
+#~ "number of datasets you can add to your workspace you can purchase more "
+#~ "seats. Each seat allows you to add 10 more datasets!"
 #~ msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
@@ -395,13 +413,23 @@ msgid "No datasets added yet"
 msgstr "لم تتم إضافة أي مجموعات بيانات حتى الآن"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "Choose how much of each dataset to publish. The default — \"Only what's queried\" — uploads just the columns your visualizations read. Widen the scope if you've added viewer-editable filters and want viewers to be able to filter beyond your defaults."
-msgstr "اختر مقدار كل مجموعة بيانات لنشرها. الافتراضي - \"فقط ما تم استعلامه\" - يقوم بتحميل الأعمدة التي تقرأها تصوراتك. قم بتوسيع النطاق إذا كنت قد أضفت فلاتر قابلة للتعديل من قبل المشاهدين وترغب في أن يتمكن المشاهدون من التصفية بما يتجاوز الافتراضات الخاصة بك."
+msgid "Choose how much of each dataset to publish. The default — \"Only what's "
+"queried\" — uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+msgstr "اختر مقدار كل مجموعة بيانات لنشرها. الافتراضي - \"فقط ما تم استعلامه\" "
+"- يقوم بتحميل الأعمدة التي تقرأها تصوراتك. قم بتوسيع النطاق إذا كنت قد "
+"أضفت فلاتر قابلة للتعديل من قبل المشاهدين وترغب في أن يتمكن المشاهدون "
+"من التصفية بما يتجاوز الافتراضات الخاصة بك."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. To increase the number of datasets you can add to your workspace you can purchase more seats. Each seat allows you to add 10 more datasets!"
-msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك، يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
+msgid "Your current plan only supports up to {0} datasets. To increase the "
+"number of datasets you can add to your workspace you can purchase more "
+"seats. Each seat allows you to add 10 more datasets!"
+msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. لزيادة "
+"عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك، "
+"يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
@@ -455,11 +483,14 @@ msgstr "تحتوي الورقة على صف رأس"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search the data catalog to add open datasets to your workspace."
-msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة العمل الخاصة بك."
+msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة "
+"العمل الخاصة بك."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data Explorer</0>."
-msgstr "الدردشة مفعلة في مستكشف البيانات ولوحات المعلومات. <0>فتح مستكشف البيانات</0>."
+msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
+"Explorer</0>."
+msgstr "الدردشة مفعلة في مستكشف البيانات ولوحات المعلومات. <0>فتح مستكشف "
+"البيانات</0>."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group updated"
@@ -530,12 +561,16 @@ msgid "PDF (multi-page)"
 msgstr "PDF (صفحات متعددة)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
-msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية لإضافة مجموعة بيانات الكتالوج هذه."
+msgid "You cannot add more datasets on your current plan. Upgrade to add this "
+"catalog dataset."
+msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية "
+"لإضافة مجموعة بيانات الكتالوج هذه."
 
 #: src/routes/register.tsx
-msgid "Please check your email for a confirmation link. It may take a few minutes to arrive."
-msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق وصوله بضع دقائق."
+msgid "Please check your email for a confirmation link. It may take a few "
+"minutes to arrive."
+msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق "
+"وصوله بضع دقائق."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Remove offline chat model?"
@@ -575,8 +610,13 @@ msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في �
 
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "These are the first {0} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here."
-msgstr "هذه هي الصفوف الأولى {0} من مجموعة بياناتك. تحقق من صحة البيانات. إذا لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
+msgid "These are the first {0} rows of your dataset. Check to see if the data "
+"is correct. If they are not, it's possible your dataset does not start "
+"on the first row or the CSV uses a different delimiter. Try adjusting "
+"those settings here."
+msgstr "هذه هي الصفوف الأولى {0} من مجموعة بياناتك. تحقق من صحة البيانات. إذا "
+"لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن "
+"CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
@@ -647,8 +687,12 @@ msgid "Offline"
 msgstr "دون اتصال"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
-msgid "These datasets are listed in your workspace, but their source data could not be found in your local storage. In order to continue, you need to either re-upload the dataset or delete it from your workspace."
-msgstr "تظهر هذه المجموعات في مساحة العمل الخاصة بك، لكن لم يتم العثور على بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
+msgid "These datasets are listed in your workspace, but their source data could "
+"not be found in your local storage. In order to continue, you need to "
+"either re-upload the dataset or delete it from your workspace."
+msgstr "تظهر هذه المجموعات في مساحة العمل الخاصة بك، لكن لم يتم العثور على "
+"بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى "
+"إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
@@ -676,7 +720,8 @@ msgstr "إعداد مسبق"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-msgstr "أضف رسمًا بيانيًا عموديًا لعدد الصفوف في {datasetName} مجمعة حسب {groupByColumn}"
+msgstr "أضف رسمًا بيانيًا عموديًا لعدد الصفوف في {datasetName} مجمعة حسب "
+"{groupByColumn}"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -692,8 +737,10 @@ msgid "Copied"
 msgstr "تم النسخ"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below to share more broadly."
-msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أدناه للمشاركة بشكل أوسع."
+msgid "Add a member or a user group to grant access. Use General access below "
+"to share more broadly."
+msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أدناه "
+"للمشاركة بشكل أوسع."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -718,7 +765,8 @@ msgid "Your question contains language that may bias the AI's answer."
 msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة الذكاء الاصطناعي."
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To add more datasets, upgrade to a paid plan."
+#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
+#~ "add more datasets, upgrade to a paid plan."
 #~ msgstr ""
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
@@ -765,8 +813,12 @@ msgid "Type your answer…"
 msgstr "اكتب إجابتك..."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link — no Avandar account required. Datasets referenced by the dashboard are copied to public storage at publish time."
-msgstr "يجعل النشر هذه اللوحة مرئية لأي شخص لديه الرابط — لا حاجة لحساب Avandar. يتم نسخ مجموعات البيانات المشار إليها بواسطة اللوحة إلى التخزين العام عند النشر."
+msgid "Publishing makes this dashboard viewable by anyone with the link — no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
+msgstr "يجعل النشر هذه اللوحة مرئية لأي شخص لديه الرابط — لا حاجة لحساب "
+"Avandar. يتم نسخ مجموعات البيانات المشار إليها بواسطة اللوحة إلى "
+"التخزين العام عند النشر."
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -812,7 +864,8 @@ msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
+msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
+"canvas."
 msgstr "تم رفض الخطة. اطلب من الدردشة اقتراح خطة مختلفة، أو أغلق هذه اللوحة."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
@@ -848,8 +901,10 @@ msgid "{0} was deleted from this device."
 msgstr "{0} تم حذفه من هذا الجهاز."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-msgid "It's time to create your first workspace. Don't think for too long—you can always change these later!"
-msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك دائمًا تغيير هذه لاحقًا!"
+msgid "It's time to create your first workspace. Don't think for too long—you "
+"can always change these later!"
+msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك "
+"دائمًا تغيير هذه لاحقًا!"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 #: src/routes/register.tsx
@@ -863,8 +918,10 @@ msgid "Show the first 20 rows of {datasetName}"
 msgstr "عرض أول 20 صفًا من {datasetName}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
-msgid "The invitation you are trying to accept is not valid. Please contact the workspace owner to get a new invitation."
-msgstr "الدعوة التي تحاول قبولها غير صالحة. يرجى الاتصال بمالك مساحة العمل للحصول على دعوة جديدة."
+msgid "The invitation you are trying to accept is not valid. Please contact the "
+"workspace owner to get a new invitation."
+msgstr "الدعوة التي تحاول قبولها غير صالحة. يرجى الاتصال بمالك مساحة العمل "
+"للحصول على دعوة جديدة."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Enter a description for this profile type"
@@ -998,8 +1055,13 @@ msgid "Choose a plan that works best for your workspace."
 msgstr "اختر خطة تناسب مساحة العمل الخاصة بك بشكل أفضل."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
-msgstr "كتالوج البيانات المفتوحة العامة لا يزال في <0/><1/>نحن نضيف المزيد من مجموعات البيانات المفتوحة كما يخبرنا المستخدمون بالمجموعات التي يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، <2>أخبرنا</2>!"
+msgid "The public open data catalog is still in <0/><1/>We are adding more open "
+"datasets as users tell us which datasets they want in Avandar. If there "
+"is a dataset you would like to see here, <2>tell us</2>!"
+msgstr "كتالوج البيانات المفتوحة العامة لا يزال في <0/><1/>نحن نضيف المزيد من "
+"مجموعات البيانات المفتوحة كما يخبرنا المستخدمون بالمجموعات التي "
+"يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، "
+"<2>أخبرنا</2>!"
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "Erase"
@@ -1108,7 +1170,8 @@ msgid "Generating…"
 msgstr "يتم الإنشاء…"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-msgid "Are you sure you want to proceed with this action? This cannot be undone."
+msgid "Are you sure you want to proceed with this action? This cannot be "
+"undone."
 msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
@@ -1133,12 +1196,18 @@ msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
-msgid "Configure this filter: set its id, label, and column name in the side panel."
-msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته، واسم العمود في اللوحة الجانبية."
+msgid "Configure this filter: set its id, label, and column name in the side "
+"panel."
+msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته، واسم العمود في اللوحة "
+"الجانبية."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
-msgid "The current SQL contains parts that the form could not represent. Continuing will overwrite that SQL with one generated from the form. This cannot be undone (unless you re-run your previous chat prompt)."
-msgstr "تحتوي SQL الحالية على أجزاء لا يمكن للنموذج تمثيلها. الاستمرار سيؤدي إلى الكتابة فوق تلك SQL بواحدة تم إنشاؤها من النموذج. لا يمكن التراجع عن ذلك (ما لم تقم بإعادة تشغيل طلب الدردشة السابق)."
+msgid "The current SQL contains parts that the form could not represent. "
+"Continuing will overwrite that SQL with one generated from the form. "
+"This cannot be undone (unless you re-run your previous chat prompt)."
+msgstr "تحتوي SQL الحالية على أجزاء لا يمكن للنموذج تمثيلها. الاستمرار سيؤدي "
+"إلى الكتابة فوق تلك SQL بواحدة تم إنشاؤها من النموذج. لا يمكن التراجع "
+"عن ذلك (ما لم تقم بإعادة تشغيل طلب الدردشة السابق)."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Select the columns you want in this {entityConfigName}"
@@ -1164,8 +1233,12 @@ msgstr "مكتمل"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل قريبًا. نعدك!"
+msgid "{0} to be notified when it's your turn to register! If you are already "
+"on our waitlist and have not received a sign-up code, we appreciate your "
+"patience. You will receive a sign-up code soon. We promise!"
+msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة "
+"الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل "
+"قريبًا. نعدك!"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
@@ -1173,8 +1246,10 @@ msgstr "تم الكشف عن تحيز:"
 
 #. placeholder {0}: planSnapshot.steps.length
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث يمكن إعادة فتحه على اللوحة."
+msgid "The {0}-step analysis that produced this result will be saved with the "
+"dataset, so it can be reopened on the canvas."
+msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث "
+"يمكن إعادة فتحه على اللوحة."
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
@@ -1228,8 +1303,10 @@ msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاج
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging <2>{avg}</2>{0}"
-msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط <2>{avg}</2>{0}"
+msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
+"<2>{avg}</2>{0}"
+msgstr "يتراوح من <0>{numericLow}</0> إلى <1>{numericHigh}</1>، بمتوسط "
+"<2>{avg}</2>{0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -1246,12 +1323,20 @@ msgid "{0} / 3"
 msgstr "{0} / 3"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and will be available very soon. If there is a database or service you use that you need to connect to, <0>please let us know so we can prioritize it</0>."
-msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخرى قيد العمل وسيكون متاحًا قريبًا جدًا. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها وتحتاج إلى الاتصال بها، <0>يرجى إخبارنا حتى نتمكن من إعطائها الأولوية</0>."
+msgid "Connecting to Google Sheets and other data sources are in the works and "
+"will be available very soon. If there is a database or service you use "
+"that you need to connect to, <0>please let us know so we can prioritize "
+"it</0>."
+msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخرى قيد العمل وسيكون متاحًا "
+"قريبًا جدًا. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها وتحتاج إلى "
+"الاتصال بها، <0>يرجى إخبارنا حتى نتمكن من إعطائها الأولوية</0>."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
-msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
+msgid "A local record of every time you approved (or cancelled) sending data to "
+"an AI provider in this workspace. Last 90 days, stored on this device "
+"only."
+msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء "
+"الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
 
 #. placeholder {0}: b.parentStepId
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
@@ -1272,7 +1357,8 @@ msgstr "لم يتم تنفيذه بعد"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
-msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه. سيتم فرض رسوم على مساحة العمل لكل عضو."
+msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه. سيتم فرض رسوم على مساحة العمل لكل "
+"عضو."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Used suggestion"
@@ -1291,8 +1377,10 @@ msgid "Restriction update failed"
 msgstr "فشل تحديث القيود"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Use the Data Explorer to analyze your datasets, create visualizations, and discover insights from your data."
-msgstr "استخدم مستكشف البيانات لتحليل مجموعات البيانات الخاصة بك، وإنشاء تصورات، واكتشاف رؤى من بياناتك."
+msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
+"and discover insights from your data."
+msgstr "استخدم مستكشف البيانات لتحليل مجموعات البيانات الخاصة بك، وإنشاء "
+"تصورات، واكتشاف رؤى من بياناتك."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
@@ -1312,7 +1400,8 @@ msgstr "توقف ونسخ"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
-msgstr "اختر مجموعة بيانات محفوظة أو استورد بيانات جديدة إلى مساحة العمل الخاصة بك."
+msgstr "اختر مجموعة بيانات محفوظة أو استورد بيانات جديدة إلى مساحة العمل الخاصة "
+"بك."
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
@@ -1329,8 +1418,11 @@ msgid "Tell us which open dataset you want via feedback"
 msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
-msgid "Export this dashboard as a PDF, or sketch on it first. Annotations support text, arrows, and freehand drawing with adjustable roughness (RoughJS)."
-msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
+msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
+"support text, arrows, and freehand drawing with adjustable roughness "
+"(RoughJS)."
+msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات "
+"النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "No speech detected"
@@ -1338,7 +1430,8 @@ msgstr "لم يتم الكشف عن أي كلام"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
-msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول المبكر."
+msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
+"المبكر."
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Step"
@@ -1430,8 +1523,10 @@ msgid "Plan branches"
 msgstr "فروع الخطة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
-msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور X (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the Y axis. Values are "
+"grouped by the X axis (\"{axisKeyValue}\")."
+msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور "
+"X (\"{axisKeyValue}\")."
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
@@ -1540,8 +1635,10 @@ msgid "You do not have access to this dashboard"
 msgstr "ليس لديك حق الوصول إلى هذه اللوحة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Could not summarize this column. The query may have failed for an unsupported value or a malformed cell."
-msgstr "لم يتمكن من تلخيص هذه العمود. قد يكون الاستعلام قد فشل بسبب قيمة غير مدعومة أو خلية مشوهة."
+msgid "Could not summarize this column. The query may have failed for an "
+"unsupported value or a malformed cell."
+msgstr "لم يتمكن من تلخيص هذه العمود. قد يكون الاستعلام قد فشل بسبب قيمة غير "
+"مدعومة أو خلية مشوهة."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Data scope"
@@ -1600,8 +1697,10 @@ msgid "Search open data catalog"
 msgstr "ابحث في كتالوج البيانات المفتوحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the billing portal.<0/>The button below will take you there."
-msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط من خلال بوابة الفوترة.<0/>سيأخذك الزر أدناه إلى هناك."
+msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
+"billing portal.<0/>The button below will take you there."
+msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط من خلال بوابة "
+"الفوترة.<0/>سيأخذك الزر أدناه إلى هناك."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete entity"
@@ -1629,7 +1728,8 @@ msgid "Sheet name"
 msgstr "اسم الورقة"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {entityConfigName}."
+msgid "We will use those columns to merge datasets into a single "
+"{entityConfigName}."
 msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {entityConfigName} واحدة."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -1643,8 +1743,10 @@ msgstr "يتم النسخ..."
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can download it again later."
-msgstr "{0} (~{1} ميغابايت) سيتم حذفه من هذا المتصفح لتحرير المساحة. يمكنك تنزيله مرة أخرى لاحقًا."
+msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+"download it again later."
+msgstr "{0} (~{1} ميغابايت) سيتم حذفه من هذا المتصفح لتحرير المساحة. يمكنك "
+"تنزيله مرة أخرى لاحقًا."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -1679,15 +1781,18 @@ msgid "Using {0}"
 msgstr "باستخدام {0}"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to generate SQL."
-msgstr "لا يوجد SQL حتى الآن. اسأل Avandar سؤالاً أو قم ببناء استعلام في علامة التبويب اليدوية لإنشاء SQL."
+msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
+"generate SQL."
+msgstr "لا يوجد SQL حتى الآن. اسأل Avandar سؤالاً أو قم ببناء استعلام في علامة "
+"التبويب اليدوية لإنشاء SQL."
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 msgid "Received a non-string value for a text field"
 msgstr "تم استلام قيمة غير نصية لحقل نصي"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come from..."
+msgid "Tell us about where the {singularEntityConfigName} data should come "
+"from..."
 msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -1769,7 +1874,8 @@ msgid "Google authentication error"
 msgstr "خطأ في مصادقة Google"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly viewable."
+msgid "This dashboard is private. This dashboard has not been made publicly "
+"viewable."
 msgstr "هذه اللوحة خاصة. لم يتم جعل هذه اللوحة قابلة للرؤية للجمهور."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -1778,7 +1884,8 @@ msgstr "مشتق"
 
 #. placeholder {0}: columns.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct."
 msgstr "{0} أعمدة تم الكشف عنها. راجع معلومات الأعمدة أدناه للتأكد من صحتها."
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
@@ -1818,8 +1925,10 @@ msgid "Register"
 msgstr "تسجيل"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
-msgstr "اطلب مني إضافة مخطط إلى لوحة المعلومات هذه. سأختار نوع التصور، وأكتب SQL، وأضع كتلة على الصفحة."
+msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
+"the SQL, and drop a block onto the page."
+msgstr "اطلب مني إضافة مخطط إلى لوحة المعلومات هذه. سأختار نوع التصور، وأكتب "
+"SQL، وأضع كتلة على الصفحة."
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: top.count.toLocaleString()
@@ -1945,7 +2054,8 @@ msgid "Could not remove voice model"
 msgstr "تعذر إزالة نموذج الصوت"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-msgid "Add a Filter block to the dashboard to enable global filtering for this visualization."
+msgid "Add a Filter block to the dashboard to enable global filtering for this "
+"visualization."
 msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية العالمية لهذه التصور."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
@@ -2055,8 +2165,10 @@ msgid "Export"
 msgstr "تصدير"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
-msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة بك. يمكن تكوين مجموعات البيانات ولوحات المعلومات لمشاركة فقط مع (أو تقييد) مجموعات مستخدمين معينة."
+msgid "Create groups for your workspace members. Datasets and dashboards can be "
+"configured to only share with (or restrict) certain user groups."
+msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة بك. يمكن تكوين مجموعات البيانات "
+"ولوحات المعلومات لمشاركة فقط مع (أو تقييد) مجموعات مستخدمين معينة."
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
@@ -2065,8 +2177,13 @@ msgstr "معاينة:"
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة — هذا الكثير من SQL. فكر فيما إذا كانت خطوة Python أو R ستعبر عن ذلك بشكل أنظف. يمكنك الموافقة كما هي. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
+msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
+"whether a Python or R step would express this more cleanly. You can "
+"still approve as-is. Nothing has run yet. Click each node to read it; "
+"approve to execute."
+msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة — هذا الكثير من SQL. فكر فيما "
+"إذا كانت خطوة Python أو R ستعبر عن ذلك بشكل أنظف. يمكنك الموافقة كما "
+"هي. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2074,16 +2191,20 @@ msgstr "اختر خطتك"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Dataset name must be under {maxDatasetNameLength} characters (current: {0})."
-msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {maxDatasetNameLength} حرفًا (الحالي: {0})."
+msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
+"{0})."
+msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {maxDatasetNameLength} حرفًا "
+"(الحالي: {0})."
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
 msgstr "إعادة تشغيل الاستعلام"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
-msgid "Choose the language used across this workspace. Right-to-left languages flip the layout automatically."
-msgstr "اختر اللغة المستخدمة في هذه المساحة. اللغات من اليمين إلى اليسار تعكس التخطيط تلقائيًا."
+msgid "Choose the language used across this workspace. Right-to-left languages "
+"flip the layout automatically."
+msgstr "اختر اللغة المستخدمة في هذه المساحة. اللغات من اليمين إلى اليسار تعكس "
+"التخطيط تلقائيًا."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "No plans available."
@@ -2163,8 +2284,10 @@ msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app access still need a direct share above."
-msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة العمل. الأشخاص الذين ليس لديهم وصول إلى التطبيق لا يزالون بحاجة إلى مشاركة مباشرة أعلاه."
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share above."
+msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة العمل. الأشخاص الذين ليس لديهم "
+"وصول إلى التطبيق لا يزالون بحاجة إلى مشاركة مباشرة أعلاه."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2173,7 +2296,8 @@ msgid "Save to dashboard"
 msgstr "حفظ إلى اللوحة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
+#~ "plan to increase the number of datasets you can add to your workspace."
 #~ msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -2211,7 +2335,8 @@ msgstr "{0} تم حذفه من هذا المتصفح."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
-msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة أخرى لاحقًا."
+msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة "
+"أخرى لاحقًا."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2235,8 +2360,10 @@ msgid "Fields that come from datasets"
 msgstr "الحقول التي تأتي من مجموعات البيانات"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be added into this {entityConfigName}."
-msgstr "هنا تختار الأعمدة من مجموعات البيانات التي يجب إضافتها إلى هذا {entityConfigName}."
+msgid "This is where you select which columns from which datasets should be "
+"added into this {entityConfigName}."
+msgstr "هنا تختار الأعمدة من مجموعات البيانات التي يجب إضافتها إلى هذا "
+"{entityConfigName}."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
@@ -2247,8 +2374,10 @@ msgid "Create your first dashboard to track key metrics and insights."
 msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Are you sure you want to delete this dataset? This action cannot be undone."
-msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا الإجراء."
+msgid "Are you sure you want to delete this dataset? This action cannot be "
+"undone."
+msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا "
+"الإجراء."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol size column must be numeric."
@@ -2263,7 +2392,8 @@ msgid "Avandar (default)"
 msgstr "افاندر (افتراضي)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "{numCols, plural, one {Will publish # column:} other {Will publish # columns:}}"
+msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
 msgstr "{numCols, plural, one {سيتم نشر # عمود:} other {سيتم نشر # أعمدة:}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
@@ -2306,8 +2436,10 @@ msgid "Choose the maximum value"
 msgstr "اختر القيمة القصوى"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do not have access to it."
-msgstr "المساحة التي تحاول الوصول إليها إما غير موجودة أو ليس لديك حق الوصول إليها."
+msgid "The workspace you are trying to access either does not exist or you do "
+"not have access to it."
+msgstr "المساحة التي تحاول الوصول إليها إما غير موجودة أو ليس لديك حق الوصول "
+"إليها."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
@@ -2335,8 +2467,10 @@ msgid "Password update failed"
 msgstr "فشل تحديث كلمة المرور"
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
-msgstr "فشل خطوة. انقر على العقدة الحمراء لإعادة المحاولة، أو استخدم إعادة التشغيل للبدء من الأعلى."
+msgid "A step failed. Click the red node to retry, or use Re-run to restart "
+"from the top."
+msgstr "فشل خطوة. انقر على العقدة الحمراء لإعادة المحاولة، أو استخدم إعادة "
+"التشغيل للبدء من الأعلى."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2398,7 +2532,9 @@ msgid "Count how many rows there are in {datasetName}"
 msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
+#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
+#~ "Starter or Impact plan to increase the number of datasets you can add to "
+#~ "your workspace."
 #~ msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2636,7 +2772,8 @@ msgstr "السماح بالتعديل اليدوي"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #~ msgid "Whisper supports many languages; auto-detect handles mixed input."
-#~ msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال المختلط."
+#~ msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال "
+#~ "المختلط."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2656,7 +2793,8 @@ msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون الع
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to support."
+msgid "The entity failed to load. Please try again later or reach out to "
+"support."
 msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
@@ -2672,16 +2810,21 @@ msgid "Open on canvas"
 msgstr "فتح على اللوحة"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach out to support."
-msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
+msgid "The profile manager page failed to load. Please try again later or reach "
+"out to support."
+msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى المحاولة مرة أخرى لاحقًا أو "
+"التواصل مع الدعم."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
-msgid "The {chartName} cannot be displayed because there are missing axes or series."
+msgid "The {chartName} cannot be displayed because there are missing axes or "
+"series."
 msgstr "لا يمكن عرض {chartName} لأنه يوجد محاور أو سلاسل مفقودة."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Permanently delete all consent decisions on this device? This action cannot be undone, and the log on other devices is not affected."
-msgstr "هل تريد حذف جميع قرارات الموافقة بشكل دائم على هذا الجهاز؟ لا يمكن التراجع عن هذا الإجراء، وسجل الأجهزة الأخرى غير متأثر."
+msgid "Permanently delete all consent decisions on this device? This action "
+"cannot be undone, and the log on other devices is not affected."
+msgstr "هل تريد حذف جميع قرارات الموافقة بشكل دائم على هذا الجهاز؟ لا يمكن "
+"التراجع عن هذا الإجراء، وسجل الأجهزة الأخرى غير متأثر."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Let AI decide (legacy)"
@@ -2813,8 +2956,10 @@ msgid "Passwords do not match"
 msgstr "كلمات المرور غير متطابقة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Values are grouped by the category axis (\"{axisKeyValue}\")."
-msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب محور الفئة (\"{axisKeyValue}\")."
+msgid "Each series is a numeric column plotted on the radial value. Values are "
+"grouped by the category axis (\"{axisKeyValue}\")."
+msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
+"محور الفئة (\"{axisKeyValue}\")."
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Select longitude column"
@@ -2833,8 +2978,10 @@ msgid "No custom groups yet."
 msgstr "لا توجد مجموعات مخصصة بعد."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan for unlimited seats."
-msgstr "مساحة العمل الخاصة بك على الخطة المجانية، التي تدعم حتى مقعدين. لدعوة المزيد من أعضاء الفريق، قم بالترقية إلى خطة مدفوعة لمقاعد غير محدودة."
+msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
+"invite more team members, upgrade to a paid plan for unlimited seats."
+msgstr "مساحة العمل الخاصة بك على الخطة المجانية، التي تدعم حتى مقعدين. لدعوة "
+"المزيد من أعضاء الفريق، قم بالترقية إلى خطة مدفوعة لمقاعد غير محدودة."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
@@ -2846,8 +2993,10 @@ msgid "Owner"
 msgstr "مالك"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the custom URL changes."
-msgstr "لا تتغير أبدًا، لذا تظل رموز QR المطبوعة من هنا تعمل حتى لو تغيرت عنوان URL المخصص."
+msgid "Never changes, so QR codes printed from here keep working even if the "
+"custom URL changes."
+msgstr "لا تتغير أبدًا، لذا تظل رموز QR المطبوعة من هنا تعمل حتى لو تغيرت عنوان "
+"URL المخصص."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -2871,7 +3020,8 @@ msgid "You don't have any dashboards yet."
 msgstr "ليس لديك أي لوحات تحكم بعد."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "No clarifications yet. The log fills in as the chat asks clarifying questions."
+msgid "No clarifications yet. The log fills in as the chat asks clarifying "
+"questions."
 msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طرح الدردشة لأسئلة توضيحية."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2896,8 +3046,10 @@ msgstr "اطلب من مسؤول إعدادات مساحة العمل تحديث
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the {entityConfigName} ID"
-msgstr "بالنسبة لمجموعة البيانات <0>{0}</0>، اختر العمود الذي سيتم استخدامه كمعرف {entityConfigName}"
+msgid "For dataset <0>{0}</0>, choose the column to use as the "
+"{entityConfigName} ID"
+msgstr "بالنسبة لمجموعة البيانات <0>{0}</0>، اختر العمود الذي سيتم استخدامه "
+"كمعرف {entityConfigName}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -3011,8 +3163,10 @@ msgid "No saved datasets found."
 msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this {resource}, in addition to whatever's listed above."
-msgstr "كل عضو في مساحة العمل يمكنه فتح تطبيق {app} يحصل على هذا الدور في {resource}، بالإضافة إلى ما هو مدرج أعلاه."
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed above."
+msgstr "كل عضو في مساحة العمل يمكنه فتح تطبيق {app} يحصل على هذا الدور في "
+"{resource}، بالإضافة إلى ما هو مدرج أعلاه."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -3041,16 +3195,20 @@ msgid "Download"
 msgstr "تنزيل"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "No members or user groups yet. Invite members or create user groups in Workspace settings."
-msgstr "لا يوجد أعضاء أو مجموعات مستخدمين حتى الآن. قم بدعوة الأعضاء أو إنشاء مجموعات مستخدمين في إعدادات مساحة العمل."
+msgid "No members or user groups yet. Invite members or create user groups in "
+"Workspace settings."
+msgstr "لا يوجد أعضاء أو مجموعات مستخدمين حتى الآن. قم بدعوة الأعضاء أو إنشاء "
+"مجموعات مستخدمين في إعدادات مساحة العمل."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "SQL"
 msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "No row filters. The slice will include every row in the dataset (for the selected columns)."
-msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة للأعمدة المحددة)."
+msgid "No row filters. The slice will include every row in the dataset (for the "
+"selected columns)."
+msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة "
+"للأعمدة المحددة)."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Turn"
@@ -3090,16 +3248,20 @@ msgid "Edit {0}"
 msgstr "تعديل {0}"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
-msgstr "لقد اكتشفنا معلومات شخصية محتملة ولغة قد تؤثر على إجابة الذكاء الاصطناعي. راجع كلاهما أدناه."
+msgid "We detected both potential personal information and language that may "
+"bias the AI's answer. Review both below."
+msgstr "لقد اكتشفنا معلومات شخصية محتملة ولغة قد تؤثر على إجابة الذكاء "
+"الاصطناعي. راجع كلاهما أدناه."
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
 msgstr "اختر التجميع"
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
-msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
+msgid "While Avandar is in beta, we are only allowing registration if you are "
+"on our waitlist and have received a sign-up code in your email."
+msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة "
+"الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
@@ -3193,7 +3355,8 @@ msgid "Some data should be manually entered"
 msgstr "يجب إدخال بعض البيانات يدويًا"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis below."
+msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
+"below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على محور Y. اختر محور X أدناه."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3253,8 +3416,10 @@ msgstr "تغيير"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
-msgid "Parts of this SQL could not be represented in the Manual form. The form shows a best-effort approximation; the SQL above is what actually runs."
-msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL above is what actually runs."
+msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا "
+"بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Looking up values in {column}…"
@@ -3348,8 +3513,12 @@ msgid "Add column as a field"
 msgstr "إضافة عمود كحقل"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
-msgstr "يبدو أن هذه البيانات تحتوي على معلومات صحية أو معلومات عن المرضى. قد يكون لإرسالها إلى مزود الذكاء الاصطناعي آثار قانونية وأخلاقية (HIPAA، GDPR، إلخ)."
+msgid "This data appears to contain health or patient information. Sending it "
+"to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
+"etc.)."
+msgstr "يبدو أن هذه البيانات تحتوي على معلومات صحية أو معلومات عن المرضى. قد "
+"يكون لإرسالها إلى مزود الذكاء الاصطناعي آثار قانونية وأخلاقية (HIPAA، "
+"GDPR، إلخ)."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Get started by exploring your workspace or uploading your first dataset."
@@ -3449,7 +3618,8 @@ msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "احسب الصفوف في {datasetName} حسب {secondGroupBy}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-msgid "Each series is a numeric column plotted on the radial value. Pick the category axis below."
+msgid "Each series is a numeric column plotted on the radial value. Pick the "
+"category axis below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. اختر محور الفئة أدناه."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
@@ -3497,8 +3667,10 @@ msgid "Your checkout was successful!"
 msgstr "تمت عملية الدفع بنجاح!"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-msgid "Import spreadsheets, connect to Google Sheets, or add data from other sources to start analyzing your information."
-msgstr "استورد جداول البيانات، اتصل بـ Google Sheets، أو أضف بيانات من مصادر أخرى لبدء تحليل معلوماتك."
+msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
+"sources to start analyzing your information."
+msgstr "استورد جداول البيانات، اتصل بـ Google Sheets، أو أضف بيانات من مصادر "
+"أخرى لبدء تحليل معلوماتك."
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
@@ -3584,16 +3756,20 @@ msgid "Pick which global filters apply to this visualization."
 msgstr "اختر الفلاتر العالمية التي تنطبق على هذه التصويرية."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-msgid "Each series is one cloud of bubbles. The size column determines bubble radius."
+msgid "Each series is one cloud of bubbles. The size column determines bubble "
+"radius."
 msgstr "كل سلسلة هي سحابة واحدة من الفقاعات. يحدد عمود الحجم نصف قطر الفقاعة."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while offline."
-msgstr "قم بتحميل نموذج دردشة غير متصل (رمز السحابة) لطرح الأسئلة أثناء عدم الاتصال."
+msgid "Download an offline chat model (cloud icon) to ask questions while "
+"offline."
+msgstr "قم بتحميل نموذج دردشة غير متصل (رمز السحابة) لطرح الأسئلة أثناء عدم "
+"الاتصال."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
-msgstr "لا تحتوي هذه الإدخالات في الكتالوج على بيانات وصفية للأعمدة. لا يمكن استيرادها بعد."
+msgstr "لا تحتوي هذه الإدخالات في الكتالوج على بيانات وصفية للأعمدة. لا يمكن "
+"استيرادها بعد."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
@@ -3632,8 +3808,10 @@ msgid "This feature is not implemented yet."
 msgstr "لم يتم تنفيذ هذه الميزة بعد."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
-msgid "This dataset is large, so we applied a 100-row limit. You can change it anytime."
-msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في أي وقت."
+msgid "This dataset is large, so we applied a 100-row limit. You can change it "
+"anytime."
+msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في "
+"أي وقت."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets — nothing to publish."
@@ -3669,8 +3847,12 @@ msgid "Warning"
 msgstr "تحذير"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
-msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة على الوصول فقط إذا كان لديهم بالفعل وصول إلى {app} في مساحة العمل. عند الإيقاف، يحصل كل عضو في المجموعة على الوصول هنا، حتى لو لم يكن بإمكانهم عادةً فتح {app}."
+msgid "When on, members of this group only get access if they already have "
+"{app} access in the workspace. When off, every member of the group gets "
+"access here, even if they normally can't open {app}."
+msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة على الوصول فقط إذا كان لديهم "
+"بالفعل وصول إلى {app} في مساحة العمل. عند الإيقاف، يحصل كل عضو في "
+"المجموعة على الوصول هنا، حتى لو لم يكن بإمكانهم عادةً فتح {app}."
 
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Auto"
@@ -3682,12 +3864,17 @@ msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numReje
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى خطة Impact لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Impact plan to increase the number of datasets you can add to your "
+"workspace."
+msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى "
+"خطة Impact لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة "
+"العمل الخاصة بك."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
-msgstr "هذه مجموعة البيانات متاحة فقط عند عدم الاتصال. انقر للسماح بالمزامنة عبر الإنترنت."
+msgstr "هذه مجموعة البيانات متاحة فقط عند عدم الاتصال. انقر للسماح بالمزامنة "
+"عبر الإنترنت."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -3698,8 +3885,10 @@ msgid "Role for {displayName}"
 msgstr "الدور لـ {displayName}"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
-msgid "Public queries are not supported for structured queries. Use raw SQL instead."
-msgstr "لا تدعم الاستعلامات العامة الاستعلامات المنظمة. استخدم SQL الخام بدلاً من ذلك."
+msgid "Public queries are not supported for structured queries. Use raw SQL "
+"instead."
+msgstr "لا تدعم الاستعلامات العامة الاستعلامات المنظمة. استخدم SQL الخام بدلاً "
+"من ذلك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "CSV file"
@@ -3792,8 +3981,12 @@ msgstr "تم نشر اللوحة!"
 #~ msgstr "إضافة مخطط شريطي لـ {target} مجمع حسب الفئة"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into device storage first (without freezing the tab). The model loads when you dictate. Progress appears bottom-left."
-msgstr "يتم تشغيل الإملاء محليًا باستخدام whisper.cpp. نقوم بتحميل نموذج ggml إلى تخزين الجهاز أولاً (دون تجميد التبويب). يتم تحميل النموذج عند الإملاء. يظهر التقدم في الأسفل إلى اليسار."
+msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
+"device storage first (without freezing the tab). The model loads when "
+"you dictate. Progress appears bottom-left."
+msgstr "يتم تشغيل الإملاء محليًا باستخدام whisper.cpp. نقوم بتحميل نموذج ggml "
+"إلى تخزين الجهاز أولاً (دون تجميد التبويب). يتم تحميل النموذج عند "
+"الإملاء. يظهر التقدم في الأسفل إلى اليسار."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3808,8 +4001,10 @@ msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "حدث خطأ أثناء محاولة المصادقة مع جوجل شيتس."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "The owner always has admin access. To change owner, use the {resource} settings."
-msgstr "المالك لديه دائمًا وصول إداري. لتغيير المالك، استخدم إعدادات {resource}."
+msgid "The owner always has admin access. To change owner, use the {resource} "
+"settings."
+msgstr "المالك لديه دائمًا وصول إداري. لتغيير المالك، استخدم إعدادات "
+"{resource}."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
@@ -3847,12 +4042,15 @@ msgstr "تم إنشاء \"{dashboardName}\""
 #. placeholder {0}: state.singularEntityConfigName
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If each {0} can only have one {fieldName} value, check this box."
-msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {fieldName}، حدد هذا المربع."
+msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {fieldName}، حدد هذا "
+"المربع."
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Description must be under {maxDatasetDescriptionLength} characters (current: {0})."
-msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength} حرفًا (الحالي: {0})."
+msgid "Description must be under {maxDatasetDescriptionLength} characters "
+"(current: {0})."
+msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength} حرفًا (الحالي: "
+"{0})."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
@@ -3865,7 +4063,8 @@ msgstr "ادفع ما تريد"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
-msgstr "يرجى اختيار مجموعة بيانات من الشريط الجانبي الأيسر، أو إنشاء واحدة جديدة."
+msgstr "يرجى اختيار مجموعة بيانات من الشريط الجانبي الأيسر، أو إنشاء واحدة "
+"جديدة."
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Limit to app access"
@@ -3876,8 +4075,10 @@ msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-msgid "This name only applies in {workspaceName}. Your other workspaces keep their own."
-msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى بأسمائها الخاصة."
+msgid "This name only applies in {workspaceName}. Your other workspaces keep "
+"their own."
+msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى "
+"بأسمائها الخاصة."
 
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
@@ -4000,11 +4201,13 @@ msgstr "قم بتحميل جدول بيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-msgid "We were unable to update your subscription. Please contact {SUPPORT_EMAIL}"
+msgid "We were unable to update your subscription. Please contact "
+"{SUPPORT_EMAIL}"
 msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال بـ {SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under maintenance."
+msgid "Google sheets connector is disabled while this feature is under "
+"maintenance."
 msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -4042,16 +4245,25 @@ msgstr "جداول بيانات Google"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "This dataset will no longer be stored online and can only be accessed as long as it is on your personal computer. Nobody on your team will be able to access this data. This is recommended only for very sensitive data."
-msgstr "لن يتم تخزين مجموعة البيانات هذه عبر الإنترنت ويمكن الوصول إليها فقط طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
+msgid "This dataset will no longer be stored online and can only be accessed as "
+"long as it is on your personal computer. Nobody on your team will be "
+"able to access this data. This is recommended only for very sensitive "
+"data."
+msgstr "لن يتم تخزين مجموعة البيانات هذه عبر الإنترنت ويمكن الوصول إليها فقط "
+"طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك "
+"من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
 msgstr "تحميل نموذج دردشة غير متصل مختلف"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to download a Whisper model from Hugging Face once. The download runs in the background; progress appears in the bottom-left corner."
-#~ msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم في الزاوية السفلى اليسرى."
+#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
+#~ "download a Whisper model from Hugging Face once. The download runs in "
+#~ "the background; progress appears in the bottom-left corner."
+#~ msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج "
+#~ "Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم "
+#~ "في الزاوية السفلى اليسرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4119,8 +4331,10 @@ msgid "Multi-select"
 msgstr "تحديد متعدد"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple metric pairs on the same chart."
-msgstr "كل سلسلة هي سحابة واحدة من النقاط (X، Y). أضف المزيد لمقارنة أزواج متعددة من المقاييس على نفس الرسم البياني."
+msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
+"metric pairs on the same chart."
+msgstr "كل سلسلة هي سحابة واحدة من النقاط (X، Y). أضف المزيد لمقارنة أزواج "
+"متعددة من المقاييس على نفس الرسم البياني."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
@@ -4219,8 +4433,12 @@ msgid "Loading sharing settings…"
 msgstr "جارٍ تحميل إعدادات المشاركة…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your workspace is on the Free plan, which supports up to 5 datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "مساحتك على خطة مجانية، التي تدعم حتى 5 مجموعات بيانات. قم بالترقية إلى خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحتك."
+msgid "Your workspace is on the Free plan, which supports up to 5 datasets. "
+"Upgrade to our Starter or Impact plan to increase the number of datasets "
+"you can add to your workspace."
+msgstr "مساحتك على خطة مجانية، التي تدعم حتى 5 مجموعات بيانات. قم بالترقية إلى "
+"خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك "
+"إضافتها إلى مساحتك."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -4279,7 +4497,8 @@ msgstr "الخطة الحالية"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
-msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUID الدائم أدناه لا يزال يعمل أيضًا."
+msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUID الدائم أدناه لا يزال يعمل "
+"أيضًا."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4346,7 +4565,8 @@ msgstr "أضف على الأقل سلسلة واحدة من X / Y / الحجم"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
-msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنترنت. انقر لجعلها متاحة فقط في وضع عدم الاتصال."
+msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنترنت. انقر لجعلها متاحة فقط في "
+"وضع عدم الاتصال."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
@@ -4376,7 +4596,8 @@ msgstr "الملف الشخصي"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be undone."
+msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
+"undone."
 msgstr "هل أنت متأكد أنك تريد حذف <0>{0}</0> بشكل دائم؟ لا يمكن التراجع عن ذلك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
@@ -4384,8 +4605,10 @@ msgid "Column outline"
 msgstr "مخطط العمود"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."
-msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. المشاهد = قراءة فقط، المحرر = تعديل المحتوى، المسؤول = التحكم الكامل بما في ذلك المشاركة."
+msgid "What this person or group can do. Viewer = read only, Editor = edit "
+"content, Admin = full control including sharing."
+msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. المشاهد = قراءة فقط، المحرر = "
+"تعديل المحتوى، المسؤول = التحكم الكامل بما في ذلك المشاركة."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
@@ -4522,8 +4745,12 @@ msgstr "إجابة توضيحية مخصصة"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-msgid "Your current plan only supports up to {0} datasets. Upgrade to our Starter or Impact plan to increase the number of datasets you can add to your workspace."
-msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك."
+msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
+"Starter or Impact plan to increase the number of datasets you can add to "
+"your workspace."
+msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} مجموعة بيانات. قم بالترقية إلى "
+"خطة البداية أو خطة التأثير لزيادة عدد مجموعات البيانات التي يمكنك "
+"إضافتها إلى مساحة العمل الخاصة بك."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
@@ -4544,8 +4771,12 @@ msgid "Some datasets are missing data"
 msgstr "بعض مجموعات البيانات تفتقر إلى البيانات"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
-msgid "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
-msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل بعض الميزات كما هو متوقع وقد لا تزال قيد الإنشاء. نقدر صبرك وملاحظاتك بينما نعمل على تحسين المنتج."
+msgid "Avandar is still in beta. Some features may not work as expected and "
+"some may still be under construction. We appreciate your patience and "
+"feedback as we work to improve the product."
+msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل بعض الميزات كما هو متوقع "
+"وقد لا تزال قيد الإنشاء. نقدر صبرك وملاحظاتك بينما نعمل على تحسين "
+"المنتج."
 
 #: src/routes/register.tsx
 msgid "Thank you for your interest!"
@@ -4594,8 +4825,10 @@ msgid "Members"
 msgstr "الأعضاء"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you type is kebab-cased automatically."
-msgstr "رابط قصير وسهل التذكر للنشرات والتقارير وأكواد QR. أي شيء تكتبه يتم تحويله تلقائيًا إلى تنسيق kebab."
+msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
+"type is kebab-cased automatically."
+msgstr "رابط قصير وسهل التذكر للنشرات والتقارير وأكواد QR. أي شيء تكتبه يتم "
+"تحويله تلقائيًا إلى تنسيق kebab."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Value"
@@ -4675,16 +4908,20 @@ msgid "Loading voice model"
 msgstr "جارٍ تحميل نموذج الصوت"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-msgid "Choose a workspace preset or customize per app. User groups control dataset and dashboard access intersections."
-msgstr "اختر إعداد مسبق لمساحة العمل أو خصصه لكل تطبيق. تتحكم مجموعات المستخدمين في تقاطعات الوصول إلى مجموعة البيانات ولوحة المعلومات."
+msgid "Choose a workspace preset or customize per app. User groups control "
+"dataset and dashboard access intersections."
+msgstr "اختر إعداد مسبق لمساحة العمل أو خصصه لكل تطبيق. تتحكم مجموعات "
+"المستخدمين في تقاطعات الوصول إلى مجموعة البيانات ولوحة المعلومات."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "تم حفظ مجموعة البيانات"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
-msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها لتحديد {entityConfigName} بشكل فريد."
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {entityConfigName}."
+msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها "
+"لتحديد {entityConfigName} بشكل فريد."
 
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -4741,16 +4978,23 @@ msgstr "لم يتم العثور على مساحة عمل"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "{0} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again."
-msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعمدة أدناه للتأكد من صحتها. إذا لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة أخرى."
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct. If they are not, change the import options above and "
+"click Upload again."
+msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعمدة أدناه للتأكد من صحتها. إذا "
+"لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة "
+"أخرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seats."
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seats."
 msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مقاعدها {totalSeats}."
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload files, connect external sources, or browse open datasets to add to your workspace."
-msgstr "قم بتحميل الملفات، أو الاتصال بالمصادر الخارجية، أو تصفح مجموعات البيانات المفتوحة لإضافتها إلى مساحة العمل الخاصة بك."
+msgid "Upload files, connect external sources, or browse open datasets to add "
+"to your workspace."
+msgstr "قم بتحميل الملفات، أو الاتصال بالمصادر الخارجية، أو تصفح مجموعات "
+"البيانات المفتوحة لإضافتها إلى مساحة العمل الخاصة بك."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not transcribe your audio."
@@ -4868,8 +5112,10 @@ msgid "Distinct values"
 msgstr "قيم مميزة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-msgid "Please confirm that you would like to proceed with this plan change. Your subscription will be updated accordingly."
-msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيير هذه الخطة. سيتم تحديث اشتراكك وفقًا لذلك."
+msgid "Please confirm that you would like to proceed with this plan change. "
+"Your subscription will be updated accordingly."
+msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيير هذه الخطة. سيتم تحديث اشتراكك "
+"وفقًا لذلك."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Speak"
@@ -4885,8 +5131,10 @@ msgid "Search..."
 msgstr "ابحث..."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-msgid "Please take a look at the data and make sure it is correct. Once you confirm, the dataset will be synced with this data."
-msgstr "يرجى إلقاء نظرة على البيانات والتأكد من صحتها. بمجرد التأكيد، ستتم مزامنة مجموعة البيانات مع هذه البيانات."
+msgid "Please take a look at the data and make sure it is correct. Once you "
+"confirm, the dataset will be synced with this data."
+msgstr "يرجى إلقاء نظرة على البيانات والتأكد من صحتها. بمجرد التأكيد، ستتم "
+"مزامنة مجموعة البيانات مع هذه البيانات."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Stroke ({strokeWidth}px)"
@@ -4901,8 +5149,10 @@ msgid "anyone with "
 msgstr "أي شخص لديه "
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
-msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء الاصطناعي وقد يسجل الطلب."
+msgid "The values you selected may contain personal information. The AI "
+"provider will receive them and may log the request."
+msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
+"الاصطناعي وقد يسجل الطلب."
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Selected"
@@ -4933,8 +5183,10 @@ msgid "Fix these issues before saving"
 msgstr "قم بإصلاح هذه المشكلات قبل الحفظ"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also redirects here."
-msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا أيضًا."
+msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
+"redirects here."
+msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا "
+"أيضًا."
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
 msgid "Hello DateValueItem"
@@ -4965,7 +5217,8 @@ msgstr "إغلاق"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
-msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} مقعد."
+msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} "
+"مقعد."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -5004,8 +5257,10 @@ msgstr "تاريخ غير صالح"
 
 #. placeholder {0}: state.nodes.length
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
+msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
+"node to read it; approve to execute."
+msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة. لم يتم تشغيل أي شيء بعد. انقر "
+"على كل عقدة لقراءتها؛ وافق للتنفيذ."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
@@ -5080,8 +5335,10 @@ msgid "Show QR code"
 msgstr "عرض رمز QR"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
-msgstr "بشكل افتراضي، نستخدم رابط دائم يعتمد على UUID. أضف مسارًا مخصصًا أدناه للحصول على عنوان URL أجمل."
+msgid "By default we use a permanent UUID-based link. Add a custom path below "
+"for a nicer URL."
+msgstr "بشكل افتراضي، نستخدم رابط دائم يعتمد على UUID. أضف مسارًا مخصصًا أدناه "
+"للحصول على عنوان URL أجمل."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"
