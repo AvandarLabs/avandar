@@ -1,9 +1,7 @@
 import { render as renderReact } from "@testing-library/react";
 import { TestProviders } from "../TestProviders";
-import { ExtraWrapperContext } from "./ExtraWrapperContext";
-import { RenderWithWrappers } from "./RenderWithWrappers";
 import type { RenderOptions, RenderResult } from "@testing-library/react";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -14,6 +12,12 @@ import type { ReactElement } from "react";
  * When `options.wrapper` is provided, it is composed *inside*
  * `TestProviders` so the test wrapper can add extra providers (for
  * example `QueryClientProvider`) on top of the always-required ones.
+ * The custom wrapper is referenced directly in JSX so it actually mounts
+ * as an ancestor of `ui`. (An earlier implementation threaded it through
+ * React context, but the context Provider ended up a *descendant* of its
+ * consumer, so `useContext` always read the default `undefined` and the
+ * wrapper was silently dropped — breaking any test that relied on it,
+ * e.g. for a `QueryClientProvider`.)
  *
  * Returns the full `RenderResult` (with `container`, `rerender`,
  * `unmount`, etc.) so callers keep the same surface as
@@ -24,13 +28,22 @@ export function render(
   options: RenderOptions = {},
 ): RenderResult {
   const { wrapper: ExtraWrapper, ...rest } = options;
-  return renderReact(
-    <ExtraWrapperContext.Provider value={ExtraWrapper}>
-      {ui}
-    </ExtraWrapperContext.Provider>,
-    {
-      wrapper: RenderWithWrappers,
-      ...rest,
-    },
-  );
+  const Wrapper =
+    ExtraWrapper === undefined ? TestProviders : (
+      function ComposedWrapper({
+        children,
+      }: {
+        children: ReactNode;
+      }): JSX.Element {
+        return (
+          <TestProviders>
+            <ExtraWrapper>{children}</ExtraWrapper>
+          </TestProviders>
+        );
+      }
+    );
+  return renderReact(ui, {
+    wrapper: Wrapper,
+    ...rest,
+  });
 }
