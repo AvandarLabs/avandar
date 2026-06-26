@@ -1073,8 +1073,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           (isDataExplorer ?
             `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
           : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
-          : genericSystemPrompt) +
-          retryContextNote;
+          : genericSystemPrompt) + retryContextNote;
 
         const requestBody: Record<string, unknown> = {
           model,
