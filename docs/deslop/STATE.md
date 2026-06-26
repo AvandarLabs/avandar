@@ -39,12 +39,16 @@ let it drift.
   (subject: _fix: use createUsePuck selector for selectedItem and
   remove nested form in ManualQueryForm (#251)_)
 - **Last update run on**: `2026-06-25`
-- **Active rows**: 83 remaining (all `[ ]`). On 2026-06-26 the 3
+- **Active rows**: 77 remaining (all `[ ]`). On 2026-06-26 the 3
   completed rows (#061, #078, #083) were removed from
   `ALL_FEATURES.md` — their `[x]` checkoff rows are gone; completion
-  is recorded only in the Completed migrations log below. Index
-  numbering is intentionally non-dense (retired #4/#5/#6/#7 folded
-  into #1, #14 into #9, #084..#089 into #083; #097 added 2026-06-25).
+  is recorded only in the Completed migrations log below. Also on
+  2026-06-26 the 6 voice/speech-to-text rows (#050–#055, section "G.
+  Multilingual voice dictation") were removed entirely — PR #254
+  deleted all voice features from `feat/ict4d-demo`, so there is
+  nothing to migrate. Index numbering is intentionally non-dense
+  (retired #4/#5/#6/#7 folded into #1, #14 into #9, #084..#089 into
+  #083; #050..#055 retired as voice-removed; #097 added 2026-06-25).
 - **Planning status**: **complete (2026-06-05; reshuffled 2026-06-10).**
   All active rows except the newly-added #097 have a matching
   `NNN-<slug>.md` plan in `docs/deslop/`. Section 0 (Infrastructure
@@ -273,3 +277,29 @@ Append-only log of `/deslop update` runs.
   G2 #096 must DELETE develop's predecessor URL-sync (from PR #238);
   the AvaPage schema chain is V2 (develop) → V3 (G2 #009) → V4 (G4
   #069). Next step: migrate group by group starting with G1.
+- `2026-06-26` — **Voice / speech-to-text features removed (PR #254).**
+  The operator deleted all voice and speech-to-text code from
+  `feat/ict4d-demo` (`358cfbdd`): the entire `src/lib/voice/`,
+  `src/lib/voiceWhisperCpp/`, desktop `registerVoiceHandlers` +
+  `createWhisperService`, `VoiceContracts`, `VoiceInputButton`,
+  `VoiceModelDownloadIndicator`/`VoiceModelLoadingNotification`, the
+  whisper.wasm dependency, voice IPC, and the voice strings from all
+  locale catalogs (~9.1k LoC deleted across 99 files). Deslop docs
+  updated to drop voice from the migration scope:
+  - **Removed section "G. Multilingual voice dictation" (rows
+    #050–#055)** from `ALL_FEATURES.md`. Active rows 83 → 77. These
+    indices are retired, not reused.
+  - **Deleted plan files** `050-voice-web-whisper.md` …
+    `055-voice-ui-polish.md`.
+  - **GROUP-5 index updated** `#050–063` → `#056–063`;
+    `GROUP-5-platform-i18n-standalone.md` no longer lists any voice
+    rows (~16 constituent rows, all non-voice).
+  - **PLAN_OF_PLANS.md** dropped the `3g (Voice)` sub-phase, the
+    "Voice desktop depends on Desktop platform foundation" dep note,
+    and the "Voice" category mention.
+  - **Cross-references scrubbed:** `018-chat-try-again-and-retry-on-empty.md`
+    (Swahili-hint note tied to retired #055), `056-desktop-platform-registry.md`
+    (voice removed from its dependents list), `062-web-offline-webllm-chat.md`
+    (E2E fixtures no longer mention the transcribe flow).
+  - No code migration was ever started for any voice row, so nothing
+    was un-done — this is purely scope removal.

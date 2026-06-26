@@ -11,7 +11,7 @@
 
 - Driver commits: `d515040`, `2d60b41`, `8744137`. Spec: `docs/superpowers/plans/2026-05-20-offline-webllm-chat.md`.
 - `releaseLoadedPipeline` lifecycle is critical — WebLLM holds GBs of memory; failure to release leaks across navigations.
-- E2E fixtures in the spec cover the model-download + transcribe flow.
+- E2E fixtures in the spec cover the model-download flow.
 
 ## What this feature is
 
