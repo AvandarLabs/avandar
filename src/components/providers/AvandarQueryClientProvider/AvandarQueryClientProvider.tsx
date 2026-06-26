@@ -16,7 +16,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * this will load with an empty cache and need a network round-trip to
  * repopulate it.
  */
-const PERSIST_MAX_AGE_MS = 7 * DAY_MS;
+const PERSIST_MAX_AGE_MS = 14 * DAY_MS;
 
 type Props = {
   /**
@@ -45,7 +45,7 @@ export function AvandarQueryClientProvider({
         buster: makeCacheBuster(userId),
         dehydrateOptions: {
           // Only successful queries get written to IndexedDB. Errors and
-          // in-flight (loading) states are ephemeral — persisting them
+          // in-flight (loading) states are ephemeral. Persisting them
           // would mean a cold reload could replay a stale error or a
           // never-resolving loading spinner forever.
           shouldDehydrateQuery: (query) => {

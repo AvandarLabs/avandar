@@ -1,36 +1,9 @@
-import { createContext, useContext } from "react";
 import { render as renderReact } from "@testing-library/react";
-import { TestProviders } from "./TestProviders";
+import { TestProviders } from "../TestProviders";
+import { ExtraWrapperContext } from "./ExtraWrapperContext";
+import { RenderWithWrappers } from "./RenderWithWrappers";
 import type { RenderOptions, RenderResult } from "@testing-library/react";
-import type { ComponentType, ReactElement, ReactNode } from "react";
-
-const ExtraWrapperContext = createContext<ComponentType<{
-  children: ReactNode;
-}> | null>(null);
-
-/**
- * Stable wrapper component nesting an optional caller-supplied
- * `ExtraWrapper` (read from React context, since RTL only accepts a
- * single `wrapper`) inside the always-required `TestProviders`.
- * Defined at module scope so React sees a stable component type
- * across every `render()` call, instead of remounting a fresh
- * anonymous component each time.
- */
-function RenderWithWrappers({
-  children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
-  const ExtraWrapper = useContext(ExtraWrapperContext);
-  if (ExtraWrapper === null) {
-    return <TestProviders>{children}</TestProviders>;
-  }
-  return (
-    <TestProviders>
-      <ExtraWrapper>{children}</ExtraWrapper>
-    </TestProviders>
-  );
-}
+import type { ReactElement } from "react";
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -52,7 +25,7 @@ export function render(
 ): RenderResult {
   const { wrapper: ExtraWrapper, ...rest } = options;
   return renderReact(
-    <ExtraWrapperContext.Provider value={ExtraWrapper ?? null}>
+    <ExtraWrapperContext.Provider value={ExtraWrapper}>
       {ui}
     </ExtraWrapperContext.Provider>,
     {

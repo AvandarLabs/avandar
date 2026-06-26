@@ -13,5 +13,5 @@ export {
   waitFor,
   within,
 } from "@testing-library/react";
-export { render } from "./render";
+export { render } from "./render/render";
 export { TestProviders } from "./TestProviders";

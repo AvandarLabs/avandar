@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
       new RegExp(
         `^${supabaseApiUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/rest/`,
       )
-    : null;
+    : undefined;
 
   return {
     plugins:
