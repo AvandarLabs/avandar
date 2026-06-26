@@ -9,15 +9,9 @@ import type { ReactElement, ReactNode } from "react";
  * pulling from `useLingui()` or rendering `<Trans>` must use this `render`
  * instead of the raw one from `@testing-library/react`.
  *
- * When `options.wrapper` is provided, it is composed *inside*
+ * When `options.wrapper` is provided, it is composed inside
  * `TestProviders` so the test wrapper can add extra providers (for
  * example `QueryClientProvider`) on top of the always-required ones.
- * The custom wrapper is referenced directly in JSX so it actually mounts
- * as an ancestor of `ui`. (An earlier implementation threaded it through
- * React context, but the context Provider ended up a *descendant* of its
- * consumer, so `useContext` always read the default `undefined` and the
- * wrapper was silently dropped — breaking any test that relied on it,
- * e.g. for a `QueryClientProvider`.)
  *
  * Returns the full `RenderResult` (with `container`, `rerender`,
  * `unmount`, etc.) so callers keep the same surface as
