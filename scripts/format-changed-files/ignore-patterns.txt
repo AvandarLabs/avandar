@@ -11,6 +11,9 @@
 # Dependencies
 ^node_modules/
 
+# Agent skill bundles
+(^|/)\.agents/
+
 # Generated Supabase types
 ^shared/types/database\.types\.ts$
 
