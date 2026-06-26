@@ -221,6 +221,34 @@ describe("parsePo + serializePo", () => {
     const out = serializePo(parsed);
     expect(out).toContain('msgstr "He said \\"hi\\"\\nNew line"');
   });
+
+  it("emits exactly one blank line between the preamble and first entry", () => {
+    // Regression: a parse → serialize round-trip used to fold the consumed
+    // separator blank line back into the preamble AND re-add it via
+    // join("\n\n"), producing a double blank line. Lingui's formatter then
+    // stripped the extra on the next `lingui extract`, yielding a spurious
+    // newline-only diff in every catalog. See translateWithLLM.ts parsePo.
+    const out = serializePo(parsePo(samplePo));
+    expect(out).toContain('"Language: es\\n"\n\n#: src/views');
+    expect(out).not.toContain('"Language: es\\n"\n\n\n');
+  });
+
+  it("normalizes a malformed double blank line back to a single one", () => {
+    const malformed = [
+      'msgid ""',
+      'msgstr ""',
+      '"Language: es\\n"',
+      "",
+      "",
+      "#: src/views/Dashboard/Dashboard.tsx",
+      'msgid "Dashboard"',
+      'msgstr "Tablero"',
+      "",
+    ].join("\n");
+    const out = serializePo(parsePo(malformed));
+    expect(out).not.toContain("\n\n\n");
+    expect(out).toContain('"Language: es\\n"\n\n#: src/views');
+  });
 });
 
 describe("entryMatchesScope", () => {

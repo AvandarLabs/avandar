@@ -133,8 +133,14 @@ export function parsePo(text: string): ParsedPo {
     cursor++;
   }
   cursor += readMessageValue(lines, cursor).consumed;
+  // The preamble ends at the last header line. Blank lines that follow are
+  // the separator before the first entry; we exclude them here so that
+  // serializePo's `join("\n\n")` reintroduces exactly one. Including them
+  // would yield a double blank line that Lingui's formatter strips on the
+  // next `lingui extract`, producing a spurious diff.
+  const preambleEnd = cursor;
   while (cursor < lines.length && lines[cursor] === "") cursor++;
-  const preamble = lines.slice(preambleStart, cursor).join("\n");
+  const preamble = lines.slice(preambleStart, preambleEnd).join("\n");
 
   const entries: PoEntry[] = [];
   let blockStart = cursor;
