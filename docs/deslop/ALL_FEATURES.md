@@ -47,6 +47,26 @@
 > migration logs live in `STATE.md`, not here. Update both files
 > together whenever a status flips.
 
+## Phase 2 batch grouping (2026-06-26)
+
+To finish deslop in a handful of reviews instead of ~80 per-feature
+PRs, all remaining rows were batched into **5 groups, each shipping
+as ONE PR** off a `refactor-gN/<slug>` branch. Consolidated migration
+plans (with verified real paths — they supersede the per-feature
+`NNN-*.md` files where they disagree) live in:
+
+1. `GROUP-1-data-foundation-ingestion.md` — rows #077, #094, #001, #002, #003
+2. `GROUP-2-data-explorer-querying.md` — #008–#013, #096, #097, #044–#047, #049
+3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows)
+4. `GROUP-4-dashboards.md` — #064–#076, #048
+5. `GROUP-5-platform-i18n-standalone.md` — #050–#063, #079–#082, #090, #095, #091–#093
+
+**Migration order is 1 → 2 → 3 → 4 → 5** (dependency-ordered; e.g.
+the AvaPage schema chain V2→V3 (G2 #009)→V4 (G4 #069), G4 #065 needs
+G3's chat tools, G5 #081 lingui-wiring lands dead last). Base for all
+five is `origin/develop` @ `6ec98d45`. Per-row order inside each group
+doc is the in-branch build sequence, not separate PRs.
+
 ## How to read this
 
 Each row is a feature — a logical unit of capability that will land
@@ -94,9 +114,6 @@ index.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 78 | `[x] (2881b0bb)` | **lingui-scaffold** — `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, 8 locales scaffolded (`en, es, pt, fr, sw, ar, zh-Hans, zh-Hant`). **Cross-cutting prerequisite for #001 and most other UI rows** — every modified TSX file on `feat/ict4d-demo` imports from `@lingui/react/macro`. Merged via PR #242. | CHECKPOINT 12 |
-| 83 | `[x] (a40d64a3)` | **billing-ptrck-series** (folded 083+084+085+086+087+088+089) — Full PTRCK billing migration: native-free subscriptions on workspace creation, subscription permission authz, internal subscription `id` (uuid) primary key + nullable Polar fields, Polar checkout merge onto existing native-free rows, Playwright e2e coverage + native-free workspace fixture, Supabase Preview shared/ import map + edge function bundling fixes, post-rebase lint/type-check fixes, Playwright browser install docs. **Required by #001** — `useCanAddDataset` imports `SubscriptionModule` and reads `SubscriptionRead.id`. Likely required by other UI rows that consume subscription state (surface via each row's own undrift). **In flight on `feature/patrick-work-vi`** — pre-existing branch with an open PR against develop (2026-06-10). | Commits `7accd7f`, `dae6bfb`, `062659e`, `680f551`, `a8d1b38`, `be2bdeb`, `ed5b52d`, `56dddde`, `1f574f1`, `3f9f08c`, `504eb8c`, `3b2c171`, `c278a42`, `7fdff75`, `2eda2d4`, `1293836`, `c24a38c`, `0a1eb30`, `72ec020`, `331e6ae`, `5543169`, `eda9bd7` (PTRCK-011..025); migration `20260511120000_subscriptions_internal_id_pk.sql` |
-| 61 | `[x] (50fb7884)` | **web-offline-mode** — PWA + service worker, React Query persistence (`avandar-react-query-cache`), UI gates / disabled controls when offline, offline banners. **Required by #001** — ported TSX files import from `@/lib/offline/useOfflineGate`, `@/lib/offline/useIsOnline`, `@/lib/offline/useLocalDatasetIds`, `@/components/offline/OfflineGated`, `@/components/offline/OfflineUnavailableTooltipLabel`. Merged via PR #252 (`refactor 061/web offline mode`). **Drift note:** a later feat/ict4d-demo-only service-worker tweak (`1a436512`) is not on develop — re-verify if a follow-up is needed. | `docs/demo-features/web-offline-mode.md`; `docs/superpowers/plans/2026-05-20-web-read-only-offline-mode-demo.md`; commits `c597869`, `7740537`, `207d422` |
 | 77 | `[ ]` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. **Required by #001** — `useSaveDataset` imports from `@/lib/analytics/analyticsClient`. | CHECKPOINT 3 + 9 + 13 |
 | 94 | `[ ]` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. **Required by #001** — `DatasetClient` imports from `shared/types/chat.types` (extended types from this row). The `Subscription*` portions of the same commits are refactors of files already covered by the folded billing series (#083 here) and ride along when that lands (no separate row). | Commits `09e1a97e`, `32ea53b6` |
 
@@ -242,10 +259,9 @@ Phases 0-9 cumulatively land below.
 
 ## N. i18n / Lingui
 
-Row #78 `lingui-scaffold` is **physically listed in section 0
-(Infrastructure prerequisites)** because it's a cross-cutting
-build-time prerequisite for most other rows. The remaining i18n
-rows live here.
+The `lingui-scaffold` build-time prerequisite (#078) is already
+merged into `develop` (see the Completed migrations log in
+`STATE.md`). The remaining i18n rows live here.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|

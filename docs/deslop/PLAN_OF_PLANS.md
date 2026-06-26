@@ -119,6 +119,18 @@ planning is complete.
     authored (run `/deslop continue` once its scope is confirmed).
   - The next `/deslop continue` should drain #077 and #094, after
     which Section A (#001) becomes unblocked.
+- **2026-06-26 — batch grouping for the rest of Phase 2.** Operator
+  decision: finish deslop in **5 large PRs instead of ~80**. All
+  remaining rows were grouped into 5 dependency-ordered groups, each
+  shipping as ONE PR off `refactor-gN/<slug>` (base `develop` @
+  `6ec98d45`). Consolidated, path-verified migration plans authored
+  in `docs/deslop/GROUP-1..5-*.md` (these supersede the per-feature
+  `NNN-*.md` plans where they disagree — the group docs use real
+  paths confirmed against the tree). Order: G1 data-foundation →
+  G2 data-explorer/querying → G3 chat panel → G4 dashboards →
+  G5 platform/i18n/standalone. **Next step:** migrate group by group
+  (start G1), opening one PR per group. See the grouping summary at
+  the top of `ALL_FEATURES.md`.
 
 ## Phase 2 ready
 

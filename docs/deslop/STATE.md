@@ -39,10 +39,12 @@ let it drift.
   (subject: _fix: use createUsePuck selector for selectedItem and
   remove nested form in ManualQueryForm (#251)_)
 - **Last update run on**: `2026-06-25`
-- **Active rows**: 86 (was 85; #97 `data-explorer-auto-open-ai-panel`
-  added on the 2026-06-25 update run). Index numbering is
-  intentionally non-dense (retired #4/#5/#6/#7 folded into #1, #14
-  into #9, #084..#089 into #083).
+- **Active rows**: 83 remaining (all `[ ]`). On 2026-06-26 the 3
+  completed rows (#061, #078, #083) were removed from
+  `ALL_FEATURES.md` — their `[x]` checkoff rows are gone; completion
+  is recorded only in the Completed migrations log below. Index
+  numbering is intentionally non-dense (retired #4/#5/#6/#7 folded
+  into #1, #14 into #9, #084..#089 into #083; #097 added 2026-06-25).
 - **Planning status**: **complete (2026-06-05; reshuffled 2026-06-10).**
   All active rows except the newly-added #097 have a matching
   `NNN-<slug>.md` plan in `docs/deslop/`. Section 0 (Infrastructure
@@ -256,3 +258,18 @@ Append-only log of `/deslop update` runs.
     precedent).
   - **Skipped — noise/tooling:** `86bfdcea` (formatter), `0c559f79`
     (gitignore worktrees).
+- `2026-06-26` — **Phase 2 batched into 5 group PRs.** Operator
+  decided to finish deslop in 5 large PRs (one per group) instead of
+  ~80 per-feature PRs. All remaining rows grouped + consolidated
+  migration plans authored at `docs/deslop/GROUP-1..5-*.md` (base
+  `origin/develop` @ `6ec98d45`; PR #253 test-utils render fix is the
+  newest develop commit). Five parallel agents wrote the plans against
+  git-verified real paths — the group docs **supersede** the
+  per-feature `NNN-*.md` plans where they disagree (those had many
+  stale/aspirational paths). Group order + contents are indexed at the
+  top of `ALL_FEATURES.md`. Notable drift the plans capture: the
+  #061-merge relocated the offline hooks (`useIsOnline`/`useOfflineGate`/
+  `useLocalDatasetIds`) so G1 re-introduces the flat paths #001 needs;
+  G2 #096 must DELETE develop's predecessor URL-sync (from PR #238);
+  the AvaPage schema chain is V2 (develop) → V3 (G2 #009) → V4 (G4
+  #069). Next step: migrate group by group starting with G1.
