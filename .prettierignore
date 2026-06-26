@@ -1,6 +1,7 @@
 node_modules
 dist
 build
+.agents
 src/routeTree.gen.ts
 LICENSE
 shared/types/database.types.ts
