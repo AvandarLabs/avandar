@@ -3,7 +3,7 @@ import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
 import type { AnimateTargetAnchor } from "@/config/Theme/buildAnimateOriginStyle";
 import type { AnimationEvent, CSSProperties, RefObject } from "react";
 
-export type FloatingPanelAnimationPhase = "enter" | "exit" | null;
+export type FloatingPanelAnimationPhase = "enter" | "exit" | undefined;
 
 type FloatingPanelInitialPosition = {
   top?: number;
@@ -30,15 +30,19 @@ type MorphTransitionState = {
   isAnimating: boolean;
   /** Panel is mounted but waiting for position + origin before ooze-in runs. */
   isEnterPending: boolean;
-  handleAnimationEnd: (event: AnimationEvent<HTMLElement>) => void;
+  onAnimationEnd: (event: AnimationEvent<HTMLElement>) => void;
 };
-
-const POSITION_TOLERANCE_PX = 2;
 
 function _resolveTargetAnchor(
   initialPosition: FloatingPanelInitialPosition | undefined,
   panel: HTMLElement,
-): AnimateTargetAnchor | null {
+): AnimateTargetAnchor | undefined {
+  const styleLeft = Number.parseFloat(panel.style.left);
+  const styleTop = Number.parseFloat(panel.style.top);
+  if (Number.isFinite(styleLeft) && Number.isFinite(styleTop)) {
+    return { left: styleLeft, top: styleTop };
+  }
+
   if (
     initialPosition?.left != null &&
     initialPosition?.top != null &&
@@ -53,25 +57,10 @@ function _resolveTargetAnchor(
 
   const panelRect = panel.getBoundingClientRect();
   if (panelRect.width <= 0 || panelRect.height <= 0) {
-    return null;
+    return undefined;
   }
 
   return { left: panelRect.left, top: panelRect.top };
-}
-
-function _isPanelAtTargetAnchor(
-  panel: HTMLElement,
-  anchor: AnimateTargetAnchor,
-): boolean {
-  const styleLeft = Number.parseFloat(panel.style.left);
-  const styleTop = Number.parseFloat(panel.style.top);
-
-  return (
-    Number.isFinite(styleLeft) &&
-    Number.isFinite(styleTop) &&
-    Math.abs(styleLeft - anchor.left) <= POSITION_TOLERANCE_PX &&
-    Math.abs(styleTop - anchor.top) <= POSITION_TOLERANCE_PX
-  );
 }
 
 function _buildOozeOriginStyle(
@@ -107,7 +96,7 @@ export function useFloatingPanelMorphTransition({
 
   const [isRendered, setIsRendered] = useState(opened);
   const [animationPhase, setAnimationPhase] =
-    useState<FloatingPanelAnimationPhase>(null);
+    useState<FloatingPanelAnimationPhase>();
   const [panelAnimationStyle, setPanelAnimationStyle] = useState<CSSProperties>(
     {},
   );
@@ -115,32 +104,37 @@ export function useFloatingPanelMorphTransition({
 
   const prevOpenedRef = useRef(opened);
   const hasInitializedRef = useRef(false);
-  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const initialPositionRef = useRef(initialPosition);
   initialPositionRef.current = initialPosition;
 
   const clearFallbackTimeout = useCallback((): void => {
     if (fallbackTimeoutRef.current != null) {
       clearTimeout(fallbackTimeoutRef.current);
-      fallbackTimeoutRef.current = null;
+      fallbackTimeoutRef.current = undefined;
     }
   }, []);
 
   const finishEnter = useCallback((): void => {
-    setAnimationPhase(null);
+    setAnimationPhase(undefined);
     setIsEnterPending(false);
     setPanelAnimationStyle({});
   }, []);
 
   const finishExit = useCallback((): void => {
     setIsRendered(false);
-    setAnimationPhase(null);
+    setAnimationPhase(undefined);
     setIsEnterPending(false);
     setPanelAnimationStyle({});
   }, []);
 
   const scheduleFallback = useCallback(
     (phase: FloatingPanelAnimationPhase, onComplete: () => void): void => {
+      if (fallbackTimeoutRef.current != null) {
+        clearTimeout(fallbackTimeoutRef.current);
+      }
       const durationMs =
         phase === "enter" ?
           ANIMATION_PRESET.oozeIn.durationMs
@@ -150,48 +144,62 @@ export function useFloatingPanelMorphTransition({
     [],
   );
 
-  useLayoutEffect(() => {
-    clearFallbackTimeout();
+  useLayoutEffect(
+    function runMorphTransition() {
+      clearFallbackTimeout();
+      let aborted = false;
+      const cleanup = (): void => {
+        aborted = true;
+      };
 
-    if (!morphEnabled || !originRef) {
-      setIsRendered(opened);
-      setAnimationPhase(null);
-      setIsEnterPending(false);
-      setPanelAnimationStyle({});
+      if (!morphEnabled || !originRef) {
+        setIsRendered(opened);
+        setAnimationPhase(undefined);
+        setIsEnterPending(false);
+        setPanelAnimationStyle({});
+        prevOpenedRef.current = opened;
+        return cleanup;
+      }
+
+      if (!hasInitializedRef.current) {
+        hasInitializedRef.current = true;
+        prevOpenedRef.current = opened;
+        setIsRendered(opened);
+        return cleanup;
+      }
+
+      const wasOpened = prevOpenedRef.current;
       prevOpenedRef.current = opened;
-      return;
-    }
+      const isOpening = opened && !wasOpened;
+      const isClosing = !opened && wasOpened;
+      const isAlreadyOpen = opened && wasOpened;
 
-    if (!hasInitializedRef.current) {
-      hasInitializedRef.current = true;
-      prevOpenedRef.current = opened;
-      setIsRendered(opened);
-      return;
-    }
+      const scheduleFrame = (fn: () => void): void => {
+        requestAnimationFrame(() => {
+          if (!aborted) {
+            fn();
+          }
+        });
+      };
 
-    const wasOpened = prevOpenedRef.current;
-    prevOpenedRef.current = opened;
-
-    if (opened && !wasOpened) {
-      setIsRendered(true);
-      setIsEnterPending(true);
-      setAnimationPhase(null);
+      const commitEnter = (): void => {
+        setIsEnterPending(false);
+        setAnimationPhase("enter");
+        scheduleFallback("enter", finishEnter);
+      };
 
       const runEnter = (): void => {
+        if (aborted) {
+          return;
+        }
         const panel = panelRef.current;
-        if (!panel) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
+        const anchor =
+          panel ?
+            _resolveTargetAnchor(initialPositionRef.current, panel)
+          : undefined;
 
-        const anchor = _resolveTargetAnchor(initialPositionRef.current, panel);
-        if (!anchor) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
-
-        if (!_isPanelAtTargetAnchor(panel, anchor)) {
-          requestAnimationFrame(runEnter);
+        if (!panel || !anchor) {
+          scheduleFrame(runEnter);
           return;
         }
 
@@ -200,53 +208,53 @@ export function useFloatingPanelMorphTransition({
           panelRef,
           initialPositionRef.current,
         );
-        if (Object.keys(style).length === 0) {
-          requestAnimationFrame(runEnter);
-          return;
-        }
+        const hasOrigin = Object.keys(style).length > 0;
 
-        setPanelAnimationStyle(style);
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setIsEnterPending(false);
-            setAnimationPhase("enter");
-            scheduleFallback("enter", finishEnter);
+        if (hasOrigin) {
+          setPanelAnimationStyle(style);
+          scheduleFrame(() => {
+            scheduleFrame(commitEnter);
           });
-        });
+        } else {
+          // Origin button isn't in the DOM yet (re-render race). Skip the
+          // morph animation rather than polling forever; the panel still opens.
+          commitEnter();
+        }
       };
 
-      runEnter();
-      return;
-    }
+      if (isOpening) {
+        setIsRendered(true);
+        setIsEnterPending(true);
+        setAnimationPhase(undefined);
+        runEnter();
+      } else if (isClosing) {
+        setIsEnterPending(false);
+        setAnimationPhase("exit");
+        scheduleFallback("exit", finishExit);
+      } else if (isAlreadyOpen) {
+        setIsRendered(true);
+        setIsEnterPending(false);
+      }
 
-    if (!opened && wasOpened) {
-      setIsEnterPending(false);
-      setAnimationPhase("exit");
-      scheduleFallback("exit", finishExit);
-      return;
-    }
-
-    if (opened) {
-      setIsRendered(true);
-      setIsEnterPending(false);
-    }
-  }, [
-    clearFallbackTimeout,
-    finishEnter,
-    finishExit,
-    morphEnabled,
-    opened,
-    originRef,
-    panelRef,
-    scheduleFallback,
-  ]);
+      return cleanup;
+    },
+    [
+      clearFallbackTimeout,
+      finishEnter,
+      finishExit,
+      morphEnabled,
+      opened,
+      originRef,
+      panelRef,
+      scheduleFallback,
+    ],
+  );
 
   useLayoutEffect(() => {
     return clearFallbackTimeout;
   }, [clearFallbackTimeout]);
 
-  const handleAnimationEnd = useCallback(
+  const onAnimationEnd = useCallback(
     (event: AnimationEvent<HTMLElement>): void => {
       if (event.target !== panelRef.current) {
         return;
@@ -268,10 +276,10 @@ export function useFloatingPanelMorphTransition({
 
   return {
     isRendered: morphEnabled ? isRendered : opened,
-    animationPhase: morphEnabled ? animationPhase : null,
+    animationPhase: morphEnabled ? animationPhase : undefined,
     panelAnimationStyle: morphEnabled ? panelAnimationStyle : {},
-    isAnimating: morphEnabled && animationPhase != null,
+    isAnimating: morphEnabled && animationPhase !== undefined,
     isEnterPending: morphEnabled && isEnterPending,
-    handleAnimationEnd,
+    onAnimationEnd,
   };
 }
