@@ -8,10 +8,10 @@ repo) so the output stays small and tied to the diff.
 
 - In Deno-reachable code, imports must include file extensions (e.g.
   `.ts`). Repos that use Deno usually pin a few specific directories as
-  Deno-reachable (Supabase Edge Functions, shared/cross-runtime code,
-  etc.). The repo-local `docs/code-reviews/extra-checklist.md` should
-  enumerate the exact directories that count as Deno-reachable for that
-  repo; check there before flagging.
+  Deno-reachable. The repo-local `docs/code-reviews/extra-checklist.md`
+  should enumerate the exact directories that count as Deno-reachable for
+  that repo; check there before flagging. If the repo-local checklist does
+  not define Deno-reachable paths, skip this rule.
 
   **Find candidates** (replace `<deno-dir>` with each Deno-reachable
   directory from the repo-local checklist):
@@ -189,9 +189,9 @@ repo) so the output stays small and tied to the diff.
 - Nested functions and object methods should use arrow functions.
 - Type imports and type exports should always use the `type` keyword.
 
-  **Find candidates** (imports/exports of clearly type-only names — by
+  **Find candidates** (imports/exports of clearly type-only names, by
   convention `T`, `I`, or names ending in `Props` / `Type` / `Id` /
-  `Config` — without the `type` keyword; heuristic):
+  `Config`, without the `type` keyword; heuristic):
 
   ```bash
   grep -rEn '^import \{[^}]*\b([A-Z][a-zA-Z]*Props|[A-Z][a-zA-Z]*Type|[A-Z][a-zA-Z]*Id|[A-Z][a-zA-Z]*Config)\b' \
@@ -202,15 +202,18 @@ repo) so the output stays small and tied to the diff.
   Heuristic only; still scan import lists manually for type-only names
   this regex doesn't anticipate.
 
-- Do not add barrel files, except approved `index.ts` files in `packages/`.
+- Do not add barrel files, except in repo-approved directories documented
+  by the repo-local checklist.
 
-  **Find candidates** (new `index.ts` outside `packages/`):
+  **Find candidates** (new `index.ts` files):
 
   ```bash
   find . -name "index.ts" \
-    -not -path "*/node_modules/*" \
-    -not -path "./packages/*"
+    -not -path "*/node_modules/*"
   ```
+
+  Compare each hit against the repo-local allow-list, if one exists. If no
+  repo-local allow-list exists, treat newly added barrel files as findings.
 
 - Do not use namespace exports such as `export * from`.
 
@@ -236,7 +239,7 @@ repo) so the output stays small and tied to the diff.
   ```
 
   Filter hits: only flag the ones applied to local variable
-  declarations, internal helper return types, or shared type aliases —
+  declarations, internal helper return types, or shared type aliases,
   not to function parameters (which are correct).
 
 - Prefer mutable local variables and intermediate values.

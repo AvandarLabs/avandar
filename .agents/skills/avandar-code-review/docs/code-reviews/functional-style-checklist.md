@@ -129,26 +129,26 @@ library-gated phase.
   This is bad:
 
   ```ts
-  function buildChatRequest(
-    apiMessages: ChatClientMessage.T[],
-    pageContext: ChatPageContext.T,
+  function buildRequestBody(
+    payloadParts: PayloadPart[],
+    requestContext: RequestContext,
     options: {
-      model?: string;
-      regenerateContext?: { lastError?: string; lastSql?: string };
+      priority?: "low" | "normal" | "high";
+      retry?: { reason?: string; attempts: number };
     },
-  ): ChatRequest {
-    const body: ChatRequest = {
-      messages: apiMessages,
-      context: pageContext,
+  ): RequestBody {
+    const body: RequestBody = {
+      parts: payloadParts,
+      context: requestContext,
     };
-    if (options.model) {
-      body.model = options.model;
+    if (options.priority) {
+      body.priority = options.priority;
     }
-    if (options.regenerateContext?.lastError) {
-      body.regenerateContext = options.regenerateContext;
+    if (options.retry?.reason) {
+      body.retry = options.retry;
     }
-    if (apiMessages.length > 20) {
-      body.summarize = true;
+    if (payloadParts.length > 20) {
+      body.compact = true;
     }
     return body;
   }
@@ -157,26 +157,26 @@ library-gated phase.
   This is good:
 
   ```ts
-  function buildChatRequest(
-    apiMessages: ChatClientMessage.T[],
-    pageContext: ChatPageContext.T,
+  function buildRequestBody(
+    payloadParts: PayloadPart[],
+    requestContext: RequestContext,
     options: {
-      model?: string;
-      regenerateContext?: { lastError?: string; lastSql?: string };
+      priority?: "low" | "normal" | "high";
+      retry?: { reason?: string; attempts: number };
     },
-  ): ChatRequest {
-    const regenerateContext =
-      options.regenerateContext?.lastError ?
-        options.regenerateContext
+  ): RequestBody {
+    const retry =
+      options.retry?.reason ?
+        options.retry
       : undefined;
-    const summarize = apiMessages.length > 20 ? true : undefined;
+    const compact = payloadParts.length > 20 ? true : undefined;
 
     return {
-      messages: apiMessages,
-      context: pageContext,
-      model: options.model,
-      regenerateContext,
-      summarize,
+      parts: payloadParts,
+      context: requestContext,
+      priority: options.priority,
+      retry,
+      compact,
     };
   }
   ```
@@ -187,7 +187,7 @@ library-gated phase.
     literal (TypeScript treats `{ foo: undefined }` and `{}` as
     structurally identical for an optional `foo?: T`). When that
     bothers a downstream consumer that distinguishes them, use a
-    conditional spread (`...(cond ? { foo } : {})`) instead — it still
+    conditional spread (`...(cond ? { foo } : {})`) instead; it still
     keeps the construction inside one literal.
   - If a field's computation needs multiple intermediate names or a
     try/catch, extract it into the IIFE form from the "IIFE for
@@ -206,7 +206,7 @@ library-gated phase.
   variable gets `foo.bar = ...` assignments inside `if` blocks, flag
   and propose the field-then-literal refactor above. Legitimate uses
   of `= {}` exist (passing a fresh empty options bag into a library
-  call, seeding a `useState({})`, etc.) — filter those out first.
+  call, seeding a `useState({})`, etc.); filter those out first.
 
 - Build variable-length arrays by listing every candidate inline with a
   conditional that evaluates to `undefined`, then filter out the
@@ -218,13 +218,13 @@ library-gated phase.
   This is bad:
 
   ```ts
-  const assistantParts: Array<{ type: "text"; text: string }> = [
-    { type: "text", text: response.assistantText },
+  const sections: Array<{ type: "text"; text: string }> = [
+    { type: "text", text: response.summary },
   ];
-  if (response.generatedSql) {
-    assistantParts.push({
+  if (response.details) {
+    sections.push({
       type: "text",
-      text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
+      text: response.details,
     });
   }
   ```
@@ -232,12 +232,12 @@ library-gated phase.
   This is good:
 
   ```ts
-  const assistantParts = [
-    { type: "text" as const, text: response.assistantText },
-    response.generatedSql
+  const sections = [
+    { type: "text" as const, text: response.summary },
+    response.details
       ? {
           type: "text" as const,
-          text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
+          text: response.details,
         }
       : undefined,
   ].filter(isDefined);
@@ -252,55 +252,55 @@ library-gated phase.
   This is bad:
 
   ```ts
-  let vizConfig: VizConfig | undefined;
+  let parsedConfig: ParsedConfig | undefined;
   try {
-    vizConfig = urlSearch.vc
-      ? (JSON.parse(urlSearch.vc) as VizConfig)
+    parsedConfig = urlSearch.config
+      ? (JSON.parse(urlSearch.config) as ParsedConfig)
       : undefined;
   } catch {
-    vizConfig = undefined;
+    parsedConfig = undefined;
   }
 
-  let openDataset: OpenDatasetInfo | undefined;
+  let selectedItem: SelectedItem | undefined;
   try {
-    const raw = urlSearch.od
-      ? OpenDatasetSchema.parse(JSON.parse(urlSearch.od))
+    const raw = urlSearch.item
+      ? SelectedItemSchema.parse(JSON.parse(urlSearch.item))
       : undefined;
     if (raw) {
-      openDataset = {
-        datasetId: raw.did as DatasetId,
+      selectedItem = {
+        itemId: raw.id as ItemId,
         name: raw.name,
-        virtualDatasetId: raw.vid as VirtualDatasetId,
       };
     }
   } catch {
-    openDataset = undefined;
+    selectedItem = undefined;
   }
 
-  return { vizConfig, openDataset };
+  return { parsedConfig, selectedItem };
   ```
 
   This is good:
 
   ```ts
-  const vizConfig = (() => {
+  const parsedConfig = (() => {
     try {
-      return urlSearch.vc ? (JSON.parse(urlSearch.vc) as VizConfig) : undefined;
+      return urlSearch.config
+        ? (JSON.parse(urlSearch.config) as ParsedConfig)
+        : undefined;
     } catch {
       return undefined;
     }
   })();
 
-  const openDataset = (() => {
+  const selectedItem = (() => {
     try {
-      const raw = urlSearch.od
-        ? OpenDatasetSchema.parse(JSON.parse(urlSearch.od))
+      const raw = urlSearch.item
+        ? SelectedItemSchema.parse(JSON.parse(urlSearch.item))
         : undefined;
       if (raw) {
         return {
-          datasetId: raw.did as DatasetId,
+          itemId: raw.id as ItemId,
           name: raw.name,
-          virtualDatasetId: raw.vid as VirtualDatasetId,
         };
       }
     } catch {
@@ -309,7 +309,7 @@ library-gated phase.
     return undefined;
   })();
 
-  return { vizConfig, openDataset };
+  return { parsedConfig, selectedItem };
   ```
 
 - Do not gate `.message` access on `instanceof Error` when the value is

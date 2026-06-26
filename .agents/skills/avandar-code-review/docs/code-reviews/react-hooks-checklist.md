@@ -2,7 +2,7 @@
 
 Use this checklist when the diff includes a TSX file (or a `.ts` file that
 exports a custom hook) that uses React hooks such as `useEffect`,
-`useMemo`, `useState`, or query hooks like TanStack Query's `useQuery`.
+`useMemo`, `useState`, or data-loading hooks.
 
 Skip this phase for purely presentational components with no hooks.
 
@@ -69,9 +69,11 @@ Skip this phase for purely presentational components with no hooks.
   );
   ```
 
-- When destructuring from a hook that returns a possibly-`undefined` array
-  (TanStack Query, custom data-loading hooks, etc.), default to `[]` in
-  the destructure rather than coalescing at each use site.
+- When destructuring from a hook that returns a possibly-`undefined` array,
+  default to `[]` in the destructure rather than coalescing at each use
+  site. If the hook is from a specific external data library, apply this
+  rule only after confirming the repo uses that library and the hook's
+  return contract matches the pattern.
 
   **Find candidates** (`xxx ?? []` patterns, which often indicate a
   missed default-destructure):
@@ -101,7 +103,7 @@ Skip this phase for purely presentational components with no hooks.
   const models = groups.flatMap((g) => g.models);
   ```
 
-  Caveats — keep the `undefined` and coalesce only where you actually use it
+  Caveats: keep the `undefined` and coalesce only where you actually use it
   if either of these applies:
 
   1. The `undefined` value is load-bearing. Downstream code distinguishes
@@ -113,6 +115,6 @@ Skip this phase for purely presentational components with no hooks.
      a fresh array reference on every render, so any `useMemo`,
      `useEffect`, `useCallback`, or memoized child that depends on the
      destructured value will invalidate every render. In that case, keep
-     the original possibly-`undefined` reference (which TanStack Query
-     keeps stable across renders) and coalesce at the leaf use site
-     instead, or memoize the fallback array yourself.
+     the original possibly-`undefined` reference when the hook keeps it
+     stable across renders and coalesce at the leaf use site instead, or
+     memoize the fallback array yourself.

@@ -3,11 +3,12 @@
 Use this checklist when the repo under review depends on
 `@avandar/models`. Confirm by checking `package.json` (or any
 `package.json` in a monorepo) for a `@avandar/models` dependency, OR by
-grepping the diff and surrounding code for imports from `@avandar/models`
-or its short alias `@models`, OR by checking for calls to `Model.make`.
+grepping the diff and surrounding code for imports from `@avandar/models`.
+A short alias such as `@models` counts only when the repo config shows
+that it resolves to `@avandar/models`.
 
 If `@avandar/models` is not present in the repo, **skip this entire
-checklist**.
+checklist**, even if the repo has unrelated files named `*.types.ts`.
 
 ## Construct models with `Model.make`
 
@@ -19,18 +20,18 @@ checklist**.
   This is bad:
 
   ```ts
-  const result: ChatResponse = {
-    assistantText,
-    generatedSql,
+  const result: ProcessResult = {
+    summary,
+    details,
   };
   ```
 
   This is good:
 
   ```ts
-  const result = Model.make("ChatResponse", {
-    assistantText,
-    generatedSql,
+  const result = Model.make("ProcessResult", {
+    summary,
+    details,
   });
   ```
 
@@ -60,22 +61,22 @@ checklist**.
   This is bad:
 
   ```ts
-  import type { ChatPageContextRead } from
-    "$/models/chat/ChatPageContext/ChatPageContext.types.ts";
-  import type { ChatApp } from
-    "$/models/chat/ChatPageContext/ChatPageContext.types.ts";
+  import type { ProcessResultRead } from
+    "@/models/ProcessResult/ProcessResult.types.ts";
+  import type { ProcessStatus } from
+    "@/models/ProcessResult/ProcessResult.types.ts";
 
-  function format(ctx: ChatPageContextRead): string { ... }
+  function format(result: ProcessResultRead): string { ... }
   ```
 
   This is good:
 
   ```ts
-  import { ChatPageContext } from
-    "$/models/chat/ChatPageContext/ChatPageContext";
+  import { ProcessResult } from
+    "@/models/ProcessResult/ProcessResult";
 
-  function format(ctx: ChatPageContext.T): string { ... }
-  // and ChatPageContext.ChatApp for the related type
+  function format(result: ProcessResult.T): string { ... }
+  // and ProcessResult.ProcessStatus for the related type
   ```
 
   Exception: files inside the model's own folder (`*.types.ts`, parsers,
