@@ -17,10 +17,6 @@ msgstr ""
 msgid "Changes to your payment method can be made in your"
 msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What is the average value in {name}?"
-#~ msgstr "ما هي القيمة المتوسطة في {name}؟"
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close chat panel"
@@ -80,10 +76,6 @@ msgstr "فتح مجموعة البيانات"
 msgid "Value column"
 msgstr "عمود القيمة"
 
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "There are no queried numeric fields"
-#~ msgstr "لا توجد حقول رقمية مستعلم عنها"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "شهري"
@@ -131,10 +123,6 @@ msgstr "الأكثر حداثة"
 msgid "PII detected:"
 msgstr "تم الكشف عن معلومات شخصية:"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} downloaded. Tap the mic to start dictating."
-#~ msgstr "{0} تم تنزيله. اضغط على الميكروفون لبدء الإملاء."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "حقل العنوان مطلوب"
@@ -154,10 +142,6 @@ msgstr "حدث خطأ أثناء تحميل الملف"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Source URL"
 msgstr "رابط المصدر"
-
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#~ msgid "Type"
-#~ msgstr "النوع"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -183,14 +167,6 @@ msgstr "الاكتشاف غير متاح في هذا السياق."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله على اللوحة."
-
-#. placeholder {0}: modelToDownload.displayName
-#. placeholder {1}: modelToDownload.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
-"here, or use a smaller RAM tier."
-msgstr "{0} يحتاج إلى {1} وليس متاحًا في المتصفح. اختر Tiny أو Base هنا، أو "
-"استخدم مستوى ذاكرة وصول عشوائي أصغر."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -242,10 +218,6 @@ msgstr "توسيع"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
 msgstr "ملاحظات"
-
-#: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-#~ msgid "Datasets"
-#~ msgstr "مجموعات البيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -402,12 +374,6 @@ msgstr "إعادة التنزيل"
 msgid "Allow multiple values"
 msgstr "السماح بقيم متعددة"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
-#~ "number of datasets you can add to your workspace you can purchase more "
-#~ "seats. Each seat allows you to add 10 more datasets!"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "لم تتم إضافة أي مجموعات بيانات حتى الآن"
@@ -463,10 +429,6 @@ msgstr "شيء آخر…"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "تغيير الخطة إلى {newPlanName} ({newPlanSubType})"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Waiting…"
-msgstr "في الانتظار…"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
@@ -552,10 +514,6 @@ msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود ال�
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Roles"
-#~ msgstr ""
-
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "PDF (multi-page)"
 msgstr "PDF (صفحات متعددة)"
@@ -592,10 +550,6 @@ msgstr "احفظ كمجموعة بيانات جديدة"
 msgid "From derived dataset"
 msgstr "من مجموعة البيانات المشتقة"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model download failed"
-msgstr "فشل تحميل نموذج الصوت"
-
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "اختيار فردي"
@@ -622,10 +576,6 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة بيانات
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 msgid "This field cannot be empty"
 msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription language: {selectedLanguageLabel}"
-msgstr "لغة النسخ: {selectedLanguageLabel}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -764,11 +714,6 @@ msgstr "الاسم"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة الذكاء الاصطناعي."
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
-#~ "add more datasets, upgrade to a paid plan."
-#~ msgstr ""
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "إغلاق الدردشة (⌘/)"
@@ -792,10 +737,6 @@ msgstr "أدخل بريدك الإلكتروني للحصول على رابط إ
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Approved"
 msgstr "موافق"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model not available"
-msgstr "نموذج الصوت غير متاح"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Loading plans..."
@@ -831,10 +772,6 @@ msgstr "مجموعة أدوار جديدة"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Download & enable"
-#~ msgstr "تحميل وتفعيل"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
@@ -894,11 +831,6 @@ msgstr "تم اختيار عمود اسم غير صالح"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "مخصص"
-
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} was deleted from this device."
-msgstr "{0} تم حذفه من هذا الجهاز."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -1149,14 +1081,6 @@ msgstr "مجموع"
 msgid "Sync data!"
 msgstr "مزامنة البيانات!"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice settings"
-msgstr "إعدادات الصوت"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Used when transcribing; does not change the model download."
-msgstr "يستخدم عند النسخ؛ لا يغير تحميل النموذج."
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr "الذين لديهم أيضًا"
@@ -1227,10 +1151,6 @@ msgstr "هذا الحقل"
 msgid "Edit access for {0}"
 msgstr "تحرير الوصول لـ {0}"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Complete"
-msgstr "مكتمل"
-
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1267,11 +1187,6 @@ msgstr "استبدال SQL بتغييرات النموذج"
 msgid "Dataset did not match the expected schema"
 msgstr "لم تتطابق مجموعة البيانات مع المخطط المتوقع"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} is on this device. Tap the mic to dictate."
-msgstr "{0} موجود على هذا الجهاز. اضغط على الميكروفون للتحدث."
-
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
@@ -1292,10 +1207,6 @@ msgstr "تم تحميل الملف جزئيًا"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "طرق الدفع"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} (~{1} MB)"
-#~ msgstr "{0} (~{1} ميغابايت)"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1390,14 +1301,6 @@ msgstr "الأدوار والأذونات"
 msgid "Connect to Google Sheets"
 msgstr "الاتصال بـ Google Sheets"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Stop and transcribe"
-msgstr "توقف ونسخ"
-
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
-#~ msgid "Data Visualization"
-#~ msgstr "تصوير البيانات"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "اختر مجموعة بيانات محفوظة أو استورد بيانات جديدة إلى مساحة العمل الخاصة "
@@ -1423,10 +1326,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "(RoughJS)."
 msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات "
 "النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "No speech detected"
-msgstr "لم يتم الكشف عن أي كلام"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1605,7 +1504,6 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1655,6 +1553,10 @@ msgstr "حذف التعليق"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "إلى"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download offline chat model (WebLLM)"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"
@@ -1731,14 +1633,6 @@ msgstr "اسم الورقة"
 msgid "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
 msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {entityConfigName} واحدة."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Browser unavailable"
-msgstr "المتصفح غير متاح"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcribing…"
-msgstr "يتم النسخ..."
 
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -1824,10 +1718,6 @@ msgstr "إنشاء مخطط في الدردشة"
 msgid "Additional seats required"
 msgstr "مقاعد إضافية مطلوبة"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Finishing setup — almost ready."
-msgstr "إنهاء الإعداد - يكاد يكون جاهزًا."
-
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
 msgstr "تعديل"
@@ -1904,10 +1794,6 @@ msgstr "تأكيد الإجراء"
 msgid "Data Preview"
 msgstr "معاينة البيانات"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model saved"
-msgstr "تم حفظ نموذج الصوت"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "ليس فارغًا"
@@ -1953,17 +1839,9 @@ msgstr "تكبير"
 msgid "Global Admin"
 msgstr "مدير عالمي"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a size column"
-#~ msgstr "لم تختار عمود الحجم"
-
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
 msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid size column selected"
-#~ msgstr "تم اختيار عمود حجم غير صالح"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
 msgid "There are no values"
@@ -2037,10 +1915,6 @@ msgstr "عمود الحجم"
 msgid "Values"
 msgstr "القيم"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to download the voice model."
-msgstr "غير قادر على تنزيل نموذج الصوت."
-
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "(untitled branch)"
 msgstr "(فرع بلا عنوان)"
@@ -2048,10 +1922,6 @@ msgstr "(فرع بلا عنوان)"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not remove voice model"
-msgstr "تعذر إزالة نموذج الصوت"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -2295,11 +2165,6 @@ msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة 
 msgid "Save to dashboard"
 msgstr "حفظ إلى اللوحة"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
-#~ "plan to increase the number of datasets you can add to your workspace."
-#~ msgstr ""
-
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "نوع التسمية"
@@ -2318,11 +2183,6 @@ msgstr "لا يوجد ملف محدد"
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "إرسال"
-
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "See all shared items"
-#~ msgstr "عرض جميع العناصر المشتركة"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dashboard"
@@ -2383,10 +2243,6 @@ msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيان�
 msgid "Symbol size column must be numeric."
 msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Loading shared resources"
-#~ msgstr "تحميل الموارد المشتركة"
-
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "افاندر (افتراضي)"
@@ -2399,10 +2255,6 @@ msgstr "{numCols, plural, one {سيتم نشر # عمود:} other {سيتم نش
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice prompting"
-msgstr "تحفيز الصوت"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2531,12 +2383,6 @@ msgstr "عمود Y"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Starter or Impact plan to increase the number of datasets you can add to "
-#~ "your workspace."
-#~ msgstr ""
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "فشل تحميل النموذج غير المتصل"
@@ -2574,7 +2420,6 @@ msgid "We'll add this visualization to your new dashboard."
 msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "جارٍ البدء…"
 
@@ -2721,10 +2566,6 @@ msgstr "اختر واحدًا أو أكثر"
 msgid "Column Name"
 msgstr "اسم العمود"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Nothing has been shared with you here."
-#~ msgstr "لم يتم مشاركة أي شيء معك هنا."
-
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور"
@@ -2761,19 +2602,10 @@ msgstr "لا تقم بتحديث أو إغلاق هذه التبويب وإلا 
 msgid "Forest"
 msgstr "غابة"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Choose the language you will speak when dictating."
-msgstr "اختر اللغة التي ستتحدث بها عند الإملاء."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Whisper supports many languages; auto-detect handles mixed input."
-#~ msgstr "يدعم Whisper العديد من اللغات؛ الكشف التلقائي يتعامل مع الإدخال "
-#~ "المختلط."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2796,10 +2628,6 @@ msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون الع
 msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "We didn't catch anything — try again a bit closer to the mic."
-msgstr "لم نلتقط أي شيء — حاول مرة أخرى بالقرب من الميكروفون."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -3028,10 +2856,6 @@ msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طر�
 msgid "Offline chat model removed"
 msgstr "تمت إزالة نموذج الدردشة غير المتصل"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Preparing download…"
-msgstr "جارٍ إعداد التنزيل…"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "أداة"
@@ -3114,14 +2938,6 @@ msgstr "اسأل عن بياناتك..."
 msgid "Theme picker"
 msgstr "اختيار السمة"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Do not refresh or close this tab — the download will be canceled."
-msgstr "لا تقم بتحديث أو إغلاق هذه الصفحة - سيتم إلغاء التنزيل."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Desktop only"
-#~ msgstr "لأجهزة الكمبيوتر فقط"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "تحضير البيانات للتصورات…"
@@ -3190,7 +3006,6 @@ msgid "Add series"
 msgstr "إضافة سلسلة"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Download"
 msgstr "تنزيل"
 
@@ -3213,10 +3028,6 @@ msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Turn"
 msgstr "تحويل"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a table of the top 10 rows of {target}"
-#~ msgstr "إضافة جدول لأعلى 10 صفوف من {target}"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -3315,10 +3126,6 @@ msgstr "تجاهل جميع الفلاتر العالمية — هذه التص�
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Sketch"
 msgstr "رسم تخطيطي"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model ready"
-#~ msgstr "نموذج الصوت جاهز"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3459,17 +3266,9 @@ msgstr "تصفية"
 msgid "This cannot be undone."
 msgstr "لا يمكن التراجع عن هذا."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Show the first 20 rows of {name}"
-#~ msgstr "عرض أول 20 صفًا من {name}"
-
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Approve and run"
 msgstr "الموافقة والتشغيل"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not access the microphone."
-msgstr "لم يتمكن من الوصول إلى الميكروفون."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -3540,10 +3339,6 @@ msgstr "هذا {resource} مشترك مع: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#~ msgid "Bubble size (numeric)"
-#~ msgstr "حجم الفقاعة (رقمي)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3923,10 +3718,6 @@ msgstr "عرض كـ"
 msgid "Line"
 msgstr "خط"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to delete the voice model from cache."
-msgstr "غير قادر على حذف نموذج الصوت من الذاكرة المؤقتة."
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "اجعلها متاحة فقط عند عدم الاتصال"
@@ -3968,25 +3759,9 @@ msgstr "اختر ملف Excel أو CSV من جهاز الكمبيوتر الخا
 msgid "Please choose a password to complete your registration"
 msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Shared with me"
-#~ msgstr "مشارك معي"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of {target} grouped by category"
-#~ msgstr "إضافة مخطط شريطي لـ {target} مجمع حسب الفئة"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
-"device storage first (without freezing the tab). The model loads when "
-"you dictate. Progress appears bottom-left."
-msgstr "يتم تشغيل الإملاء محليًا باستخدام whisper.cpp. نقوم بتحميل نموذج ggml "
-"إلى تخزين الجهاز أولاً (دون تجميد التبويب). يتم تحميل النموذج عند "
-"الإملاء. يظهر التقدم في الأسفل إلى اليسار."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4017,10 +3792,6 @@ msgstr "نشط"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download offline chat model (WebLLM, not voice)"
-msgstr "تحميل نموذج دردشة غير متصل (WebLLM، ليس صوتيًا)"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -4080,14 +3851,8 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى "
 "بأسمائها الخاصة."
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Downloading {0} for voice prompting"
-msgstr "تحميل {0} لتوجيه الصوت"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Model"
 msgstr "نموذج"
 
@@ -4102,10 +3867,6 @@ msgstr "لا تحتوي هذه المساحة على اشتراك صالح."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "All decisions"
 msgstr "جميع القرارات"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Speak (local voice-to-text)"
-#~ msgstr "تحدث (تحويل الصوت إلى نص محلي)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Show labels"
@@ -4187,10 +3948,6 @@ msgstr "تم حفظ مجموعة المستخدمين"
 msgid "Could not publish dashboard"
 msgstr "تعذر نشر لوحة التحكم"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model removed"
-msgstr "تمت إزالة نموذج الصوت"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "إعادة كتابة مقترحة:"
@@ -4256,14 +4013,6 @@ msgstr "لن يتم تخزين مجموعة البيانات هذه عبر ال�
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
 msgstr "تحميل نموذج دردشة غير متصل مختلف"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
-#~ "download a Whisper model from Hugging Face once. The download runs in "
-#~ "the background; progress appears in the bottom-left corner."
-#~ msgstr "تعمل مطالبات الصوت بالكامل على جهازك. للتحدث، نحتاج إلى تنزيل نموذج "
-#~ "Whisper من Hugging Face مرة واحدة. يتم التنزيل في الخلفية؛ يظهر التقدم "
-#~ "في الزاوية السفلى اليسرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4366,10 +4115,6 @@ msgstr "اسم مجموعة البيانات"
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "These are too big for web and are only available on Avandar Desktop"
-#~ msgstr "هذه كبيرة جدًا للويب ومتاحة فقط على Avandar Desktop"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
@@ -4526,10 +4271,6 @@ msgstr "هذا {resource} متاح لأي شخص لديه إذن {app} {0}."
 msgid "Amber"
 msgstr "كهرماني"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Enable voice prompting"
-msgstr "تفعيل التوجيه الصوتي"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "تكوين كيفية الانضمام إلى مجموعات البيانات"
@@ -4550,11 +4291,6 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 msgid "Branches"
 msgstr "الفروع"
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Starting {0}…"
-msgstr "بدء {0}…"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "ستكون مجموعة البيانات هذه متاحة فقط في وضع عدم الاتصال"
@@ -4567,11 +4303,6 @@ msgstr "أضف على الأقل سلسلة واحدة من X / Y / الحجم"
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "تم مزامنة مجموعة البيانات هذه عبر الإنترنت. انقر لجعلها متاحة فقط في "
 "وضع عدم الاتصال."
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "X Axis (numeric)"
-#~ msgstr "المحور السيني (رقمي)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4662,10 +4393,6 @@ msgstr "تحديث وإعادة نشر"
 msgid " · downloaded"
 msgstr " · تم التنزيل"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {name} by category"
-#~ msgstr "عد الصفوف في {name} حسب الفئة"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Cancelled"
 msgstr "تم الإلغاء"
@@ -4678,7 +4405,6 @@ msgstr "تم إنشاء مجموعة الأدوار"
 msgid "Failed to update display name"
 msgstr "فشل في تحديث اسم العرض"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -4687,11 +4413,6 @@ msgstr "اللغة"
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close panel (⌘/)"
 msgstr "إغلاق اللوحة (⌘/)"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "Y Axis (numeric)"
-#~ msgstr "المحور الصادي (رقمي)"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -4715,7 +4436,6 @@ msgstr "ادفع ما تريد"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Remove {0}"
 msgstr "إزالة {0}"
 
@@ -4730,10 +4450,6 @@ msgstr "لوحات المعلومات"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
 msgstr "عدد صحيح"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription failed"
-msgstr "فشل النسخ"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol color"
@@ -4867,10 +4583,6 @@ msgstr "إزالة الفلتر المحلي"
 msgid "This removes the user group from members and resources that use it."
 msgstr "هذا يزيل مجموعة المستخدمين من الأعضاء والموارد التي تستخدمها."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Microphone access denied"
-msgstr "تم رفض الوصول إلى الميكروفون"
-
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "من مطالبتك:"
@@ -4902,10 +4614,6 @@ msgstr "لم يتم إضافة أي أعمدة بعد."
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Display name updated"
 msgstr "تم تحديث اسم العرض"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Loading voice model"
-msgstr "جارٍ تحميل نموذج الصوت"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
@@ -4947,10 +4655,6 @@ msgstr "حفظ مجموعة البيانات"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid Y axis selected"
-#~ msgstr "تم اختيار محور Y غير صالح"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
@@ -4996,10 +4700,6 @@ msgid "Upload files, connect external sources, or browse open datasets to add "
 msgstr "قم بتحميل الملفات، أو الاتصال بالمصادر الخارجية، أو تصفح مجموعات "
 "البيانات المفتوحة لإضافتها إلى مساحة العمل الخاصة بك."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not transcribe your audio."
-msgstr "لم يتمكن من نسخ صوتك."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/مقعد"
@@ -5019,14 +4719,6 @@ msgstr "أدخل عنوان بريدك الإلكتروني"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a line chart showing trends in {target} over time"
-#~ msgstr "أضف مخطط خطي يظهر الاتجاهات في {target} مع مرور الوقت"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Downloaded on this device"
-msgstr "تم تنزيله على هذا الجهاز"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -5117,10 +4809,6 @@ msgid "Please confirm that you would like to proceed with this plan change. "
 msgstr "يرجى تأكيد أنك ترغب في المتابعة مع تغيير هذه الخطة. سيتم تحديث اشتراكك "
 "وفقًا لذلك."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Speak"
-msgstr "تحدث"
-
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
@@ -5154,17 +4842,9 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Selected"
-msgstr "محدد"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "ملف CSV أو Excel"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "End transcription"
-#~ msgstr "إنهاء النسخ"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -5275,10 +4955,6 @@ msgstr "سهم"
 msgid "Values, comma-separated"
 msgstr "قيم، مفصولة بفواصل"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a Y axis"
-#~ msgstr "لم تختار محور Y"
-
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
@@ -5312,15 +4988,6 @@ msgstr "من العمود: <0>{columnName}</0>"
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
 msgstr "جاهز للعمل دون اتصال"
-
-#. placeholder {0}: model.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
-msgstr "غير متوفر في المتصفح ({0}, ~{sizeMb} ميغابايت تنزيل)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Set up voice prompting"
-msgstr "إعداد التوجيه الصوتي"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"

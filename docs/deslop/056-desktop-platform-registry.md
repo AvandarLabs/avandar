@@ -4,12 +4,12 @@
 - **Source branch**: `feat/ict4d-demo`
 - **Target branch**: `develop`
 - **Refactor branch**: `refactor-056/desktop-platform-registry`
-- **Depends on**: `none` (this is the foundation that voice-desktop, offline-session, bootstrap-snapshot, and duckdb-offline all build on).
+- **Depends on**: `none` (this is the foundation that offline-session, bootstrap-snapshot, and duckdb-offline all build on).
 - **Estimated PR size**: small — ~3 files, ~250 lines.
 
 ## Notes for future you
 
-- This is the **platform abstraction foundation**. Without it, anything desktop-aware (voice, offline auth, sync engine) can't compile cross-platform. Land first.
+- This is the **platform abstraction foundation**. Without it, anything desktop-aware (offline auth, sync engine) can't compile cross-platform. Land first.
 - Module-level `getPlatformImpls` / `setPlatformImpls` deliberately throws if read before the React provider mounts — catches "platform leaked into module init" bugs at startup.
 - Spec: `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`.
 

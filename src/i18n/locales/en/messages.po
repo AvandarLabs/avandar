@@ -17,10 +17,6 @@ msgstr ""
 msgid "Changes to your payment method can be made in your"
 msgstr "Changes to your payment method can be made in your"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What is the average value in {name}?"
-#~ msgstr "What is the average value in {name}?"
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close chat panel"
@@ -79,10 +75,6 @@ msgstr "Open dataset"
 msgid "Value column"
 msgstr "Value column"
 
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "There are no queried numeric fields"
-#~ msgstr "There are no queried numeric fields"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "Monthly"
@@ -130,10 +122,6 @@ msgstr "most recent"
 msgid "PII detected:"
 msgstr "PII detected:"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} downloaded. Tap the mic to start dictating."
-#~ msgstr "{0} downloaded. Tap the mic to start dictating."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "Title field is required"
@@ -153,10 +141,6 @@ msgstr "An error occurred while loading the file"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Source URL"
 msgstr "Source URL"
-
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#~ msgid "Type"
-#~ msgstr "Type"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -182,14 +166,6 @@ msgstr "Discovery is not available in this context."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "Type a question and I will generate the SQL and run it on the canvas."
-
-#. placeholder {0}: modelToDownload.displayName
-#. placeholder {1}: modelToDownload.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
-"here, or use a smaller RAM tier."
-msgstr "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
-"here, or use a smaller RAM tier."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -242,10 +218,6 @@ msgstr "Expand"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
 msgstr "Notes"
-
-#: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-#~ msgid "Datasets"
-#~ msgstr "Datasets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -404,14 +376,6 @@ msgstr "Re-download"
 msgid "Allow multiple values"
 msgstr "Allow multiple values"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
-#~ "number of datasets you can add to your workspace you can purchase more "
-#~ "seats. Each seat allows you to add 10 more datasets!"
-#~ msgstr "Your current plan only supports up to{0} datasets. To increase the "
-#~ "number of datasets you can add to your workspace you can purchase more "
-#~ "seats. Each seat allows you to add 10 more datasets!"
-
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "No datasets added yet"
@@ -467,10 +431,6 @@ msgstr "Something else…"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Changing plan to {newPlanName} ({newPlanSubType})"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Waiting…"
-msgstr "Waiting…"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
@@ -555,10 +515,6 @@ msgstr "I understand this data will be sent to the AI provider"
 msgid "Saved datasets"
 msgstr "Saved datasets"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Roles"
-#~ msgstr "Roles"
-
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "PDF (multi-page)"
 msgstr "PDF (multi-page)"
@@ -595,10 +551,6 @@ msgstr "Save as new dataset"
 msgid "From derived dataset"
 msgstr "From derived dataset"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model download failed"
-msgstr "Voice model download failed"
-
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Single select"
@@ -626,10 +578,6 @@ msgstr "These are the first {0} rows of your dataset. Check to see if the data "
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 msgid "This field cannot be empty"
 msgstr "This field cannot be empty"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription language: {selectedLanguageLabel}"
-msgstr "Transcription language: {selectedLanguageLabel}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -767,12 +715,6 @@ msgstr "Name"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Your question contains language that may bias the AI's answer."
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
-#~ "add more datasets, upgrade to a paid plan."
-#~ msgstr "Your workspace is on the Free plan, which supports up to 5 datasets. To "
-#~ "add more datasets, upgrade to a paid plan."
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "Close chat (⌘/)"
@@ -796,10 +738,6 @@ msgstr "Enter your email to get a reset link"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Approved"
 msgstr "Approved"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model not available"
-msgstr "Voice model not available"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Loading plans..."
@@ -835,10 +773,6 @@ msgstr "New role group"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "Column name in SQL"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Download & enable"
-#~ msgstr "Download & enable"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
@@ -899,11 +833,6 @@ msgstr "Invalid name column selected"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "Custom"
-
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} was deleted from this device."
-msgstr "{0} was deleted from this device."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -1153,14 +1082,6 @@ msgstr "Sum"
 msgid "Sync data!"
 msgstr "Sync data!"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice settings"
-msgstr "Voice settings"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Used when transcribing; does not change the model download."
-msgstr "Used when transcribing; does not change the model download."
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr " who also have "
@@ -1232,10 +1153,6 @@ msgstr "This field"
 msgid "Edit access for {0}"
 msgstr "Edit access for {0}"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Complete"
-msgstr "Complete"
-
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1272,11 +1189,6 @@ msgstr "Overwrite SQL with form changes"
 msgid "Dataset did not match the expected schema"
 msgstr "Dataset did not match the expected schema"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} is on this device. Tap the mic to dictate."
-msgstr "{0} is on this device. Tap the mic to dictate."
-
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "Sign Out"
@@ -1297,10 +1209,6 @@ msgstr "File was partially loaded"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "Payment Methods"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} (~{1} MB)"
-#~ msgstr "{0} (~{1} MB)"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1396,14 +1304,6 @@ msgstr "Roles & Permissions"
 msgid "Connect to Google Sheets"
 msgstr "Connect to Google Sheets"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Stop and transcribe"
-msgstr "Stop and transcribe"
-
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
-#~ msgid "Data Visualization"
-#~ msgstr "Data Visualization"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "Choose a saved dataset or import new data into your workspace."
@@ -1429,10 +1329,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "No speech detected"
-msgstr "No speech detected"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1610,7 +1506,6 @@ msgstr "your dataset"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1660,6 +1555,10 @@ msgstr "Delete annotation"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "to"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download offline chat model (WebLLM)"
+msgstr "Download offline chat model (WebLLM)"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"
@@ -1737,14 +1636,6 @@ msgid "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
 msgstr "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Browser unavailable"
-msgstr "Browser unavailable"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcribing…"
-msgstr "Transcribing…"
 
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -1832,10 +1723,6 @@ msgstr "Build a chart in chat"
 msgid "Additional seats required"
 msgstr "Additional seats required"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Finishing setup — almost ready."
-msgstr "Finishing setup — almost ready."
-
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
 msgstr "Edit"
@@ -1914,10 +1801,6 @@ msgstr "Confirm Action"
 msgid "Data Preview"
 msgstr "Data Preview"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model saved"
-msgstr "Voice model saved"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "is not null"
@@ -1963,17 +1846,9 @@ msgstr "Zoom out"
 msgid "Global Admin"
 msgstr "Global Admin"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a size column"
-#~ msgstr "You haven't chosen a size column"
-
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
 msgstr "Registration requires an internet connection."
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid size column selected"
-#~ msgstr "Invalid size column selected"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
 msgid "There are no values"
@@ -2047,10 +1922,6 @@ msgstr "Size column"
 msgid "Values"
 msgstr "Values"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to download the voice model."
-msgstr "Unable to download the voice model."
-
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "(untitled branch)"
 msgstr "(untitled branch)"
@@ -2058,10 +1929,6 @@ msgstr "(untitled branch)"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "About your workspace"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not remove voice model"
-msgstr "Could not remove voice model"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -2307,13 +2174,6 @@ msgstr "Controls the default for the rest of the workspace. People without app "
 msgid "Save to dashboard"
 msgstr "Save to dashboard"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
-#~ "plan to increase the number of datasets you can add to your workspace."
-#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Impact plan to increase the number of datasets you can add to your "
-#~ "workspace."
-
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "Label type"
@@ -2332,11 +2192,6 @@ msgstr "No file selected"
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Submit"
-
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "See all shared items"
-#~ msgstr "See all shared items"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dashboard"
@@ -2396,10 +2251,6 @@ msgstr "Are you sure you want to delete this dataset? This action cannot be "
 msgid "Symbol size column must be numeric."
 msgstr "Symbol size column must be numeric."
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Loading shared resources"
-#~ msgstr "Loading shared resources"
-
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (default)"
@@ -2413,10 +2264,6 @@ msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # "
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "Type or paste an email below."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice prompting"
-msgstr "Voice prompting"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2545,14 +2392,6 @@ msgstr "Y column"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Count how many rows there are in {datasetName}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Starter or Impact plan to increase the number of datasets you can add to "
-#~ "your workspace."
-#~ msgstr "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Starter or Impact plan to increase the number of datasets you can add "
-#~ "to your workspace."
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Offline model download failed"
@@ -2590,7 +2429,6 @@ msgid "We'll add this visualization to your new dashboard."
 msgstr "We'll add this visualization to your new dashboard."
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "Starting…"
 
@@ -2737,10 +2575,6 @@ msgstr "Pick one or more"
 msgid "Column Name"
 msgstr "Column Name"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Nothing has been shared with you here."
-#~ msgstr "Nothing has been shared with you here."
-
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "Sent password reset email"
@@ -2777,18 +2611,10 @@ msgstr "Do not refresh or close this tab or else the download will be canceled."
 msgid "Forest"
 msgstr "Forest"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Choose the language you will speak when dictating."
-msgstr "Choose the language you will speak when dictating."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow manual edit"
 msgstr "Allow manual edit"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Whisper supports many languages; auto-detect handles mixed input."
-#~ msgstr "Whisper supports many languages; auto-detect handles mixed input."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2812,10 +2638,6 @@ msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "The entity failed to load. Please try again later or reach out to "
 "support."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "We didn't catch anything — try again a bit closer to the mic."
-msgstr "We didn't catch anything — try again a bit closer to the mic."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -3046,10 +2868,6 @@ msgstr "No clarifications yet. The log fills in as the chat asks clarifying "
 msgid "Offline chat model removed"
 msgstr "Offline chat model removed"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Preparing download…"
-msgstr "Preparing download…"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "Tool"
@@ -3132,14 +2950,6 @@ msgstr "Ask about your data..."
 msgid "Theme picker"
 msgstr "Theme picker"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Do not refresh or close this tab — the download will be canceled."
-msgstr "Do not refresh or close this tab — the download will be canceled."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Desktop only"
-#~ msgstr "Desktop only"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "Preparing data for the visualizations…"
@@ -3208,7 +3018,6 @@ msgid "Add series"
 msgstr "Add series"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Download"
 msgstr "Download"
 
@@ -3231,10 +3040,6 @@ msgstr "No row filters. The slice will include every row in the dataset (for "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Turn"
 msgstr "Turn"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a table of the top 10 rows of {target}"
-#~ msgstr "Add a table of the top 10 rows of {target}"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -3333,10 +3138,6 @@ msgstr "Ignore all global filters — this visualization is unfiltered."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Sketch"
 msgstr "Sketch"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model ready"
-#~ msgstr "Voice model ready"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3478,17 +3279,9 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Show the first 20 rows of {name}"
-#~ msgstr "Show the first 20 rows of {name}"
-
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Approve and run"
 msgstr "Approve and run"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not access the microphone."
-msgstr "Could not access the microphone."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -3560,10 +3353,6 @@ msgstr "This {resource} is shared with: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Upload"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#~ msgid "Bubble size (numeric)"
-#~ msgstr "Bubble size (numeric)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3943,10 +3732,6 @@ msgstr "Render as"
 msgid "Line"
 msgstr "Line"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to delete the voice model from cache."
-msgstr "Unable to delete the voice model from cache."
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "Make offline-only"
@@ -3988,25 +3773,9 @@ msgstr "Select an Excel or CSV file from your computer to import"
 msgid "Please choose a password to complete your registration"
 msgstr "Please choose a password to complete your registration"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Shared with me"
-#~ msgstr "Shared with me"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "Dashboard published!"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of {target} grouped by category"
-#~ msgstr "Add a bar chart of {target} grouped by category"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
-"device storage first (without freezing the tab). The model loads when "
-"you dictate. Progress appears bottom-left."
-msgstr "Dictation runs locally with whisper.cpp. We download a ggml model into "
-"device storage first (without freezing the tab). The model loads when "
-"you dictate. Progress appears bottom-left."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4037,10 +3806,6 @@ msgstr "active"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Choose the first value we see"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download offline chat model (WebLLM, not voice)"
-msgstr "Download offline chat model (WebLLM, not voice)"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -4098,14 +3863,8 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 msgstr "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Downloading {0} for voice prompting"
-msgstr "Downloading {0} for voice prompting"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Model"
 msgstr "Model"
 
@@ -4120,10 +3879,6 @@ msgstr "This workspace does not have a valid subscription."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "All decisions"
 msgstr "All decisions"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Speak (local voice-to-text)"
-#~ msgstr "Speak (local voice-to-text)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Show labels"
@@ -4205,10 +3960,6 @@ msgstr "User group saved"
 msgid "Could not publish dashboard"
 msgstr "Could not publish dashboard"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model removed"
-msgstr "Voice model removed"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "Suggested rewrite:"
@@ -4277,14 +4028,6 @@ msgstr "This dataset will no longer be stored online and can only be accessed "
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
 msgstr "Download a different offline chat model"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
-#~ "download a Whisper model from Hugging Face once. The download runs in "
-#~ "the background; progress appears in the bottom-left corner."
-#~ msgstr "Voice prompts run entirely on your device. To dictate, we need to "
-#~ "download a Whisper model from Hugging Face once. The download runs in "
-#~ "the background; progress appears in the bottom-left corner."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4387,10 +4130,6 @@ msgstr "dataset name"
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Email address updated"
 msgstr "Email address updated"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "These are too big for web and are only available on Avandar Desktop"
-#~ msgstr "These are too big for web and are only available on Avandar Desktop"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
@@ -4546,10 +4285,6 @@ msgstr "This {resource} is accessible to anyone with {app} {0} permission."
 msgid "Amber"
 msgstr "Amber"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Enable voice prompting"
-msgstr "Enable voice prompting"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "Configure how to join datasets"
@@ -4570,11 +4305,6 @@ msgstr "Could not prepare the offline chat model."
 msgid "Branches"
 msgstr "Branches"
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Starting {0}…"
-msgstr "Starting {0}…"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "This dataset will be offline-only"
@@ -4586,11 +4316,6 @@ msgstr "Add at least one X / Y / Size series"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "This dataset is synced online. Click to make offline-only."
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "X Axis (numeric)"
-#~ msgstr "X Axis (numeric)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4682,10 +4407,6 @@ msgstr "Update & republish"
 msgid " · downloaded"
 msgstr " · downloaded"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {name} by category"
-#~ msgstr "Count rows in {name} by category"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Cancelled"
 msgstr "Cancelled"
@@ -4698,7 +4419,6 @@ msgstr "Role group created"
 msgid "Failed to update display name"
 msgstr "Failed to update display name"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -4707,11 +4427,6 @@ msgstr "Language"
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close panel (⌘/)"
 msgstr "Close panel (⌘/)"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "Y Axis (numeric)"
-#~ msgstr "Y Axis (numeric)"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -4735,7 +4450,6 @@ msgstr "Pay what you want"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Remove {0}"
 msgstr "Remove {0}"
 
@@ -4750,10 +4464,6 @@ msgstr "Dashboards"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
 msgstr "integer"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription failed"
-msgstr "Transcription failed"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol color"
@@ -4887,10 +4597,6 @@ msgstr "Remove local filter"
 msgid "This removes the user group from members and resources that use it."
 msgstr "This removes the user group from members and resources that use it."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Microphone access denied"
-msgstr "Microphone access denied"
-
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "From your prompt:"
@@ -4922,10 +4628,6 @@ msgstr "No columns have been added yet."
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Display name updated"
 msgstr "Display name updated"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Loading voice model"
-msgstr "Loading voice model"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
@@ -4967,10 +4669,6 @@ msgstr "Save Dataset"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Search dashboards"
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid Y axis selected"
-#~ msgstr "Invalid Y axis selected"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
@@ -5017,10 +4715,6 @@ msgid "Upload files, connect external sources, or browse open datasets to add "
 msgstr "Upload files, connect external sources, or browse open datasets to add "
 "to your workspace."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not transcribe your audio."
-msgstr "Could not transcribe your audio."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/seat"
@@ -5040,14 +4734,6 @@ msgstr "Enter your email address"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "Delete user group"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a line chart showing trends in {target} over time"
-#~ msgstr "Add a line chart showing trends in {target} over time"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Downloaded on this device"
-msgstr "Downloaded on this device"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -5138,10 +4824,6 @@ msgid "Please confirm that you would like to proceed with this plan change. "
 msgstr "Please confirm that you would like to proceed with this plan change. "
 "Your subscription will be updated accordingly."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Speak"
-msgstr "Speak"
-
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
@@ -5175,17 +4857,9 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Selected"
-msgstr "Selected"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "CSV or Excel file"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "End transcription"
-#~ msgstr "End transcription"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -5296,10 +4970,6 @@ msgstr "Arrow"
 msgid "Values, comma-separated"
 msgstr "Values, comma-separated"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a Y axis"
-#~ msgstr "You haven't chosen a Y axis"
-
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
@@ -5333,15 +5003,6 @@ msgstr "From column: <0>{columnName}</0>"
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
 msgstr "Offline ready"
-
-#. placeholder {0}: model.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
-msgstr "Not available in the browser ({0}, ~{sizeMb} MB download)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Set up voice prompting"
-msgstr "Set up voice prompting"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"

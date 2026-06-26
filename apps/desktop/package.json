@@ -15,8 +15,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
     "duckdb": "^1.4.4",
-    "electrobun": "latest",
-    "smart-whisper": "^0.8.1"
+    "electrobun": "latest"
   },
   "devDependencies": {
     "typescript": "~5.9.3",

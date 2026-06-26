@@ -38,7 +38,6 @@ import type {
   ChatPlanStep,
   ChatRetryContext,
   ChatSessionSecretResponse,
-  ChatVoiceLanguage,
   RegeneratePlanResponse,
 } from "$/types/chat.types.ts";
 
@@ -839,23 +838,6 @@ function _buildRetryContextNote(
   return `\n\nThe user explicitly asked you to TRY AGAIN on their most recent question. Do not repeat the same output — take a different approach. Consider an alternative interpretation, a different SQL strategy, or asking a clarifying question if your previous attempt jumped to SQL too aggressively.\n\n${lines.join("\n\n")}`;
 }
 
-/**
- * Builds the trailing system-prompt fragment that tells the model the
- * user's most recent message was dictated in a specific language. Empty
- * string when no voice language was forwarded. Intentionally narrow:
- * only Swahili is wired today because low-resource Bantu languages get
- * misidentified as garbled English by the LLM far more often than the
- * well-supported European languages do.
- */
-function _buildVoiceLanguageNote(
-  voiceLanguage: ChatVoiceLanguage | undefined,
-): string {
-  if (voiceLanguage !== "swahili") {
-    return "";
-  }
-  return `\n\nThe user's most recent message was transcribed from spoken Kiswahili (Swahili). Treat it as Swahili — do not assume it is misspelled English or a different Bantu language. Reply in Swahili unless the user has explicitly written in another language earlier in the thread.`;
-}
-
 async function fetchSchemaForWorkspace(args: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseClient: any;
@@ -979,7 +961,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             priorDashboardBlockKind: z.string().max(40).optional(),
           })
           .optional(),
-        voiceLanguage: z.enum(["swahili"]).optional(),
       })
       .action(async ({ pathParams, body, supabaseClient, user }) => {
         const { workspaceId } = pathParams;
@@ -989,7 +970,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           model: requestedModel,
           consentAcks,
           retryContext,
-          voiceLanguage,
         } = body;
         const model = _resolveChatModel(requestedModel);
 
@@ -1088,15 +1068,13 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           : "";
 
         const retryContextNote = _buildRetryContextNote(retryContext);
-        const voiceLanguageNote = _buildVoiceLanguageNote(voiceLanguage);
 
         const systemContent =
           (isDataExplorer ?
             `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
           : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
           : genericSystemPrompt) +
-          retryContextNote +
-          voiceLanguageNote;
+          retryContextNote;
 
         const requestBody: Record<string, unknown> = {
           model,

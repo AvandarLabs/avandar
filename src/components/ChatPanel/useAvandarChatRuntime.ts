@@ -28,7 +28,6 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/lib/privacy/generatedSqlAssumptions";
 import { consumeAckForText } from "@/lib/privacy/pendingAcks";
-import { consumePendingVoiceLanguage } from "@/lib/voice/pendingVoiceLanguage";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -450,13 +449,6 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             buildRetryContext(cachedTurn.response)
           : undefined;
 
-        // Forward the voice-dictation language ONLY when the last
-        // composer fill was Swahili — see `pendingVoiceLanguage.ts` for
-        // why other languages are intentionally not piped through yet.
-        const pendingVoiceLang = consumePendingVoiceLanguage();
-        const voiceLanguage =
-          pendingVoiceLang === "swahili" ? ("swahili" as const) : undefined;
-
         try {
           const response = await APIClient.post({
             route: "chat/:workspaceId/messages",
@@ -467,7 +459,6 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               ...(cloudModelId ? { model: cloudModelId } : {}),
               ...(consentAcks.length > 0 ? { consentAcks } : {}),
               ...(retryContext ? { retryContext } : {}),
-              ...(voiceLanguage ? { voiceLanguage } : {}),
             },
           });
           lastTurnRef.current = {

@@ -1,5 +1,3 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
@@ -8,14 +6,6 @@ import { loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { VitePWA } from "vite-plugin-pwa";
 import { defaultExclude, defineConfig } from "vitest/config";
-
-const repoRoot = path.dirname(fileURLToPath(import.meta.url));
-
-/** Emscripten glue for @timur00kh/whisper.wasm (not in package exports). */
-const whisperLibmainPath = path.join(
-  repoRoot,
-  "node_modules/@timur00kh/whisper.wasm/dist/libmain-D9-QM3iM.mjs",
-);
 
 // Wraps `react()` with the Lingui macro babel plugin. This is required:
 // Lingui macros (<Trans>, t``, msg``, plural()) are compile-time transforms
@@ -52,27 +42,12 @@ export default defineConfig(({ mode }) => {
     : null;
 
   return {
-    server: {
-      // SharedArrayBuffer for whisper.cpp WASM (pthread build) needs cross-
-      // origin isolation. `credentialless` keeps `crossOriginIsolated` true
-      // (so SAB stays available) while still letting third-party scripts that
-      // do not opt in to CORP load (Featurebase SDK, Google Fonts, etc.).
-      headers: {
-        "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "credentialless",
-        "Cross-Origin-Resource-Policy": "same-origin",
-      },
-    },
     worker: {
       format: "es",
     },
     optimizeDeps: {
       // Pre-bundling adds node polyfills to Emscripten glue; breaks workers.
-      exclude: [
-        "@avandar/whisper-libmain",
-        "@timur00kh/whisper.wasm",
-        "@duckdb/duckdb-wasm",
-      ],
+      exclude: ["@duckdb/duckdb-wasm"],
     },
     plugins:
       mode === "test" ?
@@ -198,7 +173,6 @@ export default defineConfig(({ mode }) => {
         "@ui": "/packages/web/ui/src",
         "@hooks": "/packages/web/hooks/src",
         "@sbfn": "/supabase/functions",
-        "@avandar/whisper-libmain": whisperLibmainPath,
       },
     },
     publicDir: "public",

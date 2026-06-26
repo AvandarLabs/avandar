@@ -86,7 +86,6 @@ planning is complete.
   - 3d: #22–#28 (Privacy phase-0 guardrails).
   - 3e: #29–#43 (Chat-interactive-workflows phases 1–9).
   - 3f: #44–#49 (Manual SQL ↔ form sync).
-  - 3g: #50–#55 (Voice — web + desktop).
   - 3h: #56–#63 (Desktop platform foundation + offline modes).
   - 3i: #64–#75 (Dashboards — polish, filters, publishing).
   - 3j: #76, #77 (Summary view + analytics events).
@@ -282,7 +281,6 @@ For each feature:
    in `ALL_FEATURES.md`, note it under `Depends on`. Common
    deps to look for:
    - Chat workflows phases depend on the previous phase.
-   - Voice desktop depends on Desktop platform foundation.
    - Anything touching dashboards likely depends on
      `AvaPageDataMigrationV4` if it adds new block fields.
 6. Author the migration doc using `FEATURE_TEMPLATE.md`. Replace
@@ -329,7 +327,7 @@ This section is a scratch space for cross-session decisions that
 might otherwise get lost. Append; don't overwrite.
 
 - **2026-05-21 (Session 1)**: Decided to keep `ALL_FEATURES.md`
-  organized by category (Schema, Data Explorer, Chat, Voice,
+  organized by category (Schema, Data Explorer, Chat,
   Dashboards, ...) rather than chronologically. Indices are global
   so the order can be reshuffled without renumbering.
 - **2026-05-21 (Session 1)**: The 78-commit delta includes a

@@ -17,10 +17,6 @@ msgstr ""
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What is the average value in {name}?"
-#~ msgstr "Thamani ya wastani katika {name} ni ipi?"
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close chat panel"
@@ -79,10 +75,6 @@ msgstr "Fungua dataset"
 msgid "Value column"
 msgstr "Safu ya thamani"
 
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "There are no queried numeric fields"
-#~ msgstr "Hakuna maeneo ya nambari yaliyoulizwa"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "Kila mwezi"
@@ -130,10 +122,6 @@ msgstr "ya hivi karibuni zaidi"
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} downloaded. Tap the mic to start dictating."
-#~ msgstr "{0} imeshukuliwa. Gusa kipaza sauti kuanza kusema."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "Sehemu ya kichwa inahitajika"
@@ -153,10 +141,6 @@ msgstr "Kosa lilitokea wakati wa kupakia faili"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Source URL"
 msgstr "URL ya chanzo"
-
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#~ msgid "Type"
-#~ msgstr "Aina"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -182,14 +166,6 @@ msgstr "Utafutaji haupatikani katika muktadha huu."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "Andika swali na nitaunda SQL na kuikimbia kwenye canvas."
-
-#. placeholder {0}: modelToDownload.displayName
-#. placeholder {1}: modelToDownload.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
-"here, or use a smaller RAM tier."
-msgstr "{0} inahitaji {1} na haipatikani kwenye kivinjari. Chagua Tiny au Base "
-"hapa, au tumia kiwango kidogo cha RAM."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -242,10 +218,6 @@ msgstr "Panua"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
 msgstr "Maelezo"
-
-#: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-#~ msgid "Datasets"
-#~ msgstr "Seti za data"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -405,12 +377,6 @@ msgstr "Pakua tena"
 msgid "Allow multiple values"
 msgstr "Ruhusu thamani nyingi"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
-#~ "number of datasets you can add to your workspace you can purchase more "
-#~ "seats. Each seat allows you to add 10 more datasets!"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "Hakuna datasets zilizoongezwa bado"
@@ -467,10 +433,6 @@ msgstr "Kitu kingine…"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Kubadilisha mpango kuwa {newPlanName} ({newPlanSubType})"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Waiting…"
-msgstr "Inasubiri…"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
@@ -556,10 +518,6 @@ msgstr "Ninaelewa kuwa data hii itatumwa kwa mtoa huduma wa AI"
 msgid "Saved datasets"
 msgstr "Seti za data zilizohifadhiwa"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Roles"
-#~ msgstr ""
-
 #: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 msgid "PDF (multi-page)"
 msgstr "PDF (kurasa nyingi)"
@@ -596,10 +554,6 @@ msgstr "Hifadhi kama seti mpya ya data"
 msgid "From derived dataset"
 msgstr "Kutoka kwa seti ya data iliyotokana"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model download failed"
-msgstr "Kushusha mfano wa sauti kumeshindikana"
-
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Chaguo moja"
@@ -627,10 +581,6 @@ msgstr "Hizi ni safu za kwanza {0} za seti yako ya data. Angalia kama data ni "
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 msgid "This field cannot be empty"
 msgstr "Uwanja huu hauwezi kuwa tupu"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription language: {selectedLanguageLabel}"
-msgstr "Lugha ya maandiko: {selectedLanguageLabel}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -770,11 +720,6 @@ msgstr "Jina"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Swali lako lina lugha ambayo inaweza kuathiri jibu la AI."
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
-#~ "add more datasets, upgrade to a paid plan."
-#~ msgstr ""
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "Funga mazungumzo (⌘/)"
@@ -798,10 +743,6 @@ msgstr "Ingiza barua yako ya pepe kupata kiungo cha kurekebisha"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Approved"
 msgstr "Imeidhinishwa"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model not available"
-msgstr "Mfano wa sauti haupatikani"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Loading plans..."
@@ -838,10 +779,6 @@ msgstr "Kundi jipya la jukumu"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Download & enable"
-#~ msgstr "Pakua na kuwezesha"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
@@ -902,11 +839,6 @@ msgstr "Safu ya jina isiyo sahihi imechaguliwa"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "Kawaida"
-
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} was deleted from this device."
-msgstr "{0} imefutwa kutoka kwa kifaa hiki."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -1157,14 +1089,6 @@ msgstr "Jumla"
 msgid "Sync data!"
 msgstr "Sanidisha data!"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice settings"
-msgstr "Mipangilio ya sauti"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Used when transcribing; does not change the model download."
-msgstr "Inatumika wakati wa kuandika; haibadilishi upakuaji wa mfano."
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr " ambaye pia ana "
@@ -1235,10 +1159,6 @@ msgstr "Uwanja huu"
 msgid "Edit access for {0}"
 msgstr "Hariri ufikiaji kwa {0}"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Complete"
-msgstr "Kamilisha"
-
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1276,11 +1196,6 @@ msgstr "Badilisha SQL kwa mabadiliko ya fomu"
 msgid "Dataset did not match the expected schema"
 msgstr "Dataset haikukidhi muundo unaotarajiwa"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "{0} is on this device. Tap the mic to dictate."
-msgstr "{0} (~{1} MB) iko kwenye kifaa hiki. Gusa kipaza sauti kuandika."
-
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "Toka"
@@ -1301,10 +1216,6 @@ msgstr "Faili ilipakiwa kwa sehemu"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "Njia za Malipo"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} (~{1} MB)"
-#~ msgstr "{0} (~{1} MB)"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1402,14 +1313,6 @@ msgstr "Majukumu & Ruhusa"
 msgid "Connect to Google Sheets"
 msgstr "Unganisha na Google Sheets"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Stop and transcribe"
-msgstr "Simamisha na uandike"
-
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
-#~ msgid "Data Visualization"
-#~ msgstr "Uonyeshaji wa Data"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "Chagua dataset iliyohifadhiwa au uagize data mpya kwenye eneo lako la "
@@ -1436,10 +1339,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Export dashboard hii kama PDF, au chora kwanza. Maelezo yanasaidia "
 "maandiko, mishale, na kuchora kwa mkono kwa ukali unaoweza kubadilishwa "
 "(RoughJS)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "No speech detected"
-msgstr "Hakuna sauti iliyogunduliwa"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1619,7 +1518,6 @@ msgstr "seti yako ya data"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1669,6 +1567,10 @@ msgstr "Futa maelezo"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "kwa"
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download offline chat model (WebLLM)"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"
@@ -1746,14 +1648,6 @@ msgid "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
 msgstr "Tutatumia safu hizo kuunganisha seti za data kuwa {entityConfigName} "
 "moja."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Browser unavailable"
-msgstr "Kivinjari hakipatikani"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcribing…"
-msgstr "Kurekodi..."
 
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -1841,10 +1735,6 @@ msgstr "Jenga chati katika mazungumzo"
 msgid "Additional seats required"
 msgstr "Viti vya ziada vinahitajika"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Finishing setup — almost ready."
-msgstr "Kumaliza mipangilio — karibu tayari."
-
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
 msgstr "Hariri"
@@ -1923,10 +1813,6 @@ msgstr "Thibitisha Kitendo"
 msgid "Data Preview"
 msgstr "Mapitio ya Data"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model saved"
-msgstr "Mfano wa sauti umehifadhiwa"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "si tupu"
@@ -1972,17 +1858,9 @@ msgstr "Pandisha mbali"
 msgid "Global Admin"
 msgstr "Msimamizi wa Kimataifa"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a size column"
-#~ msgstr "Hujachagua safu ya ukubwa"
-
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
 msgstr "Usajili unahitaji muunganisho wa intaneti."
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid size column selected"
-#~ msgstr "Safu ya ukubwa isiyo sahihi imechaguliwa"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
 msgid "There are no values"
@@ -2057,10 +1935,6 @@ msgstr "Safu ya ukubwa"
 msgid "Values"
 msgstr "Thamani"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to download the voice model."
-msgstr "Haiwezekani kupakua mfano wa sauti."
-
 #: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
 msgid "(untitled branch)"
 msgstr "(tawi lisilo na jina)"
@@ -2068,10 +1942,6 @@ msgstr "(tawi lisilo na jina)"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not remove voice model"
-msgstr "Haiwezekani kuondoa mfano wa sauti"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -2318,11 +2188,6 @@ msgstr "Inadhibiti chaguo la msingi kwa sehemu nyingine ya ofisi. Watu wasio na 
 msgid "Save to dashboard"
 msgstr "Hifadhi kwenye dashibodi"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
-#~ "plan to increase the number of datasets you can add to your workspace."
-#~ msgstr ""
-
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "Aina ya lebo"
@@ -2341,11 +2206,6 @@ msgstr "Hakuna faili iliyochaguliwa"
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Wasilisha"
-
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "See all shared items"
-#~ msgstr "Tazama vitu vyote vilivyoshirikiwa"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dashboard"
@@ -2406,10 +2266,6 @@ msgstr "Je, una uhakika unataka kufuta seti hii ya data? Kitendo hiki hakiwezi "
 msgid "Symbol size column must be numeric."
 msgstr "Safu ya ukubwa wa alama lazima iwe ya nambari."
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Loading shared resources"
-#~ msgstr "Inapakia rasilimali zilizoshirikiwa"
-
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (chaguo la kawaida)"
@@ -2423,10 +2279,6 @@ msgstr "{numCols, plural, one {Itachapisha # safu:} other {Itachapisha # "
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "Andika au bandika barua pepe hapa chini."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice prompting"
-msgstr "Kuhamasisha sauti"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2555,12 +2407,6 @@ msgstr "Safu ya Y"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Starter or Impact plan to increase the number of datasets you can add to "
-#~ "your workspace."
-#~ msgstr ""
-
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Kupakua mfano wa mtandaoni kumeshindikana"
@@ -2599,7 +2445,6 @@ msgid "We'll add this visualization to your new dashboard."
 msgstr "Tutongeza picha hii kwenye dashibodi yako mpya."
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "Kuanza…"
 
@@ -2746,10 +2591,6 @@ msgstr "Chagua moja au zaidi"
 msgid "Column Name"
 msgstr "Jina la Safu"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Nothing has been shared with you here."
-#~ msgstr "Hakuna kitu kimegawanywa kwako hapa."
-
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "Imetumwa barua ya kuweka upya nenosiri"
@@ -2786,19 +2627,10 @@ msgstr "Usi-refresh au kufunga tab hii vinginevyo upakuaji utafutwa."
 msgid "Forest"
 msgstr "Msitu"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Choose the language you will speak when dictating."
-msgstr "Chagua lugha utakayozungumza unapotoa maagizo."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow manual edit"
 msgstr "Ruhusu kuhariri kwa mkono"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Whisper supports many languages; auto-detect handles mixed input."
-#~ msgstr "Whisper inasaidia lugha nyingi; kugundua kiotomatiki kunashughulikia "
-#~ "ingizo mchanganyiko."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2823,10 +2655,6 @@ msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "Kitu hakikupata kupakia. Tafadhali jaribu tena baadaye au wasiliana na "
 "msaada."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "We didn't catch anything — try again a bit closer to the mic."
-msgstr "Hatukupata chochote — jaribu tena karibu na mzunguko."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -3060,10 +2888,6 @@ msgstr "Hakuna mwelekeo bado. Kumbukumbu inajaza kadri mazungumzo yanavyouliza "
 msgid "Offline chat model removed"
 msgstr "Mfano wa mazungumzo ya mtandaoni umeondolewa"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Preparing download…"
-msgstr "Inajiandaa kupakua…"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "Chombo"
@@ -3146,14 +2970,6 @@ msgstr "Uliza kuhusu data yako..."
 msgid "Theme picker"
 msgstr "Chaguo la mandhari"
 
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Do not refresh or close this tab — the download will be canceled."
-msgstr "Tafadhali usi-refresh au kufunga tab hii — upakuaji utafutwa."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Desktop only"
-#~ msgstr "Kwa desktop pekee"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "Inatayarisha data kwa ajili ya uonyeshaji…"
@@ -3223,7 +3039,6 @@ msgid "Add series"
 msgstr "Ongeza mfululizo"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Download"
 msgstr "Pakua"
 
@@ -3246,10 +3061,6 @@ msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Turn"
 msgstr "Geuza"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a table of the top 10 rows of {target}"
-#~ msgstr "Ongeza jedwali la safu 10 za juu za {target}"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -3349,10 +3160,6 @@ msgstr "Puuza filters zote za kimataifa — picha hii haina filters."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Sketch"
 msgstr "Mchoro"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model ready"
-#~ msgstr "Mfano wa sauti uko tayari"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3495,17 +3302,9 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "Hali hii haiwezi kubadilishwa."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Show the first 20 rows of {name}"
-#~ msgstr "Onyesha safu 20 za kwanza za {name}"
-
 #: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 msgid "Approve and run"
 msgstr "Thibitisha na uendeshe"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not access the microphone."
-msgstr "Haiwezekani kufikia kipaza sauti."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -3577,10 +3376,6 @@ msgstr "Hii {resource} inashirikiwa na: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Pakia"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#~ msgid "Bubble size (numeric)"
-#~ msgstr "Ukubwa wa bubble (nambari)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3964,10 +3759,6 @@ msgstr "Onyesha kama"
 msgid "Line"
 msgstr "Mstari"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Unable to delete the voice model from cache."
-msgstr "Haiwezekani kufuta mfano wa sauti kutoka kwenye cache."
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "Fanya kuwa ya mtandaoni pekee"
@@ -4009,25 +3800,9 @@ msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
 msgid "Please choose a password to complete your registration"
 msgstr "Tafadhali chagua nenosiri kukamilisha usajili wako"
 
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Shared with me"
-#~ msgstr "Imeshirikiwa nami"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "Dashibodi imechapishwa!"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of {target} grouped by category"
-#~ msgstr "Ongeza chati ya bar ya {target} iliyopangwa kwa kategoria"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
-"device storage first (without freezing the tab). The model loads when "
-"you dictate. Progress appears bottom-left."
-msgstr "Utoaji unafanyika ndani ya kifaa kwa kutumia whisper.cpp. Tunapakua "
-"mfano wa ggml kwenye hifadhi ya kifaa kwanza (bila kufunga tab). Mfano "
-"unaload wakati unatoa maagizo. Maendeleo yanaonekana chini-kushoto."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4058,10 +3833,6 @@ msgstr "hai"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download offline chat model (WebLLM, not voice)"
-msgstr "Pakua mfano wa mazungumzo ya mtandaoni (WebLLM, si sauti)"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -4121,14 +3892,8 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 msgstr "Jina hili linatumika tu katika {workspaceName}. Workspace zako nyingine "
 "zina majina yao wenyewe."
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-msgid "Downloading {0} for voice prompting"
-msgstr "Inapakua {0} kwa ajili ya kuongoza sauti"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Model"
 msgstr "Mfano"
 
@@ -4144,10 +3909,6 @@ msgstr "Workspace hii haina usajili halali."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "All decisions"
 msgstr "Maamuzi yote"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Speak (local voice-to-text)"
-#~ msgstr "Sema (sauti ya ndani hadi maandiko)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Show labels"
@@ -4229,10 +3990,6 @@ msgstr "Kikundi cha mtumiaji kimehifadhiwa"
 msgid "Could not publish dashboard"
 msgstr "Haiwezekani kuchapisha dashibodi"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Voice model removed"
-msgstr "Mfano wa sauti umeondolewa"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
@@ -4300,15 +4057,6 @@ msgstr "Seti hii ya data haitahifadhiwa mtandaoni tena na inaweza kufikiwa tu "
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download a different offline chat model"
 msgstr "Pakua mfano tofauti wa mazungumzo ya mtandaoni"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
-#~ "download a Whisper model from Hugging Face once. The download runs in "
-#~ "the background; progress appears in the bottom-left corner."
-#~ msgstr "Maagizo ya sauti yanakimbia kabisa kwenye kifaa chako. Ili kutoa "
-#~ "maagizo, tunahitaji kupakua mfano wa Whisper kutoka Hugging Face mara "
-#~ "moja. Upakuaji unakimbia kwa nyuma; maendeleo yanaonekana katika kona "
-#~ "ya chini-kushoto."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -4412,10 +4160,6 @@ msgstr "jina la seti ya data"
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Email address updated"
 msgstr "Anwani ya barua pepe imeboreshwa"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "These are too big for web and are only available on Avandar Desktop"
-#~ msgstr "Hizi ni kubwa sana kwa wavuti na zinapatikana tu kwenye Avandar Desktop"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Freehand"
@@ -4575,10 +4319,6 @@ msgstr "Hii {resource} inapatikana kwa mtu yeyote mwenye ruhusa ya {app} {0}."
 msgid "Amber"
 msgstr "Amber"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Enable voice prompting"
-msgstr "Washa uhamasishaji wa sauti"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "Sanidi jinsi ya kuungana na seti za data"
@@ -4599,11 +4339,6 @@ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 msgid "Branches"
 msgstr "Matawi"
 
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Starting {0}…"
-msgstr "Kuanza {0}…"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "Hii dataset itakuwa ya mtandaoni pekee"
@@ -4616,11 +4351,6 @@ msgstr "Ongeza angalau mfululizo mmoja wa X / Y / Ukubwa"
 msgid "This dataset is synced online. Click to make offline-only."
 msgstr "Hii dataset imeunganishwa mtandaoni. Bonyeza kufanya iwe ya mtandaoni "
 "pekee."
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "X Axis (numeric)"
-#~ msgstr "X Axis (nambari)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4713,10 +4443,6 @@ msgstr "Sasisha & chapisha tena"
 msgid " · downloaded"
 msgstr " · imeshukuliwa"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {name} by category"
-#~ msgstr "Hesabu mistari katika {name} kwa kategoria"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Cancelled"
 msgstr "Imesitishwa"
@@ -4729,7 +4455,6 @@ msgstr "Kundi la jukumu limeundwa"
 msgid "Failed to update display name"
 msgstr "Imeshindwa kuboresha jina la kuonyesha"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -4738,11 +4463,6 @@ msgstr "Lugha"
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close panel (⌘/)"
 msgstr "Funga paneli (⌘/)"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "Y Axis (numeric)"
-#~ msgstr "Y Axis (nambari)"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -4766,7 +4486,6 @@ msgstr "Lipa unachotaka"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Remove {0}"
 msgstr "Ondoa {0}"
 
@@ -4781,10 +4500,6 @@ msgstr "Dashibodi"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "integer"
 msgstr "nambari kamili"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Transcription failed"
-msgstr "Uandishi umeshindwa"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Symbol color"
@@ -4920,10 +4635,6 @@ msgid "This removes the user group from members and resources that use it."
 msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 "zinazotumia hiyo."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Microphone access denied"
-msgstr "Upatikanaji wa kipaza sauti umekataliwa"
-
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "Kutoka kwa kichocheo chako:"
@@ -4955,10 +4666,6 @@ msgstr "Hakuna safu zilizoongezwa bado."
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "Display name updated"
 msgstr "Jina la kuonyesha limeboreshwa"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-msgid "Loading voice model"
-msgstr "Inapakia mfano wa sauti"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Choose a workspace preset or customize per app. User groups control "
@@ -5001,10 +4708,6 @@ msgstr "Hifadhi Dataset"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Tafuta dashibodi"
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid Y axis selected"
-#~ msgstr "Y-axis isiyo sahihi imechaguliwa"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
@@ -5051,10 +4754,6 @@ msgid "Upload files, connect external sources, or browse open datasets to add "
 msgstr "Pakia faili, ungana na vyanzo vya nje, au pitia datasets zilizo wazi "
 "kuongeza kwenye eneo lako la kazi."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Could not transcribe your audio."
-msgstr "Haiwezekani kuandika sauti yako."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
 msgstr "{formattedPriceToDisplay}/kiti"
@@ -5074,14 +4773,6 @@ msgstr "Ingiza anwani yako ya barua pepe"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "Futa kikundi cha mtumiaji"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a line chart showing trends in {target} over time"
-#~ msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {target} kwa muda"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Downloaded on this device"
-msgstr "Imepakuliwa kwenye kifaa hiki"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -5172,10 +4863,6 @@ msgid "Please confirm that you would like to proceed with this plan change. "
 msgstr "Tafadhali thibitisha kwamba ungependa kuendelea na mabadiliko haya ya "
 "mpango. Usajili wako utaongezwa ipasavyo."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Speak"
-msgstr "Zungumza"
-
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
@@ -5209,17 +4896,9 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 "wa AI atazipokea na anaweza kuandika ombi hilo."
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Selected"
-msgstr "Imechaguliwa"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "Faili ya CSV au Excel"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "End transcription"
-#~ msgstr "Maliza uandishi"
 
 #: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -5330,10 +5009,6 @@ msgstr "Panya"
 msgid "Values, comma-separated"
 msgstr "Thamani, zilizotengwa kwa koma"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a Y axis"
-#~ msgstr "Hujachagua mhimili wa Y"
-
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
@@ -5367,15 +5042,6 @@ msgstr "Kutoka safu: <0>{columnName}</0>"
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
 msgstr "Iko tayari mtandaoni"
-
-#. placeholder {0}: model.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
-msgstr "Haipatikani kwenye kivinjari ({0}, ~{sizeMb} MB kupakua)."
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-msgid "Set up voice prompting"
-msgstr "Weka sauti ya kuongoza"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"

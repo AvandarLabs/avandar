@@ -9,7 +9,7 @@
 
 ## Notes for future you
 
-- Driver commit: `1e7d335`. Same SHA also touches the voice "Swahili hint" (row #055) — scope to the chat-try-again portion only.
+- Driver commit: `1e7d335` — scope to the chat-try-again portion only.
 - "Retry-on-empty" means: when the LLM completes a turn with an empty assistant message (backend hiccup), the runtime retries automatically once. The per-turn "Try Again" button is a manual fallback after the auto-retry fails.
 
 ## What this feature is
