@@ -44,6 +44,31 @@ A rule belongs **here** when it mentions:
 When you add a new rule, include a short bad/good example whenever the
 rule is non-obvious.
 
+## Barrel-file allow-list (reference)
+
+This is not a phase. The skill's TypeScript checklist already runs the
+barrel-file check ("Do not add barrel files, except in repo-approved
+directories documented by the repo-local checklist") and then consults
+this list to decide whether a new `index.ts` is allowed.
+
+In this repo, barrel files are approved **only** under `packages/`.
+Every directory there belongs to a `@avandar/*` workspace package that
+is published as a library, so a barrel `src/index.ts` is the package's
+intended public entrypoint. A new `index.ts` anywhere outside
+`packages/` (under `src/`, `shared/`, `supabase/functions/`, etc.) is a
+finding.
+
+Approved packages:
+
+- `@avandar/ui` — `packages/web/ui/`
+- `@avandar/hooks` — `packages/web/hooks/`
+- `@avandar/clients` — `packages/shared/clients/`
+- `@avandar/logger` — `packages/shared/logger/`
+- `@avandar/utils` — `packages/shared/utils/`
+- `@avandar/models` — `packages/shared/models/`
+- `@avandar/modules` — `packages/shared/modules/`
+- `@avandar/ava-etl` — `packages/node/ava-etl/`
+
 ## Phases
 
 Run these **in order** after the skill's built-in checklists, and only

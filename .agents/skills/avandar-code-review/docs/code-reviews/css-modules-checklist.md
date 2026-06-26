@@ -22,7 +22,7 @@ module-CSS imports change.
   ```
 
   Each hit reaches out of the component's own folder into a parent or
-  sibling for class names — flag and propose colocating the styles.
+  sibling for class names; flag and propose colocating the styles.
 
   This is bad:
 

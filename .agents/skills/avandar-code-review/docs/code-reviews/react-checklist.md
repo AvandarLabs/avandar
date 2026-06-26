@@ -19,7 +19,7 @@ How to combine:
    under review. This is mandatory and runs regardless of whether
    `react-doctor` is available.
 2. Additionally, invoke `react-doctor` over the same scope. Treat
-   its findings as supplemental — it catches things rules-of-thumb
+   its findings as supplemental. It catches things rules-of-thumb
    miss, and it also fixes some of them in place.
 3. Merge both sets of findings into one review output. If
    `react-doctor` and a rule below disagree, this checklist wins
@@ -44,7 +44,7 @@ try to substitute an unrelated tool.
   grep -rEn '\{[^{}]*&&[^{}]*<' --include="*.tsx" .
   ```
 
-  Non-exhaustive — multi-line `{cond && (\n <jsx>\n)}` patterns are
+  Non-exhaustive: multi-line `{cond && (\n <jsx>\n)}` patterns are
   missed. Also scan diff hunks for those by eye.
 
 - React component prop types should always be named `Props`.
