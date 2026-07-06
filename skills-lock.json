@@ -7,18 +7,6 @@
       "skillPath": "skills/attach-db/SKILL.md",
       "computedHash": "db6a105a312536b75a58616dfd38b46909253c88fcb1ffd58bfc506ffa3065d6"
     },
-    "avandar-ava-model-creation": {
-      "source": "AvandarLabs/avandar-agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/avandar-ava-model-creation/SKILL.md",
-      "computedHash": "25e4d25a9fc70487345bcef67f3ba84da11acc9fa79b7add981f609e6c078c24"
-    },
-    "avandar-code-review": {
-      "source": "AvandarLabs/avandar-agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/avandar-code-review/SKILL.md",
-      "computedHash": "e66603f9121d5eecc341f1bd59329d33dff0eac6a6bb2dfb21dff768f8ae8d1f"
-    },
     "brainstorming": {
       "source": "obra/superpowers",
       "sourceType": "github",
@@ -186,12 +174,6 @@
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
       "computedHash": "d414d598b9428b3e851c4ce61898649906b19e55aa7415bb42a286bd9ca2ab32"
-    },
-    "supabase-declarative-schema": {
-      "source": "AvandarLabs/avandar-agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/supabase-declarative-schema/SKILL.md",
-      "computedHash": "0703eef71eeb9f5ac02e17499ddd20b06ee7ef1f33150cb7b1b56715be42277d"
     },
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
