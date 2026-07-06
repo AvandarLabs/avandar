@@ -18,11 +18,11 @@ export function useContainerMaxWidthPFieldConfig(): CustomField<ContainerMaxWidt
   const { t } = useLingui();
 
   return useMemo(
-    () => ({
+    () => {return {
       label: t`Container max width`,
       type: "custom",
       render: ContainerMaxWidthPField,
-    }),
+    }},
     [t],
   );
 }
