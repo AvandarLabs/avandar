@@ -36,15 +36,7 @@ export type ChartStyleProps = {
   gridProps?: Omit<CartesianGridProps, "ref">;
   gridColor?: string;
   legendProps?: Omit<LegendProps, "ref">;
-  /**
-   * Mantine-native prop: triggers automatic bottom-margin so the label is
-   * visible.
-   */
   xAxisLabel?: string;
-  /**
-   * Mantine-native prop: triggers automatic left-margin so the label is
-   * visible.
-   */
   yAxisLabel?: string;
   /**
    * Passed to Mantine's `styles` prop. Used to apply axis label color via the

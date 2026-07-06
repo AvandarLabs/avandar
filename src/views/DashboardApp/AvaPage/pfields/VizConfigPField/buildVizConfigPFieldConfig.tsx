@@ -4,6 +4,7 @@ import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useCallback, useMemo } from "react";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
@@ -22,13 +23,7 @@ export function useVizConfigPFieldConfig(options: {
   const { workspaceId, dashboardId } = options;
 
   const render = useCallback(
-    ({
-      value,
-      onChange,
-    }: {
-      value: VizConfig;
-      onChange: (value: VizConfig) => void;
-    }) => {
+    ({ value, onChange }: AvaPageFieldProps<VizConfig>) => {
       return (
         <VizConfigPField
           value={value}
