@@ -44,11 +44,6 @@ export function GlobalFilterSubscriptionPField({
   const { filtersById } = DashboardFilterStateManager.useState();
   const registeredFilters = Object.values(filtersById);
 
-  // Guard against Puck rendering the field before resolveData backfills the
-  // default - can happen when a block enters the store without this field
-  // (e.g. saved from the Data Explorer) and is then selected before the
-  // initial resolveData pass runs, or when undo restores that
-  // pre-resolve state.
   const subscription = value ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION;
 
   const _setMode = (mode: GlobalFilterSubscriptionMode): void => {
