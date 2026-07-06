@@ -3,8 +3,8 @@ import { CustomField } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useCallback, useMemo } from "react";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
