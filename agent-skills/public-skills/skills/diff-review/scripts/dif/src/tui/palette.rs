@@ -23,6 +23,10 @@ pub enum PaletteAction {
     /// Open the running difit server's URL (`http://localhost:<port>`) in the
     /// system default browser. Does not restart the server.
     OpenInBrowser,
+    /// Start a fresh claude session in the claude pane by typing `/new` and
+    /// submitting it, so the next prompt is answered in a clean session instead
+    /// of the resumed one.
+    NewClaudeSession,
 }
 
 /// One row in the global command palette.
@@ -49,6 +53,10 @@ pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
         label: "Open difit in browser",
         action: PaletteAction::OpenInBrowser,
     },
+    PaletteCommand {
+        label: "New Claude session",
+        action: PaletteAction::NewClaudeSession,
+    },
 ];
 
 /// The direct keystroke that runs `action` without opening the palette,
@@ -60,6 +68,7 @@ pub const fn shortcut_for(action: PaletteAction) -> Option<&'static str> {
         PaletteAction::RestartDifit => Some("^R"),
         PaletteAction::RegenerateGuide => Some("^D"),
         PaletteAction::OpenInBrowser => Some("^O"),
+        PaletteAction::NewClaudeSession => Some("^N"),
     }
 }
 
@@ -203,6 +212,7 @@ mod tests {
                 ("1. Restart dif".to_owned(), Some("^R")),
                 ("2. Regenerate diff guide".to_owned(), Some("^D")),
                 ("3. Open difit in browser".to_owned(), Some("^O")),
+                ("4. New Claude session".to_owned(), Some("^N")),
             ]
         );
     }
@@ -210,6 +220,11 @@ mod tests {
     #[test]
     fn open_in_browser_advertises_its_ctrl_o_shortcut() {
         assert_eq!(shortcut_for(PaletteAction::OpenInBrowser), Some("^O"));
+    }
+
+    #[test]
+    fn new_claude_session_advertises_its_ctrl_n_shortcut() {
+        assert_eq!(shortcut_for(PaletteAction::NewClaudeSession), Some("^N"));
     }
 
     #[test]

@@ -40,6 +40,12 @@ const REGENERATE_GUIDE_PROMPT: &str =
     "Regenerate the diff guide for this review using the diff-review skill, \
      then write it to the guide markdown file under .difit/.";
 
+/// The slash command `Ctrl+N` (and the palette's "New Claude session") types
+/// and submits into the claude pane. Submitting it starts a fresh claude
+/// session so the next prompt lands in a clean context instead of the resumed
+/// one.
+const NEW_SESSION_COMMAND: &str = "/new";
+
 /// Which pane currently receives input / scroll.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Panel {
@@ -163,6 +169,7 @@ impl App {
             PaletteAction::RestartDifit => self.restart_difit(),
             PaletteAction::RegenerateGuide => self.regenerate_guide(),
             PaletteAction::OpenInBrowser => self.open_in_browser(),
+            PaletteAction::NewClaudeSession => self.new_claude_session(),
         }
         self.close_palette();
     }
@@ -181,6 +188,16 @@ impl App {
         if let Some(claude) = self.claude.as_ref().filter(|p| p.is_alive()) {
             send_prompt_to_pty(claude, REGENERATE_GUIDE_PROMPT);
             self.last_inject_at = Some(Instant::now());
+        }
+    }
+
+    /// Start a fresh claude session by typing `/new` into the claude pane and
+    /// submitting it, so the next prompt is answered in a clean session rather
+    /// than the resumed one. `dif` only types the command; claude does the
+    /// reset. A no-op when the claude pane has exited.
+    pub fn new_claude_session(&self) {
+        if let Some(claude) = self.claude.as_ref().filter(|p| p.is_alive()) {
+            send_prompt_to_pty(claude, NEW_SESSION_COMMAND);
         }
     }
 
