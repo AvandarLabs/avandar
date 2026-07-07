@@ -42,6 +42,31 @@ fi
 LOCALES_DIR="src/i18n/locales"
 SOURCE_LOCALE="en"
 
+# Returns 0 (success) if any non-source catalog contains an untranslated entry:
+# an empty `msgstr ""` that is neither the PO header (whose msgstr is followed
+# by continuation lines) nor otherwise continued. `lingui extract` only rewrites
+# a catalog when a msgid is added or removed, so once an empty msgstr has been
+# committed it produces no extract diff and the git-diff gate below never sees
+# it — the translation step would be skipped forever. This catches those
+# entries directly so they always get sent to the LLM.
+has_untranslated_entries() {
+  local d locale
+  for d in "$LOCALES_DIR"/*/; do
+    locale="$(basename "$d")"
+    [[ "$locale" == "$SOURCE_LOCALE" ]] && continue
+    [[ -f "${d}messages.po" ]] || continue
+    if awk '
+      pending && $0 !~ /^"/ { found=1; pending=0 }
+      /^msgstr ""$/         { pending=1; next }
+                            { pending=0 }
+      END { if (pending) found=1; exit found ? 0 : 1 }
+    ' "${d}messages.po"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 SCOPES=()
 if [[ $# -gt 0 && "${1:-}" != "all" ]]; then
   SCOPES=("$@")
@@ -62,8 +87,8 @@ if ! pnpm exec lingui extract --clean; then
   exit 1
 fi
 
-if git diff --quiet -- "$LOCALES_DIR" 2>/dev/null; then
-  printf '\n%s\n' "${DIM}No new keys extracted — skipping LLM translation and compile.${RESET}"
+if git diff --quiet -- "$LOCALES_DIR" 2>/dev/null && ! has_untranslated_entries; then
+  printf '\n%s\n' "${DIM}No new or untranslated keys — skipping LLM translation and compile.${RESET}"
   printf '%s\n' "${BOLD}${GREEN}✓ Translations already up to date.${RESET}"
   exit 0
 fi
