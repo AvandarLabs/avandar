@@ -1515,7 +1515,7 @@ msgstr "至"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download offline chat model (WebLLM)"
-msgstr ""
+msgstr "下載離線聊天模型 (WebLLM)"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"

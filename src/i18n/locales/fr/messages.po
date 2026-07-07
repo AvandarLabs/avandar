@@ -1590,7 +1590,7 @@ msgstr "à"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download offline chat model (WebLLM)"
-msgstr ""
+msgstr "Télécharger le modèle de chat hors ligne (WebLLM)"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"

@@ -1570,7 +1570,7 @@ msgstr "kwa"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download offline chat model (WebLLM)"
-msgstr ""
+msgstr "Pakua mfano wa mazungumzo ya mtandaoni (WebLLM)"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"

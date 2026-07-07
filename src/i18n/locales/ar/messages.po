@@ -1556,7 +1556,7 @@ msgstr "إلى"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Download offline chat model (WebLLM)"
-msgstr ""
+msgstr "تحميل نموذج الدردشة غير المتصل (WebLLM)"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"
