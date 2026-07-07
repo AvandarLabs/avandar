@@ -1,0 +1,51 @@
+[package]
+name = "dif"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Review a local diff in difit as a live conversation with claude."
+
+[[bin]]
+name = "dif"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+clap = { version = "4", features = ["derive", "env"] }
+crossterm = "0.28"
+portable-pty = "0.9"
+# CommonMark/GFM parser for rendering the diff guide markdown into the "Diff
+# guide" view. The canonical Rust markdown parser (used by rustdoc + mdBook);
+# we drive its event stream and render to ratatui ourselves (see
+# src/tui/markdown/) so tables/headings/lists render as widgets, not plaintext.
+pulldown-cmark = { version = "0.12", default-features = false }
+ratatui = "0.29"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tui-term = "0.2"
+# Blocking HTTP client for the background poller (GET /api/comments-json) and
+# the difit health check. Blocking fits the dedicated poller thread; no async
+# runtime needed. Claude posts its own replies via curl, so we only GET here.
+ureq = { version = "2", default-features = false, features = ["json"] }
+uuid = { version = "1", features = ["v4"] }
+vt100 = "0.15"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+doc_markdown = "allow"
+struct_excessive_bools = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true

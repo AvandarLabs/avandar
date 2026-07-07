@@ -1,0 +1,26 @@
+# dif — review a local diff in difit as a live conversation with claude.
+#
+# Optional global entry point: source this file as a zsh function (e.g. from
+# your ~/.zshrc) so `dif` is on your PATH. It just delegates to the directly-
+# runnable `run.sh` in this directory, which owns the build/exec logic. The
+# skill's primary entry point is the repo's `diff-review` package.json script
+# (see ../ensure-command.py); this wrapper is only for users who also want a
+# global `dif` command.
+#
+# The binary is a Ratatui TUI: difit's server log on the left, a resumable
+# claude session on the right. It owns the difit server lifecycle, polls difit
+# for new reviewer comments, and types each new comment into the claude pane so
+# claude addresses it and posts its reply back to difit live (no restart).
+#
+# Usage:
+#   dif                  # vs develop if it exists, else main
+#   dif <branch>         # vs <branch>
+#   dif .                # uncommitted worktree changes
+#   dif staged|working   # staged / working tree
+
+dif() {
+  emulate -L zsh
+  # `$funcsourcetrace[1]` is "<this-file>:<lineno>"; strip the lineno, take dir.
+  local script_dir="${${funcsourcetrace[1]%:*}:h}"
+  "$script_dir/run.sh" "$@"
+}
