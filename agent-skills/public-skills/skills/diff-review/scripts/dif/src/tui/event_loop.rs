@@ -3,8 +3,8 @@
 //! Keystrokes route to the focused pane. The difit pane is read-only (scroll
 //! keys only); the claude pane receives full keyboard input. `Alt+H`/`Alt+L`
 //! switch focus; `Ctrl+P` opens the command palette, `Ctrl+R` restarts the
-//! difit server, and `Ctrl+Q` quits (all intercepted globally, so they never
-//! reach claude).
+//! difit server, `Ctrl+N` starts a fresh claude session, and `Ctrl+Q` quits
+//! (all intercepted globally, so they never reach claude).
 
 use std::io::Stdout;
 use std::time::Duration;
@@ -81,6 +81,10 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
             }
             KeyCode::Char('o' | 'O') => {
                 app.open_in_browser();
+                return;
+            }
+            KeyCode::Char('n' | 'N') => {
+                app.new_claude_session();
                 return;
             }
             KeyCode::Char('q' | 'Q') => {

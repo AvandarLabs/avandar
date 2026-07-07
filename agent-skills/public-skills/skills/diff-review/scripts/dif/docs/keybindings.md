@@ -11,12 +11,13 @@ Global (work from either pane):
 | `Ctrl+R` | restart the difit server (the palette's "Restart dif") |
 | `Ctrl+D` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open difit in browser") |
+| `Ctrl+N` | start a fresh claude session (types and submits `/new` in the claude pane; the palette's "New Claude session") |
 | `Ctrl+Q` | quit `dif` (tears down difit, claude, and the poller) |
 
 `Alt+H` / `Alt+L` switch focus; `Alt+U` / `Alt+D` scroll the focused view a
 half-page (a keyboard-only alternative to the wheel that never depends on
 terminal mouse reporting); `Ctrl+P` / `Ctrl+R` / `Ctrl+D` / `Ctrl+O` /
-`Ctrl+Q` are the command keys. The `Alt` and `Ctrl` commands are intercepted
+`Ctrl+N` / `Ctrl+Q` are the command keys. The `Alt` and `Ctrl` commands are intercepted
 globally **before** keys are forwarded to claude, so they never reach the
 claude session (a deliberate trade: claude does not receive them), which is
 what lets `Alt+U`/`Alt+D` scroll while the Claude pane is focused. When the
@@ -97,7 +98,8 @@ keeps no decisions log, so the reasoning lives here.
 
 When a shortcut is **also** a command-palette action (today: `Ctrl+R` →
 "Restart dif", `Ctrl+D` → "Regenerate diff guide", `Ctrl+O` → "Open difit in
-browser"), its dimmed `[…]` hint on the palette row is derived from
+browser", `Ctrl+N` → "New Claude session"), its dimmed `[…]` hint on the
+palette row is derived from
 `palette::shortcut_for`. If you add or change such a
 shortcut, update `shortcut_for` so the hint matches — the rule is enforced in
 `AGENTS.md`.

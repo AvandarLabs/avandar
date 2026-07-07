@@ -128,6 +128,15 @@ server's URL (`http://localhost:<port>`) in the system default browser. It does
 **not** restart the server; it just reopens the same review page (handy if you
 closed the tab difit opened on launch).
 
+### New Claude session
+
+"New Claude session" — the palette command, or its direct **`Ctrl+N`** shortcut
+(shown dimmed as `[^N]` on the palette row) — starts a fresh claude session by
+typing and submitting `/new` in the claude pane. `dif` only types the command;
+claude resets its own context, so the next injected comment or prompt is
+answered in a clean session instead of the resumed one. The difit server, the
+poller, and the pane itself are untouched.
+
 ## The diff guide and reviewed state
 
 The diff guide lives at `.difit/<branch>-difit-<scope>-guide.md` and is always a
