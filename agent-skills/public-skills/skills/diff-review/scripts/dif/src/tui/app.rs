@@ -21,6 +21,7 @@ use super::keymap::send_prompt_to_pty;
 use super::main_diff_view::MainDiffView;
 use super::open_target;
 use super::palette::{PaletteAction, PaletteState};
+use super::startup::fresh_claude_command;
 use super::vim::{VimMotion, VimState};
 
 /// How long the git diff signature must hold steady after diverging from what
@@ -39,12 +40,6 @@ const CLAUDE_ATTRIBUTION_WINDOW: Duration = Duration::from_secs(120);
 const REGENERATE_GUIDE_PROMPT: &str =
     "Regenerate the diff guide for this review using the diff-review skill, \
      then write it to the guide markdown file under .difit/.";
-
-/// The slash command `Ctrl+N` (and the palette's "New Claude session") types
-/// and submits into the claude pane. Submitting it starts a fresh claude
-/// session so the next prompt lands in a clean context instead of the resumed
-/// one.
-const NEW_SESSION_COMMAND: &str = "/new";
 
 /// Which pane currently receives input / scroll.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -75,6 +70,9 @@ pub struct App {
     pub comparison: ComparisonKey,
     /// The transcript file, re-read on restart to reseed difit's comments.
     pub transcript_path: PathBuf,
+    /// Where the claude session id is persisted, rewritten when `Ctrl+N` starts
+    /// a fresh session so a later `dif` launch can `--resume` it.
+    pub session_id_path: PathBuf,
     /// Turns difit snapshots into claude prompts, once per comment.
     pub dispatcher: Dispatcher,
     /// Logs each new `claude` reply to the difit pane, once.
@@ -191,13 +189,28 @@ impl App {
         }
     }
 
-    /// Start a fresh claude session by typing `/new` into the claude pane and
-    /// submitting it, so the next prompt is answered in a clean session rather
-    /// than the resumed one. `dif` only types the command; claude does the
-    /// reset. A no-op when the claude pane has exited.
-    pub fn new_claude_session(&self) {
-        if let Some(claude) = self.claude.as_ref().filter(|p| p.is_alive()) {
-            send_prompt_to_pty(claude, NEW_SESSION_COMMAND);
+    /// Interrupt the current claude session and start a brand-new one in the
+    /// pane.
+    ///
+    /// `Ctrl+N` is treated as an *interrupt*, not a queued message: typing
+    /// `/new` would merely land in claude's input queue and, if claude were
+    /// mid-thought, could sit unsent for minutes (and the follow-up seed prompt
+    /// with it). So instead we kill the running claude child and respawn the
+    /// pane on a fresh session that auto-submits the review prompt on startup,
+    /// exactly as the pane's first launch does (see [`fresh_claude_command`]).
+    /// Respawning reuses the pane, so its size and scrollback log carry over. A
+    /// no-op when the claude pane never spawned.
+    pub fn new_claude_session(&mut self) {
+        let Some(claude) = self.claude.as_mut() else {
+            return;
+        };
+        claude.write_to_screen("\r\n\x1b[33m[dif] Starting a new claude session…\x1b[0m\r\n");
+        claude.kill_child();
+        let command = fresh_claude_command(&self.repo_root, &self.session_id_path);
+        if let Err(e) = claude.respawn_shell_command_with_env(&command, &[], &self.repo_root) {
+            claude.write_to_screen(&format!(
+                "\x1b[31m[dif] Failed to start a new claude session: {e}\x1b[0m\r\n"
+            ));
         }
     }
 

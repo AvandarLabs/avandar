@@ -163,8 +163,11 @@ directly; each is also the palette row's dimmed `[^R]` / `[^D]` / `[^O]` /
 for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the claude pane; the skill writes the guide
 file and the diff guide view picks it up on its next refresh. "New Claude
-session" types and submits `/new` in the claude pane so claude resets its own
-context for the next prompt. The palette is a
+session" is an interrupt: it kills the running claude child and respawns the
+pane on a fresh session (via `startup::fresh_claude_command`, shared with the
+pane's first launch) that auto-submits the review prompt — chosen over typing
+`/new` so it takes effect immediately even when claude is mid-thought. The
+palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.
 
 The "Restart dif" action restarts the difit server **in place**. `PtyPane`
