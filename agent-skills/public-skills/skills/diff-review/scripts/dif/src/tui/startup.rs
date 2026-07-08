@@ -89,6 +89,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         repo_root,
         comparison,
         transcript_path,
+        session_id_path,
         dispatcher,
         reply_watcher: ReplyWatcher::new(),
         poller,
@@ -108,17 +109,32 @@ pub fn launch(cli: &Cli) -> Result<App> {
 
 /// Spawn the claude pane, resuming the saved session when possible.
 fn spawn_claude(repo_root: &Path, session_id_path: &Path) -> Option<PtyPane> {
-    let resume = resume_candidate(repo_root, session_id_path);
-    let new_id = uuid::Uuid::new_v4().to_string();
-    let plan = Plan::decide(resume, new_id);
-    if let Plan::Fresh(id) = &plan {
-        let _ = fs::write(session_id_path, id);
-    }
-    // A fresh session is launched already oriented on the review (the prompt is
-    // submitted on startup); a resumed one carries that context already.
-    let prompt = session::initial_prompt(&plan);
-    let command = session::build_claude_command(repo_root, &plan, prompt);
+    let command = resume_candidate(repo_root, session_id_path).map_or_else(
+        || fresh_claude_command(repo_root, session_id_path),
+        |id| {
+            // A resumed session already carries the review context.
+            let plan = Plan::Resume(id);
+            session::build_claude_command(repo_root, &plan, session::initial_prompt(&plan))
+        },
+    );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS).ok()
+}
+
+/// Mint a fresh claude session and return the shell command that launches it.
+///
+/// Generates a new session id, persists it to `session_id_path` (so a later
+/// `dif` launch can `--resume` this session), and builds the launch command
+/// with the initial review prompt auto-submitted on startup. Shared by the
+/// pane's first launch ([`spawn_claude`]) and the `Ctrl+N` respawn
+/// ([`App::new_claude_session`](super::app::App::new_claude_session)) so both
+/// start a fresh session identically.
+pub(crate) fn fresh_claude_command(repo_root: &Path, session_id_path: &Path) -> String {
+    let id = uuid::Uuid::new_v4().to_string();
+    let _ = fs::write(session_id_path, &id);
+    let plan = Plan::Fresh(id);
+    // A fresh session is launched already oriented on the review (the prompt is
+    // submitted on startup).
+    session::build_claude_command(repo_root, &plan, session::initial_prompt(&plan))
 }
 
 /// The saved session id, but only if `claude --resume` would find it.
@@ -146,4 +162,39 @@ fn session_transcript_exists(repo_root: &Path, id: &str) -> bool {
 /// A short human label for the comparison, e.g. `@ develop` or `.`.
 fn comparison_label(comparison: &ComparisonKey) -> String {
     comparison.difit_args().join(" ")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fresh_claude_command_persists_id_and_seeds_the_prompt() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let session_id_path = dir.path().join("session-id");
+
+        let command = fresh_claude_command(dir.path(), &session_id_path);
+
+        // The id is persisted so a later `dif` launch can `--resume` it...
+        let id = fs::read_to_string(&session_id_path).expect("id written");
+        assert!(!id.trim().is_empty(), "a fresh id must be written");
+        // ...the launch command starts that exact fresh session...
+        assert!(command.contains("--session-id"), "launches a fresh session");
+        assert!(command.contains(id.trim()), "launches the persisted id");
+        // ...already oriented on the review (the initial prompt is submitted).
+        assert!(command.contains("/diff-review"), "seeds the review prompt");
+    }
+
+    #[test]
+    fn fresh_claude_command_mints_a_distinct_id_each_call() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("session-id");
+
+        let _ = fresh_claude_command(dir.path(), &path);
+        let first = fs::read_to_string(&path).expect("first id");
+        let _ = fresh_claude_command(dir.path(), &path);
+        let second = fs::read_to_string(&path).expect("second id");
+
+        assert_ne!(first, second, "each Ctrl+N respawn is a distinct session");
+    }
 }

@@ -1,10 +1,7 @@
-import {
-  RenderOptions,
-  render as renderReact,
-  RenderResult,
-} from "@testing-library/react";
-import { ReactElement, ReactNode } from "react";
-import { TestProviders } from "./TestProviders";
+import { render as renderReact } from "@testing-library/react";
+import { TestProviders } from "../TestProviders";
+import type { RenderOptions, RenderResult } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -12,7 +9,7 @@ import { TestProviders } from "./TestProviders";
  * pulling from `useLingui()` or rendering `<Trans>` must use this `render`
  * instead of the raw one from `@testing-library/react`.
  *
- * When `options.wrapper` is provided, it is composed *inside*
+ * When `options.wrapper` is provided, it is composed inside
  * `TestProviders` so the test wrapper can add extra providers (for
  * example `QueryClientProvider`) on top of the always-required ones.
  *
@@ -22,9 +19,9 @@ import { TestProviders } from "./TestProviders";
  */
 export function render(
   ui: ReactElement,
-  options?: RenderOptions,
+  options: RenderOptions = {},
 ): RenderResult {
-  const { wrapper: ExtraWrapper, ...rest } = options ?? {};
+  const { wrapper: ExtraWrapper, ...rest } = options;
   const Wrapper =
     ExtraWrapper === undefined ? TestProviders : (
       function ComposedWrapper({

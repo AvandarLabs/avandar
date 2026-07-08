@@ -23,9 +23,10 @@ pub enum PaletteAction {
     /// Open the running difit server's URL (`http://localhost:<port>`) in the
     /// system default browser. Does not restart the server.
     OpenInBrowser,
-    /// Start a fresh claude session in the claude pane by typing `/new` and
-    /// submitting it, so the next prompt is answered in a clean session instead
-    /// of the resumed one.
+    /// Interrupt the claude pane: kill the running claude child and respawn it
+    /// on a brand-new session that auto-submits the review prompt, exactly as
+    /// the pane's first launch does. Unlike typing `/new`, this takes effect
+    /// immediately even when claude is mid-thought.
     NewClaudeSession,
 }
 

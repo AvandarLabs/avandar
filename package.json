@@ -15,6 +15,7 @@
     "dev:pipeline-server-prod": "dotenv --no-expand -o -e .env.development -e .env.production -- pnpm --filter @avandar/pipeline-server dev",
     "deploy:dev-fanout-server": "fly deploy --config apps/dev-fanout-server/fly.production.toml",
     "deploy:pipeline-server": "fly deploy --config apps/pipeline-server/fly.production.toml",
+    "diff-review": "sh agent-skills/public-skills/skills/diff-review/scripts/dif/run.sh",
     "test": "./scripts/runAllTests.sh",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
     "test:ava-etl": "pnpm --filter @avandar/ava-etl test",

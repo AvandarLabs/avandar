@@ -15,5 +15,5 @@ export {
   within,
 } from "@testing-library/react";
 export type { RenderOptions } from "@testing-library/react";
-export { render } from "./render";
+export { render } from "./render/render";
 export { TestProviders } from "./TestProviders";

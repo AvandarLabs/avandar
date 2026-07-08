@@ -30,10 +30,15 @@ install it rather than failing partway through.
   python3 <skill-dir>/scripts/ensure-command.py
   ```
   It prints `EXISTS`, `ADDED <value>`, or `NO_PACKAGE_JSON`. It adds the script
-  only if missing, pointing at `scripts/dif/run.sh` (repo-relative when the skill
-  lives inside the repo). On a platform with no matching prebuilt binary the
-  runner builds from source once via `cargo build --release` (needs a Rust
-  toolchain).
+  only if missing, pointing at `scripts/dif/run.sh` as a **repo-relative** path
+  whenever a runner exists inside the repo — either because the skill itself is
+  vendored there, or (when the skill runs from an external install like a global
+  plugin dir) because a copy of the runner is committed elsewhere in the repo. It
+  falls back to an absolute path only when the repo has no runner at all. The
+  repo-relative value is what lets teammates on a fresh clone run
+  `<pm> diff-review` without a personal global `dif`. On a platform with no
+  matching prebuilt binary the runner builds from source once via
+  `cargo build --release` (needs a Rust toolchain).
 - **`python3`** — runs `scripts/ensure-command.py` and the transcript validator
   `scripts/validate.py`.
 - **`gh`** — GitHub CLI, **optional** (used only in PR review mode, and even
