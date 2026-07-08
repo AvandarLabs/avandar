@@ -11,7 +11,7 @@ Global (work from either pane):
 | `Ctrl+R` | restart the difit server (the palette's "Restart dif") |
 | `Ctrl+D` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open difit in browser") |
-| `Ctrl+N` | start a fresh claude session (types and submits `/new` in the claude pane; the palette's "New Claude session") |
+| `Ctrl+N` | start a fresh claude session (interrupts: kills the running claude and respawns it on a new session that auto-submits the review prompt; the palette's "New Claude session") |
 | `Ctrl+Q` | quit `dif` (tears down difit, claude, and the poller) |
 
 `Alt+H` / `Alt+L` switch focus; `Alt+U` / `Alt+D` scroll the focused view a

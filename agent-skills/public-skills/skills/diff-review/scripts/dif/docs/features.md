@@ -131,11 +131,15 @@ closed the tab difit opened on launch).
 ### New Claude session
 
 "New Claude session" — the palette command, or its direct **`Ctrl+N`** shortcut
-(shown dimmed as `[^N]` on the palette row) — starts a fresh claude session by
-typing and submitting `/new` in the claude pane. `dif` only types the command;
-claude resets its own context, so the next injected comment or prompt is
-answered in a clean session instead of the resumed one. The difit server, the
-poller, and the pane itself are untouched.
+(shown dimmed as `[^N]` on the palette row) — starts a fresh claude session. It
+is an **interrupt**, not a queued message: `dif` kills the running claude child
+and respawns the pane on a brand-new session that auto-submits the review prompt
+on startup, exactly as the pane's first launch does. This is deliberate — typing
+`/new` would merely land in claude's input queue and, if claude were mid-thought,
+could sit unsent for minutes (and the follow-up prompt with it). Respawning
+reuses the pane, so its size and scrollback log carry over; the difit server and
+the poller are untouched. The fresh session's id is persisted, so a later `dif`
+launch can `--resume` it.
 
 ## The diff guide and reviewed state
 
