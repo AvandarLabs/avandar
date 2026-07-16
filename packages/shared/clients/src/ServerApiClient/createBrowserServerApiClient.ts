@@ -3,6 +3,11 @@ import type {
   ServerApiFunctionRequest,
 } from "$/platform/types/ServerApiClient.types.ts";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import {
+  ServerApiSessionRefresher,
+  SessionExpiredError,
+} from "@clients/ServerApiClient/ServerApiSessionRefresher.ts";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 
 /**
  * Build the relative URL `supabase.functions.invoke` is called with.
@@ -55,6 +60,21 @@ function buildRelativeFunctionUrl(
 }
 
 /**
+ * Whether a `supabase.functions.invoke` error is a `401 Unauthorized` from the
+ * edge function. Only these are worth a session refresh; relay/fetch errors and
+ * other status codes are not token problems.
+ *
+ * @param error - The error returned by `functions.invoke`.
+ * @returns `true` if the error is an HTTP 401.
+ */
+function _isUnauthorized(error: unknown): boolean {
+  return (
+    error instanceof FunctionsHttpError &&
+    (error.context as Response | undefined)?.status === 401
+  );
+}
+
+/**
  * Web-side {@link ServerApiClient}. Thin wrapper over the shared `AvaSupabase`
  * singleton — `rpc` is a direct passthrough; `invokeFunction` builds the
  * relative URL the same way `APIClient.sendHTTPRequest` does today and
@@ -92,10 +112,31 @@ export function createBrowserServerApiClient(): ServerApiClient {
     ): Promise<TResult> {
       const client = AvaSupabase.db();
       const relativeUrl = buildRelativeFunctionUrl(request);
-      const { data, error } = await client.functions.invoke(relativeUrl, {
-        method: request.method,
-        body: request.body as unknown as Record<string, unknown> | undefined,
-      });
+
+      const sendOnce = () => {
+        return client.functions.invoke(relativeUrl, {
+          method: request.method,
+          body: request.body as unknown as Record<string, unknown> | undefined,
+        });
+      };
+
+      let { data, error } = await sendOnce();
+
+      // A 401 (and only a 401) may be a stale access token: one signed by a
+      // retired JWT signing key. Refresh the session once (shared across all
+      // concurrent 401s) and retry exactly once. Any other error, or a second
+      // 401 after a fresh token, is not something a refresh can fix.
+      if (_isUnauthorized(error)) {
+        const session = await ServerApiSessionRefresher.refreshOnce();
+        if (session === undefined) {
+          throw new SessionExpiredError(request.route);
+        }
+        ({ data, error } = await sendOnce());
+        if (_isUnauthorized(error)) {
+          throw new SessionExpiredError(request.route);
+        }
+      }
+
       if (error) {
         throw new Error(
           `serverApi.invokeFunction('${request.route}') failed: ${error.message}`,

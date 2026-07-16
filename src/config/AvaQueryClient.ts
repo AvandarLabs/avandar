@@ -1,3 +1,4 @@
+import { SessionExpiredError } from "@clients";
 import { QueryClient } from "@tanstack/react-query";
 import { getIsOnline } from "@/lib/utils/browser/getIsOnline/getIsOnline";
 
@@ -27,7 +28,12 @@ export const AvaQueryClient = new QueryClient({
 
       // Online: 1 retry on failure. Offline: do not retry at all — the call
       // is guaranteed to fail and the user already sees the offline banner.
-      retry: (failureCount: number) => {
+      // A dead session is not retryable: the invoke wrapper already refreshed
+      // once and gave up, so a retry would just repeat a failing 401.
+      retry: (failureCount: number, error: unknown) => {
+        if (error instanceof SessionExpiredError) {
+          return false;
+        }
         return getIsOnline() ? failureCount < 1 : false;
       },
 
