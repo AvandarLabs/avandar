@@ -41,7 +41,10 @@ function ok<T>(data: T) {
 }
 
 function refreshedSession() {
-  return { data: { session: { access_token: "fresh" }, user: {} }, error: null };
+  return {
+    data: { session: { access_token: "fresh" }, user: {} },
+    error: null,
+  };
 }
 
 function refreshFailed() {
@@ -61,7 +64,10 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     fakeDbClient.functions.invoke.mockResolvedValueOnce(ok({ ok: true }));
     const client = createBrowserServerApiClient();
 
-    const result = await client.invokeFunction({ route: "chat/models", method: "GET" });
+    const result = await client.invokeFunction({
+      route: "chat/models",
+      method: "GET",
+    });
 
     expect(result).toEqual({ ok: true });
     expect(fakeDbClient.auth.refreshSession).not.toHaveBeenCalled();
@@ -74,7 +80,10 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     fakeDbClient.auth.refreshSession.mockResolvedValueOnce(refreshedSession());
     const client = createBrowserServerApiClient();
 
-    const result = await client.invokeFunction({ route: "chat/models", method: "GET" });
+    const result = await client.invokeFunction({
+      route: "chat/models",
+      method: "GET",
+    });
 
     expect(result).toEqual({ ok: true });
     expect(fakeDbClient.auth.refreshSession).toHaveBeenCalledTimes(1);
@@ -89,7 +98,10 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     await expect(
-      client.invokeFunction({ route: "support/featurebase-jwt", method: "GET" }),
+      client.invokeFunction({
+        route: "support/featurebase-jwt",
+        method: "GET",
+      }),
     ).rejects.toBeInstanceOf(SessionExpiredError);
     expect(onExpired).toHaveBeenCalledTimes(1);
     // No retry happened because there was no fresh session.
@@ -131,8 +143,9 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
       .mockResolvedValueOnce(unauthorized())
       .mockResolvedValueOnce(ok({ n: 1 }))
       .mockResolvedValueOnce(ok({ n: 2 }));
-    let resolveRefresh: (v: ReturnType<typeof refreshedSession>) => void =
-      () => {};
+    let resolveRefresh: (
+      v: ReturnType<typeof refreshedSession>,
+    ) => void = () => {};
     fakeDbClient.auth.refreshSession.mockReturnValueOnce(
       new Promise((resolve) => {
         resolveRefresh = resolve;
@@ -141,7 +154,10 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     const p1 = client.invokeFunction({ route: "chat/models", method: "GET" });
-    const p2 = client.invokeFunction({ route: "support/featurebase-jwt", method: "GET" });
+    const p2 = client.invokeFunction({
+      route: "support/featurebase-jwt",
+      method: "GET",
+    });
     // Let both hit their 401 and await the shared refresh before it resolves.
     await Promise.resolve();
     resolveRefresh(refreshedSession());
