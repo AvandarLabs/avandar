@@ -164,6 +164,47 @@ when the gate matches.
   general "utility reuse" principle is covered by the skill; this
   phase just records the in-repo README path.
 
+### Phase: Supabase session `null` normalization
+
+- **Gate:** the diff introduces a `null` (a `| null` type, a `= null`
+  initializer, or a `return null`) on a value derived from a Supabase
+  auth/session call (`refreshSession`, `getSession`, `getUser`, etc.).
+  Skip if no such `null` is introduced.
+- **Rule:** the skill's general `null`-vs-`undefined` rule applies (own
+  signatures use `undefined`; normalize external `null` at the boundary
+  with `?? undefined`). This phase records the in-repo specifics:
+  - The canonical normalization pattern lives in
+    `src/clients/AuthClient.ts` — `getCurrentSession` returns
+    `Promise<Session | undefined>` and does `return data.session ??
+    undefined`. New code that wraps a Supabase session call should follow
+    that shape rather than propagating `Session | null` outward.
+  - The **one** place `null` is legitimate is the `onAuthStateChange`
+    callback parameter (`(event, session: Session | null) => ...`), whose
+    type Supabase dictates. Keep `null` there; normalize everywhere else.
+
+  This is bad (our own module owns these signatures, so they should be
+  `undefined`):
+
+  ```ts
+  let onSessionExpired: (() => void) | null = null;
+
+  async function doRefresh(): Promise<Session | null> {
+    const { data } = await AvaSupabase.db().auth.refreshSession();
+    return data.session;
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  let onSessionExpired: (() => void) | undefined = undefined;
+
+  async function doRefresh(): Promise<Session | undefined> {
+    const { data } = await AvaSupabase.db().auth.refreshSession();
+    return data.session ?? undefined;
+  }
+  ```
+
 ### Phase: E2E tests (Playwright)
 
 - **Gate:** the diff includes any file under `tests/e2e/` (specs,

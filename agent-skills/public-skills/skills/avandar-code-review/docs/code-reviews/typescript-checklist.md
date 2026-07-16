@@ -137,7 +137,25 @@ repo) so the output stays small and tied to the diff.
   Class-style interfaces (used with `implements`) are the documented
   exception; verify before flagging.
 
-- Prefer `undefined` over `null` unless an API or framework requires `null`.
+- Prefer `undefined` over `null`. The **only** exception is when an
+  external type signature forces `null` into your code *at the exact
+  position in question*: a framework callback whose parameter is typed
+  with `null` (for example Supabase's `onAuthStateChange((event, session:
+  Session | null) => ...)`), or a value whose type you do not control (a
+  database row column typed `x | null`, a third-party return type).
+
+  Merely *receiving* a `T | null` value from an external call does **not**
+  license `null` in your own declarations, parameters, or return types.
+  Normalize it at the boundary with `?? undefined` and keep everything
+  downstream `undefined`-based. "The value came from an API that returns
+  `null`" is not sufficient justification on its own.
+
+  **Per-hit decision** (apply to every candidate below): ask *is the
+  `null` in a type signature I own, or am I only receiving it from
+  something external?* If it is in a signature you own — a local variable,
+  a parameter, a return type, or module state — it must be `undefined`
+  unless an external signature at that same position forces `null`.
+  Otherwise, normalize.
 
   **Find candidates:**
 
@@ -149,8 +167,40 @@ repo) so the output stays small and tied to the diff.
     --include="*.ts" --include="*.tsx" .
   ```
 
-  Many `null` uses are forced by external APIs (DB rows, framework
-  callbacks). Filter the hits against that context before flagging.
+  This is bad (a wrapper we own propagates the external `null` instead of
+  normalizing it, and module state defaults to `null`):
+
+  ```ts
+  // We own this return type, so the `| null` is our choice, not the SDK's.
+  async function refreshSession(): Promise<Session | null> {
+    const { data } = await client.auth.refreshSession();
+    return data.session; // Session | null straight through
+  }
+
+  let onExpired: (() => void) | null = null; // our module state
+  ```
+
+  This is good (normalize at the boundary; every signature we own uses
+  `undefined`):
+
+  ```ts
+  async function refreshSession(): Promise<Session | undefined> {
+    const { data } = await client.auth.refreshSession();
+    return data.session ?? undefined;
+  }
+
+  let onExpired: (() => void) | undefined = undefined;
+  ```
+
+  The `null` that is genuinely forced stays. If a library types a callback
+  parameter as `Session | null`, a handler written against that signature
+  keeps `null`, because the position is not one you own:
+
+  ```ts
+  client.auth.onAuthStateChange((_event, session: Session | null) => {
+    // ...
+  });
+  ```
 
 - Prefer string literal unions over enums.
 
