@@ -1,4 +1,3 @@
-import type { ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { GenericError } from "@/components/AppErrorBoundary/GenericError";
 import { isSessionError } from "@/components/AppErrorBoundary/isSessionError";
@@ -8,6 +7,7 @@ import {
   recoverFromSessionError,
 } from "@/components/AppErrorBoundary/recoverFromSessionError";
 import { SessionRecoveringScreen } from "@/components/AppErrorBoundary/SessionRecoveringScreen";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 
 /**
  * App-wide router error boundary (wired as the router's

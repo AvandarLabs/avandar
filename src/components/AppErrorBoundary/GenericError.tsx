@@ -33,7 +33,8 @@ export function GenericError({
             variant="default"
             onClick={() => {
               window.location.assign("/");
-            }}>
+            }}
+          >
             Go home
           </Button>
         </Group>
@@ -46,7 +47,8 @@ export function GenericError({
                 setShowDetails((shown) => {
                   return !shown;
                 });
-              }}>
+              }}
+            >
               {showDetails ? "Hide details" : "Show details"}
             </Button>
             {showDetails ?

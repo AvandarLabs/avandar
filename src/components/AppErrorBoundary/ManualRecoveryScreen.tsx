@@ -23,14 +23,16 @@ export function ManualRecoveryScreen(): React.ReactNode {
           <Button
             onClick={() => {
               void recoverFromSessionError();
-            }}>
+            }}
+          >
             Sign in again
           </Button>
           <Button
             variant="default"
             onClick={() => {
               void resetAppAndRecover();
-            }}>
+            }}
+          >
             Reset app
           </Button>
         </Group>
