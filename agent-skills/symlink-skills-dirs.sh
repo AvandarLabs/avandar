@@ -7,6 +7,10 @@
 # reachable without depending on `npx skills` or `skills-lock.json`.
 #
 # A "skill" is any directory under `agent-skills/` that contains a `SKILL.md`.
+# The find below is recursive, so this covers both `public-skills/` and
+# `private-skills/` (and anything else added under `agent-skills/`) without
+# needing per-directory configuration.
+#
 # Run this whenever you add, remove, or rename a skill under `agent-skills/`.
 #
 # Usage:

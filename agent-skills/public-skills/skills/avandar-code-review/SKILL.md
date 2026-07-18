@@ -199,19 +199,26 @@ modified by the author under review). Do not flag issues on context lines
    are the only lines eligible for findings in every subsequent phase.
 3. Apply the **Files To Skip** filter above and narrow the diff to only
    reviewable files before doing anything else.
-4. Review the **Most Common Mistakes** section in this file first.
-5. Review the **General Checks** section in this file second.
-6. Run each **language-specific phase** in the order listed under "Phase
-   Checklists" below, but only when that phase's gate matches the diff.
-7. Run each **library-gated phase** under "Library-Gated Phases" below,
-   gated on whether the package is present in the repo. Skip the phase
-   entirely if the package is absent.
-8. If `docs/code-reviews/extra-checklist.md` exists in the repo, run it
-   as the final repo-local phase.
-9. Follow the active review mode for how to handle each finding.
-10. At the end of the review, run only the exact tests that are relevant to
-    the code changes.
-11. Report only concrete findings that are visible in the code under review.
+4. Determine which phases fire for this diff (gate each phase by file
+   type, package presence, and whether `extra-checklist.md` exists), then
+   execute the review using the **Execution Model With Sub-Agents**
+   section below. Fan out to read-only find sub-agents when 3 or more
+   phases fire; otherwise run the phases inline in this agent. Either way,
+   the phase order is:
+   1. **Most Common Mistakes** (this file, always runs).
+   2. **General Checks** (this file, always runs).
+   3. Each **language-specific phase** under "Phase Checklists", in the
+      order listed, gated on the diff.
+   4. Each **library-gated phase** under "Library-Gated Phases", gated on
+      package presence.
+   5. The repo-local `docs/code-reviews/extra-checklist.md` phase, if the
+      file exists (always last).
+5. Follow the active review mode for how each finding is applied or
+   reported (see the Execution Model's Apply stage for how the three modes
+   differ).
+6. At the end of the review, run only the exact tests that are relevant to
+   the code changes.
+7. Report only concrete findings that are visible in the code under review.
 
 In pair review mode, announce the phase explicitly as you move through the
 review, for example: "Phase: comments", "Phase: TypeScript",
@@ -222,6 +229,134 @@ review, for example: "Phase: comments", "Phase: TypeScript",
 touches SQL should not load the TypeScript, React, hooks, CSS, or any
 library-gated phase. Loading a phase file you will not use is wasted
 context.
+
+## Execution Model With Sub-Agents
+
+The phases in this skill are independent: each applies an orthogonal rule
+set to the same read-only diff, and no phase consumes another phase's
+output. That makes the review parallelizable. When enough phases fire,
+fan them out across read-only sub-agents instead of running them
+sequentially in one context.
+
+Priorities, in order:
+
+1. **Accuracy is first.** A single agent carrying every checklist plus a
+   large diff loses rules in the middle of its context. Giving each
+   sub-agent one focused checklist against only the relevant slice keeps
+   every rule under full attention, so fewer rules are forgotten.
+2. **Review latency is second.** Fanned-out phases run concurrently, so
+   wall-clock time is the slowest single lane, not the sum of all lanes.
+3. **Token usage is a distant third.** This model re-sends diff slices to
+   several agents and adds a verify pass, so it spends more tokens. That
+   trade is acceptable: it buys both accuracy and speed.
+
+### When To Fan Out
+
+Count the phases that actually fire for this diff (after gating).
+
+- **Fewer than 3 phases fire:** do NOT fan out. Run the phases inline and
+  sequentially in this agent. Spawning sub-agents for one or two small
+  phases costs more in spawn and merge overhead than it saves. A SQL-only
+  or CSS-only diff runs inline.
+- **3 or more phases fire:** fan out using the four-stage pipeline below.
+  A diff spanning, for example, TypeScript, React, and SQL fans out.
+
+### Four Stages: Find → Verify → Merge → Apply
+
+Run the review as **Find (parallel) → Verify (parallel) → Merge (serial)
+→ Apply (serial)**. Only the final Apply stage edits files, and only this
+orchestrator agent performs it. **Sub-agents are strictly read-only and
+must never edit a file.** Because every edit happens in one serial
+orchestrator pass after all finding is done, two writers never touch the
+same file at once. This is how the model avoids simultaneous edits.
+
+#### Stage 1: Find (parallel, read-only)
+
+Spawn one find sub-agent per lane below whose gate matches the diff. Give
+each agent only:
+
+- the diff slice for the files its gate covers (not the whole diff, except
+  the `common-and-general` lane, which covers all reviewable files),
+- the shared review constraints it must respect (Review Scope: flag only
+  `+` lines; Files To Skip),
+- its own checklist.
+
+Each find agent is READ-ONLY. It returns structured findings, one record
+per finding: `{ file, lines, phase, severity, description,
+recommendedFix }`. It must not modify code.
+
+**Find lanes:**
+
+| Lane | Checklist(s) | Gate |
+|------|--------------|------|
+| `common-and-general` | Most Common Mistakes + General Checks (this file) | always |
+| `comments-and-module` | comments + module hierarchy | diff has `.ts`/`.tsx` |
+| `typescript` | typescript-checklist | diff has `.ts`/`.tsx` |
+| `functional-style` | functional-style-checklist | diff has `.ts`/`.tsx` |
+| `react` | react-checklist (plus `react-doctor` if available) | diff has a `.tsx` component |
+| `react-hooks` | react-hooks-checklist | diff uses hooks |
+| `css-modules` | css-modules-checklist | diff touches `*.module.css` |
+| `sql` | sql-checklist | diff has `.sql` |
+| `lib:@avandar/utils` | libraries/avandar-utils-checklist | package present |
+| `lib:@avandar/models` | libraries/avandar-models-checklist | package present |
+| `lib:@avandar/modules` | libraries/avandar-modules-checklist | package present |
+| `extra-checklist` | repo-local `extra-checklist.md` | file exists |
+
+The TypeScript rule family is deliberately split across three lanes
+(`typescript`, `functional-style`, `comments-and-module`) rather than run
+as one agent. `typescript` and `functional-style` are each large enough to
+saturate a single agent's attention, so keeping them apart is the
+highest-value accuracy split in the review. **Do not merge those two into
+one agent.** `comments` and `module` are small and mechanical, so they
+share one lane. Each lane reads its full file slice as context but applies
+only its own rule lens.
+
+#### Stage 2: Verify (parallel, adversarial)
+
+Parallel finding maximizes recall, which raises false positives. For every
+finding from Stage 1, spawn an adversarial verifier whose job is to
+**refute** the finding, not confirm it. Each verifier checks:
+
+- Is the flagged line actually a `+` line in the diff? Context and `-`
+  lines are out of scope and must be dropped.
+- Does the cited rule genuinely apply, or is this a documented exception
+  (for example the `for`-loop exceptions, or the `null`-over-`undefined`
+  exception)?
+- Is the recommended alternative (a helper, a library util) actually
+  present in this repo?
+
+Default to refuted when uncertain. A finding survives only if the verifier
+cannot refute it. For high-severity findings, use three verifiers with
+distinct lenses (scope, rule-applicability, exception) and drop the
+finding if a majority refute it.
+
+#### Stage 3: Merge (serial, orchestrator)
+
+Collect the surviving findings in this orchestrator. Deduplicate overlaps
+(the same code flagged by more than one lane, such as a vague name caught
+by both `common-and-general` and `typescript`). Order by severity. This is
+a plain reasoning step; do not spawn a sub-agent for it.
+
+#### Stage 4: Apply (serial, orchestrator, mode-dependent)
+
+Only the orchestrator edits, only here, one file at a time. Sub-agents
+edited nothing, so there is no write contention.
+
+- **Report mode:** do not apply. Output the merged findings ordered by
+  severity, per **Review Output**.
+- **Auto mode:** apply the surviving fixes in a single serial pass, grouped
+  by file, then run the targeted tests per **Testing At The End Of
+  Review**.
+- **Pair Review mode:** present the merged findings one at a time for
+  approval (per **Pair Review Mode**), and apply each approved fix serially
+  before moving to the next.
+
+### Inline Fallback
+
+When fewer than 3 phases fire, skip the sub-agents entirely. Run the firing
+phases in this agent, in the order given in **Review Order**, and handle
+each finding per the active mode. Everything else in this skill (gates,
+scope, Files To Skip, testing, output) applies unchanged.
 
 ## Testing At The End Of Review
 
