@@ -14,9 +14,15 @@ stay up to date.
   written to be useful to the general public (no Avandar-specific or
   repo-specific dependencies) and are licensed separately under MIT (see
   `public-skills/LICENSE`). The rest of this repo is licensed under CPAL-1.0.
+- [`private-skills/`](./private-skills) — **Avandar-repo-specific** skills that
+  operate on files only present in this checkout (for example the source of
+  our other skills, or our repo-local review checklists). They are **not**
+  meant to be installed into other repositories and have **no** `npx skills`
+  install command; installing one elsewhere would do nothing useful.
 
 Treat `agent-skills/` itself as internal. Treat `agent-skills/public-skills/`
-as a public, independently-licensed package.
+as a public, independently-licensed package, and `agent-skills/private-skills/`
+as internal, repo-only skills.
 
 ## Every skill here must be symlinked
 
