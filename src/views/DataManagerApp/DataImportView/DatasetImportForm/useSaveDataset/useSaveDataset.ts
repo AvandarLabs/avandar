@@ -182,7 +182,7 @@ export function useSaveDataset(
         message: t`Dataset "${savedDataset.name}" saved successfully`,
       });
 
-      // Hanlde post-save actions, such as uploading the dataset to cloud
+      // Handle post-save actions, such as uploading the dataset to cloud
       // storage if it was allowed by the user.
       match(params)
         .with({ sourceType: "csv_file" }, { sourceType: "xlsx_file" }, (p) => {

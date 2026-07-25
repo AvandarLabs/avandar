@@ -15,11 +15,12 @@ import { NavLinkList } from "@ui";
 import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { AppLinks } from "@/config/AppLinks";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
-import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -88,8 +89,23 @@ export function DatasetNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
-  const { slug: workspaceSlug } = useCurrentWorkspace();
-  const localDatasetIds = useLocalDatasetIds();
+  const workspace = useCurrentWorkspace();
+  const workspaceSlug = workspace.slug;
+  const [userProfile] = useCurrentUserProfile();
+  const userId = userProfile?.userId;
+
+  // Dataset ids with parquet cached locally for the current user/workspace.
+  const [localDatasets = []] = LocalDatasetClient.useGetAll({
+    where: {
+      userId: { eq: userId! },
+      workspaceId: { eq: workspace.id },
+    },
+    useQueryOptions: { enabled: !!userId },
+  });
+  const localDatasetIds = useMemo(() => {
+    return new Set(localDatasets.map(prop("datasetId")));
+  }, [localDatasets]);
+
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {

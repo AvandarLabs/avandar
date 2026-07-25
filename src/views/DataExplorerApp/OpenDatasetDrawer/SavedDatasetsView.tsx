@@ -14,24 +14,20 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
-import { where } from "@utils";
+import { propEq, where } from "@utils";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
-import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import { rehydratePlan } from "@/components/ChatPanel/PlanStateManager/planRehydrate";
-import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
+import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
-import type { ChatPlan } from "$/types/chat.types";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
@@ -63,11 +59,9 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<DatasetId | null>(
-    null,
-  );
-  const planDispatch = PlanStateManager.useDispatch();
-  const planState = PlanStateManager.useState();
+  const [selectedDatasetId, setSelectedDatasetId] = useState<
+    DatasetId | undefined
+  >(undefined);
 
   const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
     ...where("workspace_id", "eq", workspace.id),
@@ -83,24 +77,15 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
     });
   }, [datasets, debouncedSearch]);
 
+  // Derive the selection from `filtered` during render instead of syncing it
+  // with an effect. `find` yields `undefined` whenever the selected id is not
+  // in the current (searched) list, so a dataset that scrolls out of the
+  // filter is treated as unselected without any state write. When the filter
+  // clears and the dataset reappears, the selection comes back.
   const selectedDataset = useMemo(() => {
-    if (!selectedDatasetId) {
-      return null;
-    }
-    return filtered.find((dataset) => {
-      return dataset.id === selectedDatasetId;
-    });
-  }, [filtered, selectedDatasetId]);
-
-  useEffect(() => {
-    if (
-      selectedDatasetId !== null &&
-      !filtered.some((dataset) => {
-        return dataset.id === selectedDatasetId;
-      })
-    ) {
-      setSelectedDatasetId(null);
-    }
+    return selectedDatasetId ?
+        filtered.find(propEq("id", selectedDatasetId))
+      : undefined;
   }, [filtered, selectedDatasetId]);
 
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
@@ -123,13 +108,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       }
       return { dataset, virtualDataset };
     },
-    onSuccess: async ({
+    onSuccess: ({
       dataset,
       virtualDataset,
     }: {
       dataset: Dataset.T;
       virtualDataset: VirtualDataset.T;
     }) => {
+      // Virtual datasets open as their raw SQL. Plan rehydration (restoring an
+      // embedded chat plan from `planSteps`) lands with the chat-plan
+      // persistence feature; until then there is no plan to restore.
       onOpen(
         {
           datasetId: dataset.id,
@@ -139,21 +127,6 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         },
         virtualDataset.rawSQL,
       );
-
-      if (virtualDataset.planSteps) {
-        if (planState.nodes.length > 0) {
-          void dropPlanTempViews({
-            planId: planState.planId ?? undefined,
-            nodes: planState.nodes,
-          });
-        }
-        const planId = `vdataset_${virtualDataset.id}`;
-        await rehydratePlan({
-          planId,
-          plan: virtualDataset.planSteps as ChatPlan,
-          dispatch: planDispatch,
-        });
-      }
     },
     onError: (error: Error) => {
       notifyError(error.message);
@@ -167,7 +140,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         name: dataset.name,
         sourceType: dataset.sourceType,
       },
-      buildSelectAllPreviewSQL(dataset.id),
+      buildSelectAllPreviewSql(dataset.id),
     );
   };
 
@@ -201,7 +174,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       onConfirm: () => {
         deleteDataset({ id: dataset.id });
         if (selectedDatasetId === dataset.id) {
-          setSelectedDatasetId(null);
+          setSelectedDatasetId(undefined);
         }
       },
     });
@@ -230,7 +203,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         </Text>
       : <div role="listbox" aria-label={t`Saved datasets`} className={css.list}>
           {filtered.map((dataset) => {
-            const isSelected = dataset.id === selectedDatasetId;
+            const isSelected = dataset.id === selectedDataset?.id;
             return (
               <UnstyledButton
                 key={dataset.id}

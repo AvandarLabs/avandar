@@ -3,12 +3,14 @@ name: deslop
 description: >
   Use this skill whenever the user types a `/deslop` command (`/deslop list`,
   `/deslop status`, `/deslop continue`, `/deslop update`,
-  `/deslop migrate <feature-slug>`, `/deslop complete <feature-slug>`) or asks
-  in free-form about the de-slop workflow that migrates features from
-  `feat/ict4d-demo` (current production branch) into `develop`. Triggers
-  include phrases like "de-slop", "deslop", "ICT4D demo branch parity",
-  "feature migration", "refactor branch", or any reference to the planning
-  docs under `docs/deslop/`.
+  `/deslop migrate <feature-slug>`, `/deslop complete <feature-slug>`,
+  `/deslop mergeback <group-or-refactor-branch>`) or asks in free-form about
+  the de-slop workflow that migrates features from `feat/ict4d-demo` (current
+  production branch) into `develop`. Triggers include phrases like "de-slop",
+  "deslop", "ICT4D demo branch parity", "feature migration", "refactor
+  branch", "merge back", "merge-back", "forward-port the cleanup", "reduce
+  drift between ict4d-demo and develop", or any reference to the planning docs
+  under `docs/deslop/`.
 metadata:
   tags: deslop, ict4d-demo, develop, branch-management, migration
 ---
@@ -63,6 +65,11 @@ with one-line descriptions. Do not perform any other action.
 - `/deslop complete [<feature-slug>]` — verify a refactor branch
   merged into `develop`, clean up, log completion, and refresh the
   next plan in the queue.
+- `/deslop mergeback <group-or-refactor-branch>` — after a refactor
+  branch merges into `develop`, forward-port its cleanup (file moves,
+  formatting, naming, import-path updates) back into `feat/ict4d-demo`
+  via a scoped 3-way merge, so drift shrinks before the next group
+  refactor is cut.
 
 ### `/deslop status`
 
@@ -496,6 +503,152 @@ doing anything destructive.
 6. Report a summary: feature completed, merge SHA, next slug in
    the queue (with note on whether its plan was refreshed).
 
+### `/deslop mergeback <group-or-refactor-branch>`
+
+Forward-port a **just-merged** refactor's cleanup back into
+`feat/ict4d-demo`, so the branch stops drifting from `develop`.
+
+**Why this exists.** A refactor branch (per-feature or, more often, a
+whole `GROUP-N`) is a *clean re-implementation* of feat's features on
+top of `develop`. When it merges into `develop`, `develop` now holds a
+tidier version of those files than `feat/ict4d-demo` does: files were
+split/moved, formatting normalized, variables renamed, import paths
+repointed. If we leave `feat/ict4d-demo` as-is, the next `git diff
+origin/develop..origin/feat/ict4d-demo` for those paths is huge and
+noisy — every cosmetic change looks like a real difference, which makes
+`/deslop update` and the **next** group refactor far harder to reason
+about. `mergeback` collapses that cosmetic drift to (near) zero while
+**preserving** the features `feat` has that `develop` doesn't yet.
+
+This is the sanctioned reverse of a migration: it is one of the few
+operations that legitimately writes **source** on `feat/ict4d-demo`
+(the "urgent forward-port" carve-out in `PROCESS.md` → "Drift
+handling"). The operator triggers it explicitly; it is not automatic.
+
+**Preconditions — check first; if any fails, STOP and report.**
+
+1. The refactor branch is merged into `develop`:
+   `git merge-base --is-ancestor <refactor-branch> origin/develop`.
+   If not merged, there is nothing clean to pull back yet.
+2. You can resolve the refactor's **base SHA** — the `develop` commit
+   the refactor branched from. For a `GROUP-N`, read the **Base** field
+   in `docs/deslop/GROUP-N-*.md`. Otherwise use
+   `git merge-base <refactor-branch> <base-candidate>`. The base is the
+   pivot of every 3-way merge below; getting it wrong corrupts the
+   result.
+
+**Procedure.**
+
+1. `git fetch origin develop feat/ict4d-demo`. Work in the
+   `feat/ict4d-demo` checkout (this is the rare source write on feat).
+
+2. **Compute the refactored path set** — exactly the files the refactor
+   changed on `develop`'s side, scoped to real source dirs (never
+   `.claude/`, `docs/`, skills):
+
+   ```sh
+   git diff <base>..origin/develop --name-status \
+     -- src packages shared scripts supabase
+   ```
+
+   Keep the `name-status` — the `M`/`A`/`D`/`R` letters drive the next
+   step.
+
+3. **Apply per file, by status:**
+
+   - **Added (`A`) / rename-new-side (`R…` new path):**
+     `git checkout origin/develop -- <path>`. Adopt develop's new/clean
+     file verbatim. (On feat this often *overwrites* feat's messier
+     origin of the same feature — that's the point.)
+   - **Deleted (`D`) / rename-old-side (`R…` old path):**
+     `git rm <path>` on feat **iff** it is still tracked there
+     (feat may already have dropped it).
+   - **Modified (`M`): 3-way merge, favouring develop on conflict.**
+     This is the workhorse. For base = `<base>`, ours = `feat`,
+     theirs = `origin/develop`:
+
+     ```sh
+     git merge-file -p --theirs <ours> <base> <theirs> > <path>
+     ```
+
+     (`git show <ref>:<path>` to materialize each blob into a temp
+     file.) `--theirs` keeps feat-only regions that develop never
+     touched (the features develop lacks) **and** takes develop's
+     version wherever the two overlap (the cleanup). For a file that is
+     100 % refactor-owned, the result equals develop's version → drift
+     0. For a shared file, feat's extra features survive untouched.
+
+     **Exception — feat is AHEAD inside a conflict region.** If feat's
+     side of a conflict contains providers/features that develop is
+     simply missing (not a messy version of the same thing), `--theirs`
+     would *delete* them. Detect by eyeballing the `--diff3` conflicts
+     first. For those files, **leave feat's version untouched** (skip
+     them). Real examples from Group 1: `WorkspaceLayout.tsx` (feat
+     wraps extra `ModalsProvider` / `DashboardEditorStateManager` /
+     `WorkspaceI18nProvider`), and `DataExplorerApp.tsx` (feat is
+     hundreds of lines of explorer features ahead).
+
+4. **Type-check: `pnpm type-check`.** This is the gate that surfaces
+   every entanglement. Expect and fix these classes:
+
+   - **Feature rename entangled with feat-only consumers → EXCLUDE it.**
+     If the refactor renamed a module *and* changed its API, and feat
+     wires the old API into features develop doesn't have (Group 1:
+     `analyticsClient.ts` → `AnalyticsClient.ts`, consumed by feat-only
+     dashboard export/publish), do **not** force it. Restore feat's
+     file (`git checkout feat/ict4d-demo -- <path>`), drop develop's
+     new-name file, and revert the coupled call sites. That rename
+     belongs to its own feature's real migration, not this cleanup.
+   - **Case-only renames on macOS** (`Foo.ts` vs `foo.ts`): the checkout
+     silently replaces the other case. Fix with
+     `git rm --cached <wrong-case>` + `rm` + restore feat's file, then
+     confirm `git ls-files` shows exactly one.
+   - **Orphaned barrels / importers from a module restructure:** if
+     develop split a module and dropped its `index.ts` barrel, delete
+     feat's now-orphaned barrel too (check `git grep` shows no
+     importers first) and let the direct-file imports stand.
+   - **`--theirs` dropped a feat-only import** in a shared file's import
+     block (it sat adjacent to a conflicting line): re-add just that
+     import, or rebuild the file from feat + hand-apply the one or two
+     develop cleanups.
+
+5. **Lint the changed files** (`pnpm exec eslint <files>`) and **run
+   vitest on the affected dirs.** Fix test-environment mismatches:
+   - A develop-origin test that assumes develop's provider architecture
+     will fail if feat's differs. If the *source under test* is
+     identical on both branches (`git diff feat origin/develop -- <src>`
+     is empty), restore **feat's** version of the *test* — it already
+     matches feat's environment (Group 1: `openFileImportFlow.test.tsx`
+     self-wraps `ModalsProvider` because feat mounts it in
+     `WorkspaceLayout`, not `AvandarUiProvider`).
+   - Ignore pre-existing failures unrelated to the path set (confirm by
+     `git diff feat/ict4d-demo -- <file>` being empty). Report them; do
+     not fix them under this command.
+
+6. **Verify the residual.** `git diff origin/develop -- <path-set>`
+   should now be *only* legitimate feat-only content plus the files you
+   deliberately excluded. Walk the list and confirm each remaining diff
+   is a real feat feature or a named exclusion — nothing accidental.
+
+7. **Do not commit unless the operator says so** (standard rule). Leave
+   the working tree dirty for `dif`/difit review. When the operator
+   does authorize it, commit on `feat/ict4d-demo`:
+   `chore(deslop): merge back <group> cleanup from develop`.
+   Never push to `develop`; never open a PR.
+
+8. **Report:** how many files merged / checked-out / removed / excluded,
+   the before→after drift on the path set, every entangled case and how
+   you resolved it (especially anything **excluded** and why), and the
+   list of manual checks the operator should still eyeball (the
+   ahead-of-develop files you left untouched).
+
+**Guiding principle: structural cleanup travels; feature semantics do
+not.** Take develop's moves, splits, formatting, naming, and
+import-path updates. Never let the cleanup overwrite a feature that
+`feat` has and `develop` has not yet received — when the two are
+entangled in one file, preserve feat and defer the rest to that
+feature's own migration.
+
 ---
 
 ## Per-feature plan authoring rules
@@ -576,10 +729,15 @@ before continuing: `git worktree move <flat-path> <slash-path>`.
 - **Never push to `develop` or `main`.** Refactor branches push to
   their own namespace; `docs/deslop/` housekeeping pushes to
   `feat/ict4d-demo`.
-- **Never modify `feat/ict4d-demo` source code from this skill.**
-  The only files this skill writes on that branch live under
-  `docs/deslop/`, `.claude/skills/deslop/`, and (transitively, via
-  `/deslop update` reads only) `git` itself.
+- **Never modify `feat/ict4d-demo` source code from this skill —
+  except in `/deslop mergeback`.** Normally the only files this skill
+  writes on that branch live under `docs/deslop/`,
+  `.claude/skills/deslop/`, and (transitively, via `/deslop update`
+  reads only) `git` itself. `/deslop mergeback` is the one sanctioned
+  exception: it writes source on `feat/ict4d-demo` to forward-port a
+  merged refactor's cleanup (per `PROCESS.md` → "Drift handling"). Even
+  there, it only touches the merged refactor's own path set, never
+  commits without operator say-so, and never pushes to `develop`.
 - **Never delete a per-feature markdown without verifying the merge
   first.** Step 2 of `/deslop complete` is the gate.
 - **Never assume Phase 1 is done.** Read `STATE.md` first. Phase 1

@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { OfflineGated } from "@/components/offline/OfflineGated";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
@@ -66,7 +66,7 @@ export function OpenDataCatalogEntryDetail({
             {entry.displayName}
           </Title>
 
-          <OfflineGated isBlocked={offline.isBlocked}>
+          <OfflineGated>
             <Tooltip
               label={t`Add to your workspace`}
               disabled={offline.isBlocked}

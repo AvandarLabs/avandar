@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 
-export function ImportConfirmBody({
-  fileName,
-}: {
+type Props = {
   fileName: string;
-}): JSX.Element {
+};
+
+export function ImportConfirmBody({ fileName }: Props): JSX.Element {
   const { t } = useLingui();
   return (
     <Stack mt="md">

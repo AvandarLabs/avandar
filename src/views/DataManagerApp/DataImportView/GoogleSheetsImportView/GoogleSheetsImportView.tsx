@@ -23,7 +23,7 @@ import { useCallback, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
@@ -152,7 +152,7 @@ export function GoogleSheetsImportView({
       const { datasetId, numRowsToSkip, rawText, spreadsheetName } = params;
 
       // Wrap the Google-Sheets-as-CSV text in a File so we can drive it
-      // through the streaming Phase A/B import pipeline.
+      // through the streaming two-step import pipeline.
       const csvBlob = new Blob([rawText], { type: MIMEType.TEXT_CSV });
       const csvFile = new File(
         [csvBlob],
@@ -182,8 +182,8 @@ export function GoogleSheetsImportView({
           numRows: sniff.previewRows.length,
           numRejectedRows: 0,
           errors: { rejectedRows: [], rejectedScans: [] },
-          // Phase A doesn't produce parquetData; Phase B runs in the
-          // background and writes the real Blob into Dexie. Downstream
+          // The sniff phase doesn't produce parquetData; the background
+          // parquet transcoding writes the real Blob into Dexie. Downstream
           // consumers read parquetData from the Dexie row, not from this
           // result object, so a placeholder is safe.
           parquetData: new Blob(),

@@ -7,7 +7,7 @@ import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
 import { match } from "ts-pattern";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   DuckDbColumnSchema,
@@ -63,9 +63,9 @@ const EMPTY_PARQUET_PLACEHOLDER = new Blob([], {
  * Convert XLSX sniff preview rows (object keyed by column name with raw
  * cell values) to the column schema shape DuckDB returns from CSV /
  * Parquet sniffs. We can't infer DuckDB types from SheetJS values without
- * additional logic; default to VARCHAR for everything in Phase A. Phase B
- * (the actual `read_xlsx` transcode) reconciles to the real types via
- * `LocalDatasetClient._reconcileColumns`.
+ * additional logic; default to VARCHAR for everything in the sniff phase.
+ * The background parquet transcoding (the actual `read_xlsx` transcode)
+ * reconciles to the real types via `LocalDatasetClient._reconcileColumns`.
  */
 function _xlsxColumnNamesToSchema(columnNames: string[]): DuckDbColumnSchema[] {
   return columnNames.map((name) => {
@@ -141,23 +141,23 @@ function _buildDataSourceMetadataFromLoadResult({
 
 /**
  * Loads a manually uploaded file into our local storage and DuckDB in two
- * phases:
+ * named phases:
  *
- *   - **Phase A** (foreground, awaited by this hook): a fast sniff that
- *     produces the column schema, parse dialect, and a 200-row preview.
- *     CSV uses DuckDB's `sniff_csv` + LIMIT-pushdown read; XLSX uses a
- *     SheetJS sniff worker so the parse runs off the main thread.
+ *   - The sniff phase (awaited by this hook): a fast sniff that produces
+ *     the column schema, parse dialect, and a 200-row preview. CSV uses
+ *     DuckDB's `sniff_csv` + LIMIT-pushdown read; XLSX uses a SheetJS sniff
+ *     worker so the parse runs off the main thread.
  *
- *   - **Phase B** (background, fired by `startCsvImport` /
+ *   - The background parquet transcoding (fired by `startCsvImport` /
  *     `startXlsxImport`): the full `read_csv` / `read_xlsx` → parquet
  *     transcode. Status is tracked in IndexedDB on the LocalDataset row
- *     (`parseStatus`) and in memory via the `ImportJobsManager`. Phase B
- *     emits its own completion toast and column-discrepancy warning.
+ *     (`parseStatus`) and in memory via the `ImportJobsManager`. It emits
+ *     its own completion toast and column-discrepancy warning.
  *
- * Returns immediately after Phase A so the import form can render. The
- * caller may save the dataset before Phase B completes; the parquet
- * upload to Supabase storage waits on Phase B internally via
- * `ImportJobsManager.waitForCompletion`.
+ * Returns immediately after the sniff phase so the import form can render.
+ * The caller may save the dataset before the background parquet transcoding
+ * completes; the parquet upload to Supabase storage waits on the background
+ * parquet transcoding internally via `ImportJobsManager.waitForCompletion`.
  *
  * IMPORTANT: this does **not** save the dataset to the backend database;
  * that's `useSaveDataset`.
@@ -196,12 +196,12 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             file,
             parseOptions: { numRowsToSkip, delimiter },
           });
-          // Synthesize a `DuckDbLoadCsvResult` from the sniff so the
+          // Synthesize a `DuckDbLoadCsvResult` from the sniff phase so the
           // existing import form / save mutation can consume it
-          // unchanged. `parquetData` isn't real yet — Phase B will
-          // write the actual parquet into the LocalDataset row
-          // independently. `numRows` is unknown at Phase A; the toast
-          // and save mutation don't error on a fractional value.
+          // unchanged. `parquetData` isn't real yet; the background parquet
+          // transcoding will write the actual parquet into the LocalDataset
+          // row independently. `numRows` is unknown at the sniff phase; the
+          // toast and save mutation don't error on a fractional value.
           const loadResult: CsvFileLoadResult = {
             datasetId,
             numRows: sniff.previewRows.length,

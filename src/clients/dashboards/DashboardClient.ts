@@ -14,7 +14,7 @@ import {
 } from "@/clients/dashboards/sliceBuilder";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
@@ -215,8 +215,7 @@ export const DashboardClient = createUsableServiceClient(
                   let parquetBlob: Blob;
 
                   if (
-                    localDataset !== undefined &&
-                    localDataset.parseStatus === "ready" &&
+                    localDataset?.parseStatus === "ready" &&
                     localDataset.parquetData
                   ) {
                     parquetBlob = localDataset.parquetData;

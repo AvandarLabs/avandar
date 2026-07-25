@@ -5,7 +5,7 @@ import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useEffect, useRef, useState } from "react";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import {
   DatasetImportForm,
   ManualUploadDataSourceMetadata,
@@ -113,19 +113,22 @@ export function ManualUploadView({
   // dropzone), start parsing it on mount so the user lands directly
   // on the import form without an extra click.
   const hasAutoParsedInitialFileRef = useRef(false);
-  useEffect(() => {
-    if (!initialFile || hasAutoParsedInitialFileRef.current) {
-      return;
-    }
-    hasAutoParsedInitialFileRef.current = true;
-    void onRequestFileParse({
-      file: initialFile,
-      newDatasetId: uuid() as Dataset.Id,
-    });
-    // We intentionally exclude `onRequestFileParse` from deps - it
-    // changes on every render but the ref guards single execution.
+  useEffect(
+    function autoParseInitialFile() {
+      if (!initialFile || hasAutoParsedInitialFileRef.current) {
+        return;
+      }
+      hasAutoParsedInitialFileRef.current = true;
+      void onRequestFileParse({
+        file: initialFile,
+        newDatasetId: uuid() as Dataset.Id,
+      });
+      // We intentionally exclude `onRequestFileParse` from deps - it
+      // changes on every render but the ref guards single execution.
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialFile]);
+    [initialFile],
+  );
 
   const elements = {
     importForm: () => {

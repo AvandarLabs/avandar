@@ -1,5 +1,4 @@
-import { notifyError, notifySuccess, notifyWarning } from "@ui";
-import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
+import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -27,16 +26,17 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * A client for managing datasets in local storage and in local memory.
  *
  * Datasets cached locally as parquet are tracked here. The CSV / XLSX
- * import flow is two-phase:
+ * import runs in two named phases:
  *
- *   - **Phase A** (`startCsvImport` / `startXlsxImport`) — runs the
- *     fast sniff + 200-row preview so the import form can render
- *     immediately, inserts a LocalDataset row with `parseStatus="parsing"`,
- *     optionally caches the source bytes for resume-after-refresh, and
- *     kicks off Phase B in the background.
+ *   - The sniff phase (`startCsvImport` / `startXlsxImport`) runs the fast
+ *     sniff + 200-row preview so the import form can render immediately,
+ *     inserts a LocalDataset row with `parseStatus="parsing"`, optionally
+ *     caches the source bytes for resume-after-refresh, and kicks off the
+ *     background parquet transcoding.
  *
- *   - **Phase B** (`_runPhaseB`) — the heavy `read_csv` / `read_xlsx` →
- *     parquet transcode. Completion writes the parquet bytes into the row,
+ *   - The background parquet transcoding (`runBackgroundParquetTranscoding`)
+ *     is the heavy `read_csv` / `read_xlsx` → parquet step that runs after
+ *     the sniff phase. Completion writes the parquet bytes into the row,
  *     drops the cached source bytes, flips `parseStatus="ready"`, and
  *     reconciles column types against the Supabase Dataset record.
  *
@@ -46,8 +46,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Per-file ceiling for the source-bytes cache. Files above this don't
- * get their original bytes cached; if the user closes the tab mid-Phase-B
- * we'll prompt for a re-upload instead.
+ * get their original bytes cached; if the user closes the tab while the
+ * background parquet transcoding is still running we'll prompt for a
+ * re-upload instead.
  */
 const SOURCE_CACHE_PER_FILE_MAX_BYTES = 200 * 1024 * 1024;
 
@@ -106,181 +107,6 @@ async function _maybeCacheSourceBytes(file: File): Promise<Blob | undefined> {
   return file;
 }
 
-/**
- * Reconciles Phase B's authoritative column schema against the Dataset's
- * stored `detectedDataType`. For each name-matched column whose detected
- * type changed, we update the Supabase row + tally for the warning toast.
- *
- * We intentionally only touch `detectedDataType` (not `dataType`) so user
- * overrides of the queryable type are preserved.
- */
-async function _reconcileColumns(params: {
-  datasetId: DatasetId;
-  phaseBColumns: DuckDbColumnSchema[];
-}): Promise<{ changedCount: number }> {
-  // Lazy import to avoid a circular module load — these clients pull in
-  // LocalDatasetClient transitively for cloud-fetch fallbacks.
-  const { DatasetClient } = await import("@/clients/datasets/DatasetClient");
-  const { DatasetColumnClient } =
-    await import("@/clients/datasets/DatasetColumnClient");
-
-  let existingDataset;
-  try {
-    existingDataset = await DatasetClient.getOne({
-      where: { id: { eq: params.datasetId } },
-    });
-  } catch {
-    // Dataset hasn't been saved yet (user hasn't submitted the import form).
-    // Nothing to reconcile against; Dataset creation will pick up the
-    // Phase B schema directly from the load result.
-    return { changedCount: 0 };
-  }
-  if (!existingDataset) {
-    return { changedCount: 0 };
-  }
-
-  let existingColumns;
-  try {
-    existingColumns = await DatasetColumnClient.getAll({
-      where: { dataset_id: { eq: params.datasetId } },
-    });
-  } catch {
-    return { changedCount: 0 };
-  }
-
-  if (!existingColumns || existingColumns.length === 0) {
-    return { changedCount: 0 };
-  }
-
-  const byName = new Map<string, (typeof existingColumns)[number]>();
-  for (const col of existingColumns) {
-    byName.set(col.originalName, col);
-  }
-
-  let changedCount = 0;
-  for (const detected of params.phaseBColumns) {
-    const existing = byName.get(detected.column_name);
-    if (!existing) {
-      continue;
-    }
-    if (existing.detectedDataType !== detected.column_type) {
-      try {
-        await DatasetColumnClient.update({
-          id: existing.id,
-          data: { detectedDataType: detected.column_type },
-        });
-        changedCount += 1;
-      } catch {
-        // Best-effort — surface the discrepancy via the toast even if the
-        // write fails.
-        changedCount += 1;
-      }
-    }
-  }
-
-  return { changedCount };
-}
-
-/**
- * The internal Phase B engine. Updates the LocalDataset row through its
- * parsing → ready lifecycle, drives the DuckDB transcode, reconciles
- * columns, and emits the success / failure toast. Always swallows its
- * own errors (they're surfaced via the toast + `parseStatus="failed"`).
- *
- * Resolves with the final load result on success, or throws on failure.
- */
-async function _runPhaseB(params: {
-  datasetId: DatasetId;
-  workspaceId: Workspace.Id;
-  userId: UserId;
-  source:
-    | { kind: "csv"; file: File; options: LocalDatasetCsvParseOptions }
-    | { kind: "xlsx"; file: File; options: LocalDatasetXlsxParseOptions };
-}): Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult> {
-  const { datasetId } = params;
-  const startedAt = Date.now();
-  const sourceFileSize = params.source.file.size;
-  const sourceFileName = params.source.file.name;
-
-  await AvaDexie.DB.LocalDataset.update(datasetId, {
-    parseStatus: "parsing",
-    parseStartedAt: startedAt,
-    parseFailedReason: undefined,
-  });
-  ImportJobsManager.startJob({ datasetId, sourceFileSize, startedAt });
-
-  try {
-    const result =
-      params.source.kind === "csv" ?
-        await DuckDbClient.loadCsv({
-          tableName: datasetId,
-          file: params.source.file,
-          numRowsToSkip: params.source.options.numRowsToSkip,
-          delimiter: params.source.options.delimiter,
-        })
-      : await DuckDbClient.loadXlsx({
-          tableName: datasetId,
-          file: params.source.file,
-          sheet: params.source.options.sheet,
-          hasHeader: params.source.options.hasHeader,
-        });
-
-    await AvaDexie.DB.LocalDataset.update(datasetId, {
-      parquetData: result.parquetData,
-      parseStatus: "ready",
-      parseFailedReason: undefined,
-      // Drop the cached source bytes now that the parquet has landed —
-      // we no longer need them for resume.
-      sourceBytes: undefined,
-      lastSourceAccessedAt: undefined,
-    });
-
-    const { changedCount } = await _reconcileColumns({
-      datasetId,
-      phaseBColumns: result.columns,
-    });
-
-    ImportJobsManager.markSucceeded(datasetId);
-
-    notifySuccess({
-      title: "Dataset ready",
-      message: `"${sourceFileName}" finished processing and is ready to use.`,
-    });
-    if (changedCount > 0) {
-      notifyWarning({
-        title: "Column types updated",
-        message: `Detected column types for ${changedCount} ${
-          changedCount === 1 ? "column" : "columns"
-        } in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
-      });
-    }
-
-    // Hold the terminal job entry for a tick so the upload coordinator
-    // (which awaits `waitForCompletion`) can observe success before the
-    // entry disappears.
-    setTimeout(() => {
-      ImportJobsManager.clearJob(datasetId);
-    }, 2000);
-
-    return result;
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    await AvaDexie.DB.LocalDataset.update(datasetId, {
-      parseStatus: "failed",
-      parseFailedReason: message,
-    });
-    ImportJobsManager.markFailed(datasetId, message);
-    notifyError({
-      title: "Dataset failed to process",
-      message: `"${sourceFileName}" could not be parsed: ${message}`,
-    });
-    setTimeout(() => {
-      ImportJobsManager.clearJob(datasetId);
-    }, 2000);
-    throw err;
-  }
-}
-
 export const LocalDatasetClient = createUsableServiceClient(
   createDexieCrudClient({
     db: AvaDexie.DB,
@@ -294,10 +120,11 @@ export const LocalDatasetClient = createUsableServiceClient(
 
       return {
         /**
-         * Phase A for CSV imports. Synchronously runs the DuckDB sniff +
-         * 200-row preview so the caller can render the import form, then
-         * fires Phase B in the background. Promise resolves as soon as
-         * Phase A is done — callers do not need to await Phase B.
+         * The sniff phase for CSV imports. Synchronously runs the DuckDB
+         * sniff + 200-row preview so the caller can render the import form,
+         * then fires the background parquet transcoding. Promise resolves as
+         * soon as the sniff phase is done; callers do not need to await the
+         * background parquet transcoding.
          */
         startCsvImport: async (params: {
           datasetId: DatasetId;
@@ -312,7 +139,7 @@ export const LocalDatasetClient = createUsableServiceClient(
         }> => {
           const logger = config.logger.appendName("startCsvImport");
           const { datasetId, workspaceId, userId, file, parseOptions } = params;
-          logger.log("Starting CSV import (Phase A)", {
+          logger.log("Starting CSV import (sniff phase)", {
             datasetId,
             size: file.size,
           });
@@ -341,11 +168,12 @@ export const LocalDatasetClient = createUsableServiceClient(
             parseOptions: { type: "csv", ...parseOptions },
           });
 
-          // Kick off Phase B. We deliberately don't await — Phase A
-          // already returned everything the import form needs. The
-          // promise's rejection is handled inside `_runPhaseB`, so the
-          // unhandled-promise hazard doesn't apply here.
-          void _runPhaseB({
+          // Kick off the background parquet transcoding. We deliberately
+          // don't await; the sniff phase already returned everything the
+          // import form needs. The promise's rejection is handled inside
+          // `runBackgroundParquetTranscoding`, so the unhandled-promise
+          // hazard doesn't apply here.
+          void runBackgroundParquetTranscoding({
             datasetId,
             workspaceId,
             userId,
@@ -360,8 +188,8 @@ export const LocalDatasetClient = createUsableServiceClient(
         },
 
         /**
-         * Phase A for XLSX imports. Mirrors `startCsvImport` but uses a
-         * SheetJS-backed sniff worker (off-main-thread) since DuckDB
+         * The sniff phase for XLSX imports. Mirrors `startCsvImport` but
+         * uses a SheetJS-backed sniff worker (off-main-thread) since DuckDB
          * `read_xlsx` does not support partial / streaming sniffs.
          */
         startXlsxImport: async (params: {
@@ -378,7 +206,7 @@ export const LocalDatasetClient = createUsableServiceClient(
         }> => {
           const logger = config.logger.appendName("startXlsxImport");
           const { datasetId, workspaceId, userId, file, parseOptions } = params;
-          logger.log("Starting XLSX import (Phase A)", {
+          logger.log("Starting XLSX import (sniff phase)", {
             datasetId,
             size: file.size,
           });
@@ -411,7 +239,7 @@ export const LocalDatasetClient = createUsableServiceClient(
             },
           });
 
-          void _runPhaseB({
+          void runBackgroundParquetTranscoding({
             datasetId,
             workspaceId,
             userId,
@@ -430,10 +258,11 @@ export const LocalDatasetClient = createUsableServiceClient(
         },
 
         /**
-         * Resume a previously-stalled Phase B from the row's cached
-         * source bytes. Returns the load result if resume is possible;
-         * resolves with `undefined` if the source bytes were evicted /
-         * never cached (the UI should then prompt the user to re-upload).
+         * Resume a previously-stalled background parquet transcoding from
+         * the row's cached source bytes. Returns the load result if resume is
+         * possible; resolves with `undefined` if the source bytes were
+         * evicted / never cached (the UI should then prompt the user to
+         * re-upload).
          */
         resumeImport: async (params: {
           datasetId: DatasetId;
@@ -444,7 +273,7 @@ export const LocalDatasetClient = createUsableServiceClient(
             return undefined;
           }
           if (!row.sourceBytes || !row.sourceFileType || !row.parseOptions) {
-            logger.log("Cannot resume — no cached source bytes", {
+            logger.log("Cannot resume: no cached source bytes", {
               datasetId: params.datasetId,
             });
             return undefined;
@@ -464,7 +293,7 @@ export const LocalDatasetClient = createUsableServiceClient(
 
           if (row.sourceFileType === "csv") {
             const options = row.parseOptions as LocalDatasetCsvParseOptions;
-            return _runPhaseB({
+            return runBackgroundParquetTranscoding({
               datasetId: row.datasetId,
               workspaceId: row.workspaceId,
               userId: row.userId,
@@ -472,7 +301,7 @@ export const LocalDatasetClient = createUsableServiceClient(
             });
           }
           const options = row.parseOptions as LocalDatasetXlsxParseOptions;
-          return _runPhaseB({
+          return runBackgroundParquetTranscoding({
             datasetId: row.datasetId,
             workspaceId: row.workspaceId,
             userId: row.userId,

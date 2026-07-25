@@ -1,9 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
 import { Modal, Tabs } from "@ui";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
-import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
+import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
 import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
@@ -32,13 +32,10 @@ export function OpenDatasetModal({
   onOpen,
 }: Props): JSX.Element {
   const { t } = useLingui();
+  // Bumped on each modal-enter transition (see `onEntered`) to remount the
+  // Tabs indicator once the modal has laid out. Only the change matters, not
+  // the value, so there's no need to reset it on close.
   const [indicatorRemountKey, setIndicatorRemountKey] = useState(0);
-
-  useEffect(() => {
-    if (!opened) {
-      setIndicatorRemountKey(0);
-    }
-  }, [opened]);
 
   const onImportSaved = (dataset: Dataset.T) => {
     onOpen(
@@ -47,7 +44,7 @@ export function OpenDatasetModal({
         name: dataset.name,
         sourceType: dataset.sourceType,
       },
-      buildSelectAllPreviewSQL(dataset.id),
+      buildSelectAllPreviewSql(dataset.id),
     );
   };
 

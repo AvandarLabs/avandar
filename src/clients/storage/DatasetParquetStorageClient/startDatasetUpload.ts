@@ -6,7 +6,7 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import {
@@ -208,11 +208,11 @@ export async function startDatasetUpload(options: {
     return await currentUpload;
   }
 
-  // Wait for any in-flight Phase B transcode to land before pulling the
-  // parquet bytes out of IndexedDB. With the two-phase import flow the
-  // user can save the dataset (which triggers this upload) before
-  // Phase B finishes; without this guard `localDataset.parquetData`
-  // would still be the placeholder.
+  // Wait for any in-flight background parquet transcoding to land before
+  // pulling the parquet bytes out of IndexedDB. With the two-phase import
+  // flow the user can save the dataset (which triggers this upload) before
+  // the background parquet transcoding finishes; without this guard
+  // `localDataset.parquetData` would still be the placeholder.
   const importJob = ImportJobsManager.getJob(datasetId);
   if (importJob && importJob.status === "running") {
     await ImportJobsManager.waitForCompletion(datasetId);

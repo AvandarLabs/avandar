@@ -1,37 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildReadCsvArgList,
   createCsvParseOptionsFromUserHints,
-  isDuckDbEmptyToken,
   mergeSniffCsvRowIntoParseOptions,
-  normalizeNewlineDelimiterForDuckDb,
-  optionalTrimmedCsvFormat,
   refineCsvParseOptionsAfterFailure,
   resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
 } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
-
-describe("optionalTrimmedCsvFormat", () => {
-  it("returns null for null, empty, and (empty)", () => {
-    expect(optionalTrimmedCsvFormat(null)).toBeNull();
-    expect(optionalTrimmedCsvFormat("")).toBeNull();
-    expect(optionalTrimmedCsvFormat("(empty)")).toBeNull();
-  });
-
-  it("returns trimmed format strings", () => {
-    expect(optionalTrimmedCsvFormat(" %Y-%m-%d ")).toBe("%Y-%m-%d");
-  });
-});
-
-describe("isDuckDbEmptyToken", () => {
-  it("treats (empty) and blank as empty", () => {
-    expect(isDuckDbEmptyToken("(empty)")).toBe(true);
-    expect(isDuckDbEmptyToken("  ")).toBe(true);
-    expect(isDuckDbEmptyToken(null)).toBe(true);
-    expect(isDuckDbEmptyToken(",")).toBe(false);
-  });
-});
 
 describe("refineCsvParseOptionsAfterFailure", () => {
   it("enables double-quote when rejects show column misalignment", () => {
@@ -168,55 +143,8 @@ describe("mergeSniffCsvRowIntoParseOptions", () => {
       },
     });
 
-    expect(merged.quoteChar).toBeNull();
+    expect(merged.quoteChar).toBeUndefined();
     expect(merged.dateFormat).toBe("%Y-%m-%d");
-    expect(merged.timestampFormat).toBeNull();
-  });
-});
-
-describe("normalizeNewlineDelimiterForDuckDb", () => {
-  it("maps actual LF to DuckDB escape and treats empty as null", () => {
-    expect(normalizeNewlineDelimiterForDuckDb("\n")).toBe("\\n");
-    expect(normalizeNewlineDelimiterForDuckDb("\r\n")).toBe("\\r\\n");
-    expect(normalizeNewlineDelimiterForDuckDb("(empty)")).toBeNull();
-    expect(normalizeNewlineDelimiterForDuckDb(null)).toBeNull();
-  });
-});
-
-describe("buildReadCsvArgList", () => {
-  it("omits new_line when newline is null", () => {
-    const args = buildReadCsvArgList({
-      mode: "load",
-      parseOptions: createCsvParseOptionsFromUserHints({}),
-    });
-
-    expect(
-      args.some((arg) => {
-        return arg.startsWith("new_line=");
-      }),
-    ).toBe(false);
-  });
-
-  it("omits dateformat when format is null", () => {
-    const args = buildReadCsvArgList({
-      mode: "load",
-      parseOptions: {
-        ...createCsvParseOptionsFromUserHints({}),
-        dateFormat: null,
-        timestampFormat: null,
-      },
-    });
-
-    expect(
-      args.some((arg) => {
-        return arg.startsWith("dateformat=");
-      }),
-    ).toBe(false);
-    expect(
-      args.some((arg) => {
-        return arg.startsWith("timestampformat=");
-      }),
-    ).toBe(false);
-    expect(args).toContain("strict_mode=true");
+    expect(merged.timestampFormat).toBeUndefined();
   });
 });

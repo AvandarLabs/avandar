@@ -7,7 +7,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
-import { OfflineGated } from "@/components/offline/OfflineGated";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppConfig } from "@/config/AppConfig";
 import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import {
@@ -103,17 +103,17 @@ type ValidationField = (typeof VALIDATION_FIELD_ORDER)[number];
 function useErrorMessageForField(): (
   field: ValidationField,
   value: string,
-) => string | null {
+) => string | undefined {
   const { t } = useLingui();
   return (field, value) => {
     if (field === "name") {
       return value.length < maxDatasetNameLength ?
-          null
+          undefined
         : t`Dataset name must be under ${maxDatasetNameLength} characters (current: ${value.length}).`;
     }
 
     return value.length < maxDatasetDescriptionLength ?
-        null
+        undefined
       : t`Description must be under ${maxDatasetDescriptionLength} characters (current: ${value.length}).`;
   };
 }
@@ -411,7 +411,7 @@ export function DatasetImportForm({
           </Callout>
         : null}
 
-        <OfflineGated isBlocked={offline.isBlocked}>
+        <OfflineGated>
           <Button
             loading={isSavePending}
             type="submit"

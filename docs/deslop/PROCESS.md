@@ -165,6 +165,37 @@ Two sub-cases:
    `feat/ict4d-demo`, not add to it) and only happens when blocked
    on a real user need.
 
+### A refactor branch merges into `develop` (the cleanup merge-back)
+
+Every migration — and especially a whole `GROUP-N` — lands on
+`develop` as a *clean re-implementation* of feat's features: files
+split and moved, formatting normalized, variables renamed, import
+paths repointed. The moment it merges, `develop` holds a tidier copy
+of those exact files than `feat/ict4d-demo` still does. Left alone,
+that gap is pure cosmetic drift, and it compounds: the next
+`git diff origin/develop..origin/feat/ict4d-demo` over those paths is
+dominated by rename/format noise, which makes `/deslop update` and the
+**next** group refactor much harder to read.
+
+So, right after a refactor branch merges, the operator runs
+**`/deslop mergeback <group-or-refactor-branch>`**. It forward-ports
+only the *cleanup* into `feat/ict4d-demo` via a path-scoped 3-way merge
+(base = the refactor's base `develop` SHA, ours = `feat`, theirs =
+`develop`), using `git merge-file --theirs` so feat-only features
+survive while develop's tidier version wins wherever the two overlap.
+Files where `feat` is genuinely ahead of `develop`, and renames
+entangled with not-yet-migrated features (e.g. an analytics-client
+rename wired into feat-only dashboards), are deliberately **excluded**
+and deferred to that feature's own migration. `pnpm type-check` plus
+the affected tests are the gate. The full mechanical procedure lives in
+`.claude/skills/deslop/SKILL.md` under `/deslop mergeback`.
+
+This is the reverse of a migration and one of the few operations that
+legitimately writes **source** on `feat/ict4d-demo`. It never commits
+without operator sign-off and never pushes to `develop`. Its whole
+purpose is to keep the two branches converging so Phase 3 cutover is a
+formality rather than a reconciliation.
+
 ### `feat/ict4d-demo` gets a new feature that isn't on `develop`
 
 This happens when an emergency hotfix lands on the production branch

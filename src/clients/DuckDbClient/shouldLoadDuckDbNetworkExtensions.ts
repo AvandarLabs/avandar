@@ -10,11 +10,7 @@ export function shouldLoadDuckDbNetworkExtensions(options: {
    */
   hasPthreadWorker: boolean;
 }): boolean {
-  if (options.isDisableDuckDbSpatialFlagEnabled) {
-    return false;
-  }
-  if (options.hasPthreadWorker) {
-    return false;
-  }
-  return true;
+  return !(
+    options.isDisableDuckDbSpatialFlagEnabled || options.hasPthreadWorker
+  );
 }

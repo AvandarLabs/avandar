@@ -2,7 +2,7 @@ import {
   DEFAULT_CSV_ESCAPE_CHAR,
   DEFAULT_CSV_QUOTE_CHAR,
 } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
-import { normalizeDuckDbCsvOptionToken } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
+import { normalizeDuckDbCsvOptionToken } from "@/clients/DuckDbClient/csvParse/duckDbCsvTokens";
 
 /** Bytes read from each probe offset when sniff did not detect a quote char. */
 export const CSV_QUOTE_PROBE_CHUNK_SIZE = 65_536;
@@ -10,7 +10,8 @@ export const CSV_QUOTE_PROBE_CHUNK_SIZE = 65_536;
 /**
  * File offsets (by size fraction) checked for `"` when the sniff sample only
  * covered unquoted rows. Late-quoted fields (e.g. `LONG_global_deaths.csv`)
- * otherwise keep `quoteChar` null and Phase B loads an empty table in wasm.
+ * otherwise keep `quoteChar` null and the background parquet transcoding
+ * loads an empty table in wasm.
  */
 export const CSV_QUOTE_PROBE_OFFSET_FRACTIONS = [0, 0.25, 0.5, 0.75] as const;
 
@@ -20,7 +21,7 @@ export const CSV_QUOTE_PROBE_OFFSET_FRACTIONS = [0, 0.25, 0.5, 0.75] as const;
 export function inferQuoteCharFromSniffAndProbeTexts(options: {
   sniffQuoteToken: string | null | undefined;
   probeTexts: readonly string[];
-}): string | null {
+}): string | undefined {
   const quoteFromSniff = normalizeDuckDbCsvOptionToken(options.sniffQuoteToken);
   if (quoteFromSniff != null) {
     return quoteFromSniff;
@@ -32,7 +33,7 @@ export function inferQuoteCharFromSniffAndProbeTexts(options: {
     }
   }
 
-  return null;
+  return undefined;
 }
 
 async function _blobSliceToUtf8Text(blob: Blob): Promise<string> {
@@ -62,13 +63,14 @@ async function _readCsvQuoteProbeTexts(file: File): Promise<string[]> {
 }
 
 /**
- * Enables RFC quoting when DuckDB `sniff_csv` reports `(empty)` but the file
- * contains double quotes outside the sniff window.
+ * Enables standard double-quote CSV quoting (RFC 4180: fields wrapped in `"`,
+ * with an embedded `"` escaped by doubling it) when DuckDB `sniff_csv` reports
+ * `(empty)` but the file contains double quotes outside the sniff window.
  */
 export async function inferQuoteCharWhenSniffReportsEmpty(options: {
   file: File;
   sniffQuoteToken: string | null | undefined;
-}): Promise<string | null> {
+}): Promise<string | undefined> {
   const probeTexts = await _readCsvQuoteProbeTexts(options.file);
   return inferQuoteCharFromSniffAndProbeTexts({
     sniffQuoteToken: options.sniffQuoteToken,
@@ -82,8 +84,8 @@ export async function inferQuoteCharWhenSniffReportsEmpty(options: {
  */
 export async function applyQuoteProbeToParseOptions<
   T extends {
-    quoteChar: string | null;
-    escapeChar: string | null;
+    quoteChar: string | undefined;
+    escapeChar: string | undefined;
   },
 >(options: {
   file: File;

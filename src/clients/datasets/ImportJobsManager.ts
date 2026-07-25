@@ -2,19 +2,21 @@ import { useSyncExternalStore } from "react";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
- * In-memory registry of in-flight CSV / XLSX import Phase B jobs (the
- * `read_csv` / `read_xlsx` → parquet transcode). It serves three jobs:
+ * In-memory registry of in-flight CSV / XLSX background parquet transcoding
+ * jobs (the `read_csv` / `read_xlsx` → parquet conversion that runs after the
+ * sniff phase). It serves three jobs:
  *
  *   1. Drives the dataset-status UI (spinners, "approx X minutes remaining"
- *      tooltips) while a transcode is running.
+ *      tooltips) while the background parquet transcoding is running.
  *   2. Lets the `beforeunload` guard ask "is any job still active?" without
  *      reaching into IndexedDB on every tab-close attempt.
- *   3. Gives callers a promise that resolves once a given dataset's Phase B
- *      finishes, so cross-cutting work like the Supabase parquet upload
- *      can wait for the local transcode to land without polling.
+ *   3. Gives callers a promise that resolves once a given dataset's background
+ *      parquet transcoding finishes, so cross-cutting work like the Supabase
+ *      parquet upload can wait for it to land without polling.
  *
- * The store lives at module scope on purpose: Phase B runs in async code
- * paths that aren't necessarily inside a React tree, and other modules
+ * The store lives at module scope on purpose: the background parquet
+ * transcoding runs in async code paths that aren't necessarily inside a
+ * React tree, and other modules
  * (e.g. `startDatasetUpload`, `useSyncLocalDatasets`) need to read /
  * mutate it.
  */
@@ -30,7 +32,10 @@ export type ImportJob = {
    */
   sourceFileSize: number;
   status: ImportJobStatus;
-  /** Wall-clock ms when Phase B started for this dataset. */
+  /**
+   * Wall-clock ms when the background parquet transcoding started for this
+   * dataset.
+   */
   startedAt: number;
   /** Wall-clock ms when the job entered `succeeded` or `failed`. */
   finishedAt?: number;
@@ -87,9 +92,9 @@ function _getSnapshot(): ImportJobsState {
 
 export const ImportJobsManager = {
   /**
-   * Register that Phase B for `datasetId` has started. The optional fields
-   * power the ETA calculation; pass at least `sourceFileSize` so the
-   * tooltip can extrapolate.
+   * Register that the background parquet transcoding for `datasetId` has
+   * started. The optional fields power the ETA calculation; pass at least
+   * `sourceFileSize` so the tooltip can extrapolate.
    */
   startJob: (params: {
     datasetId: DatasetId;
@@ -165,7 +170,8 @@ export const ImportJobsManager = {
    * Returns a promise that resolves the next time the job for `datasetId`
    * transitions to `succeeded` or `failed`. If the job is already terminal
    * (or absent) this resolves synchronously. Used by code paths that want
-   * to await the local transcode without polling the Dexie row.
+   * to await the local background parquet transcoding without polling the
+   * Dexie row.
    */
   waitForCompletion: (datasetId: DatasetId): Promise<ImportJob | undefined> => {
     const current = _state.current.byDatasetId[datasetId];
@@ -216,15 +222,24 @@ export function useImportJob(
 }
 
 /**
- * Format a "approximately X minutes remaining" ETA string given a job's
- * `sourceFileSize` and `startedAt`. We extrapolate based on elapsed wall
- * time, which is rough but matches the file-transfer-style language the
- * UI uses. Returns undefined when there isn't yet enough signal to
- * estimate (very early in the run).
+ * Structured "time remaining" estimate. Kept as data (not a formatted
+ * string) so the display component can translate it with `t`; this module
+ * is not a React component and has no access to the Lingui hook.
  */
-export function estimateRemainingFromJob(
+export type RemainingTimeEstimate =
+  | { kind: "lessThanMinute" }
+  | { kind: "aboutMinute" }
+  | { kind: "minutes"; minutes: number };
+
+/**
+ * Estimate the remaining time for a running job from its `sourceFileSize`
+ * and `startedAt`. Extrapolates from elapsed wall time, which is rough but
+ * matches the file-transfer-style language the UI uses. Returns undefined
+ * when there isn't yet enough signal to estimate (very early in the run).
+ */
+export function estimateRemainingTimeFromJob(
   job: ImportJob | undefined,
-): string | undefined {
+): RemainingTimeEstimate | undefined {
   if (!job || job.status !== "running") {
     return undefined;
   }
@@ -234,7 +249,7 @@ export function estimateRemainingFromJob(
   }
   // Assume we're 30% of the way through after `elapsedMs` for tiny files,
   // scaling toward the "throughput from byte size" estimate for larger
-  // ones. This is intentionally fuzzy — it's a download-style estimate,
+  // ones. This is intentionally fuzzy: it's a download-style estimate,
   // not a precise progress bar.
   const assumedBytesPerSecond = Math.max(
     1_000_000, // 1 MB/s floor so tiny CSVs don't predict hours
@@ -246,11 +261,10 @@ export function estimateRemainingFromJob(
   );
   const remainingSec = remainingBytes / assumedBytesPerSecond;
   if (remainingSec < 5) {
-    return "less than a minute";
+    return { kind: "lessThanMinute" };
   }
   if (remainingSec < 90) {
-    return "about a minute";
+    return { kind: "aboutMinute" };
   }
-  const minutes = Math.round(remainingSec / 60);
-  return `about ${minutes} minutes`;
+  return { kind: "minutes", minutes: Math.round(remainingSec / 60) };
 }

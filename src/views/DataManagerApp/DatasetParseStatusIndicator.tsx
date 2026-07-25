@@ -3,10 +3,10 @@ import { Loader, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import {
-  estimateRemainingFromJob,
+  estimateRemainingTimeFromJob,
   useImportJob,
 } from "@/clients/datasets/ImportJobsManager";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
@@ -14,15 +14,16 @@ type Props = {
 };
 
 /**
- * Inline badge surfaced next to a dataset's name while its parquet
- * transcode (Phase B) is in flight. Renders nothing once the dataset is
+ * Inline badge surfaced next to a dataset's name while its background
+ * parquet transcoding is in flight. Renders nothing once the dataset is
  * ready.
  *
  * Three visual states:
  *   - active job in `ImportJobsManager` → spinner + ETA tooltip
  *   - LocalDataset row says `parsing` but no active job → "Waiting to
  *     resume" spinner (likely a tab that just reopened and is about to
- *     redrive Phase B from the cached source bytes).
+ *     redrive the background parquet transcoding from the cached source
+ *     bytes).
  *   - LocalDataset row says `failed` → warning icon + reason tooltip.
  */
 export function DatasetParseStatusIndicator({
@@ -32,11 +33,18 @@ export function DatasetParseStatusIndicator({
   const activeJob = useImportJob(datasetId);
   const [localDataset] = LocalDatasetClient.useGetById({ id: datasetId });
 
-  // Live in-flight transcode.
+  // Live in-flight background parquet transcoding.
   if (activeJob?.status === "running") {
-    const eta = estimateRemainingFromJob(activeJob);
+    const eta = estimateRemainingTimeFromJob(activeJob);
+    const remainingLabel =
+      eta === undefined ? undefined
+      : eta.kind === "lessThanMinute" ? t`less than a minute`
+      : eta.kind === "aboutMinute" ? t`about a minute`
+      : t`about ${eta.minutes} minutes`;
     const tooltipLabel =
-      eta ? t`Processing — ${eta} remaining` : t`Processing dataset…`;
+      remainingLabel ?
+        t`Processing, ${remainingLabel} remaining`
+      : t`Processing dataset…`;
     return (
       <Tooltip label={tooltipLabel}>
         <Loader size="xs" />

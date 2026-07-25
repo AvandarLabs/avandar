@@ -7,6 +7,7 @@ import {
   objectKeys,
   objectValuesMap,
   prop,
+  quoteSqlIdentifier,
 } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
@@ -16,23 +17,29 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import {
-  applyQuoteProbeToParseOptions,
-  buildDuckDbCsvSniffResultFromRejectScan,
-  buildDuckDbCsvSniffResultFromResolved,
-  buildDuckDbCsvSniffResultFromSniffRow,
-  buildReadCsvArgList,
-  buildSniffCsvConstraintArgs,
-  createCsvParseOptionsFromUserHints,
   CSV_SNIFF_SAMPLE_SIZE,
   DEFAULT_CSV_ESCAPE_CHAR,
   DEFAULT_CSV_QUOTE_CHAR,
-  isRecoverableCsvParseError,
   MAX_CSV_PARSE_ATTEMPTS,
+} from "@/clients/DuckDbClient/csvParse/csvParse.constants";
+import { isRecoverableCsvParseError } from "@/clients/DuckDbClient/csvParse/csvParseError";
+import {
+  createCsvParseOptionsFromUserHints,
   mergeSniffCsvRowIntoParseOptions,
   refineCsvParseOptionsAfterFailure,
   resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
-} from "@/clients/DuckDbClient/csvParse";
+} from "@/clients/DuckDbClient/csvParse/csvParseOptions";
+import { applyQuoteProbeToParseOptions } from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
+import {
+  buildReadCsvArgList,
+  buildSniffCsvConstraintArgs,
+} from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
+import {
+  buildDuckDbCsvSniffResultFromRejectScan,
+  buildDuckDbCsvSniffResultFromResolved,
+  buildDuckDbCsvSniffResultFromSniffRow,
+} from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
 import {
   DuckDbColumnSchema,
   DuckDbCsvSniffResult,
@@ -52,7 +59,7 @@ import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
 import type {
   CsvParseUserHints,
   DuckDbSniffCsvRow,
-} from "@/clients/DuckDbClient/csvParse";
+} from "@/clients/DuckDbClient/csvParse/csvParse.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 const sql = knex({
@@ -62,10 +69,6 @@ const sql = knex({
   },
   useNullAsDefault: true,
 });
-
-function _quoteSQLIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, '""')}"`;
-}
 
 function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
@@ -354,7 +357,7 @@ class DuckDbClientImpl {
 
     // Spatial / excel are fetched from `extensions.duckdb.org` on each fresh
     // AsyncDuckDB init (DuckDb-WASM does not persist extensions across page
-    // loads). When offline, both fetches throw — we let init succeed without
+    // loads). When offline, both fetches throw; we let init succeed without
     // them so the bulk of the app (parquet queries) still works. Geo or
     // .xlsx flows hit a runtime "unknown function/format" error instead of
     // breaking the whole client.
@@ -679,11 +682,12 @@ class DuckDbClientImpl {
 
   /**
    * Fast-path CSV inspection that returns the auto-detected dialect, the
-   * inferred column schema, and the first N rows — without transcoding
-   * the file to parquet. Used by Phase A of the async import flow so the
-   * import form can render its preview within hundreds of milliseconds
-   * regardless of the source CSV's size; Phase B (the full parquet
-   * transcode via `loadCsv`) runs separately in the background.
+   * inferred column schema, and the first N rows, without transcoding
+   * the file to parquet. Used by the sniff phase of the async import flow
+   * so the import form can render its preview within hundreds of
+   * milliseconds regardless of the source CSV's size; the full parquet
+   * transcode via `loadCsv` runs separately as the background parquet
+   * transcoding.
    *
    * Bytes read on disk are bounded by DuckDB's CSV sniff sample (a few
    * scan-buffer chunks) plus the LIMIT N read for the preview, so this
@@ -1498,7 +1502,7 @@ SET enable_external_file_cache = true;
     const adjustedFieldNames =
       castTimestampsToISO ?
         columnNamesWithoutAggregations.map((colName) => {
-          const quotedColName = _quoteSQLIdentifier(colName);
+          const quotedColName = quoteSqlIdentifier(colName);
           return timestampColumnNames.includes(colName) ?
               sql.raw(
                 `strftime(${quotedColName}::TIMESTAMP, ` +
@@ -1508,21 +1512,21 @@ SET enable_external_file_cache = true;
             : sql.raw(quotedColName);
         })
       : columnNamesWithoutAggregations.map((colName) => {
-          return sql.raw(_quoteSQLIdentifier(colName));
+          return sql.raw(quoteSqlIdentifier(colName));
         });
 
     let query = sql.select(...adjustedFieldNames).from(tableName);
     if (groupByColumnNames.length > 0) {
       const groupByClause = groupByColumnNames
         .map((colName) => {
-          return _quoteSQLIdentifier(colName);
+          return quoteSqlIdentifier(colName);
         })
         .join(", ");
       query = query.groupByRaw(groupByClause);
     }
 
     if (orderByColumnName && orderByDirection) {
-      const quotedOrderByColumn = _quoteSQLIdentifier(orderByColumnName);
+      const quotedOrderByColumn = quoteSqlIdentifier(orderByColumnName);
       query = query.orderByRaw(`${quotedOrderByColumn} ${orderByDirection}`);
     }
 
@@ -1531,8 +1535,8 @@ SET enable_external_file_cache = true;
       (newQuery, [columnName, aggType]) => {
         const aggregationColumnName =
           DuckDBQueryAggregations.getAggregationColumnName(aggType, columnName);
-        const quotedColumnName = _quoteSQLIdentifier(columnName);
-        const quotedAggregationColumnName = _quoteSQLIdentifier(
+        const quotedColumnName = quoteSqlIdentifier(columnName);
+        const quotedAggregationColumnName = quoteSqlIdentifier(
           aggregationColumnName,
         );
 

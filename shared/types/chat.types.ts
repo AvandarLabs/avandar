@@ -86,13 +86,13 @@ export type ChatGeneratedDashboardBlock =
  * The shape of a clarification request the LLM may emit instead of, or
  * before, generating SQL. See
  * `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
- * Phase 1 for the design.
+ * for the design.
  */
 export type ChatClarifyResponseShape =
   | { kind: "free_text"; placeholder?: string }
   | { kind: "fixed_options"; options: string[]; multi: boolean }
   /**
-   * Phase 2 — Discovery clarifications. The LLM emits a DuckDB SELECT
+   * Discovery clarifications. The LLM emits a DuckDB SELECT
    * (typically a `SELECT DISTINCT col FROM ...`) whose result populates a
    * dropdown in the follow-up question. The query is run client-side in
    * DuckDB-WASM; its result is NOT rendered on the canvas. The user's
@@ -117,9 +117,9 @@ export type ChatClarifyRequest = {
 };
 
 /**
- * Phase 3 — Plans + DAG. A single step in a multi-step analytic plan
- * proposed by the LLM. The frontend stores these in the plan state
- * manager and renders them as nodes in an xyflow DAG.
+ * A single step in a multi-step analytic plan proposed by the LLM. The
+ * frontend stores these in the plan state manager and renders them as
+ * nodes in an xyflow DAG.
  */
 export type ChatPlanStep = {
   /** Stable id the LLM uses to reference this step from `inputs`. */
@@ -127,8 +127,8 @@ export type ChatPlanStep = {
   /** One-sentence description for the DAG node label. */
   description: string;
   /**
-   * Execution engine for this step. v1 of Phase 3 ships `sql` and
-   * `clarification` only; `python` and `r` are reserved for Phase 6.
+   * Execution engine for this step. Only `sql` and `clarification` are
+   * currently implemented; `python` and `r` are reserved for future use.
    */
   type: "sql" | "python" | "r" | "clarification";
   /** SQL or code for the step. */
@@ -137,7 +137,7 @@ export type ChatPlanStep = {
   inputs: string[];
   /**
    * The LLM's prediction of the output schema. Used to detect schema
-   * drift (Phase 4) and to pre-pick a default viz.
+   * drift (see `SchemaDriftReport`) and to pre-pick a default viz.
    */
   predictedSchema: Array<{ name: string; type: string }>;
   /** Default visualization for the step's output. */
@@ -171,7 +171,7 @@ export type ChatRetryContext = {
 };
 
 /**
- * Phase 4 — Schema-Drift Regen. After a plan step executes, the
+ * Schema-drift regeneration. After a plan step executes, the
  * frontend diffs `actualSchema` against the LLM's `predictedSchema`.
  * If they differ, the frontend asks the model to regenerate the
  * affected downstream steps via this request shape.
@@ -186,7 +186,7 @@ export type SchemaDriftReport = {
   affectedStepIds: string[];
   /**
    * The current plan in full so the LLM can see the surrounding
-   * context — what each step does and how steps reference each other.
+   * context: what each step does and how steps reference each other.
    */
   plan: ChatPlan;
 };
@@ -237,7 +237,7 @@ export type ChatSessionSecretResponse = {
  */
 export type ConsentAck = {
   ackToken: string;
-  /** What the token covers — used by the backend to look up the payload. */
+  /** What the token covers: used by the backend to look up the payload. */
   scope:
     | { kind: "message_index"; index: number }
     | { kind: "values"; sourceColumn?: string };

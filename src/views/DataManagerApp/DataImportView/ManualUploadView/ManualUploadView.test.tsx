@@ -89,7 +89,7 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/datasets/LocalDatasetClient", () => {
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
       startCsvImport: startCsvImportMock,

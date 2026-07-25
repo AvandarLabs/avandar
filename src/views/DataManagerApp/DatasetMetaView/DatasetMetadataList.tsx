@@ -6,7 +6,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";

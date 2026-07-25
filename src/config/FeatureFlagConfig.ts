@@ -63,7 +63,7 @@ export enum FeatureFlag {
    * is restricted (sandboxed dev containers, offline demos) the fetch
    * stalls DuckDB initialization. This flag skips the `LOAD spatial;`
    * call so the rest of the database boots and CSV / XLSX / Parquet
-   * paths keep working — at the cost of any geo queries that rely on
+   * paths keep working, at the cost of any geo queries that rely on
    * spatial functions.
    */
   DisableDuckDbSpatial = "disable-duckdb-spatial",

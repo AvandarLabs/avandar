@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 
 /**
- * Attach a `beforeunload` handler whenever at least one Phase B import
- * job is in flight, and remove it once the registry empties. The browser
+ * Attach a `beforeunload` handler whenever at least one background parquet
+ * transcoding job is in flight, and remove it once the registry empties.
+ * The browser
  * forces the standard "Are you sure you want to leave?" prompt (no
  * custom text), so we just call `preventDefault()` and set
  * `returnValue`.
@@ -11,7 +12,7 @@ import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
  * Mount this once at the root of the app (inside the workspace shell).
  */
 export function useImportJobsBeforeUnloadGuard(): void {
-  useEffect(() => {
+  useEffect(function registerBeforeUnloadGuard() {
     const handler = (event: BeforeUnloadEvent) => {
       if (!ImportJobsManager.hasActiveJob()) {
         return;

@@ -15,7 +15,12 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 export type OpenDatasetInfo = {
   datasetId: DatasetId;
   name: string;
-  sourceType: DatasetSource.SourceType;
+  /**
+   * Source type of the open dataset. Optional because the legacy URL-hydration
+   * path reconstructs `openDataset` from query params that don't carry it; the
+   * dataset drawer always sets it when opening from the Saved list.
+   */
+  sourceType?: DatasetSource.SourceType;
   virtualDatasetId?: VirtualDatasetId;
 };
 

@@ -4,7 +4,7 @@ import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
@@ -155,9 +155,9 @@ export const DatasetClient = createUsableServiceClient(
           columns: DatasetColumnInput[];
           rawSQL: string;
           /**
-           * Phase 3 — if the dataset was produced by a multi-step
-           * analytic plan, the plan as JSON. Persisted onto the
-           * virtual dataset so reopening it restores the canvas.
+           * If the dataset was produced by a multi-step analytic plan,
+           * the plan as JSON. Persisted onto the virtual dataset so
+           * reopening it restores the canvas.
            */
           planSteps?: ChatPlan | null;
         }): Promise<Dataset.T> => {

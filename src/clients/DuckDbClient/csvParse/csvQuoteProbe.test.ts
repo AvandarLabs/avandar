@@ -31,13 +31,13 @@ describe("inferQuoteCharFromSniffAndProbeTexts", () => {
     ).toBe('"');
   });
 
-  it("returns null when probes contain no double quotes", () => {
+  it("returns undefined when probes contain no double quotes", () => {
     expect(
       inferQuoteCharFromSniffAndProbeTexts({
         sniffQuoteToken: "(empty)",
         probeTexts: ["a,b,c\n1,2,3\n"],
       }),
-    ).toBeNull();
+    ).toBeUndefined();
   });
 });
 
