@@ -1,9 +1,8 @@
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { useMemo } from "react";
+import { Stack } from "@mantine/core";
+import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
@@ -11,63 +10,24 @@ type Props = {
   onConfigChange: (newConfig: ScatterPlotVizConfig) => void;
 };
 
+/**
+ * Settings form for the multi-series scatter plot. Delegates series
+ * management to `PairSeriesFieldset`.
+ */
 export function ScatterChartForm({
   fields,
   config,
   onConfigChange,
 }: Props): JSX.Element {
-  const numericFields = useMemo(() => {
-    return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
-  }, [fields]);
-
-  const numericOptions = useMemo(() => {
-    return makeSelectOptions(numericFields, {
-      valueKey: "name",
-      labelKey: "name",
-    });
-  }, [numericFields]);
-
-  const { xAxisKey, yAxisKey } = config;
-
   return (
-    <>
-      <Select
-        allowDeselect
-        data={numericOptions}
-        label="X Axis (numeric)"
-        value={xAxisKey}
-        disabled={numericOptions.length === 0}
-        placeholder={
-          numericOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
-        }
-        onChange={(field) => {
-          return onConfigChange({
-            ...config,
-            xAxisKey: field ?? undefined,
-          });
+    <Stack gap="sm">
+      <PairSeriesFieldset
+        fields={fields}
+        series={config.series}
+        onChange={(next: ScatterSeries[]) => {
+          onConfigChange({ ...config, series: next });
         }}
       />
-
-      <Select
-        allowDeselect
-        data={numericOptions}
-        label="Y Axis (numeric)"
-        value={yAxisKey}
-        disabled={numericOptions.length === 0}
-        placeholder={
-          numericOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
-        }
-        onChange={(field) => {
-          return onConfigChange({
-            ...config,
-            yAxisKey: field ?? undefined,
-          });
-        }}
-      />
-    </>
+    </Stack>
   );
 }

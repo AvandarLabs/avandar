@@ -416,6 +416,8 @@ export function getDashboardPuckConfig(options: {
         schemaVersion: CURRENT_SCHEMA_VERSION,
         author: "",
         containerMaxWidth: { unit: "%", value: 100 },
+        theme: "default",
+        typography: "system",
         horizontalPadding: "md",
         isAuthorHidden: false,
         isPublishedAtHidden: false,

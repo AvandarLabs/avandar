@@ -1,0 +1,91 @@
+/**
+ * Global animation presets (see AnimationTheme.preset).
+ * Apply class names from ANIMATION_PRESET and set --ava-animate-origin-x/y
+ * for ooze-in when growing from a trigger element.
+ */
+
+.ava-animate-active {
+  overflow: hidden;
+  will-change: transform, opacity, border-radius;
+}
+
+.ava-animate-ooze-in {
+  animation: ava-animate-ooze-in var(--ava-animation-duration-ooze-in)
+    var(--ava-animation-easing-spring) forwards;
+  transform-origin: var(--ava-animate-origin-x, 50%)
+    var(--ava-animate-origin-y, 0%);
+}
+
+.ava-animate-swipe-out {
+  animation: ava-animate-swipe-out var(--ava-animation-duration-swipe-out)
+    var(--ava-animation-easing-swipe-out) forwards;
+}
+
+@keyframes ava-animate-ooze-in {
+  0% {
+    border-radius: 999px;
+    opacity: 0;
+    transform: scaleX(0.62) scaleY(0.84) rotate(-1.2deg);
+  }
+
+  52% {
+    border-radius: var(--mantine-radius-lg);
+    opacity: 1;
+    transform: scaleX(1.04) scaleY(1.06) rotate(0.35deg);
+  }
+
+  80% {
+    border-radius: var(--mantine-radius-md);
+    transform: scaleX(0.98) scaleY(0.97) rotate(-0.08deg);
+  }
+
+  100% {
+    border-radius: var(--mantine-radius-md);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ava-animate-swipe-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(var(--ava-animate-swipe-translate-y));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ava-animate-ooze-in {
+    animation: ava-animate-ooze-in-reduced var(--ava-animation-duration-reduced)
+      ease forwards;
+  }
+
+  .ava-animate-swipe-out {
+    animation: ava-animate-swipe-out-reduced
+      var(--ava-animation-duration-reduced) ease forwards;
+  }
+
+  @keyframes ava-animate-ooze-in-reduced {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes ava-animate-swipe-out-reduced {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+}

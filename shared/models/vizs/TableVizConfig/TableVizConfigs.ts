@@ -1,3 +1,4 @@
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -18,22 +19,16 @@ import type {
 export const TableVizConfigs = {
   vizType: "table",
   displayName: "Table",
+  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
 
-  /** Create an empty table config */
   makeEmptyConfig: (): TableVizConfig => {
     return { vizType: "table" };
   },
 
-  /**
-   * Hydrate a table viz config from a query config.
-   */
   hydrateFromQuery: (vizConfig: TableVizConfig): TableVizConfig => {
     return vizConfig;
   },
 
-  /**
-   * Table viz has no axis keys to hydrate from query results.
-   */
   hydrateFromQueryResult: (
     vizConfig: TableVizConfig,
     _columns: readonly QueryResultColumn[],
@@ -41,58 +36,66 @@ export const TableVizConfigs = {
     return vizConfig;
   },
 
-  /**
-   * Convert a table config to a new type.
-   */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: TableVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const emptyXY = { xAxisKey: undefined, yAxisKey: undefined };
-    const emptyPie = { nameKey: undefined, valueKey: undefined };
     return match<VizType>(newVizType)
       .with("table", (): TableVizConfig => {
         return vizConfig;
       })
       .with("bar", (vizType): BarChartVizConfig => {
-        return { vizType, ...emptyXY, withLegend: true };
+        return {
+          vizType,
+          xAxisKey: undefined,
+          series: [],
+          layout: "group",
+          withLegend: true,
+        };
       })
       .with("line", (vizType): LineChartVizConfig => {
         return {
           vizType,
-          ...emptyXY,
+          xAxisKey: undefined,
+          series: [],
           withLegend: true,
-          curveType: "monotone",
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
         return {
           vizType,
-          ...emptyXY,
+          xAxisKey: undefined,
+          series: [],
+          layout: "default",
           withLegend: true,
-          curveType: "monotone",
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, ...emptyXY };
+        return { vizType, series: [] };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
           vizType,
-          ...emptyPie,
+          nameKey: undefined,
+          valueKey: undefined,
           isDonut: false,
           withLabels: true,
           labelsType: "value",
         };
       })
       .with("funnel", (vizType): FunnelChartVizConfig => {
-        return { vizType, ...emptyPie };
+        return { vizType, nameKey: undefined, valueKey: undefined };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        return { vizType, ...emptyPie };
+        return {
+          vizType,
+          nameKey: undefined,
+          series: [],
+          withLegend: true,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, ...emptyXY, sizeKey: undefined };
+        return { vizType, series: [] };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

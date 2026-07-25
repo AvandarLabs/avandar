@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { render, screen } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
@@ -143,7 +143,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "bar", key: "value" }],
+        layout: "group",
         withLegend: true,
       },
     });
@@ -161,9 +162,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "line",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "line", key: "value", curveType: "monotone" }],
         withLegend: false,
-        curveType: "monotone",
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -180,9 +180,9 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "area",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "area", key: "value", curveType: "linear" }],
+        layout: "default",
         withLegend: true,
-        curveType: "linear",
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -198,8 +198,7 @@ describe("DataVizPBlock", () => {
       vizType: "scatter",
       vizConfig: {
         vizType: "scatter",
-        xAxisKey: "value",
-        yAxisKey: "score",
+        series: [{ xKey: "value", key: "score" }],
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -253,7 +252,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "radar",
         nameKey: "category",
-        valueKey: "value",
+        series: [{ key: "value" }],
+        withLegend: true,
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -269,9 +269,7 @@ describe("DataVizPBlock", () => {
       vizType: "bubble",
       vizConfig: {
         vizType: "bubble",
-        xAxisKey: "value",
-        yAxisKey: "score",
-        sizeKey: "value",
+        series: [{ xKey: "value", key: "score", sizeKey: "value" }],
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(

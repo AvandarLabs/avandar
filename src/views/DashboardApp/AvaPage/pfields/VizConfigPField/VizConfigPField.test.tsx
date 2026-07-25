@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { render, screen } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
@@ -14,18 +14,20 @@ const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000002" as DashboardId;
 
 vi.mock("@puckeditor/core", () => {
   return {
-    usePuck: () => {
-      return {
-        selectedItem: {
-          props: {
-            id: "viz-block",
-            nlQuery: {
-              prompt: "find data",
-              rawSql: "SELECT * FROM foo",
-              generations: [],
+    createUsePuck: () => {
+      return (selector: (state: unknown) => unknown) => {
+        return selector({
+          selectedItem: {
+            props: {
+              id: "viz-block",
+              nlQuery: {
+                prompt: "find data",
+                rawSql: "SELECT * FROM foo",
+                generations: [],
+              },
             },
           },
-        },
+        });
       };
     },
   };
@@ -87,15 +89,13 @@ describe("VizConfigPField", () => {
       value: {
         vizType: "bar",
         xAxisKey: undefined,
-        yAxisKey: undefined,
+        series: [],
+        layout: "group",
         withLegend: true,
       },
     });
     expect(
-      screen.getByRole("combobox", { name: /X Axis/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("combobox", { name: /Y Axis/i }),
+      screen.getByRole("combobox", { name: /X axis/i }),
     ).toBeInTheDocument();
   });
 
@@ -104,15 +104,17 @@ describe("VizConfigPField", () => {
       value: {
         vizType: "bar",
         xAxisKey: undefined,
-        yAxisKey: undefined,
+        series: [],
+        layout: "group",
         withLegend: true,
       },
     });
-    pickMantineSelectOption(/X Axis/i, "category");
+    pickMantineSelectOption(/X axis/i, "category");
     expect(onChange).toHaveBeenCalledWith({
       vizType: "bar",
       xAxisKey: "category",
-      yAxisKey: undefined,
+      series: [],
+      layout: "group",
       withLegend: true,
     });
   });

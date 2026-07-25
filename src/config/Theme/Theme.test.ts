@@ -1,15 +1,21 @@
 import { defaultVariantColorsResolver } from "@mantine/core";
 import { describe, expect, it } from "vitest";
 import {
+  APP_CHROME_Z_INDEX,
   APP_SHELL_MAIN_Z_INDEX,
   MODAL_ROOT_Z_INDEX,
+  NOTIFICATIONS_Z_INDEX,
+  POPOVER_Z_INDEX,
   Theme,
 } from "@/config/Theme";
 import { NEUTRAL_SHADES } from "../../../shared/config/Theme";
 
 describe("Theme modal stacking", () => {
-  it("keeps modal layer above AppShell main z-index", () => {
-    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
+  it("orders app shell → chrome → modal → popover → notifications", () => {
+    expect(APP_CHROME_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
+    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_CHROME_Z_INDEX);
+    expect(POPOVER_Z_INDEX).toBeGreaterThan(MODAL_ROOT_Z_INDEX);
+    expect(NOTIFICATIONS_Z_INDEX).toBeGreaterThan(POPOVER_Z_INDEX);
   });
 
   it("registers Modal defaults on the theme", () => {
@@ -20,13 +26,25 @@ describe("Theme modal stacking", () => {
     }
     expect(modal.defaultProps?.zIndex).toBe(MODAL_ROOT_Z_INDEX);
   });
+
+  it("exposes the chrome tier on theme.other.zIndex", () => {
+    expect(Theme.other.zIndex.appChrome).toBe(APP_CHROME_Z_INDEX);
+    expect(Theme.other.zIndex.modal).toBe(MODAL_ROOT_Z_INDEX);
+  });
 });
 
 describe("Theme design tokens", () => {
   it("registers interactive transitions on primary components", () => {
     expect(Theme.components?.Button).toBeDefined();
     expect(Theme.components?.Paper?.defaultProps?.withBorder).toBe(true);
-    expect(Theme.components?.Modal?.defaultProps?.overlayProps?.blur).toBe(0);
+    expect(Theme.components?.Modal?.defaultProps?.radius).toBe("xl");
+    expect(
+      Theme.components?.Modal?.defaultProps?.overlayProps?.style
+        ?.backdropFilter,
+    ).toBe("var(--ava-overlay-backdrop-filter)");
+    expect(
+      Theme.components?.Modal?.defaultProps?.transitionProps?.duration,
+    ).toBe(380);
   });
 
   it("uses a visible palette border for outline buttons", () => {

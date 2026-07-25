@@ -1,7 +1,7 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Button,
-  Flex,
   Group,
   LoadingOverlay,
   MantineTheme,
@@ -12,57 +12,146 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import {
+  IconAdjustmentsHorizontal,
   IconChevronDown,
   IconDownload,
   IconFolderOpen,
   IconInfoCircle,
+  IconListDetails,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess, Tooltip } from "@ui";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { formatOfflineQueryError } from "@/lib/offline/formatOfflineQueryError";
+import {
+  hasDataExplorerPanelPreferencesInSessionStorage,
+  readDataExplorerPanelPreferences,
+  writeDataExplorerPanelPreferences,
+} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
-import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
+import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
+import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import { useDataExplorerUrlSync } from "./useDataExplorerUrlSync/useDataExplorerUrlSync";
-import { DataExplorerUrlState } from "./useDataExplorerUrlSync/useHydrateDataExplorerStateFromUrl";
+import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit";
+import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { ChatPlan } from "$/types/chat.types";
 
-const QUERY_FORM_WIDTH = 300;
+const QUERY_DETAILS_WIDTH = 380;
+const VISUALIZATION_SETTINGS_WIDTH = 340;
+
+/**
+ * Default stacked layout: Query Details near the top-left of the canvas
+ * with Visualization Settings below it. Both anchor to the left edge so
+ * they share the same column.
+ */
+const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
+const VISUALIZATION_SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
+
+/** Defaults applied when there is no saved per-tab preference. */
+const DEFAULT_QUERY_DETAILS_OPENED = true;
+const DEFAULT_VISUALIZATION_SETTINGS_OPENED = false;
+const AI_PANEL_SESSION_KEY = "ava.data-explorer.ai-panel-auto-opened";
+
+function _updatePanelPreferences(
+  preferences: DataExplorerPanelPreferences,
+  panel: "queryDetails" | "settings",
+  next: DataExplorerPanelPreferences["queryDetails"],
+): DataExplorerPanelPreferences {
+  return {
+    ...preferences,
+    [panel]: {
+      ...preferences[panel],
+      ...next,
+    },
+  };
+}
 
 type Props = {
-  initialUrlState: DataExplorerUrlState;
+  urlSearch: DataExplorerURLSearch;
+  navigate: (options: {
+    search: DataExplorerURLSearch;
+    replace: boolean;
+  }) => void;
 };
 
-export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
+export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
+  const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
-  const navigate = useNavigate({ from: "/$workspaceSlug/data-explorer" });
+  const [, chatPanelDispatch] = ChatPanelStateManager.useContext();
   const [
     isOpenDatasetModalOpen,
     { open: openOpenDatasetModal, close: closeOpenDatasetModal },
   ] = useDisclosure(false);
+  const [panelPreferences, setPanelPreferences] =
+    useState<DataExplorerPanelPreferences>(() => {
+      return readDataExplorerPanelPreferences();
+    });
 
-  useDataExplorerUrlSync({ initialUrlState });
+  const isQueryDetailsOpened =
+    panelPreferences.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
+  const isVisualizationSettingsOpened =
+    panelPreferences.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
+  const isQueryDetailsCollapsed =
+    panelPreferences.queryDetails?.collapsed ?? false;
+  const isVisualizationSettingsCollapsed =
+    panelPreferences.settings?.collapsed ?? false;
+
+  const setQueryDetailsOpened = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)): void => {
+      setPanelPreferences((prev) => {
+        const current =
+          prev.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
+        const resolved = typeof next === "function" ? next(current) : next;
+        return _updatePanelPreferences(prev, "queryDetails", {
+          opened: resolved,
+        });
+      });
+    },
+    [],
+  );
+
+  const setVisualizationSettingsOpened = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)): void => {
+      setPanelPreferences((prev) => {
+        const current =
+          prev.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
+        const resolved = typeof next === "function" ? next(current) : next;
+        return _updatePanelPreferences(prev, "settings", { opened: resolved });
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    writeDataExplorerPanelPreferences(panelPreferences);
+  }, [panelPreferences]);
+
+  useDataExplorerURLSync({ urlSearch, navigate });
 
   const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset saved.");
+      notifySuccess(t`Dataset saved.`);
     },
     onError: (error) => {
-      notifyError(`Failed to save dataset: ${error.message}`);
+      notifyError(t`Failed to save dataset: ${error.message}`);
     },
   });
 
@@ -71,43 +160,63 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
     onSuccess: () => {
       dispatch.setOpenDataset(undefined);
       dispatch.setRawSql(undefined);
-      notifySuccess("Dataset deleted.");
+      notifySuccess(t`Dataset deleted.`);
     },
     onError: (error) => {
-      notifyError(`Failed to delete dataset: ${error.message}`);
+      notifyError(t`Failed to delete dataset: ${error.message}`);
     },
   });
 
   const workspace = useCurrentWorkspace();
+  const applyLargeDatasetAutoLimit = useCallback(
+    (limit: number) => {
+      if (state.query.limit === limit) {
+        return;
+      }
+      dispatch.setLimit(limit);
+    },
+    [dispatch, state.query.limit],
+  );
+
+  useSyncLargeDatasetAutoLimit({
+    query: state.query,
+    rawSQL: state.rawSQL,
+    onApplyAutoLimit: applyLargeDatasetAutoLimit,
+  });
+
   const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
+    isStructuredQueryInSync: state.isStructuredQueryInSync,
     auth: "workspace",
     workspaceId: workspace.id,
   });
 
-  // Mirror useDataQuery's runtime error onto state so the chat panel can
-  // show a "Regenerate with the error" affordance when the auto-applied SQL
-  // turned out to be invalid.
-  useEffect(
-    function updateAppStateOnQueryError() {
-      const message = dataQuery.isError ? dataQuery.error.message : undefined;
-      if (message !== state.lastQueryError) {
-        dispatch.setLastQueryError(message);
-      }
-    },
-    [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
-  );
-
+  useEffect(() => {
+    const message =
+      dataQuery.isError ?
+        (formatOfflineQueryError(dataQuery.error) ??
+        (dataQuery.error instanceof Error ?
+          dataQuery.error.message
+        : String(dataQuery.error)))
+      : undefined;
+    if (message !== state.lastQueryError) {
+      dispatch.setLastQueryError(message);
+    }
+  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
   const queryResultColumns = queryResults?.columns ?? [];
-  const columnSignature =
-    queryResults ?
-      queryResults.columns
-        .map((col) => {
-          return `${col.name}:${col.dataType}`;
-        })
-        .join("|")
-    : "";
+
+  const columnSignature = useMemo(() => {
+    if (!queryResults) {
+      return "";
+    }
+
+    return queryResults.columns
+      .map((col) => {
+        return `${col.name}:${col.dataType}`;
+      })
+      .join("|");
+  }, [queryResults]);
 
   const querySyncSignature = useMemo(() => {
     return JSON.stringify({
@@ -125,242 +234,376 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
     state.query.orderByDirection,
   ]);
 
+  useEffect(() => {
+    if (isLoadingResults) {
+      return;
+    }
+
+    if (!queryResults) {
+      return;
+    }
+
+    dispatch.syncVizFromQueryResult(queryResults.columns);
+  }, [
+    isLoadingResults,
+    columnSignature,
+    querySyncSignature,
+    state.vizConfig.vizType,
+    queryResults,
+    dispatch,
+  ]);
+
+  const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
+  const visualizationSettingsPanelButtonRef = useRef<HTMLButtonElement>(null);
+  const wasFetchingRef = useRef(false);
+  /**
+   * Auto-open settings once on the first successful query when nothing is in
+   * session storage yet.
+   */
+  const hasAutoOpenedVisualizationSettingsRef = useRef(
+    hasDataExplorerPanelPreferencesInSessionStorage(),
+  );
+  useEffect(() => {
+    const justFinishedFetching =
+      wasFetchingRef.current && !dataQuery.isFetching;
+    if (
+      justFinishedFetching &&
+      dataQuery.isSuccess &&
+      !hasAutoOpenedVisualizationSettingsRef.current
+    ) {
+      setVisualizationSettingsOpened(true);
+      hasAutoOpenedVisualizationSettingsRef.current = true;
+    }
+    wasFetchingRef.current = dataQuery.isFetching;
+  }, [
+    dataQuery.isFetching,
+    dataQuery.isSuccess,
+    setVisualizationSettingsOpened,
+  ]);
+
   useEffect(
-    function syncVizWhenResultsLoad() {
-      if (!isLoadingResults && queryResults?.columns) {
-        dispatch.syncVizFromQueryResult(queryResults.columns);
+    function openChatPanelOnMount() {
+      const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
+      if (!alreadyOpened) {
+        chatPanelDispatch.open();
+        sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
       }
-      // TODO(jpsyx): verify if all these dependencies are necessary or just
-      // legacy code
     },
-    [
-      isLoadingResults,
-      columnSignature,
-      querySyncSignature,
-      state.vizConfig.vizType,
-      queryResults?.columns,
-      dispatch,
-    ],
+    [chatPanelDispatch],
   );
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
 
   return (
-    <AppLayout title="Data Explorer">
-      <Flex>
-        <Box
-          bg="neutral.0"
-          miw={QUERY_FORM_WIDTH}
-          w={QUERY_FORM_WIDTH}
-          mih="100dvh"
-          mah="100vh"
-          style={styles.queryFormContainer}
+    <AppLayout title={t`Data Explorer`}>
+      <Stack flex={1} h="100%" gap={0} mih={0}>
+        <Group
+          bg="white"
+          py="xs"
+          w="100%"
+          justify="flex-end"
+          px="md"
+          pos="relative"
+          style={styles.toolbar}
         >
-          <QueryForm />
-          <VizSettingsForm
-            columns={queryResultColumns}
-            data={queryResultData}
-            vizConfig={state.vizConfig}
-            onVizConfigChange={dispatch.setVizConfig}
-            onVizTypeChange={dispatch.setActiveVizType}
-          />
-        </Box>
-
-        <Stack flex={1} gap={0}>
-          <Group
-            bg="white"
-            py="xs"
-            w="100%"
-            justify="flex-end"
-            px="md"
-            style={styles.toolbar}
+          <Button
+            variant="subtle"
+            color="neutral"
+            leftSection={<IconRotateClockwise size={16} />}
+            size="compact-sm"
+            onClick={() => {
+              dispatch.resetState();
+              navigate({ search: EMPTY_EXPLORER_URL_SEARCH, replace: true });
+            }}
           >
-            <Button
-              variant="subtle"
-              color="neutral"
-              leftSection={<IconRotateClockwise size={16} />}
-              size="compact-sm"
-              onClick={() => {
-                dispatch.resetState();
-                navigate({ search: {}, replace: true });
-              }}
-            >
-              Reset
-            </Button>
-            <Button
-              variant="outline"
-              color="neutral"
-              leftSection={<IconFolderOpen size={16} />}
-              size="compact-sm"
-              onClick={openOpenDatasetModal}
-            >
-              Open
-            </Button>
-            <Menu shadow="md" width={240}>
-              <Menu.Target>
-                <Button
-                  variant="outline"
-                  color="neutral"
-                  size="compact-sm"
-                  rightSection={<IconChevronDown size={16} />}
-                >
-                  Save
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                {state.openDataset ?
-                  <>
-                    {state.openDataset.virtualDatasetId ?
-                      <Menu.Item
-                        disabled={!state.rawSQL || isSavingOver}
-                        onClick={() => {
-                          const virtualDatasetId =
-                            state.openDataset?.virtualDatasetId;
-                          if (!state.rawSQL || !virtualDatasetId) {
-                            return;
-                          }
-                          saveOverDataset({
-                            id: virtualDatasetId,
-                            data: { rawSQL: state.rawSQL },
-                          });
-                        }}
-                      >
-                        Save — {state.openDataset.name}
-                      </Menu.Item>
-                    : null}
+            <Trans>Reset</Trans>
+          </Button>
+          <Button
+            ref={queryPanelButtonRef}
+            variant={isQueryDetailsOpened ? "filled" : "outline"}
+            color="neutral"
+            leftSection={<IconListDetails size={16} />}
+            size="compact-sm"
+            onClick={() => {
+              setQueryDetailsOpened((prev) => {
+                return !prev;
+              });
+            }}
+          >
+            <Trans>Query</Trans>
+          </Button>
+          <Button
+            ref={visualizationSettingsPanelButtonRef}
+            variant={isVisualizationSettingsOpened ? "filled" : "outline"}
+            color="neutral"
+            leftSection={<IconAdjustmentsHorizontal size={16} />}
+            size="compact-sm"
+            onClick={() => {
+              setVisualizationSettingsOpened((prev) => {
+                return !prev;
+              });
+            }}
+          >
+            <Trans>Visualizations</Trans>
+          </Button>
+          <Button
+            variant="outline"
+            color="neutral"
+            leftSection={<IconFolderOpen size={16} />}
+            size="compact-sm"
+            onClick={openOpenDatasetModal}
+          >
+            <Trans>Open</Trans>
+          </Button>
+          <Menu shadow="md" width={240}>
+            <Menu.Target>
+              <Button
+                variant="outline"
+                color="neutral"
+                size="compact-sm"
+                rightSection={<IconChevronDown size={16} />}
+              >
+                <Trans>Save</Trans>
+              </Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {state.openDataset ?
+                <>
+                  {state.openDataset.virtualDatasetId ?
                     <Menu.Item
-                      color="red"
-                      disabled={isDeletingDataset}
+                      disabled={!state.rawSQL || isSavingOver}
                       onClick={() => {
-                        if (!state.openDataset) {
+                        const virtualDatasetId =
+                          state.openDataset?.virtualDatasetId;
+                        if (!state.rawSQL || !virtualDatasetId) {
                           return;
                         }
-                        modals.openConfirmModal({
-                          title: "Delete dataset",
-                          children: (
-                            <Text size="sm">
-                              Permanently delete{" "}
-                              <strong>{state.openDataset.name}</strong>?
-                            </Text>
-                          ),
-                          labels: {
-                            confirm: "Delete",
-                            cancel: "Cancel",
-                          },
-                          confirmProps: { color: "red" },
-                          onConfirm: () => {
-                            if (!state.openDataset) {
-                              return;
-                            }
-                            deleteDataset({
-                              id: state.openDataset.datasetId,
-                            });
-                          },
+                        saveOverDataset({
+                          id: virtualDatasetId,
+                          data: { rawSQL: state.rawSQL },
                         });
                       }}
                     >
-                      Delete — {state.openDataset.name}
+                      <Trans>Save — {state.openDataset.name}</Trans>
                     </Menu.Item>
-                    <Menu.Divider />
-                  </>
-                : null}
-                <Menu.Item
-                  disabled={
-                    queryResultData.length === 0 || state.rawSQL === undefined
+                  : null}
+                  <Menu.Item
+                    color="red"
+                    disabled={isDeletingDataset}
+                    onClick={() => {
+                      if (!state.openDataset) {
+                        return;
+                      }
+                      modals.openConfirmModal({
+                        title: t`Delete dataset`,
+                        children: (
+                          <Text size="sm">
+                            <Trans>
+                              Permanently delete{" "}
+                              <strong>{state.openDataset.name}</strong>?
+                            </Trans>
+                          </Text>
+                        ),
+                        labels: {
+                          confirm: t`Delete`,
+                          cancel: t`Cancel`,
+                        },
+                        confirmProps: { color: "red" },
+                        onConfirm: () => {
+                          if (!state.openDataset) {
+                            return;
+                          }
+                          deleteDataset({
+                            id: state.openDataset.datasetId,
+                          });
+                        },
+                      });
+                    }}
+                  >
+                    <Trans>Delete — {state.openDataset.name}</Trans>
+                  </Menu.Item>
+                  <Menu.Divider />
+                </>
+              : null}
+              <Menu.Item
+                disabled={
+                  queryResultData.length === 0 || state.rawSQL === undefined
+                }
+                rightSection={
+                  state.rawSQL === undefined ?
+                    <Tooltip label={t`Run an AI query first.`}>
+                      <IconInfoCircle size={16} />
+                    </Tooltip>
+                  : null
+                }
+                onClick={() => {
+                  if (!state.rawSQL) {
+                    return;
                   }
-                  rightSection={
-                    state.rawSQL === undefined ?
-                      <Tooltip label="Run an AI query first.">
-                        <IconInfoCircle size={16} />
-                      </Tooltip>
-                    : null
+                  // Plan-flow snapshotting is a Group 3 (chat-plan) feature.
+                  // The Data Explorer's plan panel is reconnected in G3; until
+                  // then no plan is captured on save-as-new-dataset.
+                  const planSnapshot: ChatPlan | null = null;
+                  const modalId = modals.open({
+                    title: t`Save as new dataset`,
+                    size: "xl",
+                    children: (
+                      <SaveAsNewDatasetForm
+                        queryResultData={queryResultData}
+                        columns={queryResultColumns}
+                        dateColumns={dateColumns}
+                        rawSQL={state.rawSQL}
+                        planSnapshot={planSnapshot}
+                        onSaveSuccess={() => {
+                          modals.close(modalId);
+                        }}
+                      />
+                    ),
+                  });
+                }}
+              >
+                <Trans>Save as new dataset</Trans>
+              </Menu.Item>
+              <Menu.Item
+                disabled={
+                  queryResultData.length === 0 || state.rawSQL === undefined
+                }
+                rightSection={
+                  state.rawSQL === undefined ?
+                    <Tooltip label={t`Run an AI query first.`}>
+                      <IconInfoCircle size={16} />
+                    </Tooltip>
+                  : null
+                }
+                onClick={() => {
+                  if (!state.rawSQL) {
+                    return;
                   }
-                  onClick={() => {
-                    if (!state.rawSQL) {
-                      return;
-                    }
-                    const modalId = modals.open({
-                      title: "Save as new dataset",
-                      size: "xl",
-                      children: (
-                        <SaveAsNewDatasetForm
-                          queryResultData={queryResultData}
-                          columns={queryResultColumns}
-                          dateColumns={dateColumns}
-                          rawSQL={state.rawSQL}
-                          onSaveSuccess={() => {
-                            modals.close(modalId);
-                          }}
-                        />
-                      ),
-                    });
-                  }}
-                >
-                  Save as new dataset
-                </Menu.Item>
-                <Menu.Item
-                  disabled={
-                    queryResultData.length === 0 || state.rawSQL === undefined
-                  }
-                  rightSection={
-                    state.rawSQL === undefined ?
-                      <Tooltip label="Run an AI query first.">
-                        <IconInfoCircle size={16} />
-                      </Tooltip>
-                    : null
-                  }
-                  onClick={() => {
-                    if (!state.rawSQL) {
-                      return;
-                    }
-                    const modalId = modals.open({
-                      withCloseButton: true,
-                      size: "lg",
-                      children: (
-                        <SaveToDashboardModal
-                          rawSQL={state.rawSQL}
-                          prompt={state.nlPrompt}
-                          vizType={state.vizConfig.vizType}
-                          vizConfig={state.vizConfig}
-                          workspaceSlug={workspace.slug}
-                          onClose={() => {
-                            modals.close(modalId);
-                          }}
-                        />
-                      ),
-                    });
-                  }}
-                >
-                  Save to dashboard
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-            <Button
-              variant="outline"
-              color="neutral"
-              leftSection={<IconDownload size={16} />}
-              size="compact-sm"
-              disabled={isLoadingResults || queryResultData.length === 0}
-              onClick={() => {
-                downloadRowsAsCSV(queryResultData);
-              }}
-            >
-              Export
-            </Button>
-          </Group>
-          <GeneratedPromptBanner />
-          <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
-            <LoadingOverlay visible={isLoadingResults} zIndex={99} />
-            <VisualizationContainer
-              columns={queryResultColumns}
-              data={queryResultData}
-              dateColumns={dateColumns}
-              vizConfig={state.vizConfig}
-            />
-          </Box>
-        </Stack>
-      </Flex>
+                  const modalId = modals.open({
+                    withCloseButton: true,
+                    size: "lg",
+                    children: (
+                      <SaveToDashboardModal
+                        rawSQL={state.rawSQL}
+                        prompt={state.nlPrompt}
+                        vizType={state.vizConfig.vizType}
+                        vizConfig={state.vizConfig}
+                        workspaceSlug={workspace.slug}
+                        onClose={() => {
+                          modals.close(modalId);
+                        }}
+                      />
+                    ),
+                  });
+                }}
+              >
+                <Trans>Save to dashboard</Trans>
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+          <Button
+            variant="outline"
+            color="neutral"
+            leftSection={<IconDownload size={16} />}
+            size="compact-sm"
+            disabled={isLoadingResults || queryResultData.length === 0}
+            onClick={() => {
+              downloadRowsAsCSV(queryResultData);
+            }}
+          >
+            <Trans>Export</Trans>
+          </Button>
+        </Group>
+        <GeneratedPromptBanner />
+        <Box flex={1} pos="relative" w="100%" mih={0} bg="white">
+          <LoadingOverlay visible={isLoadingResults} zIndex={99} />
+          <VisualizationContainer
+            columns={queryResultColumns}
+            data={queryResultData}
+            dateColumns={dateColumns}
+            vizConfig={state.vizConfig}
+          />
+        </Box>
+      </Stack>
+      <FloatingPanel
+        title={t`Query Details`}
+        opened={isQueryDetailsOpened}
+        collapsed={isQueryDetailsCollapsed}
+        openOriginRef={queryPanelButtonRef}
+        onClose={() => {
+          setQueryDetailsOpened(false);
+        }}
+        onRequestClose={() => {
+          setQueryDetailsOpened(false);
+        }}
+        onToggleCollapse={() => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "queryDetails", {
+              collapsed: !isQueryDetailsCollapsed,
+            });
+          });
+        }}
+        onPositionChange={(position) => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "queryDetails", {
+              position: {
+                left: position.x,
+                top: position.y,
+              },
+            });
+          });
+        }}
+        initialPosition={
+          panelPreferences.queryDetails?.position ??
+          QUERY_DETAILS_INITIAL_POSITION
+        }
+        width={QUERY_DETAILS_WIDTH}
+      >
+        <QueryDetailsBody />
+      </FloatingPanel>
+      <FloatingPanel
+        title={t`Visualization Settings`}
+        opened={isVisualizationSettingsOpened}
+        collapsed={isVisualizationSettingsCollapsed}
+        openOriginRef={visualizationSettingsPanelButtonRef}
+        onClose={() => {
+          setVisualizationSettingsOpened(false);
+        }}
+        onRequestClose={() => {
+          setVisualizationSettingsOpened(false);
+        }}
+        onToggleCollapse={() => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "settings", {
+              collapsed: !isVisualizationSettingsCollapsed,
+            });
+          });
+        }}
+        onPositionChange={(position) => {
+          setPanelPreferences((prev) => {
+            return _updatePanelPreferences(prev, "settings", {
+              position: {
+                left: position.x,
+                top: position.y,
+              },
+            });
+          });
+        }}
+        initialPosition={
+          panelPreferences.settings?.position ??
+          VISUALIZATION_SETTINGS_INITIAL_POSITION
+        }
+        width={VISUALIZATION_SETTINGS_WIDTH}
+      >
+        <VizSettingsForm
+          columns={queryResultColumns}
+          data={queryResultData}
+          vizConfig={state.vizConfig}
+          onVizConfigChange={dispatch.setVizConfig}
+          onVizTypeChange={dispatch.setActiveVizType}
+        />
+      </FloatingPanel>
       <OpenDatasetModal
         opened={isOpenDatasetModalOpen}
         onClose={closeOpenDatasetModal}
@@ -375,15 +618,11 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
 }
 
 const styles = {
-  queryFormContainer: (theme: MantineTheme) => {
-    return {
-      borderRight: `1px solid ${theme.colors.neutral[2]}`,
-      overflowY: "auto",
-    };
-  },
   toolbar: (theme: MantineTheme) => {
     return {
       borderBottom: `1px solid ${theme.colors.neutral[2]}`,
+      flexShrink: 0,
+      zIndex: 2,
     };
   },
 };

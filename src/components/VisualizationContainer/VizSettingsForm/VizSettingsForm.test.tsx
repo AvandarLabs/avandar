@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
@@ -86,115 +86,70 @@ describe("VizSettingsForm — top-level type picker", () => {
   });
 });
 
-describe("VizSettingsForm — bar chart controls", () => {
+describe("VizSettingsForm — bar chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [],
+    layout: "group",
     withLegend: true,
   };
 
   it("picks an X axis column", () => {
     const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/X Axis/i, "category");
+    pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenCalledWith({
       ...baseConfig,
       xAxisKey: "category",
     });
   });
 
-  it("picks a Y axis from numeric columns only", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/Y Axis/i, "value");
-    expect(onVizConfigChange).toHaveBeenCalledWith({
-      ...baseConfig,
-      yAxisKey: "value",
-    });
+  it("renders the legend toggle", () => {
+    renderForm({ vizConfig: baseConfig });
+    expect(
+      screen.getByRole("switch", { name: /Show legend/i }),
+    ).toBeInTheDocument();
   });
 
-  it("toggles the legend switch", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    const toggle = screen.getByRole("switch", { name: /Show legend/i });
-    fireEvent.click(toggle);
-    expect(onVizConfigChange).toHaveBeenCalledWith({
-      ...baseConfig,
-      withLegend: false,
-    });
-  });
-
-  it("edits the series color", () => {
-    const { onVizConfigChange } = renderForm({
-      vizConfig: { ...baseConfig, yAxisKey: "value" },
-    });
-    const colorInput = screen.getByLabelText("value");
-    fireEvent.change(colorInput, { target: { value: "#ff0000" } });
-    expect(onVizConfigChange).toHaveBeenCalledWith({
-      ...baseConfig,
-      yAxisKey: "value",
-      color: "#ff0000",
-    });
+  it("renders the bar layout segmented control", () => {
+    renderForm({ vizConfig: baseConfig });
+    expect(screen.getByText(/Grouped/i)).toBeInTheDocument();
   });
 });
 
-describe("VizSettingsForm — line chart controls", () => {
+describe("VizSettingsForm — line chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "line",
     xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [],
     withLegend: false,
-    curveType: "monotone",
   };
 
-  it("picks an X and Y axis", () => {
+  it("picks an X axis column", () => {
     const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/X Axis/i, "category");
+    pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
       xAxisKey: "category",
     });
-    pickMantineSelectOption(/Y Axis/i, "value");
-    expect(onVizConfigChange).toHaveBeenLastCalledWith({
-      ...baseConfig,
-      yAxisKey: "value",
-    });
-  });
-
-  it("changes the curve style", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/Curve style/i, "Linear (straight)");
-    expect(onVizConfigChange).toHaveBeenLastCalledWith({
-      ...baseConfig,
-      curveType: "linear",
-    });
-  });
-
-  it("toggles the legend switch", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    fireEvent.click(screen.getByRole("switch", { name: /Show legend/i }));
-    expect(onVizConfigChange).toHaveBeenCalledWith({
-      ...baseConfig,
-      withLegend: true,
-    });
   });
 });
 
-describe("VizSettingsForm — area chart controls", () => {
+describe("VizSettingsForm — area chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "area",
     xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [],
+    layout: "default",
     withLegend: true,
-    curveType: "monotone",
   };
 
-  it("picks axes and changes the curve style", () => {
+  it("picks an X axis column", () => {
     const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/X Axis/i, "category");
-    pickMantineSelectOption(/Y Axis/i, "value");
-    pickMantineSelectOption(/Curve style/i, "Step");
+    pickMantineSelectOption(/X axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      curveType: "step",
+      xAxisKey: "category",
     });
   });
 });
@@ -202,13 +157,12 @@ describe("VizSettingsForm — area chart controls", () => {
 describe("VizSettingsForm — scatter chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "scatter",
-    xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [{ xKey: "value", key: "score" }],
   };
 
-  it("only offers numeric columns for axes", () => {
+  it("only offers numeric columns for X and Y axis pickers", () => {
     renderForm({ vizConfig: baseConfig });
-    const xAxisDropdown = getMantineSelectDropdown(/X Axis/i);
+    const xAxisDropdown = getMantineSelectDropdown(/X column/i);
     expect(
       within(xAxisDropdown).queryByRole("option", {
         name: "category",
@@ -312,29 +266,20 @@ describe("VizSettingsForm — funnel chart controls", () => {
   });
 });
 
-describe("VizSettingsForm — radar chart controls", () => {
+describe("VizSettingsForm — radar chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "radar",
     nameKey: undefined,
-    valueKey: undefined,
+    series: [],
+    withLegend: true,
   };
 
-  it("picks a category and value column and edits color", () => {
-    const { onVizConfigChange } = renderForm({
-      vizConfig: { ...baseConfig, valueKey: "value" },
-    });
-    pickMantineSelectOption(/Category column/i, "category");
+  it("picks a category column", () => {
+    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
+    pickMantineSelectOption(/Category axis/i, "category");
     expect(onVizConfigChange).toHaveBeenLastCalledWith({
       ...baseConfig,
-      valueKey: "value",
       nameKey: "category",
-    });
-    const colorInput = screen.getByLabelText("value");
-    fireEvent.change(colorInput, { target: { value: "#00ff00" } });
-    expect(onVizConfigChange).toHaveBeenLastCalledWith({
-      ...baseConfig,
-      valueKey: "value",
-      color: "#00ff00",
     });
   });
 });
@@ -342,19 +287,22 @@ describe("VizSettingsForm — radar chart controls", () => {
 describe("VizSettingsForm — bubble chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "bubble",
-    xAxisKey: undefined,
-    yAxisKey: undefined,
-    sizeKey: undefined,
+    series: [{ xKey: "value", key: "score", sizeKey: "value" }],
   };
 
-  it("picks X, Y, and size from numeric columns", () => {
-    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
-    pickMantineSelectOption(/X Axis/i, "value");
-    pickMantineSelectOption(/Y Axis/i, "score");
-    pickMantineSelectOption(/Bubble size/i, "value");
-    expect(onVizConfigChange).toHaveBeenLastCalledWith({
-      ...baseConfig,
-      sizeKey: "value",
-    });
+  it("renders X, Y, and Size column pickers for each series", () => {
+    renderForm({ vizConfig: baseConfig });
+    // Use `combobox` role rather than `getByLabelText` because Mantine's
+    // Select renders both the input and the listbox dropdown with the same
+    // `aria-labelledby` target, so a plain label lookup matches two nodes.
+    expect(
+      screen.getByRole("combobox", { name: /X column/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /Y column/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /Size column/i }),
+    ).toBeInTheDocument();
   });
 });

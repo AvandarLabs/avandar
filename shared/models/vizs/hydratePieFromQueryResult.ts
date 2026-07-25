@@ -7,16 +7,21 @@ type PieAxesConfig = {
 };
 
 /**
- * Hydrate `nameKey` and `valueKey` from query result column metadata when
- * they are undefined. Does not overwrite keys that are already set.
+ * Reconcile a pie/funnel config against current query columns:
  *
- * `valueKey` ← first numeric column;
- * `nameKey` ← first temporal, then text, then boolean, then any remaining
- * column that is not the value key.
+ *   1. Prune `nameKey` / `valueKey` if either references a column the
+ *      query no longer returns.
+ *   2. Seed `valueKey` from the first numeric column.
+ *   3. Seed `nameKey` from the first non-value temporal, then text,
+ *      then boolean, then any remaining column.
+ *
+ * Goal: when a query result changes columns, the chart never silently
+ * references a missing column. Stale keys are dropped and sensible
+ * defaults seeded so a config always renders something useful.
  *
  * @param currVizConfig The current pie-like viz config.
  * @param columns Result columns with names and `AvaDataType`.
- * @returns Updated config with any newly inferred keys.
+ * @returns Updated config with stale keys pruned and defaults seeded.
  */
 export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   currVizConfig: VConfig,
@@ -25,8 +30,23 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   if (columns.length === 0) {
     return currVizConfig;
   }
+  const colNames = new Set(
+    columns.map((c) => {
+      return c.name;
+    }),
+  );
 
-  let next: VConfig = { ...currVizConfig };
+  let next: VConfig = {
+    ...currVizConfig,
+    valueKey:
+      currVizConfig.valueKey && colNames.has(currVizConfig.valueKey) ?
+        currVizConfig.valueKey
+      : undefined,
+    nameKey:
+      currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
+        currVizConfig.nameKey
+      : undefined,
+  };
 
   if (next.valueKey === undefined) {
     const valueCol = columns.find((c) => {

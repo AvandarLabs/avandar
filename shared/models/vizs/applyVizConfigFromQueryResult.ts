@@ -1,7 +1,14 @@
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type {
+  BubbleSeries,
+  RadarSeries,
+  ScatterSeries,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
@@ -13,7 +20,7 @@ type ApplyVizConfigFromQueryResultInput = {
 
 /**
  * Returns true when two viz configs match for Data Explorer sync: same viz
- * type and, for all non-table viz types, the same primary axis keys.
+ * type and, for all non-table viz types, the same primary axis / series keys.
  */
 export function isVizConfigEqualForQueryResultSync(
   a: VizConfig,
@@ -29,7 +36,7 @@ export function isVizConfigEqualForQueryResultSync(
 
   const vt = a.vizType;
 
-  if (vt === "pie" || vt === "funnel" || vt === "radar") {
+  if (vt === "pie" || vt === "funnel") {
     const ap = a as {
       nameKey: string | undefined;
       valueKey: string | undefined;
@@ -41,26 +48,70 @@ export function isVizConfigEqualForQueryResultSync(
     return ap.nameKey === bp.nameKey && ap.valueKey === bp.valueKey;
   }
 
-  const ax = a as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
-  const bx = b as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
+  if (vt === "radar") {
+    const ar = a as {
+      nameKey: string | undefined;
+      series: readonly RadarSeries[];
+    };
+    const br = b as {
+      nameKey: string | undefined;
+      series: readonly RadarSeries[];
+    };
+    return ar.nameKey === br.nameKey && _sameSeriesKeys(ar.series, br.series);
+  }
 
-  return ax.xAxisKey === bx.xAxisKey && ax.yAxisKey === bx.yAxisKey;
+  if (vt === "bar" || vt === "line" || vt === "area") {
+    const ax = a as {
+      xAxisKey: string | undefined;
+      series: readonly XYSeries[];
+    };
+    const bx = b as {
+      xAxisKey: string | undefined;
+      series: readonly XYSeries[];
+    };
+    return ax.xAxisKey === bx.xAxisKey && _sameSeriesKeys(ax.series, bx.series);
+  }
+
+  if (vt === "scatter") {
+    const as_ = a as { series: readonly ScatterSeries[] };
+    const bs_ = b as { series: readonly ScatterSeries[] };
+    return _sameSeriesKeys(as_.series, bs_.series);
+  }
+
+  if (vt === "bubble") {
+    const as_ = a as { series: readonly BubbleSeries[] };
+    const bs_ = b as { series: readonly BubbleSeries[] };
+    return _sameSeriesKeys(as_.series, bs_.series);
+  }
+
+  return false;
+}
+
+function _sameSeriesKeys(
+  a: ReadonlyArray<{ key: string }>,
+  b: ReadonlyArray<{ key: string }>,
+): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i]!.key !== b[i]!.key) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
- * Clears stale axis keys missing from the result, then runs
- * `hydrateFromQueryResult` when `shouldHydrateVizFromQueryResult` is true.
- * **2B:** Skips hydration when both primary axes remain valid in the result
- * (see `shouldHydrateVizFromQueryResult`).
+ * Reconciles axis / series keys with the latest result columns. Each key is
+ * fed through {@link resolveColumnKey} so case-insensitive matches survive
+ * across re-queries (e.g. an old config with `Count` adapts to a result
+ * column called `count`). Unresolved keys are dropped — the persisted
+ * config will not reference columns the renderer can't find, so the
+ * settings UI never shows ghost references.
  *
- * @param input Current viz, query context, and result columns.
- * @returns The viz config after validation and optional result hydration.
+ * After clearing, `hydrateFromQueryResult` runs when
+ * `shouldHydrateVizFromQueryResult` is true so empty configs get seeded.
  */
 export function applyVizConfigFromQueryResult(
   input: ApplyVizConfigFromQueryResultInput,
@@ -74,9 +125,9 @@ export function applyVizConfigFromQueryResult(
 
   let next: VizConfig = vizConfig;
 
-  const { config: cleared, didChange } = _clearStaleAxisKeys(
+  const { config: cleared, didChange } = _resolveOrClearAxisKeys(
     vizConfig,
-    resultColumnNames,
+    columns,
   );
   if (didChange) {
     next = cleared;
@@ -97,13 +148,13 @@ export function applyVizConfigFromQueryResult(
 }
 
 /**
- * Returns a copy of `vizConfig` with any stale axis keys cleared (i.e.
- * keys that no longer appear in `resultColumnNames`), plus a flag indicating
- * whether any key was cleared.
+ * Returns a copy of `vizConfig` with every axis / series key passed through
+ * {@link resolveColumnKey}: exact match wins, case-insensitive match falls
+ * back to the canonical name, and anything unresolved is dropped.
  */
-function _clearStaleAxisKeys(
+function _resolveOrClearAxisKeys(
   vizConfig: VizConfig,
-  resultColumnNames: ReadonlySet<string>,
+  columns: readonly QueryResultColumn[],
 ): { config: VizConfig; didChange: boolean } {
   if (vizConfig.vizType === "table") {
     return { config: vizConfig, didChange: false };
@@ -111,7 +162,7 @@ function _clearStaleAxisKeys(
 
   const vt = vizConfig.vizType;
 
-  if (vt === "pie" || vt === "funnel" || vt === "radar") {
+  if (vt === "pie" || vt === "funnel") {
     const pv = vizConfig as {
       nameKey: string | undefined;
       valueKey: string | undefined;
@@ -119,35 +170,151 @@ function _clearStaleAxisKeys(
     let cleared: VizConfig = vizConfig;
     let didChange = false;
 
-    if (pv.nameKey !== undefined && !resultColumnNames.has(pv.nameKey)) {
-      cleared = { ...cleared, nameKey: undefined } as VizConfig;
+    const nextName = resolveColumnKey(pv.nameKey, columns);
+    if (nextName !== pv.nameKey) {
+      cleared = { ...cleared, nameKey: nextName } as VizConfig;
       didChange = true;
     }
 
-    if (pv.valueKey !== undefined && !resultColumnNames.has(pv.valueKey)) {
-      cleared = { ...cleared, valueKey: undefined } as VizConfig;
+    const nextValue = resolveColumnKey(pv.valueKey, columns);
+    if (nextValue !== pv.valueKey) {
+      cleared = { ...cleared, valueKey: nextValue } as VizConfig;
       didChange = true;
     }
 
     return { config: cleared, didChange };
   }
 
-  const xy = vizConfig as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
-  let cleared: VizConfig = vizConfig;
-  let didChange = false;
+  if (vt === "radar") {
+    const rv = vizConfig as {
+      nameKey: string | undefined;
+      series: readonly RadarSeries[];
+    };
+    let cleared: VizConfig = vizConfig;
+    let didChange = false;
 
-  if (xy.xAxisKey !== undefined && !resultColumnNames.has(xy.xAxisKey)) {
-    cleared = { ...cleared, xAxisKey: undefined } as VizConfig;
-    didChange = true;
+    const nextName = resolveColumnKey(rv.nameKey, columns);
+    if (nextName !== rv.nameKey) {
+      cleared = { ...cleared, nameKey: nextName } as VizConfig;
+      didChange = true;
+    }
+
+    const remapped: RadarSeries[] = [];
+    for (const s of rv.series) {
+      const resolved = resolveColumnKey(s.key, columns);
+      if (resolved === undefined) {
+        continue;
+      }
+      remapped.push(resolved === s.key ? s : { ...s, key: resolved });
+    }
+    if (
+      remapped.length !== rv.series.length ||
+      remapped.some((s, i) => {
+        return s.key !== rv.series[i]?.key;
+      })
+    ) {
+      cleared = { ...cleared, series: remapped } as VizConfig;
+      didChange = true;
+    }
+
+    return { config: cleared, didChange };
   }
 
-  if (xy.yAxisKey !== undefined && !resultColumnNames.has(xy.yAxisKey)) {
-    cleared = { ...cleared, yAxisKey: undefined } as VizConfig;
-    didChange = true;
+  if (vt === "bar" || vt === "line" || vt === "area") {
+    const xy = vizConfig as {
+      xAxisKey: string | undefined;
+      series: readonly XYSeries[];
+    };
+    let cleared: VizConfig = vizConfig;
+    let didChange = false;
+
+    const nextX = resolveColumnKey(xy.xAxisKey, columns);
+    if (nextX !== xy.xAxisKey) {
+      cleared = { ...cleared, xAxisKey: nextX } as VizConfig;
+      didChange = true;
+    }
+
+    const remapped: XYSeries[] = [];
+    for (const s of xy.series) {
+      const resolved = resolveColumnKey(s.key, columns);
+      if (resolved === undefined) {
+        continue;
+      }
+      remapped.push(resolved === s.key ? s : { ...s, key: resolved });
+    }
+    if (
+      remapped.length !== xy.series.length ||
+      remapped.some((s, i) => {
+        return s.key !== xy.series[i]?.key;
+      })
+    ) {
+      cleared = { ...cleared, series: remapped } as VizConfig;
+      didChange = true;
+    }
+
+    return { config: cleared, didChange };
   }
 
-  return { config: cleared, didChange };
+  if (vt === "scatter") {
+    const sv = vizConfig as { series: readonly ScatterSeries[] };
+    const remapped: ScatterSeries[] = [];
+    for (const s of sv.series) {
+      const xKey = resolveColumnKey(s.xKey, columns);
+      const yKey = resolveColumnKey(s.key, columns);
+      if (xKey === undefined || yKey === undefined) {
+        continue;
+      }
+      if (xKey === s.xKey && yKey === s.key) {
+        remapped.push(s);
+      } else {
+        remapped.push({ ...s, xKey, key: yKey });
+      }
+    }
+    if (
+      remapped.length !== sv.series.length ||
+      remapped.some((s, i) => {
+        return s.xKey !== sv.series[i]?.xKey || s.key !== sv.series[i]?.key;
+      })
+    ) {
+      return {
+        config: { ...vizConfig, series: remapped } as VizConfig,
+        didChange: true,
+      };
+    }
+    return { config: vizConfig, didChange: false };
+  }
+
+  // bubble
+  const bv = vizConfig as { series: readonly BubbleSeries[] };
+  const remapped: BubbleSeries[] = [];
+  for (const s of bv.series) {
+    const xKey = resolveColumnKey(s.xKey, columns);
+    const yKey = resolveColumnKey(s.key, columns);
+    const sizeKey = resolveColumnKey(s.sizeKey, columns);
+    if (xKey === undefined || yKey === undefined || sizeKey === undefined) {
+      continue;
+    }
+    if (xKey === s.xKey && yKey === s.key && sizeKey === s.sizeKey) {
+      remapped.push(s);
+    } else {
+      remapped.push({ ...s, xKey, key: yKey, sizeKey });
+    }
+  }
+  if (
+    remapped.length !== bv.series.length ||
+    remapped.some((s, i) => {
+      const prev = bv.series[i];
+      return (
+        s.xKey !== prev?.xKey ||
+        s.key !== prev?.key ||
+        s.sizeKey !== prev?.sizeKey
+      );
+    })
+  ) {
+    return {
+      config: { ...vizConfig, series: remapped } as VizConfig,
+      didChange: true,
+    };
+  }
+  return { config: vizConfig, didChange: false };
 }

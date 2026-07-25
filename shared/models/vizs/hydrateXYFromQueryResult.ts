@@ -8,8 +8,10 @@ type XYAxesConfig = {
 
 /**
  * Which XY chart is being configured — affects default X column priority.
+ * Scatter is excluded: it uses per-series `xKey` via
+ * `hydrateScatterSeriesFromQueryResult`.
  */
-export type XYVizChartKind = "bar" | "line" | "scatter";
+export type XYVizChartKind = "bar" | "line";
 
 /**
  * Hydrate X/Y axis keys from query result column metadata when keys are
@@ -25,7 +27,7 @@ export type XYVizChartKind = "bar" | "line" | "scatter";
 export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   currVizConfig: VConfig,
   columns: readonly QueryResultColumn[],
-  chartKind: XYVizChartKind,
+  _chartKind: XYVizChartKind,
 ): VConfig {
   if (columns.length === 0) {
     return currVizConfig;
@@ -43,10 +45,7 @@ export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   const yKey = next.yAxisKey;
 
   if (next.xAxisKey === undefined && yKey !== undefined) {
-    const xName =
-      chartKind === "scatter" ?
-        _pickScatterXColumnName(columns, yKey)
-      : _pickBarLineXColumnName(columns, yKey);
+    const xName = _pickBarLineXColumnName(columns, yKey);
     if (xName !== undefined) {
       next = { ...next, xAxisKey: xName };
     }
@@ -98,37 +97,6 @@ function _pickBarLineXColumnName(
   });
   if (numeric !== undefined) {
     return numeric.name;
-  }
-  return others[0]?.name;
-}
-
-/**
- * Scatter: prefer a second numeric for X; otherwise temporal or text.
- */
-function _pickScatterXColumnName(
-  columns: readonly QueryResultColumn[],
-  yKey: string | undefined,
-): string | undefined {
-  const others = columns.filter((c) => {
-    return c.name !== yKey;
-  });
-  const numericX = others.find((c) => {
-    return AvaDataType.isNumeric(c.dataType);
-  });
-  if (numericX !== undefined) {
-    return numericX.name;
-  }
-  const temporal = others.find((c) => {
-    return AvaDataType.isTemporal(c.dataType);
-  });
-  if (temporal !== undefined) {
-    return temporal.name;
-  }
-  const text = others.find((c) => {
-    return AvaDataType.isText(c.dataType);
-  });
-  if (text !== undefined) {
-    return text.name;
   }
   return others[0]?.name;
 }

@@ -1,4 +1,5 @@
 import { useQuery } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { Model } from "@models";
 import { makeObjectFromEntries, prop, sortObjList } from "@utils";
 import { uuid } from "$/lib/uuid";
@@ -8,6 +9,8 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
+import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { UseQueryResultTuple } from "@hooks";
 import type {
@@ -20,6 +23,11 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
   rawSQL: string | undefined;
+  /**
+   * When true, `rawSQL` was generated from the manual form and row-count guard
+   * logic may replace it with bounded SQL before execution.
+   */
+  isStructuredQueryInSync?: boolean;
 } & (
   | {
       auth: "workspace";
@@ -46,23 +54,30 @@ type UseDataQueryOptions = {
 export function useDataQuery(
   options: UseDataQueryOptions,
 ): UseQueryResultTuple<QueryResult<UnknownRow>> {
-  const { auth, query, rawSQL } = options;
+  const { t } = useLingui();
+  const { auth, query, rawSQL, isStructuredQueryInSync = true } = options;
   const {
     dataSource,
     queryColumns,
     aggregations,
     orderByColumn,
     orderByDirection,
+    limit,
+    filters,
+    having,
   } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+  const workspaceId =
+    auth === "workspace" ? options.workspaceId : options.publicAvaPageId;
 
-  return useQuery({
+  const queryResult = useQuery({
     enabled: !!dataSource || !!rawSQL,
     queryKey: [
       auth,
-      auth === "workspace" ? options.workspaceId : options.publicAvaPageId,
+      workspaceId,
+      query,
       "rawSQL",
       rawSQL,
       "dataSource",
@@ -71,39 +86,71 @@ export function useDataQuery(
       sortedQueryColumns,
       "aggregations",
       aggregations,
+      "filters",
+      filters,
+      "having",
+      having,
+      "limit",
+      limit,
       "orderBy",
       orderByColumn,
       orderByDirection,
+      "structuredInSync",
+      isStructuredQueryInSync,
     ],
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
-      if (rawSQL) {
+      // When the user (or LLM) has set `rawSQL`, run it verbatim. Skip the
+      // large-dataset auto-limit resolution and the structured-form round-trip
+      // entirely so direct SQL is never silently rewritten.
+      const resolved =
+        rawSQL === undefined && auth === "workspace" ?
+          await resolveManualQueryForExecution({
+            query,
+            workspaceId: workspaceId as Workspace.Id,
+          })
+        : { query, didAutoLimit: false as const };
+      const executionQuery = resolved.query;
+
+      const sqlToRun = selectSqlToExecute({
+        rawSQL,
+        isStructuredQueryInSync,
+        executionQuery,
+      });
+
+      if (sqlToRun) {
         if (auth === "public") {
           // if no workspace id then this is a public query
           return await PublicQETLClient.runQuery({
-            rawSQL,
+            rawSQL: sqlToRun,
             dashboardId: options.publicAvaPageId,
           });
         }
 
         return await WorkspaceQETLClient.runQuery({
-          rawSQL,
+          rawSQL: sqlToRun,
           workspaceId: options.workspaceId,
         });
       }
 
       if (auth === "public") {
         throw new Error(
-          "Public queries are not supported for structured queries. Use raw SQL instead.",
+          t`Public queries are not supported for structured queries. Use raw SQL instead.`,
         );
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {
+        const executionQueryWithSource = {
+          ...executionQuery,
+          dataSource,
+        } as StructuredQuery.T;
         const queryResults = await Model.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
           Dataset: async (): Promise<QueryResult<UnknownRow>> => {
             return await WorkspaceQETLClient.runQuery({
-              rawSQL: StructuredQuery.toRawDuckDBQuery(query),
+              rawSQL: StructuredQuery.toRawDuckDBQuery(
+                executionQueryWithSource,
+              ),
               workspaceId: options.workspaceId,
             });
           },
@@ -162,4 +209,6 @@ export function useDataQuery(
       return QueryResultFns.makeEmpty();
     },
   });
+
+  return queryResult;
 }

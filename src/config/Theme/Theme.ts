@@ -31,6 +31,7 @@ import { cssAvaVar } from "../../lib/utils/browser/css";
 import { AnimationTheme } from "./AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";
+import { OverlayTheme } from "./OverlayTheme";
 import type {
   VariantColorResolverResult,
   VariantColorsResolverInput,
@@ -47,16 +48,71 @@ import type {
 export const APP_SHELL_MAIN_Z_INDEX = 200;
 
 /**
- * Modal z-index above AppShell main.
+ * App chrome z-index. Floating toolbars and the mobile navbar live here:
+ * above the main content area but always below modals, drawers, and any
+ * overlay layer. Anchoring chrome to this token (instead of ad-hoc magic
+ * numbers like `1000`) is what keeps things like the Send Feedback button
+ * from punching through modal overlays.
+ */
+export const APP_CHROME_Z_INDEX = 250;
+
+/**
+ * Modal z-index above all app chrome.
  *
  * Mantine's `getDefaultZIndex("modal")` is hardcoded to 201 and ignores
- * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`.
+ * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`. The
+ * value is intentionally well above `APP_CHROME_Z_INDEX` so future floating
+ * UI added in the chrome tier cannot accidentally land above modals.
  */
-export const MODAL_ROOT_Z_INDEX = 300;
+export const MODAL_ROOT_Z_INDEX = 400;
+
+/** Default props for `<Modal>` and `@mantine/modals` ModalsProvider. */
+export const DEFAULT_MODAL_PROPS = {
+  zIndex: MODAL_ROOT_Z_INDEX,
+  centered: true,
+  radius: OverlayTheme.panel.radius,
+  overlayProps: {
+    backgroundOpacity: 0,
+    color: "transparent",
+    transitionProps: AnimationTheme.mantine.modalOverlay,
+    style: {
+      background: "var(--ava-overlay-background)",
+      backdropFilter: "var(--ava-overlay-backdrop-filter)",
+    },
+  },
+  transitionProps: AnimationTheme.mantine.modal,
+} as const;
+
+/**
+ * Floating panel z-index. Sits above the app shell (200) but below
+ * Mantine's default popover/combobox z-index (300) so that dropdowns
+ * opened inside a floating panel render on top of it.
+ */
+export const FLOATING_PANEL_Z_INDEX = 250;
+
+/**
+ * Overlay dropdown z-index for popovers, comboboxes, menus, and tooltips.
+ * Sits above `MODAL_ROOT_Z_INDEX` so dropdowns opened inside a modal
+ * (Share dialog selects, action menus, etc.) render on top of the modal
+ * instead of being hidden behind it. Mantine's defaults (300) live below
+ * our overridden modal layer (400), so we bump everything in this tier
+ * up in one place.
+ */
+export const POPOVER_Z_INDEX = 500;
+
+/**
+ * Toast / notification z-index. Above modals, popovers, and full-screen
+ * drop overlays so parse errors stay visible. The notifications container
+ * uses `pointer-events: none` so only toasts capture clicks.
+ */
+export const NOTIFICATIONS_Z_INDEX = 10_000;
 
 const interactiveTransition = AnimationTheme.transition.interactive;
 
-const COMBOBOX_DEFAULT_PROPS = AnimationTheme.combobox;
+const COMBOBOX_DEFAULT_PROPS = {
+  ...AnimationTheme.combobox,
+  zIndex: POPOVER_Z_INDEX,
+} as const;
 
 function avandarVariantColorResolver(
   input: VariantColorsResolverInput,
@@ -178,20 +234,29 @@ export const Theme = createTheme({
     }),
 
     Modal: Modal.extend({
-      defaultProps: {
-        zIndex: MODAL_ROOT_Z_INDEX,
-        radius: "sm",
-        centered: true,
-        overlayProps: {
-          backgroundOpacity: 0.35,
-          blur: 0,
-        },
-        transitionProps: AnimationTheme.mantine.modal,
-      },
+      defaultProps: DEFAULT_MODAL_PROPS,
       styles: {
+        overlay: {
+          background: "var(--ava-overlay-background)",
+          backdropFilter: "var(--ava-overlay-backdrop-filter)",
+        },
         content: {
-          border: "1px solid var(--ava-border-default)",
-          boxShadow: "var(--mantine-shadow-lg)",
+          backgroundColor: "var(--mantine-color-body)",
+          border: "none",
+          boxShadow: "var(--ava-overlay-panel-shadow)",
+        },
+        header: {
+          borderBottom: "1px solid var(--ava-border-default)",
+          minHeight: "unset",
+          padding: "var(--mantine-spacing-sm) var(--mantine-spacing-md)",
+        },
+        body: {
+          // Mantine zeroes body padding-top when a header is present; restore
+          // gap below the divider.
+          paddingTop: "var(--mantine-spacing-md)",
+        },
+        title: {
+          fontWeight: 600,
         },
       },
     }),
@@ -206,6 +271,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.menu,
       },
       styles: {
@@ -222,6 +288,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.popover,
       },
       styles: {
@@ -293,6 +360,7 @@ export const Theme = createTheme({
     Tooltip: Tooltip.extend({
       defaultProps: {
         radius: "sm",
+        zIndex: POPOVER_Z_INDEX,
         transitionProps: AnimationTheme.mantine.tooltip,
       },
     }),
@@ -399,11 +467,15 @@ export const Theme = createTheme({
     primaryColor: AVANDAR_BLUE_SHADES[PRIMARY_COLOR_LIGHT_SHADE],
     zIndex: {
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
+      appChrome: APP_CHROME_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
+      popover: POPOVER_Z_INDEX,
+      notifications: NOTIFICATIONS_Z_INDEX,
     },
     elevation: ElevationTheme,
     borders: BorderTheme,
     animation: AnimationTheme,
+    overlay: OverlayTheme,
     navbar: {
       backgroundColor: NEUTRAL_SHADES[6],
       textColor: DEFAULT_THEME.white,
@@ -417,6 +489,7 @@ export const Theme = createTheme({
 export { AnimationTheme } from "./AnimationTheme";
 export { BorderTheme } from "./BorderTheme";
 export { ElevationTheme } from "./ElevationTheme";
+export { OverlayTheme } from "./OverlayTheme";
 
 export const cssVariablesResolver: CSSVariablesResolver = (
   theme: MantineTheme,
@@ -435,7 +508,10 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--navbar-transition-duration": AnimationTheme.duration.fast,
 
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
+    "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
+    "--mantine-z-index-popover": String(theme.other.zIndex.popover),
+    "--mantine-z-index-notifications": String(theme.other.zIndex.notifications),
 
     "--ava-animation-duration-instant": AnimationTheme.duration.instant,
     "--ava-animation-duration-fast": AnimationTheme.duration.fast,
@@ -450,6 +526,17 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     "--ava-transition-transform": AnimationTheme.transition.transform,
     "--ava-transition-opacity": AnimationTheme.transition.opacity,
     "--ava-transition-shadow": AnimationTheme.transition.shadow,
+
+    "--ava-animation-duration-ooze-in": `${AnimationTheme.preset.oozeIn.durationMs}ms`,
+    "--ava-animation-duration-swipe-out": `${AnimationTheme.preset.swipeOut.durationMs}ms`,
+    "--ava-animation-duration-reduced": `${AnimationTheme.preset.reducedMotionDurationMs}ms`,
+    "--ava-animation-easing-spring": AnimationTheme.preset.oozeIn.easing,
+    "--ava-animation-easing-swipe-out": AnimationTheme.preset.swipeOut.easing,
+    "--ava-animate-swipe-translate-y": `${AnimationTheme.preset.swipeOut.translateYPx}px`,
+
+    "--ava-overlay-background": OverlayTheme.backdrop.backgroundColor,
+    "--ava-overlay-backdrop-filter": OverlayTheme.backdrop.backdropFilter,
+    "--ava-overlay-panel-shadow": OverlayTheme.panel.shadow,
   };
 
   return {
@@ -466,6 +553,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--ava-surface-raised": elevation.surfaces.light.raised,
       "--ava-surface-overlay": elevation.surfaces.light.overlay,
       "--ava-surface-sunken": elevation.surfaces.light.sunken,
+      "--ava-surface-panel-header": elevation.surfaces.light.panelHeader,
     },
     dark: {
       "--mantine-primary-color": theme.other.primaryColor,
@@ -479,6 +567,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--ava-surface-raised": elevation.surfaces.dark.raised,
       "--ava-surface-overlay": elevation.surfaces.dark.overlay,
       "--ava-surface-sunken": elevation.surfaces.dark.sunken,
+      "--ava-surface-panel-header": elevation.surfaces.dark.panelHeader,
 
       "--mantine-shadow-xs": elevation.shadows.xs,
       "--mantine-shadow-sm": elevation.shadows.sm,

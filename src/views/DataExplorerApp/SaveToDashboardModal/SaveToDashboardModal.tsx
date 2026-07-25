@@ -1,10 +1,11 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useNavigate } from "@tanstack/react-router";
 import { Model } from "@models";
+import { useNavigate } from "@tanstack/react-router";
 import { notifyError } from "@ui";
-import { useMemo, useState } from "react";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
+import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -17,8 +18,6 @@ import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
-
-const DEFAULT_NEW_DASHBOARD_NAME = "Untitled dashboard";
 
 type Props = {
   rawSQL: string;
@@ -52,6 +51,8 @@ export function SaveToDashboardModal({
   workspaceSlug,
   onClose,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const defaultNewDashboardName = t`Untitled dashboard`;
   const workspace = useCurrentWorkspace();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
   const navigate = useNavigate();
@@ -91,10 +92,7 @@ export function SaveToDashboardModal({
   // loading, in case we initialised assuming "empty" while the query was
   // still in-flight. Only do this if the user has not interacted yet.
   const shouldAutoSwitchToList =
-    !isInitialLoading &&
-    hasDashboards &&
-    mode === "create" &&
-    !enteredFromList;
+    !isInitialLoading && hasDashboards && mode === "create" && !enteredFromList;
   if (shouldAutoSwitchToList) {
     setMode("list");
   }
@@ -102,11 +100,15 @@ export function SaveToDashboardModal({
   const showOpenDashboardToast = (
     dashboardId: DashboardId,
     dashboardName: string,
-    actionLabel: "Added to" | "Created",
+    action: "added" | "created",
   ): void => {
+    const title =
+      action === "added" ?
+        t`Added to "${dashboardName}"`
+      : t`Created "${dashboardName}"`;
     notifications.show({
       color: "green",
-      title: `${actionLabel} "${dashboardName}"`,
+      title,
       message: (
         <Anchor
           size="sm"
@@ -120,7 +122,7 @@ export function SaveToDashboardModal({
             });
           }}
         >
-          Open dashboard
+          {t`Open dashboard`}
         </Anchor>
       ),
     });
@@ -132,12 +134,12 @@ export function SaveToDashboardModal({
       showOpenDashboardToast(
         createdDashboard.id,
         createdDashboard.name,
-        "Created",
+        "created",
       );
       onClose();
     },
     onError: (error) => {
-      notifyError(`Failed to create dashboard: ${error.message}`);
+      notifyError(t`Failed to create dashboard: ${error.message}`);
     },
   });
 
@@ -147,12 +149,12 @@ export function SaveToDashboardModal({
       showOpenDashboardToast(
         updatedDashboard.id,
         updatedDashboard.name,
-        "Added to",
+        "added",
       );
       onClose();
     },
     onError: (error) => {
-      notifyError(`Failed to save to dashboard: ${error.message}`);
+      notifyError(t`Failed to save to dashboard: ${error.message}`);
     },
   });
 
@@ -183,7 +185,7 @@ export function SaveToDashboardModal({
 
   const onCreateAndSave = (trimmedName: string) => {
     if (!userProfile) {
-      notifyError("Your user profile is not loaded yet. Please retry.");
+      notifyError(t`Your user profile is not loaded yet. Please retry.`);
       return;
     }
 
@@ -229,13 +231,15 @@ export function SaveToDashboardModal({
 
   const subtitle =
     mode === "list" ?
-      "Pick a dashboard, or create a new one."
-    : "We'll add this visualization to your new dashboard.";
+      t`Pick a dashboard, or create a new one.`
+    : t`We'll add this visualization to your new dashboard.`;
 
   return (
     <Stack gap="md">
       <Stack gap={2}>
-        <Title order={4}>Save to dashboard</Title>
+        <Title order={4}>
+          <Trans>Save to dashboard</Trans>
+        </Title>
         <Text c="dimmed" size="sm">
           {subtitle}
         </Text>
@@ -255,7 +259,7 @@ export function SaveToDashboardModal({
           onSelectAndSave={onSaveToExisting}
         />
       : <SaveToDashboardCreateMode
-          defaultName={DEFAULT_NEW_DASHBOARD_NAME}
+          defaultName={defaultNewDashboardName}
           isCreating={isInsertingDashboard}
           isDisabled={isMutating}
           showEmptyStateBanner={!enteredFromList && !hasDashboards}

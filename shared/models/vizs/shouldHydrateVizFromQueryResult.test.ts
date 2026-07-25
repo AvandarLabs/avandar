@@ -27,7 +27,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
   const barEmpty: VizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [],
+    layout: "group",
     withLegend: true,
   };
 
@@ -61,7 +62,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "month",
-          yAxisKey: "total",
+          series: [{ renderAs: "bar", key: "total" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "total"]),
@@ -80,7 +82,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "month",
-          yAxisKey: "total_cases",
+          series: [{ renderAs: "bar", key: "total_cases" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "total_cases"]),
@@ -107,7 +110,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "old_x",
-          yAxisKey: "y",
+          series: [{ renderAs: "bar", key: "y" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "y"]),
@@ -126,6 +130,23 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(true);
   });
 
+  it("returns true when bar has xAxisKey but no series (incomplete config)", () => {
+    expect(
+      shouldHydrateVizFromQueryResult({
+        rawSQL: 'SELECT "Admin2", SUM("daily_new_cases") AS total_cases FROM t',
+        query: _makeQueryWithColumns([mockColumn("Admin2")]),
+        vizConfig: {
+          vizType: "bar",
+          xAxisKey: "Admin2",
+          series: [],
+          layout: "group",
+          withLegend: true,
+        },
+        resultColumnNames: new Set(["Admin2", "total_cases"]),
+      }),
+    ).toBe(true);
+  });
+
   it("returns false when structured overlaps result and axes are valid", () => {
     expect(
       shouldHydrateVizFromQueryResult({
@@ -137,9 +158,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "line",
           xAxisKey: "month",
-          yAxisKey: "total_cases",
+          series: [
+            { renderAs: "line", key: "total_cases", curveType: "monotone" },
+          ],
           withLegend: true,
-          curveType: "monotone",
         },
         resultColumnNames: new Set(["month", "total_cases"]),
       }),

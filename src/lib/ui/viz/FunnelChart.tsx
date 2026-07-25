@@ -1,6 +1,7 @@
 import { FunnelChart as MantineFunnelChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLORS } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
 import type { UnknownDataFrame } from "@utils";
 
 type Props = {
@@ -33,5 +34,12 @@ export function FunnelChart({
     });
   }, [data, nameKey, valueKey, seriesColors]);
 
-  return <MantineFunnelChart data={chartData} size={size} withLabels />;
+  return (
+    <MantineFunnelChart
+      data={chartData}
+      size={size}
+      withLabels
+      valueFormatter={formatChartNumber}
+    />
+  );
 }

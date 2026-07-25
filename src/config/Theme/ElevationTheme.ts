@@ -53,6 +53,7 @@ const ELEVATION_SURFACES_LIGHT = {
   raised: "#ffffff",
   overlay: "#ffffff",
   sunken: NEUTRAL_SHADES[1],
+  panelHeader: NEUTRAL_SHADES[1],
 } as const;
 
 /**
@@ -63,6 +64,7 @@ const ELEVATION_SURFACES_DARK = {
   raised: NEUTRAL_SHADES[8],
   overlay: NEUTRAL_SHADES[7],
   sunken: NEUTRAL_SHADES[9],
+  panelHeader: NEUTRAL_SHADES[7],
 } as const;
 
 const ELEVATION_SURFACES = {

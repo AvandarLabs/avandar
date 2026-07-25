@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   defaultOptionsFilter,
   isOptionsGroup,
@@ -10,7 +11,7 @@ import { isNonNullish, makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId";
@@ -59,6 +60,7 @@ export function QueryColumnMultiSelect({
   onChange,
   ...multiSelectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [currentSelectedColumns, setCurrentSelectedColumns] = useUncontrolled<
     readonly QueryColumn.T[]
   >({
@@ -134,30 +136,31 @@ export function QueryColumnMultiSelect({
     return filter;
   }, [queryColumns]);
 
-  // When available columns change (e.g. data source changed, or columns
-  // were restored from URL with different synthetic UUIDs), remap the
-  // current selection to the canonical instances from the available set.
-  useEffect(() => {
-    const remapped = remapColumnsByBaseId({
-      selectedColumns: currentSelectedColumns,
-      availableColumns: queryColumns,
-    });
-    if (remapped !== undefined) {
-      setCurrentSelectedColumns(remapped);
-    }
-  }, [queryColumns, currentSelectedColumns, setCurrentSelectedColumns]);
+  const renderedSelectedColumns = useMemo(() => {
+    return (
+      remapColumnsByBaseId({
+        selectedColumns: currentSelectedColumns,
+        availableColumns: queryColumns,
+      }) ?? currentSelectedColumns
+    );
+  }, [currentSelectedColumns, queryColumns]);
 
   const selectedColumnIds = useMemo(() => {
-    return currentSelectedColumns.map(prop("id"));
-  }, [currentSelectedColumns]);
+    return renderedSelectedColumns.map(prop("id"));
+  }, [renderedSelectedColumns]);
+
+  const hasSelectableColumns = selectableOptions.length > 0;
+  const { disabled: disabledProp, ...restMultiSelectProps } = multiSelectProps;
+  const isDisabled = disabledProp ?? (!isLoading && !hasSelectableColumns);
 
   return (
     <MultiSelect
       searchable
       clearable
       label={label}
-      placeholder={isLoading ? "Loading datasets..." : placeholder}
+      placeholder={isLoading ? t`Loading datasets...` : placeholder}
       data={selectableOptions}
+      disabled={isDisabled}
       value={selectedColumnIds}
       onChange={(newColumnIds) => {
         // convert the column ids back to columns by looking them up
@@ -168,8 +171,8 @@ export function QueryColumnMultiSelect({
           .filter(isNonNullish);
         setCurrentSelectedColumns(newSelectedColumns);
       }}
-      nothingFoundMessage="No fields"
-      {...multiSelectProps}
+      nothingFoundMessage={t`No fields`}
+      {...restMultiSelectProps}
       filter={matchColumnFilter}
     />
   );

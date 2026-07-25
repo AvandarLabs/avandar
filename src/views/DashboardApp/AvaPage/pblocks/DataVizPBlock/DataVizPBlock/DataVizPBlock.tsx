@@ -1,7 +1,9 @@
+import { Trans } from "@lingui/react/macro";
 import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { Paper } from "@ui";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { useMemo } from "react";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
@@ -68,15 +70,33 @@ export function DataVizPBlock({
       }),
   });
 
-  const columns = queryResults?.columns ?? [];
-  const data = queryResults?.data ?? [];
+  const columns = useMemo(() => {
+    return queryResults?.columns ?? [];
+  }, [queryResults?.columns]);
+  const data = useMemo(() => {
+    return queryResults?.data ?? [];
+  }, [queryResults?.data]);
   const dateColumns = getDateColumns(columns, data);
+
+  const displayVizConfig = useMemo(() => {
+    if (columns.length === 0) {
+      return vizConfig;
+    }
+    return applyVizConfigFromQueryResult({
+      vizConfig,
+      rawSQL: rawSql,
+      query: emptyStructuredQuery,
+      columns,
+    });
+  }, [vizConfig, rawSql, emptyStructuredQuery, columns]);
 
   if (prompt.length === 0) {
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Add a prompt and generate SQL to configure this visualization.
+          <Trans>
+            Add a prompt and generate SQL to configure this visualization.
+          </Trans>
         </Text>
       </Paper>
     );
@@ -86,22 +106,30 @@ export function DataVizPBlock({
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Run a query to see results.
+          <Trans>Run a query to see results.</Trans>
         </Text>
       </Paper>
     );
   }
 
   return (
-    <Paper withBorder p="md">
-      <Stack gap={6}>
+    <Paper
+      withBorder
+      p="lg"
+      radius="md"
+      style={{
+        boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+        backgroundColor: "var(--mantine-color-white)",
+      }}
+    >
+      <Stack gap="sm">
         <Box pos="relative" w="100%" h={420}>
           <LoadingOverlay visible={isLoadingResults} zIndex={10} />
           <VisualizationContainer
             columns={columns}
             data={data}
             dateColumns={dateColumns}
-            vizConfig={vizConfig}
+            vizConfig={displayVizConfig}
           />
         </Box>
       </Stack>

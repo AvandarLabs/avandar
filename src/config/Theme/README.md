@@ -92,15 +92,40 @@ in CSS modules over new animation libraries.
 
 ### Transition shortcuts (`--ava-transition-*`)
 
-| Token                          | Use                                               |
-| ------------------------------ | ------------------------------------------------- |
-| `--ava-transition-colors`      | Text/background/border only                       |
-| `--ava-transition-interactive` | Buttons, clickable rows (includes shadow/opacity) |
-| `--ava-transition-transform`   | Scale/slide (do not animate layout properties)    |
-| `--ava-transition-opacity`     | Fades                                             |
-| `--ava-transition-shadow`      | Elevation changes                                 |
+| Token                                | Use                                               |
+| ------------------------------------ | ------------------------------------------------- |
+| `--ava-transition-colors`            | Text/background/border only                       |
+| `--ava-transition-interactive`       | Buttons, clickable rows (includes shadow/opacity) |
+| `--ava-transition-transform`         | Scale/slide (do not animate layout properties)    |
+| `--ava-transition-opacity`           | Fades                                             |
+| `--ava-transition-shadow`            | Elevation changes                                 |
+| `--ava-animation-duration-ooze-in`   | Ooze-in preset duration                           |
+| `--ava-animation-duration-swipe-out` | Swipe-out preset duration                         |
+| `--ava-animate-swipe-translate-x`    | Swipe-out horizontal offset (default 12px)        |
+| `--ava-animate-origin-x` / `-y`      | Per-instance transform origin for ooze-in         |
 
 **Do not** set a full `transition` shorthand on elements that use Mantine’s `FloatingIndicator` (e.g. tab pill): it overrides transform/width/height and breaks slide animation.
+
+### Animation presets (CSS classes)
+
+Global keyframes live in `animationPresets.css` (imported from `main.tsx`). Use with `ANIMATION_PRESET` from `AnimationTheme`:
+
+| Preset     | Class                   | Use                                                                   |
+| ---------- | ----------------------- | --------------------------------------------------------------------- |
+| `oozeIn`   | `ava-animate-ooze-in`   | Springy grow from a trigger; set origin via `buildAnimateOriginStyle` |
+| `swipeOut` | `ava-animate-swipe-out` | Fade + light slide right on dismiss                                   |
+| `active`   | `ava-animate-active`    | `will-change` helper while a preset animation runs                    |
+
+```tsx
+import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
+
+<div
+  className={ANIMATION_PRESET.oozeIn.className}
+  style={buildAnimateOriginStyle(buttonRect, panelRect)}
+/>;
+```
+
+Reference: `FloatingPanel` + `useFloatingPanelMorphTransition`.
 
 Overlay components (Menu, Combobox, Modal, etc.) get `transitionProps` from `MANTINE_TRANSITION_PROPS` in `AnimationTheme.ts`.
 
@@ -151,7 +176,7 @@ In CSS modules (inside `MantineProvider`):
 | Global button/input/modal look | `Theme.ts` → `components`                                                 |
 | New CSS variable               | `cssVariablesResolver` in `Theme.ts` + `mantine.d.ts` if on `theme.other` |
 | Shadow/border/surface math     | `themeElevation.ts`                                                       |
-| Motion timing                  | `AnimationTheme.ts`                                                       |
+| Motion timing / presets        | `AnimationTheme.ts`, `animationPresets.css`                               |
 | One-off component styling      | `@avandar/ui` or local CSS module usingvariables above                    |
 
 Avoid per-view color overrides in `src/views` or `src/components` unless there

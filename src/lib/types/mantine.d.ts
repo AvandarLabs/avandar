@@ -31,7 +31,10 @@ declare module "@mantine/core" {
     primaryColor: string;
     zIndex: {
       appShellMain: number;
+      appChrome: number;
       modal: number;
+      popover: number;
+      notifications: number;
     };
     elevation: typeof ElevationTheme;
     borders: typeof BorderTheme;
