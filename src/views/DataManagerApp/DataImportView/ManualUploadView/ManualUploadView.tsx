@@ -113,19 +113,22 @@ export function ManualUploadView({
   // dropzone), start parsing it on mount so the user lands directly
   // on the import form without an extra click.
   const hasAutoParsedInitialFileRef = useRef(false);
-  useEffect(function autoParseInitialFile() {
-    if (!initialFile || hasAutoParsedInitialFileRef.current) {
-      return;
-    }
-    hasAutoParsedInitialFileRef.current = true;
-    void onRequestFileParse({
-      file: initialFile,
-      newDatasetId: uuid() as Dataset.Id,
-    });
-    // We intentionally exclude `onRequestFileParse` from deps - it
-    // changes on every render but the ref guards single execution.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialFile]);
+  useEffect(
+    function autoParseInitialFile() {
+      if (!initialFile || hasAutoParsedInitialFileRef.current) {
+        return;
+      }
+      hasAutoParsedInitialFileRef.current = true;
+      void onRequestFileParse({
+        file: initialFile,
+        newDatasetId: uuid() as Dataset.Id,
+      });
+      // We intentionally exclude `onRequestFileParse` from deps - it
+      // changes on every render but the ref guards single execution.
+       
+    },
+    [initialFile],
+  );
 
   const elements = {
     importForm: () => {

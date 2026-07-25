@@ -1,4 +1,5 @@
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import { buildReadCsvPromptFromResolved } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 import {
   columnsFromSniffRow,
   duckDbDataTypeFromString,
@@ -7,7 +8,6 @@ import {
   normalizeDuckDbCsvOptionToken,
   optionalTrimmedCsvFormat,
 } from "@/clients/DuckDbClient/csvParse/duckDbCsvTokens";
-import { buildReadCsvPromptFromResolved } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 import type {
   CsvParseResolvedOptions,
   DuckDbSniffCsvRow,

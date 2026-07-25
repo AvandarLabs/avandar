@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
 import { where } from "@utils";
-import { useState } from "react";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
+import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

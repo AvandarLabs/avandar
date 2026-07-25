@@ -156,15 +156,21 @@ export async function runBackgroundParquetTranscoding(params: {
 
     notifySuccess({
       title: i18n._(msg`Dataset ready`),
-      message: i18n._(msg`"${sourceFileName}" finished processing and is ready to use.`),
+      message: i18n._(
+        msg`"${sourceFileName}" finished processing and is ready to use.`,
+      ),
     });
     if (changedCount > 0) {
       notifyWarning({
         title: i18n._(msg`Column types updated`),
         message:
           changedCount === 1 ?
-            i18n._(msg`Detected column types for 1 column in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`)
-          : i18n._(msg`Detected column types for ${changedCount} columns in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`),
+            i18n._(
+              msg`Detected column types for 1 column in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+            )
+          : i18n._(
+              msg`Detected column types for ${changedCount} columns in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+            ),
       });
     }
 

@@ -36,20 +36,23 @@ function useGarbageDatasetCollection(): void {
   });
   const [isGarbageCollectionDone, setIsGarbageCollectionDone] = useState(false);
 
-  useEffect(function garbageCollectStaleLocalDatasets() {
-    if (isGarbageCollectionDone || !allWorkspaceDatasets || !localDatasets) {
-      return;
-    }
-    const extraDatasetIds = difference(
-      localDatasets.map(prop("datasetId")),
-      allWorkspaceDatasets.map(prop("id")),
-    );
-    if (extraDatasetIds.length > 0) {
-      LocalDatasetClient.bulkDelete({ ids: extraDatasetIds }).then(() => {
-        setIsGarbageCollectionDone(true);
-      });
-    }
-  }, [allWorkspaceDatasets, localDatasets, isGarbageCollectionDone]);
+  useEffect(
+    function garbageCollectStaleLocalDatasets() {
+      if (isGarbageCollectionDone || !allWorkspaceDatasets || !localDatasets) {
+        return;
+      }
+      const extraDatasetIds = difference(
+        localDatasets.map(prop("datasetId")),
+        allWorkspaceDatasets.map(prop("id")),
+      );
+      if (extraDatasetIds.length > 0) {
+        LocalDatasetClient.bulkDelete({ ids: extraDatasetIds }).then(() => {
+          setIsGarbageCollectionDone(true);
+        });
+      }
+    },
+    [allWorkspaceDatasets, localDatasets, isGarbageCollectionDone],
+  );
 }
 
 /**
@@ -119,33 +122,36 @@ export function useSyncLocalDatasets(): void {
     },
   });
 
-  useEffect(function syncResyncModalForMissingDatasets() {
-    // we use queue microtask to ensure that the Mantine ModalsProvider is
-    // ready before opening a modal
-    queueMicrotask(() => {
-      if (or(missingDatasets, isNullish, isEmptyArray)) {
-        if (modalId) {
-          modals.closeAll();
+  useEffect(
+    function syncResyncModalForMissingDatasets() {
+      // we use queue microtask to ensure that the Mantine ModalsProvider is
+      // ready before opening a modal
+      queueMicrotask(() => {
+        if (or(missingDatasets, isNullish, isEmptyArray)) {
+          if (modalId) {
+            modals.closeAll();
+          }
+          setModalId(undefined);
+          return;
         }
-        setModalId(undefined);
-        return;
-      }
-      if (modalId) {
-        modals.updateModal({
-          modalId: modalId,
-          children: <ResyncDatasetsBlock datasets={missingDatasets} />,
-        });
-      } else {
-        setModalId(
-          modals.open({
-            title: "Some datasets are missing data",
-            withCloseButton: false,
-            closeOnClickOutside: false,
-            closeOnEscape: false,
+        if (modalId) {
+          modals.updateModal({
+            modalId: modalId,
             children: <ResyncDatasetsBlock datasets={missingDatasets} />,
-          }),
-        );
-      }
-    });
-  }, [missingDatasets, modalId]);
+          });
+        } else {
+          setModalId(
+            modals.open({
+              title: "Some datasets are missing data",
+              withCloseButton: false,
+              closeOnClickOutside: false,
+              closeOnEscape: false,
+              children: <ResyncDatasetsBlock datasets={missingDatasets} />,
+            }),
+          );
+        }
+      });
+    },
+    [missingDatasets, modalId],
+  );
 }
