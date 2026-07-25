@@ -9,6 +9,7 @@ import { createSqlMentionExtension } from "@/lib/sql/createSqlMentionExtension";
 import css from "./SqlEditor.module.css";
 import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { ReactNode } from "react";
 
 /** Matches `line-height: 1.55` on `.cm-line` at `font-size-sm` (~14px). */
 const LINE_HEIGHT_PX = 22;
@@ -48,13 +49,15 @@ export function SqlEditor({
   onPillClick,
   onEditorReady,
   "data-testid": dataTestId,
-}: SqlEditorProps): JSX.Element {
+}: SqlEditorProps): ReactNode {
   const catalogRef = useRef(catalog);
   catalogRef.current = catalog;
   const onPillClickRef = useRef(onPillClick);
   onPillClickRef.current = onPillClick;
 
-  const [editorView, setEditorView] = useState<EditorView | null>(null);
+  const [editorView, setEditorView] = useState<EditorView | undefined>(
+    undefined,
+  );
 
   const catalogCompartment = useMemo(() => {
     return new Compartment();

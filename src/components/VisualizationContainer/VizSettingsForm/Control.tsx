@@ -7,11 +7,13 @@ import {
   TextInput,
 } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
+import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Display label for the control. */
@@ -40,7 +42,7 @@ export function Control({
   value,
   onChange,
   fields = [],
-}: Props): JSX.Element {
+}: Props): ReactNode {
   switch (spec.kind) {
     case "switch":
       return (
@@ -150,25 +152,19 @@ function ColumnPickerControl({
   dataType: "numeric" | "any" | "temporal" | "text" | undefined;
   value: string | undefined;
   onChange: (next: unknown) => void;
-}): JSX.Element {
+}): ReactNode {
   const { t } = useLingui();
   const filtered = useMemo(() => {
     if (dataType === undefined || dataType === "any") {
       return fields;
     }
     if (dataType === "numeric") {
-      return fields.filter((c) => {
-        return AvaDataType.isNumeric(c.dataType);
-      });
+      return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
     }
     if (dataType === "temporal") {
-      return fields.filter((c) => {
-        return AvaDataType.isTemporal(c.dataType);
-      });
+      return fields.filter(propPasses("dataType", AvaDataType.isTemporal));
     }
-    return fields.filter((c) => {
-      return AvaDataType.isText(c.dataType);
-    });
+    return fields.filter(propPasses("dataType", AvaDataType.isText));
   }, [fields, dataType]);
 
   const options = useMemo(() => {

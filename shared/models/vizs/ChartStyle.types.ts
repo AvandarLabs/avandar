@@ -1,13 +1,13 @@
 /**
  * Style configuration for the chart canvas (axes, grid, legend). This
  * lives on the host viz config and never travels with an embedded
- * series — i.e. it is intentionally *not* composable. When a line
+ * series (it is intentionally *not* composable). When a line
  * series is dropped into a bar host, the line obeys the bar host's
  * axis and grid styling.
  *
- * Phase 1 surface only — additional granular styling (padding,
- * background, title, font sizes, tooltip styling, tick formatters)
- * will be added in phase 2.
+ * For now this covers axes, grid, and legend. More granular styling
+ * (padding, background, title, font sizes, tooltip styling, tick
+ * formatters) can be added later.
  */
 export type AxisStyle = {
   /** Display label for the axis (e.g. "Revenue (USD)"). */

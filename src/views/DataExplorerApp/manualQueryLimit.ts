@@ -10,19 +10,15 @@ export const LARGE_DATASET_ROW_THRESHOLD = 50_000;
 /** LIMIT applied when a large dataset is selected without filters. */
 export const LARGE_DATASET_AUTO_LIMIT = DEFAULT_MANUAL_QUERY_LIMIT;
 
-function _hasNonDefaultAggregation(query: PartialStructuredQuery): boolean {
-  return Object.values(query.aggregations).some((aggregation) => {
-    return aggregation !== undefined && aggregation !== "none";
-  });
-}
-
 /**
  * True when the structured query applies GROUP BY or non-trivial aggregates.
  */
 export function hasStructuredQueryAggregations(
   query: PartialStructuredQuery,
 ): boolean {
-  return _hasNonDefaultAggregation(query);
+  return Object.values(query.aggregations).some((aggregation) => {
+    return aggregation !== undefined && aggregation !== "none";
+  });
 }
 
 /**
@@ -40,7 +36,7 @@ export function shouldDefaultManualQueryLimit(
     query.queryColumns.length === 0 &&
     query.orderByColumn === undefined &&
     query.orderByDirection === undefined &&
-    !_hasNonDefaultAggregation(query) &&
+    !hasStructuredQueryAggregations(query) &&
     isEmptyQueryFilter(query.filters) &&
     isEmptyQueryFilter(query.having) &&
     query.joins.length === 0

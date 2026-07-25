@@ -18,6 +18,11 @@ export type DataSourceCommitOptions = {
   limit?: number;
 };
 
+/**
+ * Resolved manual query ready to run: the (possibly limit-adjusted) query,
+ * whether an automatic LIMIT was applied for a large dataset, and the dataset
+ * row count when it was fetched.
+ */
 export type ResolveManualQueryForExecutionResult = {
   query: PartialStructuredQuery;
   didAutoLimit: boolean;

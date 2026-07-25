@@ -42,52 +42,55 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
       dataSource.id
     : undefined;
 
-  useEffect(() => {
-    if (
-      rawSQL !== undefined ||
-      datasetId === undefined ||
-      !shouldAutoLimitLargeDataset(query)
-    ) {
-      return;
-    }
+  useEffect(
+    function syncLargeDatasetAutoLimit() {
+      if (
+        rawSQL !== undefined ||
+        datasetId === undefined ||
+        !shouldAutoLimitLargeDataset(query)
+      ) {
+        return;
+      }
 
-    const requestId = syncRequestIdRef.current + 1;
-    syncRequestIdRef.current = requestId;
+      const requestId = syncRequestIdRef.current + 1;
+      syncRequestIdRef.current = requestId;
 
-    void fetchDatasetRowCount({
-      datasetId,
-      workspaceId: workspace.id,
-    })
-      .then((rowCount) => {
-        if (syncRequestIdRef.current !== requestId) {
-          return;
-        }
-        if (rawSqlRef.current !== undefined) {
-          return;
-        }
-        if (!shouldAutoLimitLargeDataset(queryRef.current)) {
-          return;
-        }
-        const autoLimit = largeDatasetAutoLimitFromRowCount(rowCount);
-        if (autoLimit === undefined) {
-          return;
-        }
-        onApplyAutoLimitRef.current(autoLimit);
+      void fetchDatasetRowCount({
+        datasetId,
+        workspaceId: workspace.id,
       })
-      .catch(() => {
-        // Row count is best-effort; leave limit unset.
-      });
-    // Only the listed fields influence `shouldAutoLimitLargeDataset`; the
-    // async callback reads the latest query via `queryRef.current`, so adding
-    // `query` here would re-fire on every render without changing behavior.
+        .then((rowCount) => {
+          if (syncRequestIdRef.current !== requestId) {
+            return;
+          }
+          if (rawSqlRef.current !== undefined) {
+            return;
+          }
+          if (!shouldAutoLimitLargeDataset(queryRef.current)) {
+            return;
+          }
+          const autoLimit = largeDatasetAutoLimitFromRowCount(rowCount);
+          if (autoLimit === undefined) {
+            return;
+          }
+          onApplyAutoLimitRef.current(autoLimit);
+        })
+        .catch(() => {
+          // Row count is best-effort; leave limit unset.
+        });
+      // Only the listed fields influence `shouldAutoLimitLargeDataset`; the
+      // async callback reads the latest query via `queryRef.current`, so adding
+      // `query` here would re-fire on every render without changing behavior.
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    datasetId,
-    query.aggregations,
-    query.filters,
-    query.having,
-    query.limit,
-    rawSQL,
-    workspace.id,
-  ]);
+    [
+      datasetId,
+      query.aggregations,
+      query.filters,
+      query.having,
+      query.limit,
+      rawSQL,
+      workspace.id,
+    ],
+  );
 }

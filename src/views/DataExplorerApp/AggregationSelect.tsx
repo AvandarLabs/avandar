@@ -3,7 +3,6 @@ import { useUncontrolled } from "@mantine/hooks";
 import { Select } from "@ui";
 import { propIsInArray } from "@utils";
 import { AvaDataType as AvaDataTypeFns } from "$/models/datasets/AvaDataType/AvaDataType";
-import { useMemo } from "react";
 import type { SelectOption, SelectProps } from "@ui";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
@@ -49,11 +48,9 @@ export function AggregationSelect({
   const validAggregations = AvaDataTypeFns.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options
-  const aggregationOptions = useMemo(() => {
-    return allAggregationOptions.filter(
-      propIsInArray("value", validAggregations),
-    );
-  }, [allAggregationOptions, validAggregations]);
+  const aggregationOptions = allAggregationOptions.filter(
+    propIsInArray("value", validAggregations),
+  );
 
   const [currentAggregation, setCurrentAggregation] =
     useUncontrolled<QueryAggregationType.T>({

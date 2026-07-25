@@ -1,5 +1,5 @@
 import { Model } from "@models";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit";
 import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
@@ -36,6 +36,10 @@ export function useManualQueryDataSourceChange(opts: {
       hintTimeoutRef.current = null;
     }
   }, []);
+
+  useEffect(() => {
+    return clearHintTimeout;
+  }, [clearHintTimeout]);
 
   const hideLargeDatasetLimitHint = useCallback((): void => {
     clearHintTimeout();

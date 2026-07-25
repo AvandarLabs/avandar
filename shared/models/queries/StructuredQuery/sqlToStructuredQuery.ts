@@ -2,14 +2,15 @@
  * Best-effort parser from a raw SQL string into a {@link
  * PartialStructuredQuery} that the manual query form can display.
  *
- * This is the unidirectional ingest path for Phase 1 of the SQL ↔ form sync
- * feature: chat-generated or hand-edited SQL is parsed into AST form using
+ * This is the unidirectional ingest path of the SQL/form sync: chat-generated
+ * or hand-edited SQL is parsed into AST form using
  * `node-sql-parser`, and recognised shapes are mapped onto the manual query
  * model. Anything we cannot represent in the form (window functions, CTEs,
  * UNIONs, subqueries, joins, etc.) is reported through the
  * `unmappedReasons` list so the UI can show an "approximation only" badge.
  */
 import { Model } from "@models/Model/Model.ts";
+import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { Parser } from "node-sql-parser";
@@ -38,6 +39,7 @@ import type {
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
+/** Outcome of parsing a SQL string into a partial structured query. */
 export type SqlMappingResult = {
   /** The best-effort structured query produced from the SQL. */
   query: PartialStructuredQuery;
@@ -50,6 +52,7 @@ export type SqlMappingResult = {
   unmappedReasons: readonly string[];
 };
 
+/** Inputs required to parse a SQL string into a structured query. */
 export type SqlMappingInput = {
   /** The SQL string to parse. */
   sql: string;
@@ -126,23 +129,31 @@ function _columnRefName(node: unknown): string | undefined {
 }
 
 /**
+ * Lookup from an (upper-cased) parser binary operator to the
+ * corresponding {@link QueryFilterOperator}. Operators not present here are
+ * unsupported by the form.
+ */
+const _FILTER_OPERATOR_BY_SQL: Record<string, QueryFilterOperator> = {
+  "=": "=",
+  "!=": "!=",
+  "<>": "!=",
+  ">": ">",
+  ">=": ">=",
+  "<": "<",
+  "<=": "<=",
+  LIKE: "like",
+  "NOT LIKE": "not_like",
+  IN: "in",
+  "NOT IN": "not_in",
+  BETWEEN: "between",
+  IS: "is_null",
+};
+
+/**
  * Translate a parser binary operator to a {@link QueryFilterOperator}.
  */
 function _toFilterOperator(operator: string): QueryFilterOperator | undefined {
-  const op = operator.toUpperCase();
-  if (op === "=") return "=";
-  if (op === "!=" || op === "<>") return "!=";
-  if (op === ">") return ">";
-  if (op === ">=") return ">=";
-  if (op === "<") return "<";
-  if (op === "<=") return "<=";
-  if (op === "LIKE") return "like";
-  if (op === "NOT LIKE") return "not_like";
-  if (op === "IN") return "in";
-  if (op === "NOT IN") return "not_in";
-  if (op === "BETWEEN") return "between";
-  if (op === "IS") return "is_null";
-  return undefined;
+  return _FILTER_OPERATOR_BY_SQL[operator.toUpperCase()];
 }
 
 function _literalValue(
@@ -193,15 +204,14 @@ function _extractValueList(
   if (!Array.isArray(items)) {
     return undefined;
   }
-  const out: Array<string | number> = [];
-  for (const item of items) {
-    const lit = _literalValue(item);
-    if (lit === undefined || lit === null || typeof lit === "boolean") {
-      return undefined;
-    }
-    out.push(lit);
+  const literals = items.map(_literalValue);
+  const hasInvalid = literals.some((lit) => {
+    return lit === undefined || lit === null || typeof lit === "boolean";
+  });
+  if (hasInvalid) {
+    return undefined;
   }
-  return out;
+  return literals as Array<string | number>;
 }
 
 function _parseWhereNode(
@@ -433,7 +443,7 @@ function _parseJoinOn(
   }
   if (operator !== "=") {
     unmappedReasons.push(
-      `JOIN ON clause uses "${operator}" — only equality joins are mapped.`,
+      `JOIN ON clause uses "${operator}": only equality joins are mapped.`,
     );
     return undefined;
   }
@@ -691,11 +701,11 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const columnsList = ast.columns;
   const skipColumnHydration = !dataset || joins.length > 0 || !!nestedSubquery;
   if (Array.isArray(columnsList) && !skipColumnHydration && dataset) {
-    for (const item of columnsList) {
+    columnsList.forEach((item) => {
       const expr = (item as { expr?: unknown }).expr;
       if (!expr || typeof expr !== "object") {
         unmappedReasons.push("Unrecognised SELECT item; skipped.");
-        continue;
+        return;
       }
       const exprObj = expr as Record<string, unknown>;
       const exprType = exprObj.type;
@@ -710,7 +720,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         dataset.columns.forEach((col) => {
           queryColumns.push(_makeQueryColumn(col, undefined));
         });
-        continue;
+        return;
       }
 
       // Plain column reference
@@ -718,17 +728,17 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         const columnName = _identifierToString(exprObj.column);
         if (!columnName) {
           unmappedReasons.push("Unnamed column expression in SELECT; skipped.");
-          continue;
+          return;
         }
         const matched = _matchColumn(columnName, dataset.columns);
         if (!matched) {
           unmappedReasons.push(
             `SELECT references column "${columnName}" not present in the dataset.`,
           );
-          continue;
+          return;
         }
         queryColumns.push(_makeQueryColumn(matched, undefined));
-        continue;
+        return;
       }
 
       // Aggregate function: SUM(col), AVG(col), COUNT(col), MAX(col), MIN(col)
@@ -742,31 +752,31 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
           unmappedReasons.push(
             `Unsupported aggregate function "${funcName}" in SELECT; skipped.`,
           );
-          continue;
+          return;
         }
         if (!colName) {
           unmappedReasons.push(
             `Aggregate function "${funcName}" uses a complex argument; skipped.`,
           );
-          continue;
+          return;
         }
         const matched = _matchColumn(colName, dataset.columns);
         if (!matched) {
           unmappedReasons.push(
             `Aggregate references column "${colName}" not present in the dataset.`,
           );
-          continue;
+          return;
         }
         const queryColumn = _makeQueryColumn(matched, agg);
         queryColumns.push(queryColumn);
         aggregations[queryColumn.id] = agg;
-        continue;
+        return;
       }
 
       unmappedReasons.push(
         `SELECT expression of type "${String(exprType)}" is not supported by the form.`,
       );
-    }
+    });
   }
 
   // Ensure aggregations map covers all columns
@@ -786,9 +796,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         unmappedReasons.push("GROUP BY uses a non-column expression.");
         return;
       }
-      const match = queryColumns.find((c) => {
-        return c.baseColumn.name === colName;
-      });
+      const match = queryColumns.find(propEq("baseColumn.name", colName));
       if (match) {
         if (aggregations[match.id] === "none") {
           aggregations[match.id] = "group_by";
@@ -810,9 +818,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     const first = orderbyClause[0] as { type?: string; expr?: unknown };
     const colName = _columnRefName(first.expr);
     if (colName) {
-      const matchCol = queryColumns.find((c) => {
-        return c.baseColumn.name === colName;
-      });
+      const matchCol = queryColumns.find(propEq("baseColumn.name", colName));
       if (matchCol) {
         orderByColumn = matchCol.id;
         const dir = String(first.type ?? "").toLowerCase();
@@ -838,10 +844,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   if (limitClause && Array.isArray(limitClause.value)) {
     const limitValues = limitClause.value;
     if (limitValues.length === 1) {
-      const v = limitValues[0] as { value?: unknown };
-      const n = Number(v.value);
-      if (!Number.isNaN(n)) {
-        limit = n;
+      const limitNode = limitValues[0] as { value?: unknown };
+      const limitValue = Number(limitNode.value);
+      if (!Number.isNaN(limitValue)) {
+        limit = limitValue;
       }
     } else if (limitValues.length === 2) {
       const first = limitValues[0] as { value?: unknown };
@@ -905,8 +911,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
     version: 1,
-    dataSource:
-      dataset?.dataset ?? (undefined as unknown as DatasetModel["Read"]),
+    dataSource: dataset?.dataset as DatasetModel["Read"],
     ...(nestedSubquery ? { nestedSubquery } : {}),
     queryColumns,
     orderByColumn,

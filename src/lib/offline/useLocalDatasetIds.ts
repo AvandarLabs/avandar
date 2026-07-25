@@ -1,4 +1,5 @@
 import { useQuery } from "@hooks";
+import { prop } from "@utils";
 import { useMemo } from "react";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
@@ -24,10 +25,6 @@ export function useLocalDatasetIds(): Set<DatasetId> {
   });
 
   return useMemo(() => {
-    return new Set(
-      (rows ?? []).map((row) => {
-        return row.datasetId;
-      }),
-    );
+    return new Set((rows ?? []).map(prop("datasetId")));
   }, [rows]);
 }

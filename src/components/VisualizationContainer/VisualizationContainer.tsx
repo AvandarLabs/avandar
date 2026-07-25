@@ -1,4 +1,3 @@
-import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex, List, Text } from "@mantine/core";
 import { Callout, DangerText } from "@ui";
@@ -14,6 +13,7 @@ import {
   string,
 } from "zod";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit";
+import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
@@ -25,6 +25,7 @@ import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { ReactNode } from "react";
 
 type Props = {
   columns: readonly QueryResultColumn[];
@@ -50,7 +51,7 @@ type Props = {
 function useVizConfigSchemas() {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this
   // React-render path stays subscribed to locale changes via `useLingui()`.
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+
   const { t } = useLingui();
   return useMemo(() => {
     const XAxisKeySchema = string({
@@ -127,7 +128,7 @@ export function VisualizationContainer({
 }: Props): JSX.Element {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this
   // React-render path stays subscribed to locale changes via `useLingui()`.
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+
   const { t } = useLingui();
   const schemas = useVizConfigSchemas();
   const columnNames = columns.map(prop("name"));
@@ -155,7 +156,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <BarChart
               data={limitedData}
               height="100%"
@@ -169,7 +170,7 @@ export function VisualizationContainer({
           </Box>
         );
       }
-      return _renderError(t`bar chart`, error);
+      return <RenderError chartName={t`bar chart`} error={error} />;
     })
     .with({ vizType: "line" }, (config) => {
       const {
@@ -179,7 +180,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <LineChart
               data={limitedData}
               height="100%"
@@ -202,7 +203,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <AreaChart
               data={limitedData}
               height="100%"
@@ -226,7 +227,7 @@ export function VisualizationContainer({
       } = schemas.ScatterPlotConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <ScatterChart
               data={limitedData}
               height="100%"
@@ -245,7 +246,7 @@ export function VisualizationContainer({
       } = schemas.PieChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <PieChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -268,7 +269,7 @@ export function VisualizationContainer({
       } = schemas.FunnelChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <FunnelChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -288,7 +289,7 @@ export function VisualizationContainer({
       } = schemas.RadarChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <RadarChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -309,7 +310,7 @@ export function VisualizationContainer({
       } = schemas.BubbleChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <BubbleChart
               data={limitedData}
               height="100%"
@@ -329,10 +330,17 @@ export function VisualizationContainer({
     });
 }
 
-function _renderError(
-  chartName: string,
-  error: Parameters<typeof flattenError>[0],
-): JSX.Element {
+function RenderError({
+  chartName,
+  error,
+}: {
+  chartName: string;
+  error: Parameters<typeof flattenError>[0];
+}): ReactNode {
+  // Own `useLingui()` subscription so the summary/title strings below
+  // re-render on locale change, matching the hook-bound `t` used by the
+  // rest of this reactive component tree.
+  const { t } = useLingui();
   const errors = flattenError(error).fieldErrors as Record<
     string,
     readonly string[] | undefined

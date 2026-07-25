@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Paper, Text, Transition } from "@mantine/core";
 import css from "./ManualQueryLargeDatasetLimitHint.module.css";
+import type { ReactNode } from "react";
 
 /** How long the large-dataset limit hint stays visible before fading out. */
 export const LARGE_DATASET_LIMIT_HINT_VISIBLE_MS = 4_000;
@@ -15,7 +16,7 @@ type Props = {
  */
 export function ManualQueryLargeDatasetLimitHint({
   visible,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   return (
     <Transition mounted={visible} transition="fade-up" duration={220}>
       {(transitionStyle) => {

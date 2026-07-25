@@ -1,4 +1,8 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import {
+  columnNameSet,
+  pickFirstNumericColumnName,
+} from "$/models/vizs/hydrateColumnPicking.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type PieAxesConfig = {
@@ -30,13 +34,9 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = new Set(
-    columns.map((c) => {
-      return c.name;
-    }),
-  );
+  const colNames = columnNameSet(columns);
 
-  let next: VConfig = {
+  let nextConfig: VConfig = {
     ...currVizConfig,
     valueKey:
       currVizConfig.valueKey && colNames.has(currVizConfig.valueKey) ?
@@ -48,17 +48,15 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
       : undefined,
   };
 
-  if (next.valueKey === undefined) {
-    const valueCol = columns.find((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
-    if (valueCol !== undefined) {
-      next = { ...next, valueKey: valueCol.name };
+  if (nextConfig.valueKey === undefined) {
+    const valueColName = pickFirstNumericColumnName(columns);
+    if (valueColName !== undefined) {
+      nextConfig = { ...nextConfig, valueKey: valueColName };
     }
   }
 
-  if (next.nameKey === undefined) {
-    const valueKey = next.valueKey;
+  if (nextConfig.nameKey === undefined) {
+    const valueKey = nextConfig.valueKey;
     const others = columns.filter((c) => {
       return c.name !== valueKey;
     });
@@ -67,27 +65,27 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
       return AvaDataType.isTemporal(c.dataType);
     });
     if (temporal !== undefined) {
-      return { ...next, nameKey: temporal.name };
+      return { ...nextConfig, nameKey: temporal.name };
     }
 
     const text = others.find((c) => {
       return AvaDataType.isText(c.dataType);
     });
     if (text !== undefined) {
-      return { ...next, nameKey: text.name };
+      return { ...nextConfig, nameKey: text.name };
     }
 
     const booleanCol = others.find((c) => {
       return c.dataType === "boolean";
     });
     if (booleanCol !== undefined) {
-      return { ...next, nameKey: booleanCol.name };
+      return { ...nextConfig, nameKey: booleanCol.name };
     }
 
     if (others[0] !== undefined) {
-      return { ...next, nameKey: others[0].name };
+      return { ...nextConfig, nameKey: others[0].name };
     }
   }
 
-  return next;
+  return nextConfig;
 }

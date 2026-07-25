@@ -26,8 +26,14 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
   const hadUserRef = useRef(false);
 
   useEffect(() => {
+    let cancelled = false;
     const getSession = async () => {
       const currentSession = await AuthClient.getCurrentSession();
+      // Guard against a stale write if the effect re-ran (or unmounted)
+      // while the session lookup was in flight.
+      if (cancelled) {
+        return;
+      }
       setUser(currentSession?.user ?? undefined);
     };
 
@@ -54,6 +60,7 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, [router]);

@@ -7,6 +7,15 @@ For point-free helpers tied to a specific package (such as
 `@avandar/utils`'s `prop` / `propEq`), see the matching
 library-gated phase.
 
+- No imperative `for` / `while` loops for iterating collections; prefer
+  `map` / `filter` / `reduce` / `forEach` / `flatMap`, even when that means a
+  second pass (e.g. `.map().filter()`). The full rule, its **only** exceptions
+  (async sequencing, early-exit-for-performance, and large N — ~100,000+ — in a
+  hot path), and the note that raw string-character scanning is out of scope
+  live in the "Most Common Mistakes" section of this skill's `SKILL.md`. Do not
+  flag a `.map().filter()` two-pass as a performance problem below that
+  threshold.
+
 - Prefer nested positive returns over a long string of negative early-exit
   `if` statements when the function is computing a value. Early-exit guards
   are appropriate for true preconditions (auth, fast paths) but become

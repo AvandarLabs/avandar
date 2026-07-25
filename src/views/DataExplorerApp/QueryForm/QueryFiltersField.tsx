@@ -5,8 +5,10 @@ import {
   MantineValueEditor,
   QueryBuilderMantine,
 } from "@react-querybuilder/mantine";
+import { isDefined } from "@utils";
 import { useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
+import type { ReactNode } from "react";
 import "react-querybuilder/dist/query-builder.css";
 import classes from "./QueryFiltersField.module.css";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
@@ -177,17 +179,14 @@ function _convertRuleToInternal(
 }
 
 function _convertGroupToInternal(group: LibraryGroup): QueryFilterGroup {
-  const rules: Array<QueryFilterGroup | QueryFilterRule> = [];
-  group.rules.forEach((child) => {
-    if (_isGroup(child)) {
-      rules.push(_convertGroupToInternal(child));
-      return;
-    }
-    const converted = _convertRuleToInternal(child as LibraryRule);
-    if (converted) {
-      rules.push(converted);
-    }
-  });
+  const rules: Array<QueryFilterGroup | QueryFilterRule> = group.rules
+    .map((child) => {
+      if (_isGroup(child)) {
+        return _convertGroupToInternal(child);
+      }
+      return _convertRuleToInternal(child as LibraryRule);
+    })
+    .filter(isDefined);
   const combinator = String(group.combinator).toUpperCase();
   return {
     type: "group",
@@ -205,7 +204,7 @@ export function QueryFiltersField({
   columns,
   value,
   onChange,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const operatorsForLibrary = useOperatorsForLibrary();
   const fields: Field[] = useMemo(() => {
     return columns.map((col) => {

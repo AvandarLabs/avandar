@@ -1,4 +1,5 @@
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
+import { propEq } from "@utils";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import type { CompositeChartSeries } from "@mantine/charts";
 import type { UnknownDataFrame } from "@utils";
@@ -46,61 +47,45 @@ export function renderXYComposite({
       tooltipProps={tooltipProps as never}
       valueFormatter={valueFormatter}
       barProps={(s) => {
-        const found = series.find((sx) => {
-          return sx.key === s.name;
-        });
+        const found = series.find(propEq("key", s.name));
         if (found === undefined || found.renderAs !== "bar") {
           return {};
         }
-        const overrides: Record<string, unknown> = {};
-        if (found.fillOpacity !== undefined) {
-          overrides.fillOpacity = found.fillOpacity;
-        }
-        if (found.stackId !== undefined) {
-          overrides.stackId = found.stackId;
-        }
-        return overrides;
+        return {
+          ...(found.fillOpacity !== undefined ?
+            { fillOpacity: found.fillOpacity }
+          : {}),
+          ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
+        };
       }}
       lineProps={(s) => {
-        const found = series.find((sx) => {
-          return sx.key === s.name;
-        });
+        const found = series.find(propEq("key", s.name));
         if (found === undefined || found.renderAs !== "line") {
           return {};
         }
-        const overrides: Record<string, unknown> = {};
-        if (found.strokeWidth !== undefined) {
-          overrides.strokeWidth = found.strokeWidth;
-        }
-        if (found.curveType !== undefined) {
-          overrides.type = found.curveType;
-        }
-        if (found.withDots !== undefined) {
-          overrides.dot = found.withDots;
-        }
-        return overrides;
+        return {
+          ...(found.strokeWidth !== undefined ?
+            { strokeWidth: found.strokeWidth }
+          : {}),
+          ...(found.curveType !== undefined ? { type: found.curveType } : {}),
+          ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
+        };
       }}
       areaProps={(s) => {
-        const found = series.find((sx) => {
-          return sx.key === s.name;
-        });
+        const found = series.find(propEq("key", s.name));
         if (found === undefined || found.renderAs !== "area") {
           return {};
         }
-        const overrides: Record<string, unknown> = {};
-        if (found.strokeWidth !== undefined) {
-          overrides.strokeWidth = found.strokeWidth;
-        }
-        if (found.fillOpacity !== undefined) {
-          overrides.fillOpacity = found.fillOpacity;
-        }
-        if (found.curveType !== undefined) {
-          overrides.type = found.curveType;
-        }
-        if (found.withDots !== undefined) {
-          overrides.dot = found.withDots;
-        }
-        return overrides;
+        return {
+          ...(found.strokeWidth !== undefined ?
+            { strokeWidth: found.strokeWidth }
+          : {}),
+          ...(found.fillOpacity !== undefined ?
+            { fillOpacity: found.fillOpacity }
+          : {}),
+          ...(found.curveType !== undefined ? { type: found.curveType } : {}),
+          ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
+        };
       }}
       {...styleProps}
     />

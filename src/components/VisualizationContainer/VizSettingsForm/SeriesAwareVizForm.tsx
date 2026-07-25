@@ -12,11 +12,13 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
+import { makeBucketMap, propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control";
+import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.module.css";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -28,6 +30,7 @@ import type {
   XYSeries,
 } from "$/models/vizs/SeriesConfig";
 import type { ErasedSeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+import type { ReactNode } from "react";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
 type RadarHostConfig = RadarChartVizConfig;
@@ -74,15 +77,13 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   fields,
   config,
   onConfigChange,
-}: Props<TConfig>): JSX.Element {
+}: Props<TConfig>): ReactNode {
   const { t } = useLingui();
   const isRadar = config.vizType === "radar";
   const chartDescriptors = VizConfigs.getDescriptors(config.vizType).chart;
 
   const numericFields = useMemo(() => {
-    return fields.filter((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
+    return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
 
   const updateChartPath = useCallback(
@@ -173,8 +174,10 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   const axisLegend = isRadar ? t`Category axis` : t`X axis`;
 
   const groupedChartDescriptors = useMemo(() => {
-    return _groupBy(chartDescriptors, (d) => {
-      return d.group ?? "";
+    return makeBucketMap(chartDescriptors, {
+      keyFn: (descriptor) => {
+        return descriptor.group ?? "";
+      },
     });
   }, [chartDescriptors]);
 
@@ -209,7 +212,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 <IconInfoCircle
                   size={14}
                   aria-label={t`What is a series?`}
-                  style={{ cursor: "help" }}
+                  className={css.helpCursor}
                 />
               </Tooltip>
             </Group>
@@ -323,7 +326,7 @@ function SeriesCard({
   isRadarHost,
   onSeriesChange,
   onRemove,
-}: SeriesCardProps): JSX.Element {
+}: SeriesCardProps): ReactNode {
   const { t } = useLingui();
   const renderAsOptions = useRenderAsOptions();
   const seriesRenderAs: RenderAs | "radar" =
@@ -346,8 +349,10 @@ function SeriesCard({
     : descriptors;
 
   const groupedDescriptors = useMemo(() => {
-    return _groupBy(filtered, (d) => {
-      return d.group ?? "";
+    return makeBucketMap(filtered, {
+      keyFn: (descriptor) => {
+        return descriptor.group ?? "";
+      },
     });
   }, [filtered]);
 
@@ -385,12 +390,10 @@ function SeriesCard({
       const r = next as RenderAs;
       const xy = series as XYSeries;
       const common = { key: xy.key, label: xy.label, color: xy.color };
-      let updated: XYSeries;
-      if (r === "area") {
-        updated = { renderAs: r, ...common, fillOpacity: 0.6 };
-      } else {
-        updated = { renderAs: r, ...common };
-      }
+      const updated: XYSeries =
+        r === "area" ?
+          { renderAs: r, ...common, fillOpacity: 0.6 }
+        : { renderAs: r, ...common };
       onSeriesChange(updated);
     },
     [isRadarHost, series, onSeriesChange],
@@ -400,7 +403,7 @@ function SeriesCard({
     <Card withBorder shadow="none" padding="sm">
       <Stack gap="xs">
         <Group justify="space-between" wrap="nowrap">
-          <Box style={{ flex: 1, minWidth: 0 }}>
+          <Box className={css.flexFillMinW0}>
             <Control
               label={t`Column`}
               spec={{ kind: "columnPicker", dataType: "numeric" }}
@@ -474,21 +477,4 @@ function SeriesCard({
       </Stack>
     </Card>
   );
-}
-
-function _groupBy<T>(
-  items: readonly T[],
-  key: (item: T) => string,
-): Map<string, T[]> {
-  const map = new Map<string, T[]>();
-  for (const item of items) {
-    const k = key(item);
-    let arr = map.get(k);
-    if (arr === undefined) {
-      arr = [];
-      map.set(k, arr);
-    }
-    arr.push(item);
-  }
-  return map;
 }

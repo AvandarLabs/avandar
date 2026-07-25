@@ -33,24 +33,26 @@ import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettings
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { formatOfflineQueryError } from "@/lib/offline/formatOfflineQueryError";
 import {
+  DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
   hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
+import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
-import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ChatPlan } from "$/types/chat.types";
+import type { ReactNode } from "react";
 
 const QUERY_DETAILS_WIDTH = 380;
 const VISUALIZATION_SETTINGS_WIDTH = 340;
@@ -66,31 +68,30 @@ const VISUALIZATION_SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
 /** Defaults applied when there is no saved per-tab preference. */
 const DEFAULT_QUERY_DETAILS_OPENED = true;
 const DEFAULT_VISUALIZATION_SETTINGS_OPENED = false;
-const AI_PANEL_SESSION_KEY = "ava.data-explorer.ai-panel-auto-opened";
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
   panel: "queryDetails" | "settings",
-  next: DataExplorerPanelPreferences["queryDetails"],
+  nextPreference: DataExplorerPanelPreferences["queryDetails"],
 ): DataExplorerPanelPreferences {
   return {
     ...preferences,
     [panel]: {
       ...preferences[panel],
-      ...next,
+      ...nextPreference,
     },
   };
 }
 
 type Props = {
-  urlSearch: DataExplorerURLSearch;
+  urlSearch: DataExplorerUrlSearch;
   navigate: (options: {
-    search: DataExplorerURLSearch;
+    search: DataExplorerUrlSearch;
     replace: boolean;
   }) => void;
 };
 
-export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
+export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
@@ -143,7 +144,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     writeDataExplorerPanelPreferences(panelPreferences);
   }, [panelPreferences]);
 
-  useDataExplorerURLSync({ urlSearch, navigate });
+  useDataExplorerUrlSync({ urlSearch, navigate });
 
   const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -192,18 +193,18 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     workspaceId: workspace.id,
   });
 
-  useEffect(() => {
-    const message =
-      dataQuery.isError ?
-        (formatOfflineQueryError(dataQuery.error) ??
-        (dataQuery.error instanceof Error ?
-          dataQuery.error.message
-        : String(dataQuery.error)))
-      : undefined;
-    if (message !== state.lastQueryError) {
-      dispatch.setLastQueryError(message);
-    }
-  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
+  useEffect(
+    function syncLastQueryError() {
+      const message =
+        dataQuery.isError ?
+          (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
+        : undefined;
+      if (message !== state.lastQueryError) {
+        dispatch.setLastQueryError(message);
+      }
+    },
+    [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
+  );
   const queryResultColumns = queryResults?.columns ?? [];
 
   const columnSignature = useMemo(() => {
@@ -235,15 +236,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   ]);
 
   useEffect(() => {
-    if (isLoadingResults) {
-      return;
+    if (!isLoadingResults && queryResults?.columns) {
+      dispatch.syncVizFromQueryResult(queryResults.columns);
     }
-
-    if (!queryResults) {
-      return;
-    }
-
-    dispatch.syncVizFromQueryResult(queryResults.columns);
   }, [
     isLoadingResults,
     columnSignature,
@@ -283,10 +278,12 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   useEffect(
     function openChatPanelOnMount() {
-      const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
+      const alreadyOpened = sessionStorage.getItem(
+        DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
+      );
       if (!alreadyOpened) {
         chatPanelDispatch.open();
-        sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
+        sessionStorage.setItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY, "true");
       }
     },
     [chatPanelDispatch],
@@ -441,9 +438,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   if (!state.rawSQL) {
                     return;
                   }
-                  // Plan-flow snapshotting is a Group 3 (chat-plan) feature.
-                  // The Data Explorer's plan panel is reconnected in G3; until
-                  // then no plan is captured on save-as-new-dataset.
+                  // For now the Data Explorer's plan panel is not wired up, so
+                  // no plan is captured on save-as-new-dataset.
                   const planSnapshot: ChatPlan | null = null;
                   const modalId = modals.open({
                     title: t`Save as new dataset`,

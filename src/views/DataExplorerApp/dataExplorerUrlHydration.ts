@@ -1,4 +1,4 @@
-import type { ParsedURLState } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 type MinimalDataSource = { id: string };
 
@@ -8,13 +8,13 @@ type MinimalDataSource = { id: string };
  * first-mount hydration.
  */
 export function urlSearchHasHydrateableExplorerKeys(
-  parsed: ParsedURLState,
+  parsed: ParsedUrlState,
 ): boolean {
   return Boolean(parsed.dsId ?? parsed.rawSQL ?? parsed.vizConfig);
 }
 
 type DeferStructuredHydrationOptions = {
-  urlState: ParsedURLState;
+  urlState: ParsedUrlState;
   restoredDataSource: MinimalDataSource | undefined;
   needsColumns: boolean;
   datasetColumns: readonly unknown[] | undefined;
@@ -27,7 +27,7 @@ type DeferStructuredHydrationOptions = {
  * When true, the hydration effect should return early and wait for datasets /
  * column metadata to load before applying structured URL state.
  */
-export function shouldDeferURLHydrationForStructuredLoading(
+export function shouldDeferUrlHydrationForStructuredLoading(
   options: DeferStructuredHydrationOptions,
 ): boolean {
   if (options.urlState.rawSQL && !options.sqlMappingMetadataLoaded) {

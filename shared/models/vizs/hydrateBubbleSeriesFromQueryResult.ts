@@ -1,4 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -27,11 +28,7 @@ export function hydrateBubbleSeriesFromQueryResult<
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = new Set(
-    columns.map((c) => {
-      return c.name;
-    }),
-  );
+  const colNames = columnNameSet(columns);
 
   let nextSeries: BubbleSeries[] = currVizConfig.series.filter((s) => {
     return (

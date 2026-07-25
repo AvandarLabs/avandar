@@ -1,6 +1,8 @@
 import { Combobox, useCombobox } from "@mantine/core";
+import { isDefined, propEq } from "@utils";
 import { computeSqlScope } from "$/lib/sql/sqlScope";
 import { useEffect, useRef } from "react";
+import css from "./PillEditPopover.module.css";
 import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
@@ -35,27 +37,28 @@ function _buildColumnOptions(
   sql: string,
 ): Option[] {
   const scope = computeSqlScope({ sql, catalog });
-  const seen = new Set<string>();
-  const options: Option[] = [];
-  for (const dataset of catalog.datasets) {
-    if (!scope.datasetIds.has(dataset.id)) {
-      continue;
-    }
-    for (const col of dataset.columns) {
-      const key = `${dataset.name}::${col.name}`;
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      options.push({
-        value: key,
-        insert: `"${col.name}"`,
-        label: col.name,
-        group: dataset.name,
+  const options: Option[] = catalog.datasets
+    .filter((dataset) => {
+      return scope.datasetIds.has(dataset.id);
+    })
+    .flatMap((dataset) => {
+      return dataset.columns.map((col) => {
+        return {
+          value: `${dataset.name}::${col.name}`,
+          insert: `"${col.name}"`,
+          label: col.name,
+          group: dataset.name,
+        };
       });
-    }
-  }
-  return options;
+    });
+
+  // Dedupe by `${dataset.name}::${col.name}`, keeping first occurrence.
+  const byKey = new Map(
+    options.map((option) => {
+      return [option.value, option] as const;
+    }),
+  );
+  return Array.from(byKey.values());
 }
 
 /**
@@ -99,31 +102,36 @@ export function PillEditPopover({
       _buildDatasetOptions(catalog)
     : _buildColumnOptions(catalog, sql);
 
-  const grouped = new Map<string, Option[]>();
-  const ungrouped: Option[] = [];
-  for (const opt of options) {
-    if (opt.group === undefined) {
-      ungrouped.push(opt);
-      continue;
-    }
-    let bucket = grouped.get(opt.group);
-    if (bucket === undefined) {
-      bucket = [];
-      grouped.set(opt.group, bucket);
-    }
-    bucket.push(opt);
-  }
+  const ungrouped = options.filter((opt) => {
+    return opt.group === undefined;
+  });
+  const groupNames = Array.from(
+    new Set(
+      options
+        .map((opt) => {
+          return opt.group;
+        })
+        .filter(isDefined),
+    ),
+  );
+  const grouped = new Map<string, Option[]>(
+    groupNames.map((groupName) => {
+      return [
+        groupName,
+        options.filter((opt) => {
+          return opt.group === groupName;
+        }),
+      ];
+    }),
+  );
 
   return (
     <div
+      className={css.anchor}
       style={{
-        position: "fixed",
         left: pill.anchorRect.left,
         top: pill.anchorRect.bottom,
         width: pill.anchorRect.width,
-        height: 0,
-        pointerEvents: "none",
-        zIndex: 9999,
       }}
       data-testid="ava-sql-pill-popover-anchor"
     >
@@ -133,9 +141,7 @@ export function PillEditPopover({
         width={240}
         withinPortal
         onOptionSubmit={(value) => {
-          const option = options.find((o) => {
-            return o.value === value;
-          });
+          const option = options.find(propEq("value", value));
           if (option) {
             onSelect({ insert: option.insert });
           }
@@ -143,11 +149,8 @@ export function PillEditPopover({
       >
         <Combobox.Target>
           <div
-            style={{
-              width: pill.anchorRect.width,
-              height: 0,
-              pointerEvents: "auto",
-            }}
+            className={css.target}
+            style={{ width: pill.anchorRect.width }}
           />
         </Combobox.Target>
         <Combobox.Dropdown

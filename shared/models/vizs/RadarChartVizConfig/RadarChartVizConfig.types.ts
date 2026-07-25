@@ -1,4 +1,4 @@
-import type { ChartStyle } from "$/models/vizs/ChartStyle.ts";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 /**

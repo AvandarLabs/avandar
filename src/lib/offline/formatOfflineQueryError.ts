@@ -1,3 +1,4 @@
+/** Shown when an offline query hits uncached dataset data. */
 const OFFLINE_UNCACHED_MESSAGE =
   "This dataset's data isn't cached on this device. Connect to the internet, open the dataset, then try again.";
 

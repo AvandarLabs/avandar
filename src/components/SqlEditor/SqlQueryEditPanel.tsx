@@ -1,6 +1,7 @@
 import { Button, Group, Stack } from "@mantine/core";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/AvaSqlBlock";
+import type { ReactNode } from "react";
 
 export type SqlQueryEditPanelProps = {
   initialSql: string;
@@ -23,7 +24,7 @@ export function SqlQueryEditPanel({
   minRows = 6,
   onSubmit,
   onCancel,
-}: SqlQueryEditPanelProps): JSX.Element {
+}: SqlQueryEditPanelProps): ReactNode {
   const [draftSql, setDraftSql] = useState(initialSql);
   const trimmedInitial = initialSql.trim();
   const trimmedDraft = draftSql.trim();

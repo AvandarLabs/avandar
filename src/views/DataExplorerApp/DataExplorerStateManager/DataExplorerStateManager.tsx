@@ -391,12 +391,8 @@ function _sameColumnSchema(
   if (prev.length !== next.length) {
     return false;
   }
-  for (let i = 0; i < next.length; i++) {
-    const a = prev[i]!;
-    const b = next[i]!;
-    if (a.name !== b.name || a.dataType !== b.dataType) {
-      return false;
-    }
-  }
-  return true;
+  return next.every((b, idx) => {
+    const a = prev[idx]!;
+    return a.name === b.name && a.dataType === b.dataType;
+  });
 }

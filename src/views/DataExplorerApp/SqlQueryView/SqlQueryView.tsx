@@ -8,6 +8,7 @@ import { formatSqlForDisplay } from "@/lib/sql/formatSqlForDisplay";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";
+import type { ReactNode } from "react";
 
 const SQL_EDITOR_MIN_ROWS = 10;
 
@@ -18,7 +19,7 @@ const SQL_EDITOR_MIN_ROWS = 10;
  * whether the SQL came from the chat panel, the manual query form, or a
  * saved dataset.
  */
-export function SqlQueryView(): JSX.Element {
+export function SqlQueryView(): ReactNode {
   const { t } = useLingui();
   const [{ rawSQL, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
     DataExplorerStateManager.useContext();

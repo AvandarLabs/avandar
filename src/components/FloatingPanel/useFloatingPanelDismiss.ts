@@ -66,74 +66,86 @@ export function useFloatingPanelDismiss({
   openOriginRef,
   onDismiss,
 }: Options): {
-  handlePanelMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
+  onPanelMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
 } {
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
 
   const hasAutoFocusedThisOpenRef = useRef(false);
 
-  useLayoutEffect(() => {
-    if (!opened) {
-      hasAutoFocusedThisOpenRef.current = false;
-      return;
-    }
-
-    if (!isPanelMounted || hasAutoFocusedThisOpenRef.current) {
-      return;
-    }
-
-    const focusPanelWhenReady = (): void => {
-      const panel = panelRef.current;
-      if (!panel) {
-        requestAnimationFrame(focusPanelWhenReady);
+  useLayoutEffect(
+    function autoFocusPanelOnOpen() {
+      if (!opened) {
+        hasAutoFocusedThisOpenRef.current = false;
         return;
       }
 
-      if (!shouldAutoFocusFloatingPanelOnOpen(panel)) {
+      if (!isPanelMounted || hasAutoFocusedThisOpenRef.current) {
+        return;
+      }
+
+      let frameId = 0;
+      const focusPanelWhenReady = (): void => {
+        const panel = panelRef.current;
+        if (!panel) {
+          frameId = requestAnimationFrame(focusPanelWhenReady);
+          return;
+        }
+
+        if (!shouldAutoFocusFloatingPanelOnOpen(panel)) {
+          hasAutoFocusedThisOpenRef.current = true;
+          return;
+        }
+
+        panel.focus({ preventScroll: true });
         hasAutoFocusedThisOpenRef.current = true;
+      };
+
+      frameId = requestAnimationFrame(focusPanelWhenReady);
+      return () => {
+        cancelAnimationFrame(frameId);
+      };
+    },
+    [isPanelMounted, opened, panelRef],
+  );
+
+  useEffect(
+    function dismissPanelOnEscape() {
+      if (!isPanelMounted) {
         return;
       }
 
-      panel.focus({ preventScroll: true });
-      hasAutoFocusedThisOpenRef.current = true;
-    };
+      const onEscapeKeyDown = (event: KeyboardEvent): void => {
+        if (event.key !== "Escape") {
+          return;
+        }
 
-    requestAnimationFrame(focusPanelWhenReady);
-  }, [isPanelMounted, opened, panelRef]);
+        const panel = panelRef.current;
+        const activeElement = document.activeElement;
+        if (!panel || !activeElement) {
+          return;
+        }
 
-  useEffect(() => {
-    if (!isPanelMounted) {
-      return;
-    }
+        if (!_shouldDismissOnEscape(panel, activeElement, openOriginRef)) {
+          return;
+        }
 
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== "Escape") {
-        return;
-      }
+        event.preventDefault();
+        event.stopPropagation();
+        onDismissRef.current();
+      };
 
-      const panel = panelRef.current;
-      const activeElement = document.activeElement;
-      if (!panel || !activeElement) {
-        return;
-      }
+      document.addEventListener("keydown", onEscapeKeyDown, { capture: true });
+      return () => {
+        document.removeEventListener("keydown", onEscapeKeyDown, {
+          capture: true,
+        });
+      };
+    },
+    [isPanelMounted, openOriginRef, panelRef],
+  );
 
-      if (!_shouldDismissOnEscape(panel, activeElement, openOriginRef)) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-      onDismissRef.current();
-    };
-
-    document.addEventListener("keydown", handleKeyDown, { capture: true });
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown, { capture: true });
-    };
-  }, [isPanelMounted, openOriginRef, panelRef]);
-
-  const handlePanelMouseDown = useCallback(
+  const onPanelMouseDown = useCallback(
     (event: MouseEvent<HTMLDivElement>): void => {
       if (isFloatingPanelTypingTarget(event.target as Element)) {
         return;
@@ -144,5 +156,5 @@ export function useFloatingPanelDismiss({
     [panelRef],
   );
 
-  return { handlePanelMouseDown };
+  return { onPanelMouseDown };
 }

@@ -12,8 +12,10 @@ import {
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
+import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
+import css from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.module.css";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
@@ -38,9 +40,7 @@ export function BubbleSeriesFieldset({
   const { t } = useLingui();
 
   const numericFields = useMemo(() => {
-    return fields.filter((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
+    return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
 
   const numericOptions = useMemo(() => {
@@ -51,16 +51,16 @@ export function BubbleSeriesFieldset({
   }, [numericFields]);
 
   const addSeries = useCallback(() => {
-    const n0 = numericFields[0];
-    const n1 = numericFields[1] ?? n0;
-    const n2 = numericFields[2] ?? n1;
-    if (n0 === undefined) {
+    const xField = numericFields[0];
+    if (xField === undefined) {
       return;
     }
+    const yField = numericFields[1] ?? xField;
+    const sizeField = numericFields[2] ?? yField;
     const next: BubbleSeries = {
-      xKey: n0.name,
-      key: n1!.name,
-      sizeKey: n2!.name,
+      xKey: xField.name,
+      key: yField.name,
+      sizeKey: sizeField.name,
     };
     onChange([...series, next]);
   }, [numericFields, series, onChange]);
@@ -99,7 +99,7 @@ export function BubbleSeriesFieldset({
               <IconInfoCircle
                 size={14}
                 aria-label={t`What is a series?`}
-                style={{ cursor: "help" }}
+                className={css.helpCursor}
               />
             </Tooltip>
           </Group>
@@ -129,7 +129,7 @@ export function BubbleSeriesFieldset({
                     wrap="nowrap"
                     align="flex-start"
                   >
-                    <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
+                    <Stack gap="xs" className={css.flexFillMinW0}>
                       <Select
                         allowDeselect={false}
                         label={t`X column`}
@@ -201,10 +201,12 @@ export function BubbleSeriesFieldset({
                       value={s.label ?? ""}
                       placeholder={t`Defaults to "Y vs X"`}
                       onChange={(event) => {
-                        const val = event.currentTarget.value;
-                        updateAt(idx, { label: val === "" ? undefined : val });
+                        const labelText = event.currentTarget.value;
+                        updateAt(idx, {
+                          label: labelText === "" ? undefined : labelText,
+                        });
                       }}
-                      style={{ flex: 1 }}
+                      className={css.flexFill}
                     />
                     <ColorInput
                       label={t`Color`}
@@ -217,7 +219,7 @@ export function BubbleSeriesFieldset({
                           color: next === "" ? undefined : next,
                         });
                       }}
-                      style={{ flex: 1 }}
+                      className={css.flexFill}
                     />
                   </Group>
                 </Stack>

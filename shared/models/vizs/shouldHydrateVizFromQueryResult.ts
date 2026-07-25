@@ -1,3 +1,5 @@
+import { isDefined } from "@utils/guards/isDefined/isDefined.ts";
+import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { match } from "ts-pattern";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -121,27 +123,21 @@ function _getKeysToValidate(vizConfig: VizConfig): string[] {
       return [];
     })
     .with({ vizType: "pie" }, { vizType: "funnel" }, (config) => {
-      return [config.nameKey, config.valueKey].filter(_isDefinedKey);
+      return [config.nameKey, config.valueKey].filter(isDefined);
     })
     .with({ vizType: "radar" }, (config) => {
-      return [
-        config.nameKey,
-        ...config.series.map((entry) => {
-          return entry.key;
-        }),
-      ].filter(_isDefinedKey);
+      return [config.nameKey, ...config.series.map(prop("key"))].filter(
+        isDefined,
+      );
     })
     .with(
       { vizType: "bar" },
       { vizType: "line" },
       { vizType: "area" },
       (config) => {
-        return [
-          config.xAxisKey,
-          ...config.series.map((entry) => {
-            return entry.key;
-          }),
-        ].filter(_isDefinedKey);
+        return [config.xAxisKey, ...config.series.map(prop("key"))].filter(
+          isDefined,
+        );
       },
     )
     .with({ vizType: "scatter" }, (config) => {
@@ -155,8 +151,4 @@ function _getKeysToValidate(vizConfig: VizConfig): string[] {
       });
     })
     .exhaustive();
-}
-
-function _isDefinedKey(key: string | undefined): key is string {
-  return key !== undefined;
 }

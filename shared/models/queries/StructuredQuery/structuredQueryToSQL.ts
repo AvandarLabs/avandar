@@ -1,9 +1,9 @@
 /**
  * Convert a {@link PartialStructuredQuery} into a raw SQL string using knex.
  *
- * This is the canonical "structured query → SQL" path. The Data Explorer
+ * This is the canonical "structured query to SQL" path. The Data Explorer
  * calls it whenever the manual query form changes so that the textual SQL
- * stays in sync with the form (Phase 2 bidirectional sync).
+ * stays in sync with the form.
  *
  * Extracted from {@link toRawDuckDBQuery} so it can be reused outside the
  * DuckDB-specific code path and so callers can override identifier quoting
@@ -35,6 +35,7 @@ import type {
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { Knex } from "knex";
 
+/** Options controlling how a structured query is rendered to SQL. */
 export type StructuredQueryToSQLOptions = {
   /**
    * When true, timestamp columns are cast to ISO-formatted strings in the
@@ -53,6 +54,27 @@ const _sql = knex({
 
 function _quoteSQLIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, '""')}"`;
+}
+
+/**
+ * Coerce a rule's `value` into a list. Arrays pass through unchanged;
+ * strings are split on commas and trimmed. When `dropEmpty` is true (the
+ * default, used by `in`/`not_in`) empty entries are removed; `between`
+ * keeps them so the two positional bounds line up.
+ */
+function _ruleValueList(
+  value: QueryFilterRule["value"],
+  { dropEmpty = true }: { dropEmpty?: boolean } = {},
+): ReadonlyArray<string | number> {
+  if (Array.isArray(value)) {
+    return value as ReadonlyArray<string | number>;
+  }
+  const parts = String(value ?? "")
+    .split(",")
+    .map((s) => {
+      return s.trim();
+    });
+  return dropEmpty ? parts.filter(Boolean) : parts;
 }
 
 /**
@@ -89,27 +111,11 @@ function _applyFilterRule(
       return builder.where(column, "not like", String(rule.value ?? ""));
     })
     .with("in", () => {
-      const items =
-        Array.isArray(rule.value) ?
-          (rule.value as ReadonlyArray<string | number>)
-        : String(rule.value ?? "")
-            .split(",")
-            .map((s) => {
-              return s.trim();
-            })
-            .filter(Boolean);
+      const items = _ruleValueList(rule.value);
       return builder.whereIn(column, items as Knex.Value[]);
     })
     .with("not_in", () => {
-      const items =
-        Array.isArray(rule.value) ?
-          (rule.value as ReadonlyArray<string | number>)
-        : String(rule.value ?? "")
-            .split(",")
-            .map((s) => {
-              return s.trim();
-            })
-            .filter(Boolean);
+      const items = _ruleValueList(rule.value);
       return builder.whereNotIn(column, items as Knex.Value[]);
     })
     .with("is_null", () => {
@@ -119,14 +125,7 @@ function _applyFilterRule(
       return builder.whereNotNull(column);
     })
     .with("between", () => {
-      const items =
-        Array.isArray(rule.value) ?
-          (rule.value as ReadonlyArray<string | number>)
-        : String(rule.value ?? "")
-            .split(",")
-            .map((s) => {
-              return s.trim();
-            });
+      const items = _ruleValueList(rule.value, { dropEmpty: false });
       const start = items[0];
       const end = items[1];
       if (start === undefined || end === undefined) {
@@ -308,36 +307,28 @@ function _applyJoins(
   return joins.reduce<Knex.QueryBuilder>((current, join) => {
     const onClause = _buildJoinOnClause(join.on, join.combinator ?? "AND");
     const joinTarget = _buildJoinTargetSQL(join);
-    const joinFn = match(join.kind)
+    // All join kinds are rendered through `joinRaw`. `cross` omits the ON
+    // clause; every other kind keeps it.
+    const joinSQL = match(join.kind)
       .with("inner", () => {
-        return "joinRaw" as const;
+        return `inner join ${joinTarget} on ${onClause}`;
       })
       .with("left", () => {
-        return "leftJoinRaw" as const;
+        return `left join ${joinTarget} on ${onClause}`;
       })
       .with("right", () => {
-        return "rightJoinRaw" as const;
+        return `right join ${joinTarget} on ${onClause}`;
       })
       .with("full", () => {
-        return "joinRaw" as const;
+        return `full outer join ${joinTarget} on ${onClause}`;
       })
       .with("cross", () => {
-        return "crossJoin" as const;
+        return `cross join ${joinTarget}`;
       })
       .exhaustive(() => {
         throw new Error(`Unknown join kind: ${String(join.kind)}`);
       });
-
-    if (joinFn === "crossJoin") {
-      // knex.crossJoin only takes a table name; we render the raw form.
-      return current.joinRaw(`cross join ${joinTarget}`);
-    }
-    const keyword =
-      join.kind === "left" ? "left join"
-      : join.kind === "right" ? "right join"
-      : join.kind === "full" ? "full outer join"
-      : "inner join";
-    return current.joinRaw(`${keyword} ${joinTarget} on ${onClause}`);
+    return current.joinRaw(joinSQL);
   }, builder);
 }
 
@@ -401,10 +392,7 @@ export function structuredQueryToSQL(
     nestedSubquery,
     limit,
     offset,
-  } = query as PartialStructuredQuery & {
-    having?: QueryFilterGroup;
-    joins?: readonly QueryJoin[];
-  };
+  } = query;
 
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
@@ -476,7 +464,7 @@ export function structuredQueryToSQL(
   }
 
   // apply joins (must be before WHERE for correctness)
-  if (joins && joins.length > 0) {
+  if (joins.length > 0) {
     sqlQuery = _applyJoins(sqlQuery, joins);
   }
 
@@ -493,7 +481,7 @@ export function structuredQueryToSQL(
   }
 
   // apply HAVING clause (after GROUP BY, before ORDER BY)
-  if (having && !isEmptyQueryFilter(having)) {
+  if (!isEmptyQueryFilter(having)) {
     sqlQuery = _applyHaving(sqlQuery, having);
   }
 

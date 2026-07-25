@@ -1,3 +1,4 @@
+import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 /**
@@ -22,19 +23,10 @@ export function resolveColumnKey(
   if (key === undefined) {
     return undefined;
   }
-  if (columns.length === 0) {
-    return undefined;
-  }
-  for (const c of columns) {
-    if (c.name === key) {
-      return c.name;
-    }
-  }
-  const lower = key.toLowerCase();
-  for (const c of columns) {
-    if (c.name.toLowerCase() === lower) {
-      return c.name;
-    }
-  }
-  return undefined;
+  return (
+    columns.find(propEq("name", key))?.name ??
+    columns.find((col) => {
+      return col.name.toLowerCase() === key.toLowerCase();
+    })?.name
+  );
 }

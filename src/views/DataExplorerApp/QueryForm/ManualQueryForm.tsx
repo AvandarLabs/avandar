@@ -21,6 +21,7 @@ import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSe
 import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
+import classes from "./ManualQueryForm.module.css";
 import type { SelectData } from "@ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -34,6 +35,7 @@ import type {
   OrderByDirection,
   PartialStructuredQuery,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { ReactNode } from "react";
 
 /**
  * Returns the localized order direction options for the manual query form.
@@ -94,9 +96,11 @@ type LegacyProps = {
 
 type Props = ControlledProps | LegacyProps;
 
-type PendingChange = { kind: "filter"; nextFilter: QueryFilterGroup } | null;
+type PendingChange =
+  | { kind: "filter"; nextFilter: QueryFilterGroup }
+  | undefined;
 
-export function ManualQueryForm(props: Props): JSX.Element {
+export function ManualQueryForm(props: Props): ReactNode {
   const { withinPortal = true } = props;
   if (props.query !== undefined) {
     return (
@@ -120,7 +124,7 @@ function DataExplorerManualQueryForm({
   withinPortal,
 }: {
   withinPortal: boolean;
-}): JSX.Element {
+}): ReactNode {
   const [{ query, isStructuredQueryInSync }, dispatch] =
     DataExplorerStateManager.useContext();
 
@@ -156,7 +160,7 @@ function ManualQueryFormView({
   isStructuredQueryInSync: boolean;
   handlers: ManualQueryFormHandlers;
   withinPortal: boolean;
-}): JSX.Element {
+}): ReactNode {
   const { t } = useLingui();
   const orderDirectionOptions = useOrderDirectionOptions();
   const {
@@ -169,7 +173,7 @@ function ManualQueryFormView({
   } = query;
   const limit = getManualQueryLimitValue(query);
 
-  const [pendingChange, setPendingChange] = useState<PendingChange>(null);
+  const [pendingChange, setPendingChange] = useState<PendingChange>(undefined);
   const {
     onDataSourceChange,
     isLargeDatasetLimitHintVisible,
@@ -202,7 +206,7 @@ function ManualQueryFormView({
             title={t`Overwrite SQL?`}
             withCloseButton
             onClose={() => {
-              setPendingChange(null);
+              setPendingChange(undefined);
             }}
             data-testid="overwrite-sql-warning"
           >
@@ -225,16 +229,10 @@ function ManualQueryFormView({
                   if (pendingChange.kind === "filter") {
                     handlers.onSetFilters(pendingChange.nextFilter);
                   }
-                  setPendingChange(null);
+                  setPendingChange(undefined);
                 }}
                 data-testid="overwrite-sql-confirm"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  padding: 0,
-                }}
+                className={classes.unstyledButton}
               >
                 <Trans>Overwrite SQL with form changes</Trans>
               </Text>
@@ -244,16 +242,10 @@ function ManualQueryFormView({
                 size="xs"
                 c="dimmed"
                 onClick={() => {
-                  setPendingChange(null);
+                  setPendingChange(undefined);
                 }}
                 data-testid="overwrite-sql-cancel"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  padding: 0,
-                }}
+                className={classes.unstyledButton}
               >
                 <Trans>Keep SQL as-is</Trans>
               </Text>
@@ -281,7 +273,7 @@ function ManualQueryFormView({
         {queryColumns.length > 0 ?
           <Fieldset
             legend={t`Aggregations`}
-            style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+            className={classes.fieldsetTranslucent}
           >
             {queryColumns.map((col) => {
               return (
@@ -305,7 +297,7 @@ function ManualQueryFormView({
 
         <Fieldset
           legend={t`Filters (Where)`}
-          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+          className={classes.fieldsetTranslucent}
         >
           <QueryFiltersField
             columns={queryColumns}
@@ -314,10 +306,7 @@ function ManualQueryFormView({
           />
         </Fieldset>
 
-        <Fieldset
-          legend={t`Sort by`}
-          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
-        >
+        <Fieldset legend={t`Sort by`} className={classes.fieldsetTranslucent}>
           <Select
             clearable
             label={t`Column`}
@@ -345,7 +334,7 @@ function ManualQueryFormView({
 
         <Fieldset
           legend={t`Result size`}
-          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+          className={classes.fieldsetTranslucent}
         >
           <Group align="flex-end" wrap="nowrap" gap="sm">
             <NumberInput

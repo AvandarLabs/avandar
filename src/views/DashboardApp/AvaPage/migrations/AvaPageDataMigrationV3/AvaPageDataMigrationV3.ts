@@ -1,4 +1,5 @@
 import { transformProps } from "@puckeditor/core";
+import { match } from "ts-pattern";
 import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   V2_AvaPageData,
@@ -43,8 +44,8 @@ export const AvaPageDataMigrationV3 = {
       root: (props) => {
         return {
           ...props,
-          // Checkpoint 9 added theme + typography to v3 root props.
-          // v2 dashboards default to the unbranded presets.
+          // v3 root props added theme + typography; v2 dashboards
+          // predate them, so default to the unbranded presets.
           theme: "default" as const,
           typography: "system" as const,
           schemaVersion: SCHEMA_VERSION,
@@ -104,192 +105,206 @@ export const AvaPageDataMigrationV3 = {
 } satisfies AvaPageDataMigration<V2_AvaPageData, V3_AvaPageData>;
 
 function _upgradeVizConfig(v2: V2_VizConfig): VizConfig {
-  switch (v2.vizType) {
-    case "table":
+  return match(v2)
+    .returnType<VizConfig>()
+    .with({ vizType: "table" }, () => {
       return { vizType: "table" };
-    case "bar":
+    })
+    .with({ vizType: "bar" }, (bar) => {
       return {
         vizType: "bar",
-        xAxisKey: v2.xAxisKey,
+        xAxisKey: bar.xAxisKey,
         series:
-          v2.yAxisKey === undefined ?
+          bar.yAxisKey === undefined ?
             []
-          : [{ renderAs: "bar", key: v2.yAxisKey, color: v2.color }],
+          : [{ renderAs: "bar", key: bar.yAxisKey, color: bar.color }],
         layout: "group",
-        withLegend: v2.withLegend,
+        withLegend: bar.withLegend,
       };
-    case "line":
+    })
+    .with({ vizType: "line" }, (line) => {
       return {
         vizType: "line",
-        xAxisKey: v2.xAxisKey,
+        xAxisKey: line.xAxisKey,
         series:
-          v2.yAxisKey === undefined ?
+          line.yAxisKey === undefined ?
             []
           : [
               {
                 renderAs: "line",
-                key: v2.yAxisKey,
-                color: v2.color,
-                curveType: v2.curveType,
+                key: line.yAxisKey,
+                color: line.color,
+                curveType: line.curveType,
               },
             ],
-        withLegend: v2.withLegend,
+        withLegend: line.withLegend,
       };
-    case "area":
+    })
+    .with({ vizType: "area" }, (area) => {
       return {
         vizType: "area",
-        xAxisKey: v2.xAxisKey,
+        xAxisKey: area.xAxisKey,
         series:
-          v2.yAxisKey === undefined ?
+          area.yAxisKey === undefined ?
             []
           : [
               {
                 renderAs: "area",
-                key: v2.yAxisKey,
-                color: v2.color,
-                curveType: v2.curveType,
+                key: area.yAxisKey,
+                color: area.color,
+                curveType: area.curveType,
                 fillOpacity: 0.6,
               },
             ],
         layout: "default",
-        withLegend: v2.withLegend,
+        withLegend: area.withLegend,
       };
-    case "scatter":
+    })
+    .with({ vizType: "scatter" }, (scatter) => {
       return {
         vizType: "scatter",
         series:
-          v2.xAxisKey !== undefined && v2.yAxisKey !== undefined ?
-            [{ xKey: v2.xAxisKey, key: v2.yAxisKey }]
+          scatter.xAxisKey !== undefined && scatter.yAxisKey !== undefined ?
+            [{ xKey: scatter.xAxisKey, key: scatter.yAxisKey }]
           : [],
       };
-    case "pie":
+    })
+    .with({ vizType: "pie" }, (pie) => {
       return {
         vizType: "pie",
-        nameKey: v2.nameKey,
-        valueKey: v2.valueKey,
-        isDonut: v2.isDonut,
-        withLabels: v2.withLabels,
-        labelsType: v2.labelsType,
-        seriesColors: v2.seriesColors,
+        nameKey: pie.nameKey,
+        valueKey: pie.valueKey,
+        isDonut: pie.isDonut,
+        withLabels: pie.withLabels,
+        labelsType: pie.labelsType,
+        seriesColors: pie.seriesColors,
       };
-    case "funnel":
+    })
+    .with({ vizType: "funnel" }, (funnel) => {
       return {
         vizType: "funnel",
-        nameKey: v2.nameKey,
-        valueKey: v2.valueKey,
-        seriesColors: v2.seriesColors,
+        nameKey: funnel.nameKey,
+        valueKey: funnel.valueKey,
+        seriesColors: funnel.seriesColors,
       };
-    case "radar":
+    })
+    .with({ vizType: "radar" }, (radar) => {
       return {
         vizType: "radar",
-        nameKey: v2.nameKey,
+        nameKey: radar.nameKey,
         series:
-          v2.valueKey === undefined ?
+          radar.valueKey === undefined ?
             []
-          : [{ key: v2.valueKey, color: v2.color }],
+          : [{ key: radar.valueKey, color: radar.color }],
         withLegend: true,
       };
-    case "bubble":
+    })
+    .with({ vizType: "bubble" }, (bubble) => {
       return {
         vizType: "bubble",
         series:
-          v2.xAxisKey !== undefined && v2.yAxisKey !== undefined ?
+          bubble.xAxisKey !== undefined && bubble.yAxisKey !== undefined ?
             [
               {
-                xKey: v2.xAxisKey,
-                key: v2.yAxisKey,
-                sizeKey: v2.sizeKey ?? v2.yAxisKey,
+                xKey: bubble.xAxisKey,
+                key: bubble.yAxisKey,
+                sizeKey: bubble.sizeKey ?? bubble.yAxisKey,
               },
             ]
           : [],
       };
-  }
+    })
+    .exhaustive();
 }
 
 function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
-  switch (curr.vizType) {
-    case "table":
+  return match(curr)
+    .returnType<V2_VizConfig>()
+    .with({ vizType: "table" }, () => {
       return { vizType: "table" };
-    case "bar": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "bar" }, (bar) => {
+      const first = bar.series[0];
       return {
         vizType: "bar",
-        xAxisKey: curr.xAxisKey,
+        xAxisKey: bar.xAxisKey,
         yAxisKey: first?.key,
-        withLegend: curr.withLegend,
+        withLegend: bar.withLegend,
         color: first?.color,
       };
-    }
-    case "line": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "line" }, (line) => {
+      const first = line.series[0];
       return {
         vizType: "line",
-        xAxisKey: curr.xAxisKey,
+        xAxisKey: line.xAxisKey,
         yAxisKey: first?.key,
-        withLegend: curr.withLegend,
+        withLegend: line.withLegend,
         curveType:
           first?.renderAs === "line" ?
             (first.curveType ?? "monotone")
           : "monotone",
         color: first?.color,
       };
-    }
-    case "area": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "area" }, (area) => {
+      const first = area.series[0];
       return {
         vizType: "area",
-        xAxisKey: curr.xAxisKey,
+        xAxisKey: area.xAxisKey,
         yAxisKey: first?.key,
-        withLegend: curr.withLegend,
+        withLegend: area.withLegend,
         curveType:
           first?.renderAs === "area" ?
             (first.curveType ?? "monotone")
           : "monotone",
         color: first?.color,
       };
-    }
-    case "scatter": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "scatter" }, (scatter) => {
+      const first = scatter.series[0];
       return {
         vizType: "scatter",
         xAxisKey: first?.xKey,
         yAxisKey: first?.key,
       };
-    }
-    case "pie":
+    })
+    .with({ vizType: "pie" }, (pie) => {
       return {
         vizType: "pie",
-        nameKey: curr.nameKey,
-        valueKey: curr.valueKey,
-        isDonut: curr.isDonut,
-        withLabels: curr.withLabels,
-        labelsType: curr.labelsType,
-        seriesColors: curr.seriesColors,
+        nameKey: pie.nameKey,
+        valueKey: pie.valueKey,
+        isDonut: pie.isDonut,
+        withLabels: pie.withLabels,
+        labelsType: pie.labelsType,
+        seriesColors: pie.seriesColors,
       };
-    case "funnel":
+    })
+    .with({ vizType: "funnel" }, (funnel) => {
       return {
         vizType: "funnel",
-        nameKey: curr.nameKey,
-        valueKey: curr.valueKey,
-        seriesColors: curr.seriesColors,
+        nameKey: funnel.nameKey,
+        valueKey: funnel.valueKey,
+        seriesColors: funnel.seriesColors,
       };
-    case "radar": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "radar" }, (radar) => {
+      const first = radar.series[0];
       return {
         vizType: "radar",
-        nameKey: curr.nameKey,
+        nameKey: radar.nameKey,
         valueKey: first?.key,
         color: first?.color,
       };
-    }
-    case "bubble": {
-      const first = curr.series[0];
+    })
+    .with({ vizType: "bubble" }, (bubble) => {
+      const first = bubble.series[0];
       return {
         vizType: "bubble",
         xAxisKey: first?.xKey,
         yAxisKey: first?.key,
         sizeKey: first?.sizeKey,
       };
-    }
-  }
+    })
+    .exhaustive();
 }

@@ -1,10 +1,11 @@
+import { isNonNullish, makeObjectFromEntries, prop, propEq } from "@utils";
+import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { z } from "zod";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -41,9 +42,9 @@ export const DataExplorerSearchSchema = z.object({
   od: z.string().optional(),
 });
 
-export type DataExplorerURLSearch = z.infer<typeof DataExplorerSearchSchema>;
+export type DataExplorerUrlSearch = z.infer<typeof DataExplorerSearchSchema>;
 
-export type ParsedURLState = {
+export type ParsedUrlState = {
   dsId?: string;
   colNames?: readonly string[];
   aggregations?: Readonly<Record<string, QueryAggregationType.T>>;
@@ -54,26 +55,12 @@ export type ParsedURLState = {
   openDataset?: OpenDatasetInfo;
 };
 
-const VALID_AGGREGATION_VALUES = new Set([
-  "sum",
-  "avg",
-  "count",
-  "max",
-  "min",
-  "group_by",
-  "none",
-]);
-
-function _isValidAgg(value: string): value is QueryAggregationType.T {
-  return VALID_AGGREGATION_VALUES.has(value);
-}
-
 /**
  * Parses the raw URL search params into typed, structured state that the
  * Data Explorer can use to restore its session.
  */
-export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
-  const result: ParsedURLState = {};
+export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
+  const result: ParsedUrlState = {};
 
   if (search.ds) {
     result.dsId = search.ds;
@@ -84,20 +71,23 @@ export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
   }
 
   if (search.agg) {
-    const agg: Record<string, QueryAggregationType.T> = {};
-    search.agg.split(",").forEach((pair) => {
-      const idx = pair.indexOf(":");
-      if (idx === -1) {
-        return;
-      }
-      const name = pair.slice(0, idx);
-      const type = pair.slice(idx + 1);
-      if (name && _isValidAgg(type)) {
-        agg[name] = type;
-      }
-    });
-    if (Object.keys(agg).length > 0) {
-      result.aggregations = agg;
+    const aggEntries = search.agg
+      .split(",")
+      .map((pair): readonly [string, QueryAggregationType.T] | undefined => {
+        const idx = pair.indexOf(":");
+        if (idx === -1) {
+          return undefined;
+        }
+        const name = pair.slice(0, idx);
+        const type = pair.slice(idx + 1);
+        if (name && QueryAggregationType.isValid(type)) {
+          return [name, type] as const;
+        }
+        return undefined;
+      })
+      .filter(isNonNullish);
+    if (aggEntries.length > 0) {
+      result.aggregations = makeObjectFromEntries(aggEntries);
     }
   }
 
@@ -155,11 +145,11 @@ export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
  * Serialises the current Data Explorer state into the compact URL search
  * param format. Only non-default values are included.
  */
-export function serializeStateToURL(
+export function serializeStateToUrl(
   state: DataExplorerAppState,
-): DataExplorerURLSearch {
+): DataExplorerUrlSearch {
   const { query, rawSQL, vizConfig } = state;
-  const params: DataExplorerURLSearch = {};
+  const params: DataExplorerUrlSearch = {};
 
   // Raw SQL drives execution in `useDataQuery`; structured fields are ignored
   // when `rawSQL` is set. Omit them from the URL so refresh never pairs a
@@ -170,11 +160,7 @@ export function serializeStateToURL(
     }
 
     if (query.queryColumns.length > 0) {
-      params.cols = query.queryColumns
-        .map((col) => {
-          return col.baseColumn.name;
-        })
-        .join(",");
+      params.cols = query.queryColumns.map(prop("baseColumn.name")).join(",");
 
       const nonDefaultAggs = query.queryColumns.filter((col) => {
         const agg = query.aggregations[col.id];
@@ -191,9 +177,9 @@ export function serializeStateToURL(
     }
 
     if (query.orderByColumn) {
-      const orderCol = query.queryColumns.find((col) => {
-        return col.id === query.orderByColumn;
-      });
+      const orderCol = query.queryColumns.find(
+        propEq("id", query.orderByColumn),
+      );
       if (orderCol) {
         params.orderBy = orderCol.baseColumn.name;
         if (query.orderByDirection) {
@@ -236,7 +222,7 @@ export function serializeStateToURL(
  * Clears every known explorer search key so TanStack Router drops stale
  * params.
  */
-export const EMPTY_EXPLORER_URL_SEARCH: DataExplorerURLSearch = {
+export const EMPTY_EXPLORER_URL_SEARCH: DataExplorerUrlSearch = {
   ds: undefined,
   cols: undefined,
   agg: undefined,
@@ -249,14 +235,14 @@ export const EMPTY_EXPLORER_URL_SEARCH: DataExplorerURLSearch = {
 
 /**
  * Normalises raw router search into the same compact shape as
- * `serializeStateToURL`, so we can compare URL vs in-memory state without
+ * `serializeStateToUrl`, so we can compare URL vs in-memory state without
  * fighting merge semantics (`navigate({ search: {} })` leaves stale keys).
  */
-export function normalizeExplorerURLSearch(
-  search: DataExplorerURLSearch,
-): DataExplorerURLSearch {
-  const parsed = parseURLSearch(search);
-  const params: DataExplorerURLSearch = {};
+export function normalizeExplorerUrlSearch(
+  search: DataExplorerUrlSearch,
+): DataExplorerUrlSearch {
+  const parsed = parseUrlSearch(search);
+  const params: DataExplorerUrlSearch = {};
 
   if (!parsed.rawSQL) {
     if (parsed.dsId) {
@@ -309,13 +295,13 @@ export function normalizeExplorerURLSearch(
   return params;
 }
 
-export function areExplorerURLSearchParamsEqual(
-  left: DataExplorerURLSearch,
-  right: DataExplorerURLSearch,
+export function areExplorerUrlSearchParamsEqual(
+  left: DataExplorerUrlSearch,
+  right: DataExplorerUrlSearch,
 ): boolean {
   return (
-    JSON.stringify(normalizeExplorerURLSearch(left)) ===
-    JSON.stringify(normalizeExplorerURLSearch(right))
+    JSON.stringify(normalizeExplorerUrlSearch(left)) ===
+    JSON.stringify(normalizeExplorerUrlSearch(right))
   );
 }
 

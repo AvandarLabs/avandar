@@ -9,6 +9,10 @@ export type SqlDisplayCatalog = {
   }>;
 };
 
+/**
+ * One contiguous piece of rendered SQL: plain text, a dataset pill, or a
+ * column pill.
+ */
 export type SqlDisplaySegment =
   | { kind: "text"; value: string }
   | {

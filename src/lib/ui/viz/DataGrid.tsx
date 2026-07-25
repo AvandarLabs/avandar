@@ -73,7 +73,7 @@ export function DataGrid({
           : (p: { value: unknown }) => {
               return (
                 typeof p.value === "number" ? formatChartNumber(p.value)
-                : (p.value as string | null | undefined) == null ? ""
+                : p.value == null ? ""
                 : String(p.value)
               );
             },

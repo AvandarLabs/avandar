@@ -12,8 +12,10 @@ import {
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
+import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
+import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.module.css";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
@@ -38,9 +40,7 @@ export function PairSeriesFieldset({
   const { t } = useLingui();
 
   const numericFields = useMemo(() => {
-    return fields.filter((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
+    return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
 
   const numericOptions = useMemo(() => {
@@ -51,12 +51,12 @@ export function PairSeriesFieldset({
   }, [numericFields]);
 
   const addSeries = useCallback(() => {
-    const first = numericFields[0];
-    const second = numericFields[1] ?? first;
-    if (first === undefined) {
+    const xField = numericFields[0];
+    if (xField === undefined) {
       return;
     }
-    const next: ScatterSeries = { xKey: first.name, key: second!.name };
+    const yField = numericFields[1] ?? xField;
+    const next: ScatterSeries = { xKey: xField.name, key: yField.name };
     onChange([...series, next]);
   }, [numericFields, series, onChange]);
 
@@ -94,7 +94,7 @@ export function PairSeriesFieldset({
               <IconInfoCircle
                 size={14}
                 aria-label={t`What is a series?`}
-                style={{ cursor: "help" }}
+                className={css.helpCursor}
               />
             </Tooltip>
           </Group>
@@ -124,7 +124,7 @@ export function PairSeriesFieldset({
                     wrap="nowrap"
                     align="flex-start"
                   >
-                    <Stack gap="xs" style={{ flex: 1, minWidth: 0 }}>
+                    <Stack gap="xs" className={css.flexFillMinW0}>
                       <Select
                         allowDeselect={false}
                         label={t`X column`}
@@ -179,10 +179,12 @@ export function PairSeriesFieldset({
                       value={s.label ?? ""}
                       placeholder={t`Defaults to "Y vs X"`}
                       onChange={(event) => {
-                        const val = event.currentTarget.value;
-                        updateAt(idx, { label: val === "" ? undefined : val });
+                        const labelText = event.currentTarget.value;
+                        updateAt(idx, {
+                          label: labelText === "" ? undefined : labelText,
+                        });
                       }}
-                      style={{ flex: 1 }}
+                      className={css.flexFill}
                     />
                     <ColorInput
                       label={t`Color`}
@@ -195,7 +197,7 @@ export function PairSeriesFieldset({
                           color: next === "" ? undefined : next,
                         });
                       }}
-                      style={{ flex: 1 }}
+                      className={css.flexFill}
                     />
                   </Group>
                 </Stack>

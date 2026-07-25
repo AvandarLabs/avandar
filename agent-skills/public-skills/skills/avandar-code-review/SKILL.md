@@ -43,6 +43,16 @@ The actual repo-local checklist used during reviews lives at
   nothing.
 - Treat the repo-local file as additional repo-specific rules that
   supplement this skill without replacing the main checklists.
+- **`extra-checklist.md` is an extensible ENTRY POINT, not necessarily a
+  single flat file to scan.** It may declare several repo-local phases, and
+  any phase may delegate to a further ruleset file (for example under
+  `docs/code-reviews/references/`). When it points to other files, follow
+  every reference and run each referenced ruleset as its own phase, exactly
+  like the skill's built-in phases. A repo can grow its review arbitrarily
+  this way: `extra-checklist.md` stays the one file this skill opens, and any
+  number of additional phases hang off it by reference. Because these
+  repo-local phases count as real phases, they also feed the fan-out decision
+  (see "When To Fan Out") and each fans out as its own find lane.
 - If the user says to add a new common mistake, says "remember this in the
   future", says "add this to common mistakes", or says "add this to my
   review checklist":
@@ -211,8 +221,11 @@ modified by the author under review). Do not flag issues on context lines
       order listed, gated on the diff.
    4. Each **library-gated phase** under "Library-Gated Phases", gated on
       package presence.
-   5. The repo-local `docs/code-reviews/extra-checklist.md` phase, if the
-      file exists (always last).
+   5. The repo-local `docs/code-reviews/extra-checklist.md` phases, if the
+      file exists (always last). Treat `extra-checklist.md` as an entry
+      point: run every phase it declares and every further ruleset it
+      references (for example under `docs/code-reviews/references/`) as its
+      own phase, in the order the file lists them.
 5. Follow the active review mode for how each finding is applied or
    reported (see the Execution Model's Apply stage for how the three modes
    differ).
@@ -252,7 +265,14 @@ Priorities, in order:
 
 ### When To Fan Out
 
-Count the phases that actually fire for this diff (after gating).
+Count the phases that actually fire for this diff (after gating). This count
+MUST include the repo-local phases: every phase declared in
+`extra-checklist.md` plus every further ruleset it references (see "Additional
+Checklist File"), not only this skill's built-in phases. Open
+`extra-checklist.md` and resolve its referenced phases BEFORE deciding whether
+to fan out, so the repo's own rules are never the reason the count is
+undercounted. A diff that trips only one built-in phase but three repo-local
+phases still fans out.
 
 - **Fewer than 3 phases fire:** do NOT fan out. Run the phases inline and
   sequentially in this agent. Spawning sub-agents for one or two small
@@ -300,7 +320,14 @@ recommendedFix }`. It must not modify code.
 | `lib:@avandar/utils` | libraries/avandar-utils-checklist | package present |
 | `lib:@avandar/models` | libraries/avandar-models-checklist | package present |
 | `lib:@avandar/modules` | libraries/avandar-modules-checklist | package present |
-| `extra-checklist` | repo-local `extra-checklist.md` | file exists |
+| `extra-checklist:<phase>` (one lane per repo-local phase, including each referenced ruleset) | that phase's section in repo-local `extra-checklist.md` and any file it references | that phase's own gate matches |
+
+Repo-local phases fan out too. Spawn one find lane per phase declared in
+`extra-checklist.md` (and per ruleset it references), each gated
+independently, exactly like a built-in lane. Do not collapse several firing
+repo-local phases into a single `extra-checklist` agent: the repo's own rules
+get the same accuracy treatment as the built-ins, and they count toward the
+fan-out threshold in "When To Fan Out".
 
 The TypeScript rule family is deliberately split across three lanes
 (`typescript`, `functional-style`, `comments-and-module`) rather than run
@@ -392,11 +419,37 @@ full test suite.
 
 Check these first because they are the most frequent review findings:
 
-- Functional style: avoid `for` and `while` loops. Prefer functional and
-  declarative collection utilities such as `map`, `filter`, `reduce`, and
-  `forEach`.
-  - Exceptions: 1) char-by-char for loops on strings; 2) loops that implement
-    exit-early break logic to improve performance
+- Functional style: for iterating a **collection** (array/iterable of data),
+  avoid `for` and `while` loops. Prefer functional, declarative utilities such
+  as `map`, `filter`, `reduce`, `forEach`, and `flatMap`. This is a strong
+  default: a second pass over an array (e.g. `.map().filter()`) is a negligible
+  cost until N gets very large, so clarity wins. The **only** exceptions where
+  an imperative loop is acceptable:
+  1. **Async sequencing** — you must `await` each iteration in order. `for...of`
+     with `await` is correct; `.map(async …)` + `Promise.all` runs in parallel
+     (different semantics) and an awaiting `reduce` is unreadable.
+  2. **Early exit for performance** — you can stop before the end and the input
+     is large enough that scanning it fully matters. Prefer `.find` / `.some` /
+     `.every` (they already short-circuit) when they express the intent; reach
+     for a raw `for` + `break` only when those cannot.
+  3. **Large N in a hot path** — when N can realistically reach **~100,000+**
+     AND the code runs in a latency-sensitive path (event handler, render,
+     keystroke), collapse a multi-pass chain (`.map().filter().map()`) into a
+     single `for...of` / `reduce`. Below ~100k the extra pass is well under
+     ~50ms even on a mid-range mobile CPU; the doubled-pass cost only
+     approaches the ~200ms "user notices lag in a click" threshold around
+     N ≈ 0.5–1M. Default to functional clarity below the threshold, and only
+     invoke this exception when a comment or the surrounding code makes it
+     plausible that N is actually that large.
+  - Not an exception, just out of scope: scanning the **characters of a raw
+    string** by index is not collection iteration (array utilities do not
+    apply), so a `for` over string indices there is fine and needs no
+    justification.
+  - Note: some linters (e.g. react-doctor's `js-combine-iterations`) flag
+    `.map().filter()` as "two passes, use a loop." That advice inverts this
+    rule; this repo prefers the functional form and disables that lint (see the
+    repo's `doctor.config.ts`). Do not raise a two-pass finding on those
+    grounds.
 - Readonly wrappers: do not use per-property `readonly` keys when the real
   contract is "this input object is readonly". Prefer wrapping the function
   parameter in `Readonly<...>` or `readonly T[]`.
@@ -576,15 +629,24 @@ sub-checklist file.
 
 ## Repo-Local Phase
 
-### Phase: repo-local extra checklist
+### Phase: repo-local extra checklist (extensible entry point)
 
 - **Gate:** the file `docs/code-reviews/extra-checklist.md` exists in the
   repo under review.
-- **Reference:** open the file directly; it lists its own gates and any
-  further sub-checklists in `docs/code-reviews/references/` (or similar).
-- This is the final phase, always run last, and may add or override
-  rules for the specific repo. It is the only legitimate place for
-  rules that mention repo-internal paths.
+- **Reference:** open the file directly and treat it as an ENTRY POINT, not a
+  single flat file to scan. It declares its own gated phases and may delegate
+  any phase to a further ruleset file (for example under
+  `docs/code-reviews/references/`). Follow every reference and run each
+  referenced ruleset as its own phase, in the order listed.
+- These repo-local phases are always run last and may add or override rules
+  for the specific repo. This is the only legitimate place for rules that
+  mention repo-internal paths.
+- **Fan-out:** count each repo-local phase (and each referenced ruleset) as a
+  phase when deciding whether to fan out, and spawn one find lane per phase
+  when you do (see "When To Fan Out" and the Find lanes table). A repo can
+  extend its review indefinitely through this entry point, so never treat the
+  repo-local contribution as a single phase by default; size the sub-agent
+  load from the built-in phases AND the repo-local phases together.
 
 ## Review Output
 

@@ -87,14 +87,13 @@ export function pathGet<T, P extends Paths<T> & string>(
   path: P,
 ): PathValue<T, P> | undefined {
   const segments = path.split(".");
-  let curr: unknown = obj;
-  for (const seg of segments) {
+  const result = segments.reduce<unknown>((curr, seg) => {
     if (curr === undefined || curr === null || typeof curr !== "object") {
       return undefined;
     }
-    curr = (curr as Record<string, unknown>)[seg];
-  }
-  return curr as PathValue<T, P> | undefined;
+    return (curr as Record<string, unknown>)[seg];
+  }, obj);
+  return result as PathValue<T, P> | undefined;
 }
 
 /**
@@ -288,7 +287,7 @@ export type ErasedVizSettingDescriptors = {
  * Empty descriptor registry. Used by viz modules that have not yet
  * been refactored to use the descriptor-driven form (single-series
  * vizs like pie, funnel, scatter, bubble, table). Their forms remain
- * hand-coded for now; phase 2 will migrate them.
+ * hand-coded for now and can be migrated later.
  */
 export const EMPTY_VIZ_SETTING_DESCRIPTORS: ErasedVizSettingDescriptors = {
   chart: [],

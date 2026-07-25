@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  shouldDeferURLHydrationForStructuredLoading,
+  shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
-} from "@/views/DataExplorerApp/dataExplorerURLHydration";
+} from "@/views/DataExplorerApp/dataExplorerUrlHydration";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-import type { ParsedURLState } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 const _minimalBarViz: VizConfig = {
@@ -15,7 +15,7 @@ const _minimalBarViz: VizConfig = {
   withLegend: false,
 };
 
-function _parsed(overrides: Partial<ParsedURLState> = {}): ParsedURLState {
+function _parsed(overrides: Partial<ParsedUrlState> = {}): ParsedUrlState {
   return { ...overrides };
 }
 
@@ -57,12 +57,12 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
   });
 });
 
-describe("shouldDeferURLHydrationForStructuredLoading", () => {
+describe("shouldDeferUrlHydrationForStructuredLoading", () => {
   const DS = { id: "ds-1" };
 
   it("defers when rawSQL is set until workspace SQL mapping metadata loads", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ rawSQL: "SELECT 1" }),
         restoredDataSource: undefined,
         needsColumns: false,
@@ -75,7 +75,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("does not defer when rawSQL is set and SQL mapping metadata is loaded", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "missing", rawSQL: "SELECT 1" }),
         restoredDataSource: undefined,
         needsColumns: true,
@@ -88,7 +88,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("defers when structured dsId has no restored data source yet", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x" }),
         restoredDataSource: undefined,
         needsColumns: false,
@@ -101,7 +101,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("does not defer once restored data source exists", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x" }),
         restoredDataSource: DS,
         needsColumns: false,
@@ -114,7 +114,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("defers when columns are needed but neither column list is loaded", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x", colNames: ["a"] }),
         restoredDataSource: DS,
         needsColumns: true,
@@ -127,7 +127,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("does not defer when dataset columns have loaded", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x", colNames: ["a"] }),
         restoredDataSource: DS,
         needsColumns: true,
@@ -140,7 +140,7 @@ describe("shouldDeferURLHydrationForStructuredLoading", () => {
 
   it("does not defer when entity field configs have loaded", () => {
     expect(
-      shouldDeferURLHydrationForStructuredLoading({
+      shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x", colNames: ["a"] }),
         restoredDataSource: DS,
         needsColumns: true,

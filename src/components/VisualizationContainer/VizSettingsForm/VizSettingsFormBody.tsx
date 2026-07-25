@@ -28,8 +28,7 @@ type Props = {
  *
  * Bar / line / area / radar share a descriptor-driven form
  * (`SeriesAwareVizForm`). The remaining single-series vizs (pie,
- * funnel, scatter, bubble) keep their hand-coded forms until phase 2
- * migrates them.
+ * funnel, scatter, bubble) keep their hand-coded forms for now.
  */
 export function VizSettingsFormBody({
   columns,

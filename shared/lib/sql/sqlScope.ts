@@ -4,6 +4,7 @@
  * `createSqlDisplayExtension`) to mark out-of-scope column references as
  * errors and to populate the column-pill dropdown.
  */
+import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
 import type {
   SqlDisplayCatalog,
@@ -45,45 +46,41 @@ export function computeSqlScope(input: {
   const { sql, catalog } = input;
   const segments = buildSqlDisplaySegments({ sql, catalog });
 
-  const datasetIds = new Set<DatasetId>();
-  for (const seg of segments) {
-    if (seg.kind === "dataset") {
-      datasetIds.add(seg.datasetId);
-    }
-  }
+  const datasetIds = new Set(
+    segments
+      .filter((seg): seg is Extract<SqlDisplaySegment, { kind: "dataset" }> => {
+        return seg.kind === "dataset";
+      })
+      .map(prop("datasetId")),
+  );
 
-  const columnNames = new Set<string>();
-  for (const dataset of catalog.datasets) {
-    if (!datasetIds.has(dataset.id)) {
-      continue;
-    }
-    for (const col of dataset.columns) {
-      columnNames.add(col.name);
-    }
-  }
+  const columnNames = new Set(
+    catalog.datasets
+      .filter((dataset) => {
+        return datasetIds.has(dataset.id);
+      })
+      .flatMap((dataset) => {
+        return dataset.columns.map(prop("name"));
+      }),
+  );
 
-  const outOfScopeColumnTokens: Array<{
-    name: string;
-    start: number;
-    end: number;
-    raw: string;
-  }> = [];
-  if (datasetIds.size > 0) {
-    for (const seg of segments) {
-      if (seg.kind !== "column") {
-        continue;
-      }
-      if (columnNames.has(seg.name)) {
-        continue;
-      }
-      outOfScopeColumnTokens.push({
-        name: seg.name,
-        start: seg.start,
-        end: seg.end,
-        raw: seg.raw,
-      });
-    }
-  }
+  const outOfScopeColumnTokens =
+    datasetIds.size > 0 ?
+      segments
+        .filter(
+          (seg): seg is Extract<SqlDisplaySegment, { kind: "column" }> => {
+            return seg.kind === "column" && !columnNames.has(seg.name);
+          },
+        )
+        .map((seg) => {
+          return {
+            name: seg.name,
+            start: seg.start,
+            end: seg.end,
+            raw: seg.raw,
+          };
+        })
+    : [];
 
   return { datasetIds, columnNames, outOfScopeColumnTokens };
 }

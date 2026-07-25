@@ -23,6 +23,24 @@ library-gated phase should run.
 4. In Pair Review mode, announce each phase before presenting its
    findings, for example: "Phase: repo-local Deno paths".
 
+### This file is an entry point, not a single flat file
+
+`extra-checklist.md` is the one file `avandar-code-review` opens for the
+repo-local phase, but it is an **entry point**, not the whole repo-local
+ruleset. A phase here may be written inline **or** delegated to a separate
+ruleset file (kept under `docs/code-reviews/references/`). When a phase
+points to another file, that file is its own phase: open it, apply its gate,
+and run its rules just like an inline phase. Split a phase out to a
+`references/` file whenever it grows long enough to hurt this file's
+readability. There is no cap on how many phases or referenced rulesets the
+repo can add; add as many as the codebase needs and they all run.
+
+Because each declared phase and each referenced ruleset counts as a real
+phase, they also feed the skill's sub-agent fan-out decision and each fans
+out as its own find lane. So the number of phases below (inline **and**
+referenced) is part of how the review sizes its sub-agent load, not just the
+skill's built-in phases.
+
 ## Adding new rules
 
 Before adding a rule here, ask whether it is truly avandar-repo-specific.
@@ -152,6 +170,20 @@ when the gate matches.
   signing off. Bumping when not strictly required is safe but
   invalidates every user's persisted cache on next boot, so prefer to
   bump only when actually needed.
+
+### Phase: AvaPage schema migrations
+
+- **Gate:** the diff touches any file under
+  `src/views/DashboardApp/AvaPage/migrations/`. Skip otherwise.
+- **Reference:** this phase's rules live in
+  [`references/avapage-schema-migrations.md`](references/avapage-schema-migrations.md).
+  Open it and run it as its own phase.
+- **Why it is split out:** it carries a review *method* (establish the
+  current schema version and read a module's full, adjacent header rules
+  before flagging a "frozen snapshot / no live imports" violation) that a
+  past review got wrong, mis-flagging the current-version migration's
+  intended `V<N>_VizConfig = VizConfig` alias as a bug. The detail belongs in
+  its own file rather than bloating this entry point.
 
 ### Phase: utils package reference
 

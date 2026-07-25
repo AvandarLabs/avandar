@@ -1,4 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -24,11 +25,7 @@ export function hydrateScatterSeriesFromQueryResult<
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = new Set(
-    columns.map((c) => {
-      return c.name;
-    }),
-  );
+  const colNames = columnNameSet(columns);
 
   let nextSeries: ScatterSeries[] = currVizConfig.series.filter((s) => {
     return colNames.has(s.xKey) && colNames.has(s.key);

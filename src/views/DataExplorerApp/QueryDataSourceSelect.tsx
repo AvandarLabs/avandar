@@ -83,13 +83,15 @@ export function QueryDataSourceSelect({
     if (isOnline) {
       return new Set<QueryDataSourceId>();
     }
-    const ids = new Set<QueryDataSourceId>();
-    for (const dataset of datasets ?? []) {
-      if (!localDatasetIds.has(dataset.id as DatasetId)) {
-        ids.add(dataset.id as QueryDataSourceId);
-      }
-    }
-    return ids;
+    return new Set(
+      (datasets ?? [])
+        .filter((d) => {
+          return !localDatasetIds.has(d.id as DatasetId);
+        })
+        .map((d) => {
+          return d.id as QueryDataSourceId;
+        }),
+    );
   }, [datasets, isOnline, localDatasetIds]);
 
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {

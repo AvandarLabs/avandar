@@ -17,7 +17,6 @@ import type {
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types";
 import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-import type { ReactNode } from "react";
 import type { Simplify } from "type-fest";
 
 export type {
@@ -29,9 +28,6 @@ export type {
 
 // --- Frozen V3 root props (snapshot at the time V3 was the current
 // schema, before the per-viz filter fields were added in V4). ---
-
-type V3_SlotRenderer = (options?: unknown) => ReactNode;
-void (null as unknown as V3_SlotRenderer); // keep alias type referenced
 
 type V3_AvaPageRootWidthUnit = "%" | "px";
 
@@ -69,7 +65,7 @@ export type V3_AvaPageRootProps = {
 
 /**
  * V3 viz config shape. Structurally identical to the current `VizConfig`
- * shipped from `shared/models/vizs/VizConfig` — no v3-to-v4 changes
+ * shipped from `shared/models/vizs/VizConfig`. No v3-to-v4 changes
  * touched the viz config tree. If a future version reshapes vizs, snapshot
  * those types into this module the same way V2 snapshotted its own
  * `V2_VizConfig`.

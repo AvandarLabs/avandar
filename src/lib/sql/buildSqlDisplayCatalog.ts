@@ -1,3 +1,4 @@
+import { propEq } from "@utils";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -11,9 +12,7 @@ export function buildSqlDisplayCatalog(options: {
   return {
     datasets: options.datasets.map((dataset) => {
       const columns = options.columns
-        .filter((col) => {
-          return col.datasetId === dataset.id;
-        })
+        .filter(propEq("datasetId", dataset.id))
         .map((col) => {
           return { name: col.name };
         });

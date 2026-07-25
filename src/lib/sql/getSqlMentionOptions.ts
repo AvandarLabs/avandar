@@ -1,3 +1,4 @@
+import { isDefined } from "@utils";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
 
 export type SqlMentionOption =
@@ -28,27 +29,29 @@ export function getSqlMentionOptions(
   catalog: SqlDisplayCatalog,
   query: string,
 ): SqlMentionOption[] {
-  const options: SqlMentionOption[] = [];
+  return catalog.datasets.flatMap((dataset) => {
+    const datasetOption: SqlMentionOption | undefined =
+      _matchesQuery(dataset.name, query) ?
+        {
+          kind: "dataset",
+          label: dataset.name,
+          insertText: `"${dataset.id}"`,
+        }
+      : undefined;
 
-  for (const dataset of catalog.datasets) {
-    if (_matchesQuery(dataset.name, query)) {
-      options.push({
-        kind: "dataset",
-        label: dataset.name,
-        insertText: `"${dataset.id}"`,
-      });
-    }
-    for (const column of dataset.columns) {
-      if (_matchesQuery(column.name, query)) {
-        options.push({
+    const columnOptions: SqlMentionOption[] = dataset.columns
+      .filter((column) => {
+        return _matchesQuery(column.name, query);
+      })
+      .map((column) => {
+        return {
           kind: "column",
           label: `${dataset.name}.${column.name}`,
           name: column.name,
           insertText: `"${column.name}"`,
-        });
-      }
-    }
-  }
+        };
+      });
 
-  return options;
+    return [datasetOption, ...columnOptions].filter(isDefined);
+  });
 }

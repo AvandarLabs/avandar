@@ -9,6 +9,7 @@ import css from "./AvaSqlBlock.module.css";
 import { PillEditPopover } from "./PillEditPopover";
 import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
 import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { ReactNode } from "react";
 
 export type AvaSqlBlockProps = {
   value: string;
@@ -19,8 +20,8 @@ export type AvaSqlBlockProps = {
   catalog?: SqlDisplayCatalog;
   readOnly?: boolean;
   /**
-   * Called when the document text changes — whether typed by the user or
-   * dispatched via a pill swap. Required to make the block editable;
+   * Called when the document text changes (whether typed by the user or
+   * dispatched via a pill swap). Required to make the block editable;
    * ignored when `readOnly` is true.
    */
   onChange?: (next: string) => void;
@@ -43,9 +44,9 @@ type ResolvedProps = AvaSqlBlockProps & { catalog: SqlDisplayCatalog };
  * Render a SQL string with workspace dataset and column tokens replaced by
  * pills. Two render paths:
  *
- *   1. `readOnly` (default when no `onChange`) — lightweight HTML using
+ *   1. `readOnly` (default when no `onChange`): lightweight HTML using
  *      `buildSqlDisplaySegments`. Cheap for many instances in chat markdown.
- *   2. editable (`onChange` provided and `readOnly` is not `true`) —
+ *   2. editable (`onChange` provided and `readOnly` is not `true`):
  *      delegates to {@link SqlEditor} which uses CodeMirror with the pill
  *      decoration extension. Pills are interactive in this path: a caret
  *      opens a Combobox to swap the underlying token, and out-of-scope
@@ -55,14 +56,14 @@ type ResolvedProps = AvaSqlBlockProps & { catalog: SqlDisplayCatalog };
  * out through `onChange`. The caller is the source of truth for the SQL
  * string.
  */
-export function AvaSqlBlock(props: AvaSqlBlockProps): JSX.Element {
+export function AvaSqlBlock(props: AvaSqlBlockProps): ReactNode {
   if (props.catalog !== undefined) {
     return <_AvaSqlBlockInner {...props} catalog={props.catalog} />;
   }
   return <AvaSqlBlockWithHookCatalog {...props} />;
 }
 
-function AvaSqlBlockWithHookCatalog(props: AvaSqlBlockProps): JSX.Element {
+function AvaSqlBlockWithHookCatalog(props: AvaSqlBlockProps): ReactNode {
   const { catalog } = useSqlDisplayCatalog();
   return <_AvaSqlBlockInner {...props} catalog={catalog} />;
 }
@@ -76,7 +77,7 @@ function _AvaSqlBlockInner({
   outOfScopeColumns,
   className,
   "data-testid": dataTestId,
-}: ResolvedProps): JSX.Element {
+}: ResolvedProps): ReactNode {
   const isEditable = readOnly !== true && onChange !== undefined;
 
   if (isEditable) {
@@ -157,7 +158,7 @@ function AvaSqlBlockEditable({
   minRows,
   className,
   dataTestId,
-}: EditableProps): JSX.Element {
+}: EditableProps): ReactNode {
   const editorViewRef = useRef<EditorView | null>(null);
   const [activePill, setActivePill] = useState<SqlPillClickInfo | null>(null);
 
@@ -165,15 +166,15 @@ function AvaSqlBlockEditable({
     return computeSqlScope({ sql: value, catalog });
   }, [value, catalog]);
 
-  const handlePillClick = (info: SqlPillClickInfo): void => {
+  const onPillClick = (info: SqlPillClickInfo): void => {
     setActivePill(info);
   };
 
-  const handleClose = (): void => {
+  const onClose = (): void => {
     setActivePill(null);
   };
 
-  const handleSelect = (replacement: { insert: string }): void => {
+  const onSelect = (replacement: { insert: string }): void => {
     if (editorViewRef.current === null || activePill === null) {
       return;
     }
@@ -194,7 +195,7 @@ function AvaSqlBlockEditable({
         onChange={onChange}
         catalog={catalog}
         minRows={minRows}
-        onPillClick={handlePillClick}
+        onPillClick={onPillClick}
         onEditorReady={(view) => {
           editorViewRef.current = view;
         }}
@@ -211,8 +212,8 @@ function AvaSqlBlockEditable({
         pill={activePill}
         catalog={catalog}
         sql={value}
-        onClose={handleClose}
-        onSelect={handleSelect}
+        onClose={onClose}
+        onSelect={onSelect}
       />
     </div>
   );

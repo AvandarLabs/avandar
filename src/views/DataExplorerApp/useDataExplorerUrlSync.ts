@@ -1,4 +1,4 @@
-import { isNonNullish, where } from "@utils";
+import { isNonNullish, propEq, where } from "@utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -9,24 +9,24 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import {
-  shouldDeferURLHydrationForStructuredLoading,
+  shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
-} from "@/views/DataExplorerApp/dataExplorerURLHydration";
+} from "@/views/DataExplorerApp/dataExplorerUrlHydration";
 import {
-  areExplorerURLSearchParamsEqual,
+  areExplorerUrlSearchParamsEqual,
   EMPTY_EXPLORER_URL_SEARCH,
   isDefaultExplorerState,
-  parseURLSearch,
-  serializeStateToURL,
-} from "@/views/DataExplorerApp/DataExplorerURLState";
+  parseUrlSearch,
+  serializeStateToUrl,
+} from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
-import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 type Options = {
-  urlSearch: DataExplorerURLSearch;
+  urlSearch: DataExplorerUrlSearch;
   navigate: (options: {
-    search: DataExplorerURLSearch;
+    search: DataExplorerUrlSearch;
     replace: boolean;
   }) => void;
 };
@@ -51,13 +51,13 @@ type Options = {
  *   history stays clean. Failed queries do not write `sql` to the URL; once a
  *   bad `?sql=` link errors, the param is removed so refresh does not loop.
  */
-export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
+export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();
 
   const urlState = useMemo(() => {
-    return parseURLSearch(urlSearch);
+    return parseUrlSearch(urlSearch);
   }, [urlSearch]);
 
   // Data source lookup — these are already fetched by QueryDataSourceSelect
@@ -84,7 +84,7 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
   /**
    * When the URL has `sql`, it wins — do not restore `ds` / cols from URL.
    */
-  const restoreStructuredFromURL = !urlState.rawSQL;
+  const restoreStructuredFromUrl = !urlState.rawSQL;
 
   const isDatasetSource = useMemo(() => {
     return (
@@ -136,164 +136,169 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
       isDefaultExplorerState(state);
   }
 
-  useEffect(() => {
-    if (isHydrated) {
-      return;
-    }
+  useEffect(
+    function hydrateStateFromUrl() {
+      if (isHydrated) {
+        return;
+      }
 
-    if (!shouldHydrateRef.current) {
-      setIsHydrated(true);
-      return;
-    }
-
-    if (
-      shouldDeferURLHydrationForStructuredLoading({
-        urlState,
-        restoredDataSource,
-        needsColumns,
-        datasetColumns,
-        entityFieldConfigs,
-        sqlMappingMetadataLoaded,
-      })
-    ) {
-      return;
-    }
-
-    void (async () => {
-      if (restoreStructuredFromURL && restoredDataSource) {
-        const commitOptions =
-          isDatasetSource ?
-            await buildDataSourceCommitOptions({
-              dataSource: restoredDataSource,
-              query: state.query,
-              workspaceId: workspace.id,
-            })
-          : undefined;
-        dispatch.setDataSource({
-          dataSource: restoredDataSource,
-          options: commitOptions,
-        });
+      if (!shouldHydrateRef.current) {
+        setIsHydrated(true);
+        return;
       }
 
       if (
-        restoreStructuredFromURL &&
-        needsColumns &&
-        (datasetColumns ?? entityFieldConfigs)
+        shouldDeferUrlHydrationForStructuredLoading({
+          urlState,
+          restoredDataSource,
+          needsColumns,
+          datasetColumns,
+          entityFieldConfigs,
+          sqlMappingMetadataLoaded,
+        })
       ) {
-        const allQueryColumns = [
-          ...(datasetColumns ?? []).map((col) => {
-            return QueryColumn.makeFromDatasetColumn(col);
-          }),
-          ...(entityFieldConfigs ?? []).map((col) => {
-            return QueryColumn.makeFromEntityFieldConfig(col);
-          }),
-        ];
+        return;
+      }
 
-        const restoredCols = (urlState.colNames ?? [])
-          .map((name) => {
-            return allQueryColumns.find((col) => {
-              return col.baseColumn.name === name;
-            });
-          })
-          .filter(isNonNullish);
+      void (async () => {
+        if (restoreStructuredFromUrl && restoredDataSource) {
+          const commitOptions =
+            isDatasetSource ?
+              await buildDataSourceCommitOptions({
+                dataSource: restoredDataSource,
+                query: state.query,
+                workspaceId: workspace.id,
+              })
+            : undefined;
+          dispatch.setDataSource({
+            dataSource: restoredDataSource,
+            options: commitOptions,
+          });
+        }
 
-        if (restoredCols.length > 0) {
-          dispatch.setColumns(restoredCols);
+        if (
+          restoreStructuredFromUrl &&
+          needsColumns &&
+          (datasetColumns ?? entityFieldConfigs)
+        ) {
+          const allQueryColumns = [
+            ...(datasetColumns ?? []).map((col) => {
+              return QueryColumn.makeFromDatasetColumn(col);
+            }),
+            ...(entityFieldConfigs ?? []).map((col) => {
+              return QueryColumn.makeFromEntityFieldConfig(col);
+            }),
+          ];
 
-          if (urlState.aggregations) {
-            restoredCols.forEach((col) => {
-              const agg = urlState.aggregations?.[col.baseColumn.name];
-              if (agg) {
-                dispatch.setColumnAggregation({
-                  columnId: col.id,
-                  aggregation: agg,
-                });
-              }
-            });
-          }
+          const restoredCols = (urlState.colNames ?? [])
+            .map((name) => {
+              return allQueryColumns.find(propEq("baseColumn.name", name));
+            })
+            .filter(isNonNullish);
 
-          if (urlState.orderByColName) {
-            const orderCol = restoredCols.find((col) => {
-              return col.baseColumn.name === urlState.orderByColName;
-            });
-            if (orderCol) {
-              dispatch.setOrderByColumn(orderCol.id);
-              if (urlState.orderDir) {
-                dispatch.setOrderByDirection(urlState.orderDir);
+          if (restoredCols.length > 0) {
+            dispatch.setColumns(restoredCols);
+
+            if (urlState.aggregations) {
+              restoredCols.forEach((col) => {
+                const agg = urlState.aggregations?.[col.baseColumn.name];
+                if (agg) {
+                  dispatch.setColumnAggregation({
+                    columnId: col.id,
+                    aggregation: agg,
+                  });
+                }
+              });
+            }
+
+            if (urlState.orderByColName) {
+              const orderCol = restoredCols.find((col) => {
+                return col.baseColumn.name === urlState.orderByColName;
+              });
+              if (orderCol) {
+                dispatch.setOrderByColumn(orderCol.id);
+                if (urlState.orderDir) {
+                  dispatch.setOrderByDirection(urlState.orderDir);
+                }
               }
             }
           }
         }
-      }
 
-      if (urlState.rawSQL) {
-        dispatch.setRawSql(urlState.rawSQL);
-        const mapping = sqlToStructuredQuery({
-          sql: urlState.rawSQL,
-          datasets: buildSqlMappingDatasets(
-            datasets ?? [],
-            allDatasetColumns ?? [],
-          ),
-        });
-        dispatch.applySqlMapping({
-          query: mapping.query,
-          isFullyMapped: mapping.isFullyMapped,
-          unmappedReasons: mapping.unmappedReasons,
-        });
-      }
+        if (urlState.rawSQL) {
+          dispatch.setRawSql(urlState.rawSQL);
+          const mapping = sqlToStructuredQuery({
+            sql: urlState.rawSQL,
+            datasets: buildSqlMappingDatasets(
+              datasets ?? [],
+              allDatasetColumns ?? [],
+            ),
+          });
+          dispatch.applySqlMapping({
+            query: mapping.query,
+            isFullyMapped: mapping.isFullyMapped,
+            unmappedReasons: mapping.unmappedReasons,
+          });
+        }
 
-      if (urlState.openDataset) {
-        dispatch.setOpenDataset(urlState.openDataset);
-      }
+        if (urlState.openDataset) {
+          dispatch.setOpenDataset(urlState.openDataset);
+        }
 
-      // Restore viz config last — may overwrite the result of hydrateFromQuery
-      // that setColumns triggered above.
-      if (urlState.vizConfig) {
-        dispatch.setVizConfig(urlState.vizConfig);
-      }
+        // Restore viz config last — may overwrite the result of
+        // hydrateFromQuery that setColumns triggered above.
+        if (urlState.vizConfig) {
+          dispatch.setVizConfig(urlState.vizConfig);
+        }
 
-      setIsHydrated(true);
-    })();
-    // Intentionally omitting `state` from deps: the "should hydrate?" decision
-    // is captured once via shouldHydrateRef so that mid-hydration state changes
-    // (from the dispatches above) do not re-trigger the bail-out check.
+        setIsHydrated(true);
+      })();
+    },
+    // Intentionally omitting `state` from deps: the "should hydrate?"
+    // decision is captured once via shouldHydrateRef so that mid-hydration
+    // state changes (from the dispatches above) do not re-trigger the
+    // bail-out check.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isHydrated,
-    urlState,
-    restoredDataSource,
-    datasetColumns,
-    entityFieldConfigs,
-    needsColumns,
-    datasets,
-    allDatasetColumns,
-    sqlMappingMetadataLoaded,
-    dispatch,
-  ]);
+    [
+      isHydrated,
+      urlState,
+      restoredDataSource,
+      datasetColumns,
+      entityFieldConfigs,
+      needsColumns,
+      datasets,
+      allDatasetColumns,
+      sqlMappingMetadataLoaded,
+      dispatch,
+    ],
+  );
 
   // Sync state → URL on every state change, after hydration completes.
   const urlParams = useMemo(() => {
-    return serializeStateToURL(state);
+    return serializeStateToUrl(state);
   }, [state]);
   const lastSyncedRef = useRef<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-    const serialized = JSON.stringify(urlParams);
-    if (serialized === lastSyncedRef.current) {
-      return;
-    }
-    if (areExplorerURLSearchParamsEqual(urlSearch, urlParams)) {
+  useEffect(
+    function syncUrlFromState() {
+      if (!isHydrated) {
+        return;
+      }
+      const serialized = JSON.stringify(urlParams);
+      if (serialized === lastSyncedRef.current) {
+        return;
+      }
+      if (areExplorerUrlSearchParamsEqual(urlSearch, urlParams)) {
+        lastSyncedRef.current = serialized;
+        return;
+      }
       lastSyncedRef.current = serialized;
-      return;
-    }
-    lastSyncedRef.current = serialized;
-    const searchToWrite =
-      Object.keys(urlParams).length === 0 ?
-        EMPTY_EXPLORER_URL_SEARCH
-      : urlParams;
-    navigate({ search: searchToWrite, replace: true });
-  }, [isHydrated, urlParams, urlSearch, navigate]);
+      const searchToWrite =
+        Object.keys(urlParams).length === 0 ?
+          EMPTY_EXPLORER_URL_SEARCH
+        : urlParams;
+      navigate({ search: searchToWrite, replace: true });
+    },
+    [isHydrated, urlParams, urlSearch, navigate],
+  );
 }

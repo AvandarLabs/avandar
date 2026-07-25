@@ -56,16 +56,7 @@ export function useDataQuery(
 ): UseQueryResultTuple<QueryResult<UnknownRow>> {
   const { t } = useLingui();
   const { auth, query, rawSQL, isStructuredQueryInSync = true } = options;
-  const {
-    dataSource,
-    queryColumns,
-    aggregations,
-    orderByColumn,
-    orderByDirection,
-    limit,
-    filters,
-    having,
-  } = query;
+  const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
@@ -84,17 +75,6 @@ export function useDataQuery(
       dataSource,
       "select",
       sortedQueryColumns,
-      "aggregations",
-      aggregations,
-      "filters",
-      filters,
-      "having",
-      having,
-      "limit",
-      limit,
-      "orderBy",
-      orderByColumn,
-      orderByDirection,
       "structuredInSync",
       isStructuredQueryInSync,
     ],

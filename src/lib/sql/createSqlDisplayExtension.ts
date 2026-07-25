@@ -133,33 +133,31 @@ function _buildDecorationSet(
   );
   const builder = new RangeSetBuilder<Decoration>();
 
-  for (const segment of segments) {
+  segments.forEach((segment) => {
     if (segment.kind === "text") {
-      continue;
+      return;
     }
-    let payload: SqlPillClickInfo;
-    if (segment.kind === "dataset") {
-      payload = {
-        kind: "dataset",
-        label: segment.label,
-        datasetId: segment.datasetId,
-        start: segment.start,
-        end: segment.end,
-        raw: segment.raw,
-        anchorRect: new DOMRect(),
-      };
-    } else {
-      payload = {
-        kind: "column",
-        label: segment.label,
-        name: segment.name,
-        start: segment.start,
-        end: segment.end,
-        raw: segment.raw,
-        isError: outOfScopeStarts.has(segment.start),
-        anchorRect: new DOMRect(),
-      };
-    }
+    const payload: SqlPillClickInfo =
+      segment.kind === "dataset" ?
+        {
+          kind: "dataset",
+          label: segment.label,
+          datasetId: segment.datasetId,
+          start: segment.start,
+          end: segment.end,
+          raw: segment.raw,
+          anchorRect: new DOMRect(),
+        }
+      : {
+          kind: "column",
+          label: segment.label,
+          name: segment.name,
+          start: segment.start,
+          end: segment.end,
+          raw: segment.raw,
+          isError: outOfScopeStarts.has(segment.start),
+          anchorRect: new DOMRect(),
+        };
 
     builder.add(
       segment.start,
@@ -173,7 +171,7 @@ function _buildDecorationSet(
         ),
       }),
     );
-  }
+  });
 
   return builder.finish();
 }

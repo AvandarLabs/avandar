@@ -3,6 +3,7 @@
  * name) and known column identifiers. The concatenation of each segment's
  * `value` or `raw` reproduces the original SQL string.
  */
+import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { Parser } from "node-sql-parser";
 import type {
   SqlDisplayCatalog,
@@ -40,26 +41,26 @@ function _isUuid(value: string): boolean {
   return UUID_REGEX.test(value);
 }
 
-function _forEachQuotedIdentifier(
-  sql: string,
-  onMatch: (match: {
-    content: string;
-    raw: string;
-    start: number;
-    end: number;
-  }) => void,
-): void {
-  for (const pattern of QUOTED_IDENT_PATTERNS) {
-    for (const match of sql.matchAll(pattern)) {
+type QuotedIdentifier = {
+  content: string;
+  raw: string;
+  start: number;
+  end: number;
+};
+
+/** All double/backtick-quoted identifiers in `sql`, in source order. */
+function _findQuotedIdentifiers(sql: string): QuotedIdentifier[] {
+  return QUOTED_IDENT_PATTERNS.flatMap((pattern) => {
+    return [...sql.matchAll(pattern)].flatMap((match): QuotedIdentifier[] => {
       const raw = match[0];
       const content = match[1] ?? "";
       const start = match.index;
       if (start === undefined) {
-        continue;
+        return [];
       }
-      onMatch({ content, raw, start, end: start + raw.length });
-    }
-  }
+      return [{ content, raw, start, end: start + raw.length }];
+    });
+  });
 }
 
 function _findDatasetByQuotedContent(
@@ -72,7 +73,7 @@ function _findDatasetByQuotedContent(
       d.id === content ||
       d.id.toLowerCase() === normalized ||
       d.name === content ||
-      d.name.toLowerCase() === content.toLowerCase()
+      d.name.toLowerCase() === normalized
     );
   });
 }
@@ -81,32 +82,32 @@ function _collectQuotedDatasetSpans(
   sql: string,
   catalog: SqlDisplayCatalog,
 ): AnnotatedSpan[] {
-  const spans: AnnotatedSpan[] = [];
-  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
-    const dataset = _findDatasetByQuotedContent(content, catalog);
-    if (!dataset) {
-      return;
-    }
-    spans.push({
-      kind: "dataset",
-      start,
-      end,
-      raw,
-      datasetId: dataset.id,
-      datasetLabel: dataset.name,
-    });
-  });
-  return spans;
+  return _findQuotedIdentifiers(sql).flatMap<AnnotatedSpan>(
+    ({ content, raw, start, end }) => {
+      const dataset = _findDatasetByQuotedContent(content, catalog);
+      if (!dataset) {
+        return [];
+      }
+      return [
+        {
+          kind: "dataset",
+          start,
+          end,
+          raw,
+          datasetId: dataset.id,
+          datasetLabel: dataset.name,
+        },
+      ];
+    },
+  );
 }
 
 function _columnNamesInCatalog(catalog: SqlDisplayCatalog): Set<string> {
-  const names = new Set<string>();
-  for (const d of catalog.datasets) {
-    for (const c of d.columns) {
-      names.add(c.name);
-    }
-  }
-  return names;
+  return new Set(
+    catalog.datasets.flatMap((dataset) => {
+      return dataset.columns.map(prop("name"));
+    }),
+  );
 }
 
 function _collectParserColumnSpans(
@@ -138,20 +139,19 @@ function _collectParserColumnSpans(
     return [];
   }
 
-  const spans: AnnotatedSpan[] = [];
-  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
-    if (!columnNames.has(content)) {
-      return;
-    }
-    spans.push({
-      kind: "column",
-      start,
-      end,
-      raw,
-      columnName: content,
+  return _findQuotedIdentifiers(sql)
+    .filter(({ content }) => {
+      return columnNames.has(content);
+    })
+    .map<AnnotatedSpan>(({ content, raw, start, end }) => {
+      return {
+        kind: "column",
+        start,
+        end,
+        raw,
+        columnName: content,
+      };
     });
-  });
-  return spans;
 }
 
 function _collectQuotedColumnSpans(
@@ -164,26 +164,25 @@ function _collectQuotedColumnSpans(
       return [d.id, d.id.toLowerCase(), d.name, d.name.toLowerCase()];
     }),
   );
-  const spans: AnnotatedSpan[] = [];
-  _forEachQuotedIdentifier(sql, ({ content, raw, start, end }) => {
-    if (datasetIds.has(content) || datasetIds.has(content.toLowerCase())) {
-      return;
-    }
-    if (_isUuid(content)) {
-      return;
-    }
-    if (!knownColumns.has(content)) {
-      return;
-    }
-    spans.push({
-      kind: "column",
-      start,
-      end,
-      raw,
-      columnName: content,
+  return _findQuotedIdentifiers(sql)
+    .filter(({ content }) => {
+      if (datasetIds.has(content) || datasetIds.has(content.toLowerCase())) {
+        return false;
+      }
+      if (_isUuid(content)) {
+        return false;
+      }
+      return knownColumns.has(content);
+    })
+    .map<AnnotatedSpan>(({ content, raw, start, end }) => {
+      return {
+        kind: "column",
+        start,
+        end,
+        raw,
+        columnName: content,
+      };
     });
-  });
-  return spans;
 }
 
 /** Drop overlapping spans; datasets win over columns at the same range. */
@@ -201,16 +200,15 @@ function _mergeSpans(spans: AnnotatedSpan[]): AnnotatedSpan[] {
     return a.end - b.end;
   });
 
-  const merged: AnnotatedSpan[] = [];
-  for (const span of sorted) {
+  return sorted.reduce<AnnotatedSpan[]>((merged, span) => {
     const overlaps = merged.some((existing) => {
       return span.start < existing.end && span.end > existing.start;
     });
     if (!overlaps) {
       merged.push(span);
     }
-  }
-  return merged;
+    return merged;
+  }, []);
 }
 
 function _spansToSegments(
@@ -221,37 +219,43 @@ function _spansToSegments(
     return [{ kind: "text", value: sql }];
   }
 
-  const segments: SqlDisplaySegment[] = [];
-  let cursor = 0;
-
-  for (const span of spans) {
-    if (span.start > cursor) {
-      segments.push({
-        kind: "text",
-        value: sql.slice(cursor, span.start),
-      });
-    }
-    if (span.kind === "dataset" && span.datasetId && span.datasetLabel) {
-      segments.push({
-        kind: "dataset",
-        datasetId: span.datasetId,
-        label: span.datasetLabel,
-        raw: span.raw,
-        start: span.start,
-        end: span.end,
-      });
-    } else if (span.kind === "column" && span.columnName) {
-      segments.push({
-        kind: "column",
-        name: span.columnName,
-        label: span.columnName,
-        raw: span.raw,
-        start: span.start,
-        end: span.end,
-      });
-    }
-    cursor = span.end;
-  }
+  // Fold the spans into segments, tracking the running `cursor` so the plain
+  // text between pills is emitted in order.
+  const { segments, cursor } = spans.reduce<{
+    segments: SqlDisplaySegment[];
+    cursor: number;
+  }>(
+    (acc, span) => {
+      if (span.start > acc.cursor) {
+        acc.segments.push({
+          kind: "text",
+          value: sql.slice(acc.cursor, span.start),
+        });
+      }
+      if (span.kind === "dataset" && span.datasetId && span.datasetLabel) {
+        acc.segments.push({
+          kind: "dataset",
+          datasetId: span.datasetId,
+          label: span.datasetLabel,
+          raw: span.raw,
+          start: span.start,
+          end: span.end,
+        });
+      } else if (span.kind === "column" && span.columnName) {
+        acc.segments.push({
+          kind: "column",
+          name: span.columnName,
+          label: span.columnName,
+          raw: span.raw,
+          start: span.start,
+          end: span.end,
+        });
+      }
+      acc.cursor = span.end;
+      return acc;
+    },
+    { segments: [], cursor: 0 },
+  );
 
   if (cursor < sql.length) {
     segments.push({ kind: "text", value: sql.slice(cursor) });

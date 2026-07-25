@@ -31,6 +31,37 @@
   margin-top: var(--mantine-spacing-xs);
 }
 
+/*
+ * Base pill styles used by the read-only HTML variant. Kept here (the shared
+ * owner) so this variant is self-sufficient without SqlEditor.module.css. The
+ * editable CodeMirror path defines the same global rules in SqlEditor.module.css.
+ */
+:global(.sqlPill) {
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  display: inline-flex;
+  font-family: var(--mantine-font-family);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 1px;
+  padding: 0 var(--mantine-spacing-xs);
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+:global(.sqlPill--dataset) {
+  background: var(--mantine-color-primary-1);
+  border: 1px solid var(--mantine-color-primary-3);
+  color: var(--mantine-color-primary-9);
+}
+
+:global(.sqlPill--column) {
+  background: var(--mantine-color-gray-1);
+  border: 1px solid var(--mantine-color-gray-4);
+  color: var(--mantine-color-gray-9);
+}
+
 :global(.sqlPill--error) {
   background: var(--mantine-color-red-1);
   border-color: var(--mantine-color-red-4);

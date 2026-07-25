@@ -18,6 +18,8 @@ export default [
     ignores: [
       "**/dist/**",
       ".agents/**",
+      ".claude/**",
+      ".difit/**",
       "apps/desktop/build/**",
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
