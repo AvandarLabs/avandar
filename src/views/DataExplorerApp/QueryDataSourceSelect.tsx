@@ -2,18 +2,20 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { makeSelectOptions, Select, Tooltip } from "@ui";
-import { makeBucketMap, where } from "@utils";
+import { makeBucketMap, prop, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { useIsOnline } from "@/lib/offline/useIsOnline";
-import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { UserId } from "$/models/User/User.types";
 import type {
   QueryDataSource,
   QueryDataSourceId,
@@ -51,7 +53,22 @@ export function QueryDataSourceSelect({
 
   const workspace = useCurrentWorkspace();
   const isOnline = useIsOnline();
-  const localDatasetIds = useLocalDatasetIds();
+  const user = useCurrentUser();
+
+  // Dataset ids with parquet cached locally for the current user/workspace.
+  const [localDatasets] = LocalDatasetClient.useGetAll({
+    where: {
+      userId: { eq: user?.id as UserId },
+      workspaceId: { eq: workspace.id },
+    },
+    useQueryOptions: {
+      enabled: !!user,
+      staleTime: 30_000,
+    },
+  });
+  const localDatasetIds = useMemo(() => {
+    return new Set((localDatasets ?? []).map(prop("datasetId")));
+  }, [localDatasets]);
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
