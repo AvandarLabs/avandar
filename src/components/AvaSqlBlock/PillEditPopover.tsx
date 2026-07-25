@@ -81,7 +81,7 @@ export function PillEditPopover({
   });
   const lastPillStartRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  useEffect(function syncDropdownToActivePill() {
     if (pill === null) {
       combobox.closeDropdown();
       lastPillStartRef.current = null;
