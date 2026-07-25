@@ -55,8 +55,8 @@ as ONE PR** off a `refactor-gN/<slug>` branch. Consolidated migration
 plans (with verified real paths — they supersede the per-feature
 `NNN-*.md` files where they disagree) live in:
 
-1. `GROUP-1-data-foundation-ingestion.md` — rows #077, #094, #001, #002, #003
-2. `GROUP-2-data-explorer-querying.md` — #008–#013, #096, #097, #044–#047, #049
+1. ~~`GROUP-1-data-foundation-ingestion.md`~~ — rows #077, #094, #001, #002, #003. **✅ MERGED into `develop` (`914bcbba`; develop tip `3bb77f4f`) on 2026-07-24.** Group doc + per-feature plans deleted; see the Completed migrations log in `STATE.md`.
+2. `GROUP-2-data-explorer-querying.md` — #008–#013, #096, #097, #044–#047, #049 ← **next**
 3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows)
 4. `GROUP-4-dashboards.md` — #064–#076, #048
 5. `GROUP-5-platform-i18n-standalone.md` — #056–#063, #079–#082, #090, #095, #091–#093
@@ -114,16 +114,16 @@ index.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 77 | `[ ]` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. **Required by #001** — `useSaveDataset` imports from `@/lib/analytics/analyticsClient`. | CHECKPOINT 3 + 9 + 13 |
-| 94 | `[ ]` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. **Required by #001** — `DatasetClient` imports from `shared/types/chat.types` (extended types from this row). The `Subscription*` portions of the same commits are refactors of files already covered by the folded billing series (#083 here) and ride along when that lands (no separate row). | Commits `09e1a97e`, `32ea53b6` |
+| 77 | `[x] (914bcbba)` | **analytics-client-events** — `src/lib/analytics/analyticsClient.ts` writes to `usage_analytics_events` (Phase 1 schema); `analyticsEventTypes` typed allowlist; wired call sites: `dataset.imported`, `dashboard.published`, `chat.message_sent`, `chat.sql_generated`, `dashboard.block_added_via_chat`, `dashboard.filter_changed`, `dashboard.pdf_export_opened`. **Required by #001** — `useSaveDataset` imports from `@/lib/analytics/analyticsClient`. | CHECKPOINT 3 + 9 + 13 |
+| 94 | `[x] (914bcbba)` | **chat-models-catalog-regeneration** — Generated chat-models catalog (`supabase/functions/chat/chat-models-catalog.gen.json`), `scripts/regenerateChatModels.ts` regen script, type additions in `shared/types/chat.types.ts`, `shared/lib/zodHelpers.ts` helpers, and the `ModelModule` directory reorganization (`packages/shared/models/src/Model/ModelModule/`) that the regen script depends on. **Required by #001** — `DatasetClient` imports from `shared/types/chat.types` (extended types from this row). The `Subscription*` portions of the same commits are refactors of files already covered by the folded billing series (#083 here) and ride along when that lands (no separate row). | Commits `09e1a97e`, `32ea53b6` |
 
 ## A. Data ingestion & dataset management
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 1 | `[ ]` | **async-dataset-import-pipeline** — Streaming CSV/XLSX import via Web Worker, parquet output, two-phase async import with resume + status tracking. Replaces the synchronous upload path. Bundles all downstream adaptations of the pipeline: the XLSX sniffer worker (`src/workers/xlsxSniff.worker.ts`) column-inference improvements, `GoogleSheetsImportView` adapted to the new `startCsvImport`/`startXlsxImport` entry points, `ResyncDatasetCard.tsx` rewritten against the new pipeline, dataset name/CSV name display + tooltips + import validation, and all subsequent parser/status-tracking fixes. Per the operator rule "migrate refactored code, not legacy", these are all migrated together with the pipeline itself. | CHECKPOINT 1 (PRs #234/#235/#236); `docs/superpowers/plans/2026-05-19-async-dataset-import.md`; the `claude/async-dataset-import` branch series; commits `da43443`, `673419e`, `2a67c767`, `6098c3ef` (PTRCK-004) |
-| 2 | `[ ]` | **app-wide-dropzone** — Drop a CSV/XLSX anywhere in the workspace to open the dataset-import flow. Mounted globally inside `<ChatPanelProvider>` in `WorkspaceLayout`. | CHECKPOINT 1 (PR #224) |
-| 3 | `[ ]` | **dataset-drawer** — Replace the modal "Open Dataset" with a tabbed drawer (Saved / Import), with per-virtual-dataset save guards. Slide-from-bottom transition variants. | CHECKPOINT 1 (PR #229); commits `2ce199a`, `09c24af` |
+| 1 | `[x] (914bcbba)` | **async-dataset-import-pipeline** — Streaming CSV/XLSX import via Web Worker, parquet output, two-phase async import with resume + status tracking. Replaces the synchronous upload path. Bundles all downstream adaptations of the pipeline: the XLSX sniffer worker (`src/workers/xlsxSniff.worker.ts`) column-inference improvements, `GoogleSheetsImportView` adapted to the new `startCsvImport`/`startXlsxImport` entry points, `ResyncDatasetCard.tsx` rewritten against the new pipeline, dataset name/CSV name display + tooltips + import validation, and all subsequent parser/status-tracking fixes. Per the operator rule "migrate refactored code, not legacy", these are all migrated together with the pipeline itself. | CHECKPOINT 1 (PRs #234/#235/#236); `docs/superpowers/plans/2026-05-19-async-dataset-import.md`; the `claude/async-dataset-import` branch series; commits `da43443`, `673419e`, `2a67c767`, `6098c3ef` (PTRCK-004) |
+| 2 | `[x] (914bcbba)` | **app-wide-dropzone** — Drop a CSV/XLSX anywhere in the workspace to open the dataset-import flow. Mounted globally inside `<ChatPanelProvider>` in `WorkspaceLayout`. | CHECKPOINT 1 (PR #224) |
+| 3 | `[x] (914bcbba)` | **dataset-drawer** — Replace the modal "Open Dataset" with a tabbed drawer (Saved / Import), with per-virtual-dataset save guards. Slide-from-bottom transition variants. | CHECKPOINT 1 (PR #229); commits `2ce199a`, `09c24af` |
 
 ## B. Data Explorer UX
 

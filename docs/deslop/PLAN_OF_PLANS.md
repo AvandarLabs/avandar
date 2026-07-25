@@ -130,6 +130,17 @@ planning is complete.
   G5 platform/i18n/standalone. **Next step:** migrate group by group
   (start G1), opening one PR per group. See the grouping summary at
   the top of `ALL_FEATURES.md`.
+- **2026-07-24 — GROUP-1 merged.** `refactor-g1/data-foundation-ingestion`
+  (rows #077, #094, #001, #002, #003) landed on `develop` (`914bcbba`;
+  develop tip `3bb77f4f`) and its cleanup was merged back into
+  `feat/ict4d-demo` (`3068320c`). The five rows are `[x]`; the group
+  doc + five per-feature plans were deleted; the refactor branch +
+  worktree were removed. Small residual drift from the mergeback is
+  logged in `STATE.md` (analytics case-rename not collapsed; two
+  planned files never landed on develop) — operator eyeball, not a
+  blocker. **Next step:** cut `refactor-g2/data-explorer-querying`
+  off the current `develop` tip and migrate GROUP-2 (rows #008–#013,
+  #096, #097, #044–#047, #049) per `docs/deslop/GROUP-2-*.md`.
 
 ## Phase 2 ready
 

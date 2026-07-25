@@ -39,25 +39,29 @@ let it drift.
   (subject: _fix: use createUsePuck selector for selectedItem and
   remove nested form in ManualQueryForm (#251)_)
 - **Last update run on**: `2026-06-25`
-- **Active rows**: 77 remaining (all `[ ]`). On 2026-06-26 the 3
-  completed rows (#061, #078, #083) were removed from
-  `ALL_FEATURES.md` — their `[x]` checkoff rows are gone; completion
-  is recorded only in the Completed migrations log below. Also on
-  2026-06-26 the 6 voice/speech-to-text rows (#050–#055, section "G.
-  Multilingual voice dictation") were removed entirely — PR #254
-  deleted all voice features from `feat/ict4d-demo`, so there is
-  nothing to migrate. Index numbering is intentionally non-dense
-  (retired #4/#5/#6/#7 folded into #1, #14 into #9, #084..#089 into
-  #083; #050..#055 retired as voice-removed; #097 added 2026-06-25).
-- **Planning status**: **complete (2026-06-05; reshuffled 2026-06-10).**
-  All active rows except the newly-added #097 have a matching
-  `NNN-<slug>.md` plan in `docs/deslop/`. Section 0 (Infrastructure
-  prerequisites) is now mostly drained: #078, #061, and #083 are all
-  merged into `develop`; #077 and #094 remain pending. The operator
-  can continue Phase 2 migrations with `/deslop migrate
-  <feature-slug>` or `/deslop continue`. **#097 still needs a plan
-  authored** (`/deslop continue` will pick it up; operator should
-  confirm its scope first).
+- **Active rows**: 72 remaining (all `[ ]`). On 2026-07-24 the 5
+  GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
+  (`914bcbba`) and flipped to `[x]`; their `[x]` rows are kept in
+  `ALL_FEATURES.md` (with merge SHA) and the group + per-feature plan
+  files were deleted. On 2026-06-26 the 3 earlier completed rows
+  (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
+  `[x]` checkoff rows are gone; completion is recorded only in the
+  Completed migrations log below. Also on 2026-06-26 the 6
+  voice/speech-to-text rows (#050–#055, section "G. Multilingual
+  voice dictation") were removed entirely — PR #254 deleted all voice
+  features from `feat/ict4d-demo`, so there is nothing to migrate.
+  Index numbering is intentionally non-dense (retired #4/#5/#6/#7
+  folded into #1, #14 into #9, #084..#089 into #083; #050..#055
+  retired as voice-removed; #097 added 2026-06-25).
+- **Planning status**: **complete — Phase 2 batched into 5 group
+  PRs (2026-06-26).** GROUP-1 is now merged (2026-07-24); GROUP-2
+  through GROUP-5 remain. The consolidated group plans at
+  `docs/deslop/GROUP-2..5-*.md` are the source of truth for the rest
+  and supersede the per-feature `NNN-<slug>.md` plans where they
+  disagree. Next step: cut `refactor-g2/data-explorer-querying` off
+  the current `develop` tip and migrate GROUP-2. **#097 still lacks
+  its own `NNN` plan** but is folded into the GROUP-2 doc, so it
+  migrates with that group.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -73,7 +77,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| _(none)_ | | | | Both prior in-flight migrations (#083 billing-ptrck-series, #061 web-offline-mode) merged into `develop` and were closed out on the 2026-06-25 update run. |
+| _(none)_ | | | | GROUP-1 (`refactor-g1/data-foundation-ingestion`, rows #077/#094/#001/#002/#003) merged into `develop` (`914bcbba`) and closed out on 2026-07-24. GROUP-2 is next but not yet cut. |
 
 ---
 
@@ -87,6 +91,11 @@ the durable record once the per-feature markdown has been deleted.
 | 78 | `lingui-scaffold` | `2881b0bb` (PR #242) | 2026-06-10 |
 | 83 | `billing-ptrck-series` | `a40d64a3` (PR #237) | 2026-06-25 |
 | 61 | `web-offline-mode` | `50fb7884` (PR #252) | 2026-06-25 |
+| 77 | `analytics-client-events` (GROUP-1) | `914bcbba` | 2026-07-24 |
+| 94 | `chat-models-catalog-regeneration` (GROUP-1) | `914bcbba` | 2026-07-24 |
+| 1 | `async-dataset-import-pipeline` (GROUP-1) | `914bcbba` | 2026-07-24 |
+| 2 | `app-wide-dropzone` (GROUP-1) | `914bcbba` | 2026-07-24 |
+| 3 | `dataset-drawer` (GROUP-1) | `914bcbba` | 2026-07-24 |
 
 ---
 
@@ -303,3 +312,37 @@ Append-only log of `/deslop update` runs.
     (E2E fixtures no longer mention the transcribe flow).
   - No code migration was ever started for any voice row, so nothing
     was un-done — this is purely scope removal.
+- `2026-07-24` — **GROUP-1 completed + mergeback closed out.**
+  `refactor-g1/data-foundation-ingestion` (rows #077, #094, #001,
+  #002, #003) merged into `develop`; its commits land directly in
+  develop's history at `914bcbba` (develop tip after follow-up lint
+  fixes: `3bb77f4f`). The 3-way mergeback of the cleanup back into
+  `feat/ict4d-demo` is committed (`3068320c` "completed mergeback of
+  refactor-g1 branch").
+  - **Bookkeeping done:** flipped rows #077/#094/#001/#002/#003 to
+    `[x] (914bcbba)`; logged all five in the Completed migrations
+    log; deleted the five per-feature plans (`077-*`, `094-*`,
+    `001-*`, `002-*`, `003-*`) and `GROUP-1-data-foundation-ingestion.md`;
+    deleted the `refactor-g1/...` local branch + worktree (remote
+    branch already gone).
+  - **Residual drift after mergeback (for operator eyeball; not a
+    completion blocker).** `git diff origin/develop..feat/ict4d-demo`
+    over the G1 path set is down to ~12 files / +132 −144, made up of:
+    (a) **analytics case rename not collapsed** — develop renamed the
+    client to PascalCase `src/lib/analytics/AnalyticsClient.ts` (81
+    lines) but feat still carries the old lowercase
+    `analyticsClient.ts` (46 lines); the mergeback did not adopt
+    develop's PascalCase file on feat. (b) Two G1-plan files that
+    never landed on develop: `useCanAddDataset.ts` (+51) and
+    `OpenDatasetDrawer/datasetPreviewSQL.ts` (+16) exist only on feat
+    — the real PR diverged from the aspirational group plan. (c)
+    Minor test/import residue (`Model.test.ts` −51,
+    `openFileImportFlow.test.tsx`, `useSaveDataset.ts`, five
+    `source-datasets/*Client.ts` import repoints). None of this blocks
+    G1; it is the kind of small drift a later `/deslop update` or a
+    follow-up mergeback pass can absorb before G2's base matters.
+  - **Analyzed-commit marker left at `eb86cfc9`.** The feat tip is now
+    `3068320c`; the intervening commits are the G1 mergeback + lint/
+    skills cleanup (`748fdc2e`, `b80b0418`, `3068320c`) and are all
+    accounted for here, so a future `/deslop update` can bump the
+    marker straight to `3068320c` and treat them as noise.
