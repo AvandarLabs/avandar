@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
+import { propPasses, removeAtIndex } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.module.css";
@@ -72,11 +72,7 @@ export function PairSeriesFieldset({
 
   const removeAt = useCallback(
     (idx: number) => {
-      onChange(
-        series.filter((_, i) => {
-          return i !== idx;
-        }),
-      );
+      onChange(removeAtIndex(series, idx));
     },
     [series, onChange],
   );

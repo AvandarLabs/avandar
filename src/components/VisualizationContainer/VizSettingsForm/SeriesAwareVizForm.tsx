@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { makeBucketMap, propPasses } from "@utils";
+import { makeBucketMap, propPasses, removeAtIndex } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
@@ -126,9 +126,10 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
 
   const removeSeriesAt = useCallback(
     (idx: number) => {
-      const series = config.series.filter((_, i) => {
-        return i !== idx;
-      });
+      const series = removeAtIndex<(typeof config.series)[number]>(
+        config.series,
+        idx,
+      );
       onConfigChange({ ...config, series } as TConfig);
     },
     [config, onConfigChange],
