@@ -9,7 +9,7 @@ import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppConfig } from "@/config/AppConfig";
-import { useOfflineGate } from "@/lib/offline/useOfflineGate";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate/useOfflineGate";
 import {
   CsvFileLoadResult,
   XlsxFileLoadResult,

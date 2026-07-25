@@ -11,8 +11,8 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
