@@ -31,7 +31,7 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { formatOfflineQueryError } from "@/lib/offline/formatOfflineQueryError";
+import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError";
 import {
   DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
   hasDataExplorerPanelPreferencesInSessionStorage,
