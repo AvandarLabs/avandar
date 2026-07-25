@@ -125,20 +125,23 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
     state.query.orderByDirection,
   ]);
 
-  useEffect(function syncVizWhenResultsLoad() {
-    if (!isLoadingResults && queryResults?.columns) {
-      dispatch.syncVizFromQueryResult(queryResults.columns);
-    }
-    // TODO(jpsyx): verify if all these dependencies are necessary or just
-    // legacy code
-  }, [
-    isLoadingResults,
-    columnSignature,
-    querySyncSignature,
-    state.vizConfig.vizType,
-    queryResults?.columns,
-    dispatch,
-  ]);
+  useEffect(
+    function syncVizWhenResultsLoad() {
+      if (!isLoadingResults && queryResults?.columns) {
+        dispatch.syncVizFromQueryResult(queryResults.columns);
+      }
+      // TODO(jpsyx): verify if all these dependencies are necessary or just
+      // legacy code
+    },
+    [
+      isLoadingResults,
+      columnSignature,
+      querySyncSignature,
+      state.vizConfig.vizType,
+      queryResults?.columns,
+      dispatch,
+    ],
+  );
 
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);

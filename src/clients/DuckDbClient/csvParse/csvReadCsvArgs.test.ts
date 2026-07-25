@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 import { createCsvParseOptionsFromUserHints } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
+import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 
 describe("buildReadCsvArgList", () => {
   it("omits new_line when newline is null", () => {

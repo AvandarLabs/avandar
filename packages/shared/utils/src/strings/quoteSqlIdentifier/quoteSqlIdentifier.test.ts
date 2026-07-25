@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { describe, expect, it } from "vitest";
 
 describe("quoteSqlIdentifier", () => {
   it("wraps a plain identifier in double quotes", () => {

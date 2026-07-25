@@ -16,10 +16,10 @@ import { z } from "zod";
  */
 export function AvaModelSchema<
   MType extends string,
-  MPropsSchema extends Record<
+  MPropsSchema extends Record<string, z.ZodType<unknown, unknown>> = Record<
     string,
-    z.ZodType<unknown, unknown>
-  > = Record<string, never>,
+    never
+  >,
 >(options: {
   type: MType;
   props?: MPropsSchema;
