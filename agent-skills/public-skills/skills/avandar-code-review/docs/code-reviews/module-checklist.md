@@ -13,3 +13,19 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   primary file name both match the module or component name.
 - Keep directory and file casing aligned with the module naming rules. For
   example, React components should stay in `PascalCase`.
+- Never allow a file named just `constants.ts` or `types.ts`. These must be
+  qualified with what they represent: the module/component name
+  (`MyModule.constants.ts`, `MyComponent.types.ts`), or, when broader than a
+  single module, the parent directory name (`csvParse.constants.ts`), or an
+  app-level scope name when there is no meaningful parent
+  (`app.constants.ts`). This applies to both `*.constants.ts` and `*.types.ts`
+  (and their `.tsx` equivalents).
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEln '/(constants|types)\.(ts|tsx)$' <files-under-review>
+  ```
+
+  (or scan the changed file list for basenames of exactly `constants.ts`,
+  `constants.tsx`, `types.ts`, or `types.tsx`.)

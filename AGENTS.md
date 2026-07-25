@@ -37,6 +37,21 @@ Implement functionality using red/green TDD.
   as a short dash for aside explanations where you would have used an em dash.
 - Use block comments or docstrings to document exported or public interfaces,
   constants, objects, functions, and classes.
+- Comments must describe the code as it exists today, not the external plan
+  that produced it. Never reference planning artifacts a reader cannot resolve
+  from the codebase: roadmap phase numbers ("Phase 3"), plan or migration step
+  labels tied to a doc ("Phase A" / "Phase B"), ticket/milestone labels, or
+  any sequencing that lives outside the code. A human engineer reading the
+  file has no access to that plan. Describe the actual behavior instead (e.g.
+  "the background parquet transcode" rather than "Phase B").
+  - Exception: when the code itself implements a real multi-phase process (a
+    data migration, an import/transform pipeline, a render pass), it is fine,
+    and good for greppability, to name those phases, as long as the name is
+    descriptive and refers to the code rather than an external plan. Use a
+    real name like "CSV Import Phase" or "CSV Transform Phase", never a bare
+    "Phase A" or "Phase 2". The test: could a new engineer grep the name and
+    understand it from the code alone? If yes it is a code phase and allowed;
+    if it only makes sense against a roadmap or spec, it is banned.
 
 ## Naming conventions
 
@@ -99,6 +114,23 @@ Implement functionality using red/green TDD.
   - Only use inline styles if we need to dynamically compute styles.
 - Use `clsx` for conditional classes
 - Never use TailwindCSS. We are trying to deprecate it.
+
+## Internationalization
+
+- **All displayable frontend text must be translated.** Any string a user can
+  see (JSX text, and string props like `label`, `placeholder`, `title`,
+  `aria-label`, toast/notification messages, error messages shown in the UI)
+  must go through Lingui: `<Trans>…</Trans>` in JSX, or the `t` macro from
+  `useLingui()` for strings built in component code. Never ship a bare
+  user-facing string literal.
+- This applies only to user-facing text. Do **not** translate log messages,
+  thrown `Error` messages that are not rendered, test IDs, enum/key values,
+  SQL, or other non-display strings.
+- `t` is a hook macro, so it is only available inside components/hooks. When
+  user-facing copy is produced by a non-component module, return structured
+  data (a discriminated union or the raw values) and translate it at the
+  component that displays it, rather than formatting an English string in the
+  module.
 
 ## Files to ignore
 

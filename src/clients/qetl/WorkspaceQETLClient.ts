@@ -3,7 +3,7 @@ import { EmptyObject, prop, where } from "@utils";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -80,6 +80,15 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
                 parquetData: parquetBlob,
                 workspaceId,
                 userId,
+                parseStatus: "ready" as const,
+                parseStartedAt: undefined,
+                parseFailedReason: undefined,
+                sourceBytes: undefined,
+                sourceFileName: undefined,
+                sourceFileType: undefined,
+                sourceFileSize: undefined,
+                lastSourceAccessedAt: undefined,
+                parseOptions: undefined,
               };
             }),
           });

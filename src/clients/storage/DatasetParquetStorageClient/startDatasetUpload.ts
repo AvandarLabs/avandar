@@ -2,9 +2,11 @@ import { notifyError } from "@ui";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { MIMEType } from "@utils";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import {
@@ -13,7 +15,6 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -109,8 +110,8 @@ async function _oneShotParquetBlobUpload(options: {
 }): Promise<void> {
   const { workspaceId, datasetId, parquetBlob } = options;
   const objectPath = getDatasetParquetStoragePath({ workspaceId, datasetId });
-  const { error } = await AvaSupabase.db().storage
-    .from(WORKSPACES_BUCKET_NAME)
+  const { error } = await AvaSupabase.db()
+    .storage.from(WORKSPACES_BUCKET_NAME)
     .upload(objectPath, parquetBlob, {
       contentType: MIMEType.APPLICATION_PARQUET,
       upsert: true,
@@ -207,9 +208,24 @@ export async function startDatasetUpload(options: {
     return await currentUpload;
   }
 
+  // Wait for any in-flight background parquet transcoding to land before
+  // pulling the parquet bytes out of IndexedDB. With the two-phase import
+  // flow the user can save the dataset (which triggers this upload) before
+  // the background parquet transcoding finishes; without this guard
+  // `localDataset.parquetData` would still be the placeholder.
+  const importJob = ImportJobsManager.getJob(datasetId);
+  if (importJob && importJob.status === "running") {
+    await ImportJobsManager.waitForCompletion(datasetId);
+  }
+
   const localDataset = await LocalDatasetClient.getById({ id: datasetId });
   if (!localDataset) {
     throw new Error("Dataset is not available locally on this device.");
+  }
+  if (localDataset.parseStatus !== "ready" || !localDataset.parquetData) {
+    throw new Error(
+      `Dataset is not ready to upload (parseStatus: ${localDataset.parseStatus}).`,
+    );
   }
 
   const parquetBlob = localDataset.parquetData;

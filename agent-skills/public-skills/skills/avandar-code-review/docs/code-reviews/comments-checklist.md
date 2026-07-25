@@ -36,3 +36,28 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
     // ...
   }
   ```
+
+- Comments must describe the code as it exists today, not the external plan
+  that produced it. Flag any comment that references planning artifacts a
+  reader cannot resolve from the codebase: roadmap phase numbers ("Phase 3"),
+  plan or migration step labels tied to a doc ("Phase A" / "Phase B"), ticket
+  or milestone labels, or any sequencing that lives outside the code. Rewrite
+  to describe the actual behavior (e.g. "the background parquet transcode"
+  instead of "Phase B").
+
+  Exception: when the code itself implements a real multi-phase process (a
+  data migration, an import/transform pipeline, a render pass), naming those
+  phases is fine and helps greppability, as long as the name is descriptive
+  and refers to the code, not an external plan. "CSV Import Phase" or "CSV
+  Transform Phase" is allowed; a bare "Phase A" / "Phase 2" is not. Test: can
+  a new engineer grep the name and understand it from the code alone? If yes,
+  it is a code phase and allowed; if it only makes sense against a roadmap or
+  spec, flag it.
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEn '(//|\*).*\b[Pp]hase\b' <files-under-review>
+  ```
+
+  (also scan for "step N", "milestone", and ticket-ID references in comments.)

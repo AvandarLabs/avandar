@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui";
 import { snakeCaseKeysShallow } from "@utils";
@@ -10,6 +11,7 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import {
   DatasetImportFormValues,
   DataSourceMetadata,
@@ -57,12 +59,33 @@ function _duckDbColumnsToImportedColumns(
   });
 }
 
-export function useSaveDataset(): UseMutationResultTuple<
+type UseSaveDatasetOptions = {
+  /**
+   * Called once the dataset has been saved and the success notification
+   * has fired, just before the default navigation to the dataset view.
+   * Used by the app-wide import modal to close itself.
+   */
+  onAfterSave?: (savedDataset: Dataset.T) => void;
+
+  /**
+   * If set, the default redirect to the dataset view is skipped and this
+   * callback is invoked with the saved dataset instead. Use this when the
+   * caller wants to handle the post-save action itself (e.g. opening the
+   * dataset in the Data Explorer instead of navigating to its detail page).
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
+
+export function useSaveDataset(
+  options: UseSaveDatasetOptions = {},
+): UseMutationResultTuple<
   Dataset.T,
   DatasetImportFormValues & DataSourceMetadata
 > {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const { onSaveSuccess } = options;
 
   return useMutation({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -155,11 +178,11 @@ export function useSaveDataset(): UseMutationResultTuple<
     },
     onSuccess: async (savedDataset, params) => {
       notifySuccess({
-        title: "Dataset saved",
-        message: `Dataset "${savedDataset.name}" saved successfully`,
+        title: t`Dataset saved`,
+        message: t`Dataset "${savedDataset.name}" saved successfully`,
       });
 
-      // Hanlde post-save actions, such as uploading the dataset to cloud
+      // Handle post-save actions, such as uploading the dataset to cloud
       // storage if it was allowed by the user.
       match(params)
         .with({ sourceType: "csv_file" }, { sourceType: "xlsx_file" }, (p) => {
@@ -186,6 +209,23 @@ export function useSaveDataset(): UseMutationResultTuple<
           );
         });
 
+      void AnalyticsClient.logEvent({
+        event: "dataset.imported",
+        workspaceId: workspace.id,
+        app: "data_sources",
+        payload: {
+          datasetId: savedDataset.id,
+          sourceType: params.sourceType,
+        },
+      });
+
+      options.onAfterSave?.(savedDataset);
+
+      if (onSaveSuccess) {
+        onSaveSuccess(savedDataset);
+        return;
+      }
+
       navigate(
         AppLinks.dataManagerDatasetView({
           workspaceSlug: workspace.slug,
@@ -196,8 +236,8 @@ export function useSaveDataset(): UseMutationResultTuple<
     },
     onError: () => {
       notifyError({
-        title: "Error saving dataset",
-        message: "An error occurred while saving the dataset",
+        title: t`Error saving dataset`,
+        message: t`An error occurred while saving the dataset`,
       });
     },
   });

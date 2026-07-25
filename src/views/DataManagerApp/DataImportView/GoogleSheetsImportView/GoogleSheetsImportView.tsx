@@ -1,6 +1,21 @@
 import { useMutation } from "@hooks";
-import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
-import { notifyError, notifySuccess, notifyWarning, Tooltip } from "@ui";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  Box,
+  BoxProps,
+  Button,
+  Loader,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
+import {
+  Callout,
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+  Tooltip,
+} from "@ui";
 import { formatNumber, MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { csvCellValueSchema } from "$/lib/zodHelpers";
@@ -8,7 +23,11 @@ import { useCallback, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import {
+  FEATUREBASE_FEATURE_REQUEST_BOARD,
+  openFeaturebaseFeedbackWidget,
+} from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -20,6 +39,7 @@ import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { Logger } from "@/utils/Logger";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type {
   GoogleSheetsDataSourceMetadata,
   GoogleSheetsLoadResult,
@@ -49,9 +69,19 @@ type GoogleSheetsRawData = {
   spreadsheetName: string;
 };
 
-type Props = BoxProps;
+type Props = BoxProps & {
+  /**
+   * When set, this callback is invoked with the newly saved dataset instead
+   * of the default navigation to the dataset detail page.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
 
-export function GoogleSheetsImportView(props: Props): JSX.Element {
+export function GoogleSheetsImportView({
+  onSaveSuccess,
+  ...props
+}: Props): JSX.Element {
+  const { t } = useLingui();
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [selectedDocument, setSelectedDocument] = useState<
@@ -107,8 +137,8 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
     },
     onError: () => {
       notifyError({
-        title: "Google Sheet failed to load",
-        message: "An error occurred while loading the file",
+        title: t`Google Sheet failed to load`,
+        message: t`An error occurred while loading the file`,
       });
     },
   });
@@ -121,23 +151,43 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
     ): Promise<GoogleSheetsLoadResult> => {
       const { datasetId, numRowsToSkip, rawText, spreadsheetName } = params;
 
-      // store our Google Sheets-turned-CSV string into local storage.
-      const loadResult = await LocalDatasetClient.storeLocalCSV({
-        csvParseOptions: {
-          fileText: rawText,
-          numRowsToSkip,
-        },
+      // Wrap the Google-Sheets-as-CSV text in a File so we can drive it
+      // through the streaming two-step import pipeline.
+      const csvBlob = new Blob([rawText], { type: MIMEType.TEXT_CSV });
+      const csvFile = new File(
+        [csvBlob],
+        `${spreadsheetName || "google-sheet"}.csv`,
+        { type: MIMEType.TEXT_CSV },
+      );
+      const sniff = await LocalDatasetClient.startCsvImport({
         datasetId,
         userId: user!.id as UserId,
         workspaceId: workspace.id,
+        file: csvFile,
+        parseOptions: { numRowsToSkip },
       });
 
       const googleSheetsLoadResult: GoogleSheetsLoadResult = {
         datasetId,
-        numRows: loadResult.numRows,
+        numRows: sniff.previewRows.length,
         rawText,
         spreadsheetName,
-        sheetLoadMetadata: loadResult,
+        sheetLoadMetadata: {
+          id: uuid() as DuckDbLoadCsvResult["id"],
+          type: "csv",
+          tableName: datasetId,
+          csvName: csvFile.name,
+          columns: sniff.columns,
+          csvSniff: sniff.csvSniff,
+          numRows: sniff.previewRows.length,
+          numRejectedRows: 0,
+          errors: { rejectedRows: [], rejectedScans: [] },
+          // The sniff phase doesn't produce parquetData; the background
+          // parquet transcoding writes the real Blob into Dexie. Downstream
+          // consumers read parquetData from the Dexie row, not from this
+          // result object, so a placeholder is safe.
+          parquetData: new Blob(),
+        },
       };
       return googleSheetsLoadResult;
     },
@@ -158,29 +208,29 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
       } = loadResult;
       if (numRejectedRows === 0) {
         notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
+          title: t`File loaded successfully`,
+          message: t`Parsed ${formatNumber(numSuccessRows)} rows`,
         });
       } else if (numSuccessRows === 0) {
         notifyError({
-          title: "File failed to load",
-          message: "No rows were read successfully",
+          title: t`File failed to load`,
+          message: t`No rows were read successfully`,
         });
       } else {
         const numRejectedStr =
           numRejectedRows > 1000 ?
-            " over 1000 rows were rejected"
-          : ` ${numRejectedRows} rows were rejected`;
+            t` over 1000 rows were rejected`
+          : t` ${numRejectedRows} rows were rejected`;
         notifyWarning({
-          title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
+          title: t`File was partially loaded`,
+          message: t`Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
         });
       }
     },
     onError: () => {
       notifyError({
-        title: "File failed to load",
-        message: "An error occurred while loading the file",
+        title: t`File failed to load`,
+        message: t`An error occurred while loading the file`,
       });
     },
   });
@@ -250,15 +300,47 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
 
   return (
     <Box {...props}>
-      <Stack align="flex-start">
+      <Stack align="flex-start" gap="md">
+        <Callout color="warning" messageSize="sm">
+          <Text component="div" size="sm">
+            <Trans>
+              Connecting to Google Sheets and other data sources are in the
+              works and will be available very soon. If there is a database or
+              service you use that you need to connect to,{" "}
+              <UnstyledButton
+                type="button"
+                aria-label={t`Request a data source connection via feedback`}
+                display="inline"
+                p={0}
+                h="auto"
+                td="underline"
+                c="primary"
+                fz="sm"
+                fw={500}
+                style={{ verticalAlign: "baseline" }}
+                onClick={() => {
+                  openFeaturebaseFeedbackWidget({
+                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                  });
+                }}
+              >
+                please let us know so we can prioritize it
+              </UnstyledButton>
+              .
+            </Trans>
+          </Text>
+        </Callout>
+
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?
           <>
             {selectedGoogleAccount ?
               <Text>
-                You have successfully connected to{" "}
-                {selectedGoogleAccount.google_email}
+                <Trans>
+                  You have successfully connected to{" "}
+                  {selectedGoogleAccount.google_email}
+                </Trans>
               </Text>
             : null}
 
@@ -269,19 +351,23 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
                 }
               }}
             >
-              Pick google sheet
+              <Trans>Pick google sheet</Trans>
             </Button>
 
             {selectedDocument ?
               <>
-                <Text>Selected document: {selectedDocument.name}</Text>
+                <Text>
+                  <Trans>Selected document: {selectedDocument.name}</Trans>
+                </Text>
                 {isLoadingGoogleSheet ?
                   <Loader />
                 : null}
               </>
             : null}
           </>
-        : <Tooltip label="Google sheets connector is disabled while this feature is under maintenance.">
+        : <Tooltip
+            label={t`Google sheets connector is disabled while this feature is under maintenance.`}
+          >
             <Button
               disabled
               fullWidth
@@ -302,13 +388,13 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
                     devMsg: "Error while fetching Google auth URL",
                   });
                   notifyError(
-                    "Google authentication error",
-                    "There was an error while trying to authenticate with Google Sheets.",
+                    t`Google authentication error`,
+                    t`There was an error while trying to authenticate with Google Sheets.`,
                   );
                 }
               }}
             >
-              Connect to Google Sheets
+              <Trans>Connect to Google Sheets</Trans>
             </Button>
           </Tooltip>
         }
@@ -321,6 +407,7 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
               dataSourceMetadata.datasetLoadResult.spreadsheetName
             }
             isProcessing={isFetchingGoogleSheet || isLoadingGoogleSheet}
+            onSaveSuccess={onSaveSuccess}
             onDataSourceMetadataChange={(metadata) => {
               setDataSourceMetadata(metadata as GoogleSheetsDataSourceMetadata);
             }}

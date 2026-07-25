@@ -5,6 +5,7 @@ import {
   Text,
 } from "@mantine/core";
 import { makeObject } from "@utils";
+import clsx from "clsx";
 import { ReactNode, useState } from "react";
 import classes from "./Tabs.module.css";
 
@@ -31,7 +32,26 @@ type Props<TabId extends string> = {
    * - `floating`: pill background, border, and shadow (Mantine demo style).
    */
   indicatorVariant?: TabsIndicatorVariant;
-} & Omit<MantineTabsProps, "variant" | "children">;
+
+  /**
+   * Controlled active tab id. When provided together with `onTabChange`,
+   * the parent owns selection state (used when the tab is mirrored to the
+   * URL so it can survive a refresh).
+   */
+  value?: TabId;
+
+  /**
+   * Fires when the user activates a different tab. Required only when
+   * `value` is provided.
+   */
+  onTabChange?: (tabId: TabId) => void;
+
+  /**
+   * When this value changes, the floating indicator remounts and remeasures
+   * against the active tab (e.g. after a parent modal open animation).
+   */
+  indicatorRemountKey?: number;
+} & Omit<MantineTabsProps, "variant" | "children" | "value" | "onChange">;
 
 /**
  * A wrapper around Mantine Tabs that provides a consistent interface for
@@ -42,9 +62,17 @@ export function Tabs<TabId extends string>({
   renderTabHeader,
   renderTabPanel,
   indicatorVariant = "floating",
+  value,
+  onTabChange,
+  indicatorRemountKey = 0,
+  classNames: tabsClassNames,
   ...props
 }: Props<TabId>): JSX.Element {
-  const [currentTab, setCurrentTab] = useState<TabId>(tabIds[0]!);
+  const tabsClassNamesObj =
+    typeof tabsClassNames === "function" ? undefined : tabsClassNames;
+  const [internalTab, setInternalTab] = useState<TabId>(tabIds[0]!);
+  const isControlled = value !== undefined;
+  const currentTab = isControlled ? value : internalTab;
 
   // track the tab list refs so we can animate the tab indicator
   const [tabListRef, setTabListRef] = useState<HTMLDivElement | null>(null);
@@ -65,9 +93,16 @@ export function Tabs<TabId extends string>({
   return (
     <MantineTabs
       variant="none"
+      classNames={tabsClassNames}
       value={currentTab}
       onChange={(val) => {
-        return setCurrentTab(val as TabId);
+        const next = val as TabId;
+        if (isControlled) {
+          onTabChange?.(next);
+        } else {
+          setInternalTab(next);
+          onTabChange?.(next);
+        }
       }}
       {...props}
     >
@@ -75,7 +110,7 @@ export function Tabs<TabId extends string>({
         mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        className={isFloating ? classes.list : undefined}
+        className={clsx(isFloating && classes.list, tabsClassNamesObj?.list)}
         style={
           isFloating ? undefined : (
             {
@@ -105,6 +140,7 @@ export function Tabs<TabId extends string>({
         })}
 
         <FloatingIndicator
+          key={indicatorRemountKey}
           target={tabItemRefs[currentTab]}
           parent={tabListRef}
           className={isFloating ? classes.indicator : undefined}

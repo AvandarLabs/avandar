@@ -15,7 +15,7 @@ import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
@@ -334,9 +334,14 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
               id: extractor.dataset.id,
             });
 
-            // if we have a cache hit, then return the parquet blob, no need
-            // to download from cloud storage
-            if (localDataset) {
+            // Cache hit with a ready parquet: return it directly. Rows whose
+            // background parquet transcoding is still running
+            // (parseStatus !== "ready") have an undefined `parquetData`; fall
+            // through to the cloud download (or fail) in that case.
+            if (
+              localDataset?.parseStatus === "ready" &&
+              localDataset.parquetData
+            ) {
               return {
                 datasetId: extractor.dataset.id,
                 parquetBlob: localDataset.parquetData,

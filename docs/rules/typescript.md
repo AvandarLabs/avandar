@@ -246,6 +246,18 @@
     | SubComponent.tsx
   ```
 
+- **Never name a file just `constants.ts` or `types.ts`.** Always qualify the
+  file with what it represents:
+  - Name it after the module or component it belongs to:
+    `MyModule.constants.ts`, `MyComponent.types.ts`.
+  - If the constants/types are more general than a single module, name the
+    file after its parent directory. E.g. constants shared across the
+    `csvParse/` directory live in `csvParse.constants.ts`.
+  - If there is no meaningful parent module (e.g. constants for the whole
+    app), pick an appropriate scope name such as `app.constants.ts`.
+
+  This applies equally to `*.constants.ts` and `*.types.ts` (and their `.tsx`
+  equivalents). A bare `constants.ts` or `types.ts` is never allowed.
 - Never create barrel files. The only barrel files allowed are the `index.ts`
   files exporting the contents of our libraries in `packages/`.
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and

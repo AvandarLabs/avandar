@@ -12,4 +12,5 @@ export namespace ChatModelOption {
   export type Id = ChatModelOptionId;
   export type LicenseTier = ChatModelLicenseTier;
   export type OptionGroup = ChatModelOptionGroup;
+  export type Catalog = { groups: ChatModelOptionGroup[] };
 }

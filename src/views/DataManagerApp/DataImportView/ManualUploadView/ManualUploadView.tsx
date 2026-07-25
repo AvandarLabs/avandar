@@ -1,20 +1,38 @@
+import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { FileUploadForm, notifyError } from "@ui";
 import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import { useState } from "react";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { useEffect, useRef, useState } from "react";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import {
   DatasetImportForm,
   ManualUploadDataSourceMetadata,
 } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { useLoadManualUploadFile } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
-import { ManualUploadDropzone } from "./ManualUploadDropzone";
 import type { ParseManualFileOptions } from "./useLoadManualUploadFile/useLoadManualUploadFile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-type Props = BoxProps;
+type Props = BoxProps & {
+  /**
+   * A file to auto-parse on mount. Used when the import flow is launched
+   * by dropping a file onto the app-wide dropzone.
+   */
+  initialFile?: File;
+
+  /**
+   * Called after the dataset save mutation completes successfully.
+   * Used by the app-wide import modal to close itself.
+   */
+  onAfterSave?: () => void;
+
+  /**
+   * When set, this callback is invoked with the newly saved dataset instead
+   * of the default navigation to the dataset detail page.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
 
 function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
   const lowerFileName = file.name.toLowerCase();
@@ -42,7 +60,13 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
   throw new Error(`Unsupported file type: ${file.type}`);
 }
 
-export function ManualUploadView(props: Props): JSX.Element {
+export function ManualUploadView({
+  initialFile,
+  onAfterSave,
+  onSaveSuccess,
+  ...boxProps
+}: Props): JSX.Element {
+  const { t } = useLingui();
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const {
     dataSourceMetadata,
@@ -79,11 +103,29 @@ export function ManualUploadView(props: Props): JSX.Element {
       onRequestFileParse({ file, newDatasetId: uuid() as Dataset.Id });
     } else {
       notifyError({
-        title: "No file selected",
-        message: "Please select a file to import",
+        title: t`No file selected`,
+        message: t`Please select a file to import`,
       });
     }
   };
+
+  // When an `initialFile` is supplied (e.g. dropped onto the app-wide
+  // dropzone), start parsing it on mount so the user lands directly
+  // on the import form without an extra click.
+  const hasAutoParsedInitialFileRef = useRef(false);
+  useEffect(function autoParseInitialFile() {
+    if (!initialFile || hasAutoParsedInitialFileRef.current) {
+      return;
+    }
+    hasAutoParsedInitialFileRef.current = true;
+    void onRequestFileParse({
+      file: initialFile,
+      newDatasetId: uuid() as Dataset.Id,
+    });
+    // We intentionally exclude `onRequestFileParse` from deps - it
+    // changes on every render but the ref guards single execution.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialFile]);
 
   const elements = {
     importForm: () => {
@@ -101,10 +143,12 @@ export function ManualUploadView(props: Props): JSX.Element {
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}
+          onSaveSuccess={onSaveSuccess}
           onDataSourceMetadataChange={(metadata) => {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}
           isProcessing={isLoadingFile}
+          onAfterSave={onAfterSave}
           onRequestDataReparse={async (parseOptionsFromForm) => {
             if (!DatasetSource.isManuallyUploadable(parseOptionsFromForm)) {
               // this should never happen in this code path
@@ -124,12 +168,12 @@ export function ManualUploadView(props: Props): JSX.Element {
   };
 
   return (
-    <Box {...props}>
+    <Box {...boxProps}>
       <Stack align="flex-start">
         <FileUploadForm
-          label="Upload a spreadsheet"
-          description="Select an Excel or CSV file from your computer to import"
-          placeholder="Select file"
+          label={t`Upload a spreadsheet`}
+          description={t`Select an Excel or CSV file from your computer to import`}
+          placeholder={t`Select file`}
           accept={[
             MIMEType.TEXT_CSV,
             MIMEType.APPLICATION_MS_EXCEL,
@@ -141,15 +185,6 @@ export function ManualUploadView(props: Props): JSX.Element {
         />
 
         {elements.importForm()}
-
-        <ManualUploadDropzone
-          onRequestFileParse={(file) => {
-            onRequestFileParse({
-              file,
-              newDatasetId: uuid() as Dataset.Id,
-            });
-          }}
-        />
       </Stack>
     </Box>
   );

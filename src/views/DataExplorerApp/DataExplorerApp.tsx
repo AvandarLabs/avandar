@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import {
   IconChevronDown,
@@ -30,7 +31,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
-import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
+import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
@@ -48,6 +49,10 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const navigate = useNavigate({ from: "/$workspaceSlug/data-explorer" });
+  const [
+    isOpenDatasetModalOpen,
+    { open: openOpenDatasetModal, close: closeOpenDatasetModal },
+  ] = useDisclosure(false);
 
   useDataExplorerUrlSync({ initialUrlState });
 
@@ -120,7 +125,7 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
     state.query.orderByDirection,
   ]);
 
-  useEffect(() => {
+  useEffect(function syncVizWhenResultsLoad() {
     if (!isLoadingResults && queryResults?.columns) {
       dispatch.syncVizFromQueryResult(queryResults.columns);
     }
@@ -185,20 +190,7 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
               color="neutral"
               leftSection={<IconFolderOpen size={16} />}
               size="compact-sm"
-              onClick={() => {
-                modals.open({
-                  title: "Open Dataset",
-                  size: "lg",
-                  children: (
-                    <OpenDatasetModal
-                      onOpen={(info, rawSQL) => {
-                        dispatch.setRawSql(rawSQL);
-                        dispatch.setOpenDataset(info);
-                      }}
-                    />
-                  ),
-                });
-              }}
+              onClick={openOpenDatasetModal}
             >
               Open
             </Button>
@@ -216,20 +208,24 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
               <Menu.Dropdown>
                 {state.openDataset ?
                   <>
-                    <Menu.Item
-                      disabled={!state.rawSQL || isSavingOver}
-                      onClick={() => {
-                        if (!state.rawSQL || !state.openDataset) {
-                          return;
-                        }
-                        saveOverDataset({
-                          id: state.openDataset.virtualDatasetId,
-                          data: { rawSQL: state.rawSQL },
-                        });
-                      }}
-                    >
-                      Save — {state.openDataset.name}
-                    </Menu.Item>
+                    {state.openDataset.virtualDatasetId ?
+                      <Menu.Item
+                        disabled={!state.rawSQL || isSavingOver}
+                        onClick={() => {
+                          const virtualDatasetId =
+                            state.openDataset?.virtualDatasetId;
+                          if (!state.rawSQL || !virtualDatasetId) {
+                            return;
+                          }
+                          saveOverDataset({
+                            id: virtualDatasetId,
+                            data: { rawSQL: state.rawSQL },
+                          });
+                        }}
+                      >
+                        Save — {state.openDataset.name}
+                      </Menu.Item>
+                    : null}
                     <Menu.Item
                       color="red"
                       disabled={isDeletingDataset}
@@ -362,6 +358,15 @@ export function DataExplorerApp({ initialUrlState }: Props): JSX.Element {
           </Box>
         </Stack>
       </Flex>
+      <OpenDatasetModal
+        opened={isOpenDatasetModalOpen}
+        onClose={closeOpenDatasetModal}
+        onOpen={(info, rawSQL) => {
+          dispatch.setRawSql(rawSQL);
+          dispatch.setOpenDataset(info);
+          closeOpenDatasetModal();
+        }}
+      />
     </AppLayout>
   );
 }

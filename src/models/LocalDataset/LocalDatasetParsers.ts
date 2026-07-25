@@ -8,11 +8,36 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
+const CsvParseOptionsSchema = z.object({
+  type: z.literal("csv"),
+  numRowsToSkip: z.number().optional(),
+  delimiter: z.string().optional(),
+});
+
+const XlsxParseOptionsSchema = z.object({
+  type: z.literal("xlsx"),
+  sheet: z.string().optional(),
+  hasHeader: z.boolean().optional(),
+});
+
 const DBReadSchema = z.object({
   datasetId: uuidType<DatasetId>(),
   workspaceId: uuidType<WorkspaceId>(),
   userId: uuidType<UserId>(),
-  parquetData: z.instanceof(Blob),
+  parquetData: z.union([z.instanceof(Blob), z.undefined()]),
+  parseStatus: z.enum(["ready", "parsing", "failed"]),
+  parseStartedAt: z.union([z.number(), z.undefined()]),
+  parseFailedReason: z.union([z.string(), z.undefined()]),
+  sourceBytes: z.union([z.instanceof(Blob), z.undefined()]),
+  sourceFileName: z.union([z.string(), z.undefined()]),
+  sourceFileType: z.union([z.enum(["csv", "xlsx"]), z.undefined()]),
+  sourceFileSize: z.union([z.number(), z.undefined()]),
+  lastSourceAccessedAt: z.union([z.number(), z.undefined()]),
+  parseOptions: z.union([
+    CsvParseOptionsSchema,
+    XlsxParseOptionsSchema,
+    z.undefined(),
+  ]),
 });
 
 export const LocalDatasetParsers =

@@ -399,3 +399,37 @@ when the gate matches.
   similar action assertions are fine, since those use the shared
   `SHORT_WAIT` / `MEDIUM_WAIT` / `LONG_WAIT` constants and target a
   specific action rather than the whole test.
+
+### Phase: internationalization (Lingui)
+
+- **Gate:** the diff includes a frontend `.ts` or `.tsx` file under `src/`
+  (or `packages/web/`).
+- This repo renders user-facing copy through Lingui. All displayable,
+  user-facing text must be translated. Flag any bare user-facing string
+  literal:
+  - JSX text nodes.
+  - String props that render to the user: `label`, `placeholder`, `title`,
+    `description`, `aria-label`, `alt`, button/menu text, `Tooltip` labels,
+    empty-state text, user-visible table headers.
+  - Toast / notification messages (`notifySuccess`, `notifyError`,
+    `notifyWarning`) and error messages rendered in the UI.
+- Do NOT flag non-display strings: `console.*` / `logger.*`, `notifyDevAlert`,
+  unrendered `throw new Error(...)`, test IDs, enum/key values, route paths,
+  SQL, DuckDB option tokens, class/style values.
+- **React components/hooks:** translate with the macros from
+  `@lingui/react/macro`, `<Trans>…</Trans>` in JSX or `t` from `useLingui()`
+  for strings built in code. Interpolation: `` t`Import failed: ${reason}` ``.
+- **Non-component modules** (plain `.ts` clients/services, no `t` hook):
+  prefer returning structured data and translating at the display component.
+  When copy is emitted imperatively from background code with no component in
+  the call path (e.g. a fire-and-forget toast), use the Lingui core API
+  `i18n._(msg\`…\`)` (`i18n` from `@lingui/core`, `msg` from
+  `@lingui/core/macro`). Never the deprecated `t(i18n)\`…\`` binding.
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEn '(label|placeholder|title|aria-label|description)=("[A-Z]|\{"[A-Z])' \
+    --include="*.tsx" src
+  grep -rEn 'notify(Success|Error|Warning)\(\s*"' src
+  ```

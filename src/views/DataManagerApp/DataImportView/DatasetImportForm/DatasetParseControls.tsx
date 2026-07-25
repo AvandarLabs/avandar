@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Checkbox, NumberInput, Select, Text, TextInput } from "@mantine/core";
 import { Tooltip } from "@ui";
 import { match } from "ts-pattern";
@@ -11,13 +12,14 @@ export function DatasetParseControls({
   onDataSourceMetadataChange,
   ...dataSourceMetadata
 }: Props): JSX.Element {
+  const { t } = useLingui();
   return match(dataSourceMetadata)
     .with({ sourceType: "csv_file" }, (csvProps) => {
       const { parseOptions } = csvProps;
       return (
         <>
           <NumberInput
-            label="Number of rows to skip"
+            label={t`Number of rows to skip`}
             value={parseOptions.numRowsToSkip ?? 0}
             onChange={(value) => {
               return onDataSourceMetadataChange({
@@ -30,7 +32,7 @@ export function DatasetParseControls({
             }}
           />
           <TextInput
-            label="Delimiter"
+            label={t`Delimiter`}
             value={parseOptions.delimiter ?? ","}
             onChange={(e) => {
               return onDataSourceMetadataChange({
@@ -61,11 +63,11 @@ export function DatasetParseControls({
       return (
         <>
           <Tooltip
-            label="There is only one sheet in this excel sheet."
+            label={t`There is only one sheet in this excel sheet.`}
             disabled={!hasSingleSheet}
           >
             <Select
-              label="Sheet name"
+              label={t`Sheet name`}
               data={sheetOptions}
               value={parseOptions.sheetName ?? null}
               disabled={hasSingleSheet}
@@ -81,7 +83,7 @@ export function DatasetParseControls({
             />
           </Tooltip>
           <NumberInput
-            label="Number of rows to skip"
+            label={t`Number of rows to skip`}
             value={parseOptions.numRowsToSkip ?? 0}
             onChange={(value) => {
               return onDataSourceMetadataChange({
@@ -94,7 +96,7 @@ export function DatasetParseControls({
             }}
           />
           <Checkbox
-            label="The sheet has a header row"
+            label={t`The sheet has a header row`}
             checked={parseOptions.hasHeader ?? true}
             onChange={(event) => {
               return onDataSourceMetadataChange({
@@ -107,7 +109,7 @@ export function DatasetParseControls({
             }}
           />
           <TextInput
-            label="Date format"
+            label={t`Date format`}
             value={parseOptions.dateFormat ?? ""}
             placeholder="%Y-%m-%d"
             onChange={(event) => {
@@ -121,7 +123,7 @@ export function DatasetParseControls({
             }}
           />
           <TextInput
-            label="Timestamp format"
+            label={t`Timestamp format`}
             value={parseOptions.timestampFormat ?? ""}
             placeholder="%Y-%m-%d %H:%M:%S"
             onChange={(event) => {
@@ -141,7 +143,7 @@ export function DatasetParseControls({
       const { parseOptions } = googleSheetsProps;
       return (
         <NumberInput
-          label="Number of rows to skip"
+          label={t`Number of rows to skip`}
           value={parseOptions.numRowsToSkip ?? 0}
           onChange={(value) => {
             return onDataSourceMetadataChange({
@@ -156,6 +158,10 @@ export function DatasetParseControls({
       );
     })
     .exhaustive(() => {
-      return <Text>Unsupported file type</Text>;
+      return (
+        <Text>
+          <Trans>Unsupported file type</Trans>
+        </Text>
+      );
     });
 }

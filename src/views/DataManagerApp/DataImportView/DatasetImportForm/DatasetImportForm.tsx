@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
 import { Callout, notifyError } from "@ui";
@@ -6,7 +7,9 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppConfig } from "@/config/AppConfig";
+import { useOfflineGate } from "@/lib/offline/useOfflineGate";
 import {
   CsvFileLoadResult,
   XlsxFileLoadResult,
@@ -97,21 +100,22 @@ const VALIDATION_FIELD_ORDER = ["name", "description"] as const;
 
 type ValidationField = (typeof VALIDATION_FIELD_ORDER)[number];
 
-function _errorMessageForField(
+function useErrorMessageForField(): (
   field: ValidationField,
   value: string,
-): string | null {
-  if (field === "name") {
-    return value.length < maxDatasetNameLength ?
-        null
-      : `Dataset name must be under ${maxDatasetNameLength} characters ` +
-          `(current: ${value.length}).`;
-  }
+) => string | undefined {
+  const { t } = useLingui();
+  return (field, value) => {
+    if (field === "name") {
+      return value.length < maxDatasetNameLength ?
+          undefined
+        : t`Dataset name must be under ${maxDatasetNameLength} characters (current: ${value.length}).`;
+    }
 
-  return value.length < maxDatasetDescriptionLength ?
-      null
-    : `Description must be under ${maxDatasetDescriptionLength} characters ` +
-        `(current: ${value.length}).`;
+    return value.length < maxDatasetDescriptionLength ?
+        undefined
+      : t`Description must be under ${maxDatasetDescriptionLength} characters (current: ${value.length}).`;
+  };
 }
 
 type Props = {
@@ -143,6 +147,20 @@ type Props = {
 
   /** The parse options for the dataset. This is a controlled component. */
   parseOptions: FileParseOptions;
+
+  /**
+   * Optional callback fired after the dataset is saved successfully.
+   * Used by the app-wide import modal to close itself before the
+   * default post-save navigation runs.
+   */
+  onAfterSave?: () => void;
+
+  /**
+   * If set, this callback is invoked with the saved dataset instead of
+   * navigating to the dataset detail page on success. Forwarded to
+   * `useSaveDataset`.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 /**
@@ -159,7 +177,11 @@ export function DatasetImportForm({
   onRequestDataReparse,
   isProcessing = false,
   dataSourceMetadata,
+  onAfterSave,
+  onSaveSuccess,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const errorMessageForField = useErrorMessageForField();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
   const [isFormErrorSummaryVisible, setIsFormErrorSummaryVisible] =
@@ -174,15 +196,19 @@ export function DatasetImportForm({
     validateInputOnChange: true,
     validate: {
       name: (value) => {
-        return _errorMessageForField("name", value);
+        return errorMessageForField("name", value);
       },
       description: (value) => {
-        return _errorMessageForField("description", value);
+        return errorMessageForField("description", value);
       },
     },
   });
 
-  const [saveDataset, isSavePending] = useSaveDataset();
+  const [saveDataset, isSavePending] = useSaveDataset({
+    onAfterSave,
+    onSaveSuccess,
+  });
+  const offline = useOfflineGate();
 
   const previewRows = useMemo(() => {
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
@@ -202,10 +228,10 @@ export function DatasetImportForm({
       const message =
         typeof errors[field] === "string" ?
           errors[field]
-        : "Please fix the highlighted fields.";
+        : t`Please fix the highlighted fields.`;
 
       notifyError({
-        title: "Can't save dataset",
+        title: t`Can't save dataset`,
         message,
       });
 
@@ -224,7 +250,7 @@ export function DatasetImportForm({
     if (!err) {
       return [];
     }
-    const label = field === "name" ? "Dataset name" : "Description";
+    const label = field === "name" ? t`Dataset name` : t`Description`;
     const text = typeof err === "string" ? err : String(err);
     return [{ field, line: `${label}: ${text}` }];
   });
@@ -238,18 +264,18 @@ export function DatasetImportForm({
       if (numRows === 0) {
         return (
           <Callout
-            title="Data processing failed"
+            title={t`Data processing failed`}
             color="error"
-            message="No rows were read successfully"
+            message={t`No rows were read successfully`}
           />
         );
       }
 
       return (
         <Callout
-          title="Data processed successfully"
+          title={t`Data processed successfully`}
           color="success"
-          message={`Parsed ${formattedNumRows} rows successfully`}
+          message={t`Parsed ${formattedNumRows} rows successfully`}
         />
       );
     },
@@ -264,7 +290,7 @@ export function DatasetImportForm({
           loading={isProcessing}
           disabled={isProcessing}
         >
-          Process data again
+          <Trans>Process data again</Trans>
         </Button>
       );
     },
@@ -275,18 +301,23 @@ export function DatasetImportForm({
           <Checkbox
             label={
               <>
-                <Text span>This dataset can be stored in the cloud. </Text>
+                <Text span>
+                  <Trans>This dataset can be stored in the cloud. </Trans>
+                </Text>
                 {!dataSourceMetadata.onlineStorageAllowed ?
                   <Callout
                     mt="sm"
-                    title="This dataset will be offline-only"
+                    title={t`This dataset will be offline-only`}
                     titleSize="xl"
                   >
                     <Text c="red.8">
-                      This dataset will no longer be stored online and can only
-                      be accessed as long as it is on your personal computer.
-                      Nobody on your team will be able to access this data. This
-                      is recommended only for very sensitive data.
+                      <Trans>
+                        This dataset will no longer be stored online and can
+                        only be accessed as long as it is on your personal
+                        computer. Nobody on your team will be able to access
+                        this data. This is recommended only for very sensitive
+                        data.
+                      </Trans>
                     </Text>
                   </Callout>
                 : null}
@@ -309,12 +340,12 @@ export function DatasetImportForm({
   return (
     <form
       onSubmit={form.onSubmit(
-        (formValues) => {
+        offline.guard((formValues) => {
           saveDataset({
             ...formValues,
             ...dataSourceMetadata,
           });
-        },
+        }),
         (errors, values, _event) => {
           onValidationFailure(errors, values);
         },
@@ -324,16 +355,16 @@ export function DatasetImportForm({
         <TextInput
           ref={nameInputRef}
           key={form.key("name")}
-          label="Dataset Name"
-          placeholder="Enter a name for this dataset"
+          label={t`Dataset Name`}
+          placeholder={t`Enter a name for this dataset`}
           required
           {...form.getInputProps("name")}
         />
         <TextInput
           ref={descriptionInputRef}
           key={form.key("description")}
-          label="Description"
-          placeholder="Enter a description for this dataset"
+          label={t`Description`}
+          placeholder={t`Enter a description for this dataset`}
           {...form.getInputProps("description")}
         />
 
@@ -342,13 +373,8 @@ export function DatasetImportForm({
         <DatasetPreviewBlock
           previewRows={previewRows}
           columns={importedColumns}
-          dataPreviewCalloutMessage={`These are the first ${previewRows.length} rows
-            of your dataset. Check to see if the data is correct. If they are not,
-            it's possible your dataset does not start on the first row or the CSV
-            uses a different delimiter. Try adjusting those settings here.`}
-          dataColumnsCalloutMessage={`${importedColumns.length} columns were detected.
-            Review the column info below to make sure they are correct. If they
-            are not, change the import options above and click Upload again.`}
+          dataPreviewCalloutMessage={t`These are the first ${previewRows.length} rows of your dataset. Check to see if the data is correct. If they are not, it's possible your dataset does not start on the first row or the CSV uses a different delimiter. Try adjusting those settings here.`}
+          dataColumnsCalloutMessage={t`${importedColumns.length} columns were detected. Review the column info below to make sure they are correct. If they are not, change the import options above and click Upload again.`}
           dataPreviewCalloutContents={
             <Group align="flex-end">
               <DatasetParseControls
@@ -365,8 +391,8 @@ export function DatasetImportForm({
         {isFormErrorSummaryVisible && formErrorSummaryItems.length > 0 ?
           <Callout
             color="error"
-            title="Fix these issues before saving"
-            message="Scroll up to the fields above, or use the list below."
+            title={t`Fix these issues before saving`}
+            message={t`Scroll up to the fields above, or use the list below.`}
           >
             <Stack
               component="ul"
@@ -385,9 +411,17 @@ export function DatasetImportForm({
           </Callout>
         : null}
 
-        <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
-          Save Dataset
-        </Button>
+        <OfflineGated>
+          <Button
+            loading={isSavePending}
+            type="submit"
+            disabled={disableSubmit}
+            data-disabled={disableSubmit || offline.isBlocked || undefined}
+            aria-disabled={disableSubmit || offline.isBlocked}
+          >
+            <Trans>Save Dataset</Trans>
+          </Button>
+        </OfflineGated>
       </Stack>
     </form>
   );
