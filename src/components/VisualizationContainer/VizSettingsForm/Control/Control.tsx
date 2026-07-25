@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import {
   ColorInput,
   NumberInput,
@@ -6,11 +5,9 @@ import {
   Switch,
   TextInput,
 } from "@mantine/core";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { useMemo } from "react";
+import { Select } from "@ui";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
@@ -138,55 +135,4 @@ export function Control({
         />
       );
   }
-}
-
-function ColumnPickerControl({
-  label,
-  fields,
-  dataType,
-  value,
-  onChange,
-}: {
-  label: string;
-  fields: readonly QueryResultColumn[];
-  dataType: "numeric" | "any" | "temporal" | "text" | undefined;
-  value: string | undefined;
-  onChange: (next: unknown) => void;
-}): ReactNode {
-  const { t } = useLingui();
-  const filtered = useMemo(() => {
-    if (dataType === undefined || dataType === "any") {
-      return fields;
-    }
-    if (dataType === "numeric") {
-      return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
-    }
-    if (dataType === "temporal") {
-      return fields.filter(propPasses("dataType", AvaDataType.isTemporal));
-    }
-    return fields.filter(propPasses("dataType", AvaDataType.isText));
-  }, [fields, dataType]);
-
-  const options = useMemo(() => {
-    return makeSelectOptions(filtered, {
-      valueKey: "name",
-      labelKey: "name",
-    });
-  }, [filtered]);
-
-  return (
-    <Select
-      allowDeselect
-      label={label}
-      data={options}
-      value={value ?? null}
-      disabled={options.length === 0}
-      placeholder={
-        options.length === 0 ? t`No columns available` : t`Select a column`
-      }
-      onChange={(next) => {
-        onChange(next ?? undefined);
-      }}
-    />
-  );
 }

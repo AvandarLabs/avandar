@@ -17,7 +17,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
-import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control";
+import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.module.css";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
