@@ -125,8 +125,8 @@ export function ManualUploadView({
       });
       // We intentionally exclude `onRequestFileParse` from deps - it
       // changes on every render but the ref guards single execution.
-       
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [initialFile],
   );
 
