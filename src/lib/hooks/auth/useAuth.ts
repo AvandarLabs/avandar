@@ -25,7 +25,7 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
   const pendingRedirectRef = useRef<string | null>(null);
   const hadUserRef = useRef(false);
 
-  useEffect(() => {
+  useEffect(function subscribeToAuthSession() {
     let cancelled = false;
     const getSession = async () => {
       const currentSession = await AuthClient.getCurrentSession();
@@ -65,7 +65,7 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
     };
   }, [router]);
 
-  useEffect(() => {
+  useEffect(function invalidateRouterOnUserChange() {
     if (user === undefined) {
       // Only invalidate on sign-out, not on the initial mount before
       // the session check has resolved (user starts as undefined)
