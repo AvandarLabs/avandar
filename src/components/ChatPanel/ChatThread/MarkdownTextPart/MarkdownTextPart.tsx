@@ -4,7 +4,7 @@ import {
 } from "@assistant-ui/react-markdown";
 import clsx from "clsx";
 import remarkGfm from "remark-gfm";
-import { ChatSyntaxHighlighter } from "@/components/ChatPanel/ChatThread/chatSyntaxHighlighter";
+import { ChatSyntaxHighlighter } from "@/components/ChatPanel/ChatThread/ChatSyntaxHighlighter";
 import { MarkdownCodeHeader } from "@/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import css from "./MarkdownTextPart.module.css";
