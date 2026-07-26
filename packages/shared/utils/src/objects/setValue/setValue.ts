@@ -56,10 +56,13 @@ export function _setValue(
   }
 
   // Otherwise, keep traversing and immutably changing things as we go.
-  const nextObj = isArray(obj) ? obj[Number(key)] : obj[key];
+  const nextObjRaw = isArray(obj) ? obj[Number(key)] : obj[key];
+  // Create a missing intermediate object so deep sets work on sparse objects
+  // (e.g. setting `chartStyle.xAxis.labelColor` when `chartStyle` is unset).
+  const nextObj = nextObjRaw === undefined ? {} : nextObjRaw;
 
-  // If our next object is a primitive (i.e. non-traversable) then we raise an
-  // error
+  // If our next object is a (non-undefined) primitive, i.e. non-traversable,
+  // then we raise an error.
   if (isPrimitive(nextObj)) {
     const remainingPath = pathTail.join(".");
     throw new Error(

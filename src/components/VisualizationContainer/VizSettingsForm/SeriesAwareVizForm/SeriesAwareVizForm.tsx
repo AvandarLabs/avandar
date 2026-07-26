@@ -12,9 +12,14 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { makeBucketMap, propPasses, removeAtIndex } from "@utils";
+import {
+  getValue,
+  makeBucketMap,
+  propPasses,
+  removeAtIndex,
+  setValue,
+} from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
@@ -46,6 +51,10 @@ type Props<TConfig extends HostConfig> = {
  * Hook to build the localized render-as options. Returned from a hook so
  * the labels stay in sync with the active Lingui locale.
  */
+function readSetting(obj: unknown, key: string): unknown {
+  return getValue(obj as never, key as never, { throwError: false });
+}
+
 function useRenderAsOptions(): ReadonlyArray<{
   value: RenderAs;
   label: string;
@@ -88,7 +97,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
 
   const updateChartPath = useCallback(
     (path: string, value: unknown) => {
-      const next = pathSet(
+      const next = setValue(
         config as never,
         path as never,
         value as never,
@@ -274,7 +283,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 key={desc.key}
                 label={desc.label}
                 spec={desc.control}
-                value={pathGet(config as never, desc.key as never)}
+                value={readSetting(config, desc.key)}
                 onChange={(next) => {
                   updateChartPath(desc.key, next);
                 }}
@@ -295,7 +304,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                     key={desc.key}
                     label={desc.label}
                     spec={desc.control}
-                    value={pathGet(config as never, desc.key as never)}
+                    value={readSetting(config, desc.key)}
                     onChange={(next) => {
                       updateChartPath(desc.key, next);
                     }}
@@ -365,7 +374,7 @@ function SeriesCard({
 
   const setSeriesPath = useCallback(
     (path: string, value: unknown) => {
-      const next = pathSet(series as never, path as never, value as never) as
+      const next = setValue(series as never, path as never, value as never) as
         | XYSeries
         | RadarSeries;
       onSeriesChange(next);
@@ -458,7 +467,7 @@ function SeriesCard({
                       key={desc.key}
                       label={desc.label}
                       spec={desc.control}
-                      value={pathGet(series as never, desc.key as never)}
+                      value={readSetting(series, desc.key)}
                       onChange={(next) => {
                         setSeriesPath(desc.key, next);
                       }}

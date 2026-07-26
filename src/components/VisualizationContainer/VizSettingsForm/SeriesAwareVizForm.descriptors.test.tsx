@@ -8,7 +8,7 @@
  * value. This is the safety net behind the "every setting actually
  * changes the viz" guarantee.
  */
-import { pathGet } from "$/models/vizs/SettingDescriptor";
+import { getValue } from "@utils";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
@@ -25,6 +25,9 @@ import type {
   AnyChartSettingDescriptor,
   AnySeriesSettingDescriptor,
 } from "$/models/vizs/SettingDescriptor";
+function readSetting(obj: unknown, key: string): unknown {
+  return getValue(obj as never, key as never, { throwError: false });
+}
 
 const COLUMNS: readonly QueryResultColumn[] = [
   { name: "category", dataType: "varchar" },
@@ -219,7 +222,7 @@ function driveControl(
     chartDescriptors.forEach((desc: AnyChartSettingDescriptor) => {
       it(`changes the "${desc.label}" setting via its ${desc.control.kind} control`, () => {
         const { onConfigChange } = renderForm(config);
-        const currentValue = pathGet(config as never, desc.key as never);
+        const currentValue = readSetting(config, desc.key);
         const nextValue = valueForControl(desc.control, currentValue);
         if (nextValue === undefined && desc.control.kind !== "switch") {
           // No other-than-current option to flip to; skip rather than fail.
@@ -228,7 +231,7 @@ function driveControl(
         driveControl(desc.label, desc.control, nextValue);
         expect(onConfigChange).toHaveBeenCalled();
         const lastCall: unknown = onConfigChange.mock.lastCall?.[0];
-        const actual = pathGet(lastCall as never, desc.key as never);
+        const actual = readSetting(lastCall, desc.key);
         const expected =
           desc.control.kind === "switch" ? !(currentValue === true) : nextValue;
         expect(actual).toStrictEqual(expected);
@@ -245,7 +248,7 @@ function driveControl(
         const { onConfigChange } = renderForm(config);
         const firstSeries: unknown = (config as { series: unknown[] })
           .series[0];
-        const currentValue = pathGet(firstSeries as never, desc.key as never);
+        const currentValue = readSetting(firstSeries, desc.key);
         const nextValue = valueForControl(desc.control, currentValue);
         if (nextValue === undefined && desc.control.kind !== "switch") {
           return;
@@ -256,7 +259,7 @@ function driveControl(
           series: unknown[];
         };
         const updatedSeries = lastCall.series[0];
-        const actual = pathGet(updatedSeries as never, desc.key as never);
+        const actual = readSetting(updatedSeries, desc.key);
         const expected =
           desc.control.kind === "switch" ? !(currentValue === true) : nextValue;
         expect(actual).toStrictEqual(expected);
