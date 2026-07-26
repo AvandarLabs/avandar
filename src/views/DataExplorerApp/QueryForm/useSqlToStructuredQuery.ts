@@ -1,11 +1,11 @@
 import { where } from "@utils";
-import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useCallback } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
-import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
+import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 
 /**
  * Provides a memoised `parseSql` callback that uses the current workspace's

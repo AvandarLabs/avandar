@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { Tabs } from "@ui";
-import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
 import css from "./QueryDetailsBody.module.css";
+import type { ReactNode } from "react";
 
 /**
  * Body of the "Query Details" floating window. Lets the user inspect or edit
@@ -10,7 +11,7 @@ import css from "./QueryDetailsBody.module.css";
  * (SQL). Both tabs read and write through `DataExplorerStateManager` so they
  * stay in sync with the canvas and with whichever AI prompt produced the SQL.
  */
-export function QueryDetailsBody(): JSX.Element {
+export function QueryDetailsBody(): ReactNode {
   const { t } = useLingui();
   return (
     <Tabs

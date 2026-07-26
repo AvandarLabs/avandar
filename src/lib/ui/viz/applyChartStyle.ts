@@ -1,5 +1,5 @@
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
-import type { ChartStyle } from "$/models/vizs/ChartStyle";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { CSSProperties } from "react";
 import type {
   CartesianGridProps,
@@ -19,7 +19,7 @@ const DEFAULT_Y_AXIS_WIDTH = 64;
 
 /**
  * Format Y-axis ticks compactly so labels stay narrow regardless of
- * magnitude — `1.5K`, `2.3M`, `1.5B`. Tooltip / table use the verbose form.
+ * magnitude (`1.5K`, `2.3M`, `1.5B`). Tooltip / table use the verbose form.
  */
 function _formatYAxisTick(value: unknown): string {
   return formatChartNumber(value, { compact: true });
@@ -63,24 +63,24 @@ export function applyChartStyle(
   const gridStyle = style?.grid;
   const legendStyle = style?.legend;
 
-  const xAxisProps: Omit<XAxisProps, "ref"> = { ...baseXAxisProps };
-  if (xAxisStyle?.tickColor !== undefined) {
-    xAxisProps.tick = {
-      fill: xAxisStyle.tickColor,
-      fontSize: DEFAULT_TICK_FONT_SIZE,
-    };
-  }
+  const xAxisTick =
+    xAxisStyle?.tickColor !== undefined ?
+      { fill: xAxisStyle.tickColor, fontSize: DEFAULT_TICK_FONT_SIZE }
+    : undefined;
+  const xAxisProps: Omit<XAxisProps, "ref"> = {
+    ...baseXAxisProps,
+    ...(xAxisTick !== undefined ? { tick: xAxisTick } : {}),
+  };
 
+  const yAxisTick =
+    yAxisStyle?.tickColor !== undefined ?
+      { fill: yAxisStyle.tickColor, fontSize: DEFAULT_TICK_FONT_SIZE }
+    : undefined;
   const yAxisProps: Omit<YAxisProps, "ref"> = {
     tickFormatter: _formatYAxisTick,
     width: DEFAULT_Y_AXIS_WIDTH,
+    ...(yAxisTick !== undefined ? { tick: yAxisTick } : {}),
   };
-  if (yAxisStyle?.tickColor !== undefined) {
-    yAxisProps.tick = {
-      fill: yAxisStyle.tickColor,
-      fontSize: DEFAULT_TICK_FONT_SIZE,
-    };
-  }
 
   const horizontal = gridStyle?.horizontal ?? true;
   const vertical = gridStyle?.vertical ?? false;
@@ -88,10 +88,8 @@ export function applyChartStyle(
     horizontal,
     vertical,
     strokeDasharray: "5 5",
+    ...(gridStyle?.color !== undefined ? { stroke: gridStyle.color } : {}),
   };
-  if (gridStyle?.color !== undefined) {
-    gridProps.stroke = gridStyle.color;
-  }
 
   const legendPosition = legendStyle?.position ?? "top";
   const legendProps: Omit<LegendProps, "ref"> = {

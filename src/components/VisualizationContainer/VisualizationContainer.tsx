@@ -1,19 +1,13 @@
-import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { Box, Flex, List, Text } from "@mantine/core";
-import { Callout, DangerText } from "@ui";
-import { objectValues, prop, UnknownDataFrame } from "@utils";
+import { Box, Flex } from "@mantine/core";
+import { DangerText } from "@ui";
+import { prop, UnknownDataFrame } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import {
-  array,
-  flattenError,
-  looseObject,
-  object,
-  prettifyError,
-  string,
-} from "zod";
-import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit";
+import { array, looseObject, object, prettifyError, string } from "zod";
+import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
+import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
+import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
@@ -50,7 +44,7 @@ type Props = {
 function useVizConfigSchemas() {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this
   // React-render path stays subscribed to locale changes via `useLingui()`.
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+
   const { t } = useLingui();
   return useMemo(() => {
     const XAxisKeySchema = string({
@@ -127,7 +121,7 @@ export function VisualizationContainer({
 }: Props): JSX.Element {
   // Hook-bound `t` intentionally shadows the module-level macro `t` so this
   // React-render path stays subscribed to locale changes via `useLingui()`.
-  // eslint-disable-next-line @typescript-eslint/no-shadow
+
   const { t } = useLingui();
   const schemas = useVizConfigSchemas();
   const columnNames = columns.map(prop("name"));
@@ -155,7 +149,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <BarChart
               data={limitedData}
               height="100%"
@@ -169,7 +163,9 @@ export function VisualizationContainer({
           </Box>
         );
       }
-      return _renderError(t`bar chart`, error);
+      return (
+        <VisualizationRenderError chartName={t`bar chart`} error={error} />
+      );
     })
     .with({ vizType: "line" }, (config) => {
       const {
@@ -179,7 +175,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <LineChart
               data={limitedData}
               height="100%"
@@ -202,7 +198,7 @@ export function VisualizationContainer({
       } = schemas.XYSeriesConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <AreaChart
               data={limitedData}
               height="100%"
@@ -226,7 +222,7 @@ export function VisualizationContainer({
       } = schemas.ScatterPlotConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <ScatterChart
               data={limitedData}
               height="100%"
@@ -245,7 +241,7 @@ export function VisualizationContainer({
       } = schemas.PieChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <PieChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -268,7 +264,7 @@ export function VisualizationContainer({
       } = schemas.FunnelChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <FunnelChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -288,7 +284,7 @@ export function VisualizationContainer({
       } = schemas.RadarChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <RadarChart
               data={limitedData}
               nameKey={validConfig.nameKey}
@@ -309,7 +305,7 @@ export function VisualizationContainer({
       } = schemas.BubbleChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <Box w="100%" h="100%" style={{ overflow: "hidden" }}>
+          <Box className={css.chartWrapper}>
             <BubbleChart
               data={limitedData}
               height="100%"
@@ -327,43 +323,4 @@ export function VisualizationContainer({
         </Flex>
       );
     });
-}
-
-function _renderError(
-  chartName: string,
-  error: Parameters<typeof flattenError>[0],
-): JSX.Element {
-  const errors = flattenError(error).fieldErrors as Record<
-    string,
-    readonly string[] | undefined
-  >;
-  const errorMessages = objectValues(errors).flat();
-  const errorBlock = (
-    <List size="xl">
-      {errorMessages.map((errMsg) => {
-        return (
-          <List.Item key={errMsg}>
-            <Text display="flex" size="xl">
-              {errMsg}
-            </Text>
-          </List.Item>
-        );
-      })}
-    </List>
-  );
-
-  const summaryMessage =
-    errors.xAxisKey || errors.series ?
-      t`The ${chartName} cannot be displayed because there are missing axes or series.`
-    : t`The ${chartName} cannot be displayed.`;
-  return (
-    <Callout.Error
-      title={t`Cannot display ${chartName}`}
-      message={summaryMessage}
-      w="fit-content"
-      mt="-20rem"
-    >
-      {errorBlock}
-    </Callout.Error>
-  );
 }

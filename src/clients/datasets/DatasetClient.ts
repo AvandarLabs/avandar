@@ -153,7 +153,7 @@ export const DatasetClient = createUsableServiceClient(
           datasetName: string;
           datasetDescription: string;
           columns: DatasetColumnInput[];
-          rawSQL: string;
+          rawSql: string;
           /**
            * If the dataset was produced by a multi-step analytic plan,
            * the plan as JSON. Persisted onto the virtual dataset so
@@ -173,7 +173,7 @@ export const DatasetClient = createUsableServiceClient(
             p_columns: params.columns.map((col) => {
               return { ...col, description: col.description ?? null };
             }),
-            p_raw_sql: params.rawSQL,
+            p_raw_sql: params.rawSql,
             p_plan_steps: params.planSteps ?? null,
           });
           logger.log("Successfully added virtual dataset", dataset);

@@ -43,7 +43,7 @@ export const VirtualDatasetParsers =
       ({ rawSql, planSteps, ...obj }) => {
         return Model.make("VirtualDataset", {
           ...obj,
-          rawSQL: rawSql,
+          rawSql: rawSql,
           planSteps: (planSteps ?? null) as ChatPlan | null,
           id: obj.id as VirtualDatasetId,
           datasetId: obj.datasetId as DatasetId,

@@ -1,9 +1,9 @@
 import { BarChart as MantineBarChart } from "@mantine/charts";
-import { formatDate } from "@utils";
+import { formatDate, propEq } from "@utils";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarSeries } from "$/models/vizs/SeriesConfig";
@@ -69,11 +69,7 @@ export function BarChart({
     return applyChartStyle(chartStyle, baseXAxisProps);
   }, [chartStyle, baseXAxisProps]);
 
-  const allBars = useMemo(() => {
-    return series.every((s) => {
-      return s.renderAs === "bar";
-    });
-  }, [series]);
+  const allBars = series.every(propEq("renderAs", "bar"));
 
   if (!allBars) {
     return renderXYComposite({
@@ -102,20 +98,16 @@ export function BarChart({
         return { name: s.key, label: s.label, color: s.color };
       })}
       barProps={(s): Partial<Omit<BarProps, "ref">> => {
-        const found = barSeries.find((bs) => {
-          return bs.key === s.name;
-        });
+        const found = barSeries.find(propEq("key", s.name));
         if (found === undefined) {
           return {};
         }
-        const overrides: Partial<Omit<BarProps, "ref">> = {};
-        if (found.fillOpacity !== undefined) {
-          overrides.fillOpacity = found.fillOpacity;
-        }
-        if (found.stackId !== undefined) {
-          overrides.stackId = found.stackId;
-        }
-        return overrides;
+        return {
+          ...(found.fillOpacity !== undefined ?
+            { fillOpacity: found.fillOpacity }
+          : {}),
+          ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
+        };
       }}
       {...styleProps}
     />

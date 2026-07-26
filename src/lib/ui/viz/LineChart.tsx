@@ -1,9 +1,9 @@
 import { LineChart as MantineLineChart } from "@mantine/charts";
-import { formatDate } from "@utils";
+import { formatDate, propEq } from "@utils";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
@@ -52,11 +52,7 @@ export function LineChart({
     return applyChartStyle(chartStyle, baseXAxisProps);
   }, [chartStyle, baseXAxisProps]);
 
-  const allLines = useMemo(() => {
-    return series.every((s) => {
-      return s.renderAs === "line";
-    });
-  }, [series]);
+  const allLines = series.every(propEq("renderAs", "line"));
 
   if (!allLines) {
     return renderXYComposite({
@@ -89,20 +85,16 @@ export function LineChart({
         };
       })}
       lineProps={(s): Partial<Omit<LineProps, "ref">> => {
-        const found = lineSeries.find((ls) => {
-          return ls.key === s.name;
-        });
+        const found = lineSeries.find(propEq("key", s.name));
         if (found === undefined) {
           return {};
         }
-        const overrides: Partial<Omit<LineProps, "ref">> = {};
-        if (found.strokeWidth !== undefined) {
-          overrides.strokeWidth = found.strokeWidth;
-        }
-        if (found.withDots !== undefined) {
-          overrides.dot = found.withDots;
-        }
-        return overrides;
+        return {
+          ...(found.strokeWidth !== undefined ?
+            { strokeWidth: found.strokeWidth }
+          : {}),
+          ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
+        };
       }}
       {...styleProps}
     />

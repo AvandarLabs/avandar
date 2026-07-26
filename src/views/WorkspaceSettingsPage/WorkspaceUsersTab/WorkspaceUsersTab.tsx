@@ -22,7 +22,7 @@ import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useOfflineGate } from "@/lib/offline/useOfflineGate";
+import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";

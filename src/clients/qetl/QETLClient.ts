@@ -40,7 +40,7 @@ export type IQETLClient = Module<
   "QETLClient",
   {
     /** Get the necessary dice to answer the given SQL query. */
-    getDiceFromSQL: (rawSQL: string) => Promise<readonly Dataset.Id[]>;
+    getDiceFromSql: (rawSql: string) => Promise<readonly Dataset.Id[]>;
 
     /** Insert the given facts into the local storage cache. */
     insertToStorageCache: (params: {
@@ -54,10 +54,10 @@ export type IQETLClient = Module<
      */
     runQuery: {
       <RowObject extends UnknownRow = UnknownRow>(params: {
-        rawSQL: string;
+        rawSql: string;
         returnType?: "js";
       }): Promise<QueryResult<RowObject>>;
-      (params: { rawSQL: string; returnType: "parquet" }): Promise<Blob>;
+      (params: { rawSql: string; returnType: "parquet" }): Promise<Blob>;
     };
   }
 >;
@@ -125,7 +125,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
   "QETLClient",
   {
     childBuilder(module) {
-      const { getDiceFromSQL, insertToStorageCache } = module.getState();
+      const { getDiceFromSql, insertToStorageCache } = module.getState();
 
       // The Memory Cube is an in-memory DuckDB instance.
       const MemoryCube = {
@@ -177,11 +177,11 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
 
       const DiceManager = {
         determineMissingDice: async ({
-          rawSQL,
+          rawSql,
         }: {
-          rawSQL: string;
+          rawSql: string;
         }): Promise<{ missingDice: Dataset.Id[] }> => {
-          const queryDependencies = await getDiceFromSQL(rawSQL);
+          const queryDependencies = await getDiceFromSql(rawSql);
 
           if (queryDependencies.length === 0) {
             // there are no dependencies, so there is nothing to load
@@ -384,7 +384,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 // materialize it into a parquet blob.
                 // This blob is a dice we can use to answer the original query.
                 const evaluatedBlob = await runQuery({
-                  rawSQL: ex.sourceDataset.rawSQL,
+                  rawSql: ex.sourceDataset.rawSql,
                   returnType: "parquet",
                 });
 
@@ -502,20 +502,20 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
       };
 
       async function runQuery(options: {
-        rawSQL: string;
+        rawSql: string;
         returnType: "parquet";
       }): Promise<Blob>;
       async function runQuery<
         RowObject extends UnknownObject = UnknownRow,
       >(options: {
-        rawSQL: string;
+        rawSql: string;
         returnType?: "js";
       }): Promise<QueryResult<RowObject>>;
       async function runQuery<RowObject extends UnknownObject = UnknownRow>({
-        rawSQL,
+        rawSql,
         returnType = "js",
       }: {
-        rawSQL: string;
+        rawSql: string;
         returnType?: "parquet" | "js";
       }): Promise<Blob | QueryResult<RowObject>> {
         // From Baldacci et. al. (2017) p.6:
@@ -547,7 +547,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         //   dataset ids and see which are in memory and local storage. We are
         //   not using anything more sophisticated for v0.
         const { missingDice } = await DiceManager.determineMissingDice({
-          rawSQL,
+          rawSql,
         });
 
         // 2. Optimization engine determines set of optimal extractions
@@ -592,9 +592,9 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         // now run the actual query against the memory cube, because we can be
         // confident that all the data is in the memory cube.
         if (returnType === "js") {
-          return await DuckDbClient.runRawQuery<RowObject>(rawSQL);
+          return await DuckDbClient.runRawQuery<RowObject>(rawSql);
         } else {
-          return await DuckDbClient.runRawQuery(rawSQL, {
+          return await DuckDbClient.runRawQuery(rawSql, {
             returnType: "parquet",
           });
         }

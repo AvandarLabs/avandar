@@ -17,12 +17,12 @@ import css from "./RegenerateErrorBanner.module.css";
  * decision each time rather than an automatic retry.
  */
 export function RegenerateErrorBanner(): JSX.Element | null {
-  const { lastQueryError, rawSQL } = DataExplorerStateManager.useState();
+  const { lastQueryError, rawSql } = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const aui = useAui();
   const { t } = useLingui();
 
-  if (!lastQueryError || !rawSQL) {
+  if (!lastQueryError || !rawSql) {
     return null;
   }
 

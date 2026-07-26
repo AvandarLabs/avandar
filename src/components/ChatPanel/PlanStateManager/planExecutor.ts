@@ -59,9 +59,9 @@ export function stepViewName(stepId: string): string {
  */
 async function ensureWorkspaceDatasetsLoadedForPlanSql(options: {
   workspaceId: Workspace.Id;
-  rawSQL: string;
+  rawSql: string;
 }): Promise<void> {
-  const matches = options.rawSQL.match(DATASET_ID_IN_SQL_RE);
+  const matches = options.rawSql.match(DATASET_ID_IN_SQL_RE);
   if (!matches) {
     return;
   }
@@ -70,7 +70,7 @@ async function ensureWorkspaceDatasetsLoadedForPlanSql(options: {
     uniqueDatasetIds.map(async (datasetId) => {
       await WorkspaceQETLClient.runQuery({
         workspaceId: options.workspaceId,
-        rawSQL: `SELECT 1 AS "_ava_probe" FROM "${datasetId}" LIMIT 1`,
+        rawSql: `SELECT 1 AS "_ava_probe" FROM "${datasetId}" LIMIT 1`,
       });
     }),
   );
@@ -121,7 +121,7 @@ export async function executePlanStep(args: {
   try {
     await ensureWorkspaceDatasetsLoadedForPlanSql({
       workspaceId,
-      rawSQL: step.code,
+      rawSql: step.code,
     });
 
     const runOnConnection = async (

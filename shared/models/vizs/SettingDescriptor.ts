@@ -1,5 +1,5 @@
 /**
- * # Setting vs. control — viz settings nomenclature
+ * # Setting vs. control: viz settings nomenclature
  *
  * The viz layer makes a deliberate, consistent distinction between
  * **settings** and **controls**. Use these terms everywhere: in code,
@@ -27,108 +27,7 @@
  * control widget the user clicks.
  */
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
-
-// ---------------------------------------------------------------------
-// Path utilities
-// ---------------------------------------------------------------------
-
-/**
- * `true` if `T` is a plain object (not a primitive, not an array, not a
- * function). Used to gate recursion into nested fields.
- */
-type _IsPlainObject<T> =
-  T extends readonly unknown[] ? false
-  : T extends (...args: never[]) => unknown ? false
-  : T extends object ? true
-  : false;
-
-/**
- * Recursively enumerate every dotted path through `T`. Stops at
- * primitives, arrays, and functions; arrays are treated as opaque
- * (series are addressed by index in the form layer, not via paths).
- *
- * Optional fields are unwrapped via `NonNullable` so a path like
- * `"chartStyle.xAxis.labelColor"` is reachable even when each level is
- * optional.
- *
- * For union types, paths are distributed so `Paths<A | B>` yields paths
- * reachable through either variant.
- */
-export type Paths<T> =
-  T extends unknown ?
-    T extends object ?
-      {
-        [K in Extract<keyof T, string>]: _IsPlainObject<
-          NonNullable<T[K]>
-        > extends true ?
-          K | `${K}.${Paths<NonNullable<T[K]>>}`
-        : K;
-      }[Extract<keyof T, string>]
-    : never
-  : never;
-
-/** Resolve the value type at a given dotted path. */
-export type PathValue<T, P extends string> =
-  T extends unknown ?
-    P extends `${infer K}.${infer Rest}` ?
-      K extends keyof T ?
-        PathValue<NonNullable<T[K]>, Rest>
-      : never
-    : P extends keyof T ? T[P]
-    : never
-  : never;
-
-/**
- * Read the value at a dotted path. Returns `undefined` if any segment
- * along the way is `undefined` / `null` or not an object.
- */
-export function pathGet<T, P extends Paths<T> & string>(
-  obj: T,
-  path: P,
-): PathValue<T, P> | undefined {
-  const segments = path.split(".");
-  let curr: unknown = obj;
-  for (const seg of segments) {
-    if (curr === undefined || curr === null || typeof curr !== "object") {
-      return undefined;
-    }
-    curr = (curr as Record<string, unknown>)[seg];
-  }
-  return curr as PathValue<T, P> | undefined;
-}
-
-/**
- * Immutably set the value at a dotted path. Intermediate objects are
- * created as needed. Passing `undefined` clears the leaf field. The
- * original object is not mutated.
- */
-export function pathSet<T, P extends Paths<T> & string>(
-  obj: T,
-  path: P,
-  value: PathValue<T, P> | undefined,
-): T {
-  const segments = path.split(".");
-  return _pathSetRec(obj, segments, value) as T;
-}
-
-function _pathSetRec(
-  source: unknown,
-  segments: readonly string[],
-  value: unknown,
-): unknown {
-  if (segments.length === 0) {
-    return value;
-  }
-  const [head, ...rest] = segments;
-  if (head === undefined) {
-    return value;
-  }
-  const base =
-    source !== null && typeof source === "object" && !Array.isArray(source) ?
-      (source as Record<string, unknown>)
-    : {};
-  return { ...base, [head]: _pathSetRec(base[head], rest, value) };
-}
+import type { Paths } from "type-fest";
 
 // ---------------------------------------------------------------------
 // Control specifications
@@ -250,7 +149,7 @@ export type SeriesSettingDescriptor<TSeries> = {
  * (BarChartVizConfigs, LineChartVizConfigs, etc.) exports one of
  * these.
  *
- * The form layer reads descriptors through {@link ErasedVizSettingDescriptors}
+ * The form layer reads descriptors through {@link AnyVizSettingDescriptors}
  * (a type-erased view) so it can iterate them without knowing the
  * concrete config or series shapes.
  */
@@ -260,17 +159,18 @@ export type VizSettingDescriptors<TConfig, TSeries> = {
 };
 
 /**
- * Type-erased descriptor pair, used at the registry / form-dispatch
- * boundary where the concrete `TConfig` and `TSeries` are unknown.
+ * Generic (un-parameterized) descriptor pair, used at the registry /
+ * form-dispatch boundary where the concrete `TConfig` and `TSeries` are
+ * unknown.
  */
-export type ErasedChartSettingDescriptor = {
+export type AnyChartSettingDescriptor = {
   key: string;
   label: string;
   group?: string;
   control: ControlSpec;
 };
 
-export type ErasedSeriesSettingDescriptor = {
+export type AnySeriesSettingDescriptor = {
   key: string;
   label: string;
   group?: string;
@@ -279,18 +179,18 @@ export type ErasedSeriesSettingDescriptor = {
   appliesTo: RenderAs | "radar";
 };
 
-export type ErasedVizSettingDescriptors = {
-  chart: readonly ErasedChartSettingDescriptor[];
-  series: readonly ErasedSeriesSettingDescriptor[];
+export type AnyVizSettingDescriptors = {
+  chart: readonly AnyChartSettingDescriptor[];
+  series: readonly AnySeriesSettingDescriptor[];
 };
 
 /**
  * Empty descriptor registry. Used by viz modules that have not yet
  * been refactored to use the descriptor-driven form (single-series
  * vizs like pie, funnel, scatter, bubble, table). Their forms remain
- * hand-coded for now; phase 2 will migrate them.
+ * hand-coded for now and can be migrated later.
  */
-export const EMPTY_VIZ_SETTING_DESCRIPTORS: ErasedVizSettingDescriptors = {
+export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],
   series: [],
 };

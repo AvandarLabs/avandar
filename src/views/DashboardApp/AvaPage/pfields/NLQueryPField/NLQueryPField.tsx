@@ -12,12 +12,12 @@ import {
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { Tabs, TextareaForm } from "@ui";
 import { useState } from "react";
-import { AvaSqlBlock } from "@/components/AvaSqlBlock";
-import { SqlQueryEditPanel } from "@/components/SqlEditor";
+import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
+import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
-import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
@@ -242,9 +242,9 @@ function SqlTabPanel({
               initialSql={rawSql}
               submitButtonLabel={t`Save and re-run query`}
               cancelButtonLabel={t`Cancel`}
-              onSubmit={(newRawSQL) => {
+              onSubmit={(newRawSql) => {
                 setIsEditSQLMode(false);
-                onSubmitSql(newRawSQL);
+                onSubmitSql(newRawSql);
               }}
               onCancel={() => {
                 setIsEditSQLMode(false);

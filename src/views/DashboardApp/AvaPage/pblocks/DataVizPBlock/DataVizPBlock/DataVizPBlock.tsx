@@ -3,7 +3,7 @@ import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { Paper } from "@ui";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult";
+import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { useMemo } from "react";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
@@ -84,7 +84,7 @@ export function DataVizPBlock({
 
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
-    rawSQL: filteredSql,
+    rawSql: filteredSql,
     ...(metadata.auth === "workspace" ?
       {
         auth: "workspace" as const,
@@ -110,7 +110,7 @@ export function DataVizPBlock({
     }
     return applyVizConfigFromQueryResult({
       vizConfig,
-      rawSQL: rawSql,
+      rawSql: rawSql,
       query: emptyStructuredQuery,
       columns,
     });

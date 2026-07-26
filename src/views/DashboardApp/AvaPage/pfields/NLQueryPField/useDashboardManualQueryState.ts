@@ -3,7 +3,7 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
+import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";

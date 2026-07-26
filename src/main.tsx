@@ -17,8 +17,8 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
 import { registerSessionExpiredHandler } from "@/config/registerSessionExpiredHandler";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
-import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 

@@ -1,4 +1,4 @@
-import type { AnimationTheme } from "@/config/Theme/AnimationTheme";
+import type { AnimationTheme } from "@/config/Theme/AnimationTheme/AnimationTheme";
 import type { BorderTheme } from "@/config/Theme/BorderTheme";
 import type { ElevationTheme } from "@/config/Theme/ElevationTheme";
 import type {

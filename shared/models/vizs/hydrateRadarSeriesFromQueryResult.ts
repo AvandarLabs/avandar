@@ -1,4 +1,8 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import {
+  columnNameSet,
+  pickFirstNumericColumnName,
+} from "$/models/vizs/hydrateColumnPicking.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -22,22 +26,16 @@ export function hydrateRadarSeriesFromQueryResult<
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = new Set(
-    columns.map((c) => {
-      return c.name;
-    }),
-  );
+  const colNames = columnNameSet(columns);
 
   let nextSeries: RadarSeries[] = currVizConfig.series.filter((s) => {
     return colNames.has(s.key);
   });
 
   if (nextSeries.length === 0) {
-    const firstNumeric = columns.find((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
-    if (firstNumeric !== undefined) {
-      nextSeries = [{ key: firstNumeric.name }];
+    const firstNumericName = pickFirstNumericColumnName(columns);
+    if (firstNumericName !== undefined) {
+      nextSeries = [{ key: firstNumericName }];
     }
   }
 

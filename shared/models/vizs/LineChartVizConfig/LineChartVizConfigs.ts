@@ -18,7 +18,7 @@ import type {
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
 import type {
-  ErasedVizSettingDescriptors,
+  AnyVizSettingDescriptors,
   VizSettingDescriptors,
 } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
@@ -170,7 +170,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
 export const LineChartVizConfigs = {
   vizType: "line",
   displayName: "Line Chart",
-  descriptors: descriptors as unknown as ErasedVizSettingDescriptors,
+  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
 
   makeEmptyConfig: (): LineChartVizConfig => {
     return {

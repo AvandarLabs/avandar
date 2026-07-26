@@ -3,7 +3,7 @@ import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettings
 import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm";
 import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
-import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm";
+import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
@@ -28,8 +28,7 @@ type Props = {
  *
  * Bar / line / area / radar share a descriptor-driven form
  * (`SeriesAwareVizForm`). The remaining single-series vizs (pie,
- * funnel, scatter, bubble) keep their hand-coded forms until phase 2
- * migrates them.
+ * funnel, scatter, bubble) keep their hand-coded forms for now.
  */
 export function VizSettingsFormBody({
   columns,

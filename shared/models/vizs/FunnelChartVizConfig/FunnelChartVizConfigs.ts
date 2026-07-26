@@ -1,5 +1,5 @@
-import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery.ts";
-import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult.ts";
+import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
+import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
 import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";

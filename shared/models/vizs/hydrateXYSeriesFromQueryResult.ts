@@ -1,4 +1,8 @@
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import {
+  columnNameSet,
+  pickCategoryColumnName,
+  pickFirstNumericColumnName,
+} from "$/models/vizs/hydrateColumnPicking.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -31,22 +35,16 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = new Set(
-    columns.map((c) => {
-      return c.name;
-    }),
-  );
+  const colNames = columnNameSet(columns);
 
   let nextSeries: XYSeries[] = currVizConfig.series.filter((s) => {
     return colNames.has(s.key);
   });
 
   if (nextSeries.length === 0) {
-    const firstNumeric = columns.find((c) => {
-      return AvaDataType.isNumeric(c.dataType);
-    });
-    if (firstNumeric !== undefined) {
-      nextSeries = [{ renderAs: defaultRenderAs, key: firstNumeric.name }];
+    const firstNumericName = pickFirstNumericColumnName(columns);
+    if (firstNumericName !== undefined) {
+      nextSeries = [{ renderAs: defaultRenderAs, key: firstNumericName }];
     }
   }
 
@@ -60,7 +58,7 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
         return s.key;
       }),
     );
-    nextXAxisKey = _pickBarLineXColumnName(columns, seriesKeys);
+    nextXAxisKey = pickCategoryColumnName(columns, seriesKeys);
   }
 
   return {
@@ -68,43 +66,4 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
     xAxisKey: nextXAxisKey,
     series: nextSeries,
   };
-}
-
-/**
- * Preferred X column for bar / line / area: temporal, then text, then
- * boolean (as category), then a numeric column that isn't already
- * being used as a series.
- */
-function _pickBarLineXColumnName(
-  columns: readonly QueryResultColumn[],
-  seriesKeys: ReadonlySet<string>,
-): string | undefined {
-  const others = columns.filter((c) => {
-    return !seriesKeys.has(c.name);
-  });
-  const temporal = others.find((c) => {
-    return AvaDataType.isTemporal(c.dataType);
-  });
-  if (temporal !== undefined) {
-    return temporal.name;
-  }
-  const text = others.find((c) => {
-    return AvaDataType.isText(c.dataType);
-  });
-  if (text !== undefined) {
-    return text.name;
-  }
-  const booleanCol = others.find((c) => {
-    return c.dataType === "boolean";
-  });
-  if (booleanCol !== undefined) {
-    return booleanCol.name;
-  }
-  const numeric = others.find((c) => {
-    return AvaDataType.isNumeric(c.dataType);
-  });
-  if (numeric !== undefined) {
-    return numeric.name;
-  }
-  return others[0]?.name;
 }

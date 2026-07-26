@@ -4,7 +4,7 @@ import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
 import { OfflineGated } from "@/components/offline/OfflineGated";
-import { useOfflineGate } from "@/lib/offline/useOfflineGate";
+import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

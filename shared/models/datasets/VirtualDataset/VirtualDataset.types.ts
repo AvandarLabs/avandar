@@ -27,7 +27,7 @@ export type VirtualDatasetRead = Model.Base<
     updatedAt: string;
 
     /** The raw SQL query that was used to generate the dataset. */
-    rawSQL: string;
+    rawSql: string;
 
     /**
      * When the dataset was produced by a multi-step LLM analytic plan

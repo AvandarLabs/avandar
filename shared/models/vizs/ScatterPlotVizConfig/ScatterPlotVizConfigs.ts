@@ -1,5 +1,5 @@
 import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrateScatterSeriesFromQuery.ts";
-import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult.ts";
+import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
 import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";

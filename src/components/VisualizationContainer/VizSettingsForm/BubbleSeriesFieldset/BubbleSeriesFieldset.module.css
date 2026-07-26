@@ -1,0 +1,21 @@
+/*
+ * Static layout styles for the bubble series fieldset. Extracted from
+ * inline `style` props so the markup stays declarative.
+ */
+
+/* Column-picker stack that grows to fill its row while allowing the
+ * inner Selects to shrink below their content width. */
+.flexFillMinW0 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Inputs that share a row and each take an equal fraction of the width. */
+.flexFill {
+  flex: 1;
+}
+
+/* The "what is a series?" info icon uses a help cursor on hover. */
+.helpCursor {
+  cursor: help;
+}

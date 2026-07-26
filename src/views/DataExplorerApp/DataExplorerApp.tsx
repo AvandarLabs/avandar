@@ -33,26 +33,28 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { formatOfflineQueryError } from "@/lib/offline/formatOfflineQueryError";
 import {
+  DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
   hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
-} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+} from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
+import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit";
-import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
-import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
+import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
+import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ChatPlan } from "$/types/chat.types";
+import type { ReactNode } from "react";
 
 const QUERY_DETAILS_WIDTH = 380;
 const VISUALIZATION_SETTINGS_WIDTH = 340;
@@ -68,31 +70,30 @@ const VISUALIZATION_SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
 /** Defaults applied when there is no saved per-tab preference. */
 const DEFAULT_QUERY_DETAILS_OPENED = true;
 const DEFAULT_VISUALIZATION_SETTINGS_OPENED = false;
-const AI_PANEL_SESSION_KEY = "ava.data-explorer.ai-panel-auto-opened";
 
 function _updatePanelPreferences(
   preferences: DataExplorerPanelPreferences,
   panel: "queryDetails" | "settings",
-  next: DataExplorerPanelPreferences["queryDetails"],
+  nextPreference: DataExplorerPanelPreferences["queryDetails"],
 ): DataExplorerPanelPreferences {
   return {
     ...preferences,
     [panel]: {
       ...preferences[panel],
-      ...next,
+      ...nextPreference,
     },
   };
 }
 
 type Props = {
-  urlSearch: DataExplorerURLSearch;
+  urlSearch: DataExplorerUrlSearch;
   navigate: (options: {
-    search: DataExplorerURLSearch;
+    search: DataExplorerUrlSearch;
     replace: boolean;
   }) => void;
 };
 
-export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
+export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
@@ -146,7 +147,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     writeDataExplorerPanelPreferences(panelPreferences);
   }, [panelPreferences]);
 
-  useDataExplorerURLSync({ urlSearch, navigate });
+  useDataExplorerUrlSync({ urlSearch, navigate });
 
   const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -183,30 +184,30 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   useSyncLargeDatasetAutoLimit({
     query: state.query,
-    rawSQL: state.rawSQL,
+    rawSql: state.rawSql,
     onApplyAutoLimit: applyLargeDatasetAutoLimit,
   });
 
   const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
-    rawSQL: state.rawSQL,
+    rawSql: state.rawSql,
     isStructuredQueryInSync: state.isStructuredQueryInSync,
     auth: "workspace",
     workspaceId: workspace.id,
   });
 
-  useEffect(() => {
-    const message =
-      dataQuery.isError ?
-        (formatOfflineQueryError(dataQuery.error) ??
-        (dataQuery.error instanceof Error ?
-          dataQuery.error.message
-        : String(dataQuery.error)))
-      : undefined;
-    if (message !== state.lastQueryError) {
-      dispatch.setLastQueryError(message);
-    }
-  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
+  useEffect(
+    function syncLastQueryError() {
+      const message =
+        dataQuery.isError ?
+          (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
+        : undefined;
+      if (message !== state.lastQueryError) {
+        dispatch.setLastQueryError(message);
+      }
+    },
+    [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
+  );
   const queryResultColumns = queryResults?.columns ?? [];
 
   const columnSignature = useMemo(() => {
@@ -224,29 +225,23 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const querySyncSignature = useMemo(() => {
     return JSON.stringify({
       queryColumns: state.query.queryColumns,
-      rawSQL: state.rawSQL,
+      rawSql: state.rawSql,
       dataSource: state.query.dataSource,
       orderByColumn: state.query.orderByColumn,
       orderByDirection: state.query.orderByDirection,
     });
   }, [
     state.query.queryColumns,
-    state.rawSQL,
+    state.rawSql,
     state.query.dataSource,
     state.query.orderByColumn,
     state.query.orderByDirection,
   ]);
 
   useEffect(() => {
-    if (isLoadingResults) {
-      return;
+    if (!isLoadingResults && queryResults?.columns) {
+      dispatch.syncVizFromQueryResult(queryResults.columns);
     }
-
-    if (!queryResults) {
-      return;
-    }
-
-    dispatch.syncVizFromQueryResult(queryResults.columns);
   }, [
     isLoadingResults,
     columnSignature,
@@ -286,10 +281,12 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   useEffect(
     function openChatPanelOnMount() {
-      const alreadyOpened = sessionStorage.getItem(AI_PANEL_SESSION_KEY);
+      const alreadyOpened = sessionStorage.getItem(
+        DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
+      );
       if (!alreadyOpened) {
         chatPanelDispatch.open();
-        sessionStorage.setItem(AI_PANEL_SESSION_KEY, "true");
+        sessionStorage.setItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY, "true");
       }
     },
     [chatPanelDispatch],
@@ -375,16 +372,16 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                 <>
                   {state.openDataset.virtualDatasetId ?
                     <Menu.Item
-                      disabled={!state.rawSQL || isSavingOver}
+                      disabled={!state.rawSql || isSavingOver}
                       onClick={() => {
                         const virtualDatasetId =
                           state.openDataset?.virtualDatasetId;
-                        if (!state.rawSQL || !virtualDatasetId) {
+                        if (!state.rawSql || !virtualDatasetId) {
                           return;
                         }
                         saveOverDataset({
                           id: virtualDatasetId,
-                          data: { rawSQL: state.rawSQL },
+                          data: { rawSql: state.rawSql },
                         });
                       }}
                     >
@@ -431,17 +428,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               : null}
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSQL === undefined
+                  queryResultData.length === 0 || state.rawSql === undefined
                 }
                 rightSection={
-                  state.rawSQL === undefined ?
+                  state.rawSql === undefined ?
                     <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSQL) {
+                  if (!state.rawSql) {
                     return;
                   }
                   const planSnapshot: ChatPlan | null =
@@ -471,7 +468,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                         queryResultData={queryResultData}
                         columns={queryResultColumns}
                         dateColumns={dateColumns}
-                        rawSQL={state.rawSQL}
+                        rawSql={state.rawSql}
                         planSnapshot={planSnapshot}
                         onSaveSuccess={() => {
                           modals.close(modalId);
@@ -485,17 +482,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               </Menu.Item>
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSQL === undefined
+                  queryResultData.length === 0 || state.rawSql === undefined
                 }
                 rightSection={
-                  state.rawSQL === undefined ?
+                  state.rawSql === undefined ?
                     <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSQL) {
+                  if (!state.rawSql) {
                     return;
                   }
                   const modalId = modals.open({
@@ -503,7 +500,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                     size: "lg",
                     children: (
                       <SaveToDashboardModal
-                        rawSQL={state.rawSQL}
+                        rawSql={state.rawSql}
                         prompt={state.nlPrompt}
                         vizType={state.vizConfig.vizType}
                         vizConfig={state.vizConfig}
@@ -626,8 +623,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
       <OpenDatasetModal
         opened={isOpenDatasetModalOpen}
         onClose={closeOpenDatasetModal}
-        onOpen={(info, rawSQL) => {
-          dispatch.setRawSql(rawSQL);
+        onOpen={(info, rawSql) => {
+          dispatch.setRawSql(rawSql);
           dispatch.setOpenDataset(info);
           closeOpenDatasetModal();
         }}

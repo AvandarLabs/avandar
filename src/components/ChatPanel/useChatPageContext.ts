@@ -24,7 +24,7 @@ export function useChatPageContext(): ChatPageContext.T {
       return s.location.pathname;
     },
   });
-  const { openDataset, rawSQL, lastQueryError, lastResultColumns } =
+  const { openDataset, rawSql, lastQueryError, lastResultColumns } =
     DataExplorerStateManager.useState();
   const { activeDashboardId } = DashboardEditorStateManager.useState();
   const openDatasetId = openDataset?.datasetId;
@@ -37,7 +37,7 @@ export function useChatPageContext(): ChatPageContext.T {
         });
       return ChatPageContext.createDataExplorerViewContext({
         openDatasetId,
-        lastSql: rawSQL,
+        lastSql: rawSql,
         lastResultColumns: resultColumns,
         lastError: lastQueryError,
       });
@@ -57,7 +57,7 @@ export function useChatPageContext(): ChatPageContext.T {
   }, [
     pathname,
     openDatasetId,
-    rawSQL,
+    rawSql,
     lastQueryError,
     lastResultColumns,
     activeDashboardId,

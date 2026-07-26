@@ -18,7 +18,7 @@ import type {
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
 import type {
-  ErasedVizSettingDescriptors,
+  AnyVizSettingDescriptors,
   VizSettingDescriptors,
 } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
@@ -191,7 +191,7 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
 export const AreaChartVizConfigs = {
   vizType: "area",
   displayName: "Area Chart",
-  descriptors: descriptors as unknown as ErasedVizSettingDescriptors,
+  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
 
   makeEmptyConfig: (): AreaChartVizConfig => {
     return {

@@ -14,7 +14,7 @@ export {
   ANIMATION_PRESET,
   AnimationTheme,
   DEFAULT_NOTIFICATIONS_PROPS,
-} from "./AnimationTheme";
+} from "./AnimationTheme/AnimationTheme";
 export { OverlayTheme } from "./OverlayTheme";
 export { buildAnimateOriginStyle } from "./buildAnimateOriginStyle";
 export { BorderTheme } from "./BorderTheme";

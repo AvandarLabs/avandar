@@ -32,10 +32,10 @@ export type DataExplorerAppState = {
    * the structured query.
    */
   // TODO(jpsyx): for consistency, rename this to `rawSql`
-  rawSQL: string | undefined;
+  rawSql: string | undefined;
 
   /**
-   * The natural-language prompt that produced the current `rawSQL`, if any.
+   * The natural-language prompt that produced the current `rawSql`, if any.
    * Persisted in state so downstream actions (e.g. saving to a dashboard as
    * a DataViz block) can carry the prompt alongside the generated SQL.
    */
@@ -55,7 +55,7 @@ export type DataExplorerAppState = {
   lastQueryError: string | undefined;
 
   /**
-   * Whether `rawSQL` and `query` (the structured form) currently represent
+   * Whether `rawSql` and `query` (the structured form) currently represent
    * the same query. `true` when both are empty, when SQL was successfully
    * parsed into the form, or when the form generated the current SQL. `false`
    * when SQL was too complex to map fully onto the form (best-effort
@@ -65,7 +65,7 @@ export type DataExplorerAppState = {
   isStructuredQueryInSync: boolean;
 
   /**
-   * Human-readable reasons describing what part of `rawSQL` could not be
+   * Human-readable reasons describing what part of `rawSql` could not be
    * represented in the manual form. Empty when the two are in sync.
    */
   sqlSyncWarnings: readonly string[];
@@ -84,7 +84,7 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   vizConfig: {
     vizType: "table",
   },
-  rawSQL: undefined,
+  rawSql: undefined,
   nlPrompt: undefined,
   openDataset: undefined,
   lastQueryError: undefined,

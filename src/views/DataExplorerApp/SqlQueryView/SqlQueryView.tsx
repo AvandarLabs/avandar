@@ -2,31 +2,32 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Button, Group, List, Paper, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-import { AvaSqlBlock } from "@/components/AvaSqlBlock";
-import { SqlQueryEditPanel } from "@/components/SqlEditor";
-import { formatSqlForDisplay } from "@/lib/sql/formatSqlForDisplay";
+import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
+import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay/formatSqlForDisplay";
+import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";
+import type { ReactNode } from "react";
 
 const SQL_EDITOR_MIN_ROWS = 10;
 
 /**
  * Read-only view of the current SQL with an "Edit query" affordance that
  * swaps the textarea into edit mode and re-runs the query on submit. Reads
- * `rawSQL` from `DataExplorerStateManager` so it stays in sync regardless of
+ * `rawSql` from `DataExplorerStateManager` so it stays in sync regardless of
  * whether the SQL came from the chat panel, the manual query form, or a
  * saved dataset.
  */
-export function SqlQueryView(): JSX.Element {
+export function SqlQueryView(): ReactNode {
   const { t } = useLingui();
-  const [{ rawSQL, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
+  const [{ rawSql, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
     DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
   const displaySql = useMemo(() => {
-    return formatSqlForDisplay(rawSQL ?? "");
-  }, [rawSQL]);
+    return formatSqlForDisplay(rawSql ?? "");
+  }, [rawSql]);
 
   const onSubmitSql = (rawValue: string): void => {
     const trimmedValue = rawValue.trim();
@@ -40,7 +41,7 @@ export function SqlQueryView(): JSX.Element {
     setIsEditMode(false);
   };
 
-  if (rawSQL === undefined) {
+  if (rawSql === undefined) {
     return (
       <Stack gap="xs" px="sm">
         <Text size="sm" c="neutral.6">
@@ -79,7 +80,7 @@ export function SqlQueryView(): JSX.Element {
       : null}
       {isEditMode ?
         <SqlQueryEditPanel
-          initialSql={rawSQL}
+          initialSql={rawSql}
           submitButtonLabel={t`Re-run query`}
           cancelButtonLabel={t`Cancel`}
           minRows={SQL_EDITOR_MIN_ROWS}

@@ -19,8 +19,8 @@ import clsx from "clsx";
 import { useCallback, useRef } from "react";
 import { ANIMATION_PRESET, FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
 import css from "./FloatingPanel.module.css";
-import { useFloatingPanelDismiss } from "./useFloatingPanelDismiss";
-import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
+import { useFloatingPanelDismiss } from "./useFloatingPanelDismiss/useFloatingPanelDismiss";
+import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition/useFloatingPanelMorphTransition";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
 type FloatingPanelInitialPosition = {
@@ -108,7 +108,7 @@ export function FloatingPanel({
   // `initialPosition` while the FloatingWindow is mounted.
   const onPositionChangeRef = useRef(onPositionChange);
   onPositionChangeRef.current = onPositionChange;
-  const handlePositionChange = useCallback(
+  const onWindowPositionChange = useCallback(
     (position: FloatingPanelPosition) => {
       onPositionChangeRef.current?.(position);
     },
@@ -135,7 +135,7 @@ export function FloatingPanel({
 
   const isPanelMounted = usesMorphTransition ? morph.isRendered : opened;
 
-  const { handlePanelMouseDown } = useFloatingPanelDismiss({
+  const { onPanelMouseDown } = useFloatingPanelDismiss({
     opened,
     isPanelMounted,
     panelRef,
@@ -145,7 +145,7 @@ export function FloatingPanel({
 
   const onToggleCollapseRef = useRef(onToggleCollapse);
   onToggleCollapseRef.current = onToggleCollapse;
-  const handleDragHandleDoubleClick = useCallback(() => {
+  const onDragHandleDoubleClick = useCallback(() => {
     onToggleCollapseRef.current();
   }, []);
 
@@ -161,7 +161,7 @@ export function FloatingPanel({
         w={width}
         zIndex={FLOATING_PANEL_Z_INDEX}
         initialPosition={initialPositionRef.current}
-        onPositionChange={handlePositionChange}
+        onPositionChange={onWindowPositionChange}
         dragHandleSelector={`.${css.header}`}
         excludeDragHandleSelector={`.${css.actions}`}
         className={clsx(
@@ -181,7 +181,7 @@ export function FloatingPanel({
         role="dialog"
         aria-modal={false}
         tabIndex={-1}
-        onMouseDown={handlePanelMouseDown}
+        onMouseDown={onPanelMouseDown}
       >
         <Group
           className={css.header}
@@ -196,7 +196,7 @@ export function FloatingPanel({
             wrap="nowrap"
             className={css.titleGroup}
             aria-hidden
-            onDoubleClick={handleDragHandleDoubleClick}
+            onDoubleClick={onDragHandleDoubleClick}
           >
             <IconGripVertical size={14} className={css.gripIcon} />
             <Text size="sm" fw={600} c="neutral.9" className={css.titleText}>

@@ -3,7 +3,7 @@ import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { ChatSyntaxHighlighterRouter } from "./MarkdownTextPart";
 
-vi.mock("@/hooks/sql/useSqlDisplayCatalog", () => {
+vi.mock("@/components/sql/sql-helpers/useSqlDisplayCatalog", () => {
   return {
     useSqlDisplayCatalog: () => {
       return { catalog: { datasets: [] }, isReady: true };

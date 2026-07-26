@@ -147,7 +147,7 @@ export const DashboardClient = createUsableServiceClient(
                   });
 
                   const materializedSql = buildSliceSql({
-                    baseSelectExpr: virtualDataset.rawSQL,
+                    baseSelectExpr: virtualDataset.rawSql,
                     sliceConfig: slice,
                     availableColumns,
                     queriedColumns,
@@ -155,7 +155,7 @@ export const DashboardClient = createUsableServiceClient(
                   });
 
                   const parquetBlob = await WorkspaceQETLClient.runQuery({
-                    rawSQL: materializedSql,
+                    rawSql: materializedSql,
                     workspaceId: dashboard.workspaceId,
                     returnType: "parquet",
                   });
@@ -191,7 +191,7 @@ export const DashboardClient = createUsableServiceClient(
                   });
 
                   const parquetBlob = await WorkspaceQETLClient.runQuery({
-                    rawSQL: materializedSql,
+                    rawSql: materializedSql,
                     workspaceId: dashboard.workspaceId,
                     returnType: "parquet",
                   });

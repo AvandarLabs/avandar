@@ -1,5 +1,5 @@
 import { hydrateBubbleSeriesFromQuery } from "$/models/vizs/hydrateBubbleSeriesFromQuery.ts";
-import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult.ts";
+import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult/hydrateBubbleSeriesFromQueryResult.ts";
 import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";

@@ -1,10 +1,10 @@
 import { Model } from "@models";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit";
-import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
-import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
-import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
+import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
+import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
+import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
+import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
@@ -30,19 +30,31 @@ export function useManualQueryDataSourceChange(opts: {
   const applyRequestIdRef = useRef(0);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearHintTimeout = useCallback((): void => {
+  const clearHintTimeout = useCallback(() => {
     if (hintTimeoutRef.current !== null) {
       clearTimeout(hintTimeoutRef.current);
       hintTimeoutRef.current = null;
     }
   }, []);
 
-  const hideLargeDatasetLimitHint = useCallback((): void => {
+  useEffect(
+    function cleanUpPendingWorkOnUnmount() {
+      return () => {
+        clearHintTimeout();
+        // Invalidate any in-flight row-count resolution so its `.then` /
+        // `.catch` bails instead of committing / setting state after unmount.
+        applyRequestIdRef.current += 1;
+      };
+    },
+    [clearHintTimeout],
+  );
+
+  const hideLargeDatasetLimitHint = useCallback(() => {
     clearHintTimeout();
     setIsLargeDatasetLimitHintVisible(false);
   }, [clearHintTimeout]);
 
-  const showLargeDatasetLimitHint = useCallback((): void => {
+  const showLargeDatasetLimitHint = useCallback(() => {
     clearHintTimeout();
     setIsLargeDatasetLimitHintVisible(true);
     hintTimeoutRef.current = setTimeout(() => {
@@ -52,7 +64,7 @@ export function useManualQueryDataSourceChange(opts: {
   }, [clearHintTimeout]);
 
   const onDataSourceChange = useCallback(
-    (dataSource: QueryDataSource | null): void => {
+    (dataSource: QueryDataSource | null) => {
       const requestId = applyRequestIdRef.current + 1;
       applyRequestIdRef.current = requestId;
       hideLargeDatasetLimitHint();

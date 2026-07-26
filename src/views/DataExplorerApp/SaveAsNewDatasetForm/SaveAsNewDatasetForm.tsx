@@ -17,7 +17,7 @@ type Props = {
   queryResultData: UnknownDataFrame;
   columns: readonly QueryResultColumn[];
   dateColumns: ReadonlySet<string>;
-  rawSQL: string;
+  rawSql: string;
   /**
    * Snapshot of the current multi-step analytic plan, if any, captured by
    * the caller while still inside the `PlanStateManager` provider tree.
@@ -32,7 +32,7 @@ export function SaveAsNewDatasetForm({
   queryResultData,
   columns,
   dateColumns,
-  rawSQL,
+  rawSql,
   planSnapshot,
   onSaveSuccess,
 }: Props): JSX.Element {
@@ -86,7 +86,7 @@ export function SaveAsNewDatasetForm({
                 data_type: col.dataType,
               };
             }),
-            rawSQL,
+            rawSql,
             planSteps: planSnapshot,
           });
         })}

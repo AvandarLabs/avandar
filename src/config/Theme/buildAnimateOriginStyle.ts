@@ -14,8 +14,8 @@ export function buildAnimateOriginStyle(
   originRect: DOMRect,
   target: DOMRect | AnimateTargetAnchor,
 ): CSSProperties {
-  const targetLeft = "width" in target ? target.left : target.left;
-  const targetTop = "height" in target ? target.top : target.top;
+  const targetLeft = target.left;
+  const targetTop = target.top;
 
   return {
     "--ava-animate-origin-x": `${originRect.left + originRect.width / 2 - targetLeft}px`,

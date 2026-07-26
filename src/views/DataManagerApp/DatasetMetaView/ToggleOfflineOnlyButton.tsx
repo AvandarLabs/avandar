@@ -12,7 +12,7 @@ import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetSt
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { OfflineGated } from "@/components/offline/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useOfflineGate } from "@/lib/offline/useOfflineGate";
+import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";

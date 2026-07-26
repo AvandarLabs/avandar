@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock";
+import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -20,7 +20,7 @@ import type {
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
-  rawSQL: string;
+  rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
   vizConfig: VizConfig;
@@ -37,14 +37,14 @@ type Mode = "list" | "create";
  * they can pick a target; when they have none (or click "Create new"), it
  * switches to `"create"` mode so they can name and create one inline. In
  * both cases the resulting dashboard ends with a freshly built `DataViz`
- * block whose props mirror the explorer's `rawSQL`, prompt, and viz config.
+ * block whose props mirror the explorer's `rawSql`, prompt, and viz config.
  *
  * Each mode's UI lives in its own sub-component
  * (`SaveToDashboardListMode`, `SaveToDashboardCreateMode`); this component
  * owns the mode state, the dashboards query, and the mutations.
  */
 export function SaveToDashboardModal({
-  rawSQL,
+  rawSql,
   prompt,
   vizType,
   vizConfig,
@@ -162,7 +162,7 @@ export function SaveToDashboardModal({
 
   const onSaveToExisting = (targetDashboard: Dashboard.T) => {
     const newBlock = createDataVizBlock({
-      rawSQL,
+      rawSql,
       prompt,
       vizType,
       vizConfig,
@@ -190,7 +190,7 @@ export function SaveToDashboardModal({
     }
 
     const newBlock = createDataVizBlock({
-      rawSQL,
+      rawSql,
       prompt,
       vizType,
       vizConfig,

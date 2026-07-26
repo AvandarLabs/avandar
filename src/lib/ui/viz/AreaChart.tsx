@@ -5,7 +5,7 @@
  * handing the children to Recharts. Recharts resolves graphical
  * elements by reference inside `filterFormatItem`
  * (generateCategoricalChart.js), and the Fragment wrapping causes the
- * fill+stroke `Area` to be un-matched at render time — leaving only
+ * fill+stroke `Area` to be un-matched at render time: leaving only
  * the dots-only `Area` visible (dots, no line, no fill). The
  * `areaProps` escape hatch does not help because `withDots={false}`
  * removes the only Area that was successfully matching, resulting in
@@ -17,7 +17,7 @@
  * logic internally.
  */
 import { Box } from "@mantine/core";
-import { formatDate } from "@utils";
+import { formatDate, propEq } from "@utils";
 import { Fragment, useId, useMemo } from "react";
 import {
   Area,
@@ -31,7 +31,7 @@ import {
 } from "recharts";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { AreaSeries } from "$/models/vizs/SeriesConfig";
@@ -89,11 +89,7 @@ export function AreaChart({
   const hasXLabel = xLabelText !== undefined && xLabelText !== "";
   const hasYLabel = yLabelText !== undefined && yLabelText !== "";
 
-  const allAreas = useMemo(() => {
-    return series.every((s) => {
-      return s.renderAs === "area";
-    });
-  }, [series]);
+  const allAreas = series.every(propEq("renderAs", "area"));
 
   const tickFormatter = useMemo(() => {
     if (!isDateAxis) {
@@ -224,7 +220,7 @@ export function AreaChart({
             const showDots = s.withDots ?? true;
             const curveType = s.curveType ?? DEFAULT_AREA_CURVE;
             return (
-              <Fragment key={`${id}-area`}>
+              <Fragment key={`${s.key}-area`}>
                 <Area
                   type={curveType}
                   dataKey={s.key}

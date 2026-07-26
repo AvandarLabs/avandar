@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset";
+import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";

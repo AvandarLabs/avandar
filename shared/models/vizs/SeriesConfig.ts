@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { CurveType } from "$/models/vizs/CurveType.ts";
 
 /**
@@ -155,18 +156,21 @@ export function convertSeriesRenderAs(
   newRenderAs: RenderAs,
 ): XYSeries {
   const { key, label, color } = series;
-  switch (newRenderAs) {
-    case "bar":
-      return { renderAs: "bar", key, label, color };
-    case "line":
-      return { renderAs: "line", key, label, color };
-    case "area":
+  return match(newRenderAs)
+    .with("bar", () => {
+      return { renderAs: "bar" as const, key, label, color };
+    })
+    .with("line", () => {
+      return { renderAs: "line" as const, key, label, color };
+    })
+    .with("area", () => {
       return {
-        renderAs: "area",
+        renderAs: "area" as const,
         key,
         label,
         color,
         fillOpacity: DEFAULT_AREA_FILL_OPACITY,
       };
-  }
+    })
+    .exhaustive();
 }

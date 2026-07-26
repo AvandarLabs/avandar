@@ -1,4 +1,4 @@
-import { AvaSqlBlock } from "@/components/AvaSqlBlock";
+import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 
 /**
  * Read-only SQL for a plan step with dataset/column pills.

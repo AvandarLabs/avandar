@@ -169,7 +169,7 @@ async function _extractFieldValuesFromDataset({
     Record<EntityFieldConfigId, unknown>
   >({
     workspaceId,
-    rawSQL: sqlTemplate(`
+    rawSql: sqlTemplate(`
       -- Get all the external IDs we will pull values for
       WITH external_ids AS (
         SELECT

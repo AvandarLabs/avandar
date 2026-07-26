@@ -33,8 +33,14 @@ export type PathValue<T, P extends Paths<T>> =
  * Gets the value of a property at a given key path.
  * This can get values deeply by using a dot-notation path.
  *
+ * By default a missing key (or a primitive found mid-path) throws. Pass
+ * `{ throwError: false }` to get `undefined` back instead, in which case the
+ * return type widens to include `undefined`.
+ *
  * @param obj The object to get the value from.
  * @param path The key path in dot notation.
+ * @param options.throwError Whether to throw when the path can't be resolved.
+ *   Defaults to `true`.
  * @returns The value of the property.
  */
 export function getValue<
@@ -43,9 +49,30 @@ export function getValue<
   V extends K extends keyof T ? T[K]
   : K extends Paths<T> ? PathValue<T, K>
   : never,
->(obj: T, path: K): V {
+>(obj: T, path: K, options?: { throwError?: true }): V;
+export function getValue<
+  T extends object,
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(obj: T, path: K, options: { throwError: false }): V | undefined;
+export function getValue<
+  T extends object,
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(obj: T, path: K, options?: { throwError?: boolean }): V | undefined {
   const fullPathAsString = String(path);
   const pathParts = fullPathAsString.split(".");
+  if (options?.throwError === false) {
+    try {
+      return _getValue(obj, pathParts, fullPathAsString) as V;
+    } catch {
+      return undefined;
+    }
+  }
   return _getValue(obj, pathParts, fullPathAsString) as V;
 }
 

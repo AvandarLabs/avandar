@@ -197,7 +197,7 @@ function createEntityFieldValueClient(): WithLogger<
                         Record<EntityFieldConfigId, unknown>
                       >({
                         workspaceId: entity.workspaceId,
-                        rawSQL: sqlTemplate(`
+                        rawSql: sqlTemplate(`
                           -- Get all rows matching this external_id
                           WITH entity_rows AS (
                             SELECT

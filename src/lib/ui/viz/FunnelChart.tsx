@@ -1,7 +1,7 @@
 import { FunnelChart as MantineFunnelChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLORS } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { UnknownDataFrame } from "@utils";
 
 type Props = {

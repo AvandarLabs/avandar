@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { RouteMiddleware } from "@/utils/RouteMiddleware";
 import { DataExplorerApp } from "@/views/DataExplorerApp/DataExplorerApp";
-import { DataExplorerSearchSchema } from "@/views/DataExplorerApp/DataExplorerURLState";
+import { DataExplorerSearchSchema } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/data-explorer")({
   validateSearch: DataExplorerSearchSchema,
