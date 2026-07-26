@@ -1,27 +1,14 @@
-
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Button,
-  Fieldset,
-  Group,
-  Stack,
-  Text,
-  Tooltip,
-} from "@mantine/core";
+import { Button, Fieldset, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import {
-  makeBucketMap,
-  propPasses,
-  removeAtIndex,
-  setValue,
-} from "@utils";
+import { makeBucketMap, propPasses, removeAtIndex, setValue } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
-import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -245,7 +232,9 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             spec={{ kind: "columnPicker", dataType: "any" }}
             value={axisKeyValue}
             onChange={(nextValue) => {
-              updateAxisKey(typeof nextValue === "string" ? nextValue : undefined);
+              updateAxisKey(
+                typeof nextValue === "string" ? nextValue : undefined,
+              );
             }}
             fields={fields}
           />

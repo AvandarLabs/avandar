@@ -30,17 +30,14 @@ export const VirtualDatasetParsers =
   makeParserRegistry<VirtualDatasetModel>().build({
     modelName: "VirtualDataset",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(
-      camelCaseKeysDeep,
-      ({ planSteps, ...obj }) => {
-        return Model.make("VirtualDataset", {
-          ...obj,
-          id: obj.id as VirtualDatasetId,
-          datasetId: obj.datasetId as DatasetId,
-          workspaceId: obj.workspaceId as Workspace.Id,
-        });
-      },
-    ),
+    fromDBReadToModelRead: pipe(camelCaseKeysDeep, ({ planSteps, ...obj }) => {
+      return Model.make("VirtualDataset", {
+        ...obj,
+        id: obj.id as VirtualDatasetId,
+        datasetId: obj.datasetId as DatasetId,
+        workspaceId: obj.workspaceId as Workspace.Id,
+      });
+    }),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

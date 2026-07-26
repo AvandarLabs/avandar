@@ -1,4 +1,3 @@
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -14,7 +13,9 @@ import { makeBucketMap, setValue } from "@utils";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
+import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
   RadarSeries,
@@ -23,8 +24,6 @@ import type {
 } from "$/models/vizs/SeriesConfig";
 import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
-import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 
 /**
  * Build the localized render-as options. Labels stay in sync with the active

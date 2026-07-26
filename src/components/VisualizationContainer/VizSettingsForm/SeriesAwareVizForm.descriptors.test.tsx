@@ -21,10 +21,11 @@ import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChart
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type {
-  ControlSpec,
   AnyChartSettingDescriptor,
   AnySeriesSettingDescriptor,
+  ControlSpec,
 } from "$/models/vizs/SettingDescriptor";
+
 function readSetting(obj: unknown, key: string): unknown {
   return getValue(obj as never, key as never, { throwError: false });
 }

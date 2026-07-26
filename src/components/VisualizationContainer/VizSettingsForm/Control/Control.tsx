@@ -6,8 +6,8 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Select } from "@ui";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";

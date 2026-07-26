@@ -1,7 +1,7 @@
 import { Combobox, useCombobox } from "@mantine/core";
 import { isDefined, propEq } from "@utils";
-import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { useEffect, useRef } from "react";
+import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import css from "./PillEditPopover.module.css";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
@@ -81,17 +81,20 @@ export function PillEditPopover({
   });
   const lastPillStartRef = useRef<number | null>(null);
 
-  useEffect(function syncDropdownToActivePill() {
-    if (pill === null) {
-      combobox.closeDropdown();
-      lastPillStartRef.current = null;
-      return;
-    }
-    if (lastPillStartRef.current !== pill.start) {
-      combobox.openDropdown();
-      lastPillStartRef.current = pill.start;
-    }
-  }, [pill, combobox]);
+  useEffect(
+    function syncDropdownToActivePill() {
+      if (pill === null) {
+        combobox.closeDropdown();
+        lastPillStartRef.current = null;
+        return;
+      }
+      if (lastPillStartRef.current !== pill.start) {
+        combobox.openDropdown();
+        lastPillStartRef.current = pill.start;
+      }
+    },
+    [pill, combobox],
+  );
 
   if (pill === null) {
     return null;

@@ -90,14 +90,17 @@ export function SqlEditor({
     ];
   }, [buildCatalogExtensions, catalogCompartment, readOnly]);
 
-  useEffect(function reconfigureCatalogExtensions() {
-    if (!editorView) {
-      return;
-    }
-    editorView.dispatch({
-      effects: catalogCompartment.reconfigure(buildCatalogExtensions()),
-    });
-  }, [buildCatalogExtensions, catalog, catalogCompartment, editorView]);
+  useEffect(
+    function reconfigureCatalogExtensions() {
+      if (!editorView) {
+        return;
+      }
+      editorView.dispatch({
+        effects: catalogCompartment.reconfigure(buildCatalogExtensions()),
+      });
+    },
+    [buildCatalogExtensions, catalog, catalogCompartment, editorView],
+  );
 
   const minHeightPx = minRows * LINE_HEIGHT_PX + 16;
 

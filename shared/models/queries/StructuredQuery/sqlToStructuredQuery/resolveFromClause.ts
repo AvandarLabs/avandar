@@ -1,7 +1,6 @@
 import { uuid } from "$/lib/uuid.ts";
-import { Parser } from "node-sql-parser";
 import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
-import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
+import { Parser } from "node-sql-parser";
 import type { QueryFilterCombinator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
   NestedSubquerySource,
@@ -9,6 +8,7 @@ import type {
   QueryJoinKind,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
+import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
 export type FromResolution = {
   base?: DatasetWithColumns;
@@ -236,4 +236,3 @@ export function resolveFrom(
   }
   return { base, baseAlias, nestedSubquery, joins };
 }
-

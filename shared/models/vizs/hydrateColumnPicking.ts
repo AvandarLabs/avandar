@@ -1,5 +1,5 @@
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { prop } from "@utils/objects/hofs/prop/prop.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 /**

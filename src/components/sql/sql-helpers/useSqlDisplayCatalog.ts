@@ -2,8 +2,8 @@ import { where } from "@utils";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSqlDisplayCatalog } from "@/components/sql/sql-helpers/buildSqlDisplayCatalog/buildSqlDisplayCatalog";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 /**

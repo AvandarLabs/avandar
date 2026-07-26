@@ -1,7 +1,6 @@
-
+import { describe, expect, it } from "vitest";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { listInScopeDatasets } from "@/components/sql/sql-helpers/listInScopeDatasets/listInScopeDatasets";
-import { describe, expect, it } from "vitest";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

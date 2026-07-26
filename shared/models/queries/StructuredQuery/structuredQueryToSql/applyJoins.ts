@@ -1,11 +1,10 @@
-
+import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 import { match } from "ts-pattern";
 import type {
   QueryJoin,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { Knex } from "knex";
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 
 /**
  * Apply each join in order to the knex query builder. Subquery joins use
@@ -75,4 +74,3 @@ function _buildJoinOnClause(
     })
     .join(` ${combinator} `);
 }
-

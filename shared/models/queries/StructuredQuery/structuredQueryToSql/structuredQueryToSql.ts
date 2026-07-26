@@ -16,20 +16,20 @@ import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectValues } from "@utils/objects/objectValues.ts";
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList.ts";
+import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import { match } from "ts-pattern";
-import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { Knex } from "knex";
 import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
 import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts";
 import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { match } from "ts-pattern";
+import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
+import type { Knex } from "knex";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
@@ -142,9 +142,7 @@ export function structuredQueryToSql(
   }
 
   if (groupByColumnNames.length > 0) {
-    const groupByClause = groupByColumnNames
-      .map(quoteSqlIdentifier)
-      .join(", ");
+    const groupByClause = groupByColumnNames.map(quoteSqlIdentifier).join(", ");
     sqlQuery = sqlQuery.groupByRaw(groupByClause);
   }
 

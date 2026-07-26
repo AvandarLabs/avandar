@@ -25,70 +25,76 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
   const pendingRedirectRef = useRef<string | null>(null);
   const hadUserRef = useRef(false);
 
-  useEffect(function subscribeToAuthSession() {
-    let cancelled = false;
-    const getSession = async () => {
-      const currentSession = await AuthClient.getCurrentSession();
-      // Guard against a stale write if the effect re-ran (or unmounted)
-      // while the session lookup was in flight.
-      if (cancelled) {
-        return;
-      }
-      setUser(currentSession?.user ?? undefined);
-    };
-
-    getSession();
-
-    const subscription = AuthClient.onAuthStateChange((event, newSession) => {
-      if (event === "SIGNED_OUT") {
-        if (!AuthClient.isManuallySignedOut() && !navigator.onLine) {
+  useEffect(
+    function subscribeToAuthSession() {
+      let cancelled = false;
+      const getSession = async () => {
+        const currentSession = await AuthClient.getCurrentSession();
+        // Guard against a stale write if the effect re-ran (or unmounted)
+        // while the session lookup was in flight.
+        if (cancelled) {
           return;
         }
-        // Clear the guard so the AI panel auto-opens again on next login
-        sessionStorage.removeItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY);
-      }
+        setUser(currentSession?.user ?? undefined);
+      };
 
-      if (newSession?.user) {
-        const currentLocation = router.state.location;
-        const searchParams = new URLSearchParams(currentLocation.search);
-        const redirectParam = searchParams.get("redirect");
-        if (redirectParam) {
-          pendingRedirectRef.current = redirectParam;
+      getSession();
+
+      const subscription = AuthClient.onAuthStateChange((event, newSession) => {
+        if (event === "SIGNED_OUT") {
+          if (!AuthClient.isManuallySignedOut() && !navigator.onLine) {
+            return;
+          }
+          // Clear the guard so the AI panel auto-opens again on next login
+          sessionStorage.removeItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY);
         }
+
+        if (newSession?.user) {
+          const currentLocation = router.state.location;
+          const searchParams = new URLSearchParams(currentLocation.search);
+          const redirectParam = searchParams.get("redirect");
+          if (redirectParam) {
+            pendingRedirectRef.current = redirectParam;
+          }
+        }
+        setUser(newSession?.user ?? undefined);
+      });
+
+      return () => {
+        cancelled = true;
+        subscription.unsubscribe();
+      };
+    },
+    [router],
+  );
+
+  useEffect(
+    function invalidateRouterOnUserChange() {
+      if (user === undefined) {
+        // Only invalidate on sign-out, not on the initial mount before
+        // the session check has resolved (user starts as undefined)
+        if (hadUserRef.current) {
+          hadUserRef.current = false;
+          router.invalidate();
+        }
+        return;
       }
-      setUser(newSession?.user ?? undefined);
-    });
+      hadUserRef.current = true;
 
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, [router]);
-
-  useEffect(function invalidateRouterOnUserChange() {
-    if (user === undefined) {
-      // Only invalidate on sign-out, not on the initial mount before
-      // the session check has resolved (user starts as undefined)
-      if (hadUserRef.current) {
-        hadUserRef.current = false;
-        router.invalidate();
+      // Invalidate workspace cache on sign-in so the incoming user always
+      // gets fresh workspace data (prevents stale data from a prior user)
+      AvaQueryClient.invalidateQueries({
+        queryKey: [WorkspaceClient.getClientName()],
+      });
+      if (pendingRedirectRef.current) {
+        const redirect = pendingRedirectRef.current;
+        pendingRedirectRef.current = null;
+        router.navigate({ to: redirect });
       }
-      return;
-    }
-    hadUserRef.current = true;
-
-    // Invalidate workspace cache on sign-in so the incoming user always
-    // gets fresh workspace data (prevents stale data from a prior user)
-    AvaQueryClient.invalidateQueries({
-      queryKey: [WorkspaceClient.getClientName()],
-    });
-    if (pendingRedirectRef.current) {
-      const redirect = pendingRedirectRef.current;
-      pendingRedirectRef.current = null;
-      router.navigate({ to: redirect });
-    }
-    router.invalidate();
-  }, [user, router]);
+      router.invalidate();
+    },
+    [user, router],
+  );
 
   if (user && hasDefinedProps(user, "email")) {
     return { user: user as User.T };

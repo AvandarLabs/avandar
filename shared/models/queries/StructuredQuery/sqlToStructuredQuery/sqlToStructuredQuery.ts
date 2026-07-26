@@ -18,7 +18,6 @@ import { Model } from "@models/Model/Model.ts";
 import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import { Parser } from "node-sql-parser";
 import {
   parseHavingNode,
   parseWhereNode,
@@ -29,8 +28,9 @@ import {
   identifierToString,
   matchAggregation,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import { Parser } from "node-sql-parser";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type {
   QueryColumnId,
@@ -38,13 +38,13 @@ import type {
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
-  PartialStructuredQuery,
-  StructuredQueryId,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
   SqlMappingInput,
   SqlMappingResult,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
+import type {
+  PartialStructuredQuery,
+  StructuredQueryId,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export type {
   SqlMappingInput,
@@ -55,9 +55,7 @@ export type {
  * Make the empty result for the case where we could not produce anything
  * useful from the SQL.
  */
-function _makeUnmappedResult(
-  reasons: readonly string[],
-): SqlMappingResult {
+function _makeUnmappedResult(reasons: readonly string[]): SqlMappingResult {
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
     version: 1,
@@ -157,11 +155,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   }
 
   // Resolve FROM clause (base + joins + optional nested subquery)
-  const fromResolution = resolveFrom(
-    ast.from,
-    input.datasets,
-    unmappedReasons,
-  );
+  const fromResolution = resolveFrom(ast.from, input.datasets, unmappedReasons);
   if (!fromResolution) {
     return _makeUnmappedResult(unmappedReasons);
   }

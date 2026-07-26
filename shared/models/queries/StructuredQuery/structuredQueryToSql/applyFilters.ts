@@ -1,4 +1,3 @@
-
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { match } from "ts-pattern";
 import type {

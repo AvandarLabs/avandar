@@ -26,8 +26,8 @@
  * when you talk about "the curve type control" you mean the segmented
  * control widget the user clicks.
  */
-import type { Paths } from "type-fest";
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
+import type { Paths } from "type-fest";
 
 // ---------------------------------------------------------------------
 // Control specifications
