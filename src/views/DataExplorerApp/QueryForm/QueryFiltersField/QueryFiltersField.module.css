@@ -3,11 +3,8 @@
  * rule row (field + operator + value + remove button) to wrap onto multiple
  * lines in narrow containers instead of overflowing.
  */
-/* stylelint-disable selector-class-pattern -- third-party react-querybuilder class names */
+/* stylelint-disable-next-line selector-class-pattern -- third-party react-querybuilder class name */
 .queryFiltersField :global(.ruleGroup-header),
-/* stylelint-enable selector-class-pattern */
-/* stylelint-disable selector-class-pattern -- third-party react-querybuilder class names */
 .queryFiltersField :global(.rule) {
   flex-wrap: wrap;
 }
-/* stylelint-enable selector-class-pattern */
