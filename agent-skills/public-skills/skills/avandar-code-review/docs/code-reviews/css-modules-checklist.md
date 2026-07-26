@@ -57,3 +57,37 @@ module-CSS imports change.
   they style (for example `userMessageRow`, not `row`). The prefix makes
   the class self-describing in the rendered DOM and prevents accidental
   collisions if two CSS module files are ever merged.
+
+- Use canonical CSS block comment formatting. Consistent comment shape makes
+  stylesheet comments easy to scan and keeps formatter output predictable.
+  Single-line comments may stay on one line; multi-line comments must put
+  the opening and closing markers on their own lines and prefix each content
+  line with `*`.
+
+  This is bad:
+
+  ```css
+  .shell {
+    /* First sentence.
+       Second sentence. */
+  }
+  ```
+
+  This is good:
+
+  ```css
+  .shell {
+    /*
+     * First sentence.
+     * Second sentence.
+     */
+  }
+  ```
+
+  This is also good:
+
+  ```css
+  .shell {
+    /* Single sentence. */
+  }
+  ```
