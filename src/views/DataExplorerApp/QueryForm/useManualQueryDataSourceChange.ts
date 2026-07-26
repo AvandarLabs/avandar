@@ -30,23 +30,31 @@ export function useManualQueryDataSourceChange(opts: {
   const applyRequestIdRef = useRef(0);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearHintTimeout = useCallback((): void => {
+  const clearHintTimeout = useCallback(() => {
     if (hintTimeoutRef.current !== null) {
       clearTimeout(hintTimeoutRef.current);
       hintTimeoutRef.current = null;
     }
   }, []);
 
-  useEffect(() => {
-    return clearHintTimeout;
-  }, [clearHintTimeout]);
+  useEffect(
+    function cleanUpPendingWorkOnUnmount() {
+      return () => {
+        clearHintTimeout();
+        // Invalidate any in-flight row-count resolution so its `.then` /
+        // `.catch` bails instead of committing / setting state after unmount.
+        applyRequestIdRef.current += 1;
+      };
+    },
+    [clearHintTimeout],
+  );
 
-  const hideLargeDatasetLimitHint = useCallback((): void => {
+  const hideLargeDatasetLimitHint = useCallback(() => {
     clearHintTimeout();
     setIsLargeDatasetLimitHintVisible(false);
   }, [clearHintTimeout]);
 
-  const showLargeDatasetLimitHint = useCallback((): void => {
+  const showLargeDatasetLimitHint = useCallback(() => {
     clearHintTimeout();
     setIsLargeDatasetLimitHintVisible(true);
     hintTimeoutRef.current = setTimeout(() => {
@@ -56,7 +64,7 @@ export function useManualQueryDataSourceChange(opts: {
   }, [clearHintTimeout]);
 
   const onDataSourceChange = useCallback(
-    (dataSource: QueryDataSource | null): void => {
+    (dataSource: QueryDataSource | null) => {
       const requestId = applyRequestIdRef.current + 1;
       applyRequestIdRef.current = requestId;
       hideLargeDatasetLimitHint();
