@@ -34,7 +34,7 @@ suite with `cargo test` (it finishes in a couple of seconds).
 - `tui::keymap` — key→bytes encodings.
 - `tui::palette` — command registry (Restart dif, Regenerate diff guide, Open
   difit in browser, New Claude session), filter (by label and row number),
-  selection/navigation, empty-match handling, and the `^R` / `^D` / `^O` / `^N`
+  selection/navigation, empty-match handling, and the `^R` / `^G` / `^O` / `^N`
   shortcut hints.
 - `tui::vim` — count and `gg` prefix accumulation, the bare-letter motions
   (`jkhl`, `w`/`b`, `d`/`u`, `G`, `o`), and unknown-key count reset.

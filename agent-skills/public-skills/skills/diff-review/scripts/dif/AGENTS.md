@@ -52,7 +52,7 @@ about one without the other.
 - **The diff guide must stay current.** Whenever code changes during a review,
   the guide markdown under `.difit/` must be regenerated so it always reflects
   the present diff. That regeneration is the skill's job; `dif` only triggers
-  it (`Ctrl+D`) and renders the result.
+  it (`Ctrl+G`) and renders the result.
 
 ## The docs/ contract
 

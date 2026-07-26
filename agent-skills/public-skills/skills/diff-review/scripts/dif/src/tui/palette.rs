@@ -67,7 +67,7 @@ pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
 pub const fn shortcut_for(action: PaletteAction) -> Option<&'static str> {
     match action {
         PaletteAction::RestartDifit => Some("^R"),
-        PaletteAction::RegenerateGuide => Some("^D"),
+        PaletteAction::RegenerateGuide => Some("^G"),
         PaletteAction::OpenInBrowser => Some("^O"),
         PaletteAction::NewClaudeSession => Some("^N"),
     }
@@ -211,7 +211,7 @@ mod tests {
             p.numbered_entries(),
             vec![
                 ("1. Restart dif".to_owned(), Some("^R")),
-                ("2. Regenerate diff guide".to_owned(), Some("^D")),
+                ("2. Regenerate diff guide".to_owned(), Some("^G")),
                 ("3. Open difit in browser".to_owned(), Some("^O")),
                 ("4. New Claude session".to_owned(), Some("^N")),
             ]
@@ -234,8 +234,8 @@ mod tests {
     }
 
     #[test]
-    fn regenerate_guide_advertises_its_ctrl_d_shortcut() {
-        assert_eq!(shortcut_for(PaletteAction::RegenerateGuide), Some("^D"));
+    fn regenerate_guide_advertises_its_ctrl_g_shortcut() {
+        assert_eq!(shortcut_for(PaletteAction::RegenerateGuide), Some("^G"));
     }
 
     #[test]

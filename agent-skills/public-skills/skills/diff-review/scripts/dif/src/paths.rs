@@ -29,6 +29,17 @@ pub fn guide_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> Path
     difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-guide.md"))
 }
 
+/// The structured diff-guide for this review:
+/// `<repo>/.difit/<branch>-difit-<scope>-guide.json`.
+///
+/// The `diff-review` skill writes this alongside `-guide.md` (same data, JSON
+/// form). The browser web shell reads it to render its sidebar and to derive
+/// each group's file set for per-group `/api/diff` filtering.
+#[must_use]
+pub fn guide_json_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
+    difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-guide.json"))
+}
+
 /// The reviewed-state file for this review:
 /// `<repo>/.difit/<branch>-difit-<scope>-reviewed.json`.
 ///
@@ -69,6 +80,12 @@ mod tests {
             p,
             PathBuf::from("/r/.difit/feat-share-difit-dot-guide.md")
         );
+    }
+
+    #[test]
+    fn guide_json_matches_skill_filename() {
+        let p = guide_json_path(Path::new("/r"), "feat-share", "dot");
+        assert_eq!(p, PathBuf::from("/r/.difit/feat-share-difit-dot-guide.json"));
     }
 
     #[test]

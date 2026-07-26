@@ -4,6 +4,7 @@
 pub mod app;
 pub mod change_alert;
 pub mod draw;
+pub mod draw_help;
 pub mod draw_palette;
 pub mod event_loop;
 pub mod guide;
@@ -13,6 +14,7 @@ pub mod markdown;
 pub mod open_target;
 pub mod palette;
 pub mod session_meta;
+pub mod shortcuts;
 pub mod startup;
 pub mod vim;
 

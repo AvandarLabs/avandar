@@ -44,9 +44,10 @@ appends `claude`-authored replies. See the injection contract in
 | `.claude-session-<branch>-<scope>` | startup | the claude session id to `--resume` |
 | `.session-<branch>-<scope>.json` | startup | live-session metadata (port, pid, transcript, comparison) for the skill |
 | `<branch>-difit-<scope>-guide.md` | the `diff-review` skill | the rendered diff guide (read by the diff guide view) |
+| `<branch>-difit-<scope>-guide.json` | the `diff-review` skill | the structured guide the web-shell sidebar reads |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
 
-Writes to the transcript are atomic (temp file + rename). All five share the
+Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
 
 ### The diff guide and reviewed-state files

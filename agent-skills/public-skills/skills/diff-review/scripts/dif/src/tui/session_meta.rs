@@ -12,7 +12,8 @@ use serde::Serialize;
 /// The on-disk shape skills read to locate the running server.
 #[derive(Debug, Serialize)]
 pub struct SessionMeta {
-    /// The difit server port.
+    /// The difit server port. The skill POSTs replies here directly — difit
+    /// broadcasts them over SSE, which the web shell streams to the browser.
     pub port: u16,
     /// The `dif` process id.
     pub pid: u32,
@@ -20,6 +21,10 @@ pub struct SessionMeta {
     pub comments_file: String,
     /// The comparison key (`.`, `staged`, `working`, or a branch).
     pub comparison_key: String,
+    /// The browser web-shell port (the origin the reviewer's browser uses).
+    pub shell_port: u16,
+    /// The web-shell URL opened in the browser.
+    pub shell_url: String,
 }
 
 /// Best-effort write of the session metadata as pretty JSON.

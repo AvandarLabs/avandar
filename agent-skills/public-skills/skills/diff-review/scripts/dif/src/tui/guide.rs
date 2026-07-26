@@ -3,7 +3,7 @@
 //!
 //! The `diff-review` skill writes the guide markdown to disk; `dif` only
 //! reads it. [`Guide::refresh`] re-reads the file and reports whether the
-//! contents changed, so edits the skill makes (or a `Ctrl+D` regeneration) show
+//! contents changed, so edits the skill makes (or a `Ctrl+G` regeneration) show
 //! up without restarting the shell.
 //!
 //! The markdown is rendered to **styled** lines by [`super::markdown`] (colored

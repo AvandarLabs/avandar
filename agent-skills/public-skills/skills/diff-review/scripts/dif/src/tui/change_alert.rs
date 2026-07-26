@@ -38,10 +38,10 @@ pub fn change_author(since_last_inject: Option<Duration>, window: Duration) -> C
 pub fn change_alert(author: ChangeAuthor) -> String {
     let body = match author {
         ChangeAuthor::Claude => {
-            "⚠️  Claude made code changes — restart difit to show them (Ctrl+R) 🔁"
+            "⚠️  Claude made code changes. Restart difit to show them (Ctrl+R) 🔁"
         }
         ChangeAuthor::Manual => {
-            "⚠️  New manual changes detected — restart difit to show them (Ctrl+R) 🔁"
+            "⚠️  New manual changes detected. Restart difit to show them (Ctrl+R) 🔁"
         }
     };
     format!("\r\n\x1b[1;38;5;208m{body}\x1b[0m\r\n")

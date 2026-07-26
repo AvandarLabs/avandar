@@ -61,7 +61,7 @@ Pick a mode before doing anything else:
 | Trigger | Mode |
 |---|---|
 | User said "summary", "prepare another summary", "remind me how to review the diff", or invoked `/diff-review summary` | **Summary** |
-| User said "regenerate the diff guide", or the `dif` TUI injected "Regenerate the diff guide … using the diff-review skill" (the `Ctrl+D` path) | **Diff guide** |
+| User said "regenerate the diff guide", or the `dif` TUI injected "Regenerate the diff guide … using the diff-review skill" (the `Ctrl+G` path) | **Diff guide** |
 | User said "group N is reviewed", "I reviewed `<file>`", "mark … reviewed", "what have I reviewed?", or "what's left to review?" | **Diff guide** |
 | User said "continue", "respond to comments", "address newest comments", or similar; OR the transcript already exists and contains messages authored by `reviewer`; OR a session file `.difit/.session-<…>.json` exists | **Continue** |
 | User invoked `/diff-review pr\|pre\|pre-review\|auto <n>`, said "review PR <n>" / "review pull request <n>", or asked the agent in natural language to review a PR for them ("review this PR for me", "prepare a diff review for PR <n>", "pre-review <n>", "auto-review <n>") | **PR review** |
@@ -171,6 +171,12 @@ diff. Don't comment on lines outside the requested diff scope.
 
 These rules apply to every `claude`-authored entry, both new `thread`
 explainer threads and `reply` entries that respond to `reviewer`.
+
+**Never use em dashes (`—`).** Not in review comments, not in replies, not in
+threads, not anywhere. Use a colon, semicolon, comma, parentheses, or two
+sentences instead. The **only** allowed use is a true explanatory interjection
+where a paired em dash is the single best grammatical choice, and even then
+prefer parentheses or commas. When in doubt, do not use one.
 
 **For reply entries (responding to a `reviewer` comment):**
 
@@ -339,15 +345,15 @@ fences themselves; the file-purpose-note line is *optional* per rule 4
 │  <thread-count> threads · <file-count> files        │
 └─────────────────────────────────────────────────────┘
 
-**GROUP 1 — <group-name>**  *(<why this comes first>)*
-  ├─ `<path/to/file-with-note>`   [<n> threads] — <tag>
+**GROUP 1: <group-name>**  *(<why this comes first>)*
+  ├─ `<path/to/file-with-note>`   [<n> threads] · <tag>
   │   <One- or two-sentence file-purpose note. Skip this line when the
   │   file's role is obvious from path / tag / group context.>
-  └─ `<path/to/file-no-note>`     [<n> threads] — <tag>
+  └─ `<path/to/file-no-note>`     [<n> threads] · <tag>
 
-**GROUP 2 — <group-name>**  *(<why this follows>)*
-  ├─ `<path/to/file>`             [<n> threads] — <tag>
-  └─ `<path/to/file>`             [<n> threads] — <tag>
+**GROUP 2: <group-name>**  *(<why this follows>)*
+  ├─ `<path/to/file>`             [<n> threads] · <tag>
+  └─ `<path/to/file>`             [<n> threads] · <tag>
 
 → Run: `<pm> diff-review <comparison-key>`
 ```
@@ -369,8 +375,8 @@ per rule 4):
   • <sha-short>  <subject>
   • <sha-short>  <subject>
 
-**GROUP 1 — <group-name>**  *(<why this comes first>)*
-  ├─ `<path/to/file-with-note>`   [<n> new · <m> replies] — <tag>
+**GROUP 1: <group-name>**  *(<why this comes first>)*
+  ├─ `<path/to/file-with-note>`   [<n> new · <m> replies] · <tag>
   │   <One- or two-sentence file-purpose note. Skip this line when the
   │   file's role is obvious from path / tag / group context.>
   └─ ...
@@ -385,14 +391,48 @@ still attach to individual file rows the same way.
 ## The diff guide
 
 The diff guide is a standalone markdown file the `dif` TUI renders in its "Diff
-guide" view (press `d` / `Tab` in the shell). It is **always a guide to what is
-left to review** — never a changelog, never an "already reviewed" archive. Keep
-it short: anything fully reviewed disappears from it.
+guide" view (press `d` / `Tab` in the shell). It is a guide to what is left to
+review — never a changelog, never an "already reviewed" archive; as you mark
+work reviewed, fully-reviewed groups drop out of the *rendered* view. **When you
+(re)write it, though, it must list _every_ file then in the diff** — completeness
+at write time is a hard rule (see [Completeness](#completeness--the-guide-lists-every-file-in-the-diff)).
 
-You own two files (the TUI only reads the guide):
+You own three files (the TUI only reads the guide markdown):
 
 - `…-guide.md` — the rendered guide (below).
+- `…-guide.json` — the **structured** form of the guide (below), consumed by the
+  browser web shell's sidebar. Write it whenever you write `…-guide.md`.
 - `…-reviewed.json` — the reviewed state that drives what the guide shows.
+
+### Completeness — the guide lists every file in the diff
+
+**Every time you write or regenerate the guide, it must include _every_ file
+present in the diff at that moment. Never omit a file** — not lockfiles, not
+generated output, not binaries. This is a hard rule across all three files
+(`-guide.md`, `-guide.json`, `-reviewed.json`): the group roster is a **complete
+partition** of the diff's files at write time.
+
+Why: it's what makes the web shell's **"new files not in guide"** signal
+trustworthy. With a complete guide, the only files difit shows that the guide
+doesn't are ones that appeared *after* the guide was written — e.g. files you
+created while addressing review comments — which is exactly the cue to
+regenerate. If the guide silently dropped files, that signal would be permanent
+noise instead.
+
+Files that don't need reading — machine-generated or compiled artifacts such as
+lockfiles (`Cargo.lock`, `pnpm-lock.yaml`), prebuilt binaries (`bin/dif`),
+snapshots, and other build output — still go in the guide, collected into a
+**final catch-all group named `Generated — review not required`**. It always
+takes the **last** group number, and its one-line orientation must say the files
+are generated and can be skipped in review (e.g. _"Machine-generated / compiled
+artifacts — no review needed."_). Give each such file a `—` status and `0`
+threads, and never write explainer threads on them. Do not scatter these files
+into the concern groups; they belong together in this final group.
+
+(This completeness is about **write time**. Later, as you mark real content
+reviewed, fully-reviewed *content* groups may still drop from the rendered guide
+— but the `Generated — review not required` group is never a review target, so
+it never disappears.)
 
 ### When to (re)write the guide
 
@@ -400,7 +440,7 @@ You own two files (the TUI only reads the guide):
 - **Continue mode:** whenever you change code in a round, **regenerate the guide**
   so it matches the new diff (this is also enforced by the bundled CLI's
   `scripts/dif/AGENTS.md`).
-- **Diff guide mode:** on an explicit "regenerate the diff guide" / `Ctrl+D`
+- **Diff guide mode:** on an explicit "regenerate the diff guide" / `Ctrl+G`
   request, or after a mark-reviewed request, rewrite the guide from the current
   diff + the reviewed state.
 
@@ -413,25 +453,33 @@ Markdown rendered by the TUI (headings, **bold**, `code`, lists, and **tables**
 all render). Numbered groups, same grouping logic as the chat summary (group by
 concern; order so earlier groups give context for later ones).
 
+**Never use em dashes (`—`) in the guide.** Not in the title, not in group
+headings, not in group names, not in orientations, tags, or notes. This is the
+rule violated most often: group names like `Web shell — pure core` are wrong.
+Use a colon (`Web shell: pure core`), a period in the heading separator
+(`## Group 1. <name>`), commas, or parentheses. The pending-status glyph is a
+middle dot `·`, never an em dash. The only allowed em dash anywhere is a true
+explanatory interjection, and even then prefer parentheses.
+
 ```markdown
-# Diff guide — <branch> vs <comparison>
+# Diff guide: <branch> vs <comparison>
 
 _<n> threads · <n> files · what's left to review_
 
-## Group 1 — <group name>
+## Group 1. <group name>
 
 <optional one-line orientation for the group>
 
 | File | Threads | Status | Note |
 | --- | --- | --- | --- |
-| `src/a.rs` | 2 | — | <≤6-word tag> |
+| `src/a.rs` | 2 | · | <≤6-word tag> |
 | `src/b.rs` | 1 | ✅ reviewed | <tag> |
 | `src/c.rs` | 3 | ⚠️ changed since review | <tag> |
 
-## Group 3 — <group name>
+## Group 3. <group name>
 | File | Threads | Status | Note |
 | --- | --- | --- | --- |
-| `src/d.rs` | 1 | — | <tag> |
+| `src/d.rs` | 1 | · | <tag> |
 ```
 
 - **Numbered groups, stable numbers.** A group keeps the same number for the
@@ -439,11 +487,54 @@ _<n> threads · <n> files · what's left to review_
   the same group even after others are removed. Visible numbers may therefore
   have gaps (e.g. Group 1 then Group 3 once Group 2 is fully reviewed). New
   groups that appear in a later round take the next unused number.
-- **Status column:** `—` (not yet reviewed), `✅ reviewed` (file signed off but
+- **Status column:** `·` (not yet reviewed), `✅ reviewed` (file signed off but
   its group isn't fully done), or `⚠️ changed since review` (a previously
   reviewed file whose code changed again — back to needing review).
-- A **fully reviewed group is omitted entirely** — no header, no "(reviewed)"
-  note. Don't lengthen the guide with what's done.
+- A **fully reviewed _content_ group is omitted entirely** from the rendered
+  markdown — no header, no "(reviewed)" note. Don't lengthen the guide with
+  what's done. (The `Generated — review not required` catch-all group is **not**
+  a review target and is **never** omitted — it stays so the roster remains a
+  complete list of the diff; see [Completeness](#completeness--the-guide-lists-every-file-in-the-diff).)
+
+### Structured guide (`-guide.json`)
+
+The browser web shell renders the guide as a sidebar natively (per-group
+orientation, per-file tag / thread count / status) rather than parsing the
+markdown. So alongside `…-guide.md`, write a `…-guide.json` array — one object
+per group, using the **same grouping and stable numbers** as the markdown:
+
+```jsonc
+[
+  {
+    "n": 1,                       // stable group number (matches -reviewed.json)
+    "kind": "bug",                // free label: "bug" | "enhancement" | "refactor" | …
+    "ticket": "PP-39",            // optional issue key; omit when there is none
+    "name": "mixed-media child ordering",
+    "orient": "One-line orientation for the group.",
+    "files": [
+      { "path": "src/a.ts", "tag": "assigns sibling_order at save", "threads": 1, "status": "—" }
+    ]
+  }
+]
+```
+
+- `path` must be the repo-relative path exactly as it appears in the diff — the
+  web shell matches it against difit's `/api/diff` to filter each group's view,
+  so a mismatch silently drops the file from the filtered view.
+- `threads` = number of `claude` threads on that file in the transcript.
+- `status` mirrors the markdown: `"—"` (pending), `"reviewed"`, or `"changed"`.
+- **Include every file in the diff** (the [Completeness](#completeness--the-guide-lists-every-file-in-the-diff)
+  rule): generated / non-reviewable files go in the final
+  `Generated — review not required` group, e.g.
+  `{ "n": <last>, "kind": "generated", "name": "Generated — review not required",
+  "orient": "Machine-generated / compiled artifacts — no review needed.",
+  "files": [ { "path": "Cargo.lock", "tag": "lockfile", "threads": 0, "status": "—" } ] }`.
+- Keep it in **lockstep with `…-guide.md`**: a fully-reviewed *content* group
+  dropped from the markdown is also omitted here (the shell's "Full diff" view
+  still shows every file regardless) — but the `Generated — review not required`
+  group is never dropped.
+- Write/rewrite it in the **same steps** you write `…-guide.md` (Initial;
+  Continue when code changed; Diff-guide mode). It is plain JSON — no validator.
 
 ### Reviewed state (`-reviewed.json`)
 
@@ -493,7 +584,8 @@ _<n> threads · <n> files · what's left to review_
    exists; don't invent a new grouping gratuitously). Preserve stable group
    numbers from `groups`; append new groups with the next number.
 5. Recompute reviewed-file signatures; demote any that changed (above).
-6. Write `-reviewed.json`, then write `-guide.md` (omit fully-reviewed groups).
+6. Write `-reviewed.json`, then write `-guide.md` and `-guide.json` (both omit
+   fully-reviewed groups; keep them in lockstep).
 7. In chat, briefly confirm what changed (e.g. "Group 2 marked reviewed and
    dropped from the guide; 3 files left across Groups 1 and 3."). Do not paste
    the whole guide — the reviewer reads it in the `dif` Diff guide view.
@@ -526,9 +618,9 @@ Use when there's no live conversation to continue.
    real thread, etc.). It exits non-zero on any failure. If it fails, fix
    the issues and re-run before printing the summary — a transcript that
    fails validation will crash `dif` on launch.
-7. **Write the diff guide** (`…-guide.md`) and initialize `…-reviewed.json` with
-   the groups you just derived (empty `reviewedGroups` / `reviewedFiles`). See
-   [The diff guide](#the-diff-guide).
+7. **Write the diff guide** (`…-guide.md` **and** `…-guide.json`) and initialize
+   `…-reviewed.json` with the groups you just derived (empty `reviewedGroups` /
+   `reviewedFiles`). See [The diff guide](#the-diff-guide).
 8. Print the chat summary per **Required chat output**.
 
 Do not commit, push, merge, or change source files in initial mode.
@@ -784,7 +876,7 @@ policy in step 3). Then:
   stale: rewrite `…-guide.md` (and refresh reviewed-file signatures, demoting any
   reviewed file you just edited to `⚠️ changed since review`) per
   [The diff guide](#the-diff-guide). This keeps the `dif` Diff guide view honest
-  without a `Ctrl+D`.
+  without a `Ctrl+G`.
 
 The verbatim "chat == difit reply" rule applies to **Case A only**.
 
@@ -961,16 +1053,17 @@ For `/diff-review cleanup`:
 1. List local branches with `git for-each-ref --format='%(refname:short)' refs/heads`.
 2. Slugify each branch using the same rules as `dif`.
 3. Inspect every `.difit/*-difit-*.json`, `.difit/*-difit-*-guide.md`,
-   `.difit/*-difit-*-reviewed.json`, and `.difit/.session-*.json`.
+   `.difit/*-difit-*-guide.json`, `.difit/*-difit-*-reviewed.json`, and
+   `.difit/.session-*.json`.
 4. Keep files whose `<branch-slug>` prefix matches an existing branch.
 5. For prefix mismatches that look like a rename (exactly one stale file
    with the suffix, and the current branch has no file with that suffix),
    rename it to the current branch's slug. Move a review's whole file set
-   together (transcript + `-guide.md` + `-reviewed.json`).
+   together (transcript + `-guide.md` + `-guide.json` + `-reviewed.json`).
 6. Delete the rest, including stale `.session-*.json` files for branches that
    no longer exist (and any leftover `.watcher-*.log` files from the retired
-   Python watcher). When you delete a transcript, delete its `-guide.md` and
-   `-reviewed.json` siblings too. Report renames and deletions.
+   Python watcher). When you delete a transcript, delete its `-guide.md`,
+   `-guide.json`, and `-reviewed.json` siblings too. Report renames and deletions.
 7. Never touch files outside `.difit/`. Don't delete the `.session-*.json` for
    a branch that still exists — a `dif` session may be live and writing it.
 
@@ -981,6 +1074,7 @@ For `/diff-review cleanup`:
 | Review a GitHub PR | `/diff-review pr\|pre\|pre-review\|auto <number>` (or "review this PR for me") → pull into `review/pr-<number>` worktree, review, `<pm> diff-review <baseRefName>` |
 | Transcript | `<repo>/.difit/<branch-slug>-difit-<scope-slug>.json` |
 | Diff guide | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-guide.md` |
+| Structured guide (web shell) | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-guide.json` |
 | Reviewed state | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-reviewed.json` |
 | Session metadata | `<repo>/.difit/.session-<branch-slug>-<scope-slug>.json` |
 | Slug rules | `scripts/dif/src/comparison.rs` + `scripts/dif/src/slug.rs` (bundled CLI) |

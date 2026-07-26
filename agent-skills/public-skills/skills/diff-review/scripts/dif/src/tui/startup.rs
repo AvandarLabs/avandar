@@ -23,6 +23,7 @@ use crate::paths;
 use crate::pty_pane::PtyPane;
 use crate::session::{self, Plan};
 use crate::slug;
+use crate::web;
 
 use super::app::{App, Panel};
 use super::session_meta::{self, SessionMeta};
@@ -54,11 +55,24 @@ pub fn launch(cli: &Cli) -> Result<App> {
         &comparison,
         port,
         transcript_raw.as_deref(),
-        true, // open the review in a browser (difit's default)
+        false, // the web shell owns browser-open; difit must not open its own
         INITIAL_ROWS,
         INITIAL_COLS,
     )?;
     let _ready = server::wait_until_ready(port, 50);
+
+    // Wrap difit in the browser web shell (guide sidebar + per-group filtered
+    // views) and open *that* instead of difit's own frontend. If the shell fails
+    // to start, fall back to opening raw difit so the review still works.
+    let guide_json_path = paths::guide_json_path(&repo_root, &branch_slug, &scope_slug);
+    let shell_port = server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
+    let worktree = web::meta::worktree_name(&repo_root, &branch);
+    let web_shell =
+        web::WebShell::start(port, shell_port, guide_json_path, branch, worktree).ok();
+    let open_url = web_shell
+        .as_ref()
+        .map_or_else(|| format!("http://localhost:{port}/"), web::WebShell::url);
+    super::open_target::open_url(&open_url);
 
     let claude = spawn_claude(&repo_root, &session_id_path);
 
@@ -69,6 +83,8 @@ pub fn launch(cli: &Cli) -> Result<App> {
             pid: std::process::id(),
             comments_file: transcript_path.display().to_string(),
             comparison_key: comparison.key(),
+            shell_port,
+            shell_url: open_url,
         },
     );
 
@@ -103,6 +119,8 @@ pub fn launch(cli: &Cli) -> Result<App> {
         vim: super::vim::VimState::new(),
         session_meta: session_meta_path,
         palette: None,
+        help_open: false,
+        web_shell,
         should_quit: false,
     })
 }

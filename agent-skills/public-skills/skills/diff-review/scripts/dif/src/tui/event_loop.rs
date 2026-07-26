@@ -30,6 +30,7 @@ pub fn run_event_loop(terminal: &mut Terminal<CrosstermBackend<Stdout>>, app: &m
         app.reap_claude();
         terminal.draw(|f| draw(f, app))?;
         app.inject_pending();
+        app.poll_web_shell_requests();
         app.update_difit_log();
         if app.should_quit {
             break;
@@ -54,6 +55,12 @@ pub fn run_event_loop(terminal: &mut Terminal<CrosstermBackend<Stdout>>, app: &m
 }
 
 fn handle_key(app: &mut App, k: &KeyEvent) {
+    // The help modal is a read-only overlay: while open it captures all keys and
+    // only closes.
+    if app.help_open {
+        handle_help_key(app, k);
+        return;
+    }
     // The palette is a modal overlay: while open it captures all keys.
     if app.palette_open() {
         handle_palette_key(app, k);
@@ -75,7 +82,7 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
                 app.restart_difit();
                 return;
             }
-            KeyCode::Char('d' | 'D') => {
+            KeyCode::Char('g' | 'G') => {
                 app.regenerate_guide();
                 return;
             }
@@ -115,6 +122,11 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
                 app.scroll_focused_half_page(false);
                 return;
             }
+            // Alt+S opens the keyboard-shortcuts help modal.
+            KeyCode::Char('s' | 'S') => {
+                app.toggle_help();
+                return;
+            }
             _ => {}
         }
     }
@@ -122,6 +134,19 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
     match app.focus {
         Panel::Difit => handle_difit_keys(app, k),
         Panel::Claude => forward_to_claude(app, k),
+    }
+}
+
+/// Drive the open help modal: `Esc`, `Alt+S`, or `Ctrl+C` close it; every other
+/// key is swallowed (the modal is read-only).
+const fn handle_help_key(app: &mut App, k: &KeyEvent) {
+    let ctrl = k.modifiers.contains(KeyModifiers::CONTROL);
+    let alt = k.modifiers.contains(KeyModifiers::ALT);
+    match k.code {
+        KeyCode::Esc => app.close_help(),
+        KeyCode::Char('c' | 'C') if ctrl => app.close_help(),
+        KeyCode::Char('s' | 'S') if alt => app.close_help(),
+        _ => {}
     }
 }
 

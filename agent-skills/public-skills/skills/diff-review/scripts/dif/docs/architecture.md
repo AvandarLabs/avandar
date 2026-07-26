@@ -147,7 +147,7 @@ uses), so the pane reads as a running activity log. Each UI tick,
     on restart.
   - **Best-effort attribution.** `change_alert::change_author` (pure, unit-tested)
     decides claude-vs-manual from how recently `dif` last injected a prompt
-    (`last_inject_at`, set on comment injection and `Ctrl+D`): a change within
+    (`last_inject_at`, set on comment injection and `Ctrl+G`): a change within
     `CLAUDE_ATTRIBUTION_WINDOW` (120s) of an injection is credited to claude
     ("Claude made code changes…"), otherwise it reads as a manual edit ("New
     manual changes detected…").
@@ -157,8 +157,8 @@ uses), so the pane reads as a running activity log. Each UI tick,
 `Ctrl+P` opens an in-memory command palette (`palette.rs`); the event loop
 captures its keys while open and `App::execute_palette_action` dispatches the
 chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`, or
-`NewClaudeSession`). `Ctrl+R` / `Ctrl+D` / `Ctrl+O` / `Ctrl+N` run those
-directly; each is also the palette row's dimmed `[^R]` / `[^D]` / `[^O]` /
+`NewClaudeSession`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N` run those
+directly; each is also the palette row's dimmed `[^R]` / `[^G]` / `[^O]` /
 `[^N]` shortcut hint, via `palette::shortcut_for` (the source of truth
 for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the claude pane; the skill writes the guide

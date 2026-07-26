@@ -8,7 +8,7 @@
 //! border brightens and (for a PTY) its cursor is surfaced.
 
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
@@ -18,18 +18,69 @@ use crate::pty_pane::PtyPane;
 
 use super::app::{App, Panel};
 use super::main_diff_view::MainDiffView;
+use super::shortcuts::{self, Group};
 
 /// Draw the whole UI for one frame.
 pub fn draw(f: &mut Frame, app: &mut App) {
-    let cols =
-        Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]).split(f.area());
+    // Reserve the bottom row for the keyboard-shortcut statusline.
+    let root = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(f.area());
+    let cols = Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(root[0]);
     draw_main_diff(f, cols[0], app);
     draw_claude(f, cols[1], app);
-    // The command palette overlays both panes when open; drawn last so its
-    // border and cursor sit on top.
+    draw_statusline(f, root[1]);
+    // The command palette and help modal overlay both panes when open; drawn
+    // last so their borders and cursor sit on top. Only one is ever open.
     if let Some(palette) = app.palette.as_ref() {
         super::draw_palette::draw_palette(f, palette, f.area());
     }
+    if app.help_open {
+        super::draw_help::draw_help(f, f.area());
+    }
+}
+
+/// The bottom keyboard-shortcut statusline: the curated command chips on the
+/// left, and the `Alt+S` help hint pinned to the far right so it always shows.
+fn draw_statusline(f: &mut Frame, area: Rect) {
+    let key = Style::new()
+        .fg(Color::Rgb(255, 199, 119))
+        .add_modifier(Modifier::BOLD);
+    let lbl = Style::new().fg(Color::Rgb(154, 165, 199));
+    let sep = Style::new().fg(Color::Rgb(78, 92, 122));
+
+    let mut left = vec![Span::raw(" ")];
+    let mut first = true;
+    for s in shortcuts::footer_subset()
+        .into_iter()
+        .filter(|s| s.group != Group::Global)
+    {
+        if !first {
+            left.push(Span::styled("  ·  ", sep));
+        }
+        first = false;
+        left.push(Span::styled(s.keys, key));
+        left.push(Span::raw(" "));
+        left.push(Span::styled(s.label, lbl));
+    }
+
+    // The Global-group chip (Alt+S) pinned right.
+    let mut right = Vec::new();
+    for s in shortcuts::footer_subset()
+        .into_iter()
+        .filter(|s| s.group == Group::Global)
+    {
+        right.push(Span::styled(s.keys, key));
+        right.push(Span::raw(" "));
+        right.push(Span::styled(s.label, lbl));
+        right.push(Span::raw(" "));
+    }
+
+    let split = Layout::horizontal([Constraint::Min(0), Constraint::Length(20)]).split(area);
+    f.render_widget(Paragraph::new(Line::from(left)), split[0]);
+    f.render_widget(
+        Paragraph::new(Line::from(right)).alignment(Alignment::Right),
+        split[1],
+    );
 }
 
 /// Draw the main diff pane: a tab strip plus the active view (log or guide).
@@ -101,7 +152,7 @@ fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
                 Line::default(),
                 Line::from(Span::styled("  No diff guide yet.", hint)),
                 Line::from(Span::styled(
-                    "  Press Ctrl+D to ask Claude to generate one.",
+                    "  Press Ctrl+G to ask Claude to generate one.",
                     hint,
                 )),
             ]),
