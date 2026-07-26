@@ -142,13 +142,13 @@ index.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 15 | `[ ]` | **chat-disabled-visual-feedback** — Chat composer visibly disabled on pages where chat is not available (dim background + placeholder copy). Includes the transparency fix on top of the dark navbar gradient. | CHECKPOINT 1 (PR #232); CHECKPOINT 8 (publish modal polish notes) |
-| 16 | `[ ]` | **chat-context-memo-fix** — Memoize `useChatPageContext` by content (pathname/openDatasetId/rawSQL/lastQueryError) to stop the assistant-ui runtime from being thrashed; fixes the "canvas stops updating after multi-turn" bug (#29). | CHECKPOINT 2; FEATURE_CHECKLIST #29 |
-| 17 | `[ ]` | **chat-empty-state-improvements** — Improved empty-chat-state rendering (suggested prompts, no jumpy layout) merged with i18n suggestion prompts. | Commits `8ca7ce9`, `661511a` |
-| 18 | `[ ]` | **chat-try-again-and-retry-on-empty** — Per-turn "Try Again" button on chat replies; automatic retry-on-empty so transient backend hiccups don't leave the user staring at silence. | Commit `1e7d335` |
-| 19 | `[ ]` | **chat-recover-sql-without-tool-call** — When the model returns SQL in its message body but skipped the `generateSql` tool, recover the SQL and apply it anyway. | Commit `381b07d` |
-| 20 | `[ ]` | **chat-multi-dataset-clarification** — When 2+ datasets could plausibly answer a question, force a clarification asking which dataset to use before generating SQL. | Commit `2359378` |
-| 21 | `[ ]` | **chat-better-pblock-generation** — Improvements to AI-driven P-block generation for chat-in-dashboards (column resolution, viz type heuristics). | Commits `c3e63d6`, `a01db18` |
+| 15 | `[~]` | **chat-disabled-visual-feedback** — Chat composer visibly disabled on pages where chat is not available (dim background + placeholder copy). Includes the transparency fix on top of the dark navbar gradient. | CHECKPOINT 1 (PR #232); CHECKPOINT 8 (publish modal polish notes) |
+| 16 | `[~]` | **chat-context-memo-fix** — Memoize `useChatPageContext` by content (pathname/openDatasetId/rawSQL/lastQueryError) to stop the assistant-ui runtime from being thrashed; fixes the "canvas stops updating after multi-turn" bug (#29). | CHECKPOINT 2; FEATURE_CHECKLIST #29 |
+| 17 | `[~]` | **chat-empty-state-improvements** — Improved empty-chat-state rendering (suggested prompts, no jumpy layout) merged with i18n suggestion prompts. | Commits `8ca7ce9`, `661511a` |
+| 18 | `[~]` | **chat-try-again-and-retry-on-empty** — Per-turn "Try Again" button on chat replies; automatic retry-on-empty so transient backend hiccups don't leave the user staring at silence. | Commit `1e7d335` |
+| 19 | `[~]` | **chat-recover-sql-without-tool-call** — When the model returns SQL in its message body but skipped the `generateSql` tool, recover the SQL and apply it anyway. | Commit `381b07d` |
+| 20 | `[~]` | **chat-multi-dataset-clarification** — When 2+ datasets could plausibly answer a question, force a clarification asking which dataset to use before generating SQL. | Commit `2359378` |
+| 21 | `[~]` | **chat-better-pblock-generation** — Improvements to AI-driven P-block generation for chat-in-dashboards (column resolution, viz type heuristics). | Commits `c3e63d6`, `a01db18` |
 
 *Row #94 `chat-models-catalog-regeneration` was relocated to Section 0 on 2026-06-10 — it is a cross-cutting prerequisite for #001 and other UI rows that consume `shared/types/chat.types`.*
 
@@ -160,33 +160,33 @@ Phases 0-9 cumulatively land below.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 22 | `[ ]` | **privacy-pii-detector** — Column-name keyword + content regex layers (email, SSN, Luhn CC, IBAN, IP, DOB, address). `src/lib/privacy/piiDetector.ts` with 16 unit tests. | CHECKPOINT 4 |
-| 23 | `[ ]` | **privacy-bias-detector** — Gender / ethnic / cultural / loaded-framing / statistical-assumption rules with curated suggestions. `src/lib/privacy/biasDetector.ts` with 11 unit tests. | CHECKPOINT 4 |
-| 24 | `[ ]` | **privacy-consent-modal** — Modes A/B/C/D/E (clean / PII / bias / composite / medical-strict typed phrase). `src/components/Privacy/ConsentModal/`. | CHECKPOINT 4 + 5 |
-| 25 | `[ ]` | **privacy-crossboundary-hmac** — `crossBoundary` API as the single chokepoint, HMAC-signed ack tokens with replay protection, `UNAPPROVED_DATA_TRANSFER` rejection on the server, ESLint chokepoint guard. | CHECKPOINT 5; CHECKPOINT 9b ESLint guard |
-| 26 | `[ ]` | **privacy-audit-log-page** — Dexie-backed consent audit log + `/settings/privacy/log` page with filter, CSV export, clear. Metadata-only. | CHECKPOINT 5 |
-| 27 | `[ ]` | **privacy-discovery-spanish-french-stubs** — Locale stub files for Spanish + French patterns (UX copy translated; patterns themselves pending advisor review). | CHECKPOINT 5 |
-| 28 | `[ ]` | **privacy-isrowdatamessage-helper** — Server helper that detects row-shaped messages (for Phase 2+ values-scope enforcement). | CHECKPOINT 5 |
+| 22 | `[~]` | **privacy-pii-detector** — Column-name keyword + content regex layers (email, SSN, Luhn CC, IBAN, IP, DOB, address). `src/lib/privacy/piiDetector.ts` with 16 unit tests. | CHECKPOINT 4 |
+| 23 | `[~]` | **privacy-bias-detector** — Gender / ethnic / cultural / loaded-framing / statistical-assumption rules with curated suggestions. `src/lib/privacy/biasDetector.ts` with 11 unit tests. | CHECKPOINT 4 |
+| 24 | `[~]` | **privacy-consent-modal** — Modes A/B/C/D/E (clean / PII / bias / composite / medical-strict typed phrase). `src/components/Privacy/ConsentModal/`. | CHECKPOINT 4 + 5 |
+| 25 | `[~]` | **privacy-crossboundary-hmac** — `crossBoundary` API as the single chokepoint, HMAC-signed ack tokens with replay protection, `UNAPPROVED_DATA_TRANSFER` rejection on the server, ESLint chokepoint guard. | CHECKPOINT 5; CHECKPOINT 9b ESLint guard |
+| 26 | `[~]` | **privacy-audit-log-page** — Dexie-backed consent audit log + `/settings/privacy/log` page with filter, CSV export, clear. Metadata-only. | CHECKPOINT 5 |
+| 27 | `[~]` | **privacy-discovery-spanish-french-stubs** — Locale stub files for Spanish + French patterns (UX copy translated; patterns themselves pending advisor review). | CHECKPOINT 5 |
+| 28 | `[~]` | **privacy-isrowdatamessage-helper** — Server helper that detects row-shaped messages (for Phase 2+ values-scope enforcement). | CHECKPOINT 5 |
 
 ## E. Chat interactive workflows — Phases 1-9
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 29 | `[ ]` | **chat-clarify-tool** — `clarify` tool registered alongside `generateSql` with a 3-turn cap; system-prompt clarification block. | CHECKPOINT 4 |
-| 30 | `[ ]` | **chat-clarification-card-and-bias-check** — Inline `ClarificationCard` (free-text / fixed-options-single / fixed-options-multi), keyboard behavior, bias check on outgoing user messages + on LLM clarification questions. | CHECKPOINT 4 + 5 |
-| 31 | `[ ]` | **chat-clarification-telemetry** — Separate Dexie DB `AvandarClarificationAuditDB`, recordShown/recordOutcome with timing, Privacy log "Clarifications" sub-tab. | CHECKPOINT 5 + 9b |
-| 32 | `[ ]` | **chat-discovery-clarifications** — Phase 2: LLM emits a read-only `SELECT DISTINCT`, dropdown populates from local DuckDB, selection routes through `crossBoundary` with `discovery_clarification` context. Shared `isReadOnlyDiscoveryQuery` validator. | CHECKPOINT 9b |
-| 33 | `[ ]` | **chat-plan-propose** — Phase 3: `proposePlan` tool with ≤8-step plans, schema-validated server-side; `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle (`step_<id>`). | CHECKPOINT 9b + 10 |
-| 34 | `[ ]` | **chat-plan-canvas** — xyflow visual DAG canvas with `RoughEdge` (RoughJS-styled bezier), custom `PlanStepNode`, animated zoom-in/zoom-out via `fitView`+`setCenter`, Auto/Step run-mode toggle. | CHECKPOINT 10 |
-| 35 | `[ ]` | **chat-plan-step-materialization** — `planStepStorage.ts` Dexie DB keyed by `(planId, stepId)`; explicit cleanup on Close / replace / new `proposePlan`; **no OPFS**. | CHECKPOINT 10 |
-| 36 | `[ ]` | **chat-plan-virtual-dataset-persistence** — Save-as-virtual-dataset persists the full plan in a new `plan_steps` JSONB column; reopening rehydrates the plan and re-registers cached parquet blobs (`rehydratePlan` + `loadParquet`). | CHECKPOINT 10 |
-| 37 | `[ ]` | **chat-plan-schema-drift-regen** — Phase 4: `isSchemaDrift` strict comparator + `findAffectedDownstream` BFS; `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool; frontend regen loop with ≤2-attempt cap per step. | CHECKPOINT 10 |
-| 38 | `[ ]` | **chat-plan-branching** — Phase 5: `PlanBranchStateManager` + `PlanBranchSidebar` + "Branch from here" CTA on succeeded steps. (Per-branch chat thread + virtual-dataset persistence intentionally deferred upstream.) | CHECKPOINT 15 |
-| 39 | `[ ]` | **chat-plan-python-sandbox** — Phase 6: Sandboxed iframe at `/sandbox-executor.html` with strict CSP + pre-boot network stubs, lazy Pyodide load, parquet bridge via `pyarrow`, `sandboxClient`/`sandboxProtocol`, 30 s default timeout. WebR explicitly deferred. | CHECKPOINT 15 |
-| 40 | `[ ]` | **chat-plan-approval-gate** — `approvalStatus: awaiting_approval | approved | rejected`; Approve/Reject banner blocks auto-run; >7-SQL-step heuristic suggests Python/R. | CHECKPOINT 15 |
-| 41 | `[ ]` | **chat-plan-annotations** — Phase 9: `PlanAnnotationStateManager` (text/sticky/arrow/pen via perfect-freehand), `PlanCanvasToolbar`, `PlanAnnotationOverlay` sharing xyflow viewport, RoughJS arrows, 50-deep undo/redo, `AvandarPlanAnnotationDB` Dexie persistence. | CHECKPOINT 15 |
-| 42 | `[ ]` | **chat-plan-png-pdf-export** — PNG export via `html-to-image` (toolbar/minimap excluded); PDF export via dynamic-imported `@react-pdf/renderer` — page 1 overview + one page per step (description / code / status / schema / row count). | CHECKPOINT 15 |
-| 43 | `[ ]` | **chat-multi-language-plans** — `proposePlan` `type` enum accepts `sql | python | r | clarification`; executor dispatches by type. R returns error today (Python only registered in `availableRuntimes`). | CHECKPOINT 15 |
+| 29 | `[~]` | **chat-clarify-tool** — `clarify` tool registered alongside `generateSql` with a 3-turn cap; system-prompt clarification block. | CHECKPOINT 4 |
+| 30 | `[~]` | **chat-clarification-card-and-bias-check** — Inline `ClarificationCard` (free-text / fixed-options-single / fixed-options-multi), keyboard behavior, bias check on outgoing user messages + on LLM clarification questions. | CHECKPOINT 4 + 5 |
+| 31 | `[~]` | **chat-clarification-telemetry** — Separate Dexie DB `AvandarClarificationAuditDB`, recordShown/recordOutcome with timing, Privacy log "Clarifications" sub-tab. | CHECKPOINT 5 + 9b |
+| 32 | `[~]` | **chat-discovery-clarifications** — Phase 2: LLM emits a read-only `SELECT DISTINCT`, dropdown populates from local DuckDB, selection routes through `crossBoundary` with `discovery_clarification` context. Shared `isReadOnlyDiscoveryQuery` validator. | CHECKPOINT 9b |
+| 33 | `[~]` | **chat-plan-propose** — Phase 3: `proposePlan` tool with ≤8-step plans, schema-validated server-side; `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle (`step_<id>`). | CHECKPOINT 9b + 10 |
+| 34 | `[~]` | **chat-plan-canvas** — xyflow visual DAG canvas with `RoughEdge` (RoughJS-styled bezier), custom `PlanStepNode`, animated zoom-in/zoom-out via `fitView`+`setCenter`, Auto/Step run-mode toggle. | CHECKPOINT 10 |
+| 35 | `[~]` | **chat-plan-step-materialization** — `planStepStorage.ts` Dexie DB keyed by `(planId, stepId)`; explicit cleanup on Close / replace / new `proposePlan`; **no OPFS**. | CHECKPOINT 10 |
+| 36 | `[~]` | **chat-plan-virtual-dataset-persistence** — Save-as-virtual-dataset persists the full plan in a new `plan_steps` JSONB column; reopening rehydrates the plan and re-registers cached parquet blobs (`rehydratePlan` + `loadParquet`). | CHECKPOINT 10 |
+| 37 | `[~]` | **chat-plan-schema-drift-regen** — Phase 4: `isSchemaDrift` strict comparator + `findAffectedDownstream` BFS; `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool; frontend regen loop with ≤2-attempt cap per step. | CHECKPOINT 10 |
+| 38 | `[~]` | **chat-plan-branching** — Phase 5: `PlanBranchStateManager` + `PlanBranchSidebar` + "Branch from here" CTA on succeeded steps. (Per-branch chat thread + virtual-dataset persistence intentionally deferred upstream.) | CHECKPOINT 15 |
+| 39 | `[~]` | **chat-plan-python-sandbox** — Phase 6: Sandboxed iframe at `/sandbox-executor.html` with strict CSP + pre-boot network stubs, lazy Pyodide load, parquet bridge via `pyarrow`, `sandboxClient`/`sandboxProtocol`, 30 s default timeout. WebR explicitly deferred. | CHECKPOINT 15 |
+| 40 | `[~]` | **chat-plan-approval-gate** — `approvalStatus: awaiting_approval | approved | rejected`; Approve/Reject banner blocks auto-run; >7-SQL-step heuristic suggests Python/R. | CHECKPOINT 15 |
+| 41 | `[~]` | **chat-plan-annotations** — Phase 9: `PlanAnnotationStateManager` (text/sticky/arrow/pen via perfect-freehand), `PlanCanvasToolbar`, `PlanAnnotationOverlay` sharing xyflow viewport, RoughJS arrows, 50-deep undo/redo, `AvandarPlanAnnotationDB` Dexie persistence. | CHECKPOINT 15 |
+| 42 | `[~]` | **chat-plan-png-pdf-export** — PNG export via `html-to-image` (toolbar/minimap excluded); PDF export via dynamic-imported `@react-pdf/renderer` — page 1 overview + one page per step (description / code / status / schema / row count). | CHECKPOINT 15 |
+| 43 | `[~]` | **chat-multi-language-plans** — `proposePlan` `type` enum accepts `sql | python | r | clarification`; executor dispatches by type. R returns error today (Python only registered in `availableRuntimes`). | CHECKPOINT 15 |
 
 ## F. Manual querying & SQL form
 

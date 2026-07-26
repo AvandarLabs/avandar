@@ -78,7 +78,9 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| _(none)_ | | | | GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`refactor-g2/data-explorer-querying`, rows #008–#013/#044–#047/#049/#096/#097, `59cdb59c`, 2026-07-26) both merged into `develop` and merged back into `feat/ict4d-demo`. GROUP-3 (`refactor-g3/ai-chat-panel`) is next but not yet cut. |
+| #015–#043 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. All G3 infrastructure ported + green (type-check/eslint/vitest). **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because feat's runtime interweaves G3's privacy/plan/clarify turn logic with G4 dashboard-block generation and G5 offline WebLLM chat — not cleanly separable. Complete the runtime integration in coordination with G4/G5. Not pushed. |
+
+GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`59cdb59c`, 2026-07-26) are merged into `develop` and merged back into `feat/ict4d-demo`.
 
 ---
 
@@ -388,3 +390,18 @@ Append-only log of `/deslop update` runs.
     VirtualDataset (`#036`).
   - **Analyzed-commit marker still `eb86cfc9`;** feat tip advanced through the
     G1 + G2 mergeback commits, all accounted for in this log.
+- `2026-07-26` — **GROUP-3 cut + migrated (in flight).** Cut
+  `refactor-g3/ai-chat-panel` off `develop @ f37ba802` in a worktree and ported
+  GROUP-3 (rows #015–#043, ~95 files / +14.4k). type-check, eslint (G3 source),
+  and vitest (14 files/110 tests + 9 ChatPanel/58) all green. Committed
+  (`401419f2`), not pushed. Rows flipped `[ ]` → `[~]`.
+  - **Deferred (flagged on the in-flight row):** `useAvandarChatRuntime.ts` kept
+    at develop's slim version — feat's runtime interweaves G3's privacy/plan/
+    clarify turn wiring with G4 dashboard-block generation and G5 offline WebLLM
+    chat that landed on the same turn path after G3, so it can't be cleanly
+    extracted to G3-only. All G3 infra (privacy detectors, crossBoundary, consent
+    modal, plan state managers, canvas, sandbox, clarification, audit logs) is
+    ported + unit-tested but not yet threaded into the live turn lifecycle. Also
+    stripped G5 offline (`OfflineChatDownloadControl`, Composer offline branch)
+    and G4 dashboard branch (useChatPageContext). Complete the runtime wiring in
+    coordination with G4/G5.
