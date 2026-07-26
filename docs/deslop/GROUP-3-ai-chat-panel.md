@@ -5,16 +5,19 @@
 - **Migration strategy:** one PR per group — the whole group lands as a single PR off `refactor-g3/ai-chat-panel`; the per-row order below is the in-branch build sequence.
 - **Source branch**: `feat/ict4d-demo`
 - **Target branch**: `develop`
-- **Base**: `origin/develop`. NOTE: the prompt said `6ec98d45`; at authoring
-  time `origin/develop` is at `6ec98d45` (drift — see Notes). Re-fetch and
-  re-base before starting.
+- **Base**: `origin/develop` — **Group 2 is now merged (`59cdb59c`)**, so cut
+  `refactor-g3/...` off the current `origin/develop` HEAD (past `59cdb59c`) and
+  re-run the drift checks. (The `6ec98d45` in earlier drafts is stale.)
 - **Depends on**:
   - **Group 1** — `#094 chat-models-catalog` (chat edge function +
-    `shared/types/chat.types` foundation the chat surface builds on).
-  - **Group 2** — chat recovers/applies SQL into the Data Explorer and
-    generates p-blocks (`#019` and `#021` here lean on Group 2 being in place
-    on `develop`; the Data Explorer apply-SQL path and the DataViz p-block
-    generator are Group 2 territory).
+    `shared/types/chat.types` foundation the chat surface builds on). Merged.
+  - **Group 2 — MERGED into `develop` (`59cdb59c`, 2026-07-26).** develop now
+    HAS: the Data Explorer apply-SQL path and DataViz p-block generator (v3
+    `series`-shape) that `#019`/`#021` lean on; the `src/components/sql/`
+    home for `SqlEditor`/`AvaSqlBlock` + `sql-helpers`; `rawSql` field naming
+    (not `rawSQL`) and `Url` (not `URL`) path casing; and `node-sql-parser`
+    already installed. See "Post-G2-merge updates" in Notes for the concrete
+    consequences for this group.
 - **Estimated size**: **~16.7k insertions across ~91 files** (measured:
   `git diff --stat origin/develop..feat/ict4d-demo` over
   `src/components/ChatPanel`, `src/components/Privacy`, `src/lib/privacy`,
@@ -77,6 +80,46 @@
 ---
 
 ## Notes for future you
+
+### ⚠️ Post-G2-merge updates (2026-07-26) — READ FIRST
+
+Group 2 merged into `develop` (`59cdb59c`) and its cleanup was merged back into
+`feat/ict4d-demo`. That changes several assumptions in the rest of this doc; the
+corrections below override the older paths/notes wherever they conflict.
+
+- **SQL components moved to `src/components/sql/` (no barrels).** develop now
+  has `src/components/sql/AvaSqlBlock/AvaSqlBlock.tsx`,
+  `src/components/sql/SqlEditor/SqlEditor.tsx` (+ `SqlQueryEditPanel.tsx`), and
+  `src/components/sql/sql-helpers/*` (incl. `useSqlDisplayCatalog.ts`). The old
+  top-level `src/components/AvaSqlBlock/` and `src/components/SqlEditor/` dirs
+  and the `src/hooks/sql/useSqlDisplayCatalog.ts` hook are **gone**. Every G3
+  chat file that renders SQL — `PlanFlowView/PlanStepSqlCode.tsx` (copy-verbatim
+  below), `ChatThread/MarkdownTextPart/MarkdownTextPart.tsx` (surgical), and any
+  test that mocks the catalog hook — must import from
+  `@/components/sql/AvaSqlBlock/AvaSqlBlock` and mock
+  `@/components/sql/sql-helpers/useSqlDisplayCatalog`. develop's `AvaSqlBlock`
+  auto-derives its catalog via `useCurrentWorkspace()` when no `catalog` prop is
+  passed, so render tests need a workspace/router context or a mocked hook.
+- **`rawSql` naming (not `rawSQL`), `Url` casing (not `URL`).** G2 renamed the
+  VirtualDataset field and DataExplorer state to `rawSql` and the URL-sync files
+  to `Url`. `useChatPageContext`'s memo deps are `pathname, openDatasetId,
+  rawSql, lastQueryError` (see #016). `planExecutor.ts` uses `rawSql`.
+- **`#036` must ADD `planSteps` to develop's VirtualDataset — G2 did not.** The
+  G2 mergeback kept feat's `planSteps: ChatPlan | null` on the model + the
+  `plan_steps` JSONB round-trip in `VirtualDatasetParsers.ts`, but **develop's
+  post-G2 VirtualDataset has `rawSql` and NO `planSteps`**. So `#036` owns
+  adding the `planSteps` model field, the ChatPlan import, and the parser's
+  `plan_steps` extract/reattach (insert/update) + `null`-tolerant read. Confirm
+  the `plan_steps` DB column exists (Phase 1); if not, STOP and flag the
+  operator. This supersedes the "confirm Phase 1 added it" note at #036.
+- **`#033`/`#034` DataExplorer reconnection (G2's [E2] deferral).** G2 shipped
+  develop's `DataExplorerApp.tsx` **without** the plan-flow panel. So this group
+  owns wiring `PlanStateManager.useState()` + `<PlanFlowView />` (and the
+  save-as-new-dataset `planSnapshot` built from `planState`) into develop's
+  `DataExplorerApp.tsx`. (feat already carries this wiring from the G2 mergeback,
+  so use feat as the reference for the exact edit.)
+- **`node-sql-parser` is already on develop** (G2 `#044` added it). Drop it from
+  the dependency-add list below — adding it again is a no-op/error.
 
 **This group is huge (29 features, ~16.7k lines), but it ships as a single PR
 off `refactor-g3/ai-chat-panel`.** Treat this file as the map for building the
@@ -384,7 +427,8 @@ supabase/functions/chat/chat-models-catalog.gen.json                      (Group
   #018 retry-on-empty, #024 consent gate, #029 clarify cap, #033 register
   `PlanStateManager`, #035/#040 executor wiring. **Merge across rows.**
 - `src/components/ChatPanel/useChatPageContext.ts` — #016 wrap return in
-  `useMemo` (deps: pathname, openDatasetId, rawSQL, lastQueryError).
+  `useMemo` (deps: pathname, openDatasetId, `rawSql`, lastQueryError). Note the
+  `rawSql` casing — G2 renamed it from `rawSQL`.
 - `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` (+
   `Composer.module.css`) — #015 disabled state + transparency fix, #024
   intercept-on-send, #030 outgoing bias check + Enter-key arbitration.
@@ -433,7 +477,7 @@ pnpm add perfect-freehand@^1.2.3           # #041 freehand pen
 pnpm add @react-pdf/renderer@^4.5.1        # #042 PDF (dynamic import)
 pnpm add html-to-image@^1.11.13            # #042 PNG
 pnpm add pyodide@^0.29.4                    # #039 python sandbox
-pnpm add node-sql-parser@^5.4.0            # SQL parsing (recovery #019 / discovery #032 / plan SQL)
+# node-sql-parser@^5.4.0 — ALREADY on develop (added by G2 #044); do NOT re-add
 pnpm add @assistant-ui/react-markdown@^0.14.0          # markdown message parts
 pnpm add @assistant-ui/react-syntax-highlighter@^0.14.0 # chat code highlighting
 ```

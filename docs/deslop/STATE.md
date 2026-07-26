@@ -39,11 +39,12 @@ let it drift.
   (subject: _fix: use createUsePuck selector for selectedItem and
   remove nested form in ManualQueryForm (#251)_)
 - **Last update run on**: `2026-06-25`
-- **Active rows**: 72 remaining (all `[ ]`). On 2026-07-24 the 5
+- **Active rows**: 59 remaining (all `[ ]`). On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
-  (`914bcbba`) and flipped to `[x]`; their `[x]` rows are kept in
-  `ALL_FEATURES.md` (with merge SHA) and the group + per-feature plan
-  files were deleted. On 2026-06-26 the 3 earlier completed rows
+  (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
+  #049, #096, #097) merged (`59cdb59c`). All flipped to `[x]`; their
+  `[x]` rows are kept in `ALL_FEATURES.md` (with merge SHA) and the group
+  + per-feature plan files were deleted. On 2026-06-26 the 3 earlier completed rows
   (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
   `[x]` checkoff rows are gone; completion is recorded only in the
   Completed migrations log below. Also on 2026-06-26 the 6
@@ -54,14 +55,14 @@ let it drift.
   folded into #1, #14 into #9, #084..#089 into #083; #050..#055
   retired as voice-removed; #097 added 2026-06-25).
 - **Planning status**: **complete — Phase 2 batched into 5 group
-  PRs (2026-06-26).** GROUP-1 is now merged (2026-07-24); GROUP-2
-  through GROUP-5 remain. The consolidated group plans at
-  `docs/deslop/GROUP-2..5-*.md` are the source of truth for the rest
+  PRs (2026-06-26).** GROUP-1 (2026-07-24) and GROUP-2 (2026-07-26) are
+  now merged and merged back into `feat/ict4d-demo`; GROUP-3 through
+  GROUP-5 remain. The consolidated group plans at
+  `docs/deslop/GROUP-3..5-*.md` are the source of truth for the rest
   and supersede the per-feature `NNN-<slug>.md` plans where they
-  disagree. Next step: cut `refactor-g2/data-explorer-querying` off
-  the current `develop` tip and migrate GROUP-2. **#097 still lacks
-  its own `NNN` plan** but is folded into the GROUP-2 doc, so it
-  migrates with that group.
+  disagree. Next step: cut `refactor-g3/ai-chat-panel` off the current
+  `develop` tip (past `59cdb59c`) and migrate GROUP-3; its plan was
+  refreshed against the post-G2 develop on 2026-07-26.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -77,7 +78,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| _(none)_ | | | | GROUP-1 (`refactor-g1/data-foundation-ingestion`, rows #077/#094/#001/#002/#003) merged into `develop` (`914bcbba`) and closed out on 2026-07-24. GROUP-2 is next but not yet cut. |
+| _(none)_ | | | | GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`refactor-g2/data-explorer-querying`, rows #008–#013/#044–#047/#049/#096/#097, `59cdb59c`, 2026-07-26) both merged into `develop` and merged back into `feat/ict4d-demo`. GROUP-3 (`refactor-g3/ai-chat-panel`) is next but not yet cut. |
 
 ---
 
@@ -96,6 +97,19 @@ the durable record once the per-feature markdown has been deleted.
 | 1 | `async-dataset-import-pipeline` (GROUP-1) | `914bcbba` | 2026-07-24 |
 | 2 | `app-wide-dropzone` (GROUP-1) | `914bcbba` | 2026-07-24 |
 | 3 | `dataset-drawer` (GROUP-1) | `914bcbba` | 2026-07-24 |
+| 8 | `floating-query-windows` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 9 | `viz-multi-series-and-chart-types` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 10 | `viz-settings-fieldsets` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 11 | `codemirror-sql-editor` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 12 | `sql-pill-rendering` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 13 | `chart-number-formatting` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 44 | `sql-to-structured-query` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 45 | `structured-query-to-sql` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 46 | `recursive-filter-ui` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 47 | `sql-form-sync-data-explorer` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 49 | `duckdb-sql-parser-updates` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 96 | `data-explorer-url-session-sync` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| 97 | `data-explorer-auto-open-ai-panel` (GROUP-2) | `59cdb59c` | 2026-07-26 |
 
 ---
 
@@ -346,3 +360,31 @@ Append-only log of `/deslop update` runs.
     skills cleanup (`748fdc2e`, `b80b0418`, `3068320c`) and are all
     accounted for here, so a future `/deslop update` can bump the
     marker straight to `3068320c` and treat them as noise.
+- `2026-07-26` — **GROUP-2 completed + mergeback + G3 plan refresh.**
+  `refactor-g2/data-explorer-querying` (rows #008–#013, #044–#047, #049,
+  #096, #097) merged into `develop`; its commits sit in develop's history
+  at `59cdb59c` (base `3bb77f4f`). The 3-way mergeback of the cleanup into
+  `feat/ict4d-demo` is committed (source + docs, not pushed).
+  - **Bookkeeping done:** flipped all 13 rows to `[x] (59cdb59c)`; logged
+    them in the Completed migrations log; deleted the 12 per-feature plans
+    (#008–#013, #044–#047, #049, #096) and `GROUP-2-data-explorer-querying.md`
+    (#097 never had a plan file); deleted the `refactor-g2/...` local branch
+    + worktree (remote already gone).
+  - **Mergeback outcome:** drift on the G2 path set fell from 210 files /
+    +3023 −11701 to 19 files / +1713 −1180 (all legit feat-ahead: the G4/G5
+    dashboard surface — V4 schema, Filter PBlocks, DataVizPBlock/pfields,
+    getDashboardPuckConfig — plus feat-only bits DataExplorerApp PlanFlowView
+    wiring, VirtualDataset `planSteps`, offline `useLocalDatasetIds`, i18n
+    RegenerateErrorBanner, `registerSessionExpiredHandler`). Adopted develop's
+    `rawSQL`→`rawSql` and `URL`→`Url` renames codebase-wide, the
+    `src/components/sql/` relocation of SqlEditor/AvaSqlBlock, and collapsed
+    ~27 pre-existing feat flat/dir duplicate modules to develop's dir form.
+    Left the 2 `src/components/offline/{OfflineGated,OfflineIndicator}` flat
+    dups for the offline group. type-check + eslint + vitest green.
+  - **GROUP-3 plan refreshed** against the post-G2 develop: new
+    `src/components/sql/` import paths, `rawSql`/`Url` naming, `node-sql-parser`
+    already present, and G3 now owns the `DataExplorerApp` plan-flow
+    reconnection ([E2] deferral) + adding `planSteps` to develop's
+    VirtualDataset (`#036`).
+  - **Analyzed-commit marker still `eb86cfc9`;** feat tip advanced through the
+    G1 + G2 mergeback commits, all accounted for in this log.

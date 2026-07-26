@@ -56,12 +56,12 @@ plans (with verified real paths — they supersede the per-feature
 `NNN-*.md` files where they disagree) live in:
 
 1. ~~`GROUP-1-data-foundation-ingestion.md`~~ — rows #077, #094, #001, #002, #003. **✅ MERGED into `develop` (`914bcbba`; develop tip `3bb77f4f`) on 2026-07-24.** Group doc + per-feature plans deleted; see the Completed migrations log in `STATE.md`.
-2. `GROUP-2-data-explorer-querying.md` — #008–#013, #096, #097, #044–#047, #049 ← **next**
-3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows)
+2. ~~`GROUP-2-data-explorer-querying.md`~~ — #008–#013, #096, #097, #044–#047, #049. **✅ MERGED into `develop` (`59cdb59c`; base `3bb77f4f`) on 2026-07-26.** Group doc + per-feature plans deleted; cleanup merged back into `feat/ict4d-demo`. See the Completed migrations log in `STATE.md`.
+3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows) ← **next**
 4. `GROUP-4-dashboards.md` — #064–#076, #048
 5. `GROUP-5-platform-i18n-standalone.md` — #056–#063, #079–#082, #090, #095, #091–#093
 
-**Migration order is 1 → 2 → 3 → 4 → 5** (dependency-ordered; e.g.
+**Migration order is 1 → 2 → 3 → 4 → 5** (1 and 2 done; dependency-ordered; e.g.
 the AvaPage schema chain V2→V3 (G2 #009)→V4 (G4 #069), G4 #065 needs
 G3's chat tools, G5 #081 lingui-wiring lands dead last). Base for all
 five is `origin/develop` @ `6ec98d45`. Per-row order inside each group
@@ -129,14 +129,14 @@ index.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 8 | `[ ]` | **floating-query-windows** — Draggable, collapsible Query Details and Visualization Settings floating windows on top of the Data Explorer canvas. | CHECKPOINT 1 (PR #228) |
-| 9 | `[ ]` | **viz-multi-series-and-chart-types** — Multi-series visualizations across the full chart-type expansion: bar/line/area + scatter + bubble + **pie + funnel + radar**, all with per-series xKey/yKey/sizeKey (or nameKey/valueKey for pie-like configs); axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers; auto-hydration of viz axes from query results; `CurveType` shared type with `curveType` setting on Line/Area; `withLegend` setting across Bar/Line/Area; `hydratePieFromQuery`/`hydratePieFromQueryResult` utilities. Per the operator rule, the PTRCK-005/006/007/008 expansion is bundled into this row rather than split — migrate the up-to-date chart suite, not the original multi-series + later expansion. **Also absorbs retired row #14 `chart-color-picker-fix`** (commit `c8fb6b6`): color picker behavior + chart rendering fixes for big-number columns ship in the same commit family and are inseparable. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527`, `517daefc` (PTRCK-005+006), `7b738f13` (PTRCK-007+008), `c8fb6b6` (color-picker fix, ex-#14) |
-| 10 | `[ ]` | **viz-settings-fieldsets** — Visualization Settings restructured into labelled fieldsets matching the design doc. | `docs/superpowers/specs/2026-05-21-sql-pills-viz-settings-design.md`; commit `4e85af6` |
-| 11 | `[ ]` | **codemirror-sql-editor** — CodeMirror-based SQL editor in the Data Explorer (replaces the prior textarea), supporting dataset/column pills inline. | Commit `314f8a9`; sql-pills design spec |
-| 12 | `[ ]` | **sql-pill-rendering** — Render dataset names and column names as pills inside the read-only SQL block (`AvaSqlBlock`); editable pill dropdowns when the SQL is editable; widened dropdown. | Commits `4e85af6`, `6febbcf`, `a01db18` |
-| 13 | `[ ]` | **chart-number-formatting** — Centralized formatting helper used across the chart layer for big-number columns, locale-aware. | Commits `57c5803`, `c8fb6b6` |
-| 96 | `[ ]` | **data-explorer-url-session-sync** — Data Explorer state (`ds`, `cols`, `agg`, `orderBy`, `orderDir`, `sql`, `vc`, `od`) hydrates from and serializes back to the URL via `replace: true` navigation. Adds `DataExplorerURLState` parse/serialize helpers (+332 LoC), `dataExplorerURLHydration` deferral/hydrate-key checks (+54), `useDataExplorerURLSync` first-load hydration + ongoing sync (+299), and `remapColumnsByBaseId` in `QueryColumnMultiSelect` so URL-hydrated columns stay aligned with fetched metadata. Reset clears search params in one navigation so the query string can go bare. ~838 lines of new code; none of these files exist on `develop`. | Commit `7b738f13` (PTRCK-009 + PTRCK-010) |
-| 97 | `[ ]` | **data-explorer-auto-open-ai-panel** — Auto-opens the AI/chat panel on a user's first Data Explorer visit per session. Adds `src/views/DataExplorerApp/dataExplorerPanelPreferences.ts` (new), an `openChatPanelOnMount` effect in `DataExplorerApp.tsx`, and a small `useAuth.ts` adjustment. Added post-marker on `feat/ict4d-demo` (PR #240); no plan file authored yet — operator to confirm scope before `/deslop migrate`. | Commit `6d3841b6` (PR #240) |
+| 8 | `[x] (59cdb59c)` | **floating-query-windows** — Draggable, collapsible Query Details and Visualization Settings floating windows on top of the Data Explorer canvas. | CHECKPOINT 1 (PR #228) |
+| 9 | `[x] (59cdb59c)` | **viz-multi-series-and-chart-types** — Multi-series visualizations across the full chart-type expansion: bar/line/area + scatter + bubble + **pie + funnel + radar**, all with per-series xKey/yKey/sizeKey (or nameKey/valueKey for pie-like configs); axis-mapping tooltip on Series header; prune-on-column-change in hydration helpers; auto-hydration of viz axes from query results; `CurveType` shared type with `curveType` setting on Line/Area; `withLegend` setting across Bar/Line/Area; `hydratePieFromQuery`/`hydratePieFromQueryResult` utilities. Per the operator rule, the PTRCK-005/006/007/008 expansion is bundled into this row rather than split — migrate the up-to-date chart suite, not the original multi-series + later expansion. **Also absorbs retired row #14 `chart-color-picker-fix`** (commit `c8fb6b6`): color picker behavior + chart rendering fixes for big-number columns ship in the same commit family and are inseparable. | CHECKPOINT 1 (`claude/add-series-support`); commits `7c8d08a`, `add9d03`, `3d7f527`, `517daefc` (PTRCK-005+006), `7b738f13` (PTRCK-007+008), `c8fb6b6` (color-picker fix, ex-#14) |
+| 10 | `[x] (59cdb59c)` | **viz-settings-fieldsets** — Visualization Settings restructured into labelled fieldsets matching the design doc. | `docs/superpowers/specs/2026-05-21-sql-pills-viz-settings-design.md`; commit `4e85af6` |
+| 11 | `[x] (59cdb59c)` | **codemirror-sql-editor** — CodeMirror-based SQL editor in the Data Explorer (replaces the prior textarea), supporting dataset/column pills inline. | Commit `314f8a9`; sql-pills design spec |
+| 12 | `[x] (59cdb59c)` | **sql-pill-rendering** — Render dataset names and column names as pills inside the read-only SQL block (`AvaSqlBlock`); editable pill dropdowns when the SQL is editable; widened dropdown. | Commits `4e85af6`, `6febbcf`, `a01db18` |
+| 13 | `[x] (59cdb59c)` | **chart-number-formatting** — Centralized formatting helper used across the chart layer for big-number columns, locale-aware. | Commits `57c5803`, `c8fb6b6` |
+| 96 | `[x] (59cdb59c)` | **data-explorer-url-session-sync** — Data Explorer state (`ds`, `cols`, `agg`, `orderBy`, `orderDir`, `sql`, `vc`, `od`) hydrates from and serializes back to the URL via `replace: true` navigation. Adds `DataExplorerURLState` parse/serialize helpers (+332 LoC), `dataExplorerURLHydration` deferral/hydrate-key checks (+54), `useDataExplorerURLSync` first-load hydration + ongoing sync (+299), and `remapColumnsByBaseId` in `QueryColumnMultiSelect` so URL-hydrated columns stay aligned with fetched metadata. Reset clears search params in one navigation so the query string can go bare. ~838 lines of new code; none of these files exist on `develop`. | Commit `7b738f13` (PTRCK-009 + PTRCK-010) |
+| 97 | `[x] (59cdb59c)` | **data-explorer-auto-open-ai-panel** — Auto-opens the AI/chat panel on a user's first Data Explorer visit per session. Adds `src/views/DataExplorerApp/dataExplorerPanelPreferences.ts` (new), an `openChatPanelOnMount` effect in `DataExplorerApp.tsx`, and a small `useAuth.ts` adjustment. Added post-marker on `feat/ict4d-demo` (PR #240); no plan file authored yet — operator to confirm scope before `/deslop migrate`. | Commit `6d3841b6` (PR #240) |
 
 ## C. Chat panel core fixes & UX
 
@@ -192,12 +192,12 @@ Phases 0-9 cumulatively land below.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 44 | `[ ]` | **sql-to-structured-query** — `node-sql-parser` driven `sqlToStructuredQuery` that projects arbitrary SELECT statements onto `PartialStructuredQuery`. Returns `{ query, isFullyMapped, unmappedReasons }`. 12 unit tests. | CHECKPOINT 7; `docs/demo-features/sql-parser-filter-ui.md` |
-| 45 | `[ ]` | **structured-query-to-sql** — Knex-based form-to-SQL renderer extracted from `toRawDuckDBQuery` into a reusable utility. Also renders the new WHERE clause. 5 unit tests. | CHECKPOINT 7 |
-| 46 | `[ ]` | **recursive-filter-ui** — `QueryFiltersField` powered by `react-querybuilder` + `@react-querybuilder/mantine`; nested AND/OR groups; library-agnostic `QueryFilterGroup` shape. | CHECKPOINT 7 |
-| 47 | `[ ]` | **sql-form-sync-data-explorer** — Bidirectional sync: `applySqlMapping` updates `isStructuredQueryInSync` + `sqlSyncWarnings`, manual edits regenerate SQL, out-of-sync confirmation Alert. | CHECKPOINT 7 |
+| 44 | `[x] (59cdb59c)` | **sql-to-structured-query** — `node-sql-parser` driven `sqlToStructuredQuery` that projects arbitrary SELECT statements onto `PartialStructuredQuery`. Returns `{ query, isFullyMapped, unmappedReasons }`. 12 unit tests. | CHECKPOINT 7; `docs/demo-features/sql-parser-filter-ui.md` |
+| 45 | `[x] (59cdb59c)` | **structured-query-to-sql** — Knex-based form-to-SQL renderer extracted from `toRawDuckDBQuery` into a reusable utility. Also renders the new WHERE clause. 5 unit tests. | CHECKPOINT 7 |
+| 46 | `[x] (59cdb59c)` | **recursive-filter-ui** — `QueryFiltersField` powered by `react-querybuilder` + `@react-querybuilder/mantine`; nested AND/OR groups; library-agnostic `QueryFilterGroup` shape. | CHECKPOINT 7 |
+| 47 | `[x] (59cdb59c)` | **sql-form-sync-data-explorer** — Bidirectional sync: `applySqlMapping` updates `isStructuredQueryInSync` + `sqlSyncWarnings`, manual edits regenerate SQL, out-of-sync confirmation Alert. | CHECKPOINT 7 |
 | 48 | `[ ]` | **sql-form-sync-dashboards** — Per-block `useDashboardManualQueryState` hook giving DataViz blocks the same SQL ↔ form parity as Data Explorer; 3-tab `NLQueryPField` (Prompt / Manual / SQL). | CHECKPOINT 16 |
-| 49 | `[ ]` | **duckdb-sql-parser-updates** — Parser-side updates so DuckDB-specific SQL parses correctly. | Commit `673419e` |
+| 49 | `[x] (59cdb59c)` | **duckdb-sql-parser-updates** — Parser-side updates so DuckDB-specific SQL parses correctly. | Commit `673419e` |
 
 ## H. Desktop platform & offline (web + desktop)
 
