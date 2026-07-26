@@ -22,3 +22,4 @@ pub mod pty_pane;
 pub mod session;
 pub mod slug;
 pub mod tui;
+pub mod web;

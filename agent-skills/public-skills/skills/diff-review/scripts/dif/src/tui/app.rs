@@ -35,7 +35,7 @@ const CODE_CHANGE_SETTLE: Duration = Duration::from_secs(3);
 /// enough to cover claude thinking + editing after a comment is typed in.
 const CLAUDE_ATTRIBUTION_WINDOW: Duration = Duration::from_secs(120);
 
-/// The prompt `Ctrl+D` (and the palette's "Regenerate diff guide") types into
+/// The prompt `Ctrl+G` (and the palette's "Regenerate diff guide") types into
 /// the claude pane. Intentionally minimal: the skill derives the paths itself.
 const REGENERATE_GUIDE_PROMPT: &str =
     "Regenerate the diff guide for this review using the diff-review skill, \
@@ -91,7 +91,7 @@ pub struct App {
     /// settled signature re-arms the warning (so a manual edit after a prior
     /// warning still alerts); cleared on restart.
     pub warned_sig: Option<String>,
-    /// When `dif` last injected a prompt into claude (comment or `Ctrl+D`).
+    /// When `dif` last injected a prompt into claude (comment or `Ctrl+G`).
     /// Used to attribute a settled code change to claude vs. a manual edit.
     pub last_inject_at: Option<Instant>,
     /// Which view the main diff pane is showing (log view or diff guide view).
@@ -104,6 +104,12 @@ pub struct App {
     pub session_meta: PathBuf,
     /// The global command palette, open when `Some`.
     pub palette: Option<PaletteState>,
+    /// Whether the `Alt+S` keyboard-shortcuts help modal is open.
+    pub help_open: bool,
+    /// The browser web shell wrapping difit (guide sidebar + per-group views).
+    /// Owned here so it lives for the session and shuts down on exit; `None`
+    /// only if it failed to start (the review then falls back to raw difit).
+    pub web_shell: Option<crate::web::WebShell>,
     /// Set when the user asks to quit.
     pub should_quit: bool,
 }
@@ -161,6 +167,16 @@ impl App {
         self.palette.is_some()
     }
 
+    /// Toggle the `Alt+S` keyboard-shortcuts help modal.
+    pub const fn toggle_help(&mut self) {
+        self.help_open = !self.help_open;
+    }
+
+    /// Close the help modal.
+    pub const fn close_help(&mut self) {
+        self.help_open = false;
+    }
+
     /// Run a palette action and close the palette.
     pub fn execute_palette_action(&mut self, action: PaletteAction) {
         match action {
@@ -172,11 +188,28 @@ impl App {
         self.close_palette();
     }
 
-    /// Open the running difit server's URL in the system default browser. Does
-    /// not restart the server; best-effort and never blocks the event loop.
+    /// Open the review in the system default browser. Prefers the web-shell URL
+    /// (guide sidebar + per-group views); falls back to raw difit if the shell
+    /// isn't running. Best-effort and never blocks the event loop.
     pub fn open_in_browser(&self) {
-        let url = format!("http://localhost:{}", self.port);
-        let _ = std::process::Command::new("open").arg(&url).spawn();
+        let url = self
+            .web_shell
+            .as_ref()
+            .map_or_else(|| format!("http://localhost:{}", self.port), crate::web::WebShell::url);
+        super::open_target::open_url(&url);
+    }
+
+    /// Service a pending "Regenerate guide" request from the browser web shell.
+    ///
+    /// The shell server (a background thread) can't type into the claude pane
+    /// itself, so it flags the request and this — polled each event-loop tick —
+    /// runs the same regeneration as `Ctrl+G`. A no-op when nothing is pending.
+    pub fn poll_web_shell_requests(&mut self) {
+        if self.web_shell.as_ref().is_some_and(crate::web::WebShell::take_regen_request) {
+            self.difit
+                .write_to_screen("\r\n\x1b[36m↻ Regenerating diff guide (requested from the browser)…\x1b[0m\r\n");
+            self.regenerate_guide();
+        }
     }
 
     /// Ask claude to regenerate the diff guide (via the `diff-review`
@@ -227,7 +260,10 @@ impl App {
             &self.comparison,
             self.port,
             transcript_raw.as_deref(),
-            true, // reopen the review in the browser, matching the original launch
+            // difit must not open its own frontend: the web shell owns the
+            // browser surface, so restart spawns difit with `--no-open` (exactly
+            // as the original launch) and we reopen the *shell* URL below.
+            false,
         );
         self.difit
             .write_to_screen("\r\n\x1b[33m[dif] Stopping difit server…\x1b[0m\r\n");
@@ -251,6 +287,9 @@ impl App {
         self.served_sig = self.git_watcher.current();
         self.pending_change = None;
         self.warned_sig = None;
+        // Reopen the review in the browser at the wrapped-shell URL (difit was
+        // told not to), matching the original launch surface.
+        self.open_in_browser();
     }
 
     /// Mirror activity into the difit pane log: a line per new `claude` reply,

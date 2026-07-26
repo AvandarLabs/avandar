@@ -31,7 +31,11 @@ if command -v cargo >/dev/null 2>&1; then
     need_build=1
   elif [ "$MANIFEST" -nt "$BIN" ]; then
     need_build=1
-  elif [ -n "$(find "$SRC_DIR" -name '*.rs' -newer "$BIN" -print 2>/dev/null | head -n 1)" ]; then
+  elif [ -n "$(find "$SRC_DIR" -type f -newer "$BIN" -print 2>/dev/null | head -n 1)" ]; then
+    # Any file under src/ — not just *.rs. The web-shell frontend
+    # (src/web/frontend/*.js|css|html) is `include_str!`'d into the binary, so a
+    # frontend-only edit must rebuild too; a *.rs-only check silently ships a
+    # stale UI.
     need_build=1
   fi
   if [ "$need_build" -eq 1 ]; then

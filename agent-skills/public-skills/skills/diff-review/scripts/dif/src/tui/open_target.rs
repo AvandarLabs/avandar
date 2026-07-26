@@ -137,6 +137,27 @@ fn open_with_default(arg: &str) {
     let _ = Command::new("open").arg(arg).spawn();
 }
 
+/// Open a URL in the system default browser, cross-platform. Best-effort:
+/// spawns the opener detached and never blocks. Used to launch the web shell.
+pub fn open_url(url: &str) {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = Command::new("open").arg(url).spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = Command::new("xdg-open").arg(url).spawn();
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = Command::new("cmd").args(["/C", "start", "", url]).spawn();
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+    {
+        let _ = Command::new("open").arg(url).spawn();
+    }
+}
+
 /// Open `path` at `line` in `nvim`, in a *new* surface so the running `dif`
 /// pane is never clobbered: a new tmux window when inside tmux (like the
 /// `<leader> c` binding), otherwise a new iTerm2 tab.

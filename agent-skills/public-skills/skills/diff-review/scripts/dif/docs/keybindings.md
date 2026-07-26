@@ -1,5 +1,10 @@
 # Keybindings
 
+This file covers the **terminal TUI**. The browser **web shell** is a separate
+surface with its own command palette (`⌘K` / `Ctrl+K`) and navigation hotkeys
+(`Ctrl+1..9` groups, `Ctrl+F` full diff, `Ctrl+H` toggle sidebar) — see
+[web-shell.md](web-shell.md#header-chrome-command-palette--hotkeys).
+
 Global (work from either pane):
 
 | Key | Action |
@@ -9,14 +14,15 @@ Global (work from either pane):
 | `Alt+U` / `Alt+D` | scroll the focused view a half-page up / down (guide view moves its cursor; a PTY pane scrolls half its visible rows) |
 | `Ctrl+P` | open the **command palette** (works from either pane) |
 | `Ctrl+R` | restart the difit server (the palette's "Restart dif") |
-| `Ctrl+D` | regenerate the diff guide (the palette's "Regenerate diff guide") |
+| `Ctrl+G` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open difit in browser") |
 | `Ctrl+N` | start a fresh claude session (interrupts: kills the running claude and respawns it on a new session that auto-submits the review prompt; the palette's "New Claude session") |
 | `Ctrl+Q` | quit `dif` (tears down difit, claude, and the poller) |
+| `Alt+S` | show the keyboard-shortcuts help modal (also pinned at the right of the bottom statusline) |
 
 `Alt+H` / `Alt+L` switch focus; `Alt+U` / `Alt+D` scroll the focused view a
 half-page (a keyboard-only alternative to the wheel that never depends on
-terminal mouse reporting); `Ctrl+P` / `Ctrl+R` / `Ctrl+D` / `Ctrl+O` /
+terminal mouse reporting); `Ctrl+P` / `Ctrl+R` / `Ctrl+G` / `Ctrl+O` /
 `Ctrl+N` / `Ctrl+Q` are the command keys. The `Alt` and `Ctrl` commands are intercepted
 globally **before** keys are forwarded to claude, so they never reach the
 claude session (a deliberate trade: claude does not receive them), which is
@@ -97,7 +103,7 @@ keeps no decisions log, so the reasoning lives here.
 ## Shortcut-label rule (for agents)
 
 When a shortcut is **also** a command-palette action (today: `Ctrl+R` →
-"Restart dif", `Ctrl+D` → "Regenerate diff guide", `Ctrl+O` → "Open difit in
+"Restart dif", `Ctrl+G` → "Regenerate diff guide", `Ctrl+O` → "Open difit in
 browser", `Ctrl+N` → "New Claude session"), its dimmed `[…]` hint on the
 palette row is derived from
 `palette::shortcut_for`. If you add or change such a

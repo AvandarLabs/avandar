@@ -29,9 +29,29 @@ pub fn pick_port(preferred: u16) -> u16 {
         .map_or(preferred, |addr| addr.port())
 }
 
-/// Build the shell command that launches difit:
-/// `cd <repo> && exec difit <args…> --port <p> --keep-alive --include-untracked
-/// [--comment <json>] [--no-open]`.
+/// Resolve the difit executable to launch.
+///
+/// Prefers the repo's locally-installed `node_modules/.bin/difit` shim when it
+/// exists, so a repo that declares difit as a devDependency never requires a
+/// global install and doesn't depend on `difit` being on `PATH`. Falls back to
+/// a bare `difit` (resolved from `PATH`) for repos with no local install, e.g.
+/// non-JS projects. The returned string is already shell-quoted.
+#[must_use]
+fn difit_program(repo_root: &Path) -> String {
+    let local = repo_root.join("node_modules/.bin/difit");
+    if local.exists() {
+        shell_quote(&local.display().to_string())
+    } else {
+        "difit".to_owned()
+    }
+}
+
+/// Build the shell command that launches difit.
+///
+/// Shape: `cd <repo> && exec <difit> <args…> --port <p> --keep-alive
+/// --include-untracked [--comment <json>] [--no-open]`, where `<difit>` is the
+/// repo's local `node_modules/.bin/difit` when present, else a bare `difit`
+/// from `PATH` (see [`difit_program`]).
 ///
 /// `transcript_raw` is the existing transcript text (already validated as
 /// non-empty by the caller); when present it seeds difit's initial comments.
@@ -55,7 +75,7 @@ pub fn build_command(
         shell_quote(&repo_root.display().to_string()),
         "&&".to_owned(),
         "exec".to_owned(),
-        "difit".to_owned(),
+        difit_program(repo_root),
     ];
     for arg in comparison.difit_args() {
         parts.push(shell_quote(&arg));
@@ -149,6 +169,45 @@ mod tests {
     fn command_for_uncommitted_passes_dot() {
         let cmd = build_command(Path::new("/r"), &ComparisonKey::Uncommitted, 4500, None, true);
         assert!(cmd.contains(" '.' "));
+    }
+
+    #[test]
+    fn prefers_local_difit_binary_when_present() {
+        // A repo that installs difit as a devDependency has a
+        // node_modules/.bin/difit shim; prefer it so engineers never need a
+        // global install (and we don't depend on PATH).
+        let dir = tempfile::tempdir().unwrap();
+        let bin = dir.path().join("node_modules/.bin");
+        std::fs::create_dir_all(&bin).unwrap();
+        std::fs::write(bin.join("difit"), b"#!/bin/sh\n").unwrap();
+        let local = bin.join("difit");
+        let cmd = build_command(
+            dir.path(),
+            &ComparisonKey::Branch("develop".to_owned()),
+            4711,
+            None,
+            true,
+        );
+        assert!(
+            cmd.contains(&format!("exec {}", shell_quote(&local.display().to_string()))),
+            "expected exec of local difit shim, got: {cmd}"
+        );
+        assert!(!cmd.contains("exec difit "), "should not fall back to PATH difit");
+    }
+
+    #[test]
+    fn falls_back_to_path_difit_without_local_install() {
+        // A repo (e.g. a non-JS project) without a local shim keeps working by
+        // resolving `difit` from PATH.
+        let dir = tempfile::tempdir().unwrap();
+        let cmd = build_command(
+            dir.path(),
+            &ComparisonKey::Branch("develop".to_owned()),
+            4711,
+            None,
+            true,
+        );
+        assert!(cmd.contains("&& exec difit "), "expected PATH fallback, got: {cmd}");
     }
 
     #[test]

@@ -13,10 +13,10 @@ each `PaletteAction` variant is dispatched by `App::execute_palette_action`
 
 Today the registry has four entries: "Restart dif" → `PaletteAction::RestartDifit`
 (`Ctrl+R`), "Regenerate diff guide" → `PaletteAction::RegenerateGuide`
-(`Ctrl+D`), "Open difit in browser" → `PaletteAction::OpenInBrowser`
+(`Ctrl+G`), "Open difit in browser" → `PaletteAction::OpenInBrowser`
 (`Ctrl+O`), and "New Claude session" → `PaletteAction::NewClaudeSession`
 (`Ctrl+N`), each shown with its direct key as a dimmed
-`[^R]` / `[^D]` / `[^O]` / `[^N]` hint on its row (`palette::shortcut_for`). Adding a command is three edits: add a
+`[^R]` / `[^G]` / `[^O]` / `[^N]` hint on its row (`palette::shortcut_for`). Adding a command is three edits: add a
 `PaletteAction` variant, add a row to `PALETTE_COMMANDS`, and handle the variant
 in `execute_palette_action`; add a `shortcut_for` arm if it also gets a direct
 key (and the dimmed hint then renders automatically — keep it current with the

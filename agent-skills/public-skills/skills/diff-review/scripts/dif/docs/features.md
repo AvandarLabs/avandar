@@ -39,7 +39,7 @@ The shell is split into the **main view** (the left "diff view") and the
     markdown with full styling (colored headings, **bold**, `code`, lists, and
     tables render as such). The guide is a guide to what's *left* to review; the
     `diff-review` skill writes it and keeps it current. Absent guide → a
-    hint to press `Ctrl+D`. This view is a **basic vim pager with a visible
+    hint to press `Ctrl+G`. This view is a **basic vim pager with a visible
     cursor**: `j`/`k`/`h`/`l` move the cursor, `w`/`b` move by word, `d`/`u` are
     half-page, `gg`/`G` are top/bottom, all with count prefixes (`3j`, `8w`).
     Press **`o`** to open the file path or URL **under the cursor** — a
@@ -63,7 +63,7 @@ log:
 - **A restart-needed warning** (orange) when the code changes since launch. The
   wording names the likely author: **`⚠️  Claude made code changes — restart
   difit (Ctrl+R) 🔁`** when claude just edited (it was handed a comment or a
-  `Ctrl+D` moments before), or **`⚠️  New manual changes detected — …`** when the
+  `Ctrl+G` moments before), or **`⚠️  New manual changes detected — …`** when the
   change came from outside the shell. It appears once the change settles, and
   `dif` **never auto-restarts** — that would drop a comment you're mid-typing in
   the browser. Press `Ctrl+R` (or run "Restart dif" from the palette) when ready.
@@ -113,8 +113,8 @@ reconnects automatically once difit is back on the same port.
 
 ### Regenerate diff guide
 
-"Regenerate diff guide" — the palette command, or its direct **`Ctrl+D`**
-shortcut (shown dimmed as `[^D]` on the palette row) — asks Claude to rebuild the
+"Regenerate diff guide" — the palette command, or its direct **`Ctrl+G`**
+shortcut (shown dimmed as `[^G]` on the palette row) — asks Claude to rebuild the
 diff guide for this review via the `/diff-review` skill. `dif` only types
 the request into the claude pane; the skill writes the guide markdown file, and
 the diff guide view picks it up automatically on its next refresh (no restart).

@@ -23,9 +23,14 @@ reply posted by claude shows up in the open browser immediately.
 log). The command is:
 
 ```
-cd <repo> && exec difit <args…> --port <P> --keep-alive --include-untracked [--comment <json>]
+cd <repo> && exec <difit> <args…> --port <P> --keep-alive --include-untracked [--comment <json>]
 ```
 
+- `<difit>` resolves to the repo's local `node_modules/.bin/difit` when it
+  exists (a repo can pin difit as a devDependency so no global install or `PATH`
+  entry is required), and falls back to a bare `difit` from `PATH` for repos
+  with no local install (e.g. non-JS projects). See `difit_program` in
+  `src/difit/server.rs`.
 - `<args…>` come from the comparison key (`.`/`staged`/`working`, or `@ <branch>`).
 - `--port <P>` is a confirmed-free port (we bind-test it first; difit would
   otherwise silently auto-reassign an occupied port and strand the poller).
@@ -48,7 +53,9 @@ that the code changed since launch; it never restarts on its own, so a comment
 you're mid-typing in the browser is never dropped. The flow:
 
 1. `App::restart_difit` re-reads the `.difit` transcript and rebuilds the same
-   difit command (same comparison + port, `--comment` reseeded).
+   difit command (same comparison + port, `--comment` reseeded). difit is spawned
+   with `--no-open` — exactly as at launch — because the **web shell owns the
+   browser surface**; a restart must not pop difit's own frontend.
 2. It writes a `[dif] Stopping…` status line into the pane, calls
    `PtyPane::kill_child` (SIGKILL lands on difit thanks to `exec`), then
    `server::wait_until_port_free` so the port is released before rebinding.
@@ -56,6 +63,9 @@ you're mid-typing in the browser is never dropped. The flow:
    `PtyPane::respawn_shell_command_with_env`, which spawns the new difit into a
    fresh PTY **reusing the same `vt100` parser** — so the log is continuous, not
    cleared.
+4. It reopens the review in the browser via `App::open_in_browser`, which targets
+   the **wrapped-shell URL** (the running `WebShell` still proxies the same port),
+   not raw difit.
 
 The poller (still pointed at the unchanged port) and the claude pane are not
 touched; the poller just reconnects once difit answers again. The dispatcher's
@@ -63,20 +73,42 @@ once-each baseline means reseeded comments are not re-injected.
 
 The restart warning that prompts this is **attributed**: `dif` tracks when it
 last injected a prompt into claude (`last_inject_at`, set on comment injection
-and on `Ctrl+D`) and words the alert "Claude made code changes…" when the change
+and on `Ctrl+G`) and words the alert "Claude made code changes…" when the change
 settles soon after an injection, or "New manual changes detected…" otherwise. It
 re-arms on each new distinct change, so a manual edit after a prior warning still
 alerts. See [architecture.md](architecture.md#difit-pane-activity-log).
 
-### Regenerating the diff guide ("Regenerate diff guide" / `Ctrl+D`)
+### Regenerating the diff guide ("Regenerate diff guide" / `Ctrl+G`)
 
 The diff guide is generated and maintained by the `diff-review` skill, not
-by `dif`. `Ctrl+D` (or the palette entry) types a minimal request into the claude
+by `dif`. `Ctrl+G` (or the palette entry) types a minimal request into the claude
 pane — "Regenerate the diff guide … using the diff-review skill" — via the
 same `send_prompt_to_pty` path as comment injection (and likewise records
 `last_inject_at`). The skill writes `.difit/<branch>-difit-<scope>-guide.md`; the
 diff guide view re-reads the file on its next tick (`Guide::refresh`, a content
 diff) and renders it. No server restart and no `dif`-side writes to the guide.
+
+**Caching.** Everything the shell *owns* — its HTML/JS/CSS, `inject.js`,
+`meta.json`, `groups.json`, the injected difit document, and the filtered
+`/api/diff` — is served `Cache-Control: no-store` (`send_bytes_nostore` in
+`web/server.rs`). This is load-bearing: the frontend is compiled into the binary,
+so after `dif` relaunches with a rebuilt frontend a cached copy would keep the
+browser running stale code (e.g. an old "Show new changes" handler that never
+clears). difit's own content-hashed static bundle still goes through plain
+`send_bytes` and stays cacheable.
+
+The served page also appends a per-build tag (`shell.js?v=<hash>`,
+`shell.css?v=<hash>`; the hash covers all embedded frontend assets) so even a
+browser that ignored `no-store` for an already-cached entry fetches the current
+frames after a relaunch, because the URL itself changes.
+
+The **browser web shell** can trigger the same regeneration from its "Regenerate"
+button. Since the shell server thread can't type into the claude pane, it bridges
+through a shared flag: `POST /__wrap/regenerate` sets `Ctx::regen`
+(`Arc<AtomicBool>`) and returns `202`; the event loop polls
+`WebShell::take_regen_request()` each tick (`App::poll_web_shell_requests`) and
+runs the same `regenerate_guide()`. Both the TUI guide view and the shell's
+`groups.json` poll then pick up the rewritten guide.
 
 ## The claude pane
 
