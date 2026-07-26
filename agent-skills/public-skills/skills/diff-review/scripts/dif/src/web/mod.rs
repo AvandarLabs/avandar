@@ -26,11 +26,11 @@ pub mod server;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread::JoinHandle;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use tiny_http::Server;
 
 use server::Ctx;
@@ -64,12 +64,15 @@ impl WebShell {
     ///
     /// `branch` titles the header; `worktree` is the checkout's directory name,
     /// shown as a pill when it differs from the branch.
+    #[allow(clippy::too_many_arguments)]
     pub fn start(
         difit_port: u16,
         shell_port: u16,
         guide_json_path: PathBuf,
         branch: String,
         worktree: String,
+        diff_summary_path: PathBuf,
+        test_plan_path: PathBuf,
     ) -> Result<Self> {
         let server = Server::http(("127.0.0.1", shell_port))
             .map_err(|e| anyhow!("web shell failed to bind port {shell_port}: {e}"))?;
@@ -78,6 +81,8 @@ impl WebShell {
         let ctx = Arc::new(Ctx {
             difit_port,
             guide_json_path,
+            diff_summary_path,
+            test_plan_path,
             branch,
             worktree,
             regen: Arc::clone(&regen),
@@ -85,7 +90,12 @@ impl WebShell {
         });
         let srv = Arc::clone(&server);
         let handle = std::thread::spawn(move || server::serve(&srv, &ctx));
-        Ok(Self { port: shell_port, server, handle: Some(handle), regen })
+        Ok(Self {
+            port: shell_port,
+            server,
+            handle: Some(handle),
+            regen,
+        })
     }
 
     /// Take a pending "regenerate the diff guide" request from the browser,

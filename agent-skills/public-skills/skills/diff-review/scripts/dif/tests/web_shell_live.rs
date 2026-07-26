@@ -11,7 +11,11 @@ use std::time::{Duration, Instant};
 use dif::web::WebShell;
 
 fn free_port() -> u16 {
-    TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port()
+    TcpListener::bind("127.0.0.1:0")
+        .unwrap()
+        .local_addr()
+        .unwrap()
+        .port()
 }
 
 /// Kills the difit child on drop so a panicking assertion can't leak a
@@ -25,7 +29,12 @@ impl Drop for Difit {
 }
 
 fn git(dir: &std::path::Path, args: &[&str]) {
-    let ok = Command::new("git").args(args).current_dir(dir).status().unwrap().success();
+    let ok = Command::new("git")
+        .args(args)
+        .current_dir(dir)
+        .status()
+        .unwrap()
+        .success();
     assert!(ok, "git {args:?} failed");
 }
 
@@ -43,12 +52,23 @@ fn injects_and_filters_against_real_difit() {
     git(root, &["add", "-A"]);
     git(root, &["commit", "-qm", "init"]);
     // Working-tree changes to review.
-    std::fs::write(root.join("a.ts"), "export const a = 11;\nexport const added = true;\n").unwrap();
+    std::fs::write(
+        root.join("a.ts"),
+        "export const a = 11;\nexport const added = true;\n",
+    )
+    .unwrap();
     std::fs::write(root.join("b.ts"), "export const b = 22;\n").unwrap();
 
     let difit_port = free_port();
     let child = Command::new("difit")
-        .args([".", "--port", &difit_port.to_string(), "--no-open", "--keep-alive", "--include-untracked"])
+        .args([
+            ".",
+            "--port",
+            &difit_port.to_string(),
+            "--no-open",
+            "--keep-alive",
+            "--include-untracked",
+        ])
         .current_dir(root)
         .spawn()
         .expect("difit must be on PATH for this test");
@@ -57,7 +77,10 @@ fn injects_and_filters_against_real_difit() {
     // Wait for difit to answer.
     let deadline = Instant::now() + Duration::from_secs(10);
     loop {
-        if ureq::get(&format!("http://localhost:{difit_port}/api/diff")).call().is_ok() {
+        if ureq::get(&format!("http://localhost:{difit_port}/api/diff"))
+            .call()
+            .is_ok()
+        {
             break;
         }
         assert!(Instant::now() < deadline, "difit never became ready");
@@ -73,23 +96,50 @@ fn injects_and_filters_against_real_difit() {
     .unwrap();
 
     let shell_port = free_port();
-    let mut shell =
-        WebShell::start(difit_port, shell_port, guide, "feat/web-shell".into(), "web-shell".into())
-            .unwrap();
+    let mut shell = WebShell::start(
+        difit_port,
+        shell_port,
+        guide,
+        "feat/web-shell".into(),
+        "web-shell".into(),
+        root.join("summary.md"),
+        root.join("test-plan.md"),
+    )
+    .unwrap();
     std::thread::sleep(Duration::from_millis(50));
     let base = format!("http://127.0.0.1:{shell_port}");
 
     // 1) difit document is proxied AND our script is injected.
-    let doc = ureq::get(&format!("{base}/__wrap/difit")).call().unwrap().into_string().unwrap();
-    assert!(doc.contains(r#"<script src="/__wrap/inject.js"></script>"#), "script injected");
-    assert!(doc.contains("id=\"root\"") || doc.to_lowercase().contains("<div id=root"), "difit markup present");
+    let doc = ureq::get(&format!("{base}/__wrap/difit"))
+        .call()
+        .unwrap()
+        .into_string()
+        .unwrap();
+    assert!(
+        doc.contains(r#"<script src="/__wrap/inject.js"></script>"#),
+        "script injected"
+    );
+    assert!(
+        doc.contains("id=\"root\"") || doc.to_lowercase().contains("<div id=root"),
+        "difit markup present"
+    );
 
     // 2) Unfiltered /api/diff has both files.
-    let full: serde_json::Value =
-        ureq::get(&format!("{base}/api/diff")).call().unwrap().into_json().unwrap();
-    let full_paths: Vec<&str> =
-        full["files"].as_array().unwrap().iter().map(|f| f["path"].as_str().unwrap()).collect();
-    assert!(full_paths.contains(&"a.ts") && full_paths.contains(&"b.ts"), "full diff has both: {full_paths:?}");
+    let full: serde_json::Value = ureq::get(&format!("{base}/api/diff"))
+        .call()
+        .unwrap()
+        .into_json()
+        .unwrap();
+    let full_paths: Vec<&str> = full["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| f["path"].as_str().unwrap())
+        .collect();
+    assert!(
+        full_paths.contains(&"a.ts") && full_paths.contains(&"b.ts"),
+        "full diff has both: {full_paths:?}"
+    );
 
     // 3) With a group-1 Referer, /api/diff is filtered to just a.ts, and the
     //    identity-bearing fields are unchanged (so the shared viewed key holds).
@@ -99,11 +149,22 @@ fn injects_and_filters_against_real_difit() {
         .unwrap()
         .into_json()
         .unwrap();
-    let filtered_paths: Vec<&str> =
-        filtered["files"].as_array().unwrap().iter().map(|f| f["path"].as_str().unwrap()).collect();
-    assert_eq!(filtered_paths, vec!["a.ts"], "group 1 filtered to a.ts only");
+    let filtered_paths: Vec<&str> = filtered["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| f["path"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        filtered_paths,
+        vec!["a.ts"],
+        "group 1 filtered to a.ts only"
+    );
     for key in ["baseCommitish", "targetCommitish", "commit"] {
-        assert_eq!(filtered[key], full[key], "field {key} must survive filtering");
+        assert_eq!(
+            filtered[key], full[key],
+            "field {key} must survive filtering"
+        );
     }
 
     // 4) SSE endpoint STREAMS (not buffered): headers must arrive promptly with
@@ -114,7 +175,11 @@ fn injects_and_filters_against_real_difit() {
         .get(&format!("{base}/api/watch"))
         .call()
         .expect("SSE headers should stream through promptly (not buffer)");
-    assert_eq!(watch.content_type(), "text/event-stream", "watch is streamed as SSE");
+    assert_eq!(
+        watch.content_type(),
+        "text/event-stream",
+        "watch is streamed as SSE"
+    );
     drop(watch); // never read the infinite body
 
     // 5) Comment round-trip through the shell: POST an import, then read it back

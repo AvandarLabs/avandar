@@ -220,7 +220,7 @@ fn handle_difit_keys(app: &mut App, k: &KeyEvent) {
         KeyCode::Down => app.scroll_focused_down(SCROLL_STEP),
         KeyCode::PageUp => app.scroll_focused_up(PAGE_STEP),
         KeyCode::PageDown => app.scroll_focused_down(PAGE_STEP),
-        KeyCode::Char(c) if app.guide_view_active() => app.guide_vim_char(c),
+        KeyCode::Char(c) if app.markdown_view_active() => app.guide_vim_char(c),
         _ => {}
     }
 }

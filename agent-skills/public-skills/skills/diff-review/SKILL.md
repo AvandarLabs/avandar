@@ -103,16 +103,19 @@ Examples on branch `feat/share`:
 Defaults match `dif`: no argument → `develop` if it exists, else `main`.
 
 Two sibling files share the same `<branch-slug>-difit-<scope-slug>` stem and are
-owned by **this skill** (the `dif` TUI reads the guide to render it but never
-writes either):
+owned by **this skill** (the `dif` TUI reads the guide and test plan to render
+them but never writes them):
 
 ```
 <repo>/.difit/<branch-slug>-difit-<scope-slug>-guide.md        # the diff guide
+<repo>/.difit/<branch-slug>-difit-<scope-slug>-summary.md      # high-level diff summary
+<repo>/.difit/<branch-slug>-difit-<scope-slug>-test-plan.md    # manual test plan
 <repo>/.difit/<branch-slug>-difit-<scope-slug>-reviewed.json   # reviewed state
 ```
 
 e.g. on `feat/share` with `develop`: `feat-share-difit-at-develop-guide.md` and
-`feat-share-difit-at-develop-reviewed.json`. See [The diff guide](#the-diff-guide).
+`feat-share-difit-at-develop-reviewed.json`. See [The diff guide](#the-diff-guide)
+and [The diff summary and test plan](#the-diff-summary-and-test-plan).
 
 ### Comment shape
 
@@ -439,11 +442,13 @@ work reviewed, fully-reviewed groups drop out of the *rendered* view. **When you
 (re)write it, though, it must list _every_ file then in the diff** — completeness
 at write time is a hard rule (see [Completeness](#completeness--the-guide-lists-every-file-in-the-diff)).
 
-You own three files (the TUI only reads the guide markdown):
+You own five files:
 
 - `…-guide.md` — the rendered guide (below).
 - `…-guide.json` — the **structured** form of the guide (below), consumed by the
   browser web shell's sidebar. Write it whenever you write `…-guide.md`.
+- `…-summary.md` — the high-level diff summary.
+- `…-test-plan.md` — the manual test plan.
 - `…-reviewed.json` — the reviewed state that drives what the guide shows.
 
 ### Completeness — the guide lists every file in the diff
@@ -616,6 +621,42 @@ per group, using the **same grouping and stable numbers** as the markdown:
   (reviewed groups + files) and the guide (what remains). The guide alone only
   shows what's left; the reviewed state is where the done work is recorded.
 
+### The diff summary and test plan
+
+The diff summary and test plan are part of the **diff guide umbrella**, but they
+are separate artifacts:
+
+- `…-summary.md` is rendered in the browser web shell's left sidebar under the
+  "Diff guide" title, before the "Full diff" row.
+- `…-test-plan.md` is rendered in its own TUI tab and in the browser web shell's
+  "Test plan" sidebar tab. It is **not** appended to or rendered inside the diff
+  guide markdown.
+
+Write both files when you create the guide for a new review. When regenerating
+the diff guide, decide whether each file should be regenerated. Do not
+regenerate them reflexively: a file-list-only regrouping usually does not change
+the manual test plan, while bug fixes, new features, behavior changes, or
+functional enhancements often do.
+
+**Diff summary rules (`…-summary.md`):**
+
+- At most **3 sentences**. Never write a fourth sentence.
+- Describe the diff at a high level: what area it touches and what changed.
+- Do not list every file, repeat the chat summary, or include test steps.
+
+**Test plan rules (`…-test-plan.md`):**
+
+- Use a numbered markdown list for the manual steps.
+- Steps must be manual and concrete. If browser testing is needed, tell the
+  user exactly where to go and what to click.
+- If a script or command should be run, include the exact command in a fenced
+  code block so the web shell can render it with a copy icon.
+- If the user needs to copy any non-command text, put that text in a blockquote
+  (or another clearly separated markdown block) so the web shell can render it
+  with a copy icon.
+- Keep generated copy text literal. Do not say "copy the sample above" unless
+  the exact sample text is present in the artifact.
+
 ### Diff guide mode (the workflow)
 
 1. Resolve repo root, branch, comparison key, and the two file paths.
@@ -627,7 +668,9 @@ per group, using the **same grouping and stable numbers** as the markdown:
    numbers from `groups`; append new groups with the next number.
 5. Recompute reviewed-file signatures; demote any that changed (above).
 6. Write `-reviewed.json`, then write `-guide.md` and `-guide.json` (both omit
-   fully-reviewed groups; keep them in lockstep).
+   fully-reviewed groups; keep them in lockstep). Decide whether `-summary.md`
+   and `-test-plan.md` also need to be regenerated, and rewrite only the ones
+   whose content is stale.
 7. In chat, briefly confirm what changed (e.g. "Group 2 marked reviewed and
    dropped from the guide; 3 files left across Groups 1 and 3."). Do not paste
    the whole guide — the reviewer reads it in the `dif` Diff guide view.
@@ -660,9 +703,11 @@ Use when there's no live conversation to continue.
    real thread, etc.). It exits non-zero on any failure. If it fails, fix
    the issues and re-run before printing the summary — a transcript that
    fails validation will crash `dif` on launch.
-7. **Write the diff guide** (`…-guide.md` **and** `…-guide.json`) and initialize
-   `…-reviewed.json` with the groups you just derived (empty `reviewedGroups` /
-   `reviewedFiles`). See [The diff guide](#the-diff-guide).
+7. **Write the diff guide** (`…-guide.md` **and** `…-guide.json`), write
+   `…-summary.md`, write `…-test-plan.md`, and initialize `…-reviewed.json` with
+   the groups you just derived (empty `reviewedGroups` / `reviewedFiles`). See
+   [The diff guide](#the-diff-guide) and
+   [The diff summary and test plan](#the-diff-summary-and-test-plan).
 8. Print the chat summary per **Required chat output**.
 
 Do not commit, push, merge, or change source files in initial mode.
@@ -784,8 +829,10 @@ file, put the replacement code right in the comment.
 Same machinery as Initial mode. `mkdir -p .difit`, write the transcript at
 `<repo>/.difit/<branch-slug>-difit-<scope-slug>.json` (here the branch slug is
 `review-pr-<number>` and the scope is the base branch), validate it with
-`validate.py`, then write the diff guide and initialize the reviewed state. See
-[Initial mode](#initial-mode) steps 5–7 and [The diff guide](#the-diff-guide).
+`validate.py`, then write the diff guide, diff summary, test plan, and reviewed
+state. See [Initial mode](#initial-mode) steps 5–7,
+[The diff guide](#the-diff-guide), and
+[The diff summary and test plan](#the-diff-summary-and-test-plan).
 
 ### 5. Report
 
@@ -917,7 +964,8 @@ policy in step 3). Then:
 - **Regenerate the diff guide.** Because you changed code, the guide is now
   stale: rewrite `…-guide.md` (and refresh reviewed-file signatures, demoting any
   reviewed file you just edited to `⚠️ changed since review`) per
-  [The diff guide](#the-diff-guide). This keeps the `dif` Diff guide view honest
+  [The diff guide](#the-diff-guide). Also decide whether `…-summary.md` and
+  `…-test-plan.md` need updates. This keeps the `dif` Diff guide view honest
   without a `Ctrl+G`.
 
 The verbatim "chat == difit reply" rule applies to **Case A only**.
@@ -1095,17 +1143,20 @@ For `/diff-review cleanup`:
 1. List local branches with `git for-each-ref --format='%(refname:short)' refs/heads`.
 2. Slugify each branch using the same rules as `dif`.
 3. Inspect every `.difit/*-difit-*.json`, `.difit/*-difit-*-guide.md`,
-   `.difit/*-difit-*-guide.json`, `.difit/*-difit-*-reviewed.json`, and
+   `.difit/*-difit-*-guide.json`, `.difit/*-difit-*-summary.md`,
+   `.difit/*-difit-*-test-plan.md`, `.difit/*-difit-*-reviewed.json`, and
    `.difit/.session-*.json`.
 4. Keep files whose `<branch-slug>` prefix matches an existing branch.
 5. For prefix mismatches that look like a rename (exactly one stale file
    with the suffix, and the current branch has no file with that suffix),
    rename it to the current branch's slug. Move a review's whole file set
-   together (transcript + `-guide.md` + `-guide.json` + `-reviewed.json`).
+   together (transcript + `-guide.md` + `-guide.json` + `-summary.md` +
+   `-test-plan.md` + `-reviewed.json`).
 6. Delete the rest, including stale `.session-*.json` files for branches that
    no longer exist (and any leftover `.watcher-*.log` files from the retired
    Python watcher). When you delete a transcript, delete its `-guide.md`,
-   `-guide.json`, and `-reviewed.json` siblings too. Report renames and deletions.
+   `-guide.json`, `-summary.md`, `-test-plan.md`, and `-reviewed.json` siblings
+   too. Report renames and deletions.
 7. Never touch files outside `.difit/`. Don't delete the `.session-*.json` for
    a branch that still exists — a `dif` session may be live and writing it.
 
@@ -1117,6 +1168,8 @@ For `/diff-review cleanup`:
 | Transcript | `<repo>/.difit/<branch-slug>-difit-<scope-slug>.json` |
 | Diff guide | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-guide.md` |
 | Structured guide (web shell) | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-guide.json` |
+| Diff summary | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-summary.md` |
+| Test plan | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-test-plan.md` |
 | Reviewed state | `<repo>/.difit/<branch-slug>-difit-<scope-slug>-reviewed.json` |
 | Session metadata | `<repo>/.difit/.session-<branch-slug>-<scope-slug>.json` |
 | Slug rules | `scripts/dif/src/comparison.rs` + `scripts/dif/src/slug.rs` (bundled CLI) |

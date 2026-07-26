@@ -16,7 +16,7 @@ src/
 ├── slug.rs            slugify, branch_slug, deterministic port_for
 ├── git.rs             repo_root, current_branch, default-comparison, diff_signature
 ├── git_watcher.rs     background thread publishing the repo's diff signature
-├── paths.rs           .difit transcript + session-id + guide + reviewed-state paths
+├── paths.rs           .difit transcript + session-id + guide + summary + test-plan + reviewed-state paths
 ├── session.rs         pure LLM command builder (resume/fresh + prompt)
 ├── pty_pane.rs        PTY-backed pane parsed through vt100 (reused by both panes)
 ├── difit/
@@ -34,11 +34,11 @@ src/
     ├── startup.rs     spawn LLM, start difit now or wait for review artifacts, assemble App
     ├── app.rs         App state + delayed difit startup + focus + main-view switching + inject + scroll + palette/restart
     ├── control.rs     local POST /comparison endpoint for live comparison retargeting while the TUI is waiting
-    ├── draw.rs        two-half layout, main-view tab strip + log/guide routing, palette overlay
+    ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
     ├── palette.rs     command registry (PALETTE_COMMANDS) + PaletteState
-    ├── main_diff_view.rs  the MainDiffView cycle (log view ↔ diff guide view)
-    ├── guide.rs       diff guide view state: styled markdown (re-read on change) + a cursor overlay (cursor is source of truth; scroll derived to keep it visible)
+    ├── main_diff_view.rs  the MainDiffView cycle (log view ↔ test plan ↔ diff guide)
+    ├── guide.rs       markdown view state: styled markdown (re-read on change) + a cursor overlay (cursor is source of truth; scroll derived to keep it visible)
     ├── vim.rs         pure vim-motion parser (count/gg prefixes) → VimMotion
     ├── open_target.rs  pure path/URL token parsing + classify; opener (nvim new tab/tmux, else `open`)
     ├── markdown/      diff-guide markdown → ratatui Text (mod.rs walk, inline.rs, table.rs)
@@ -50,16 +50,16 @@ src/
 
 No file exceeds 400 lines; modules are single-purpose. The main diff pane shows
 one `MainDiffView` at a time: the **log view** (difit's `vt100` screen, or a
-waiting status before difit starts) or the **diff guide view** (`guide.rs`
-markdown rendered by `markdown/`). `dif` starts focused on this pane (in the log
-view), with the LLM pane already working from its auto-submitted initial prompt
-(see [integrations.md](integrations.md)).
+waiting status before difit starts), the **test plan view**, or the **diff guide
+view** (`guide.rs` markdown rendered by `markdown/`). `dif` starts focused on
+this pane (in the log view), with the LLM pane already working from its
+auto-submitted initial prompt (see [integrations.md](integrations.md)).
 
-## Diff guide navigation
+## Markdown navigation
 
-The diff guide view is a basic vim pager with a **visible cursor**, drawn over
-the fully **styled** (colored) markdown render — `dif` keeps the heading colors,
-bold, code, and tables. The cursor `(row, col)` in `Guide` is the single source
+The test plan and diff guide views are basic vim pagers with a **visible
+cursor**, drawn over the fully **styled** (colored) markdown render. `dif` keeps
+the heading colors, bold, code, and tables. The cursor `(row, col)` in `Guide` is the single source
 of truth: motions move it, and the scroll is *derived* each frame to keep it on
 screen (`Guide::ensure_visible`, minimal movement). The draw layer renders the
 styled `Text`, hands `Guide` the plain text of each line (to clamp the cursor /
@@ -68,7 +68,7 @@ cursor at the cursor cell (`f.set_cursor_position`, the same mechanism the PTY
 panes use).
 
 `event_loop.rs` routes bare letters to `vim::VimState` (the pure motion grammar:
-counts, `gg`, etc.) while the guide view is active, and `app::App::apply_guide_motion`
+counts, `gg`, etc.) while a markdown view is active, and `app::App::apply_guide_motion`
 maps each `VimMotion` onto a `Guide` cursor move. `o` reads the token under the
 cursor (`Guide::target_under_cursor` → `open_target` pure parse + classify) and
 opens the result; only the final `open_target::open` (and the browser-open for
@@ -135,7 +135,7 @@ LLM pane starts with /diff-review [comparison]
 diff-review skill may POST selected comparison to control.rs
         │
         ▼
-diff-review skill writes .difit transcript + guide.md + guide.json
+diff-review skill writes .difit transcript + guide.md + guide.json + summary.md + test-plan.md
         │
         ▼
 App::update_difit_log sees review_files_ready()

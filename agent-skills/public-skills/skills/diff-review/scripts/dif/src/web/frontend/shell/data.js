@@ -24,6 +24,31 @@
       .catch(function () { /* keep last known guide */ });
   }
 
+  function applySummary(text) {
+    if (text === lastSummaryText) return;
+    lastSummaryText = text;
+    diffSummary = text.trim();
+    renderAll();
+  }
+  function fetchSummary() {
+    fetch("/__wrap/diff-summary.md", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error("summary " + r.status)); })
+      .then(applySummary)
+      .catch(function () { /* keep last known summary */ });
+  }
+  function applyTestPlan(text) {
+    if (text === lastTestPlanText) return;
+    lastTestPlanText = text;
+    testPlan = text;
+    renderAll();
+  }
+  function fetchTestPlan() {
+    fetch("/__wrap/test-plan.md", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error("test-plan " + r.status)); })
+      .then(applyTestPlan)
+      .catch(function () { /* keep last known test plan */ });
+  }
+
   // ---- data: header identity (branch + worktree pill) ----
   function applyMeta(meta) {
     if (!meta || typeof meta !== "object") return;

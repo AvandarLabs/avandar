@@ -47,6 +47,8 @@ appends `claude`-authored replies. See the injection contract in
 | `.session-<branch>-<scope>.json` | startup | live-session metadata (ports, pid, transcript, comparison, control URL) for the skill |
 | `<branch>-difit-<scope>-guide.md` | the `diff-review` skill | the rendered diff guide (read by the diff guide view) |
 | `<branch>-difit-<scope>-guide.json` | the `diff-review` skill | the structured guide the web-shell sidebar reads |
+| `<branch>-difit-<scope>-summary.md` | the `diff-review` skill | the high-level diff summary shown in the web-shell sidebar |
+| `<branch>-difit-<scope>-test-plan.md` | the `diff-review` skill | the manual test plan shown in the TUI Test plan tab and web-shell sidebar tab |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
 
 Writes to the transcript are atomic (temp file + rename). They all share the
@@ -76,16 +78,20 @@ already-open waiting TUI, so `dif` can retarget its in-memory paths and ports
 before starting difit. The endpoint returns `202` while the review is still
 offline and `409` after the review is online.
 
-### The diff guide and reviewed-state files
+### The diff guide, summary, test plan, and reviewed-state files
 
-These two are owned end-to-end by the `diff-review` skill; `dif` **reads**
-the guide markdown to render it and never writes either. The Rust side only
-provides the path helpers (`paths::guide_path`, `paths::reviewed_state_path`) so
-both halves agree on the names.
+These files are owned end-to-end by the `diff-review` skill; `dif` **reads**
+the guide and test-plan markdown to render them and never writes them. The Rust
+side only provides the path helpers so both halves agree on the names.
 
 - **`-guide.md`** — GitHub-flavored markdown. Always a guide to what is *left* to
   review, organized as numbered groups (`Group 1`, `Group 2`, …). The diff guide
   view renders headings, bold/italic, inline code, lists, and tables.
+- **`-summary.md`** — markdown containing at most three sentences. The browser
+  web shell shows it under the "Diff guide" title before the "Full diff" row.
+- **`-test-plan.md`** — markdown containing numbered manual test steps. The TUI
+  renders it in a separate Test plan tab before Diff guide; the browser web
+  shell renders it in a separate sidebar tab, not inside the guide.
 - **`-reviewed.json`** — the reviewed state the skill consults to keep the guide
   current. Shape is the skill's to define and evolve; conceptually it records
   which group numbers are fully reviewed (and thus dropped from the guide) and

@@ -8,7 +8,11 @@
   selectView("full"); // mount difit immediately; the guide fills in around it
   fetchMeta();
   fetchGroups();
+  fetchSummary();
+  fetchTestPlan();
   fetchDiff(); // authoritative file counts + "new files not in guide"
   window.setInterval(fetchGroups, 3000); // reflect the skill regenerating the guide
+  window.setInterval(fetchSummary, 3000);
+  window.setInterval(fetchTestPlan, 3000);
   window.setInterval(fetchDiff, 3000);   // keep counts + new-files + show-changes in sync
 })();

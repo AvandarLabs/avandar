@@ -45,7 +45,7 @@ const LLM_ATTRIBUTION_WINDOW: Duration = Duration::from_secs(120);
 /// The prompt `Ctrl+G` (and the palette's "Regenerate diff guide") types into
 /// the LLM pane. Intentionally minimal: the skill derives the paths itself.
 const REGENERATE_GUIDE_PROMPT: &str = "Regenerate the diff guide for this review using the diff-review skill, \
-     then write it to the guide markdown file under .difit/.";
+     and decide whether the diff summary and test plan need to be regenerated too.";
 
 /// Which pane currently receives input / scroll.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -112,6 +112,8 @@ pub struct App {
     pub active_diff_view: MainDiffView,
     /// The diff guide view's backing markdown + scroll.
     pub guide: Guide,
+    /// The test plan view's backing markdown + scroll.
+    pub test_plan: Guide,
     /// Vim-motion accumulator for the diff guide view (count + `gg` prefix).
     pub vim: VimState,
     /// The live-session metadata file, removed on exit.
@@ -134,6 +136,10 @@ pub struct App {
     pub control_port: u16,
     /// Structured guide path required by the browser shell.
     pub guide_json_path: PathBuf,
+    /// High-level diff summary path served by the browser shell.
+    pub diff_summary_path: PathBuf,
+    /// Manual test plan path served by the browser shell and rendered in TUI.
+    pub test_plan_path: PathBuf,
     /// Current branch name used in browser shell metadata.
     pub branch: String,
     /// Current worktree name used in browser shell metadata.
@@ -276,11 +282,15 @@ impl App {
             paths::llm_session_id_path(&self.repo_root, self.agent_kind, &branch_slug, &scope_slug);
         self.session_meta = paths::session_meta_path(&self.repo_root, &branch_slug, &scope_slug);
         self.guide_json_path = paths::guide_json_path(&self.repo_root, &branch_slug, &scope_slug);
+        self.diff_summary_path =
+            paths::diff_summary_path(&self.repo_root, &branch_slug, &scope_slug);
+        self.test_plan_path = paths::test_plan_path(&self.repo_root, &branch_slug, &scope_slug);
         self.guide = Guide::new(paths::guide_path(
             &self.repo_root,
             &branch_slug,
             &scope_slug,
         ));
+        self.test_plan = Guide::new(self.test_plan_path.clone());
         self.vim.reset();
         self.comparison = comparison;
         self.difit.write_to_screen(&format!(
@@ -408,6 +418,7 @@ impl App {
             }
         }
         self.guide.refresh();
+        self.test_plan.refresh();
         self.warn_if_code_changed();
     }
 
@@ -455,11 +466,14 @@ impl App {
             self.guide_json_path.clone(),
             self.branch.clone(),
             self.worktree.clone(),
+            self.diff_summary_path.clone(),
+            self.test_plan_path.clone(),
         )
         .ok();
-        let open_url = web_shell
-            .as_ref()
-            .map_or_else(|| format!("http://localhost:{}/", self.port), web::WebShell::url);
+        let open_url = web_shell.as_ref().map_or_else(
+            || format!("http://localhost:{}/", self.port),
+            web::WebShell::url,
+        );
         session_meta::write(&self.session_meta, &self.session_meta_for(open_url.clone()));
         self.web_shell = web_shell;
         self.open_url = Some(open_url.clone());
@@ -469,6 +483,7 @@ impl App {
         self.pending_change = None;
         self.warned_sig = None;
         self.guide.refresh();
+        self.test_plan.refresh();
         super::open_target::open_url(&open_url);
     }
 
@@ -564,18 +579,30 @@ impl App {
         }
     }
 
-    /// Whether the diff guide view is the active main view.
+    /// Whether a markdown-backed main view is active.
     #[must_use]
-    pub fn guide_view_active(&self) -> bool {
-        self.focus == Panel::Difit && self.active_diff_view == MainDiffView::Guide
+    pub fn markdown_view_active(&self) -> bool {
+        self.focus == Panel::Difit
+            && matches!(
+                self.active_diff_view,
+                MainDiffView::TestPlan | MainDiffView::Guide
+            )
+    }
+
+    const fn active_markdown(&mut self) -> &mut Guide {
+        match self.active_diff_view {
+            MainDiffView::TestPlan => &mut self.test_plan,
+            _ => &mut self.guide,
+        }
     }
 
     /// Scroll up by `n` rows (mouse wheel / arrows / PageUp). In the diff guide
     /// view this moves the cursor (the view follows it); otherwise the focused
     /// PTY pane scrolls.
     pub fn scroll_focused_up(&mut self, n: usize) {
-        if self.guide_view_active() {
-            self.guide.cursor_up(u16::try_from(n).unwrap_or(u16::MAX));
+        if self.markdown_view_active() {
+            self.active_markdown()
+                .cursor_up(u16::try_from(n).unwrap_or(u16::MAX));
         } else if let Some(pane) = self.focused_pane() {
             pane.scroll_up(n);
         }
@@ -583,8 +610,9 @@ impl App {
 
     /// Scroll down by `n` rows (mouse wheel / arrows / PageDown).
     pub fn scroll_focused_down(&mut self, n: usize) {
-        if self.guide_view_active() {
-            self.guide.cursor_down(u16::try_from(n).unwrap_or(u16::MAX));
+        if self.markdown_view_active() {
+            self.active_markdown()
+                .cursor_down(u16::try_from(n).unwrap_or(u16::MAX));
         } else if let Some(pane) = self.focused_pane() {
             pane.scroll_down(n);
         }
@@ -596,11 +624,11 @@ impl App {
     /// Intercepted before keys reach the LLM, so it fires while the LLM is
     /// focused too.
     pub fn scroll_focused_half_page(&mut self, up: bool) {
-        if self.guide_view_active() {
+        if self.markdown_view_active() {
             if up {
-                self.guide.half_page_up();
+                self.active_markdown().half_page_up();
             } else {
-                self.guide.half_page_down();
+                self.active_markdown().half_page_down();
             }
         } else if let Some(pane) = self.focused_pane() {
             let step = half_page_step(pane.rows);
@@ -612,8 +640,8 @@ impl App {
         }
     }
 
-    /// Feed a character to the diff guide's vim navigator and apply the motion
-    /// it completes, if any. Only meaningful while the guide view is active.
+    /// Feed a character to the active markdown view's vim navigator and apply
+    /// the motion it completes, if any.
     pub fn guide_vim_char(&mut self, c: char) {
         if let Some(motion) = self.vim.feed(c) {
             self.apply_guide_motion(motion);
@@ -623,16 +651,16 @@ impl App {
     /// Apply a completed [`VimMotion`] to the diff guide view.
     fn apply_guide_motion(&mut self, motion: VimMotion) {
         match motion {
-            VimMotion::Down(n) => self.guide.cursor_down(n),
-            VimMotion::Up(n) => self.guide.cursor_up(n),
-            VimMotion::Left(n) => self.guide.cursor_left(n),
-            VimMotion::Right(n) => self.guide.cursor_right(n),
-            VimMotion::WordForward(n) => self.guide.word_forward(n),
-            VimMotion::WordBack(n) => self.guide.word_back(n),
-            VimMotion::HalfPageDown => self.guide.half_page_down(),
-            VimMotion::HalfPageUp => self.guide.half_page_up(),
-            VimMotion::Top => self.guide.to_top(),
-            VimMotion::Bottom => self.guide.to_bottom(),
+            VimMotion::Down(n) => self.active_markdown().cursor_down(n),
+            VimMotion::Up(n) => self.active_markdown().cursor_up(n),
+            VimMotion::Left(n) => self.active_markdown().cursor_left(n),
+            VimMotion::Right(n) => self.active_markdown().cursor_right(n),
+            VimMotion::WordForward(n) => self.active_markdown().word_forward(n),
+            VimMotion::WordBack(n) => self.active_markdown().word_back(n),
+            VimMotion::HalfPageDown => self.active_markdown().half_page_down(),
+            VimMotion::HalfPageUp => self.active_markdown().half_page_up(),
+            VimMotion::Top => self.active_markdown().to_top(),
+            VimMotion::Bottom => self.active_markdown().to_bottom(),
             VimMotion::Open => self.open_under_cursor(),
         }
     }
@@ -640,7 +668,11 @@ impl App {
     /// Open the path/URL under the diff guide's cursor (the `o` key). A no-op
     /// when the cursor isn't on a path/URL token.
     fn open_under_cursor(&self) {
-        if let Some(target) = self.guide.target_under_cursor() {
+        let target = match self.active_diff_view {
+            MainDiffView::TestPlan => self.test_plan.target_under_cursor(),
+            _ => self.guide.target_under_cursor(),
+        };
+        if let Some(target) = target {
             open_target::open(&target, &self.repo_root);
         }
     }
