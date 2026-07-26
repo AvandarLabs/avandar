@@ -1,4 +1,4 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /** Workspace dataset + columns used to label SQL tokens for display. */
 export type SqlDisplayCatalog = {

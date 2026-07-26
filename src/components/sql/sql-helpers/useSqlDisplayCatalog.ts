@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { buildSqlDisplayCatalog } from "@/lib/sql/buildSqlDisplayCatalog";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import { buildSqlDisplayCatalog } from "@/components/sql/sql-helpers/buildSqlDisplayCatalog";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 /**
  * Workspace dataset + column catalog for SQL display pills and `@` mentions.

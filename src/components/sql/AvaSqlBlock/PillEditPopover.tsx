@@ -1,10 +1,10 @@
 import { Combobox, useCombobox } from "@mantine/core";
 import { isDefined, propEq } from "@utils";
-import { computeSqlScope } from "$/lib/sql/sqlScope";
+import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope";
 import { useEffect, useRef } from "react";
 import css from "./PillEditPopover.module.css";
-import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 type PillEditPopoverProps = {
   pill: SqlPillClickInfo | null;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { AvaSqlBlock } from "./AvaSqlBlock";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const DATASET_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;

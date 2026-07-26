@@ -7,9 +7,9 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments";
-import { computeSqlScope } from "$/lib/sql/sqlScope";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments";
+import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 export type SqlPillClickInfo =

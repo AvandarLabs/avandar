@@ -1,5 +1,5 @@
 import { propEq } from "@utils";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**

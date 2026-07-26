@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { PillEditPopover } from "./PillEditPopover";
-import type { SqlPillClickInfo } from "@/lib/sql/createSqlDisplayExtension";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const CASES_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;

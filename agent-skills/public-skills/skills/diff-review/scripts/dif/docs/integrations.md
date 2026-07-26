@@ -23,9 +23,14 @@ reply posted by claude shows up in the open browser immediately.
 log). The command is:
 
 ```
-cd <repo> && exec difit <args…> --port <P> --keep-alive --include-untracked [--comment <json>]
+cd <repo> && exec <difit> <args…> --port <P> --keep-alive --include-untracked [--comment <json>]
 ```
 
+- `<difit>` resolves to the repo's local `node_modules/.bin/difit` when it
+  exists (a repo can pin difit as a devDependency so no global install or `PATH`
+  entry is required), and falls back to a bare `difit` from `PATH` for repos
+  with no local install (e.g. non-JS projects). See `difit_program` in
+  `src/difit/server.rs`.
 - `<args…>` come from the comparison key (`.`/`staged`/`working`, or `@ <branch>`).
 - `--port <P>` is a confirmed-free port (we bind-test it first; difit would
   otherwise silently auto-reassign an occupied port and strand the poller).

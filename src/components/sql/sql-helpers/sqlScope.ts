@@ -4,13 +4,13 @@
  * `createSqlDisplayExtension`) to mark out-of-scope column references as
  * errors and to populate the column-pill dropdown.
  */
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
-import { buildSqlDisplaySegments } from "$/lib/sql/buildSqlDisplaySegments.ts";
+import { prop } from "@utils";
+import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments";
 import type {
   SqlDisplayCatalog,
   SqlDisplaySegment,
-} from "$/lib/sql/sqlDisplay.types.ts";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+} from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 export type SqlScope = {
   /** Datasets referenced anywhere in the SQL (catalog-resolved). */

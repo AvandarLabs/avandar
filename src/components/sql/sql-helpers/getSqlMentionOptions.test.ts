@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getSqlMentionOptions } from "@/lib/sql/getSqlMentionOptions";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import { getSqlMentionOptions } from "@/components/sql/sql-helpers/getSqlMentionOptions";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const DS_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;

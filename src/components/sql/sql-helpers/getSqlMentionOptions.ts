@@ -1,5 +1,5 @@
 import { isDefined } from "@utils";
-import type { SqlDisplayCatalog } from "$/lib/sql/sqlDisplay.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 export type SqlMentionOption =
   | {

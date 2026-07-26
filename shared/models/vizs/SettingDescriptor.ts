@@ -1,5 +1,5 @@
 /**
- * # Setting vs. control — viz settings nomenclature
+ * # Setting vs. control: viz settings nomenclature
  *
  * The viz layer makes a deliberate, consistent distinction between
  * **settings** and **controls**. Use these terms everywhere: in code,

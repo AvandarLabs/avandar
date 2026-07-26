@@ -3,13 +3,13 @@
  * name) and known column identifiers. The concatenation of each segment's
  * `value` or `raw` reproduces the original SQL string.
  */
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
+import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
 import type {
   SqlDisplayCatalog,
   SqlDisplaySegment,
-} from "$/lib/sql/sqlDisplay.types.ts";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+} from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type AnnotatedSpan = {
   kind: "dataset" | "column";
