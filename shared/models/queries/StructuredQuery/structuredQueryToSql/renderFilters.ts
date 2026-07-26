@@ -248,8 +248,3 @@ function _renderFilterGroupSql(group: QueryFilterGroup): string {
   });
   return parts.filter(Boolean).join(` ${group.combinator} `);
 }
-
-/**
- * Apply each join in order to the knex query builder. Subquery joins use
- * `knex.raw` so we don't need to recursively build a knex sub-builder.
- */

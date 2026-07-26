@@ -7,6 +7,10 @@ import type {
 import type { Knex } from "knex";
 import { quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 
+/**
+ * Apply each join in order to the knex query builder. Subquery joins use
+ * `knex.raw` so we don't need to recursively build a knex sub-builder.
+ */
 export function applyJoins(
   builder: Knex.QueryBuilder,
   joins: readonly QueryJoin[],
