@@ -24,9 +24,11 @@ import { match } from "ts-pattern";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { Knex } from "knex";
-import { applyFilters, applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderFilters.ts";
-import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderJoins.ts";
-import { quoteSqlIdentifier, sql } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
+import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts";
+import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
+import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
@@ -108,23 +110,23 @@ export function structuredQueryToSql(
     const quotedColName = quoteSqlIdentifier(colName);
     if (castTimestampsToISO) {
       return timestampColumnNames.includes(colName) ?
-          sql.raw(
+          sqlBuilder.raw(
             `strftime(${quotedColName}::TIMESTAMP, "'%Y-%m-%dT%H:%M:%S.%fZ') as ${quotedColName}`,
           )
-        : sql.raw(quotedColName);
+        : sqlBuilder.raw(quotedColName);
     }
-    return sql.raw(quotedColName);
+    return sqlBuilder.raw(quotedColName);
   });
 
   let sqlQuery: Knex.QueryBuilder;
   if (nestedSubquery) {
     const alias = nestedSubquery.alias ?? "subq";
     const quotedAlias = quoteSqlIdentifier(alias);
-    sqlQuery = sql
+    sqlQuery = sqlBuilder
       .select(...adjustedColumnNames)
       .fromRaw(`(${nestedSubquery.sql}) as ${quotedAlias}`);
   } else if (tableName) {
-    sqlQuery = sql.select(...adjustedColumnNames).from(tableName);
+    sqlQuery = sqlBuilder.select(...adjustedColumnNames).from(tableName);
   } else {
     return "";
   }
@@ -170,35 +172,35 @@ export function structuredQueryToSql(
       return match(aggType)
         .with("sum", () => {
           return newQuery.select(
-            sql.raw(
+            sqlBuilder.raw(
               `sum(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("avg", () => {
           return newQuery.select(
-            sql.raw(
+            sqlBuilder.raw(
               `avg(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("count", () => {
           return newQuery.select(
-            sql.raw(
+            sqlBuilder.raw(
               `count(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("max", () => {
           return newQuery.select(
-            sql.raw(
+            sqlBuilder.raw(
               `max(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("min", () => {
           return newQuery.select(
-            sql.raw(
+            sqlBuilder.raw(
               `min(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );

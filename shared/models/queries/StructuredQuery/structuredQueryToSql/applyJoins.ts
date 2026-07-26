@@ -5,7 +5,7 @@ import type {
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { Knex } from "knex";
-import { quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 
 /**
  * Apply each join in order to the knex query builder. Subquery joins use
