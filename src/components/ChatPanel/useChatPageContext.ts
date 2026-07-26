@@ -13,8 +13,8 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
  * this, the chat runtime's `useMemo([..., pageContext, ...])` adapter
  * busts on every parent render, and assistant-ui's `__internal_setOptions`
  * effect (which runs on every render) thrashes the in-flight turn. Bug
- * #29 — "after some back-and-forth the canvas stops updating despite the
- * assistant returning correct SQL" — traces back to this object
+ * #29 ("after some back-and-forth the canvas stops updating despite the
+ * assistant returning correct SQL") traces back to this object
  * instability.
  */
 export function useChatPageContext(): ChatPageContext.T {

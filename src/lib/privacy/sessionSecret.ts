@@ -1,3 +1,4 @@
+import { createModule } from "@modules";
 import { APIClient } from "@/clients/APIClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -43,9 +44,7 @@ async function _fetchAndImport(
   return { key, issuedAt: response.issuedAt };
 }
 
-export function getSessionSecret(
-  workspaceId: Workspace.Id,
-): Promise<CachedSecret> {
+function _getSessionSecret(workspaceId: Workspace.Id): Promise<CachedSecret> {
   const cached = CACHE.get(workspaceId);
   if (cached) {
     return cached;
@@ -58,54 +57,64 @@ export function getSessionSecret(
   return promise;
 }
 
-export function clearAll(): void {
-  CACHE.clear();
-}
+export const SessionSecret = createModule("SessionSecret", {
+  builder: () => {
+    return {
+      getSessionSecret: (workspaceId: Workspace.Id): Promise<CachedSecret> => {
+        return _getSessionSecret(workspaceId);
+      },
 
-/**
- * Hash a UTF-8 string with SHA-256 and return the lowercase hex digest.
- * Mirrors the server's `hashTextPayload` so both sides compute the same
- * `payloadHash` for the ack header.
- */
-export async function hashTextPayload(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    TEXT_ENCODER.encode(text),
-  );
-  return _toHex(new Uint8Array(digest));
-}
+      clearAll: (): void => {
+        CACHE.clear();
+      },
 
-/**
- * Issue a signed ack token. Header is base64url-encoded JSON; signature
- * is hex-encoded HMAC-SHA256 over the encoded header. The two are
- * joined by a `.`.
- */
-export async function issueAckToken(args: {
-  workspaceId: Workspace.Id;
-  userId: string;
-  payloadHash: string;
-}): Promise<string> {
-  const { key } = await getSessionSecret(args.workspaceId);
+      /**
+       * Hash a UTF-8 string with SHA-256 and return the lowercase hex digest.
+       * Mirrors the server's `hashTextPayload` so both sides compute the same
+       * `payloadHash` for the ack header.
+       */
+      hashTextPayload: async (text: string): Promise<string> => {
+        const digest = await crypto.subtle.digest(
+          "SHA-256",
+          TEXT_ENCODER.encode(text),
+        );
+        return _toHex(new Uint8Array(digest));
+      },
 
-  const now = Date.now();
-  const header = {
-    nonce: crypto.randomUUID(),
-    workspaceId: args.workspaceId,
-    userId: args.userId,
-    issuedAt: now,
-    expiresAt: now + 5 * 60 * 1000,
-    payloadHash: args.payloadHash,
-  };
-  const headerJson = JSON.stringify(header);
-  const headerB64 = _base64UrlEncode(TEXT_ENCODER.encode(headerJson));
-  const sigBuf = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    TEXT_ENCODER.encode(headerB64),
-  );
-  const sigHex = _toHex(new Uint8Array(sigBuf));
-  return `${headerB64}.${sigHex}`;
-}
+      /**
+       * Issue a signed ack token. Header is base64url-encoded JSON; signature
+       * is hex-encoded HMAC-SHA256 over the encoded header. The two are
+       * joined by a `.`.
+       */
+      issueAckToken: async (args: {
+        workspaceId: Workspace.Id;
+        userId: string;
+        payloadHash: string;
+      }): Promise<string> => {
+        const { key } = await _getSessionSecret(args.workspaceId);
+
+        const now = Date.now();
+        const header = {
+          nonce: crypto.randomUUID(),
+          workspaceId: args.workspaceId,
+          userId: args.userId,
+          issuedAt: now,
+          expiresAt: now + 5 * 60 * 1000,
+          payloadHash: args.payloadHash,
+        };
+        const headerJson = JSON.stringify(header);
+        const headerB64 = _base64UrlEncode(TEXT_ENCODER.encode(headerJson));
+        const sigBuf = await crypto.subtle.sign(
+          "HMAC",
+          key,
+          TEXT_ENCODER.encode(headerB64),
+        );
+        const sigHex = _toHex(new Uint8Array(sigBuf));
+        return `${headerB64}.${sigHex}`;
+      },
+    };
+  },
+});
 
 function _base64Decode(input: string): Uint8Array {
   const bin = atob(input);

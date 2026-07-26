@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
  * side `issueAckToken` (mocked to use a known key) and inline a
  * minimal server-side `verifyAckToken` that mirrors what
  * `supabase/functions/_shared/privacy/ackToken.ts` does. This validates
- * that the wire format the two sides agree on actually round-trips —
+ * that the wire format the two sides agree on actually round-trips,
  * which is what the live integration depends on.
  *
  * If the server-side file changes, this test won't catch it directly,

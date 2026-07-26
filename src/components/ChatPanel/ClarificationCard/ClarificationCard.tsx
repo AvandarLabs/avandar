@@ -13,17 +13,29 @@ import {
   Textarea,
 } from "@mantine/core";
 import { IconAlertCircle, IconHelp } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CLARIFICATION_NONE_OF_ABOVE,
   CLARIFICATION_SOMETHING_ELSE,
   useClarificationNoneOfAboveLabel,
   useClarificationSomethingElseLabel,
-} from "./clarificationAnswer";
-import type { ClarificationSubmitAnswer } from "./clarificationAnswer";
+} from "./clarificationAnswer/clarificationAnswer";
+import type { ClarificationSubmitAnswer } from "./clarificationAnswer/clarificationAnswer";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
-export type { ClarificationSubmitAnswer } from "./clarificationAnswer";
+export type { ClarificationSubmitAnswer } from "./clarificationAnswer/clarificationAnswer";
+
+/** Resolves discovery queries to concrete column values (or an error). */
+export type DiscoveryResolver = (args: {
+  query: string;
+  column: string;
+}) => Promise<{ values: string[] } | { error: string }>;
+
+export type Props = {
+  request: ChatClarifyRequest;
+  onAnswer: (answer: ClarificationSubmitAnswer) => void;
+  resolveDiscovery?: DiscoveryResolver;
+};
 
 /**
  * Inline clarification UI rendered in the chat thread (not modal).
@@ -33,32 +45,15 @@ export type { ClarificationSubmitAnswer } from "./clarificationAnswer";
  *     "None of the above"
  *   - fixed_options single: radio group + custom text + "None of the above"
  */
-export type DiscoveryResolver = (args: {
-  query: string;
-  column: string;
-}) => Promise<{ values: string[] } | { error: string }>;
-
-export type ClarificationCardProps = {
-  request: ChatClarifyRequest;
-  onAnswer: (answer: ClarificationSubmitAnswer) => void;
-  resolveDiscovery?: DiscoveryResolver;
-};
-
 export function ClarificationCard({
   request,
   onAnswer,
   resolveDiscovery,
-}: ClarificationCardProps): JSX.Element {
+}: Props): React.ReactNode {
   const { question, rationale, responseShape, turnNumber } = request;
 
   return (
-    <Paper
-      withBorder
-      shadow="xs"
-      radius="md"
-      p="md"
-      style={{ backgroundColor: "var(--mantine-color-blue-0)" }}
-    >
+    <Paper withBorder shadow="xs" radius="md" p="md" bg="blue.0">
       <Stack gap="sm">
         <Group gap="xs" align="flex-start">
           <IconHelp
@@ -122,7 +117,7 @@ function FreeTextBody({
 }: {
   placeholder: string | undefined;
   onSubmit: (text: string) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLTextAreaElement>(null);
   const { t } = useLingui();
@@ -151,6 +146,9 @@ function FreeTextBody({
           return setValue(e.currentTarget.value);
         }}
         onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) {
+            return;
+          }
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             submit();
@@ -174,8 +172,8 @@ function FixedOptionsBody({
   options: readonly string[];
   multi: boolean;
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
-}): JSX.Element {
-  const [single, setSingle] = useState<string | null>(null);
+}): React.ReactNode {
+  const [single, setSingle] = useState<string>();
   const [multiSelected, setMultiSelected] = useState<string[]>([]);
   const [customText, setCustomText] = useState("");
   const { t } = useLingui();
@@ -221,7 +219,10 @@ function FixedOptionsBody({
       })
     : Boolean(single) && single !== CLARIFICATION_SOMETHING_ELSE);
 
-  const handleKey = (e: React.KeyboardEvent) => {
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (canSubmit) {
@@ -230,14 +231,14 @@ function FixedOptionsBody({
     }
   };
 
-  const handleSingleChange = (value: string) => {
+  const onSingleChange = (value: string) => {
     setSingle(value);
     if (value !== CLARIFICATION_SOMETHING_ELSE) {
       setCustomText("");
     }
   };
 
-  const handleMultiChange = (values: string[]) => {
+  const onMultiChange = (values: string[]) => {
     setMultiSelected(values);
     if (!values.includes(CLARIFICATION_SOMETHING_ELSE)) {
       setCustomText("");
@@ -245,12 +246,12 @@ function FixedOptionsBody({
   };
 
   return (
-    <Stack gap="xs" onKeyDown={handleKey}>
+    <Stack gap="xs" onKeyDown={onKey}>
       {multi ?
         <>
           <Checkbox.Group
             value={multiSelected}
-            onChange={handleMultiChange}
+            onChange={onMultiChange}
             aria-label={t`Pick one or more`}
           >
             <Stack gap={4}>
@@ -276,8 +277,8 @@ function FixedOptionsBody({
           : null}
         </>
       : <Radio.Group
-          value={single}
-          onChange={handleSingleChange}
+          value={single ?? null}
+          onChange={onSingleChange}
           aria-label={t`Pick one`}
         >
           <Stack gap={4}>
@@ -350,7 +351,7 @@ function DiscoveryBody({
   multi: boolean;
   resolveDiscovery: DiscoveryResolver | undefined;
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const [state, setState] = useState<DiscoveryState>({ kind: "loading" });
   const { t } = useLingui();
 
@@ -392,9 +393,7 @@ function DiscoveryBody({
     };
   }, [query, column, resolveDiscovery, t]);
 
-  const queryPreview = useMemo(() => {
-    return query.length > 200 ? `${query.slice(0, 200)}…` : query;
-  }, [query]);
+  const queryPreview = query.length > 200 ? `${query.slice(0, 200)}…` : query;
 
   if (state.kind === "loading") {
     return (
@@ -452,7 +451,7 @@ function DiscoveryCustomFallback({
   onSubmit,
 }: {
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { t } = useLingui();
   return (
     <FreeTextBody

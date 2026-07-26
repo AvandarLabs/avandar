@@ -8,7 +8,7 @@ import sql from "react-syntax-highlighter/dist/esm/languages/prism/sql";
 import tsx from "react-syntax-highlighter/dist/esm/languages/prism/tsx";
 import { Theme } from "@/config/Theme";
 
-function registerChatPrismLanguages(): void {
+function _registerChatPrismLanguages(): void {
   PrismAsyncLight.registerLanguage("bash", bash);
   PrismAsyncLight.registerLanguage("sh", bash);
   PrismAsyncLight.registerLanguage("shell", bash);
@@ -18,19 +18,14 @@ function registerChatPrismLanguages(): void {
   PrismAsyncLight.registerLanguage("sql", sql);
   PrismAsyncLight.registerLanguage("duckdb", sql);
 
-  for (const alias of [
-    "javascript",
-    "js",
-    "jsx",
-    "typescript",
-    "ts",
-    "tsx",
-  ] as const) {
-    PrismAsyncLight.registerLanguage(alias, tsx);
-  }
+  (["javascript", "js", "jsx", "typescript", "ts", "tsx"] as const).forEach(
+    (alias) => {
+      return PrismAsyncLight.registerLanguage(alias, tsx);
+    },
+  );
 }
 
-registerChatPrismLanguages();
+_registerChatPrismLanguages();
 
 /** VS Code dark+ palette for fenced code in assistant markdown. */
 export const ChatSyntaxHighlighter = makePrismAsyncLightSyntaxHighlighter({

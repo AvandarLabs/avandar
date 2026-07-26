@@ -8,7 +8,7 @@ import type { useLingui } from "@lingui/react/macro";
 /**
  * Export the plan canvas as a PNG image.
  *
- * Captures whatever is currently inside `element` — that's the
+ * Captures whatever is currently inside `element`: that's the
  * xyflow viewport including the annotation overlay. The capture
  * uses the DOM's current pan/zoom state, which matches what the
  * user sees.
@@ -26,7 +26,7 @@ export async function exportPlanCanvasAsPng(args: {
     backgroundColor: args.backgroundColor ?? "#ffffff",
     cacheBust: true,
     filter: (node) => {
-      // Drop the toolbar from the export — it's a UI affordance, not
+      // Drop the toolbar from the export: it's a UI affordance, not
       // canvas content the user wants to share.
       if (node instanceof HTMLElement) {
         if (
@@ -40,7 +40,7 @@ export async function exportPlanCanvasAsPng(args: {
       return true;
     },
   });
-  triggerDownload(
+  _triggerDownload(
     dataUrl,
     args.filename ??
       `avandar-plan-${new Date().toISOString().slice(0, 10)}.png`,
@@ -82,30 +82,32 @@ export async function exportPlanCanvasAsPdf(args: {
   t?: ReturnType<typeof useLingui>["t"];
 }): Promise<void> {
   const translate = args.t;
-  // Capture the canvas first so we can embed it on page 1.
-  const overviewPng = await toPng(args.element, {
-    pixelRatio: 2,
-    backgroundColor: "#ffffff",
-    cacheBust: true,
-    filter: (node) => {
-      if (node instanceof HTMLElement) {
-        if (
-          node.dataset?.canvasToolbar === "true" ||
-          node.classList.contains("react-flow__controls") ||
-          node.classList.contains("react-flow__minimap")
-        ) {
-          return false;
+  // Capture the canvas (for page 1) and lazy-load the PDF renderer in
+  // parallel: none of the three depends on another. `@react-pdf/renderer`
+  // is large (~1.5 MB minified) and only used when the user exports, so it
+  // stays a dynamic import (tree-shaking can't help: the renderer is a
+  // side-effect-y JSX runtime).
+  const [overviewPng, reactPdf, React] = await Promise.all([
+    toPng(args.element, {
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+      cacheBust: true,
+      filter: (node) => {
+        if (node instanceof HTMLElement) {
+          if (
+            node.dataset?.canvasToolbar === "true" ||
+            node.classList.contains("react-flow__controls") ||
+            node.classList.contains("react-flow__minimap")
+          ) {
+            return false;
+          }
         }
-      }
-      return true;
-    },
-  });
-
-  // Dynamic import: @react-pdf/renderer is large (~1.5 MB minified)
-  // and only used when the user exports. Tree-shaking can't help
-  // here because the renderer is a side-effect-y JSX runtime.
-  const reactPdf = await import("@react-pdf/renderer");
-  const React = await import("react");
+        return true;
+      },
+    }),
+    import("@react-pdf/renderer"),
+    import("react"),
+  ]);
   const { Document, Image, Page, StyleSheet, Text, View, pdf } = reactPdf;
 
   const styles = StyleSheet.create({
@@ -277,7 +279,7 @@ export async function exportPlanCanvasAsPdf(args: {
 
   const blob = await pdf(doc).toBlob();
   const dataUrl = URL.createObjectURL(blob);
-  triggerDownload(
+  _triggerDownload(
     dataUrl,
     args.filename ??
       `avandar-plan-${new Date().toISOString().slice(0, 10)}.pdf`,
@@ -288,7 +290,7 @@ export async function exportPlanCanvasAsPdf(args: {
   }, 5000);
 }
 
-function triggerDownload(dataUrl: string, filename: string): void {
+function _triggerDownload(dataUrl: string, filename: string): void {
   const a = document.createElement("a");
   a.href = dataUrl;
   a.download = filename;

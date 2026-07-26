@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, TruncatedText } from "@ui";
-import { where } from "@utils";
+import { isDefined, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -12,7 +12,7 @@ import { getCachedDatasetColumnSummaries } from "@/components/ChatPanel/ChatEmpt
 import {
   pickAverageColumn,
   pickGroupByColumn,
-} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns";
+} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns/pickChatSuggestionColumns";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -57,7 +57,7 @@ function _pickRandomDataset(
  * Shows the current page context as a chip and, for Data Explorer, three
  * starter prompts the user can click to send.
  */
-export function ChatEmptyState(): JSX.Element {
+export function ChatEmptyState(): React.ReactNode {
   const context = useChatPageContext();
   const workspace = useCurrentWorkspace();
   const queryClient = useQueryClient();
@@ -119,30 +119,24 @@ export function ChatEmptyState(): JSX.Element {
     const pickedGroupBy = pickGroupByColumn(columns, cachedSummaries);
     const averageColumn = pickAverageColumn(columns);
 
-    const prompts = [t`Show the first 20 rows of ${datasetName}`];
+    const secondGroupBy =
+      !averageColumn && pickedGroupBy ?
+        pickGroupByColumn(columns, cachedSummaries, {
+          excludeColumnNames: [pickedGroupBy],
+        })
+      : undefined;
 
-    if (pickedGroupBy) {
-      prompts.push(t`Count rows in ${datasetName} by ${pickedGroupBy}`);
-    } else {
-      prompts.push(t`Count how many rows there are in ${datasetName}`);
-    }
-
-    if (averageColumn) {
-      prompts.push(t`What is the average ${averageColumn} in ${datasetName}?`);
-    } else if (pickedGroupBy) {
-      const secondGroupBy = pickGroupByColumn(columns, cachedSummaries, {
-        excludeColumnNames: [pickedGroupBy],
-      });
-      if (secondGroupBy) {
-        prompts.push(t`Count rows in ${datasetName} by ${secondGroupBy}`);
-      } else {
-        prompts.push(
-          t`What are the distinct values of ${pickedGroupBy} in ${datasetName}?`,
-        );
-      }
-    }
-
-    return prompts;
+    return [
+      t`Show the first 20 rows of ${datasetName}`,
+      pickedGroupBy ?
+        t`Count rows in ${datasetName} by ${pickedGroupBy}`
+      : t`Count how many rows there are in ${datasetName}`,
+      averageColumn ? t`What is the average ${averageColumn} in ${datasetName}?`
+      : pickedGroupBy ?
+        secondGroupBy ? t`Count rows in ${datasetName} by ${secondGroupBy}`
+        : t`What are the distinct values of ${pickedGroupBy} in ${datasetName}?`
+      : undefined,
+    ].filter(isDefined);
   }, [
     context.app,
     datasetColumns,
@@ -207,10 +201,10 @@ export function ChatEmptyState(): JSX.Element {
           <Text size="xs" c="neutral.6" tt="uppercase" fw={600}>
             <Trans>Try one of these</Trans>
           </Text>
-          {suggestions.map((prompt, index) => {
+          {suggestions.map((prompt) => {
             return (
               <Button
-                key={`suggestion-${index}`}
+                key={prompt}
                 variant="default"
                 size="xs"
                 justify="flex-start"

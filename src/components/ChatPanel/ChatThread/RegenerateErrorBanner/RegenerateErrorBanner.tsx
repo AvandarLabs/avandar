@@ -16,7 +16,7 @@ import css from "./RegenerateErrorBanner.module.css";
  * reappears with the new error, but the action is deliberately the user's
  * decision each time rather than an automatic retry.
  */
-export function RegenerateErrorBanner(): JSX.Element | null {
+export function RegenerateErrorBanner(): React.ReactNode {
   const { lastQueryError, rawSql } = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const aui = useAui();

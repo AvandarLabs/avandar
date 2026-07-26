@@ -1,3 +1,5 @@
+import { createModule } from "@modules";
+import { isDefined } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Dexie from "dexie";
 import type { ConsentModalMode } from "@/components/Privacy/ConsentModal/ConsentModal";
@@ -92,57 +94,6 @@ export type RecordConsentDecisionInput = {
   ackTokenNonce?: string;
 };
 
-export async function recordConsentDecision(
-  input: RecordConsentDecisionInput,
-): Promise<void> {
-  const warningShown: ConsentAuditEntry["warningShown"] = [];
-  if (input.detectedPii.length > 0) {
-    warningShown.push("pii");
-  }
-  if (input.detectedBias.length > 0) {
-    warningShown.push("bias");
-  }
-  if (input.isMedical) {
-    warningShown.push("medical");
-  }
-
-  const entry: ConsentAuditEntry = {
-    id: uuid(),
-    workspaceId: input.workspaceId,
-    userId: input.userId,
-    threadId: input.threadId ?? null,
-    timestamp: Date.now(),
-    decision: input.decision,
-    context: input.context,
-    mode: input.mode,
-    detectedPii: input.detectedPii,
-    detectedBias: input.detectedBias,
-    sourceColumn: input.sourceColumn ?? null,
-    valueCount: input.valueCount ?? 0,
-    contentLengthChars: input.contentLengthChars ?? null,
-    warningShown,
-    warningDismissed: input.decision === "cancelled" ? warningShown : [],
-    suggestionUsed:
-      input.decision === "used_suggestion" ? true
-      : warningShown.includes("bias") ? false
-      : null,
-    patternLocale: PATTERN_LOCALE,
-    detectorVersion: DETECTOR_VERSION,
-    medicalTierTriggeredBy: input.isMedical ? "column" : null,
-    typedConfirmationCorrect: input.typedConfirmationCorrect,
-    ackTokenNonce: input.ackTokenNonce ?? null,
-  };
-
-  try {
-    await db.consent.add(entry);
-  } catch (e) {
-    // Never block a consent decision on audit-log failure. The user's
-    // approval still takes effect; we just lose the entry.
-
-    console.warn("[privacy] consent audit write failed:", e);
-  }
-}
-
 export type ConsentLogQueryOptions = {
   workspaceId?: string;
   /** Lower-bound timestamp (ms). Defaults to the retention window. */
@@ -153,107 +104,163 @@ export type ConsentLogQueryOptions = {
   decision?: ConsentDecisionKind;
 };
 
-export async function listConsentLog(
-  options: ConsentLogQueryOptions = {},
-): Promise<ConsentAuditEntry[]> {
-  const since =
-    options.sinceTimestamp ?? Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
+export const ConsentAuditLog = createModule("ConsentAuditLog", {
+  builder: () => {
+    return {
+      recordConsentDecision: async (
+        input: RecordConsentDecisionInput,
+      ): Promise<void> => {
+        const warningShown: ConsentAuditEntry["warningShown"] = [
+          input.detectedPii.length > 0 ? ("pii" as const) : undefined,
+          input.detectedBias.length > 0 ? ("bias" as const) : undefined,
+          input.isMedical ? ("medical" as const) : undefined,
+        ].filter(isDefined);
 
-  const query = db.consent.where("timestamp").above(since);
+        const entry: ConsentAuditEntry = {
+          id: uuid(),
+          workspaceId: input.workspaceId,
+          userId: input.userId,
+          threadId: input.threadId ?? null,
+          timestamp: Date.now(),
+          decision: input.decision,
+          context: input.context,
+          mode: input.mode,
+          detectedPii: input.detectedPii,
+          detectedBias: input.detectedBias,
+          sourceColumn: input.sourceColumn ?? null,
+          valueCount: input.valueCount ?? 0,
+          contentLengthChars: input.contentLengthChars ?? null,
+          warningShown,
+          warningDismissed: input.decision === "cancelled" ? warningShown : [],
+          suggestionUsed:
+            input.decision === "used_suggestion" ? true
+            : warningShown.includes("bias") ? false
+            : null,
+          patternLocale: PATTERN_LOCALE,
+          detectorVersion: DETECTOR_VERSION,
+          medicalTierTriggeredBy: input.isMedical ? "column" : null,
+          typedConfirmationCorrect: input.typedConfirmationCorrect,
+          ackTokenNonce: input.ackTokenNonce ?? null,
+        };
 
-  const rows = await query.reverse().sortBy("timestamp");
-  return rows.filter((entry) => {
-    if (options.workspaceId && entry.workspaceId !== options.workspaceId) {
-      return false;
-    }
-    if (options.context && entry.context !== options.context) {
-      return false;
-    }
-    if (options.decision && entry.decision !== options.decision) {
-      return false;
-    }
-    return true;
-  });
-}
+        try {
+          await db.consent.add(entry);
+        } catch (e) {
+          // Never block a consent decision on audit-log failure. The user's
+          // approval still takes effect; we just lose the entry.
 
-/**
- * Drop everything from the audit log. Triggered from the privacy log
- * page so the user can purge their own history.
- */
-export async function clearConsentLog(): Promise<void> {
-  await db.consent.clear();
-}
+          console.warn("[privacy] consent audit write failed:", e);
+        }
+      },
 
-/**
- * Render the audit log as a CSV string for download.
- */
-export function consentLogToCsv(entries: ConsentAuditEntry[]): string {
-  const header = [
-    "id",
-    "timestamp",
-    "workspaceId",
-    "userId",
-    "threadId",
-    "context",
-    "decision",
-    "mode",
-    "detectedPii",
-    "detectedBias",
-    "sourceColumn",
-    "valueCount",
-    "contentLengthChars",
-    "warningShown",
-    "warningDismissed",
-    "suggestionUsed",
-    "patternLocale",
-    "detectorVersion",
-    "medicalTierTriggeredBy",
-    "typedConfirmationCorrect",
-    "ackTokenNonce",
-  ];
-  const escape = (v: unknown): string => {
-    if (v === null || v === undefined) {
-      return "";
-    }
-    if (Array.isArray(v)) {
-      return `"${v.join("|").replace(/"/g, '""')}"`;
-    }
-    const s = String(v);
-    if (/[",\n]/.test(s)) {
-      return `"${s.replace(/"/g, '""')}"`;
-    }
-    return s;
-  };
+      listConsentLog: async (
+        options: ConsentLogQueryOptions = {},
+      ): Promise<ConsentAuditEntry[]> => {
+        const since =
+          options.sinceTimestamp ??
+          Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
-  const lines = [header.join(",")];
-  for (const entry of entries) {
-    lines.push(
-      [
-        entry.id,
-        new Date(entry.timestamp).toISOString(),
-        entry.workspaceId,
-        entry.userId,
-        entry.threadId,
-        entry.context,
-        entry.decision,
-        entry.mode,
-        entry.detectedPii,
-        entry.detectedBias,
-        entry.sourceColumn,
-        entry.valueCount,
-        entry.contentLengthChars,
-        entry.warningShown,
-        entry.warningDismissed,
-        entry.suggestionUsed,
-        entry.patternLocale,
-        entry.detectorVersion,
-        entry.medicalTierTriggeredBy,
-        entry.typedConfirmationCorrect,
-        entry.ackTokenNonce,
-      ]
-        .map(escape)
-        .join(","),
-    );
-  }
-  return lines.join("\n");
-}
+        const query = db.consent.where("timestamp").above(since);
+
+        const rows = await query.reverse().sortBy("timestamp");
+        return rows.filter((entry) => {
+          if (
+            options.workspaceId &&
+            entry.workspaceId !== options.workspaceId
+          ) {
+            return false;
+          }
+          if (options.context && entry.context !== options.context) {
+            return false;
+          }
+          if (options.decision && entry.decision !== options.decision) {
+            return false;
+          }
+          return true;
+        });
+      },
+
+      /**
+       * Drop everything from the audit log. Triggered from the privacy log
+       * page so the user can purge their own history.
+       */
+      clearConsentLog: async (): Promise<void> => {
+        await db.consent.clear();
+      },
+
+      /**
+       * Render the audit log as a CSV string for download.
+       */
+      consentLogToCsv: (entries: ConsentAuditEntry[]): string => {
+        const header = [
+          "id",
+          "timestamp",
+          "workspaceId",
+          "userId",
+          "threadId",
+          "context",
+          "decision",
+          "mode",
+          "detectedPii",
+          "detectedBias",
+          "sourceColumn",
+          "valueCount",
+          "contentLengthChars",
+          "warningShown",
+          "warningDismissed",
+          "suggestionUsed",
+          "patternLocale",
+          "detectorVersion",
+          "medicalTierTriggeredBy",
+          "typedConfirmationCorrect",
+          "ackTokenNonce",
+        ];
+        const escape = (v: unknown): string => {
+          if (v === null || v === undefined) {
+            return "";
+          }
+          if (Array.isArray(v)) {
+            return `"${v.join("|").replace(/"/g, '""')}"`;
+          }
+          const s = String(v);
+          if (/[",\n]/.test(s)) {
+            return `"${s.replace(/"/g, '""')}"`;
+          }
+          return s;
+        };
+
+        const lines = [
+          header.join(","),
+          ...entries.map((entry) => {
+            return [
+              entry.id,
+              new Date(entry.timestamp).toISOString(),
+              entry.workspaceId,
+              entry.userId,
+              entry.threadId,
+              entry.context,
+              entry.decision,
+              entry.mode,
+              entry.detectedPii,
+              entry.detectedBias,
+              entry.sourceColumn,
+              entry.valueCount,
+              entry.contentLengthChars,
+              entry.warningShown,
+              entry.warningDismissed,
+              entry.suggestionUsed,
+              entry.patternLocale,
+              entry.detectorVersion,
+              entry.medicalTierTriggeredBy,
+              entry.typedConfirmationCorrect,
+              entry.ackTokenNonce,
+            ]
+              .map(escape)
+              .join(",");
+          }),
+        ];
+        return lines.join("\n");
+      },
+    };
+  },
+});

@@ -1,5 +1,6 @@
+import { prop } from "@utils";
 import { describe, expect, test } from "vitest";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout/planLayout";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
 function makeNode(args: { id: string; inputs?: string[] }): PlanNode {
@@ -18,7 +19,7 @@ describe("layoutPlan", () => {
   test("assigns nodes with no inputs to layer 0", () => {
     const { rfNodes } = layoutPlan({
       nodes: [makeNode({ id: "a" }), makeNode({ id: "b" })],
-      focusedStepId: null,
+      focusedStepId: undefined,
     });
     expect(rfNodes.length).toBe(2);
     expect(rfNodes[0]!.position.x).toBe(0);
@@ -32,7 +33,7 @@ describe("layoutPlan", () => {
         makeNode({ id: "agg", inputs: ["filter"] }),
         makeNode({ id: "rank", inputs: ["agg"] }),
       ],
-      focusedStepId: null,
+      focusedStepId: undefined,
     });
     const xs = rfNodes
       .map((n) => {
@@ -54,16 +55,10 @@ describe("layoutPlan", () => {
         makeNode({ id: "b" }),
         makeNode({ id: "c", inputs: ["a", "b"] }),
       ],
-      focusedStepId: null,
+      focusedStepId: undefined,
     });
     expect(rfEdges.length).toBe(2);
-    expect(
-      rfEdges
-        .map((e) => {
-          return e.id;
-        })
-        .sort(),
-    ).toEqual(["a->c", "b->c"]);
+    expect(rfEdges.map(prop("id")).sort()).toEqual(["a->c", "b->c"]);
   });
 
   test("ignores inputs that reference missing steps", () => {
@@ -72,7 +67,7 @@ describe("layoutPlan", () => {
         makeNode({ id: "a" }),
         makeNode({ id: "b", inputs: ["does_not_exist"] }),
       ],
-      focusedStepId: null,
+      focusedStepId: undefined,
     });
     expect(rfEdges.length).toBe(0);
   });

@@ -1,6 +1,6 @@
 import { AvaDataTypeModule } from "$/models/datasets/AvaDataType/AvaDataTypeModule";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 const ENUM_LIKE_DISTINCT_MAX = 10;
 
@@ -75,7 +75,7 @@ const NON_GROUPABLE_EXACT_NAMES = new Set([
   "uri",
 ]);
 
-type ColumnMeta = Pick<DatasetColumnRead, "name" | "dataType" | "columnIdx">;
+type ColumnMeta = Pick<DatasetColumn.T, "name" | "dataType" | "columnIdx">;
 
 function _normalizeColumnName(columnName: string): string {
   return columnName.trim().toLowerCase().replace(/\s+/g, "_");

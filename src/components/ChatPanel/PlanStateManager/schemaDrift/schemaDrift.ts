@@ -8,7 +8,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPlan, SchemaDriftReport } from "$/types/chat.types";
 
 /**
- * Phase 4 — Schema-Drift Regen.
+ * Schema-Drift Regen.
  *
  * After a plan step succeeds, the executor compares its actualSchema
  * against the LLM's predictedSchema. When they differ, the runtime
@@ -38,17 +38,12 @@ export function isSchemaDrift(
   if (predicted.length !== actual.length) {
     return true;
   }
-  for (let i = 0; i < predicted.length; i++) {
-    const p = predicted[i]!;
-    const a = actual[i]!;
-    if (p.name !== a.name) {
-      return true;
-    }
-    if (p.type.toLowerCase() !== a.type.toLowerCase()) {
-      return true;
-    }
-  }
-  return false;
+  return predicted.some((p, i) => {
+    return (
+      p.name !== actual[i]!.name ||
+      p.type.toLowerCase() !== actual[i]!.type.toLowerCase()
+    );
+  });
 }
 
 /**
@@ -62,13 +57,13 @@ export function findAffectedDownstream(args: {
 }): string[] {
   const { plan, driftedStepId } = args;
   const dependents = new Map<string, string[]>();
-  for (const step of plan.steps) {
-    for (const inputId of step.inputs) {
+  plan.steps.forEach((step) => {
+    step.inputs.forEach((inputId) => {
       const arr = dependents.get(inputId) ?? [];
       arr.push(step.id);
       dependents.set(inputId, arr);
-    }
-  }
+    });
+  });
   const affected: string[] = [];
   const queue = [driftedStepId];
   const seen = new Set<string>();
@@ -121,12 +116,12 @@ export async function regenerateOnDrift(args: {
     body: { driftReport, model: args.model },
   });
 
-  for (const updated of response.steps) {
+  response.steps.forEach((updated) => {
     args.dispatch.replaceStepCode({
       stepId: updated.stepId,
       code: updated.code,
     });
-  }
+  });
 
   // Re-run the steps the model rewrote, in plan order so each
   // step's view is registered before the next references it.

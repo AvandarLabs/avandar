@@ -12,7 +12,7 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
  * AppToolbar so it's available across every app view. The keyboard shortcut
  * (Cmd/Ctrl+/) lives on the AppShell itself.
  */
-export function ChatAsideToggle(): JSX.Element {
+export function ChatAsideToggle(): React.ReactNode {
   const [{ isOpen }, dispatch] = ChatPanelStateManager.useContext();
   const { t } = useLingui();
 

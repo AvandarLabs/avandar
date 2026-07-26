@@ -11,7 +11,7 @@
  *   3. Validating client-side lets us fail fast before the user
  *      sees a loading spinner that never resolves.
  *
- * The two files agree by convention (no shared package) — there's a
+ * The two files agree by convention (no shared package): there's a
  * roundtrip test pinning them together.
  */
 

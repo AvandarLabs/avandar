@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
-import css from "../ChatThread.module.css";
+import css from "./AssistantMessage.module.css";
 
 /**
  * Renders a single assistant turn in the thread: the message row and its
@@ -11,7 +11,7 @@ import css from "../ChatThread.module.css";
  * `assistant` role. Shows a typing loader while the turn has no content yet,
  * then delegates content rendering to `MessagePrimitive.Parts`.
  */
-export function AssistantMessage(): JSX.Element {
+export function AssistantMessage(): React.ReactNode {
   const { t } = useLingui();
   return (
     <MessagePrimitive.Root className={css.assistantRow}>
@@ -30,7 +30,7 @@ export function AssistantMessage(): JSX.Element {
         <MessagePrimitive.If hasContent={true}>
           <ActionBarPrimitive.Root className={css.assistantActions}>
             <ActionBarPrimitive.Reload
-              className={css.tryAgainButton}
+              className={css.assistantMessageTryAgainButton}
               aria-label={t`Try again`}
               title={t`Try again`}
             >

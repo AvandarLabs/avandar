@@ -7,12 +7,14 @@ import {
   IconPlayerPlay,
   IconPlayerSkipForward,
 } from "@tabler/icons-react";
+import { matchLiteral, prop } from "@utils";
 import { Handle, Position } from "@xyflow/react";
 import type {
   PlanNode,
   PlanStepStatus,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { NodeProps } from "@xyflow/react";
+import type { ReactNode } from "react";
 
 const STATUS_COLOR: Record<PlanStepStatus, string> = {
   pending: "gray",
@@ -27,44 +29,36 @@ const STATUS_COLOR: Record<PlanStepStatus, string> = {
  */
 function useStatusLabel(status: PlanStepStatus): string {
   const { t } = useLingui();
-  switch (status) {
-    case "pending":
-      return t`Pending`;
-    case "running":
-      return t`Running…`;
-    case "succeeded":
-      return t`Ready`;
-    case "failed":
-      return t`Failed`;
-    case "skipped":
-      return t`Skipped`;
-  }
+  return matchLiteral(status, {
+    pending: t`Pending`,
+    running: t`Running…`,
+    succeeded: t`Ready`,
+    failed: t`Failed`,
+    skipped: t`Skipped`,
+  });
 }
 
-function StatusIcon({ status }: { status: PlanStepStatus }): JSX.Element {
-  switch (status) {
-    case "succeeded":
-      return <IconCircleCheck size={16} color="var(--mantine-color-green-6)" />;
-    case "failed":
-      return <IconAlertTriangle size={16} color="var(--mantine-color-red-6)" />;
-    case "running":
-      return (
-        <IconLoader2
-          size={16}
-          color="var(--mantine-color-blue-6)"
-          style={{ animation: "spin 1s linear infinite" }}
-        />
-      );
-    case "skipped":
-      return (
-        <IconPlayerSkipForward
-          size={16}
-          color="var(--mantine-color-yellow-7)"
-        />
-      );
-    default:
-      return <IconPlayerPlay size={16} color="var(--mantine-color-gray-6)" />;
-  }
+// A Record keyed by PlanStepStatus is exhaustiveness-checked: adding a new
+// status is a compile error here until an icon is provided. Declared at module
+// scope so the elements are created once rather than on every render.
+const STATUS_ICON: Record<PlanStepStatus, ReactNode> = {
+  pending: <IconPlayerPlay size={16} color="var(--mantine-color-gray-6)" />,
+  running: (
+    <IconLoader2
+      size={16}
+      color="var(--mantine-color-blue-6)"
+      style={{ animation: "spin 1s linear infinite" }}
+    />
+  ),
+  succeeded: <IconCircleCheck size={16} color="var(--mantine-color-green-6)" />,
+  failed: <IconAlertTriangle size={16} color="var(--mantine-color-red-6)" />,
+  skipped: (
+    <IconPlayerSkipForward size={16} color="var(--mantine-color-yellow-7)" />
+  ),
+};
+
+function StatusIcon({ status }: { status: PlanStepStatus }): ReactNode {
+  return STATUS_ICON[status];
 }
 
 /**
@@ -87,7 +81,7 @@ export type PlanStepNodeData = {
  * `nodrag` class is applied to inner controls so they remain
  * clickable.
  */
-export function PlanStepNode(props: NodeProps): JSX.Element {
+export function PlanStepNode(props: NodeProps): React.ReactNode {
   const data = props.data as PlanStepNodeData;
   const { step, index, isFocused } = data;
   const { t } = useLingui();
@@ -144,18 +138,8 @@ export function PlanStepNode(props: NodeProps): JSX.Element {
               {t`${step.rowCount ?? 0} rows${colCountSuffix}`}
             </Text>
             {step.actualSchema && step.actualSchema.length > 0 ?
-              <Text
-                size="xs"
-                c="dimmed"
-                lineClamp={2}
-                style={{ fontFamily: "monospace" }}
-              >
-                {step.actualSchema
-                  .slice(0, 4)
-                  .map((c) => {
-                    return c.name;
-                  })
-                  .join(", ")}
+              <Text size="xs" c="dimmed" lineClamp={2} ff="monospace">
+                {step.actualSchema.slice(0, 4).map(prop("name")).join(", ")}
                 {step.actualSchema.length > 4 ? ", …" : ""}
               </Text>
             : null}

@@ -1,23 +1,22 @@
 /**
  * Server-side helpers for the ack-token protocol described in
- * `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
- * Phase 0.
+ * `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
  *
  *   ackToken = base64url(headerJson) + '.' + hex(HMAC-SHA256(headerJson, K))
  *
  * where `K` is a session secret derived per (workspace, user) pair from
  * `SB_SECRET_KEY`. The client and server both derive `K` independently
- * via `deriveSessionSecret(workspaceId, userId)` — no secret material
+ * via `deriveSessionSecret(workspaceId, userId)`: no secret material
  * ever has to round-trip on the wire.
  *
  * The header carries:
  *
- *   - `nonce`        — UUID, single-use within the token's TTL
- *   - `workspaceId`  — must match the route's `workspaceId`
- *   - `userId`       — must match the authenticated user
- *   - `issuedAt`     — wall-clock ms
- *   - `expiresAt`    — `issuedAt + 5 * 60 * 1000`
- *   - `payloadHash`  — SHA-256 hex of the canonicalised approved payload
+ *   - `nonce`        : UUID, single-use within the token's TTL
+ *   - `workspaceId`  : must match the route's `workspaceId`
+ *   - `userId`       : must match the authenticated user
+ *   - `issuedAt`     : wall-clock ms
+ *   - `expiresAt`    : `issuedAt + 5 * 60 * 1000`
+ *   - `payloadHash`  : SHA-256 hex of the canonicalised approved payload
  *
  * The backend rejects:
  *   - bad signature
@@ -25,7 +24,7 @@
  *   - mismatched workspaceId / userId
  *   - mismatched payloadHash (i.e. the values in the body don't match
  *     what was approved client-side)
- *   - duplicate nonces (replayed tokens) — best-effort, see notes.
+ *   - duplicate nonces (replayed tokens): best-effort, see notes.
  */
 
 const SB_SECRET_KEY = Deno.env.get("SB_SECRET_KEY");
@@ -87,7 +86,7 @@ export type VerifyAckTokenResult =
 /**
  * Module-scope set of seen nonces. In a multi-instance deployment this
  * needs to move to Redis / Supabase. The single-instance edge function
- * deployment we ship today is good enough for v1 — replay attacks would
+ * deployment we ship today is good enough for v1: replay attacks would
  * have to land on the same edge worker within the 5-minute window.
  */
 const SEEN_NONCES = new Map<string, number>();

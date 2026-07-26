@@ -55,7 +55,7 @@ export const VirtualDatasetParsers =
      * The `planSteps` column holds an opaque JSONB blob whose nested keys are
      * camelCase (matching the `ChatPlan` shape from
      * `shared/types/chat.types.ts`). `snakeCaseKeysDeep` would rewrite those
-     * nested keys and break the round-trip — so we extract `planSteps`,
+     * nested keys and break the round-trip, so we extract `planSteps`,
      * snake-case everything else, and reattach the blob untouched at
      * `plan_steps`.
      */

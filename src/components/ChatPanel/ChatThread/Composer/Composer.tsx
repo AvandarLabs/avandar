@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
+import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
 import css from "./Composer.module.css";
 
 /**
@@ -15,7 +15,7 @@ import css from "./Composer.module.css";
  * picker, and the send button. Input and actions are disabled outside the Data
  * Explorer app, where chat actions are not yet available.
  */
-export function Composer(): JSX.Element {
+export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
   const panelRef = useRef<HTMLDivElement>(null);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
@@ -32,8 +32,7 @@ export function Composer(): JSX.Element {
   const chatDisabled = !isChatEnabled;
 
   const placeholder =
-    context.app === "dashboards" ?
-      t`Ask me to add a chart to this dashboard...`
+    context.app === "dashboards" ? t`Ask me to add a chart to this dashboard...`
     : context.app === "data-explorer" ? t`Ask about your data...`
     : t`Chat is enabled in Data Explorer and Dashboards`;
 

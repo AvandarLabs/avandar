@@ -1,10 +1,10 @@
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import type {
   ColumnSummary,
   DatasetSummary,
 } from "@/clients/datasets/DatasetQueryClient";
 import type { QueryClient } from "@tanstack/react-query";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type ColumnRef = { name: string; dataType: string };
@@ -16,7 +16,7 @@ type ColumnRef = { name: string; dataType: string };
  */
 export function getCachedDatasetColumnSummaries(params: {
   queryClient: QueryClient;
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   workspaceId: Workspace.Id;
   columns: readonly ColumnRef[];
 }): Map<string, ColumnSummary> {
@@ -27,13 +27,14 @@ export function getCachedDatasetColumnSummaries(params: {
     DatasetQueryClient.QueryKeys.getSummary({ datasetId, workspaceId }),
   );
   if (fullSummary?.columnSummaries) {
-    for (const summary of fullSummary.columnSummaries) {
-      byName.set(summary.name, summary);
-    }
-    return byName;
+    return new Map(
+      fullSummary.columnSummaries.map((summary) => {
+        return [summary.name, summary];
+      }),
+    );
   }
 
-  for (const column of columns) {
+  columns.forEach((column) => {
     const cached = queryClient.getQueryData<ColumnSummary>(
       DatasetQueryClient.QueryKeys.getColumnSummary({
         datasetId,
@@ -45,7 +46,7 @@ export function getCachedDatasetColumnSummaries(params: {
     if (cached) {
       byName.set(column.name, cached);
     }
-  }
+  });
 
   return byName;
 }

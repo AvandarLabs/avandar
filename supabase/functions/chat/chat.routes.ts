@@ -20,12 +20,13 @@ import {
   buildSqlSystemPrompt,
   cleanGeneratedSql,
   extractSqlFromAssistantText,
-} from "@sbfn/chat/utils/buildSqlSystemPrompt.ts";
+} from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { modelSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
 import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
@@ -108,6 +109,17 @@ type OpenRouterToolCall = {
   function?: { name?: string; arguments?: string };
 };
 
+/** A chat message returned by the OpenRouter completions API. */
+type OpenRouterMessage = {
+  content?: string;
+  tool_calls?: OpenRouterToolCall[];
+};
+
+/** The subset of the OpenRouter completion response we consume. */
+type OpenRouterCompletion = {
+  choices?: Array<{ message?: OpenRouterMessage }>;
+};
+
 /**
  * Thrown when an ack token fails verification. The MiniServer wraps
  * `AvaHTTPError` into a 4xx automatically, so this is the only thing
@@ -142,16 +154,9 @@ const CLARIFICATION_MARKER_RE = /^\[Clarification answer:/m;
 function _countClarificationsInHistory(
   messages: ReadonlyArray<{ role: string; content: string }>,
 ): number {
-  let count = 0;
-  for (const msg of messages) {
-    if (msg.role !== "user") {
-      continue;
-    }
-    if (CLARIFICATION_MARKER_RE.test(msg.content)) {
-      count += 1;
-    }
-  }
-  return count;
+  return messages.filter((msg) => {
+    return msg.role === "user" && CLARIFICATION_MARKER_RE.test(msg.content);
+  }).length;
 }
 
 type RawClarifyArgs = {
@@ -838,9 +843,8 @@ function _buildRetryContextNote(
   return `\n\nThe user explicitly asked you to TRY AGAIN on their most recent question. Do not repeat the same output — take a different approach. Consider an alternative interpretation, a different SQL strategy, or asking a clarifying question if your previous attempt jumped to SQL too aggressively.\n\n${lines.join("\n\n")}`;
 }
 
-async function fetchSchemaForWorkspace(args: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabaseClient: any;
+async function _fetchSchemaForWorkspace(args: {
+  supabaseClient: AvaSupabaseClient;
   workspaceId: string;
 }): Promise<{ datasets: Dataset[]; columns: DatasetColumn[] }> {
   const { supabaseClient, workspaceId } = args;
@@ -1013,7 +1017,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         // Only fetch the schema when we'll actually use it.
         const schema =
           needsSchema ?
-            await fetchSchemaForWorkspace({ supabaseClient, workspaceId })
+            await _fetchSchemaForWorkspace({ supabaseClient, workspaceId })
           : { datasets: [], columns: [] };
 
         const lastUserPrompt =
@@ -1381,8 +1385,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         // params. Throws on non-2xx so the outer handler surfaces it.
         const runAttempt = async (
           attemptBody: Record<string, unknown>,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ): Promise<{ message: any; text: string }> => {
+        ): Promise<{
+          message: OpenRouterMessage | undefined;
+          text: string;
+        }> => {
           const r = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
             {
@@ -1400,8 +1406,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             const errorText = await r.text();
             throw new Error(`OpenRouter API error: ${errorText}`);
           }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const d: any = await r.json();
+          const d = (await r.json()) as OpenRouterCompletion;
           const m = d.choices?.[0]?.message;
           return { message: m, text: (m?.content ?? "").trim() };
         };
@@ -1421,8 +1426,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
          * `priorClarifications`.
          */
         const parseAttempt = (
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          msg: any,
+          msg: OpenRouterMessage | undefined,
           attemptText: string,
         ): ParsedAttempt => {
           const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
@@ -1773,8 +1777,7 @@ Call the \`regenerateSteps\` tool with the corrected SQL and updated
           throw new Error(`OpenRouter API error: ${errorText}`);
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any = await response.json();
+        const data = (await response.json()) as OpenRouterCompletion;
         const message = data.choices?.[0]?.message;
         const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
         const tool = toolCalls.find((tc) => {
@@ -1789,8 +1792,10 @@ Call the \`regenerateSteps\` tool with the corrected SQL and updated
           };
         }
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const parsed: any = JSON.parse(tool.function.arguments);
+          const parsed = JSON.parse(tool.function.arguments) as {
+            steps?: unknown;
+            explanation?: unknown;
+          };
           const stepsRaw = Array.isArray(parsed.steps) ? parsed.steps : [];
           const cleaned: RegeneratePlanResponse["steps"] = [];
           for (const s of stepsRaw) {

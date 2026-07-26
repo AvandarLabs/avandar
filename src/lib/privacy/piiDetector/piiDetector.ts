@@ -2,12 +2,12 @@
  * Client-side PII heuristics. Used by `crossBoundary` to decide whether to
  * elevate the consent modal before any data leaves the browser for the LLM.
  *
- * Two layers (per the chat-interactive-workflows spec, Phase 0):
+ * Two layers (per the chat-interactive-workflows spec):
  *   A. Column-name keyword match (categorised)
  *   B. Content regex over the actual values being sent
  *
  * Both layers run client-side and never call an LLM. We prefer false
- * positives — a one-click nudge is cheap, a false negative breaks the
+ * positives: a one-click nudge is cheap, a false negative breaks the
  * promise that the LLM never sees row-level data without consent.
  *
  * v1 scope: English only. Spanish + French pattern files stubbed at
@@ -26,7 +26,7 @@ export type PiiCategory =
 export type PiiSeverity = "clean" | "warning" | "critical";
 
 export type PiiPatternHit = {
-  /** Where the hit came from — column-name layer or content layer. */
+  /** Where the hit came from: column-name layer or content layer. */
   layer: "column_name" | "content";
   category: PiiCategory;
   /** Stable, user-presentable label (e.g. "Email", "Phone number"). */
@@ -151,7 +151,7 @@ const COLUMN_NAME_KEYWORDS: Array<{
   },
 ];
 
-// Standalone "name" — not in a compound like "first_name" — is a direct
+// Standalone "name" (not in a compound like "first_name") is a direct
 // identifier hit. We add it after the table to keep compound matching from
 // double-firing.
 const STANDALONE_NAME_PATTERN = /^name$|_name$|^name_/i;
@@ -235,38 +235,36 @@ function _passesLuhn(digits: string): boolean {
   let sum = 0;
   let alt = false;
   for (let i = digits.length - 1; i >= 0; i--) {
-    let n = digits.charCodeAt(i) - 48;
-    if (n < 0 || n > 9) {
+    let digitValue = digits.charCodeAt(i) - 48;
+    if (digitValue < 0 || digitValue > 9) {
       return false;
     }
     if (alt) {
-      n *= 2;
-      if (n > 9) {
-        n -= 9;
+      digitValue *= 2;
+      if (digitValue > 9) {
+        digitValue -= 9;
       }
     }
-    sum += n;
+    sum += digitValue;
     alt = !alt;
   }
   return sum % 10 === 0;
 }
 
 function _detectFromColumnName(columnName: string): PiiPatternHit[] {
-  const hits: PiiPatternHit[] = [];
   const normalized = columnName.toLowerCase();
 
-  for (const entry of COLUMN_NAME_KEYWORDS) {
-    for (const kw of entry.keywords) {
-      if (normalized.includes(kw)) {
-        hits.push({
-          layer: "column_name",
-          category: entry.category,
-          label: entry.label,
-        });
-        break;
-      }
-    }
-  }
+  const hits: PiiPatternHit[] = COLUMN_NAME_KEYWORDS.filter((entry) => {
+    return entry.keywords.some((kw) => {
+      return normalized.includes(kw);
+    });
+  }).map((entry) => {
+    return {
+      layer: "column_name" as const,
+      category: entry.category,
+      label: entry.label,
+    };
+  });
 
   if (STANDALONE_NAME_PATTERN.test(normalized)) {
     const alreadyHasName = hits.some((h) => {
@@ -323,16 +321,12 @@ function _detectFromContent(values: readonly unknown[]): PiiPatternHit[] {
 }
 
 function _maxSeverity(hits: readonly PiiPatternHit[]): PiiSeverity {
-  let severity: PiiSeverity = "clean";
-  for (const hit of hits) {
-    if (CATEGORY_CRITICAL.has(hit.category)) {
-      return "critical";
-    }
-    if (CATEGORY_WARNING.has(hit.category)) {
-      severity = "warning";
-    }
+  if (hits.some((h) => {return CATEGORY_CRITICAL.has(h.category)})) {
+    return "critical";
   }
-  return severity;
+  return hits.some((h) => {return CATEGORY_WARNING.has(h.category)})
+    ? "warning"
+    : "clean";
 }
 
 export function detectPii(input: {

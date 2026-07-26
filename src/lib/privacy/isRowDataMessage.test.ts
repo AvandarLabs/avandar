@@ -87,7 +87,7 @@ describe("isRowDataMessage", () => {
 
   it("flags mixed objects (some safe + some unknown keys) as row data", () => {
     // Even though `status` is known-safe, the presence of `name`
-    // means we treat this as row data — prefer false positives.
+    // means we treat this as row data: prefer false positives.
     expect(isRowDataMessage('{"status": "ok", "name": "Jane"}').isRowData).toBe(
       true,
     );

@@ -1,0 +1,196 @@
+.messageMarkdown {
+  /*
+   * Fixed VS Code dark-theme palette for fenced code blocks. The Avandar
+   * neutral scale is blue-tinted and has no clean match for these pure
+   * grays, so the code-block chrome and syntax colors are kept as a
+   * deliberate fixed scheme and hoisted to named custom properties (rather
+   * than scattered literals). These cascade to the code header chrome
+   * (rendered by MarkdownCodeHeader) as well, since it is a descendant.
+   */
+  --chat-code-border: #3c3c3c;
+  --chat-code-fg: #d4d4d4;
+  --chat-code-header-fg: #ccc;
+  --chat-code-header-hover-bg: rgb(255 255 255 / 8%);
+  --chat-syntax-keyword: #569cd6;
+  --chat-syntax-function: #dcdcaa;
+  --chat-syntax-string: #ce9178;
+  --chat-syntax-number: #b5cea8;
+  --chat-syntax-comment: #6a9955;
+  --chat-syntax-class: #4ec9b0;
+
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.messageMarkdown > :first-child {
+  margin-top: 0;
+}
+
+.messageMarkdown > :last-child {
+  margin-bottom: 0;
+}
+
+.messageMarkdown p {
+  margin: 0 0 var(--mantine-spacing-xs);
+}
+
+.messageMarkdown h1,
+.messageMarkdown h2,
+.messageMarkdown h3,
+.messageMarkdown h4 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin: var(--mantine-spacing-sm) 0 var(--mantine-spacing-xs);
+}
+
+.messageMarkdown h1 {
+  font-size: var(--mantine-font-size-lg);
+}
+
+.messageMarkdown h2 {
+  font-size: var(--mantine-font-size-md);
+}
+
+.messageMarkdown h3,
+.messageMarkdown h4 {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.messageMarkdown ul,
+.messageMarkdown ol {
+  margin: 0 0 var(--mantine-spacing-xs);
+  padding-left: 1.25rem;
+}
+
+.messageMarkdown li + li {
+  margin-top: 2px;
+}
+
+.messageMarkdown a {
+  color: var(--mantine-color-primary-6);
+  text-decoration: underline;
+}
+
+.messageMarkdown blockquote {
+  border-left: 3px solid var(--ava-border-default);
+  color: var(--mantine-color-neutral-7);
+  margin: 0 0 var(--mantine-spacing-xs);
+  padding-left: var(--mantine-spacing-sm);
+}
+
+.messageMarkdown hr {
+  border: none;
+  border-top: 1px solid var(--ava-border-default);
+  margin: var(--mantine-spacing-sm) 0;
+}
+
+.messageMarkdown table {
+  border-collapse: collapse;
+  font-size: var(--mantine-font-size-xs);
+  margin: 0 0 var(--mantine-spacing-xs);
+  width: 100%;
+}
+
+.messageMarkdown th,
+.messageMarkdown td {
+  border: 1px solid var(--ava-border-default);
+  padding: 2px 6px;
+  text-align: left;
+}
+
+.messageMarkdown th {
+  background: var(--mantine-color-neutral-1);
+  font-weight: 600;
+}
+
+/* Inline code only (not fenced blocks). */
+.messageMarkdown :not(pre) > code {
+  background: var(--mantine-color-neutral-1);
+  border-radius: var(--mantine-radius-xs);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  padding: 1px 4px;
+}
+
+.codeBlockHeader {
+  align-items: center;
+  background: var(--mantine-color-neutral-9);
+  border: 1px solid var(--chat-code-border);
+  border-bottom: none;
+  border-radius: var(--mantine-radius-sm) var(--mantine-radius-sm) 0 0;
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--mantine-spacing-xs);
+  padding: 4px 6px 4px 10px;
+}
+
+.codeBlockPre,
+.messageMarkdown pre.codeBlockPre {
+  background: var(--mantine-color-neutral-9);
+  border: 1px solid var(--chat-code-border);
+  border-radius: 0 0 var(--mantine-radius-sm) var(--mantine-radius-sm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin: var(--mantine-spacing-xs) 0 0;
+  overflow-x: auto;
+  padding: 0;
+}
+
+.codeBlockHeader + .codeBlockPre,
+.codeBlockHeader + pre.codeBlockPre,
+.messageMarkdown .codeBlockHeader + pre.codeBlockPre {
+  border-top: none;
+  margin-top: 0;
+}
+
+.codeBlockCode,
+.messageMarkdown pre code.codeBlockCode {
+  background: transparent;
+  border-radius: 0;
+  color: var(--chat-code-fg);
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+}
+
+.messageMarkdown pre code.codeBlockCode > span {
+  background: transparent;
+  line-height: inherit;
+}
+
+/* VS Code token colors (fallback if inline styles are overridden). */
+.messageMarkdown pre .token.keyword {
+  color: var(--chat-syntax-keyword);
+}
+
+.messageMarkdown pre .token.function {
+  color: var(--chat-syntax-function);
+}
+
+.messageMarkdown pre .token.string,
+.messageMarkdown pre .token.char {
+  color: var(--chat-syntax-string);
+}
+
+.messageMarkdown pre .token.number,
+.messageMarkdown pre .token.boolean {
+  color: var(--chat-syntax-number);
+}
+
+.messageMarkdown pre .token.operator,
+.messageMarkdown pre .token.punctuation {
+  color: var(--chat-code-fg);
+}
+
+.messageMarkdown pre .token.comment {
+  color: var(--chat-syntax-comment);
+}
+
+.messageMarkdown pre .token.class-name,
+.messageMarkdown pre .token.builtin {
+  color: var(--chat-syntax-class);
+}

@@ -1,7 +1,7 @@
 import {
   cleanGeneratedSql,
   extractSqlFromAssistantText,
-} from "@sbfn/chat/utils/buildSqlSystemPrompt.ts";
+} from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { describe, expect, it } from "vitest";
 
 describe("cleanGeneratedSql", () => {

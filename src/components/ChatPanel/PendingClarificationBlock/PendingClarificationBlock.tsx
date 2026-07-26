@@ -7,15 +7,15 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import {
   clarificationAnswerNeedsCrossBoundary,
   formatClarificationAnswerForThread,
-} from "@/components/ChatPanel/ClarificationCard/clarificationAnswer";
+} from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { recordOutcome } from "@/lib/privacy/clarificationAuditLog";
+import { ClarificationAuditLog } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
-import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer";
-import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
+import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
+import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
 
 /**
  * Renders the inline clarification card above the composer when the
@@ -29,7 +29,7 @@ import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatCla
  * The answer is appended as a new user message so the backend can count it
  * against the 3-clarifications-per-question cap.
  */
-export function PendingClarificationBlock(): JSX.Element | null {
+export function PendingClarificationBlock(): React.ReactNode {
   const pending = ChatPanelStateManager.useState().pendingClarification;
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useThreadRuntime();
@@ -100,7 +100,10 @@ export function PendingClarificationBlock(): JSX.Element | null {
         if (!result.approved) {
           const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
           if (auditId) {
-            await recordOutcome({ id: auditId, outcome: "cancelled" });
+            await ClarificationAuditLog.recordOutcome({
+              id: auditId,
+              outcome: "cancelled",
+            });
           }
           return;
         }
@@ -124,7 +127,10 @@ export function PendingClarificationBlock(): JSX.Element | null {
         if (!result.approved) {
           const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
           if (auditId) {
-            await recordOutcome({ id: auditId, outcome: "cancelled" });
+            await ClarificationAuditLog.recordOutcome({
+              id: auditId,
+              outcome: "cancelled",
+            });
           }
           return;
         }
@@ -143,7 +149,10 @@ export function PendingClarificationBlock(): JSX.Element | null {
 
     const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
     if (auditId) {
-      await recordOutcome({ id: auditId, outcome: "answered" });
+      await ClarificationAuditLog.recordOutcome({
+        id: auditId,
+        outcome: "answered",
+      });
     }
 
     runtime?.append(formatClarificationAnswerForThread(resolvedAnswer));

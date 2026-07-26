@@ -1,0 +1,20 @@
+/*
+ * The `--chat-code-header-*` custom properties are declared on
+ * `.messageMarkdown` in MarkdownTextPart.module.css (the owner of the
+ * code-block visual system) and cascade down to this header, which is
+ * always rendered as a descendant of the markdown container.
+ */
+.codeBlockLanguage {
+  color: var(--chat-code-header-fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+}
+
+.codeBlockCopyButton {
+  color: var(--chat-code-header-fg);
+}
+
+.codeBlockCopyButton:hover {
+  background: var(--chat-code-header-hover-bg);
+  color: var(--mantine-color-white);
+}

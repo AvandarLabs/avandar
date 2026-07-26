@@ -17,12 +17,8 @@ import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { listClarificationLog } from "@/lib/privacy/clarificationAuditLog";
-import {
-  clearConsentLog,
-  consentLogToCsv,
-  listConsentLog,
-} from "@/lib/privacy/consentAuditLog";
+import { ClarificationAuditLog } from "@/lib/privacy/clarificationAuditLog";
+import { ConsentAuditLog } from "@/lib/privacy/consentAuditLog";
 import type {
   ClarificationAuditEntry,
   ClarificationOutcome,
@@ -70,7 +66,7 @@ function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
  *
  * Both sources are local-only and stored on this device.
  */
-export function PrivacyLogTab(): JSX.Element {
+export function PrivacyLogTab(): React.ReactNode {
   return (
     <Tabs defaultValue="consent">
       <Tabs.List>
@@ -91,7 +87,7 @@ export function PrivacyLogTab(): JSX.Element {
   );
 }
 
-function ConsentLogPanel(): JSX.Element {
+function ConsentLogPanel(): React.ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
@@ -100,7 +96,9 @@ function ConsentLogPanel(): JSX.Element {
   const contextLabels = useContextLabels();
 
   const load = useCallback(async (): Promise<void> => {
-    const rows = await listConsentLog({ workspaceId: workspace.id });
+    const rows = await ConsentAuditLog.listConsentLog({
+      workspaceId: workspace.id,
+    });
     setEntries(rows);
   }, [workspace.id]);
 
@@ -124,7 +122,7 @@ function ConsentLogPanel(): JSX.Element {
     if (!entries || entries.length === 0) {
       return;
     }
-    const csv = consentLogToCsv(entries);
+    const csv = ConsentAuditLog.consentLogToCsv(entries);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -148,7 +146,7 @@ function ConsentLogPanel(): JSX.Element {
       labels: { confirm: t`Clear log`, cancel: t`Cancel` },
       confirmProps: { color: "red" },
       onConfirm: async () => {
-        await clearConsentLog();
+        await ConsentAuditLog.clearConsentLog();
         await load();
         notifySuccess(t`Privacy log cleared.`);
       },
@@ -355,7 +353,7 @@ const LEGACY_OUTCOME_COLOR: Record<string, string> = {
   let_ai_decide: "blue",
 };
 
-function ClarificationLogPanel(): JSX.Element {
+function ClarificationLogPanel(): React.ReactNode {
   const workspace = useCurrentWorkspace();
   const outcomeLabels = useOutcomeLabels();
   const legacyOutcomeLabels = useLegacyOutcomeLabels();
@@ -366,7 +364,9 @@ function ClarificationLogPanel(): JSX.Element {
   useEffect(() => {
     let cancelled = false;
     async function load(): Promise<void> {
-      const rows = await listClarificationLog(workspace.id);
+      const rows = await ClarificationAuditLog.listClarificationLog(
+        workspace.id,
+      );
       if (!cancelled) {
         setEntries(rows);
       }

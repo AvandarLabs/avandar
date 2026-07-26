@@ -18,7 +18,7 @@ import css from "./ChatPanel.module.css";
  * pushes the generated SQL to `DataExplorerStateManager` so the canvas
  * re-runs automatically.
  */
-export function ChatPanel(): JSX.Element {
+export function ChatPanel(): React.ReactNode {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
   const context = useChatPageContext();

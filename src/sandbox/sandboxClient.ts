@@ -9,7 +9,7 @@ import type {
 } from "@/sandbox/sandboxProtocol";
 
 /**
- * Parent-side client for the Phase 6 Python/R sandbox iframe.
+ * Parent-side client for the Python/R sandbox iframe.
  *
  * Lifecycle:
  *   1. First call to `runInSandbox` mounts a hidden `<iframe>` with
@@ -42,7 +42,7 @@ type IframeHandle = {
 
 let handle: IframeHandle | null = null;
 
-function ensureIframe(): IframeHandle {
+function _ensureIframe(): IframeHandle {
   if (handle) {
     return handle;
   }
@@ -122,8 +122,8 @@ function ensureIframe(): IframeHandle {
   return handle;
 }
 
-async function bootIfNeeded(preload: SandboxRuntime[]): Promise<void> {
-  const h = ensureIframe();
+async function _bootIfNeeded(preload: SandboxRuntime[]): Promise<void> {
+  const h = _ensureIframe();
   await h.ready;
   // Send boot, await boot_response.
   const bootRequest: SandboxBootRequest = {
@@ -154,8 +154,8 @@ export async function runInSandbox(args: {
   inputs: Array<{ name: string; arrow: Uint8Array }>;
   timeoutMs?: number;
 }): Promise<{ arrow: Uint8Array }> {
-  await bootIfNeeded([args.runtime]);
-  const h = ensureIframe();
+  await _bootIfNeeded([args.runtime]);
+  const h = _ensureIframe();
 
   const requestId = uuid();
   const request: SandboxRunRequest = {

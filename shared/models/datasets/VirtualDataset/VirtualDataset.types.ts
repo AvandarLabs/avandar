@@ -30,9 +30,9 @@ export type VirtualDatasetRead = Model.Base<
     rawSql: string;
 
     /**
-     * When the dataset was produced by a multi-step LLM analytic plan
-     * (Phase 3), the plan that produced it. Reopening the dataset
-     * rehydrates this plan into the canvas. `null` for one-shot SQL.
+     * When the dataset was produced by a multi-step LLM analytic plan, the
+     * plan that produced it. Reopening the dataset rehydrates this plan into
+     * the canvas. `null` for one-shot SQL.
      */
     planSteps: ChatPlan | null;
   }

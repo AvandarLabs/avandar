@@ -5,11 +5,11 @@ import {
   isNonGroupableColumnName,
   pickAverageColumn,
   pickGroupByColumn,
-} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns";
+} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns/pickChatSuggestionColumns";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
-type ColumnMeta = Pick<DatasetColumnRead, "name" | "dataType" | "columnIdx">;
+type ColumnMeta = Pick<DatasetColumn.T, "name" | "dataType" | "columnIdx">;
 
 function _col(
   name: string,

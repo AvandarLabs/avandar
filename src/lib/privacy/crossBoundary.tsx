@@ -1,16 +1,18 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { ConsentModal } from "@/components/Privacy/ConsentModal/ConsentModal";
-import { detectBias } from "@/lib/privacy/biasDetector";
-import { recordConsentDecision } from "@/lib/privacy/consentAuditLog";
-import { registerAck } from "@/lib/privacy/pendingAcks";
-import { detectPii } from "@/lib/privacy/piiDetector";
-import { hashTextPayload, issueAckToken } from "@/lib/privacy/sessionSecret";
+import { detectBias } from "@/lib/privacy/biasDetector/biasDetector";
+import { ConsentAuditLog } from "@/lib/privacy/consentAuditLog";
+import { PendingAcks } from "@/lib/privacy/pendingAcks";
+import { detectPii } from "@/lib/privacy/piiDetector/piiDetector";
+import { SessionSecret } from "@/lib/privacy/sessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
 } from "@/components/Privacy/ConsentModal/ConsentModal";
-import type { BiasHit } from "@/lib/privacy/biasDetector";
-import type { PiiDetectionResult } from "@/lib/privacy/piiDetector";
+import type { BiasHit } from "@/lib/privacy/biasDetector/biasDetector";
+import type { PiiDetectionResult } from "@/lib/privacy/piiDetector/piiDetector";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
@@ -138,7 +140,7 @@ export async function crossBoundary(
   // Clean send when there is nothing to flag.
   if (mode === null) {
     const ackToken = await _mintAckFor(req, req.text ?? "");
-    await recordConsentDecision({
+    await ConsentAuditLog.recordConsentDecision({
       workspaceId: req.workspaceId,
       userId: req.userId,
       context: req.context,
@@ -174,7 +176,7 @@ export async function crossBoundary(
   });
 
   if (decision.action === "cancel") {
-    await recordConsentDecision({
+    await ConsentAuditLog.recordConsentDecision({
       workspaceId: req.workspaceId,
       userId: req.userId,
       context: req.context,
@@ -203,7 +205,7 @@ export async function crossBoundary(
 
   const ackToken = await _mintAckFor(req, finalText ?? "");
 
-  await recordConsentDecision({
+  await ConsentAuditLog.recordConsentDecision({
     workspaceId: req.workspaceId,
     userId: req.userId,
     context: req.context,
@@ -250,14 +252,14 @@ async function _mintAckFor(
   req: CrossBoundaryRequest,
   text: string,
 ): Promise<string> {
-  const payloadHash = await hashTextPayload(text);
-  const ackToken = await issueAckToken({
+  const payloadHash = await SessionSecret.hashTextPayload(text);
+  const ackToken = await SessionSecret.issueAckToken({
     workspaceId: req.workspaceId,
     userId: req.userId,
     payloadHash,
   });
   if (text) {
-    await registerAck({ text, ackToken });
+    await PendingAcks.registerAck({ text, ackToken });
   }
   return ackToken;
 }
@@ -300,11 +302,12 @@ function _openModal(args: {
 }): Promise<ConsentDecision> {
   return new Promise((resolve) => {
     const title =
-      args.mode === "clean" ? "Send to AI?"
-      : args.mode === "pii_warning" ? "Personal data detected"
-      : args.mode === "medical_strict" ? "Health information detected"
-      : args.mode === "composite" ? "Review before sending"
-      : "Consider rephrasing";
+      args.mode === "clean" ? i18n._(msg`Send to AI?`)
+      : args.mode === "pii_warning" ? i18n._(msg`Personal data detected`)
+      : args.mode === "medical_strict" ?
+        i18n._(msg`Health information detected`)
+      : args.mode === "composite" ? i18n._(msg`Review before sending`)
+      : i18n._(msg`Consider rephrasing`);
 
     let settled = false;
     const settle = (decision: ConsentDecision) => {

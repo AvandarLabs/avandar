@@ -1,3 +1,4 @@
+import { makeMap } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type { ChatPlan, ChatPlanStep } from "$/types/chat.types";
@@ -23,7 +24,7 @@ export type PlanRunMode = "auto" | "step";
 /**
  * Lifecycle of a plan from "LLM proposed it" to "user approved it"
  * to "actively running". The user has to opt in before any step
- * touches their data — a plan can be way off and re-running blindly
+ * touches their data: a plan can be way off and re-running blindly
  * burns DuckDB resources for nothing.
  */
 export type PlanApprovalStatus = "awaiting_approval" | "approved" | "rejected";
@@ -36,7 +37,7 @@ export type PlanApprovalStatus = "awaiting_approval" | "approved" | "rejected";
 export type PlanCanvasView = "overview" | "focused";
 
 /**
- * Phase 5 — Branching. Each plan can be branched from any succeeded
+ * Branching. Each plan can be branched from any succeeded
  * step into a child plan. The branch carries the parent step's
  * `actualSchema` as its anchor so the LLM can write SQL against it
  * without re-running the parent chain.
@@ -66,7 +67,7 @@ export type PlanNode = ChatPlanStep & {
   previewRows?: ReadonlyArray<Record<string, unknown>>;
   /** Schema-drift regen attempts that have been applied to this step. */
   regenAttempts?: number;
-  /** Phase 5 — child branches forked off this step. */
+  /** Child branches forked off this step. */
   branches?: PlanBranchRef[];
 };
 
@@ -86,8 +87,8 @@ export type PlanState = {
    * to inspect / confirm. Defaults to `auto`.
    */
   runMode: PlanRunMode;
-  /** Active step id when the user clicks a node — drives canvas focus. */
-  focusedStepId: string | null;
+  /** Active step id when the user clicks a node: drives canvas focus. */
+  focusedStepId: string | undefined;
   /** Whether the plan panel is currently visible on the canvas. */
   isVisible: boolean;
   /** Overview (zoomed-out DAG) vs focused (single-step canvas). */
@@ -99,7 +100,7 @@ export type PlanState = {
    * `approvePlan` directly so the auto-run path keeps working.
    */
   approvalStatus: PlanApprovalStatus;
-  /** Phase 5 — when this plan is a branch, the parent ref. */
+  /** When this plan is a branch, the parent ref. */
   parentBranch?: {
     parentPlanId: string;
     parentStepId: string;
@@ -115,7 +116,7 @@ const initialState: PlanState = {
   nodes: [],
   rootMessage: "",
   runMode: "auto",
-  focusedStepId: null,
+  focusedStepId: undefined,
   isVisible: false,
   canvasView: "overview",
   approvalStatus: "awaiting_approval",
@@ -123,11 +124,11 @@ const initialState: PlanState = {
 };
 
 /**
- * State for the multi-step analytic plan view (Phase 3+).
+ * State for the multi-step analytic plan view.
  *
  * Plans are proposed by the LLM via the `proposePlan` tool. The runtime
  * fans the steps out across DuckDB-WASM (and, for `python`/`r` steps
- * after user approval, the sandboxed iframe in Phase 6). Each step's
+ * after user approval, the sandboxed iframe). Each step's
  * result is persisted to IndexedDB as parquet so the analysis can be
  * reopened across reloads and saved into virtual datasets. The xyflow
  * DAG view reads from this manager.
@@ -140,7 +141,7 @@ export const PlanStateManager = createAppStateManager({
      * Load a fresh plan from the LLM and reset all runtime state to
      * `pending`. Drops any prior plan; the caller is responsible for
      * dropping any DuckDB temp views + IndexedDB blobs via
-     * `dropPlanTempViews`. The plan lands in `awaiting_approval` — the
+     * `dropPlanTempViews`. The plan lands in `awaiting_approval`: the
      * user must explicitly approve before any step runs.
      */
     loadPlan: (state: PlanState, plan: ChatPlan): PlanState => {
@@ -151,7 +152,7 @@ export const PlanStateManager = createAppStateManager({
           return { ...step, status: "pending" as const };
         }),
         rootMessage: plan.rootMessage,
-        focusedStepId: plan.steps[0]?.id ?? null,
+        focusedStepId: plan.steps[0]?.id ?? undefined,
         isVisible: true,
         canvasView: "overview",
         approvalStatus: "awaiting_approval",
@@ -180,11 +181,7 @@ export const PlanStateManager = createAppStateManager({
         }>;
       },
     ): PlanState => {
-      const statusByStep = new Map(
-        args.statuses.map((s) => {
-          return [s.stepId, s] as const;
-        }),
-      );
+      const statusByStep = makeMap(args.statuses, { key: "stepId" });
       return {
         ...state,
         planId: args.planId,
@@ -199,7 +196,7 @@ export const PlanStateManager = createAppStateManager({
           };
         }),
         rootMessage: args.plan.rootMessage,
-        focusedStepId: args.plan.steps[0]?.id ?? null,
+        focusedStepId: args.plan.steps[0]?.id ?? undefined,
         isVisible: true,
         canvasView: "overview",
         approvalStatus: "approved",
@@ -285,7 +282,7 @@ export const PlanStateManager = createAppStateManager({
     },
 
     /**
-     * Replace a step's `code` after a Phase 4 schema-drift regen. The
+     * Replace a step's `code` after a schema-drift regen. The
      * regenerated step is set back to `pending` so the executor picks
      * it up again; `regenAttempts` is incremented to honour the cap.
      */
@@ -315,7 +312,7 @@ export const PlanStateManager = createAppStateManager({
     },
 
     /**
-     * Phase 5 — Branching. Attach a child branch ref onto the
+     * Branching. Attach a child branch ref onto the
      * parent step. The ChatBranchStateManager owns the actual thread
      * + plan; this is just the back-pointer the parent node renders
      * in its "branches" list.
@@ -350,7 +347,10 @@ export const PlanStateManager = createAppStateManager({
       return { ...state, runMode };
     },
 
-    setFocusedStep: (state: PlanState, stepId: string | null): PlanState => {
+    setFocusedStep: (
+      state: PlanState,
+      stepId: string | undefined,
+    ): PlanState => {
       return { ...state, focusedStepId: stepId };
     },
 

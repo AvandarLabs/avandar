@@ -7,7 +7,7 @@ import type {
 import type { ChatPlan } from "$/types/chat.types";
 
 /**
- * Phase 5 — Branching.
+ * Branching.
  *
  * Each branch is an independent plan that forks off a parent plan's
  * step. It carries:
@@ -18,12 +18,12 @@ import type { ChatPlan } from "$/types/chat.types";
  *
  * The "active" plan is whichever the user is currently looking at:
  * the root plan (entry created by `proposePlan` from chat) or any
- * branch. `activeBranchId === null` means the root plan.
+ * branch. `activeBranchId === undefined` means the root plan.
  *
  * Branches share the same IndexedDB step blob keyspace as the root
  * (each branch has its own `planId`, so blob keys never collide),
  * which means closing the root drops the root's blobs but leaves
- * branches alone — by design. To wipe everything, the user clicks
+ * branches alone: by design. To wipe everything, the user clicks
  * "Clear all branches".
  */
 
@@ -38,7 +38,7 @@ export type BranchRecord = {
   anchorSchema: Array<{ name: string; type: string }>;
   /** View name registered in DuckDB at the time of branching. */
   anchorViewName: string;
-  /** User-derived title — first user message, truncated. */
+  /** User-derived title: first user message, truncated. */
   title: string;
   /** Plan-state snapshot. Mirrors `PlanState` minus the lifecycle bits. */
   plan: ChatPlan;
@@ -60,15 +60,15 @@ export type PlanBranchState = {
    */
   branches: Record<string, BranchRecord>;
   /**
-   * Currently-displayed branch planId. `null` = the root plan in
+   * Currently-displayed branch planId. `undefined` = the root plan in
    * `PlanStateManager` is what's showing.
    */
-  activeBranchId: string | null;
+  activeBranchId: string | undefined;
 };
 
 const initialState: PlanBranchState = {
   branches: {},
-  activeBranchId: null,
+  activeBranchId: undefined,
 };
 
 export const PlanBranchStateManager = createAppStateManager({
@@ -142,12 +142,12 @@ export const PlanBranchStateManager = createAppStateManager({
     /** Switch which branch is rendered in the canvas. */
     setActiveBranch: (
       state: PlanBranchState,
-      branchId: string | null,
+      branchId?: string,
     ): PlanBranchState => {
       return { ...state, activeBranchId: branchId };
     },
 
-    /** Delete one branch. Does not touch its IndexedDB blobs — caller
+    /** Delete one branch. Does not touch its IndexedDB blobs: caller
      *  is responsible for cleanup via `clearPlanStepBlobs(planId)`. */
     closeBranch: (
       state: PlanBranchState,
@@ -161,12 +161,12 @@ export const PlanBranchStateManager = createAppStateManager({
         ...state,
         branches: rest,
         activeBranchId:
-          state.activeBranchId === branchId ? null : state.activeBranchId,
+          state.activeBranchId === branchId ? undefined : state.activeBranchId,
       };
     },
 
     clearAllBranches: (state: PlanBranchState): PlanBranchState => {
-      return { ...state, branches: {}, activeBranchId: null };
+      return { ...state, branches: {}, activeBranchId: undefined };
     },
   },
 });

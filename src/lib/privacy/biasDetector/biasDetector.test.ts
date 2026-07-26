@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectBias } from "@/lib/privacy/biasDetector";
+import { detectBias } from "@/lib/privacy/biasDetector/biasDetector";
 
 describe("detectBias", () => {
   it("returns no hits for empty input", () => {

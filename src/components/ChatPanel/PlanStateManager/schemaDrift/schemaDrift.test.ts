@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   findAffectedDownstream,
   isSchemaDrift,
-} from "@/components/ChatPanel/PlanStateManager/schemaDrift";
+} from "@/components/ChatPanel/PlanStateManager/schemaDrift/schemaDrift";
 import type { ChatPlan } from "$/types/chat.types";
 
 describe("isSchemaDrift", () => {

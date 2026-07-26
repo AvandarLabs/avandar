@@ -19,7 +19,7 @@ import type { EdgeProps } from "@xyflow/react";
  *     SVG `marker-end`. Markers ship straight lines; the only way to
  *     get the wobble at the tip is to draw the polygon ourselves.
  */
-export function RoughEdge(props: EdgeProps): JSX.Element {
+export function RoughEdge(props: EdgeProps): React.ReactNode {
   const {
     id,
     sourceX,

@@ -1,15 +1,16 @@
+import { createModule } from "@modules";
 import Dexie from "dexie";
-import type { Annotation } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import type { Annotation } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 import type { Table } from "dexie";
 
 /**
- * IndexedDB-backed persistence for plan annotations (Phase 9).
+ * IndexedDB-backed persistence for plan annotations.
  *
  * Lives in its own Dexie database (separate from `AvandarPlanStepDB`)
  * so we can independently version annotation schema changes without
  * touching the parquet blob keyspace.
  *
- * Storage hygiene: same as plan step blobs — explicit cleanup on
+ * Storage hygiene: same as plan step blobs, explicit cleanup on
  * Close / replace, never TTL.
  */
 class AvandarPlanAnnotationDB extends Dexie {
@@ -25,31 +26,39 @@ class AvandarPlanAnnotationDB extends Dexie {
 
 const db = new AvandarPlanAnnotationDB();
 
-export async function putAnnotation(a: Annotation): Promise<void> {
-  await db.annotations.put(a);
-}
+/**
+ * IndexedDB-backed store for plan annotations. Grouped as a module because
+ * every method shares the one `AvandarPlanAnnotationDB` Dexie backend.
+ */
+export const PlanAnnotationStorage = createModule("PlanAnnotationStorage", {
+  builder: () => {
+    return {
+      putAnnotation: async (a: Annotation): Promise<void> => {
+        await db.annotations.put(a);
+      },
 
-export async function putAnnotations(items: Annotation[]): Promise<void> {
-  if (items.length === 0) {
-    return;
-  }
-  await db.annotations.bulkPut(items);
-}
+      putAnnotations: async (items: Annotation[]): Promise<void> => {
+        if (items.length === 0) {
+          return;
+        }
+        await db.annotations.bulkPut(items);
+      },
 
-export async function listAnnotationsForPlan(
-  planId: string,
-): Promise<Annotation[]> {
-  return await db.annotations.where("planId").equals(planId).toArray();
-}
+      listAnnotationsForPlan: async (planId: string): Promise<Annotation[]> => {
+        return await db.annotations.where("planId").equals(planId).toArray();
+      },
 
-export async function deleteAnnotation(id: string): Promise<void> {
-  await db.annotations.delete(id);
-}
+      deleteAnnotation: async (id: string): Promise<void> => {
+        await db.annotations.delete(id);
+      },
 
-export async function clearAnnotationsForPlan(planId: string): Promise<void> {
-  await db.annotations.where("planId").equals(planId).delete();
-}
+      clearAnnotationsForPlan: async (planId: string): Promise<void> => {
+        await db.annotations.where("planId").equals(planId).delete();
+      },
 
-export async function clearAllAnnotations(): Promise<void> {
-  await db.annotations.clear();
-}
+      clearAllAnnotations: async (): Promise<void> => {
+        await db.annotations.clear();
+      },
+    };
+  },
+});

@@ -1,15 +1,13 @@
+import { makeIdLookupMap } from "@utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import {
-  clearPlanStepBlobs,
-  putPlanStepBlob,
-} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
+import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import {
   findAffectedDownstream,
   isSchemaDrift,
   MAX_REGEN_ATTEMPTS,
   regenerateOnDrift,
-} from "@/components/ChatPanel/PlanStateManager/schemaDrift";
+} from "@/components/ChatPanel/PlanStateManager/schemaDrift/schemaDrift";
 import { runInSandbox } from "@/sandbox/sandboxClient";
 import type {
   PlanNode,
@@ -27,9 +25,9 @@ import type { ChatPlan } from "$/types/chat.types";
  * reference earlier ones by the view name in their SQL. Caps:
  *
  *   - Aborts the run on the first failure; downstream steps marked
- *     `skipped` (Phase 4 schema-drift regen can re-issue them).
+ *     `skipped` (schema-drift regen can re-issue them).
  *   - Steps with `type !== "sql"` are marked `skipped` for now (Python
- *     and R are Phase 6).
+ *     and R run in the sandbox iframe).
  *
  * The IndexedDB write is what lets us survive page reloads, save plans
  * to virtual datasets, and re-open analyses without re-running every
@@ -93,7 +91,7 @@ export async function executePlanStep(args: {
   const { planId, step, dispatch, workspaceId, duckDbConnection, nodeById } =
     args;
   if (step.type === "clarification") {
-    // Clarification steps are presentational — the plan was supposed
+    // Clarification steps are presentational: the plan was supposed
     // to pause here for user input. We mark them skipped so the user
     // can read what was requested and resume manually.
     dispatch.markStepSkipped(step.id);
@@ -181,7 +179,7 @@ export async function executePlanStep(args: {
         duckDbConnection ?
           await materializeParquet(duckDbConnection)
         : await DuckDbClient.withConnection(materializeParquet);
-      await putPlanStepBlob({
+      await PlanStepStorage.putPlanStepBlob({
         planId,
         stepId: step.id,
         parquet: parquetBlob,
@@ -214,7 +212,7 @@ export async function executePlanStep(args: {
 }
 
 /**
- * Phase 6 — run a python or r plan step inside the sandboxed
+ * Run a python or r plan step inside the sandboxed
  * iframe. Pulls input views out of DuckDB as Arrow IPC bytes,
  * dispatches to the sandbox via `runInSandbox`, then registers the
  * result back into DuckDB as a parquet-backed view so downstream
@@ -293,9 +291,9 @@ async function _executeSandboxStep(args: {
       : previewResult.data.length;
 
     // Persist to IndexedDB so the analysis is reloadable across page
-    // refreshes — same pattern as SQL steps.
+    // refreshes: same pattern as SQL steps.
     try {
-      await putPlanStepBlob({
+      await PlanStepStorage.putPlanStepBlob({
         planId,
         stepId: step.id,
         parquet: resultBlob,
@@ -325,7 +323,7 @@ async function _executeSandboxStep(args: {
 }
 
 /**
- * Optional Phase 4 — schema-drift regen — context. Pass this to
+ * Optional schema-drift regen context. Pass this to
  * `executePlan` to enable automatic regeneration of downstream steps
  * when an executed step produces a schema different from what the LLM
  * predicted. The runtime hits the `/regenerate-plan` endpoint, swaps
@@ -346,12 +344,12 @@ export async function executePlan(args: {
   nodes: readonly PlanNode[];
   dispatch: PlanExecutorDispatch;
   workspaceId: Workspace.Id;
-  /** Optional Phase 4 drift-regen behaviour. */
+  /** Optional drift-regen behaviour. */
   driftRegen?: DriftRegenContext;
 }): Promise<void> {
   const { planId, nodes, dispatch, workspaceId, driftRegen } = args;
 
-  // Track how many regen attempts we've spent on each (step) — capped
+  // Track how many regen attempts we've spent on each (step): capped
   // by MAX_REGEN_ATTEMPTS so a misbehaving LLM can't burn through
   // tokens. `replaceStepCode` bumps `regenAttempts` on the node, so
   // the next pass through reads it from the live plan.
@@ -384,7 +382,7 @@ export async function executePlan(args: {
       if (!driftRegen) {
         continue;
       }
-      // Phase 4 drift check: pull the freshly-executed step out of the
+      // Drift check: pull the freshly-executed step out of the
       // latest plan so we can read its `actualSchema`.
       const latestPlan = driftRegen.getLatestPlan();
       const latestNode = (latestPlan.steps as PlanNode[]).find((planNode) => {
@@ -423,15 +421,10 @@ export async function executePlan(args: {
           dispatch,
           runStep: async (stepId) => {
             const latest = driftRegen.getLatestPlan();
-            const target = (latest.steps as PlanNode[]).find((planNode) => {
-              return planNode.id === stepId;
-            });
+            const regenNodeById = makeIdLookupMap(latest.steps as PlanNode[]);
+            const target = regenNodeById.get(stepId);
             if (!target) {
               return;
-            }
-            const regenNodeById = new Map<string, PlanNode>();
-            for (const planNode of latest.steps as PlanNode[]) {
-              regenNodeById.set(planNode.id, planNode);
             }
             await executePlanStep({
               planId,
@@ -456,7 +449,7 @@ export async function executePlan(args: {
  *
  *   - A new plan replaces the prior one
  *   - The user clicks "Close plan"
- *   - The chat panel unmounts (defensive — Plan provider cleanup
+ *   - The chat panel unmounts (defensive: Plan provider cleanup
  *     should already have run)
  *
  * Idempotent; failures on either side are swallowed.
@@ -470,12 +463,12 @@ export async function dropPlanTempViews(args: {
     try {
       await DuckDbClient.runRawQuery(`DROP VIEW IF EXISTS "${viewName}"`);
     } catch {
-      // Swallow — view cleanup is best-effort.
+      // Swallow: view cleanup is best-effort.
     }
   }
   if (args.planId) {
     try {
-      await clearPlanStepBlobs(args.planId);
+      await PlanStepStorage.clearPlanStepBlobs(args.planId);
     } catch {
       // Swallow.
     }

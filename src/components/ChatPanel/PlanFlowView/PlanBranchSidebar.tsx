@@ -11,16 +11,16 @@ import {
 } from "@mantine/core";
 import { IconGitBranch, IconHome, IconX } from "@tabler/icons-react";
 import { useMemo } from "react";
-import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
 /**
- * Phase 5 — Branching sidebar.
+ * Branching sidebar.
  *
  * Lists every branch that has been opened off the current plan tree.
  * Clicking a branch makes it the active plan; clicking "home"
  * returns to the root plan. Closing a branch deletes the in-memory
- * record only — IndexedDB cleanup is fired separately so a closed
+ * record only: IndexedDB cleanup is fired separately so a closed
  * branch's parquet blobs can be garbage collected.
  */
 export function PlanBranchSidebar({
@@ -31,7 +31,7 @@ export function PlanBranchSidebar({
   onSelectRoot: () => void;
   onSelectBranch: (branchId: string) => void;
   onCloseBranch: (branchId: string) => void;
-}): JSX.Element | null {
+}): React.ReactNode {
   const branchState = PlanBranchStateManager.useState();
   const planState = PlanStateManager.useState();
   const { t } = useLingui();
@@ -70,7 +70,7 @@ export function PlanBranchSidebar({
               planState.rootMessage.slice(0, 60)
             : undefined
           }
-          isActive={branchState.activeBranchId === null}
+          isActive={branchState.activeBranchId === undefined}
           onClick={onSelectRoot}
         />
         <ScrollArea.Autosize mah={240}>
@@ -107,13 +107,13 @@ function BranchRow({
   onClick,
   onClose,
 }: {
-  icon: JSX.Element;
+  icon: React.ReactNode;
   label: string;
   subtitle?: string;
   isActive: boolean;
   onClick: () => void;
   onClose?: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { t } = useLingui();
   return (
     <Box

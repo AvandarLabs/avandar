@@ -1,12 +1,10 @@
+import { makeMap } from "@utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   rehydratePlanStep,
   stepViewName,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import {
-  listPlanStepBlobs,
-  putPlanStepBlob,
-} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
+import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import type {
   PlanStateManager,
   PlanStepStatus,
@@ -27,7 +25,7 @@ export type RehydrateDispatch = ReturnType<typeof PlanStateManager.useDispatch>;
  *      step `succeeded`. The user sees the prior analysis without any
  *      LLM round-trip.
  *   3. For steps with no blob (e.g. opened from a virtual dataset on
- *      a fresh device), re-run the SQL locally — this only touches
+ *      a fresh device), re-run the SQL locally: this only touches
  *      DuckDB-WASM, no LLM call.
  *
  * The caller passes the plan plus the planId to use. For
@@ -51,12 +49,8 @@ export async function rehydratePlan(args: {
     }),
   });
 
-  const existingBlobs = await listPlanStepBlobs(planId);
-  const blobsByStep = new Map(
-    existingBlobs.map((b) => {
-      return [b.stepId, b] as const;
-    }),
-  );
+  const existingBlobs = await PlanStepStorage.listPlanStepBlobs(planId);
+  const blobsByStep = makeMap(existingBlobs, { key: "stepId" });
 
   // Step 2 + 3: re-register parquet blobs we already have, run SQL
   // for the rest. We do this in plan order so step N's view exists
@@ -85,7 +79,7 @@ export async function rehydratePlan(args: {
       }
     }
     // Fallback: re-run the SQL. Mirrors `executePlanStep` but cuts
-    // the bias against IndexedDB write — we'll cache the result on
+    // the bias against IndexedDB write: we'll cache the result on
     // success so the next reload is fast.
     dispatch.markStepRunning(step.id);
     try {
@@ -114,7 +108,7 @@ export async function rehydratePlan(args: {
           `SELECT * FROM "${viewName}"`,
           { returnType: "parquet" },
         );
-        await putPlanStepBlob({
+        await PlanStepStorage.putPlanStepBlob({
           planId,
           stepId: step.id,
           parquet: parquetBlob,
@@ -135,7 +129,7 @@ export async function rehydratePlan(args: {
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
       dispatch.markStepFailed({ stepId: step.id, error });
-      // Stop on first failure — downstream steps depend on this one's
+      // Stop on first failure: downstream steps depend on this one's
       // view.
       return;
     }

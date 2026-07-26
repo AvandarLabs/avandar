@@ -11,7 +11,7 @@ import css from "./ChatThread.module.css";
  * The main thread + composer composition for the chat panel. Composed from
  * Assistant UI primitives and styled with Avandar tokens.
  */
-export function ChatThread(): JSX.Element {
+export function ChatThread(): React.ReactNode {
   return (
     <ThreadPrimitive.Root className={css.thread}>
       <ThreadPrimitive.Viewport className={css.viewport}>

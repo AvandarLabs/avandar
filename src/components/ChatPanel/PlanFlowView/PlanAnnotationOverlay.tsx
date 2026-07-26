@@ -6,14 +6,14 @@ import { getStroke } from "perfect-freehand";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import rough from "roughjs";
 import { activeAnnotationColor } from "@/components/ChatPanel/PlanFlowView/annotationColor";
-import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 import type {
   Annotation,
   ArrowAnnotation,
   StickyAnnotation,
   StrokeAnnotation,
   TextAnnotation,
-} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 
 /**
  * Annotation overlay rendered on top of the xyflow canvas.
@@ -31,7 +31,7 @@ import type {
  * from screen to canvas.
  */
 
-export type PlanAnnotationOverlayProps = {
+type Props = {
   planId: string;
   /** Container element bounding rect used to subtract from pointer coords. */
   containerRef: React.RefObject<HTMLElement | null>;
@@ -40,7 +40,7 @@ export type PlanAnnotationOverlayProps = {
 export function PlanAnnotationOverlay({
   planId,
   containerRef,
-}: PlanAnnotationOverlayProps): JSX.Element {
+}: Props): React.ReactNode {
   const state = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
   const viewport = useViewport();
@@ -52,36 +52,38 @@ export function PlanAnnotationOverlay({
     });
   }, [state.annotations, planId]);
 
-  const [strokeInProgress, setStrokeInProgress] = useState<Array<
-    [number, number]
-  > | null>(null);
-  const [arrowStart, setArrowStart] = useState<[number, number] | null>(null);
+  const [strokeInProgress, setStrokeInProgress] =
+    useState<Array<[number, number]>>();
+  const [arrowStart, setArrowStart] = useState<[number, number]>();
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Keyboard shortcuts: undo/redo + delete-selected.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === "z" && !e.shiftKey) {
+  useEffect(
+    function bindAnnotationKeyboardShortcuts() {
+      const onKey = (e: KeyboardEvent): void => {
+        if (e.ctrlKey || e.metaKey) {
+          if (e.key === "z" && !e.shiftKey) {
+            e.preventDefault();
+            dispatch.undo();
+          } else if (e.key === "z" && e.shiftKey) {
+            e.preventDefault();
+            dispatch.redo();
+          }
+        } else if (
+          (e.key === "Delete" || e.key === "Backspace") &&
+          state.selectedId
+        ) {
           e.preventDefault();
-          dispatch.undo();
-        } else if (e.key === "z" && e.shiftKey) {
-          e.preventDefault();
-          dispatch.redo();
+          dispatch.deleteAnnotation(state.selectedId);
         }
-      } else if (
-        (e.key === "Delete" || e.key === "Backspace") &&
-        state.selectedId
-      ) {
-        e.preventDefault();
-        dispatch.deleteAnnotation(state.selectedId);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [dispatch, state.selectedId]);
+      };
+      window.addEventListener("keydown", onKey);
+      return () => {
+        window.removeEventListener("keydown", onKey);
+      };
+    },
+    [dispatch, state.selectedId],
+  );
 
   const screenToCanvas = useCallback(
     (clientX: number, clientY: number): [number, number] => {
@@ -156,7 +158,7 @@ export function PlanAnnotationOverlay({
       if (strokeInProgress) {
         const [x, y] = screenToCanvas(e.clientX, e.clientY);
         setStrokeInProgress((prev) => {
-          return prev ? [...prev, [x, y]] : null;
+          return prev ? [...prev, [x, y]] : undefined;
         });
       }
     },
@@ -181,7 +183,7 @@ export function PlanAnnotationOverlay({
           color: activeAnnotationColor(),
         };
         dispatch.addAnnotation({ annotation });
-        setArrowStart(null);
+        setArrowStart(undefined);
       } else if (tool === "pen" && strokeInProgress) {
         if (strokeInProgress.length >= 2) {
           const annotation: Omit<
@@ -196,7 +198,7 @@ export function PlanAnnotationOverlay({
           };
           dispatch.addAnnotation({ annotation });
         }
-        setStrokeInProgress(null);
+        setStrokeInProgress(undefined);
       }
     },
     [
@@ -229,7 +231,7 @@ export function PlanAnnotationOverlay({
         zIndex: 5,
       }}
       // Important: when not drawing, the overlay must not capture
-      // hits — annotations get their own pointer-events:auto.
+      // hits: annotations get their own pointer-events:auto.
       data-annotation-overlay
     >
       <div
@@ -298,8 +300,8 @@ function AnnotationRenderer({
   onDelete: () => void;
   isPanMode: boolean;
   isEraseMode: boolean;
-}): JSX.Element | null {
-  const handleClick = (e: React.MouseEvent): void => {
+}): React.ReactNode {
+  const onClick = (e: React.MouseEvent | React.KeyboardEvent): void => {
     e.stopPropagation();
     if (isEraseMode) {
       onDelete();
@@ -318,7 +320,7 @@ function AnnotationRenderer({
   if (annotation.kind === "text") {
     return (
       <Box
-        onClick={handleClick}
+        onClick={onClick}
         style={{
           ...sharedStyle,
           left: annotation.x,
@@ -342,7 +344,7 @@ function AnnotationRenderer({
   if (annotation.kind === "sticky") {
     return (
       <Box
-        onClick={handleClick}
+        onClick={onClick}
         style={{
           ...sharedStyle,
           left: annotation.x,
@@ -371,7 +373,7 @@ function AnnotationRenderer({
       <ArrowRender
         annotation={annotation}
         isSelected={isSelected}
-        onClick={handleClick}
+        onClick={onClick}
         isPanMode={isPanMode}
         onDelete={onDelete}
       />
@@ -382,7 +384,7 @@ function AnnotationRenderer({
       <StrokeWrapper
         annotation={annotation}
         isSelected={isSelected}
-        onClick={handleClick}
+        onClick={onClick}
         isPanMode={isPanMode}
         onDelete={onDelete}
       />
@@ -391,7 +393,7 @@ function AnnotationRenderer({
   return null;
 }
 
-function DeleteHandle({ onDelete }: { onDelete: () => void }): JSX.Element {
+function DeleteHandle({ onDelete }: { onDelete: () => void }): React.ReactNode {
   const { t } = useLingui();
   return (
     <ActionIcon
@@ -423,10 +425,10 @@ function ArrowRender({
 }: {
   annotation: ArrowAnnotation;
   isSelected: boolean;
-  onClick: (e: React.MouseEvent) => void;
+  onClick: (e: React.MouseEvent | React.KeyboardEvent) => void;
   isPanMode: boolean;
   onDelete: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   const { fromX, fromY, toX, toY, color } = annotation;
   const pathD = useMemo(() => {
     const svgNs = "http://www.w3.org/2000/svg";
@@ -438,7 +440,7 @@ function ArrowRender({
       bowing: 1.4,
       stroke,
       strokeWidth: 2,
-      seed: hashSeed(annotation.id),
+      seed: _hashSeed(annotation.id),
     });
     const dx = toX - fromX;
     const dy = toY - fromY;
@@ -461,7 +463,7 @@ function ArrowRender({
         fill: stroke,
         fillStyle: "solid",
         strokeWidth: 1.6,
-        seed: hashSeed(annotation.id) + 1,
+        seed: _hashSeed(annotation.id) + 1,
       },
     );
     return Array.from([line, head])
@@ -484,7 +486,15 @@ function ArrowRender({
 
   return (
     <svg
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(e);
+        }
+      }}
       style={{
         position: "absolute",
         left: minX,
@@ -515,7 +525,7 @@ function StrokeRender({
   points: ReadonlyArray<[number, number, number?] | [number, number]>;
   color: string;
   strokeWidth: number;
-}): JSX.Element {
+}): React.ReactNode {
   const pathD = useMemo(() => {
     const outline = getStroke(
       points.map((p) => {
@@ -531,10 +541,14 @@ function StrokeRender({
     if (outline.length === 0) {
       return "";
     }
-    let d = `M ${outline[0]![0]} ${outline[0]![1]}`;
-    for (let i = 1; i < outline.length; i++) {
-      d += ` L ${outline[i]![0]} ${outline[i]![1]}`;
-    }
+    const d =
+      `M ${outline[0]![0]} ${outline[0]![1]}` +
+      outline
+        .slice(1)
+        .map((pt) => {
+          return ` L ${pt[0]} ${pt[1]}`;
+        })
+        .join("");
     return `${d} Z`;
   }, [points, strokeWidth]);
 
@@ -578,10 +592,10 @@ function StrokeWrapper({
 }: {
   annotation: StrokeAnnotation;
   isSelected: boolean;
-  onClick: (e: React.MouseEvent) => void;
+  onClick: (e: React.MouseEvent | React.KeyboardEvent) => void;
   isPanMode: boolean;
   onDelete: () => void;
-}): JSX.Element {
+}): React.ReactNode {
   // Bounding box for click target.
   const xs = annotation.points.map((p) => {
     return p[0];
@@ -622,7 +636,7 @@ function StrokeWrapper({
   );
 }
 
-function hashSeed(id: string): number {
+function _hashSeed(id: string): number {
   let h = 0;
   for (let i = 0; i < id.length; i++) {
     h = (h * 31 + id.charCodeAt(i)) | 0;

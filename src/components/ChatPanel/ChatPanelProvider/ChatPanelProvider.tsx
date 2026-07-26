@@ -3,8 +3,8 @@ import {
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
-import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
+import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { ReactNode } from "react";
 
@@ -32,14 +32,14 @@ type Props = {
  * seeds the initial `isOpen` value from `localStorage`, and writes it back
  * whenever it changes so the panel state survives page reloads.
  *
- * The `PlanStateManager` is nested here so that Phase 3 multi-step plans
- * share the same lifetime as the chat panel itself — closing or remounting
+ * The `PlanStateManager` is nested here so that multi-step plans
+ * share the same lifetime as the chat panel itself: closing or remounting
  * the panel clears plan state.
  */
 export function ChatPanelProvider({
   children,
   isChatAvailable = true,
-}: Props): JSX.Element {
+}: Props): React.ReactNode {
   return (
     <ChatPanelStateManager.Provider
       initialStateOverrides={{

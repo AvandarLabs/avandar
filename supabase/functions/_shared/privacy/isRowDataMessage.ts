@@ -1,11 +1,11 @@
 /**
- * Identifies "row-data" tool messages — messages that carry actual
+ * Identifies "row-data" tool messages: messages that carry actual
  * row-level data values to the LLM rather than schema, status, or
  * error strings.
  *
- * Used (in Phase 2+ of the chat-interactive-workflows spec) to enforce
+ * Used (per the chat-interactive-workflows spec) to enforce
  * that any row-data crossing the LLM boundary carries a valid ack token
- * — see `verifyAckToken`.
+ * (see `verifyAckToken`).
  *
  * v1 heuristic (English-only, deliberately conservative):
  *   - tool-result messages whose content is a JSON array of length > 0

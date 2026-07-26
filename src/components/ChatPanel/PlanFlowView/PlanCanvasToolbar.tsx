@@ -22,18 +22,18 @@ import {
   IconTypography,
 } from "@tabler/icons-react";
 import { setAnnotationColor } from "@/components/ChatPanel/PlanFlowView/annotationColor";
-import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 import type {
   AnnotationTool,
   PlanAnnotationState,
-} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 
 /**
  * Floating annotation toolbar that pins to the top-left of the
  * plan canvas. Drives the active drawing tool, undo / redo, and
  * exports.
  */
-export type PlanCanvasToolbarProps = {
+type Props = {
   onExportPng: () => void;
   onExportPdf: () => void;
 };
@@ -45,7 +45,7 @@ export type PlanCanvasToolbarProps = {
 function useAnnotationTools(): Array<{
   tool: AnnotationTool;
   label: string;
-  icon: () => JSX.Element;
+  icon: () => React.ReactNode;
 }> {
   const { t } = useLingui();
   return [
@@ -94,7 +94,7 @@ function useAnnotationTools(): Array<{
   ];
 }
 
-export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
+export function PlanCanvasToolbar(props: Props): React.ReactNode {
   const state: PlanAnnotationState = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
   const { t } = useLingui();
@@ -212,10 +212,10 @@ const PALETTE = [
   "#000000",
 ];
 
-function ColorPalette(): JSX.Element {
+function ColorPalette(): React.ReactNode {
   // Color picker for new annotations. Stores the swatch as a CSS
   // string in module-scope so adding it to PlanAnnotationState would
-  // be overkill — the user picks once per session.
+  // be overkill: the user picks once per session.
   const { t } = useLingui();
   return (
     <Stack gap={2}>

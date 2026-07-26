@@ -1,64 +1,28 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Alert,
-  Box,
-  Button,
-  Group,
-  Paper,
-  SegmentedControl,
-  Stack,
-  Text,
-} from "@mantine/core";
-import {
-  IconArrowsMaximize,
-  IconArrowsMinimize,
-  IconRefresh,
-  IconX,
-} from "@tabler/icons-react";
-import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
-  ReactFlowProvider,
-  useReactFlow,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+import { Alert, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { PlanAnnotationOverlay } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay";
-import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
-import {
-  clearAnnotationsForPlan,
-  listAnnotationsForPlan,
-  putAnnotations,
-} from "@/components/ChatPanel/PlanFlowView/planAnnotationStorage";
-import { PlanBranchSidebar } from "@/components/ChatPanel/PlanFlowView/PlanBranchSidebar";
+import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
+import { PlanAnnotationStorage } from "@/components/ChatPanel/PlanFlowView/planAnnotationStorage";
 import {
   exportPlanCanvasAsPdf,
   exportPlanCanvasAsPng,
 } from "@/components/ChatPanel/PlanFlowView/planCanvasExport";
-import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
-import { PlanStepNode } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
+import { PlanFlowBanners } from "@/components/ChatPanel/PlanFlowView/PlanFlowBanners";
+import { PlanFlowCanvasArea } from "@/components/ChatPanel/PlanFlowView/PlanFlowCanvasArea";
+import { PlanFlowHeader } from "@/components/ChatPanel/PlanFlowView/PlanFlowHeader";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout/planLayout";
 import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode";
-import { RoughEdge } from "@/components/ChatPanel/PlanFlowView/RoughEdge";
-import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
-import {
-  dropPlanTempViews,
-  executePlan,
-  executePlanStep,
-} from "@/components/ChatPanel/PlanStateManager/planExecutor";
+import { usePlanRun } from "@/components/ChatPanel/PlanFlowView/usePlanRun";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager/PlanBranchStateManager";
+import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
-import type { ChatPlan } from "$/types/chat.types";
-
-const NODE_TYPES = { planStep: PlanStepNode };
-const EDGE_TYPES = { rough: RoughEdge };
 
 /**
- * Phase 3 — visual plan canvas.
+ * Visual plan canvas.
  *
  * The plan renders as an xyflow DAG with RoughJS-styled hand-drawn
  * edges. Two view modes share the canvas:
@@ -76,7 +40,7 @@ const EDGE_TYPES = { rough: RoughEdge };
  * Run-mode toggle: "auto" runs all steps sequentially as soon as the
  * plan arrives; "step" pauses between steps so the user can inspect.
  */
-export function PlanFlowView(): JSX.Element | null {
+export function PlanFlowView(): React.ReactNode {
   const state = PlanStateManager.useState();
   if (!state.isVisible || state.nodes.length === 0) {
     return null;
@@ -88,7 +52,7 @@ export function PlanFlowView(): JSX.Element | null {
   );
 }
 
-function PlanFlowCanvas(): JSX.Element {
+function PlanFlowCanvas(): React.ReactNode {
   const state = PlanStateManager.useState();
   const dispatch = PlanStateManager.useDispatch();
   const branchState = PlanBranchStateManager.useState();
@@ -104,8 +68,12 @@ function PlanFlowCanvas(): JSX.Element {
 
   // Keep the latest plan reachable to `executePlan`'s drift-regen
   // callback without re-creating the callable on every state change.
+  // `runAll`/`runSingle` read `stateRef.current` only from async handlers
+  // (never during render), so we update it in an effect to keep render pure.
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   const { rfNodes, rfEdges } = useMemo(() => {
     return layoutPlan({
@@ -116,106 +84,40 @@ function PlanFlowCanvas(): JSX.Element {
 
   const planId = state.planId;
 
-  const runAll = useCallback(async (): Promise<void> => {
-    if (!planId) {
-      return;
-    }
-    // Approval gate. The button caller is already gated by the
-    // banner UI, but `runAll` is also fired by the auto-run effect
-    // — that effect has its own gate. This is the belt for the
-    // braces.
-    if (stateRef.current.approvalStatus !== "approved") {
-      return;
-    }
-    await executePlan({
-      planId,
-      nodes: state.nodes,
-      dispatch,
-      workspaceId: workspace.id,
-      driftRegen: {
-        workspaceId: workspace.id,
-        getLatestPlan: (): ChatPlan => {
-          const cur = stateRef.current;
-          return {
-            rootMessage: cur.rootMessage,
-            steps: cur.nodes,
-          };
-        },
-      },
-    });
-  }, [planId, state.nodes, dispatch, workspace.id]);
-
-  const runSingle = useCallback(
-    async (node: PlanNode): Promise<void> => {
-      if (!planId) {
-        return;
-      }
-      if (stateRef.current.approvalStatus !== "approved") {
-        return;
-      }
-      const nodeById = new Map(
-        stateRef.current.nodes.map((planNode) => {
-          return [planNode.id, planNode] as const;
-        }),
-      );
-      await executePlanStep({
-        planId,
-        step: node,
-        dispatch,
-        workspaceId: workspace.id,
-        nodeById,
-      });
-    },
-    [planId, dispatch, workspace.id],
-  );
-
-  // Auto-run on first load when runMode === 'auto' AND the user has
-  // approved the plan. Approval is the gate that distinguishes
-  // "LLM just proposed this" from "user wants this to run." Key off
-  // the planId so a brand-new plan triggers exactly one run.
-  useEffect(() => {
-    if (state.nodes.length === 0 || !state.isVisible || !planId) {
-      return;
-    }
-    if (state.runMode !== "auto") {
-      return;
-    }
-    if (state.approvalStatus !== "approved") {
-      return;
-    }
-    const allPending = state.nodes.every((n) => {
-      return n.status === "pending";
-    });
-    if (allPending && runOnceRef.current !== planId) {
-      runOnceRef.current = planId;
-      void runAll();
-    }
-  }, [
-    state.nodes,
-    state.isVisible,
-    state.runMode,
-    state.approvalStatus,
+  // Plan-run orchestration (runAll / runSingle / auto-run effect) is
+  // lifted into a self-contained hook. It is called here — before the
+  // canvas-zoom effect — so hook order, dependency arrays, and effect
+  // timing are identical to the previous inline version. `stateRef` and
+  // `runOnceRef` stay owned here so `close` can reset the run-once gate.
+  const { runAll, runSingle } = usePlanRun({
     planId,
-    runAll,
-  ]);
+    state,
+    dispatch,
+    workspaceId: workspace.id,
+    stateRef,
+    runOnceRef,
+  });
 
-  // Animated zoom between overview and focused views — xyflow handles
+  // Animated zoom between overview and focused views: xyflow handles
   // the easing for us via `duration`.
-  useEffect(() => {
-    if (state.canvasView === "overview") {
-      void fitView({ duration: 350, padding: 0.18 });
-      return;
-    }
-    if (state.canvasView === "focused" && state.focusedStepId) {
-      const node = getNode(state.focusedStepId);
-      if (node) {
-        void setCenter(node.position.x + 140, node.position.y + 70, {
-          zoom: 1.4,
-          duration: 350,
-        });
+  useEffect(
+    function animateCanvasZoom() {
+      if (state.canvasView === "overview") {
+        void fitView({ duration: 350, padding: 0.18 });
+        return;
       }
-    }
-  }, [state.canvasView, state.focusedStepId, fitView, setCenter, getNode]);
+      if (state.canvasView === "focused" && state.focusedStepId) {
+        const node = getNode(state.focusedStepId);
+        if (node) {
+          void setCenter(node.position.x + 140, node.position.y + 70, {
+            zoom: 1.4,
+            duration: 350,
+          });
+        }
+      }
+    },
+    [state.canvasView, state.focusedStepId, fitView, setCenter, getNode],
+  );
 
   const openOnCanvas = useCallback(
     (node: PlanNode): void => {
@@ -230,7 +132,7 @@ function PlanFlowCanvas(): JSX.Element {
     [dataExplorerDispatch, dispatch],
   );
 
-  const handleNodeClick = useCallback(
+  const onNodeClick = useCallback(
     (_e: React.MouseEvent, node: { id: string }): void => {
       const planNode = state.nodes.find((n) => {
         return n.id === node.id;
@@ -256,7 +158,7 @@ function PlanFlowCanvas(): JSX.Element {
       // Wipe annotations + branches in IndexedDB + memory.
       annotationDispatch.clearPlanAnnotations(planId);
       try {
-        await clearAnnotationsForPlan(planId);
+        await PlanAnnotationStorage.clearAnnotationsForPlan(planId);
       } catch {
         // best-effort
       }
@@ -271,12 +173,12 @@ function PlanFlowCanvas(): JSX.Element {
   }, [planId, state.nodes, dispatch, annotationDispatch, branchDispatch]);
 
   // Branch sidebar callbacks. Switching branches doesn't actually
-  // swap the rendered nodes in this checkpoint — that requires
+  // swap the rendered nodes in this checkpoint: that requires
   // chat-thread orchestration we land in a follow-up. For now we
   // record the active id so the sidebar shows the correct selection,
   // which is enough to verify the model end-to-end.
   const selectRoot = useCallback((): void => {
-    branchDispatch.setActiveBranch(null);
+    branchDispatch.setActiveBranch(undefined);
   }, [branchDispatch]);
   const selectBranch = useCallback(
     (branchId: string): void => {
@@ -291,47 +193,54 @@ function PlanFlowCanvas(): JSX.Element {
     [branchDispatch],
   );
 
-  // Annotation persistence — load on plan mount, save on every
+  // Annotation persistence: load on plan mount, save on every
   // annotation change for the active plan.
-  useEffect(() => {
-    if (!planId) {
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      try {
-        const loaded = await listAnnotationsForPlan(planId);
-        if (!cancelled && loaded.length > 0) {
-          annotationDispatch.loadAnnotations({
-            planId,
-            annotations: loaded,
-          });
-        }
-      } catch {
-        // best-effort
+  useEffect(
+    function loadPlanAnnotations() {
+      if (!planId) {
+        return;
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [planId, annotationDispatch]);
+      let cancelled = false;
+      void (async () => {
+        try {
+          const loaded =
+            await PlanAnnotationStorage.listAnnotationsForPlan(planId);
+          if (!cancelled && loaded.length > 0) {
+            annotationDispatch.loadAnnotations({
+              planId,
+              annotations: loaded,
+            });
+          }
+        } catch {
+          // best-effort
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    },
+    [planId, annotationDispatch],
+  );
 
-  useEffect(() => {
-    if (!planId) {
-      return;
-    }
-    const planAnnotations = Object.values(annotationState.annotations).filter(
-      (a) => {
-        return a.planId === planId;
-      },
-    );
-    if (planAnnotations.length === 0) {
-      return;
-    }
-    void putAnnotations(planAnnotations);
-  }, [annotationState.annotations, planId]);
+  useEffect(
+    function persistPlanAnnotations() {
+      if (!planId) {
+        return;
+      }
+      const planAnnotations = Object.values(annotationState.annotations).filter(
+        (a) => {
+          return a.planId === planId;
+        },
+      );
+      if (planAnnotations.length === 0) {
+        return;
+      }
+      void PlanAnnotationStorage.putAnnotations(planAnnotations);
+    },
+    [annotationState.annotations, planId],
+  );
 
-  // Export callbacks — capture the canvas element via the ref.
+  // Export callbacks: capture the canvas element via the ref.
   const exportPng = useCallback((): void => {
     if (!canvasContainerRef.current) {
       return;
@@ -353,231 +262,38 @@ function PlanFlowCanvas(): JSX.Element {
     });
   }, [state.nodes, state.rootMessage, t]);
 
-  const allSucceeded = state.nodes.every((n) => {
-    return n.status === "succeeded";
-  });
-  const anyFailed = state.nodes.some((n) => {
-    return n.status === "failed";
-  });
-  const sqlStepCount = state.nodes.filter((n) => {
-    return n.type === "sql";
-  }).length;
-  // Heuristic the spec calls out: >7 SQL steps suggests Python or R
-  // might be a better fit. Show the hint, but allow the user to run
-  // the plan anyway.
-  const showSqlStepHint = sqlStepCount > 7;
-  const isAwaitingApproval = state.approvalStatus === "awaiting_approval";
-  const wasRejected = state.approvalStatus === "rejected";
-
   return (
     <Paper withBorder shadow="sm" radius="md" p="sm">
       <Stack gap="xs">
-        <Group justify="space-between" wrap="nowrap" align="flex-start">
-          <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-            <Text fw={600} size="sm">
-              <Trans>Analytic plan</Trans>
-            </Text>
-            <Text size="xs" c="dimmed" lineClamp={2}>
-              {state.rootMessage}
-            </Text>
-          </Stack>
-          <Group gap="xs" wrap="nowrap">
-            <SegmentedControl
-              size="xs"
-              value={state.runMode}
-              data={[
-                { label: t`Auto`, value: "auto" },
-                { label: t`Step`, value: "step" },
-              ]}
-              onChange={(v) => {
-                dispatch.setRunMode(v === "step" ? "step" : "auto");
-              }}
-            />
-            <Button
-              size="xs"
-              variant="light"
-              leftSection={<IconRefresh size={14} />}
-              disabled={state.approvalStatus !== "approved"}
-              onClick={() => {
-                return runAll();
-              }}
-            >
-              <Trans>Re-run</Trans>
-            </Button>
-            <Button
-              size="xs"
-              variant="subtle"
-              color="neutral"
-              leftSection={
-                state.canvasView === "focused" ?
-                  <IconArrowsMaximize size={14} />
-                : <IconArrowsMinimize size={14} />
-              }
-              onClick={() => {
-                dispatch.setCanvasView(
-                  state.canvasView === "focused" ? "overview" : "focused",
-                );
-              }}
-            >
-              {state.canvasView === "focused" ?
-                <Trans>Zoom out</Trans>
-              : <Trans>Zoom in</Trans>}
-            </Button>
-            <Button
-              size="xs"
-              variant="subtle"
-              color="red"
-              leftSection={<IconX size={14} />}
-              onClick={() => {
-                return close();
-              }}
-            >
-              <Trans>Close</Trans>
-            </Button>
-          </Group>
-        </Group>
+        <PlanFlowHeader
+          rootMessage={state.rootMessage}
+          runMode={state.runMode}
+          canvasView={state.canvasView}
+          approvalStatus={state.approvalStatus}
+          dispatch={dispatch}
+          onReRun={runAll}
+          onClose={close}
+        />
 
-        {isAwaitingApproval ?
-          <Alert
-            color="blue"
-            variant="light"
-            radius="sm"
-            p="xs"
-            title={t`Review and approve the plan`}
-          >
-            <Stack gap="xs">
-              <Text size="xs">
-                {showSqlStepHint ?
-                  <Trans>
-                    The AI has proposed a {state.nodes.length}-step plan —
-                    that's a lot of SQL. Consider whether a Python or R step
-                    would express this more cleanly. You can still approve
-                    as-is. Nothing has run yet. Click each node to read it;
-                    approve to execute.
-                  </Trans>
-                : <Trans>
-                    The AI has proposed a {state.nodes.length}-step plan.
-                    Nothing has run yet. Click each node to read it; approve to
-                    execute.
-                  </Trans>
-                }
-              </Text>
-              <Group gap="xs">
-                <Button
-                  size="xs"
-                  color="green"
-                  onClick={() => {
-                    dispatch.approvePlan();
-                  }}
-                >
-                  <Trans>Approve and run</Trans>
-                </Button>
-                <Button
-                  size="xs"
-                  variant="outline"
-                  color="red"
-                  onClick={() => {
-                    dispatch.rejectPlan();
-                  }}
-                >
-                  <Trans>Reject</Trans>
-                </Button>
-              </Group>
-            </Stack>
-          </Alert>
-        : null}
+        <PlanFlowBanners
+          nodes={state.nodes}
+          approvalStatus={state.approvalStatus}
+          dispatch={dispatch}
+        />
 
-        {wasRejected ?
-          <Alert color="gray" variant="light" radius="sm" p="xs">
-            <Text size="xs">
-              <Trans>
-                Plan rejected. Ask the chat to propose a different plan, or
-                close this canvas.
-              </Trans>
-            </Text>
-          </Alert>
-        : null}
-
-        {anyFailed ?
-          <Alert color="red" variant="light" radius="sm" p="xs">
-            <Text size="xs">
-              <Trans>
-                A step failed. Click the red node to retry, or use Re-run to
-                restart from the top.
-              </Trans>
-            </Text>
-          </Alert>
-        : null}
-
-        {allSucceeded ?
-          <Alert color="green" variant="light" radius="sm" p="xs">
-            <Text size="xs">
-              <Trans>
-                All steps succeeded. Click any node to open it on the canvas.
-              </Trans>
-            </Text>
-          </Alert>
-        : null}
-
-        <Group
-          align="stretch"
-          gap={0}
-          wrap="nowrap"
-          style={{
-            height: 420,
-            borderRadius: 8,
-            border: "1px solid var(--mantine-color-gray-3)",
-            overflow: "hidden",
-          }}
-        >
-          <PlanBranchSidebar
-            onSelectRoot={selectRoot}
-            onSelectBranch={selectBranch}
-            onCloseBranch={closeBranch}
-          />
-          <Box
-            ref={canvasContainerRef}
-            style={{
-              flex: 1,
-              position: "relative",
-              background:
-                "radial-gradient(circle at center, #fafafa 0%, #f1f3f5 100%)",
-              overflow: "hidden",
-            }}
-          >
-            <ReactFlow
-              nodes={rfNodes}
-              edges={rfEdges}
-              nodeTypes={NODE_TYPES}
-              edgeTypes={EDGE_TYPES}
-              onNodeClick={handleNodeClick}
-              fitView
-              fitViewOptions={{ padding: 0.2 }}
-              minZoom={0.2}
-              maxZoom={2}
-              proOptions={{ hideAttribution: true }}
-              defaultEdgeOptions={{ type: "rough" }}
-              // While an annotation drawing tool is active, suppress
-              // xyflow's pan-on-drag so the user can draw cleanly.
-              panOnDrag={annotationState.activeTool === "pan"}
-              nodesDraggable={annotationState.activeTool === "pan"}
-            >
-              <Background gap={20} size={1} color="#dee2e6" />
-              <Controls showInteractive={false} />
-              <MiniMap pannable zoomable />
-            </ReactFlow>
-            {planId ?
-              <PlanAnnotationOverlay
-                planId={planId}
-                containerRef={canvasContainerRef}
-              />
-            : null}
-            <PlanCanvasToolbar
-              onExportPng={exportPng}
-              onExportPdf={exportPdf}
-            />
-          </Box>
-        </Group>
+        <PlanFlowCanvasArea
+          rfNodes={rfNodes}
+          rfEdges={rfEdges}
+          onNodeClick={onNodeClick}
+          activeTool={annotationState.activeTool}
+          planId={planId}
+          canvasContainerRef={canvasContainerRef}
+          onExportPng={exportPng}
+          onExportPdf={exportPdf}
+          onSelectRoot={selectRoot}
+          onSelectBranch={selectBranch}
+          onCloseBranch={closeBranch}
+        />
 
         {state.canvasView === "focused" && state.focusedStepId ?
           <FocusedStepDetail
@@ -620,7 +336,7 @@ function FocusedStepDetail({
   onRun: (node: PlanNode) => void | Promise<void>;
   onOpen: (node: PlanNode) => void;
   onBranch: (node: PlanNode) => void;
-}): JSX.Element | null {
+}): React.ReactNode {
   if (!node) {
     return null;
   }

@@ -1,4 +1,5 @@
-import { hashTextPayload } from "@/lib/privacy/sessionSecret";
+import { createModule } from "@modules";
+import { SessionSecret } from "@/lib/privacy/sessionSecret";
 
 /**
  * Module-scope queue of consent ack tokens that have been approved by
@@ -39,37 +40,41 @@ function _gc(): void {
   }
 }
 
-export async function registerAck(args: {
-  text: string;
-  ackToken: string;
-}): Promise<void> {
-  const payloadHash = await hashTextPayload(args.text);
-  QUEUE.set(payloadHash, {
-    ackToken: args.ackToken,
-    payloadHash,
-    expiresAt: Date.now() + ACK_TTL_MS,
-  });
-}
+export const PendingAcks = createModule("PendingAcks", {
+  builder: () => {
+    return {
+      registerAck: async (args: {
+        text: string;
+        ackToken: string;
+      }): Promise<void> => {
+        const payloadHash = await SessionSecret.hashTextPayload(args.text);
+        QUEUE.set(payloadHash, {
+          ackToken: args.ackToken,
+          payloadHash,
+          expiresAt: Date.now() + ACK_TTL_MS,
+        });
+      },
 
-/**
- * Consume the ack matching `text`, if any. The ack is removed from the
- * queue immediately so two parallel chat turns can't both claim the
- * same ack for the same content.
- */
-export async function consumeAckForText(
-  text: string,
-): Promise<string | undefined> {
-  _gc();
-  const hash = await hashTextPayload(text);
-  const entry = QUEUE.get(hash);
-  if (!entry) {
-    return undefined;
-  }
-  QUEUE.delete(hash);
-  return entry.ackToken;
-}
+      /**
+       * Consume the ack matching `text`, if any. The ack is removed from the
+       * queue immediately so two parallel chat turns can't both claim the
+       * same ack for the same content.
+       */
+      consumeAckForText: async (text: string): Promise<string | undefined> => {
+        _gc();
+        const hash = await SessionSecret.hashTextPayload(text);
+        const entry = QUEUE.get(hash);
+        if (!entry) {
+          return undefined;
+        }
+        QUEUE.delete(hash);
+        return entry.ackToken;
+      },
 
-/** Wipe all pending acks. Used on logout / workspace switch. */
-export function clearAll(): void {
-  QUEUE.clear();
-}
+      /** Wipe all pending acks. Used on logout / workspace switch. */
+      clearAll: (): void => {
+        QUEUE.clear();
+      },
+    };
+  },
+});

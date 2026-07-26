@@ -1,12 +1,12 @@
 /**
  * Client-side bias heuristics for user-typed text and LLM-generated
  * clarification questions. Per the chat-interactive-workflows spec,
- * bias hits are **always a soft nudge — never a hard block**. The
+ * bias hits are **always a soft nudge, never a hard block**. The
  * consent modal lets the user continue as-is, edit themselves, or
  * accept the curated suggestion.
  *
  * v1 ships English-only patterns curated internally. The spec mandates a
- * social-sector-advisor review before Phase 2 ships.
+ * social-sector-advisor review before non-English patterns ship.
  */
 
 export type BiasCategory =
@@ -149,26 +149,22 @@ export function detectBias(text: string): BiasDetectionResult {
     return { hits: [] };
   }
 
-  const hits: BiasHit[] = [];
   const seen = new Set<string>();
-
-  for (const rule of RULES) {
+  const hits: BiasHit[] = RULES.flatMap((rule) => {
     const match = rule.regex.exec(text);
-    if (!match) {
-      continue;
+    if (!match || seen.has(rule.label)) {
+      return [];
     }
-    const dedupeKey = rule.label;
-    if (seen.has(dedupeKey)) {
-      continue;
-    }
-    seen.add(dedupeKey);
-    hits.push({
-      category: rule.category,
-      label: rule.label,
-      sample: match[0].slice(0, 80),
-      suggestion: rule.suggest(match[0], text),
-    });
-  }
+    seen.add(rule.label);
+    return [
+      {
+        category: rule.category,
+        label: rule.label,
+        sample: match[0].slice(0, 80),
+        suggestion: rule.suggest(match[0], text),
+      },
+    ];
+  });
 
   return { hits };
 }

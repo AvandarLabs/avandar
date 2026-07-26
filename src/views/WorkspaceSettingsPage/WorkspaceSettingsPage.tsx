@@ -12,7 +12,7 @@ import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
 
-export function WorkspaceSettingsPage(): JSX.Element {
+export function WorkspaceSettingsPage(): React.ReactNode {
   const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
   const isSettingsAdmin = useIsGlobalAdmin();
@@ -81,7 +81,14 @@ export function WorkspaceSettingsPage(): JSX.Element {
         {isCurrentUserTheWorkspaceOwner ?
           <Tabs
             tabIds={
-              ["general", "users", "roles", "tags", "privacy", "billing"] as const
+              [
+                "general",
+                "users",
+                "roles",
+                "tags",
+                "privacy",
+                "billing",
+              ] as const
             }
             renderTabHeader={{
               general: "General",

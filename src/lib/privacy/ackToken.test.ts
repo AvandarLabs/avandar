@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hashTextPayload, issueAckToken } from "@/lib/privacy/sessionSecret";
+import { SessionSecret } from "@/lib/privacy/sessionSecret";
 
 /**
  * Sanity check that the client-side ack-token issuance produces a
@@ -9,30 +9,30 @@ import { hashTextPayload, issueAckToken } from "@/lib/privacy/sessionSecret";
  * the contract with the server.
  *
  * `crypto.subtle` is available in Node 22's web-crypto polyfill which
- * vitest picks up via jsdom — no shim needed.
+ * vitest picks up via jsdom: no shim needed.
  */
 
 describe("hashTextPayload", () => {
   it("returns a 64-char hex digest", async () => {
-    const hex = await hashTextPayload("hello");
+    const hex = await SessionSecret.hashTextPayload("hello");
     expect(hex).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("hashes the same input to the same digest", async () => {
-    const a = await hashTextPayload("show me revenue by month");
-    const b = await hashTextPayload("show me revenue by month");
+    const a = await SessionSecret.hashTextPayload("show me revenue by month");
+    const b = await SessionSecret.hashTextPayload("show me revenue by month");
     expect(a).toBe(b);
   });
 
   it("hashes different inputs to different digests", async () => {
-    const a = await hashTextPayload("show me revenue by month");
-    const b = await hashTextPayload("show me revenue by year");
+    const a = await SessionSecret.hashTextPayload("show me revenue by month");
+    const b = await SessionSecret.hashTextPayload("show me revenue by year");
     expect(a).not.toBe(b);
   });
 
   it("matches the known SHA-256 of an empty string", async () => {
     // sha256("") = e3b0c442...
-    const hex = await hashTextPayload("");
+    const hex = await SessionSecret.hashTextPayload("");
     expect(hex).toBe(
       "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     );
@@ -41,7 +41,7 @@ describe("hashTextPayload", () => {
 
 describe("issueAckToken", () => {
   // Without mocking the session-secret fetcher we can't actually
-  // mint a token — `issueAckToken` calls `getSessionSecret`, which
+  // mint a token: `issueAckToken` calls `getSessionSecret`, which
   // hits the `/chat/:workspaceId/session-secret` endpoint. We exercise
   // the happy-path inside `useAvandarChatRuntime` integration tests
   // once the test harness can stub the edge function.
@@ -50,6 +50,6 @@ describe("issueAckToken", () => {
   // workspaceId + userId + payloadHash. If any are missing TypeScript
   // catches it at compile time.
   it("is a function", () => {
-    expect(typeof issueAckToken).toBe("function");
+    expect(typeof SessionSecret.issueAckToken).toBe("function");
   });
 });

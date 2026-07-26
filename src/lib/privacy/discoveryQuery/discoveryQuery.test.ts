@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
-} from "@/lib/privacy/discoveryQuery";
+} from "@/lib/privacy/discoveryQuery/discoveryQuery";
 
 describe("isReadOnlyDiscoveryQuery", () => {
   test("accepts simple SELECT", () => {

@@ -2,7 +2,7 @@ import { uuid } from "$/lib/uuid";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 /**
- * Phase 9 — Canvas Annotation + Export.
+ * Canvas Annotation + Export.
  *
  * Annotations are user-drawn overlays on the plan canvas. They live
  * alongside the plan in IndexedDB (keyed by `planId`), serialise into
@@ -89,17 +89,17 @@ export type PlanAnnotationState = {
   /** Active drawing tool. */
   activeTool: AnnotationTool;
   /** Currently selected annotation id (for delete + edit). */
-  selectedId: string | null;
-  /** Undo stack — snapshots of `annotations` before each mutation. */
+  selectedId: string | undefined;
+  /** Undo stack: snapshots of `annotations` before each mutation. */
   undoStack: ReadonlyArray<Record<string, Annotation>>;
-  /** Redo stack — snapshots produced by `undo`. */
+  /** Redo stack: snapshots produced by `undo`. */
   redoStack: ReadonlyArray<Record<string, Annotation>>;
 };
 
 const initialState: PlanAnnotationState = {
   annotations: {},
   activeTool: "pan",
-  selectedId: null,
+  selectedId: undefined,
   undoStack: [],
   redoStack: [],
 };
@@ -128,7 +128,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
 
     selectAnnotation: (
       state: PlanAnnotationState,
-      id: string | null,
+      id?: string,
     ): PlanAnnotationState => {
       return { ...state, selectedId: id };
     },
@@ -142,7 +142,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
       // The discriminated union doesn't survive object spread without
       // a deliberate cast through unknown; we trust the caller's
       // `args.annotation.kind` to be consistent with its other fields.
-      const next = {
+      const nextState = {
         ...(args.annotation as object),
         id,
         createdAt: now,
@@ -150,7 +150,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
       } as unknown as Annotation;
       return {
         ...state,
-        annotations: { ...state.annotations, [id]: next },
+        annotations: { ...state.annotations, [id]: nextState },
         undoStack: _push(state.undoStack, state.annotations),
         redoStack: [],
         selectedId: id,
@@ -165,14 +165,14 @@ export const PlanAnnotationStateManager = createAppStateManager({
       if (!existing) {
         return state;
       }
-      const next = {
+      const nextState = {
         ...existing,
         ...args.patch,
         updatedAt: Date.now(),
       } as Annotation;
       return {
         ...state,
-        annotations: { ...state.annotations, [args.id]: next },
+        annotations: { ...state.annotations, [args.id]: nextState },
         undoStack: _push(state.undoStack, state.annotations),
         redoStack: [],
       };
@@ -191,7 +191,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
         annotations: rest,
         undoStack: _push(state.undoStack, state.annotations),
         redoStack: [],
-        selectedId: state.selectedId === id ? null : state.selectedId,
+        selectedId: state.selectedId === id ? undefined : state.selectedId,
       };
     },
 
@@ -212,10 +212,10 @@ export const PlanAnnotationStateManager = createAppStateManager({
       if (state.redoStack.length === 0) {
         return state;
       }
-      const next = state.redoStack[state.redoStack.length - 1]!;
+      const nextState = state.redoStack[state.redoStack.length - 1]!;
       return {
         ...state,
-        annotations: next,
+        annotations: nextState,
         redoStack: state.redoStack.slice(0, -1),
         undoStack: _push(state.undoStack, state.annotations),
       };
@@ -236,10 +236,14 @@ export const PlanAnnotationStateManager = createAppStateManager({
           return a.planId !== args.planId;
         }),
       );
-      const merged: Record<string, Annotation> = { ...kept };
-      for (const a of args.annotations) {
-        merged[a.id] = a;
-      }
+      const merged: Record<string, Annotation> = {
+        ...kept,
+        ...Object.fromEntries(
+          args.annotations.map((a) => {
+            return [a.id, a];
+          }),
+        ),
+      };
       return {
         ...state,
         annotations: merged,
@@ -263,7 +267,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
         annotations: filtered,
         undoStack: _push(state.undoStack, state.annotations),
         redoStack: [],
-        selectedId: null,
+        selectedId: undefined,
       };
     },
   },

@@ -38,7 +38,18 @@ export function useChatPanelComposerAutoFocus({
       return;
     }
 
+    // Guard + handles so the effect can tear down its pending listener,
+    // timeout, and animation-frame recursion when `isOpen` flips or the
+    // component unmounts before the aside transition completes.
+    let cancelled = false;
+    let rafId: number | undefined;
+    let fallbackTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    let boundAside: HTMLElement | undefined;
+
     const focusComposer = (): void => {
+      if (cancelled) {
+        return;
+      }
       const panel = panelRef.current;
       const input = composerInputRef.current;
       if (!panel || !input || input.disabled) {
@@ -56,35 +67,40 @@ export function useChatPanelComposerAutoFocus({
       hasAutoFocusedThisOpenRef.current = true;
     };
 
-    const waitForAsideTransitionEnd = (): void => {
-      const aside = panelRef.current?.closest("aside");
-      if (!aside) {
-        requestAnimationFrame(waitForAsideTransitionEnd);
+    const teardownAsideListeners = (): void => {
+      if (boundAside) {
+        boundAside.removeEventListener("transitionend", onTransitionEnd);
+        boundAside = undefined;
+      }
+      if (fallbackTimeoutId != null) {
+        clearTimeout(fallbackTimeoutId);
+        fallbackTimeoutId = undefined;
+      }
+    };
+
+    const onTransitionEnd = (event: TransitionEvent): void => {
+      if (event.target !== boundAside || event.propertyName !== "transform") {
         return;
       }
 
-      let fallbackTimeoutId: ReturnType<typeof setTimeout> | undefined;
+      teardownAsideListeners();
+      focusComposer();
+    };
 
-      const cleanup = (): void => {
-        aside.removeEventListener("transitionend", handleTransitionEnd);
-        if (fallbackTimeoutId != null) {
-          clearTimeout(fallbackTimeoutId);
-          fallbackTimeoutId = undefined;
-        }
-      };
+    const waitForAsideTransitionEnd = (): void => {
+      if (cancelled) {
+        return;
+      }
+      const aside = panelRef.current?.closest("aside");
+      if (!aside) {
+        rafId = requestAnimationFrame(waitForAsideTransitionEnd);
+        return;
+      }
 
-      const handleTransitionEnd = (event: TransitionEvent): void => {
-        if (event.target !== aside || event.propertyName !== "transform") {
-          return;
-        }
-
-        cleanup();
-        focusComposer();
-      };
-
-      aside.addEventListener("transitionend", handleTransitionEnd);
+      boundAside = aside;
+      aside.addEventListener("transitionend", onTransitionEnd);
       fallbackTimeoutId = setTimeout(() => {
-        cleanup();
+        teardownAsideListeners();
         focusComposer();
       }, APP_SHELL_ASIDE_TRANSITION_FALLBACK_MS);
 
@@ -95,13 +111,21 @@ export function useChatPanelComposerAutoFocus({
         transform === "none";
 
       if (hasNoTransformTransition) {
-        cleanup();
-        requestAnimationFrame(() => {
-          requestAnimationFrame(focusComposer);
+        teardownAsideListeners();
+        rafId = requestAnimationFrame(() => {
+          rafId = requestAnimationFrame(focusComposer);
         });
       }
     };
 
     waitForAsideTransitionEnd();
+
+    return () => {
+      cancelled = true;
+      if (rafId != null) {
+        cancelAnimationFrame(rafId);
+      }
+      teardownAsideListeners();
+    };
   }, [composerInputRef, isOpen, panelRef]);
 }

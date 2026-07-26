@@ -1,4 +1,4 @@
-import { detectPii } from "@/lib/privacy/piiDetector";
+import { detectPii } from "@/lib/privacy/piiDetector/piiDetector";
 
 /** Matches user messages that answer an inline clarification card. */
 export const CLARIFICATION_ANSWER_MARKER_RE = /^\[Clarification answer:/m;
@@ -24,16 +24,12 @@ export type GeneratedSqlAssumptionReview = {
 export function countClarificationAnswersInThread(
   messages: readonly ThreadMessage[],
 ): number {
-  let count = 0;
-  for (const message of messages) {
-    if (message.role !== "user") {
-      continue;
-    }
-    if (CLARIFICATION_ANSWER_MARKER_RE.test(message.content)) {
-      count += 1;
-    }
-  }
-  return count;
+  return messages.filter((msg) => {
+    return (
+      msg.role === "user" &&
+      CLARIFICATION_ANSWER_MARKER_RE.test(msg.content)
+    );
+  }).length;
 }
 
 /**

@@ -19,6 +19,7 @@
  * security-reviewed; gate user-facing exposure on that review.
  */
 
+import { prop } from "@utils";
 import type {
   SandboxBootRequest,
   SandboxBootResponse,
@@ -66,7 +67,7 @@ const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/";
 let pyodideLoading: Promise<PyodideInstance> | null = null;
 let pyodide: PyodideInstance | null = null;
 
-async function loadPyodide(): Promise<PyodideInstance> {
+async function _loadPyodide(): Promise<PyodideInstance> {
   if (pyodide) {
     return pyodide;
   }
@@ -76,17 +77,17 @@ async function loadPyodide(): Promise<PyodideInstance> {
   pyodideLoading = (async () => {
     // Pull Pyodide's bootstrap script. The CSP allowlists jsdelivr.
     const loaderUrl = `${PYODIDE_CDN}pyodide.js`;
-    await loadScriptViaDOM(loaderUrl);
+    await _loadScriptViaDom(loaderUrl);
     if (!window.loadPyodide) {
       throw new Error("[sandbox] Pyodide loader did not register");
     }
     const inst = await window.loadPyodide({
       indexURL: PYODIDE_CDN,
       stdout: (s) => {
-        postLogToParent("python_stdout", s);
+        _postLogToParent("python_stdout", s);
       },
       stderr: (s) => {
-        postLogToParent("python_stderr", s);
+        _postLogToParent("python_stderr", s);
       },
     });
     // pyarrow is needed for Arrow IPC roundtripping with DuckDB.
@@ -99,7 +100,7 @@ async function loadPyodide(): Promise<PyodideInstance> {
   return await pyodideLoading;
 }
 
-function loadScriptViaDOM(src: string): Promise<void> {
+function _loadScriptViaDom(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = src;
@@ -113,32 +114,32 @@ function loadScriptViaDOM(src: string): Promise<void> {
   });
 }
 
-function postToParent(message: SandboxResponse): void {
+function _postToParent(message: SandboxResponse): void {
   // The parent origin was captured at iframe boot.
   const target = window.__sandboxParentOrigin ?? "*";
   window.parent.postMessage(message, target);
 }
 
-function postLogToParent(
+function _postLogToParent(
   channel: "python_stdout" | "python_stderr" | "r_stdout" | "r_stderr",
   line: string,
 ): void {
-  postToParent({ kind: "log", channel, line });
+  _postToParent({ kind: "log", channel, line });
 }
 
-async function handleBoot(req: SandboxBootRequest): Promise<void> {
+async function _handleBoot(req: SandboxBootRequest): Promise<void> {
   const response: SandboxBootResponse = {
     kind: "boot_response",
     requestId: req.requestId,
     ok: true,
     availableRuntimes: ["python"], // R wired separately when WebR lands.
   };
-  postToParent(response);
+  _postToParent(response);
 }
 
-async function handleRun(req: SandboxRunRequest): Promise<void> {
+async function _handleRun(req: SandboxRunRequest): Promise<void> {
   if (req.runtime !== "python") {
-    postToParent({
+    _postToParent({
       kind: "run_response",
       requestId: req.requestId,
       ok: false,
@@ -149,7 +150,7 @@ async function handleRun(req: SandboxRunRequest): Promise<void> {
 
   let timeoutHandle: number | null = null;
   try {
-    const inst = await loadPyodide();
+    const inst = await _loadPyodide();
 
     // Write each input view's parquet bytes into Pyodide's FS so
     // Python code can read them as DataFrames via the helper below.
@@ -158,12 +159,7 @@ async function handleRun(req: SandboxRunRequest): Promise<void> {
     for (const input of req.inputs) {
       inst.FS.writeFile(`/inputs/${input.name}.parquet`, input.arrow);
     }
-    inst.globals.set(
-      "__avandar_input_names",
-      req.inputs.map((i) => {
-        return i.name;
-      }),
-    );
+    inst.globals.set("__avandar_input_names", req.inputs.map(prop("name")));
 
     const wrapper = `
 import os, sys
@@ -207,14 +203,14 @@ globals().update(_local_inputs)
       "write_output(result)",
     )) as Uint8Array;
 
-    postToParent({
+    _postToParent({
       kind: "run_response",
       requestId: req.requestId,
       ok: true,
       arrow: arrowBytes,
     });
   } catch (e) {
-    postToParent({
+    _postToParent({
       kind: "run_response",
       requestId: req.requestId,
       ok: false,
@@ -258,13 +254,13 @@ window.addEventListener("message", (event) => {
     return;
   }
   if (data.kind === "boot") {
-    void handleBoot(data as SandboxBootRequest);
+    void _handleBoot(data as SandboxBootRequest);
   } else if (data.kind === "run") {
-    void handleRun(data as SandboxRunRequest);
+    void _handleRun(data as SandboxRunRequest);
   }
 });
 
 // Signal to the parent that the iframe is ready to receive boot/run
 // requests. The parent waits for this before queueing work so it
 // doesn't fire before the script has installed its message listener.
-postToParent({ kind: "ready" });
+_postToParent({ kind: "ready" });

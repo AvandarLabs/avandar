@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager/PlanBranchStateManager";
 import { act, renderHook } from "@/test-utils";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
@@ -67,9 +67,9 @@ describe("PlanBranchStateManager", () => {
     });
     expect(result.current[0].activeBranchId).toBe(first.planId);
     act(() => {
-      result.current[1].setActiveBranch(null);
+      result.current[1].setActiveBranch(undefined);
     });
-    expect(result.current[0].activeBranchId).toBeNull();
+    expect(result.current[0].activeBranchId).toBeUndefined();
   });
 
   test("closeBranch removes the entry and resets active when it was active", () => {
@@ -86,7 +86,7 @@ describe("PlanBranchStateManager", () => {
       result.current[1].closeBranch(active);
     });
     expect(Object.keys(result.current[0].branches).length).toBe(0);
-    expect(result.current[0].activeBranchId).toBeNull();
+    expect(result.current[0].activeBranchId).toBeUndefined();
   });
 
   test("clearAllBranches wipes everything", () => {
@@ -109,6 +109,6 @@ describe("PlanBranchStateManager", () => {
       result.current[1].clearAllBranches();
     });
     expect(Object.keys(result.current[0].branches).length).toBe(0);
-    expect(result.current[0].activeBranchId).toBeNull();
+    expect(result.current[0].activeBranchId).toBeUndefined();
   });
 });

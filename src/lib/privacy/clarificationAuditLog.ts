@@ -1,3 +1,4 @@
+import { createModule } from "@modules";
 import { uuid } from "$/lib/uuid";
 import Dexie from "dexie";
 import type { ChatClarifyRequest } from "$/types/chat.types";
@@ -79,77 +80,86 @@ function _responseShape(
   return "fixed_options_single";
 }
 
-/**
- * Record the clarification at the moment it's shown to the user. Returns
- * the row id so the caller can settle it later with `recordOutcome`.
- */
-export async function recordShown(args: {
-  workspaceId: string;
-  threadId?: string;
-  request: ChatClarifyRequest;
-}): Promise<string> {
-  const id = uuid();
-  const responseShape = _responseShape(args.request);
-  // For discovery the option count is unknown at "shown" time — it
-  // only becomes known after the discovery query resolves. Persist
-  // null for now; future work can update it once the dropdown loads.
-  const optionsCount =
-    args.request.responseShape.kind === "fixed_options" ?
-      args.request.responseShape.options.length
-    : null;
+export const ClarificationAuditLog = createModule("ClarificationAuditLog", {
+  builder: () => {
+    return {
+      /**
+       * Record the clarification at the moment it's shown to the user. Returns
+       * the row id so the caller can settle it later with `recordOutcome`.
+       */
+      recordShown: async (args: {
+        workspaceId: string;
+        threadId?: string;
+        request: ChatClarifyRequest;
+      }): Promise<string> => {
+        const id = uuid();
+        const responseShape = _responseShape(args.request);
+        // For discovery the option count is unknown at "shown" time — it
+        // only becomes known after the discovery query resolves. Persist
+        // null for now; future work can update it once the dropdown loads.
+        const optionsCount =
+          args.request.responseShape.kind === "fixed_options" ?
+            args.request.responseShape.options.length
+          : null;
 
-  PENDING.set(id, { id, askedAtMs: Date.now() });
+        PENDING.set(id, { id, askedAtMs: Date.now() });
 
-  try {
-    await db.clarifications.add({
-      id,
-      workspaceId: args.workspaceId,
-      threadId: args.threadId ?? null,
-      timestamp: Date.now(),
-      turnNumber: args.request.turnNumber,
-      responseShape,
-      questionLengthChars: args.request.question.length,
-      rationaleProvided: Boolean(args.request.rationale),
-      optionsCount,
-      outcome: "answered", // tentative; updated by recordOutcome
-      biasReprompts: 0,
-      timeToAnswerMs: null,
-      ledToSuccessfulSql: null,
-      patternLocale: PATTERN_LOCALE,
-    });
-  } catch (e) {
-    console.warn("[privacy] clarification audit write failed:", e);
-  }
-  return id;
-}
+        try {
+          await db.clarifications.add({
+            id,
+            workspaceId: args.workspaceId,
+            threadId: args.threadId ?? null,
+            timestamp: Date.now(),
+            turnNumber: args.request.turnNumber,
+            responseShape,
+            questionLengthChars: args.request.question.length,
+            rationaleProvided: Boolean(args.request.rationale),
+            optionsCount,
+            outcome: "answered", // tentative; updated by recordOutcome
+            biasReprompts: 0,
+            timeToAnswerMs: null,
+            ledToSuccessfulSql: null,
+            patternLocale: PATTERN_LOCALE,
+          });
+        } catch (e) {
+          console.warn("[privacy] clarification audit write failed:", e);
+        }
+        return id;
+      },
 
-export async function recordOutcome(args: {
-  id: string;
-  outcome: ClarificationOutcome;
-}): Promise<void> {
-  const pending = PENDING.get(args.id);
-  const now = Date.now();
-  const elapsed = pending ? now - pending.askedAtMs : null;
-  PENDING.delete(args.id);
-  try {
-    await db.clarifications.update(args.id, {
-      outcome: args.outcome,
-      timeToAnswerMs: elapsed,
-    });
-  } catch (e) {
-    console.warn("[privacy] clarification audit outcome write failed:", e);
-  }
-}
+      recordOutcome: async (args: {
+        id: string;
+        outcome: ClarificationOutcome;
+      }): Promise<void> => {
+        const pending = PENDING.get(args.id);
+        const now = Date.now();
+        const elapsed = pending ? now - pending.askedAtMs : null;
+        PENDING.delete(args.id);
+        try {
+          await db.clarifications.update(args.id, {
+            outcome: args.outcome,
+            timeToAnswerMs: elapsed,
+          });
+        } catch (e) {
+          console.warn(
+            "[privacy] clarification audit outcome write failed:",
+            e,
+          );
+        }
+      },
 
-export async function listClarificationLog(
-  workspaceId: string,
-): Promise<ClarificationAuditEntry[]> {
-  const rows = await db.clarifications.toArray();
-  return rows
-    .filter((r) => {
-      return r.workspaceId === workspaceId;
-    })
-    .sort((a, b) => {
-      return b.timestamp - a.timestamp;
-    });
-}
+      listClarificationLog: async (
+        workspaceId: string,
+      ): Promise<ClarificationAuditEntry[]> => {
+        const rows = await db.clarifications.toArray();
+        return rows
+          .filter((r) => {
+            return r.workspaceId === workspaceId;
+          })
+          .sort((a, b) => {
+            return b.timestamp - a.timestamp;
+          });
+      },
+    };
+  },
+});

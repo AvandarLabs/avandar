@@ -107,16 +107,62 @@ Goal: a copy-pasteable review for GitHub, Slack, or another discussion surface.
 
 ### Auto Mode
 
-Goal: agent acts as reviewer and fixer.
+Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
+**do everything**: fix every violation you find, and never stop to ask.
 
-- Fix rule violations as you find them when the change is clear and local.
-- Stay inside the requested review scope. No opportunistic cleanup or
-  unrelated refactors.
-- Continue reviewing after each fix until the checklist is exhausted.
-- Run relevant validation (typecheck, lint, targeted tests). Report anything
-  you could not verify.
-- End with a summary of fixes plus any ambiguous, risky, or out-of-scope
-  findings.
+- **Fix every rule violation you find, without exception.** Apply a fix for
+  every finding that survives verification, including the low-value,
+  cosmetic, and high-churn ones (comment cleanups, naming, file moves,
+  component splits, helper reuse, functional-style rewrites, etc.). "Low
+  value," "high churn," or "large refactor" is never a reason to skip a fix
+  in auto mode.
+- **Never ask the user anything in auto mode.** Do not ask whether to apply a
+  fix, do not ask the user to confirm your approach or how aggressive to be,
+  and do not defer anything as an optional "follow-up" for the user to
+  approve. There are no follow-ups in auto mode: if it breaks a rule, you fix
+  it now. The only thing you may resolve non-interactively is the base branch
+  (default to `develop`, else `main`, else the repo's obvious trunk) — pick
+  it and proceed rather than prompting.
+- Correctness is the top priority: when a fix is behavior-sensitive, make the
+  change and prove it with the finish protocol below. Never trade correctness
+  for coverage, but never skip a fix merely because it is risky — do it and
+  verify it.
+- Stay inside the requested review scope (the files/diff under review). Do not
+  hunt for issues in unrelated, untouched code. Within that scope there is no
+  "out of scope" finding: fix it.
+- Continue reviewing and fixing until every checklist phase is exhausted and
+  no reviewed line still breaks a rule.
+- The only findings you may leave unfixed are **verified false positives**: a
+  documented exception, a linter rule this repo disables, or a rule that does
+  not actually apply once checked. These are not "skipped" work — record each
+  with a one-line reason. Everything else gets fixed.
+
+**Finish protocol (auto mode always runs this, in order, without asking):**
+
+1. Apply every fix.
+2. **Format.** If the repo defines a format script (e.g. a `format` entry in
+   `package.json` such as `pnpm format`, or a documented formatter), run it
+   once over the changed files.
+3. **Zero out errors from the changes.** After formatting, run the repo's
+   typecheck and lint and fix **every** type error and lint error that is
+   attributable to the set of changes under review. Do **not** fix
+   pre-existing errors that exist independently of this diff (confirm by
+   checking the base branch or the untouched committed state when unsure);
+   those are genuinely out of scope — report them, do not fix them.
+4. **Run the relevant tests** (see "Testing At The End Of Review") and get
+   them green.
+5. **Re-verify.** Re-run the review's own checks (including any repo linters
+   the React phase uses, such as `react-doctor`) and confirm nothing reviewed
+   still breaks a rule except verified false positives. Loop back to step 1
+   if anything remains.
+
+**Exit bar for auto mode:** by the time you report, there must be (a) no type
+errors and no lint errors introduced by the changes under review, and (b) no
+code-review rule still broken on the reviewed lines. End with a summary of
+what you fixed plus a short list of any verified false positives (with the
+reason each is not a real violation). The summary must NOT contain a
+"recommended follow-up" section that punts real rule violations back to the
+user — in auto mode there are none.
 
 ### Pair Review Mode
 
@@ -371,9 +417,11 @@ edited nothing, so there is no write contention.
 
 - **Report mode:** do not apply. Output the merged findings ordered by
   severity, per **Review Output**.
-- **Auto mode:** apply the surviving fixes in a single serial pass, grouped
-  by file, then run the targeted tests per **Testing At The End Of
-  Review**.
+- **Auto mode:** apply **every** surviving fix (never defer one as a
+  follow-up), grouped by file, then run the auto-mode **Finish protocol**
+  defined under "Auto Mode" (format → zero out the type/lint errors
+  introduced by the changes → targeted tests → re-verify no reviewed line
+  still breaks a rule). Do not ask the user anything.
 - **Pair Review mode:** present the merged findings one at a time for
   approval (per **Pair Review Mode**), and apply each approved fix serially
   before moving to the next.
@@ -652,8 +700,14 @@ sub-checklist file.
 
 - In report mode, report findings first, ordered by severity, with file and
   line references, in a format that can be pasted into GitHub or Slack.
-- In auto mode, summarize the fixes you applied, then list any remaining
-  findings or follow-up items.
+- In auto mode, summarize the fixes you applied and confirm the exit bar was
+  met (no type/lint errors introduced by the changes; no reviewed line still
+  breaks a rule). The only list you may include is **verified false
+  positives**, each with a one-line reason. Do NOT list "remaining findings"
+  or "recommended follow-ups" that are real rule violations left unfixed —
+  auto mode fixes them all. The only unfixed items you may mention are
+  pre-existing issues that are independent of the diff under review (and are
+  therefore out of scope).
 - In pair review mode, present one finding at a time with the recommended fix
   and wait for user approval before changing code.
 - Skip sections that are not relevant to the diff.

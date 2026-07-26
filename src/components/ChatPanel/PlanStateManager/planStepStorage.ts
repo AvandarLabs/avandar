@@ -1,3 +1,4 @@
+import { createModule } from "@modules";
 import Dexie from "dexie";
 import type { Table } from "dexie";
 
@@ -19,7 +20,7 @@ import type { Table } from "dexie";
  *
  * **Storage hygiene**: `clearPlan` is called when the user dismisses
  * the plan; `clearAll` is the nuclear option (workspace switch,
- * sign-out). We're holding parquet bytes, which can be large — never
+ * sign-out). We're holding parquet bytes, which can be large: never
  * keep them around longer than the analysis they belong to.
  */
 export type PlanStepBlob = {
@@ -57,46 +58,55 @@ function _key(planId: string, stepId: string): string {
   return `${planId}|${stepId}`;
 }
 
-export async function putPlanStepBlob(args: {
-  planId: string;
-  stepId: string;
-  parquet: Blob;
-  schema: Array<{ name: string; type: string }>;
-  rowCount: number;
-}): Promise<void> {
-  await db.steps.put({
-    id: _key(args.planId, args.stepId),
-    planId: args.planId,
-    stepId: args.stepId,
-    parquet: args.parquet,
-    schema: args.schema,
-    rowCount: args.rowCount,
-    savedAt: Date.now(),
-  });
-}
-
-export async function getPlanStepBlob(args: {
-  planId: string;
-  stepId: string;
-}): Promise<PlanStepBlob | undefined> {
-  return await db.steps.get(_key(args.planId, args.stepId));
-}
-
-export async function listPlanStepBlobs(
-  planId: string,
-): Promise<PlanStepBlob[]> {
-  return await db.steps.where("planId").equals(planId).toArray();
-}
-
 /**
- * Clear all step blobs for one plan. Call this when the user closes the
- * plan or when a new plan replaces the prior one.
+ * IndexedDB-backed store for plan step result blobs, keyed by
+ * `(planId, stepId)`. Grouped as a module because every method shares the
+ * one `AvandarPlanStepDB` Dexie backend.
  */
-export async function clearPlanStepBlobs(planId: string): Promise<void> {
-  await db.steps.where("planId").equals(planId).delete();
-}
+export const PlanStepStorage = createModule("PlanStepStorage", {
+  builder: () => {
+    return {
+      putPlanStepBlob: async (args: {
+        planId: string;
+        stepId: string;
+        parquet: Blob;
+        schema: Array<{ name: string; type: string }>;
+        rowCount: number;
+      }): Promise<void> => {
+        await db.steps.put({
+          id: _key(args.planId, args.stepId),
+          planId: args.planId,
+          stepId: args.stepId,
+          parquet: args.parquet,
+          schema: args.schema,
+          rowCount: args.rowCount,
+          savedAt: Date.now(),
+        });
+      },
 
-/** Wipe the entire materialisation cache. */
-export async function clearAllPlanStepBlobs(): Promise<void> {
-  await db.steps.clear();
-}
+      getPlanStepBlob: async (args: {
+        planId: string;
+        stepId: string;
+      }): Promise<PlanStepBlob | undefined> => {
+        return await db.steps.get(_key(args.planId, args.stepId));
+      },
+
+      listPlanStepBlobs: async (planId: string): Promise<PlanStepBlob[]> => {
+        return await db.steps.where("planId").equals(planId).toArray();
+      },
+
+      /**
+       * Clear all step blobs for one plan. Call this when the user closes the
+       * plan or when a new plan replaces the prior one.
+       */
+      clearPlanStepBlobs: async (planId: string): Promise<void> => {
+        await db.steps.where("planId").equals(planId).delete();
+      },
+
+      /** Wipe the entire materialisation cache. */
+      clearAllPlanStepBlobs: async (): Promise<void> => {
+        await db.steps.clear();
+      },
+    };
+  },
+});
