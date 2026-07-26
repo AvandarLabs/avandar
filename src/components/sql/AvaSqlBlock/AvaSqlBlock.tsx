@@ -1,12 +1,12 @@
 import { EditorView } from "@codemirror/view";
-import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments";
-import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope";
+import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
+import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope/sqlScope";
 import clsx from "clsx";
 import { useMemo, useRef, useState } from "react";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
 import { useSqlDisplayCatalog } from "@/components/sql/sql-helpers/useSqlDisplayCatalog";
 import css from "./AvaSqlBlock.module.css";
-import { PillEditPopover } from "./PillEditPopover";
+import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { ReactNode } from "react";

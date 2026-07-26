@@ -22,7 +22,7 @@ import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { UnknownDataFrame } from "@utils";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 

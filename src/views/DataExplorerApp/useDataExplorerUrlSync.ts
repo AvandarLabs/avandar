@@ -1,6 +1,6 @@
 import { isNonNullish, propEq, where } from "@utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

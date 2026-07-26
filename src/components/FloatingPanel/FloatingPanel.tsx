@@ -19,8 +19,8 @@ import clsx from "clsx";
 import { useCallback, useRef } from "react";
 import { ANIMATION_PRESET, FLOATING_PANEL_Z_INDEX } from "@/config/Theme";
 import css from "./FloatingPanel.module.css";
-import { useFloatingPanelDismiss } from "./useFloatingPanelDismiss";
-import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
+import { useFloatingPanelDismiss } from "./useFloatingPanelDismiss/useFloatingPanelDismiss";
+import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition/useFloatingPanelMorphTransition";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
 type FloatingPanelInitialPosition = {

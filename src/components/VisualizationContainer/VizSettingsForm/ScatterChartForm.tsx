@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset";
+import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";

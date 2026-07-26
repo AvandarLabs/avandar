@@ -1,4 +1,4 @@
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { CSSProperties } from "react";
 import type {

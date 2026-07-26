@@ -1,4 +1,4 @@
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL.ts";
+import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 /**

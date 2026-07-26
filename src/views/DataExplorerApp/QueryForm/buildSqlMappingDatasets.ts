@@ -1,7 +1,7 @@
 import { propEq } from "@utils";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
-import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStructuredQuery";
+import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 
 /**
  * Groups workspace dataset columns by dataset for `sqlToStructuredQuery`.

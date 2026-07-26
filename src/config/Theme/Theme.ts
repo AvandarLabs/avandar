@@ -28,7 +28,7 @@ import {
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
 import { cssAvaVar } from "../../lib/utils/browser/css";
-import { AnimationTheme } from "./AnimationTheme";
+import { AnimationTheme } from "./AnimationTheme/AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";
 import { OverlayTheme } from "./OverlayTheme";
@@ -486,7 +486,7 @@ export const Theme = createTheme({
   },
 }) as MantineTheme;
 
-export { AnimationTheme } from "./AnimationTheme";
+export { AnimationTheme } from "./AnimationTheme/AnimationTheme";
 export { BorderTheme } from "./BorderTheme";
 export { ElevationTheme } from "./ElevationTheme";
 export { OverlayTheme } from "./OverlayTheme";

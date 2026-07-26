@@ -1,4 +1,4 @@
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
+import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 type Params = {

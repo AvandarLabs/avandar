@@ -1,11 +1,11 @@
 import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
+import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
-} from "$/models/vizs/applyVizConfigFromQueryResult";
+} from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";

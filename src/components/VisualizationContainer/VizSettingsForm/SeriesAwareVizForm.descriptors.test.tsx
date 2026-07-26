@@ -12,7 +12,7 @@ import { pathGet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
-import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm";
+import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

@@ -2,7 +2,7 @@ import { ComponentConfig } from "@puckeditor/core";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps";
+import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
 import { buildNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
 import { buildVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";

@@ -5,7 +5,7 @@ import { prop, UnknownDataFrame } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit";
+import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";

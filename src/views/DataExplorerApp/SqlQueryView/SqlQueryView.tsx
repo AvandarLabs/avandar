@@ -4,7 +4,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor";
-import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay";
+import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay/formatSqlForDisplay";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";

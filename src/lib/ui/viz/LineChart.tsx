@@ -3,7 +3,7 @@ import { formatDate, propEq } from "@utils";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
