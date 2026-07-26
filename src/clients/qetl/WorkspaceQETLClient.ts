@@ -46,7 +46,7 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
       }
 
       const qetlClient = QETLClientFactory.create({
-        getDiceFromSQL: async (rawSql: string) => {
+        getDiceFromSql: async (rawSql: string) => {
           /**
            * Reuse the same TanStack Query cache as `DatasetClient.useGetAll`
            * (via `withEnsureQueryData`), so each QETL `runQuery` does not

@@ -33,7 +33,7 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
       }
 
       const qetlClient = QETLClientFactory.create({
-        getDiceFromSQL: async (rawSql: string) => {
+        getDiceFromSql: async (rawSql: string) => {
           const publishedDatasetIds =
             await PublicDatasetParquetStorageClient.listDatasetIdsForDashboard({
               dashboardId,

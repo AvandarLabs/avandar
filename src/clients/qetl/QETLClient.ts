@@ -40,7 +40,7 @@ export type IQETLClient = Module<
   "QETLClient",
   {
     /** Get the necessary dice to answer the given SQL query. */
-    getDiceFromSQL: (rawSql: string) => Promise<readonly Dataset.Id[]>;
+    getDiceFromSql: (rawSql: string) => Promise<readonly Dataset.Id[]>;
 
     /** Insert the given facts into the local storage cache. */
     insertToStorageCache: (params: {
@@ -125,7 +125,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
   "QETLClient",
   {
     childBuilder(module) {
-      const { getDiceFromSQL, insertToStorageCache } = module.getState();
+      const { getDiceFromSql, insertToStorageCache } = module.getState();
 
       // The Memory Cube is an in-memory DuckDB instance.
       const MemoryCube = {
@@ -181,7 +181,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         }: {
           rawSql: string;
         }): Promise<{ missingDice: Dataset.Id[] }> => {
-          const queryDependencies = await getDiceFromSQL(rawSql);
+          const queryDependencies = await getDiceFromSql(rawSql);
 
           if (queryDependencies.length === 0) {
             // there are no dependencies, so there is nothing to load
