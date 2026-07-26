@@ -2,9 +2,9 @@ import path from "node:path";
 import "@testing-library/jest-dom";
 import { i18n } from "@lingui/core";
 import * as matchers from "@testing-library/jest-dom/matchers";
+import { cleanup } from "@testing-library/react";
 import dotenv from "dotenv";
 import { afterEach, expect } from "vitest";
-import { cleanup } from "@/test-utils";
 
 // Activate the Lingui singleton with an empty English catalog so any test
 // that mounts a component using `t`/`Trans` can resolve message ids without
