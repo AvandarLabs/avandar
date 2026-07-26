@@ -3,7 +3,7 @@ import { isDefined } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Dexie from "dexie";
 import type { ConsentModalMode } from "@/components/Privacy/ConsentModal/ConsentModal";
-import type { CrossBoundaryContext } from "@/lib/privacy/crossBoundary";
+import type { CrossBoundaryContext } from "@/components/Privacy/privacy-helpers/crossBoundary";
 import type { Table } from "dexie";
 
 /**

@@ -1,5 +1,5 @@
 import { createModule } from "@modules";
-import { SessionSecret } from "@/lib/privacy/sessionSecret";
+import { SessionSecret } from "@/components/Privacy/privacy-helpers/sessionSecret";
 
 /**
  * Module-scope queue of consent ack tokens that have been approved by

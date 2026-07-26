@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Alert, Code, Stack, Text } from "@mantine/core";
 import { IconBulb } from "@tabler/icons-react";
-import type { BiasHit } from "@/lib/privacy/biasDetector/biasDetector";
 import { BiasHitBadges } from "./BiasHitBadges";
+import type { BiasHit } from "@/components/Privacy/privacy-helpers/biasDetector/biasDetector";
 
 type Props = {
   /** Bias findings driving the nudge. Non-empty when this panel renders. */

@@ -1,10 +1,10 @@
 import { Trans } from "@lingui/react/macro";
 import { Alert, Checkbox, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import type { PiiDetectionResult } from "@/lib/privacy/piiDetector/piiDetector";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
+import type { PiiDetectionResult } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
 
 type Props = {
   /** PII findings driving the warning. */

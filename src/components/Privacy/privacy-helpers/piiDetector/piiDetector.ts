@@ -11,7 +11,7 @@
  * promise that the LLM never sees row-level data without consent.
  *
  * v1 scope: English only. Spanish + French pattern files stubbed at
- * `src/lib/privacy/patterns/*` once those locales ship.
+ * `src/components/Privacy/privacy-helpers/patterns/*` once those locales ship.
  */
 
 export type PiiCategory =
@@ -321,11 +321,19 @@ function _detectFromContent(values: readonly unknown[]): PiiPatternHit[] {
 }
 
 function _maxSeverity(hits: readonly PiiPatternHit[]): PiiSeverity {
-  if (hits.some((h) => {return CATEGORY_CRITICAL.has(h.category)})) {
+  if (
+    hits.some((h) => {
+      return CATEGORY_CRITICAL.has(h.category);
+    })
+  ) {
     return "critical";
   }
-  return hits.some((h) => {return CATEGORY_WARNING.has(h.category)})
-    ? "warning"
+  return (
+      hits.some((h) => {
+        return CATEGORY_WARNING.has(h.category);
+      })
+    ) ?
+      "warning"
     : "clean";
 }
 

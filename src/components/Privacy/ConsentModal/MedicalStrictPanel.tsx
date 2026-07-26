@@ -1,10 +1,10 @@
 import { Trans } from "@lingui/react/macro";
 import { Alert, Checkbox, Code, Stack, Text, TextInput } from "@mantine/core";
 import { IconHeartbeat } from "@tabler/icons-react";
-import type { PiiDetectionResult } from "@/lib/privacy/piiDetector/piiDetector";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
+import type { PiiDetectionResult } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
 
 type Props = {
   /** PII findings driving the health-data warning. */
@@ -50,11 +50,7 @@ export function MedicalStrictPanel({
 }: Props): React.ReactNode {
   return (
     <>
-      <Alert
-        color="red"
-        icon={<IconHeartbeat size={18} />}
-        title={alertTitle}
-      >
+      <Alert color="red" icon={<IconHeartbeat size={18} />} title={alertTitle}>
         <Text size="sm">
           <Trans>
             This data appears to contain health or patient information. Sending

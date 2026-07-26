@@ -2,17 +2,17 @@ import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { ConsentModal } from "@/components/Privacy/ConsentModal/ConsentModal";
-import { detectBias } from "@/lib/privacy/biasDetector/biasDetector";
-import { ConsentAuditLog } from "@/lib/privacy/consentAuditLog";
-import { PendingAcks } from "@/lib/privacy/pendingAcks";
-import { detectPii } from "@/lib/privacy/piiDetector/piiDetector";
-import { SessionSecret } from "@/lib/privacy/sessionSecret";
+import { detectBias } from "@/components/Privacy/privacy-helpers/biasDetector/biasDetector";
+import { ConsentAuditLog } from "@/components/Privacy/privacy-helpers/consentAuditLog";
+import { PendingAcks } from "@/components/Privacy/privacy-helpers/pendingAcks";
+import { detectPii } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
+import { SessionSecret } from "@/components/Privacy/privacy-helpers/sessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
 } from "@/components/Privacy/ConsentModal/ConsentModal";
-import type { BiasHit } from "@/lib/privacy/biasDetector/biasDetector";
-import type { PiiDetectionResult } from "@/lib/privacy/piiDetector/piiDetector";
+import type { BiasHit } from "@/components/Privacy/privacy-helpers/biasDetector/biasDetector";
+import type { PiiDetectionResult } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**

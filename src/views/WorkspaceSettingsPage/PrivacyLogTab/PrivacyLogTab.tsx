@@ -16,14 +16,14 @@ import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ClarificationAuditLog } from "@/components/Privacy/privacy-helpers/clarificationAuditLog";
+import { ConsentAuditLog } from "@/components/Privacy/privacy-helpers/consentAuditLog";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ClarificationAuditLog } from "@/lib/privacy/clarificationAuditLog";
-import { ConsentAuditLog } from "@/lib/privacy/consentAuditLog";
 import type {
   ClarificationAuditEntry,
   ClarificationOutcome,
-} from "@/lib/privacy/clarificationAuditLog";
-import type { ConsentAuditEntry } from "@/lib/privacy/consentAuditLog";
+} from "@/components/Privacy/privacy-helpers/clarificationAuditLog";
+import type { ConsentAuditEntry } from "@/components/Privacy/privacy-helpers/consentAuditLog";
 
 type FilterValue = "all" | ConsentAuditEntry["decision"];
 

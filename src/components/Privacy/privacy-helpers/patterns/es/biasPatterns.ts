@@ -8,10 +8,11 @@
  * they are turned on.
  *
  * Adding patterns: copy the shape from
- * `src/lib/privacy/biasDetector.ts`, but keep this file frozen until
- * the locale expansion and the advisor review have signed off. Until then,
- * `detectBias` falls back to English-only patterns and Spanish-locale
- * users see the English detector with translated UX copy.
+ * `src/components/Privacy/privacy-helpers/biasDetector/biasDetector.ts`,
+ * but keep this file frozen until the locale expansion and the advisor
+ * review have signed off. Until then, `detectBias` falls back to
+ * English-only patterns and Spanish-locale users see the English detector
+ * with translated UX copy.
  */
 
 export const PATTERNS_STATUS = "stub_pending_advisor_review" as const;

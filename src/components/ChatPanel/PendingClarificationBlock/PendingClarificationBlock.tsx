@@ -9,10 +9,10 @@ import {
   formatClarificationAnswerForThread,
 } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
+import { ClarificationAuditLog } from "@/components/Privacy/privacy-helpers/clarificationAuditLog";
+import { crossBoundary } from "@/components/Privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ClarificationAuditLog } from "@/lib/privacy/clarificationAuditLog";
-import { crossBoundary } from "@/lib/privacy/crossBoundary";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
