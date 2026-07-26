@@ -4,7 +4,7 @@ import {
   hasDataExplorerPanelPreferencesInSessionStorage,
   readDataExplorerPanelPreferences,
   writeDataExplorerPanelPreferences,
-} from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+} from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 
 describe("dataExplorerPanelPreferences", () => {
   beforeEach(() => {

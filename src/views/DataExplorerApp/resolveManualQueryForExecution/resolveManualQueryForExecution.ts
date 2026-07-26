@@ -7,7 +7,7 @@ import {
 import {
   largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
-} from "@/views/DataExplorerApp/manualQueryLimit";
+} from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";

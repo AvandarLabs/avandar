@@ -11,7 +11,7 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import {
   shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
-} from "@/views/DataExplorerApp/dataExplorerUrlHydration";
+} from "@/views/DataExplorerApp/dataExplorerUrlHydration/dataExplorerUrlHydration";
 import {
   areExplorerUrlSearchParamsEqual,
   EMPTY_EXPLORER_URL_SEARCH,
@@ -20,7 +20,7 @@ import {
   serializeStateToUrl,
 } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
-import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
+import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 type Options = {

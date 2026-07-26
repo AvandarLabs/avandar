@@ -15,11 +15,11 @@ import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/Q
 import { useState } from "react";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit";
+import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
-import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint";
-import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
+import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
+import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import classes from "./ManualQueryForm.module.css";
 import type { SelectData } from "@ui";

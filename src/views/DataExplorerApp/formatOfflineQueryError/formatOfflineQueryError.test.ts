@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   formatOfflineQueryError,
   OFFLINE_UNCACHED_MESSAGE,
-} from "@/views/DataExplorerApp/formatOfflineQueryError";
+} from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 
 describe("formatOfflineQueryError", () => {
   afterEach(() => {

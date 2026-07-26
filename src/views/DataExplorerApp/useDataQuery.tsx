@@ -9,8 +9,8 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution";
-import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute";
+import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
+import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { UseQueryResultTuple } from "@hooks";
 import type {

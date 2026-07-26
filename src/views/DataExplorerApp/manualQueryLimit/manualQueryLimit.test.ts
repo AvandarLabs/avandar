@@ -9,7 +9,7 @@ import {
   largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
   shouldDefaultManualQueryLimit,
-} from "@/views/DataExplorerApp/manualQueryLimit";
+} from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 describe("manualQueryLimit", () => {

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences";
+import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
 import type { User } from "$/models/User/User";

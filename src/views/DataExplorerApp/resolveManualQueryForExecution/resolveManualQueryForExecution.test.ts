@@ -9,11 +9,11 @@ import {
 import {
   LARGE_DATASET_AUTO_LIMIT,
   LARGE_DATASET_ROW_THRESHOLD,
-} from "@/views/DataExplorerApp/manualQueryLimit";
+} from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import {
   fetchDatasetRowCount,
   resolveManualQueryForExecution,
-} from "@/views/DataExplorerApp/resolveManualQueryForExecution";
+} from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
