@@ -24,9 +24,9 @@ import { match } from "ts-pattern";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { Knex } from "knex";
-import { _applyFilters, _applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderFilters.ts";
-import { _applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderJoins.ts";
-import { _quoteSqlIdentifier, _sql } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { applyFilters, applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderFilters.ts";
+import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/renderJoins.ts";
+import { quoteSqlIdentifier, sql } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
@@ -105,54 +105,54 @@ export function structuredQueryToSql(
   });
 
   const adjustedColumnNames = columnNamesWithoutAggregations.map((colName) => {
-    const quotedColName = _quoteSqlIdentifier(colName);
+    const quotedColName = quoteSqlIdentifier(colName);
     if (castTimestampsToISO) {
       return timestampColumnNames.includes(colName) ?
-          _sql.raw(
+          sql.raw(
             `strftime(${quotedColName}::TIMESTAMP, "'%Y-%m-%dT%H:%M:%S.%fZ') as ${quotedColName}`,
           )
-        : _sql.raw(quotedColName);
+        : sql.raw(quotedColName);
     }
-    return _sql.raw(quotedColName);
+    return sql.raw(quotedColName);
   });
 
   let sqlQuery: Knex.QueryBuilder;
   if (nestedSubquery) {
     const alias = nestedSubquery.alias ?? "subq";
-    const quotedAlias = _quoteSqlIdentifier(alias);
-    sqlQuery = _sql
+    const quotedAlias = quoteSqlIdentifier(alias);
+    sqlQuery = sql
       .select(...adjustedColumnNames)
       .fromRaw(`(${nestedSubquery.sql}) as ${quotedAlias}`);
   } else if (tableName) {
-    sqlQuery = _sql.select(...adjustedColumnNames).from(tableName);
+    sqlQuery = sql.select(...adjustedColumnNames).from(tableName);
   } else {
     return "";
   }
 
   // apply joins (must be before WHERE for correctness)
   if (joins.length > 0) {
-    sqlQuery = _applyJoins(sqlQuery, joins);
+    sqlQuery = applyJoins(sqlQuery, joins);
   }
 
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
-    sqlQuery = _applyFilters(sqlQuery, filters);
+    sqlQuery = applyFilters(sqlQuery, filters);
   }
 
   if (groupByColumnNames.length > 0) {
     const groupByClause = groupByColumnNames
-      .map(_quoteSqlIdentifier)
+      .map(quoteSqlIdentifier)
       .join(", ");
     sqlQuery = sqlQuery.groupByRaw(groupByClause);
   }
 
   // apply HAVING clause (after GROUP BY, before ORDER BY)
   if (!isEmptyQueryFilter(having)) {
-    sqlQuery = _applyHaving(sqlQuery, having);
+    sqlQuery = applyHaving(sqlQuery, having);
   }
 
   if (orderByColumnName && orderByDirection) {
-    const quotedOrderByColumn = _quoteSqlIdentifier(orderByColumnName);
+    const quotedOrderByColumn = quoteSqlIdentifier(orderByColumnName);
     sqlQuery = sqlQuery.orderByRaw(
       `${quotedOrderByColumn} ${orderByDirection}`,
     );
@@ -162,43 +162,43 @@ export function structuredQueryToSql(
     (newQuery, [columnName, aggType]) => {
       const aggregationColumnName =
         DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
-      const quotedColumnName = _quoteSqlIdentifier(columnName);
-      const quotedAggregationColumnName = _quoteSqlIdentifier(
+      const quotedColumnName = quoteSqlIdentifier(columnName);
+      const quotedAggregationColumnName = quoteSqlIdentifier(
         aggregationColumnName,
       );
 
       return match(aggType)
         .with("sum", () => {
           return newQuery.select(
-            _sql.raw(
+            sql.raw(
               `sum(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("avg", () => {
           return newQuery.select(
-            _sql.raw(
+            sql.raw(
               `avg(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("count", () => {
           return newQuery.select(
-            _sql.raw(
+            sql.raw(
               `count(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("max", () => {
           return newQuery.select(
-            _sql.raw(
+            sql.raw(
               `max(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );
         })
         .with("min", () => {
           return newQuery.select(
-            _sql.raw(
+            sql.raw(
               `min(${quotedColumnName}) as ${quotedAggregationColumnName}`,
             ),
           );

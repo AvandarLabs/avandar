@@ -7,7 +7,7 @@ import type {
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { Knex } from "knex";
-import { _quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 
 /**
  * Coerce a rule's `value` into a list. Arrays pass through unchanged;
@@ -129,7 +129,7 @@ function _applyFilterNode(
   return builder.andWhere(subFn);
 }
 
-export function _applyFilters(
+export function applyFilters(
   builder: Knex.QueryBuilder,
   group: QueryFilterGroup,
 ): Knex.QueryBuilder {
@@ -147,7 +147,7 @@ export function _applyFilters(
  * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
  * but using `havingRaw` so the predicate is rendered after GROUP BY.
  */
-export function _applyHaving(
+export function applyHaving(
   builder: Knex.QueryBuilder,
   group: QueryFilterGroup,
 ): Knex.QueryBuilder {
@@ -175,7 +175,7 @@ function _renderFilterValue(value: QueryFilterRule["value"]): string {
 }
 
 function _renderFilterRuleSql(rule: QueryFilterRule): string {
-  const col = _quoteSqlIdentifier(rule.columnName);
+  const col = quoteSqlIdentifier(rule.columnName);
   return match(rule.operator)
     .with("=", () => {
       return `${col} = ${_renderFilterValue(rule.value)}`;

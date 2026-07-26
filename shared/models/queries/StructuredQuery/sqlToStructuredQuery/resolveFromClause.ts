@@ -1,6 +1,6 @@
 import { uuid } from "$/lib/uuid.ts";
 import { Parser } from "node-sql-parser";
-import { _columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
+import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 import type { QueryFilterCombinator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
@@ -82,8 +82,8 @@ function _parseJoinOn(
     );
     return undefined;
   }
-  const leftCol = _columnRefName(obj.left);
-  const rightCol = _columnRefName(obj.right);
+  const leftCol = columnRefName(obj.left);
+  const rightCol = columnRefName(obj.right);
   const leftTable = (obj.left as { table?: string | null } | null)?.table;
   const rightTable = (obj.right as { table?: string | null } | null)?.table;
   if (!leftCol || !rightCol) {
@@ -123,7 +123,7 @@ function _stringifyNodeSqlParserSelect(node: unknown): string {
  * (either a known table or a nested subquery), collect any JOINs, and
  * record unmapped reasons.
  */
-export function _resolveFrom(
+export function resolveFrom(
   fromList: unknown,
   datasets: readonly DatasetWithColumns[],
   unmappedReasons: string[],

@@ -1,8 +1,8 @@
 import {
-  _columnRefName,
-  _extractValueList,
-  _literalValue,
-  _toFilterOperator,
+  columnRefName,
+  extractValueList,
+  literalValue,
+  toFilterOperator,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import type {
   QueryFilter,
@@ -11,7 +11,7 @@ import type {
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-export function _parseWhereNode(
+export function parseWhereNode(
   node: unknown,
   unmappedReasons: string[],
 ): QueryFilter | undefined {
@@ -28,8 +28,8 @@ export function _parseWhereNode(
 
   const operator = String(obj.operator ?? "").toUpperCase();
   if (operator === "AND" || operator === "OR") {
-    const left = _parseWhereNode(obj.left, unmappedReasons);
-    const right = _parseWhereNode(obj.right, unmappedReasons);
+    const left = parseWhereNode(obj.left, unmappedReasons);
+    const right = parseWhereNode(obj.right, unmappedReasons);
     const rules: QueryFilter[] = [];
     if (left) {
       if (left.type === "group" && left.combinator === operator) {
@@ -61,7 +61,7 @@ export function _parseWhereNode(
   }
 
   // Leaf comparison
-  const columnName = _columnRefName(obj.left);
+  const columnName = columnRefName(obj.left);
   if (!columnName) {
     unmappedReasons.push(
       "WHERE clause uses an expression on the left-hand side that is not a column reference.",
@@ -88,7 +88,7 @@ export function _parseWhereNode(
   }
 
   if (operator === "BETWEEN") {
-    const valueList = _extractValueList(obj.right);
+    const valueList = extractValueList(obj.right);
     if (!valueList || valueList.length !== 2) {
       unmappedReasons.push(
         `WHERE clause uses BETWEEN on "${columnName}" with a value that the form cannot represent.`,
@@ -105,7 +105,7 @@ export function _parseWhereNode(
   }
 
   if (operator === "IN" || operator === "NOT IN") {
-    const valueList = _extractValueList(obj.right);
+    const valueList = extractValueList(obj.right);
     if (!valueList) {
       unmappedReasons.push(
         `WHERE clause uses "${operator}" on "${columnName}" with a non-literal list.`,
@@ -121,7 +121,7 @@ export function _parseWhereNode(
     return rule;
   }
 
-  const filterOp = _toFilterOperator(operator);
+  const filterOp = toFilterOperator(operator);
   if (!filterOp) {
     unmappedReasons.push(
       `WHERE clause uses operator "${operator}" which the form does not support.`,
@@ -129,7 +129,7 @@ export function _parseWhereNode(
     return undefined;
   }
 
-  const literal = _literalValue(obj.right);
+  const literal = literalValue(obj.right);
   if (literal === undefined) {
     unmappedReasons.push(
       `WHERE clause compares "${columnName}" against a non-literal expression.`,
@@ -152,7 +152,7 @@ export function _parseWhereNode(
  * (e.g. `count(age)` becomes a rule on the column "age" with an explicit
  * `COUNT(...)` prefix preserved in the renderer).
  */
-export function _parseHavingNode(
+export function parseHavingNode(
   node: unknown,
   unmappedReasons: string[],
 ): QueryFilter | undefined {
@@ -168,8 +168,8 @@ export function _parseHavingNode(
   }
   const operator = String(obj.operator ?? "").toUpperCase();
   if (operator === "AND" || operator === "OR") {
-    const left = _parseHavingNode(obj.left, unmappedReasons);
-    const right = _parseHavingNode(obj.right, unmappedReasons);
+    const left = parseHavingNode(obj.left, unmappedReasons);
+    const right = parseHavingNode(obj.right, unmappedReasons);
     const rules: QueryFilter[] = [];
     if (left) {
       rules.push(left);
@@ -193,7 +193,7 @@ export function _parseHavingNode(
   if (left?.type === "aggr_func") {
     const funcName = String(left.name ?? "");
     const args = left.args as { expr?: unknown } | undefined;
-    const innerCol = _columnRefName(args?.expr);
+    const innerCol = columnRefName(args?.expr);
     if (innerCol) {
       columnName = `${funcName.toLowerCase()}(${innerCol})`;
     } else {
@@ -203,7 +203,7 @@ export function _parseHavingNode(
       columnName = funcName.toLowerCase();
     }
   } else if (left?.type === "column_ref") {
-    columnName = _columnRefName(left);
+    columnName = columnRefName(left);
   }
   if (!columnName) {
     unmappedReasons.push(
@@ -212,14 +212,14 @@ export function _parseHavingNode(
     return undefined;
   }
 
-  const filterOp = _toFilterOperator(operator);
+  const filterOp = toFilterOperator(operator);
   if (!filterOp) {
     unmappedReasons.push(
       `HAVING uses operator "${operator}" which the form does not support.`,
     );
     return undefined;
   }
-  const literal = _literalValue(obj.right);
+  const literal = literalValue(obj.right);
   if (literal === undefined) {
     unmappedReasons.push(
       `HAVING compares "${columnName}" against a non-literal expression.`,

@@ -5,9 +5,9 @@ import type {
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { Knex } from "knex";
-import { _quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { quoteSqlIdentifier } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 
-export function _applyJoins(
+export function applyJoins(
   builder: Knex.QueryBuilder,
   joins: readonly QueryJoin[],
 ): Knex.QueryBuilder {
@@ -41,12 +41,12 @@ export function _applyJoins(
 
 function _buildJoinTargetSql(join: QueryJoin): string {
   if (join.target.type === "subquery") {
-    const alias = _quoteSqlIdentifier(join.target.alias);
+    const alias = quoteSqlIdentifier(join.target.alias);
     return `(${join.target.subqueryId}) as ${alias}`;
   }
-  const table = _quoteSqlIdentifier(join.target.tableName);
+  const table = quoteSqlIdentifier(join.target.tableName);
   if (join.target.alias) {
-    return `${table} as ${_quoteSqlIdentifier(join.target.alias)}`;
+    return `${table} as ${quoteSqlIdentifier(join.target.alias)}`;
   }
   return table;
 }
@@ -59,14 +59,14 @@ function _buildJoinOnClause(
     .map((p) => {
       const left =
         p.leftTable ?
-          `${_quoteSqlIdentifier(p.leftTable)}.` +
-          `${_quoteSqlIdentifier(p.leftColumn)}`
-        : _quoteSqlIdentifier(p.leftColumn);
+          `${quoteSqlIdentifier(p.leftTable)}.` +
+          `${quoteSqlIdentifier(p.leftColumn)}`
+        : quoteSqlIdentifier(p.leftColumn);
       const right =
         p.rightTable ?
-          `${_quoteSqlIdentifier(p.rightTable)}.` +
-          `${_quoteSqlIdentifier(p.rightColumn)}`
-        : _quoteSqlIdentifier(p.rightColumn);
+          `${quoteSqlIdentifier(p.rightTable)}.` +
+          `${quoteSqlIdentifier(p.rightColumn)}`
+        : quoteSqlIdentifier(p.rightColumn);
       return `${left} = ${right}`;
     })
     .join(` ${combinator} `);

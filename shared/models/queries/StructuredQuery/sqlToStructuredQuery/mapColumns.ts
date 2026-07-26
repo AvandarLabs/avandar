@@ -17,7 +17,7 @@ import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStr
  * Make the empty result for the case where we could not produce anything
  * useful from the SQL.
  */
-export function _makeUnmappedResult(
+export function makeUnmappedResult(
   reasons: readonly string[],
 ): SqlMappingResult {
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
@@ -41,7 +41,7 @@ export function _makeUnmappedResult(
   };
 }
 
-export function _matchColumn(
+export function matchColumn(
   columnName: string,
   columns: readonly DatasetColumnRead[],
 ): DatasetColumnRead | undefined {
@@ -50,7 +50,7 @@ export function _matchColumn(
   });
 }
 
-export function _makeQueryColumn(
+export function makeQueryColumn(
   baseColumn: DatasetColumnRead,
   aggregation: QueryAggregationTypeT | undefined,
 ): QueryColumnRead {

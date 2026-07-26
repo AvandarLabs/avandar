@@ -4,7 +4,7 @@ import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/Query
 /**
  * Maps the AST's aggregation function name onto our QueryAggregationType.
  */
-export function _matchAggregation(
+export function matchAggregation(
   name: string,
 ): QueryAggregationTypeT | undefined {
   const normalized = name.trim().toLowerCase();
@@ -26,7 +26,7 @@ export function _matchAggregation(
   return undefined;
 }
 
-export function _identifierToString(value: unknown): string | undefined {
+export function identifierToString(value: unknown): string | undefined {
   if (typeof value === "string") {
     return value;
   }
@@ -50,7 +50,7 @@ export function _identifierToString(value: unknown): string | undefined {
 /**
  * Extract a column name from an AST column-ref node.
  */
-export function _columnRefName(node: unknown): string | undefined {
+export function columnRefName(node: unknown): string | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;
   }
@@ -58,7 +58,7 @@ export function _columnRefName(node: unknown): string | undefined {
   if (obj.type !== "column_ref") {
     return undefined;
   }
-  return _identifierToString(obj.column);
+  return identifierToString(obj.column);
 }
 
 /**
@@ -85,13 +85,13 @@ const _FILTER_OPERATOR_BY_SQL: Record<string, QueryFilterOperator> = {
 /**
  * Translate a parser binary operator to a {@link QueryFilterOperator}.
  */
-export function _toFilterOperator(
+export function toFilterOperator(
   operator: string,
 ): QueryFilterOperator | undefined {
   return _FILTER_OPERATOR_BY_SQL[operator.toUpperCase()];
 }
 
-export function _literalValue(
+export function literalValue(
   node: unknown,
 ): string | number | boolean | null | undefined {
   if (node === null || typeof node !== "object") {
@@ -125,7 +125,7 @@ export function _literalValue(
   return undefined;
 }
 
-export function _extractValueList(
+export function extractValueList(
   node: unknown,
 ): ReadonlyArray<string | number> | undefined {
   if (node === null || typeof node !== "object") {
@@ -139,7 +139,7 @@ export function _extractValueList(
   if (!Array.isArray(items)) {
     return undefined;
   }
-  const literals = items.map(_literalValue);
+  const literals = items.map(literalValue);
   const hasInvalid = literals.some((lit) => {
     return lit === undefined || lit === null || typeof lit === "boolean";
   });
