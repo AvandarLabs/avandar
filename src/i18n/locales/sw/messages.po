@@ -120,7 +120,7 @@ msgstr "Chagua mfano wa mazungumzo"
 msgid "most recent"
 msgstr "ya hivi karibuni zaidi"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
 
@@ -427,7 +427,7 @@ msgstr "Kubadilisha mpango kuwa {newPlanName} ({newPlanSubType})"
 msgid "Waiting…"
 msgstr "Inasubiri…"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
 msgstr "Tumia pendekezo"
 
@@ -499,7 +499,7 @@ msgstr "Taarifa ya safu"
 msgid "Plan step input"
 msgstr "Kuingiza hatua ya mpango"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "Ninaelewa kuwa data hii itatumwa kwa mtoa huduma wa AI"
 
@@ -691,7 +691,7 @@ msgstr "Dashibodi yako imechapishwa kwenye:"
 msgid "Name"
 msgstr "Jina"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Swali lako lina lugha ambayo inaweza kuathiri jibu la AI."
 
@@ -872,7 +872,7 @@ msgstr "Muhtasari wa Data"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "Hii {resource} kwa sasa inapatikana tu kwa mmiliki wake."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Detected:"
 msgstr "Imegundulika:"
 
@@ -927,7 +927,7 @@ msgstr "Haiwezekani kukamata dashibodi kwa ajili ya maelezo."
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "Inaweza kuchukua dakika chache kwa usajili wako kuanza kutumika."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "Endelea kama ilivyo"
 
@@ -982,7 +982,7 @@ msgstr "Katalogi ya data za umma bado iko katika <0/><1/>Tunaongeza datasets zai
 msgid "Erase"
 msgstr "Futa"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "Taarifa za afya zimegunduliwa"
 
@@ -1140,7 +1140,7 @@ msgstr "Kamilisha"
 msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko kwenye orodha yetu ya kusubiri na hujapokea msimbo wa kujiandikisha, tunashukuru uvumilivu wako. Utapokea msimbo wa kujiandikisha hivi karibuni. Tunahidi!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
@@ -1153,7 +1153,7 @@ msgstr "Uchambuzi wa hatua {0} uliozalisha matokeo haya utaokolewa na dataset, i
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested:"
 msgstr "Ilipendekezwa:"
 
@@ -1479,7 +1479,7 @@ msgstr "seti yako ya data"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1662,7 +1662,7 @@ msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} inapaswa
 msgid "Delete Entity"
 msgstr "Futa Kitu"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "Data binafsi + upendeleo umebainishwa"
 
@@ -1880,7 +1880,7 @@ msgstr "Jina la Uwanja"
 msgid "+ Add row filter"
 msgstr "+ Ongeza kichujio cha safu"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Consider rephrasing"
 msgstr "Fikiria kubadilisha maneno"
 
@@ -2025,7 +2025,7 @@ msgstr "Export"
 msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
 msgstr "Unda makundi kwa wanachama wa ofisi yako. Seti za data na dashboards zinaweza kuwekewa mipangilio ya kushiriki tu na (au kuzuia) makundi fulani ya watumiaji."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Muonekano:"
@@ -2084,7 +2084,7 @@ msgstr "Fanya upya"
 msgid "Choose a model"
 msgstr "Chagua mfano"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data detected"
 msgstr "Data binafsi zimegunduliwa"
 
@@ -2441,7 +2441,7 @@ msgstr "Fungua mazungumzo (⌘/)"
 msgid "Catalog ({0})"
 msgstr "Katalogi ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Tuma"
 
@@ -2778,7 +2778,7 @@ msgstr "Chagua safu ya longitudo"
 msgid "Dataset loaded successfully"
 msgstr "Dataset imepakiwa kwa mafanikio"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "Nina mamlaka ya kisheria ya kushiriki data hii na mtoa huduma wa AI"
 
@@ -3043,7 +3043,7 @@ msgstr ""
 msgid "Edit {0}"
 msgstr "Hariri {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
 msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha katika jibu la AI. Angalia zote hapa chini."
 
@@ -3055,7 +3055,7 @@ msgstr "Chagua muungano"
 msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
 msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye orodha yetu ya kusubiri na umepokea msimbo wa kujiandikisha kwenye barua pepe yako."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
 msgstr "Umeandika:"
 
@@ -3297,7 +3297,7 @@ msgstr "Jina la eneo la kazi limeboreshwa"
 msgid "Add column as a field"
 msgstr "Ongeza safu kama uwanja"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
 msgstr "Data hii inaonekana ina taarifa za afya au za mgonjwa. Kutuma kwa mtoa huduma wa AI kunaweza kuwa na athari za kisheria na maadili (HIPAA, GDPR, n.k.)."
 
@@ -3447,7 +3447,7 @@ msgstr "Ingiza karatasi za kazi, ungana na Google Sheets, au ongeza data kutoka 
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "Tuma <0>{0}</0> thamani{1} kwa AI?"
 
@@ -3935,7 +3935,7 @@ msgstr "Haiwezekani kuchapisha dashibodi"
 msgid "Voice model removed"
 msgstr "Mfano wa sauti umeondolewa"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
 
@@ -4193,7 +4193,7 @@ msgstr "Hujachagua safu ya thamani"
 msgid "Text contains"
 msgstr "Maandishi yana"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 msgstr "Ili kuthibitisha, andika <0>{MEDICAL_CONFIRMATION_PHRASE}</0> hapa chini:"
 
@@ -4760,7 +4760,7 @@ msgstr "Hifadhi mabadiliko"
 msgid "Google Sheet failed to load"
 msgstr "Google Sheet ilishindwa kupakia"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Andika kifungu cha uthibitisho"
 
@@ -4825,7 +4825,7 @@ msgstr "Mchoro ({strokeWidth}px)"
 msgid "Annual"
 msgstr "Mwaka"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
 msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma wa AI atazipokea na anaweza kuandika ombi hilo."
 
@@ -4975,7 +4975,7 @@ msgstr "Hakuna mifano inayolingana na utafutaji wako"
 msgid "Recommended next steps"
 msgstr "Hatua zinazopendekezwa zifuatazo"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "Kutoka safu: <0>{columnName}</0>"
 

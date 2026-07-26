@@ -11,7 +11,7 @@
  * promise that the LLM never sees row-level data without consent.
  *
  * v1 scope: English only. Spanish + French pattern files stubbed at
- * `src/components/Privacy/privacy-helpers/patterns/*` once those locales ship.
+ * `src/components/privacy/privacy-helpers/patterns/*` once those locales ship.
  */
 
 export type PiiCategory =

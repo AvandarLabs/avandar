@@ -7,7 +7,7 @@
  * and shed it cleanly.
  *
  * Mirrored by client tests in
- * `src/components/Privacy/privacy-helpers/discoveryQuery.test.ts`.
+ * `src/components/privacy/privacy-helpers/discoveryQuery.test.ts`.
  */
 
 export const MAX_DISCOVERY_QUERY_CHARS = 2000;

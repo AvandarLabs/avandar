@@ -9,8 +9,8 @@ import {
   formatClarificationAnswerForThread,
 } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { ClarificationAuditLog } from "@/components/Privacy/privacy-helpers/clarificationAuditLog";
-import { crossBoundary } from "@/components/Privacy/privacy-helpers/crossBoundary";
+import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/clarificationAuditLog";
+import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";

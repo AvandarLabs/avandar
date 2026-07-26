@@ -120,7 +120,7 @@ msgstr "选择聊天模型"
 msgid "most recent"
 msgstr "最近的"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "PII detected:"
 msgstr "检测到个人身份信息："
 
@@ -427,7 +427,7 @@ msgstr "正在更改计划为 {newPlanName} ({newPlanSubType})"
 msgid "Waiting…"
 msgstr "等待中…"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
 msgstr "使用建议"
 
@@ -499,7 +499,7 @@ msgstr "列信息"
 msgid "Plan step input"
 msgstr "计划步骤输入"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我理解这些数据将发送给 AI 提供者"
 
@@ -691,7 +691,7 @@ msgstr "您的仪表板已发布在："
 msgid "Name"
 msgstr "名称"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的问题包含可能会影响 AI 回答的语言。"
 
@@ -872,7 +872,7 @@ msgstr "数据摘要"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "此 {resource} 目前仅对其所有者可访问。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Detected:"
 msgstr "检测到："
 
@@ -927,7 +927,7 @@ msgstr "无法捕获仪表板以进行注释。"
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "您的订阅可能需要几分钟才能生效。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "继续保持现状"
 
@@ -982,7 +982,7 @@ msgstr "公共开放数据目录仍在 <0/><1/>我们正在根据用户的反馈
 msgid "Erase"
 msgstr "擦除"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "检测到健康信息"
 
@@ -1140,7 +1140,7 @@ msgstr "完成"
 msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的候补名单上并且尚未收到注册代码，我们感谢您的耐心。您将很快收到注册代码。我们保证！"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
 msgstr "检测到偏见："
 
@@ -1153,7 +1153,7 @@ msgstr "生成此结果的 {0} 步分析将与数据集一起保存，以便可�
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成员看到的名称。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested:"
 msgstr "建议："
 
@@ -1479,7 +1479,7 @@ msgstr "您的数据集"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1662,7 +1662,7 @@ msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
 msgid "Delete Entity"
 msgstr "删除实体"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "检测到个人数据 + 偏见框架"
 
@@ -1880,7 +1880,7 @@ msgstr "字段名称"
 msgid "+ Add row filter"
 msgstr "+ 添加行过滤器"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Consider rephrasing"
 msgstr "考虑重新措辞"
 
@@ -2025,7 +2025,7 @@ msgstr "导出"
 msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
 msgstr "为您的工作区成员创建组。数据集和仪表板可以配置为仅与某些用户组共享（或限制）。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "预览："
@@ -2084,7 +2084,7 @@ msgstr "重做"
 msgid "Choose a model"
 msgstr "选择模型"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data detected"
 msgstr "检测到个人数据"
 
@@ -2441,7 +2441,7 @@ msgstr "打开聊天 (⌘/)"
 msgid "Catalog ({0})"
 msgstr "目录 ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "发送"
 
@@ -2778,7 +2778,7 @@ msgstr "选择经度列"
 msgid "Dataset loaded successfully"
 msgstr "数据集加载成功"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "我有法律权力与AI提供者共享此数据"
 
@@ -3043,7 +3043,7 @@ msgstr ""
 msgid "Edit {0}"
 msgstr "编辑 {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
 msgstr "我们检测到潜在的个人信息和可能会影响 AI 回答的语言。请在下面查看这两者。"
 
@@ -3055,7 +3055,7 @@ msgstr "选择聚合"
 msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
 msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
 msgstr "您写道："
 
@@ -3297,7 +3297,7 @@ msgstr "工作区名称已更新"
 msgid "Add column as a field"
 msgstr "将列添加为字段"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
 msgstr "此数据似乎包含健康或患者信息。将其发送给 AI 提供商可能会有法律和伦理影响（HIPAA、GDPR 等）。"
 
@@ -3447,7 +3447,7 @@ msgstr "导入电子表格，连接到 Google 表格，或从其他来源添加�
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "将 <0>{0}</0> 值{1} 发送给 AI 吗？"
 
@@ -3935,7 +3935,7 @@ msgstr "无法发布仪表板"
 msgid "Voice model removed"
 msgstr "语音模型已移除"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "建议重写："
 
@@ -4193,7 +4193,7 @@ msgstr "您尚未选择值列"
 msgid "Text contains"
 msgstr "文本包含"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 msgstr "确认请在下面输入 <0>{MEDICAL_CONFIRMATION_PHRASE}</0>："
 
@@ -4760,7 +4760,7 @@ msgstr "保存更改"
 msgid "Google Sheet failed to load"
 msgstr "Google 表格加载失败"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "输入确认短语"
 
@@ -4825,7 +4825,7 @@ msgstr "描边 ({strokeWidth}px)"
 msgid "Annual"
 msgstr "年度"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
 msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信息并可能记录请求。"
 
@@ -4975,7 +4975,7 @@ msgstr "没有模型匹配您的搜索"
 msgid "Recommended next steps"
 msgstr "推荐的下一步"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "来自列：<0>{columnName}</0>"
 

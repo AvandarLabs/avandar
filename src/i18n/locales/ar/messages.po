@@ -120,7 +120,7 @@ msgstr "اختر نموذج الدردشة"
 msgid "most recent"
 msgstr "الأكثر حداثة"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "PII detected:"
 msgstr "تم الكشف عن معلومات شخصية:"
 
@@ -427,7 +427,7 @@ msgstr "تغيير الخطة إلى {newPlanName} ({newPlanSubType})"
 msgid "Waiting…"
 msgstr "في الانتظار…"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
 msgstr "استخدام الاقتراح"
 
@@ -499,7 +499,7 @@ msgstr "معلومات العمود"
 msgid "Plan step input"
 msgstr "مدخل خطوة الخطة"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود الذكاء الاصطناعي"
 
@@ -691,7 +691,7 @@ msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 msgid "Name"
 msgstr "الاسم"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة الذكاء الاصطناعي."
 
@@ -872,7 +872,7 @@ msgstr "ملخص البيانات"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "هذه {resource} متاحة حاليًا فقط لمالكها."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Detected:"
 msgstr "تم الكشف عن:"
 
@@ -927,7 +927,7 @@ msgstr "لم نتمكن من التقاط لوحة المعلومات للتعل
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "قد يستغرق الأمر بضع دقائق لتفعيل اشتراكك."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "استمر كما هو"
 
@@ -982,7 +982,7 @@ msgstr "كتالوج البيانات المفتوحة العامة لا يزا�
 msgid "Erase"
 msgstr "مسح"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "تم الكشف عن معلومات صحية"
 
@@ -1140,7 +1140,7 @@ msgstr "مكتمل"
 msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل قريبًا. نعدك!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
 
@@ -1153,7 +1153,7 @@ msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه الن�
 msgid "The name other members see in {workspaceName}."
 msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested:"
 msgstr "مقترح:"
 
@@ -1479,7 +1479,7 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1662,7 +1662,7 @@ msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
 msgid "Delete Entity"
 msgstr "حذف الكيان"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "تم الكشف عن بيانات شخصية + تأطير متحيز"
 
@@ -1880,7 +1880,7 @@ msgstr "اسم الحقل"
 msgid "+ Add row filter"
 msgstr "+ إضافة فلتر صف"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Consider rephrasing"
 msgstr "فكر في إعادة صياغة"
 
@@ -2025,7 +2025,7 @@ msgstr "تصدير"
 msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
 msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة بك. يمكن تكوين مجموعات البيانات ولوحات المعلومات لمشاركة فقط مع (أو تقييد) مجموعات مستخدمين معينة."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "معاينة:"
@@ -2084,7 +2084,7 @@ msgstr "إعادة"
 msgid "Choose a model"
 msgstr "اختر نموذجًا"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data detected"
 msgstr "تم اكتشاف بيانات شخصية"
 
@@ -2441,7 +2441,7 @@ msgstr "فتح الدردشة (⌘/)"
 msgid "Catalog ({0})"
 msgstr "الفهرس ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "إرسال"
 
@@ -2778,7 +2778,7 @@ msgstr "اختر عمود خط الطول"
 msgid "Dataset loaded successfully"
 msgstr "تم تحميل مجموعة البيانات بنجاح"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "لدي السلطة القانونية لمشاركة هذه البيانات مع مزود الذكاء الاصطناعي"
 
@@ -3043,7 +3043,7 @@ msgstr ""
 msgid "Edit {0}"
 msgstr "تعديل {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
 msgstr "لقد اكتشفنا معلومات شخصية محتملة ولغة قد تؤثر على إجابة الذكاء الاصطناعي. راجع كلاهما أدناه."
 
@@ -3055,7 +3055,7 @@ msgstr "اختر التجميع"
 msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
 msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
 msgstr "لقد كتبت:"
 
@@ -3297,7 +3297,7 @@ msgstr "تم تحديث اسم مساحة العمل"
 msgid "Add column as a field"
 msgstr "إضافة عمود كحقل"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
 msgstr "يبدو أن هذه البيانات تحتوي على معلومات صحية أو معلومات عن المرضى. قد يكون لإرسالها إلى مزود الذكاء الاصطناعي آثار قانونية وأخلاقية (HIPAA، GDPR، إلخ)."
 
@@ -3447,7 +3447,7 @@ msgstr "استورد جداول البيانات، اتصل بـ Google Sheets،
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "هل تريد إرسال قيمة <0>{0}</0> {1} إلى الذكاء الاصطناعي؟"
 
@@ -3935,7 +3935,7 @@ msgstr "تعذر نشر لوحة التحكم"
 msgid "Voice model removed"
 msgstr "تمت إزالة نموذج الصوت"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "إعادة كتابة مقترحة:"
 
@@ -4193,7 +4193,7 @@ msgstr "لم تختار عمود القيمة"
 msgid "Text contains"
 msgstr "النص يحتوي على"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 msgstr "لتأكيد، اكتب <0>{MEDICAL_CONFIRMATION_PHRASE}</0> أدناه:"
 
@@ -4760,7 +4760,7 @@ msgstr "احفظ التغييرات"
 msgid "Google Sheet failed to load"
 msgstr "فشل تحميل ورقة Google"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "اكتب عبارة التأكيد"
 
@@ -4825,7 +4825,7 @@ msgstr "سمك الخط ({strokeWidth}px)"
 msgid "Annual"
 msgstr "سنوي"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء الاصطناعي وقد يسجل الطلب."
 
@@ -4975,7 +4975,7 @@ msgstr "لا توجد نماذج تطابق بحثك"
 msgid "Recommended next steps"
 msgstr "الخطوات التالية الموصى بها"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "من العمود: <0>{columnName}</0>"
 

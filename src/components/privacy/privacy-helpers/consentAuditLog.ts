@@ -2,8 +2,8 @@ import { createModule } from "@modules";
 import { isDefined } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Dexie from "dexie";
-import type { ConsentModalMode } from "@/components/Privacy/ConsentModal/ConsentModal";
-import type { CrossBoundaryContext } from "@/components/Privacy/privacy-helpers/crossBoundary";
+import type { ConsentModalMode } from "@/components/privacy/ConsentModal/ConsentModal";
+import type { CrossBoundaryContext } from "@/components/privacy/privacy-helpers/crossBoundary";
 import type { Table } from "dexie";
 
 /**

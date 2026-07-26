@@ -5,8 +5,8 @@ import { BiasHitBadges } from "./BiasHitBadges";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
-import type { BiasHit } from "@/components/Privacy/privacy-helpers/biasDetector/biasDetector";
-import type { PiiDetectionResult } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/biasDetector/biasDetector";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
 
 type Props = {
   /** PII findings driving the warning. */

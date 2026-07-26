@@ -4,7 +4,7 @@ import { IconHeartbeat } from "@tabler/icons-react";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
-import type { PiiDetectionResult } from "@/components/Privacy/privacy-helpers/piiDetector/piiDetector";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
 
 type Props = {
   /** PII findings driving the health-data warning. */

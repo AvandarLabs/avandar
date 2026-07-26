@@ -120,7 +120,7 @@ msgstr "Elegir modelo de chat"
 msgid "most recent"
 msgstr "más reciente"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "PII detected:"
 msgstr "PII detectado:"
 
@@ -427,7 +427,7 @@ msgstr "Cambiando el plan a {newPlanName} ({newPlanSubType})"
 msgid "Waiting…"
 msgstr "Esperando…"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Use suggestion"
 msgstr "Usar sugerencia"
 
@@ -499,7 +499,7 @@ msgstr "Información de la columna"
 msgid "Plan step input"
 msgstr "Entrada del paso del plan"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "Entiendo que estos datos serán enviados al proveedor de IA"
 
@@ -691,7 +691,7 @@ msgstr "Tu tablero está publicado en:"
 msgid "Name"
 msgstr "Nombre"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Tu pregunta contiene lenguaje que puede sesgar la respuesta de la IA."
 
@@ -872,7 +872,7 @@ msgstr "Resumen de datos"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "Este {resource} actualmente solo es accesible para su propietario."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Detected:"
 msgstr "Detectado:"
 
@@ -927,7 +927,7 @@ msgstr "No se pudo capturar el tablero para anotación."
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "Puede tardar unos minutos en que tu suscripción surta efecto."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "Continuar como está"
 
@@ -982,7 +982,7 @@ msgstr "El catálogo de datos abiertos públicos aún está en <0/><1/>Estamos a
 msgid "Erase"
 msgstr "Borrar"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "Información de salud detectada"
 
@@ -1140,7 +1140,7 @@ msgstr "Completo"
 msgid "{0} to be notified when it's your turn to register! If you are already on our waitlist and have not received a sign-up code, we appreciate your patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} para ser notificado cuando sea tu turno de registrarte. Si ya estás en nuestra lista de espera y no has recibido un código de registro, agradecemos tu paciencia. Recibirás un código de registro pronto. ¡Lo prometemos!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Bias detected:"
 msgstr "Sesgo detectado:"
 
@@ -1153,7 +1153,7 @@ msgstr "El análisis de {0} pasos que produjo este resultado se guardará con el
 msgid "The name other members see in {workspaceName}."
 msgstr "El nombre que otros miembros ven en {workspaceName}."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested:"
 msgstr "Sugerido:"
 
@@ -1479,7 +1479,7 @@ msgstr "tu conjunto de datos"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1662,7 +1662,7 @@ msgstr "Cuéntanos de dónde debería provenir la información de {singularEntit
 msgid "Delete Entity"
 msgstr "Eliminar entidad"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "Datos personales + marco sesgado detectado"
 
@@ -1880,7 +1880,7 @@ msgstr "Nombre del campo"
 msgid "+ Add row filter"
 msgstr "+ Agregar filtro de fila"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Consider rephrasing"
 msgstr "Considera reformular"
 
@@ -2025,7 +2025,7 @@ msgstr "Exportar"
 msgid "Create groups for your workspace members. Datasets and dashboards can be configured to only share with (or restrict) certain user groups."
 msgstr "Crea grupos para los miembros de tu espacio de trabajo. Los conjuntos de datos y los tableros pueden configurarse para compartir solo con (o restringir) ciertos grupos de usuarios."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Vista previa:"
@@ -2084,7 +2084,7 @@ msgstr "Rehacer"
 msgid "Choose a model"
 msgstr "Elige un modelo"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data detected"
 msgstr "Datos personales detectados"
 
@@ -2441,7 +2441,7 @@ msgstr "Abrir chat (⌘/)"
 msgid "Catalog ({0})"
 msgstr "Catálogo ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Enviar"
 
@@ -2778,7 +2778,7 @@ msgstr "Seleccionar columna de longitud"
 msgid "Dataset loaded successfully"
 msgstr "Conjunto de datos cargado con éxito"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "Tengo la autoridad legal para compartir estos datos con el proveedor de IA"
 
@@ -3043,7 +3043,7 @@ msgstr ""
 msgid "Edit {0}"
 msgstr "Editar {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "We detected both potential personal information and language that may bias the AI's answer. Review both below."
 msgstr "Detectamos tanto información personal potencial como lenguaje que puede sesgar la respuesta de la IA. Revisa ambos a continuación."
 
@@ -3055,7 +3055,7 @@ msgstr "Seleccionar agregación"
 msgid "While Avandar is in beta, we are only allowing registration if you are on our waitlist and have received a sign-up code in your email."
 msgstr "Mientras Avandar esté en beta, solo permitimos el registro si estás en nuestra lista de espera y has recibido un código de registro en tu correo electrónico."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "You wrote:"
 msgstr "Escribiste:"
 
@@ -3297,7 +3297,7 @@ msgstr "Nombre del espacio de trabajo actualizado"
 msgid "Add column as a field"
 msgstr "Agregar columna como un campo"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "This data appears to contain health or patient information. Sending it to an AI provider may have legal and ethical implications (HIPAA, GDPR, etc.)."
 msgstr "Estos datos parecen contener información de salud o del paciente. Enviarlos a un proveedor de IA puede tener implicaciones legales y éticas (HIPAA, GDPR, etc.)."
 
@@ -3447,7 +3447,7 @@ msgstr "Importe hojas de cálculo, conéctese a Google Sheets o agregue datos de
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "¿Enviar <0>{0}</0> valor{1} a la IA?"
 
@@ -3935,7 +3935,7 @@ msgstr "No se pudo publicar el tablero"
 msgid "Voice model removed"
 msgstr "Modelo de voz eliminado"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Suggested rewrite:"
 msgstr "Reescritura sugerida:"
 
@@ -4193,7 +4193,7 @@ msgstr "No ha elegido una columna de valores"
 msgid "Text contains"
 msgstr "El texto contiene"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 msgstr "Para confirmar, escriba <0>{MEDICAL_CONFIRMATION_PHRASE}</0> a continuación:"
 
@@ -4760,7 +4760,7 @@ msgstr "Guardar cambios"
 msgid "Google Sheet failed to load"
 msgstr "Error al cargar Google Sheet"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Escribe la frase de confirmación"
 
@@ -4825,7 +4825,7 @@ msgstr "Trazado ({strokeWidth}px)"
 msgid "Annual"
 msgstr "Anual"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "The values you selected may contain personal information. The AI provider will receive them and may log the request."
 msgstr "Los valores que seleccionaste pueden contener información personal. El proveedor de IA los recibirá y puede registrar la solicitud."
 
@@ -4975,7 +4975,7 @@ msgstr "No hay modelos que coincidan con tu búsqueda"
 msgid "Recommended next steps"
 msgstr "Pasos recomendados a seguir"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "Desde la columna: <0>{columnName}</0>"
 

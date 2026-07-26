@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SessionSecret } from "@/components/Privacy/privacy-helpers/sessionSecret";
+import { SessionSecret } from "@/components/privacy/privacy-helpers/sessionSecret";
 
 /**
  * Sanity check that the client-side ack-token issuance produces a
