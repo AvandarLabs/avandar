@@ -90,7 +90,7 @@ export function SqlEditor({
     ];
   }, [buildCatalogExtensions, catalogCompartment, readOnly]);
 
-  useEffect(() => {
+  useEffect(function reconfigureCatalogExtensions() {
     if (!editorView) {
       return;
     }
