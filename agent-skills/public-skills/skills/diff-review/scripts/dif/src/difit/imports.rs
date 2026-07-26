@@ -73,10 +73,11 @@ pub struct ImportEntry {
 /// are attributed to them (e.g. `jpsyx`) rather than this generic default.
 const DIFIT_DEFAULT_AUTHOR: &str = "User";
 
-/// The reviewer handle used to attribute the reviewer's own comments. Resolved
-/// at runtime from the `DIFF_REVIEW_REVIEWER` env var (set by `run.sh` from
-/// `scripts/get-reviewer-name.sh`), defaulting to `"reviewer"` when unset/empty.
-/// Never hardcoded to a person.
+/// The reviewer handle used to attribute the reviewer's own comments.
+///
+/// Resolved at runtime from the `DIFF_REVIEW_REVIEWER` env var (set by `run.sh`
+/// from `scripts/get-reviewer-name.sh`), defaulting to `"reviewer"` when
+/// unset/empty. Never hardcoded to a person.
 #[must_use]
 pub fn reviewer_name() -> String {
     std::env::var("DIFF_REVIEW_REVIEWER")
@@ -173,7 +174,10 @@ mod tests {
         assert_eq!(imports[1].entry_type, "reply");
         assert_eq!(imports[1].id, "m2");
         assert_eq!(imports[1].file_path.as_deref(), Some("a.rs"));
-        assert_eq!(imports[1].position, imports[0].position, "reply inherits position");
+        assert_eq!(
+            imports[1].position, imports[0].position,
+            "reply inherits position"
+        );
     }
 
     #[test]
@@ -186,8 +190,14 @@ mod tests {
         let entry = &snapshot_to_imports(&snap)[0];
         assert_eq!(entry.author, None);
         let json = serde_json::to_string(entry).unwrap();
-        assert!(!json.contains("author"), "empty author must be omitted: {json}");
-        assert!(!json.contains("createdAt"), "empty timestamp must be omitted");
+        assert!(
+            !json.contains("author"),
+            "empty author must be omitted: {json}"
+        );
+        assert!(
+            !json.contains("createdAt"),
+            "empty timestamp must be omitted"
+        );
     }
 
     #[test]
@@ -220,7 +230,10 @@ mod tests {
 
     #[test]
     fn claude_and_other_authors_pass_through_unchanged() {
-        assert_eq!(author_for(Some("claude"), "jpsyx").as_deref(), Some("claude"));
+        assert_eq!(
+            author_for(Some("claude"), "jpsyx").as_deref(),
+            Some("claude")
+        );
         assert_eq!(author_for(Some("alice"), "jpsyx").as_deref(), Some("alice"));
     }
 

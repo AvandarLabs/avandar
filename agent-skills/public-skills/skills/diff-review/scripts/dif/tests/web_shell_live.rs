@@ -31,6 +31,7 @@ fn git(dir: &std::path::Path, args: &[&str]) {
 
 #[test]
 #[ignore = "spawns difit + binds ports; run with --ignored"]
+#[allow(clippy::too_many_lines)]
 fn injects_and_filters_against_real_difit() {
     let repo = tempfile::tempdir().unwrap();
     let root = repo.path();

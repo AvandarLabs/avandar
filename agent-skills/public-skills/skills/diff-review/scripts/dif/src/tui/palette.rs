@@ -13,21 +13,21 @@ pub enum PaletteAction {
     /// Kill the difit server and relaunch it with the same comparison, port,
     /// and seeded comments, keeping the left pane's log continuous (the new
     /// server output appends below a `[dif]` status line rather than clearing
-    /// the pane). Does not touch the claude pane or quit the shell.
+    /// the pane). Does not touch the LLM pane or quit the shell.
     RestartDifit,
-    /// Ask claude to regenerate the diff guide for this review (via the
+    /// Ask the LLM to regenerate the diff guide for this review (via the
     /// `diff-review` skill), so the diff guide view reflects the current
-    /// diff. Injected as a prompt into the claude pane; `dif` does not write the
+    /// diff. Injected as a prompt into the LLM pane; `dif` does not write the
     /// guide itself.
     RegenerateGuide,
     /// Open the running difit server's URL (`http://localhost:<port>`) in the
     /// system default browser. Does not restart the server.
     OpenInBrowser,
-    /// Interrupt the claude pane: kill the running claude child and respawn it
+    /// Interrupt the LLM pane: kill the running child and respawn it
     /// on a brand-new session that auto-submits the review prompt, exactly as
     /// the pane's first launch does. Unlike typing `/new`, this takes effect
-    /// immediately even when claude is mid-thought.
-    NewClaudeSession,
+    /// immediately even when the LLM is mid-thought.
+    NewLlmSession,
 }
 
 /// One row in the global command palette.
@@ -43,7 +43,7 @@ pub struct PaletteCommand {
 /// points at the same command.
 pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
     PaletteCommand {
-        label: "Restart dif",
+        label: "Restart diff server",
         action: PaletteAction::RestartDifit,
     },
     PaletteCommand {
@@ -51,12 +51,12 @@ pub const PALETTE_COMMANDS: &[PaletteCommand] = &[
         action: PaletteAction::RegenerateGuide,
     },
     PaletteCommand {
-        label: "Open difit in browser",
+        label: "Open diff in browser",
         action: PaletteAction::OpenInBrowser,
     },
     PaletteCommand {
-        label: "New Claude session",
-        action: PaletteAction::NewClaudeSession,
+        label: "New LLM session",
+        action: PaletteAction::NewLlmSession,
     },
 ];
 
@@ -69,7 +69,7 @@ pub const fn shortcut_for(action: PaletteAction) -> Option<&'static str> {
         PaletteAction::RestartDifit => Some("^R"),
         PaletteAction::RegenerateGuide => Some("^G"),
         PaletteAction::OpenInBrowser => Some("^O"),
-        PaletteAction::NewClaudeSession => Some("^N"),
+        PaletteAction::NewLlmSession => Some("^N"),
     }
 }
 
@@ -197,9 +197,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn registry_starts_with_restart_dif() {
+    fn registry_starts_with_restart_diff_server() {
         let first = &PALETTE_COMMANDS[0];
-        assert_eq!(first.label, "Restart dif");
+        assert_eq!(first.label, "Restart diff server");
         assert_eq!(first.action, PaletteAction::RestartDifit);
     }
 
@@ -210,10 +210,10 @@ mod tests {
         assert_eq!(
             p.numbered_entries(),
             vec![
-                ("1. Restart dif".to_owned(), Some("^R")),
+                ("1. Restart diff server".to_owned(), Some("^R")),
                 ("2. Regenerate diff guide".to_owned(), Some("^G")),
-                ("3. Open difit in browser".to_owned(), Some("^O")),
-                ("4. New Claude session".to_owned(), Some("^N")),
+                ("3. Open diff in browser".to_owned(), Some("^O")),
+                ("4. New LLM session".to_owned(), Some("^N")),
             ]
         );
     }
@@ -224,8 +224,8 @@ mod tests {
     }
 
     #[test]
-    fn new_claude_session_advertises_its_ctrl_n_shortcut() {
-        assert_eq!(shortcut_for(PaletteAction::NewClaudeSession), Some("^N"));
+    fn new_llm_session_advertises_its_ctrl_n_shortcut() {
+        assert_eq!(shortcut_for(PaletteAction::NewLlmSession), Some("^N"));
     }
 
     #[test]

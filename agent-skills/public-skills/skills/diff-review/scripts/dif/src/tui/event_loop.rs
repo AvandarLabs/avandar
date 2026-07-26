@@ -1,16 +1,18 @@
 //! The main loop: draw, inject, then poll input on a 50ms cadence.
 //!
 //! Keystrokes route to the focused pane. The difit pane is read-only (scroll
-//! keys only); the claude pane receives full keyboard input. `Alt+H`/`Alt+L`
+//! keys only); the LLM pane receives full keyboard input. `Alt+H`/`Alt+L`
 //! switch focus; `Ctrl+P` opens the command palette, `Ctrl+R` restarts the
-//! difit server, `Ctrl+N` starts a fresh claude session, and `Ctrl+Q` quits
-//! (all intercepted globally, so they never reach claude).
+//! difit server, `Ctrl+N` starts a fresh LLM session, and `Ctrl+Q` quits
+//! (all intercepted globally, so they never reach the LLM).
 
 use std::io::Stdout;
 use std::time::Duration;
 
 use anyhow::Result;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEventKind};
+use crossterm::event::{
+    self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEventKind,
+};
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 
@@ -23,11 +25,20 @@ const SCROLL_STEP: usize = 3;
 /// Rows scrolled per page key.
 const PAGE_STEP: usize = 20;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum AltScroll {
+    LineUp,
+    LineDown,
+}
+
 /// Run the TUI until the user quits or both panes die.
-pub fn run_event_loop(terminal: &mut Terminal<CrosstermBackend<Stdout>>, app: &mut App) -> Result<()> {
+pub fn run_event_loop(
+    terminal: &mut Terminal<CrosstermBackend<Stdout>>,
+    app: &mut App,
+) -> Result<()> {
     let poll = Duration::from_millis(50);
     loop {
-        app.reap_claude();
+        app.reap_llm();
         terminal.draw(|f| draw(f, app))?;
         app.inject_pending();
         app.poll_web_shell_requests();
@@ -70,7 +81,7 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
     // Global commands intercepted before keys reach the focused pane. The
     // palette (Ctrl+P), restart (Ctrl+R), and quit (Ctrl+Q) work from either
     // pane; Alt+H / Alt+L switch focus. These Ctrl keys are not forwarded to
-    // claude.
+    // the LLM.
     let ctrl = k.modifiers.contains(KeyModifiers::CONTROL);
     if ctrl {
         match k.code {
@@ -91,7 +102,7 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
                 return;
             }
             KeyCode::Char('n' | 'N') => {
-                app.new_claude_session();
+                app.new_llm_session();
                 return;
             }
             KeyCode::Char('q' | 'Q') => {
@@ -108,12 +119,9 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
                 return;
             }
             KeyCode::Char('l' | 'L') => {
-                app.focus_claude();
+                app.focus_llm();
                 return;
             }
-            // Alt+U / Alt+D scroll the focused view a half-page up / down.
-            // Intercepted here (before keys reach Claude) so they fire even
-            // while the Claude pane is focused.
             KeyCode::Char('u' | 'U') => {
                 app.scroll_focused_half_page(true);
                 return;
@@ -127,13 +135,32 @@ fn handle_key(app: &mut App, k: &KeyEvent) {
                 app.toggle_help();
                 return;
             }
-            _ => {}
+            _ => {
+                if let Some(action) = alt_scroll_action(k) {
+                    match action {
+                        AltScroll::LineUp => app.scroll_focused_up(1),
+                        AltScroll::LineDown => app.scroll_focused_down(1),
+                    }
+                    return;
+                }
+            }
         }
     }
 
     match app.focus {
         Panel::Difit => handle_difit_keys(app, k),
-        Panel::Claude => forward_to_claude(app, k),
+        Panel::Llm => forward_to_llm(app, k),
+    }
+}
+
+const fn alt_scroll_action(k: &KeyEvent) -> Option<AltScroll> {
+    if !k.modifiers.contains(KeyModifiers::ALT) {
+        return None;
+    }
+    match k.code {
+        KeyCode::Char('k' | 'K') => Some(AltScroll::LineUp),
+        KeyCode::Char('j' | 'J') => Some(AltScroll::LineDown),
+        _ => None,
     }
 }
 
@@ -184,7 +211,7 @@ fn handle_palette_key(app: &mut App, k: &KeyEvent) {
 /// [`vim`](super::vim) navigator (`jkhl`, `w`/`b`, `d`/`u`, `gg`/`G`, and `o` to
 /// open the path/URL under the cursor). Arrows / `PageUp` / `PageDown` scroll in
 /// either view. (Bare letters are safe here because the main pane never forwards
-/// keystrokes to claude.)
+/// keystrokes to the LLM.)
 fn handle_difit_keys(app: &mut App, k: &KeyEvent) {
     match k.code {
         KeyCode::Tab => app.cycle_main_view_next(),
@@ -198,13 +225,42 @@ fn handle_difit_keys(app: &mut App, k: &KeyEvent) {
     }
 }
 
-/// Forward a keystroke to the live claude pane, snapping it to the live tail.
-fn forward_to_claude(app: &App, k: &KeyEvent) {
-    let Some(claude) = app.claude.as_ref() else {
+/// Forward a keystroke to the live LLM pane, snapping it to the live tail.
+fn forward_to_llm(app: &App, k: &KeyEvent) {
+    let Some(llm) = app.llm.as_ref() else {
         return;
     };
     if let Some(bytes) = key_to_bytes(k) {
-        claude.scroll_to_bottom();
-        claude.send(bytes);
+        llm.scroll_to_bottom();
+        llm.send(bytes);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+
+    use super::{AltScroll, alt_scroll_action};
+
+    fn alt_key(c: char) -> KeyEvent {
+        KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
+    }
+
+    fn plain_key(c: char) -> KeyEvent {
+        KeyEvent::new(KeyCode::Char(c), KeyModifiers::NONE)
+    }
+
+    #[test]
+    fn alt_j_and_alt_k_are_single_line_scrolls() {
+        assert_eq!(alt_scroll_action(&alt_key('j')), Some(AltScroll::LineDown));
+        assert_eq!(alt_scroll_action(&alt_key('J')), Some(AltScroll::LineDown));
+        assert_eq!(alt_scroll_action(&alt_key('k')), Some(AltScroll::LineUp));
+        assert_eq!(alt_scroll_action(&alt_key('K')), Some(AltScroll::LineUp));
+    }
+
+    #[test]
+    fn bare_j_and_k_are_not_global_scrolls() {
+        assert_eq!(alt_scroll_action(&plain_key('j')), None);
+        assert_eq!(alt_scroll_action(&plain_key('k')), None);
     }
 }

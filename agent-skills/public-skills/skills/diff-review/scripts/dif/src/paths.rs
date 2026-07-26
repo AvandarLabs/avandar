@@ -6,6 +6,8 @@
 
 use std::path::{Path, PathBuf};
 
+use crate::session::AgentKind;
+
 /// The `.difit` directory inside a repo.
 #[must_use]
 pub fn difit_dir(repo_root: &Path) -> PathBuf {
@@ -51,12 +53,27 @@ pub fn reviewed_state_path(repo_root: &Path, branch_slug: &str, scope_slug: &str
     difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-reviewed.json"))
 }
 
-/// Where `dif` remembers the claude session id for this review so a relaunch
+/// Where `dif` remembers the Claude session id for this review so a relaunch
 /// can `--resume` the same conversation:
 /// `<repo>/.difit/.claude-session-<branch>-<scope>`.
 #[must_use]
 pub fn session_id_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
-    difit_dir(repo_root).join(format!(".claude-session-{branch_slug}-{scope_slug}"))
+    llm_session_id_path(repo_root, AgentKind::Claude, branch_slug, scope_slug)
+}
+
+/// Where `dif` remembers the selected LLM session id for this review.
+#[must_use]
+pub fn llm_session_id_path(
+    repo_root: &Path,
+    agent_kind: AgentKind,
+    branch_slug: &str,
+    scope_slug: &str,
+) -> PathBuf {
+    let prefix = match agent_kind {
+        AgentKind::Claude => "claude",
+        AgentKind::Codex => "codex",
+    };
+    difit_dir(repo_root).join(format!(".{prefix}-session-{branch_slug}-{scope_slug}"))
 }
 
 /// Where `dif` records the live-session metadata.
@@ -76,16 +93,16 @@ mod tests {
     #[test]
     fn guide_matches_skill_filename() {
         let p = guide_path(Path::new("/r"), "feat-share", "dot");
-        assert_eq!(
-            p,
-            PathBuf::from("/r/.difit/feat-share-difit-dot-guide.md")
-        );
+        assert_eq!(p, PathBuf::from("/r/.difit/feat-share-difit-dot-guide.md"));
     }
 
     #[test]
     fn guide_json_matches_skill_filename() {
         let p = guide_json_path(Path::new("/r"), "feat-share", "dot");
-        assert_eq!(p, PathBuf::from("/r/.difit/feat-share-difit-dot-guide.json"));
+        assert_eq!(
+            p,
+            PathBuf::from("/r/.difit/feat-share-difit-dot-guide.json")
+        );
     }
 
     #[test]
@@ -116,6 +133,12 @@ mod tests {
     fn session_id_file_is_hidden_and_scoped() {
         let p = session_id_path(Path::new("/r"), "feat-share", "dot");
         assert_eq!(p, PathBuf::from("/r/.difit/.claude-session-feat-share-dot"));
+    }
+
+    #[test]
+    fn codex_session_id_file_is_hidden_and_scoped() {
+        let p = llm_session_id_path(Path::new("/r"), AgentKind::Codex, "feat-share", "dot");
+        assert_eq!(p, PathBuf::from("/r/.difit/.codex-session-feat-share-dot"));
     }
 
     #[test]

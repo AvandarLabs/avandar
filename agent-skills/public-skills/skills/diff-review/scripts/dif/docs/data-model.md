@@ -41,14 +41,40 @@ appends `claude`-authored replies. See the injection contract in
 | Path | Written by | Purpose |
 | --- | --- | --- |
 | `<branch>-difit-<scope>.json` | the poller | the canonical, re-injectable transcript |
-| `.claude-session-<branch>-<scope>` | startup | the claude session id to `--resume` |
-| `.session-<branch>-<scope>.json` | startup | live-session metadata (port, pid, transcript, comparison) for the skill |
+| `.claude-session-<branch>-<scope>` | startup | the Claude session id to `--resume` |
+| `.codex-session-<branch>-<scope>` | startup | optional Codex session id to `codex resume` |
+| `dif.config.json` | config CLI | repo-local `claude_cmd` and `codex_cmd` values |
+| `.session-<branch>-<scope>.json` | startup | live-session metadata (ports, pid, transcript, comparison, control URL) for the skill |
 | `<branch>-difit-<scope>-guide.md` | the `diff-review` skill | the rendered diff guide (read by the diff guide view) |
 | `<branch>-difit-<scope>-guide.json` | the `diff-review` skill | the structured guide the web-shell sidebar reads |
 | `<branch>-difit-<scope>-reviewed.json` | the `diff-review` skill | reviewed-group / reviewed-file state |
 
 Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
+
+### Live-session metadata
+
+`.session-<branch>-<scope>.json` is written even while the TUI is still waiting
+for the first review artifacts. Its shape includes:
+
+```jsonc
+{
+  "port": 4500,
+  "pid": 12345,
+  "comments_file": "/repo/.difit/<branch>-difit-<scope>.json",
+  "comparison_key": ".",
+  "shell_port": 4600,
+  "shell_url": "http://127.0.0.1:4600/",
+  "control_port": 4700,
+  "comparison_update_url": "http://127.0.0.1:4700/comparison"
+}
+```
+
+The `comparison_update_url` is live-only coordination. The `diff-review` skill
+POSTs `{ "comparisonKey": "." }` there when it chose a comparison inside an
+already-open waiting TUI, so `dif` can retarget its in-memory paths and ports
+before starting difit. The endpoint returns `202` while the review is still
+offline and `409` after the review is online.
 
 ### The diff guide and reviewed-state files
 

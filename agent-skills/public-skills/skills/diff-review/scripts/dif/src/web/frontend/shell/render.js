@@ -7,7 +7,7 @@
 
     if (!groups.length) {
       els.sideScroll.innerHTML =
-        '<div class="side-empty">No diff guide yet.<br>Ask Claude to prepare the review, then it appears here.</div>';
+        '<div class="side-empty">No diff guide yet.<br>Ask the LLM to prepare the review, then it appears here.</div>';
       return;
     }
 

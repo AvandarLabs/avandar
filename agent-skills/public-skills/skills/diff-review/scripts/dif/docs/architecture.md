@@ -1,7 +1,8 @@
 # Architecture
 
-`dif` is a Ratatui TUI that runs difit and a resumable claude session side by
-side, and pipes new difit comments into claude automatically.
+`dif` is a Ratatui TUI that runs difit and an LLM frontend side by side, and
+pipes new difit comments into the LLM automatically. Claude is the default;
+`--codex` runs the right pane with Codex instead.
 
 ## Module map
 
@@ -9,13 +10,14 @@ side, and pipes new difit comments into claude automatically.
 src/
 ├── main.rs            entry: parse CLI, call tui::run
 ├── lib.rs             module declarations
-├── cli.rs             clap surface (one optional comparison key)
+├── cli.rs             clap surface (optional comparison key, --codex, config)
+├── config.rs          repo-local .difit/dif.config.json + `dif config`
 ├── comparison.rs      ComparisonKey + difit args + scope slug + CommitPolicy
 ├── slug.rs            slugify, branch_slug, deterministic port_for
 ├── git.rs             repo_root, current_branch, default-comparison, diff_signature
 ├── git_watcher.rs     background thread publishing the repo's diff signature
 ├── paths.rs           .difit transcript + session-id + guide + reviewed-state paths
-├── session.rs         pure claude command builder (resume/fresh + prompt)
+├── session.rs         pure LLM command builder (resume/fresh + prompt)
 ├── pty_pane.rs        PTY-backed pane parsed through vt100 (reused by both panes)
 ├── difit/
 │   ├── imports.rs     server↔import comment shapes + conversion
@@ -26,11 +28,12 @@ src/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
 │   ├── dispatcher.rs  stateful baseline-then-dispatch-once driver (pure)
-│   └── reply_watcher.rs  baseline-then-log-once detector for new claude replies (pure)
+│   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()
-    ├── startup.rs     spawn difit + claude + poller, assemble App
-    ├── app.rs         App state + focus + main-view switching + inject + scroll + palette/restart
+    ├── startup.rs     spawn LLM, start difit now or wait for review artifacts, assemble App
+    ├── app.rs         App state + delayed difit startup + focus + main-view switching + inject + scroll + palette/restart
+    ├── control.rs     local POST /comparison endpoint for live comparison retargeting while the TUI is waiting
     ├── draw.rs        two-half layout, main-view tab strip + log/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
     ├── palette.rs     command registry (PALETTE_COMMANDS) + PaletteState
@@ -42,14 +45,15 @@ src/
     ├── change_alert.rs  pure change-author attribution + restart-alert wording
     ├── session_meta.rs  the live-session metadata file
     ├── event_loop.rs  50ms loop: draw, inject, route input (incl. palette + main-view keys + mouse hover)
-    └── keymap.rs      key→bytes encoder + prompt injection into the claude pane
+    └── keymap.rs      key→bytes encoder + prompt injection into the LLM pane
 ```
 
 No file exceeds 400 lines; modules are single-purpose. The main diff pane shows
-one `MainDiffView` at a time — the **log view** (difit's `vt100` screen) or the
-**diff guide view** (`guide.rs` markdown rendered by `markdown/`). `dif` starts
-focused on this pane (in the log view), with the claude pane already working
-from its auto-submitted initial prompt (see [integrations.md](integrations.md)).
+one `MainDiffView` at a time: the **log view** (difit's `vt100` screen, or a
+waiting status before difit starts) or the **diff guide view** (`guide.rs`
+markdown rendered by `markdown/`). `dif` starts focused on this pane (in the log
+view), with the LLM pane already working from its auto-submitted initial prompt
+(see [integrations.md](integrations.md)).
 
 ## Diff guide navigation
 
@@ -92,11 +96,13 @@ cursor instead).
 - **Main thread** — the TUI event loop (draw + input at ~50ms).
 - **Per-pane reader/writer/waiter threads** — each `PtyPane` spawns three (PTY
   master → vt100 parser, mpsc channel → PTY master, child wait → exit status).
-  Two panes (difit, claude) → six. A "Restart dif" respawns the difit pane: its
+  Two panes (difit, LLM) → six. A "Restart diff server" respawns the difit pane: its
   old three threads wind down on EOF and three fresh ones start against the same
   parser.
 - **Poller thread** — polls difit's `/api/comments-json` once a second,
   publishes the latest snapshot under a lock, and mirrors it to the transcript.
+  It is absent while the LLM is preparing the first review; `App` starts it only
+  after the transcript and guide artifacts exist and difit has been spawned.
 - **Git-watcher thread** — recomputes the repo's diff signature once a second
   (`git rev-parse HEAD` + `status` + `diff HEAD`, hashed) and publishes it under
   a lock, so the UI loop can notice stale-diff state without spawning git itself.
@@ -113,14 +119,33 @@ difit server (PtyPane, left)  ──poll /api/comments-json──►  Poller thr
         │                                          .difit/<…>.json transcript
         │                                                      │
    POST /api/comment-imports                                   ▼
-   (claude's reply, live)                         event loop: Dispatcher
+   (agent reply, live)                            event loop: Dispatcher
         ▲                                          (baseline, then once-each)
         │                                                      │
-        └──────────── claude pane (PtyPane, right) ◄── typed prompt
+        └──────────── LLM pane (PtyPane, right) ◄── typed prompt
 ```
 
-The reviewer never has to ask claude to "address the comments": the poller
-sees each new reviewer comment and the loop types it into claude. Claude posts
+When no prepared review exists yet, the data flow has a short prepare state
+before this loop starts:
+
+```
+LLM pane starts with /diff-review [comparison]
+        │
+        ▼
+diff-review skill may POST selected comparison to control.rs
+        │
+        ▼
+diff-review skill writes .difit transcript + guide.md + guide.json
+        │
+        ▼
+App::update_difit_log sees review_files_ready()
+        │
+        ▼
+same left PtyPane respawns as difit, poller starts, browser shell opens
+```
+
+The reviewer never has to ask the agent to "address the comments": the poller
+sees each new reviewer comment and the loop types it into the LLM. The agent posts
 its reply back to the live server, which pushes it to the browser over SSE — no
 restart. See [integrations.md](integrations.md).
 
@@ -131,7 +156,7 @@ status lines into it via `PtyPane::write_to_screen` (the same primitive restart
 uses), so the pane reads as a running activity log. Each UI tick,
 `App::update_difit_log`:
 
-- asks the `ReplyWatcher` for `claude` replies new since the last snapshot and
+- asks the `ReplyWatcher` for agent replies new since the last snapshot and
   writes a cyan `💬 Added response to comment on <file>:Lx` line per reply
   (baseline-seeded at launch, logged once each), and
 - re-reads the diff guide file (`Guide::refresh`, a content diff) so the diff
@@ -146,9 +171,9 @@ uses), so the pane reads as a running activity log. Each UI tick,
     prior warning still alerts. `served_sig` re-baselines and `warned_sig` clears
     on restart.
   - **Best-effort attribution.** `change_alert::change_author` (pure, unit-tested)
-    decides claude-vs-manual from how recently `dif` last injected a prompt
+    decides agent-vs-manual from how recently `dif` last injected a prompt
     (`last_inject_at`, set on comment injection and `Ctrl+G`): a change within
-    `CLAUDE_ATTRIBUTION_WINDOW` (120s) of an injection is credited to claude
+    `LLM_ATTRIBUTION_WINDOW` (120s) of an injection is credited to the agent
     ("Claude made code changes…"), otherwise it reads as a manual edit ("New
     manual changes detected…").
 
@@ -157,20 +182,20 @@ uses), so the pane reads as a running activity log. Each UI tick,
 `Ctrl+P` opens an in-memory command palette (`palette.rs`); the event loop
 captures its keys while open and `App::execute_palette_action` dispatches the
 chosen `PaletteAction` (`RestartDifit`, `RegenerateGuide`, `OpenInBrowser`, or
-`NewClaudeSession`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N` run those
+`NewLlmSession`). `Ctrl+R` / `Ctrl+G` / `Ctrl+O` / `Ctrl+N` run those
 directly; each is also the palette row's dimmed `[^R]` / `[^G]` / `[^O]` /
 `[^N]` shortcut hint, via `palette::shortcut_for` (the source of truth
 for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
-guide" types a minimal request into the claude pane; the skill writes the guide
-file and the diff guide view picks it up on its next refresh. "New Claude
-session" is an interrupt: it kills the running claude child and respawns the
-pane on a fresh session (via `startup::fresh_claude_command`, shared with the
-pane's first launch) that auto-submits the review prompt — chosen over typing
-`/new` so it takes effect immediately even when claude is mid-thought. The
+guide" types a minimal request into the LLM pane; the skill writes the guide
+file and the diff guide view picks it up on its next refresh. "New LLM
+session" is an interrupt: it kills the running LLM child and respawns the
+pane on a fresh session (via `startup::fresh_llm_command`, shared with the
+pane's first launch) that auto-submits the review prompt. This is chosen over
+typing `/new` so it takes effect immediately even when the LLM is mid-thought. The
 palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.
 
-The "Restart dif" action restarts the difit server **in place**. `PtyPane`
+The "Restart diff server" action restarts the difit server **in place**. `PtyPane`
 gained two capabilities for this:
 
 - `kill_child()` — signal the current child without tearing down the pane.
@@ -185,7 +210,7 @@ gained two capabilities for this:
 `App::restart_difit` orchestrates: write a `[dif]` status line into the pane,
 kill difit, `server::wait_until_port_free` (so the relaunch rebinds the same
 port rather than letting difit auto-reassign), then respawn with the same
-comparison/port and a freshly re-read transcript. The poller and claude pane are
+comparison/port and a freshly re-read transcript. The poller and LLM pane are
 untouched; the poller reconnects on its own.
 
 ## Dependencies

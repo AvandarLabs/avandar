@@ -38,7 +38,7 @@ findings for the human to vet before their own pass.
 - A group view shows **only** that group's files (data-filtered, not DOM-hidden).
 - "Viewed" state and comments are shared across all views automatically.
 - Never fork difit; survive difit version bumps with minimal breakage surface.
-- Coexist with the TUI (the TUI still drives the claude session + comment
+- Coexist with the TUI (the TUI still drives the LLM session + comment
   injection); the web shell is the human's reading surface.
 
 **Non-goals**
@@ -320,7 +320,7 @@ stale.
   it whenever the guide or the diff refreshes, so the button appears/disappears
   live as files are added or removed.
 
-The browser can't type into the TUI's claude pane, so clicking it bridges through
+The browser can't type into the TUI's LLM pane, so clicking it bridges through
 the shell server:
 
 1. The button `POST`s `/__wrap/regenerate`; the handler sets a shared
@@ -330,7 +330,7 @@ the shell server:
 2. The TUI event loop polls `WebShell::take_regen_request()` each tick
    (`App::poll_web_shell_requests`) and, on a pending request, runs
    `App::regenerate_guide()` — the same path as `Ctrl+G`: it types the
-   `/diff-review` regenerate prompt into the claude pane.
+   `/diff-review` regenerate prompt into the LLM pane.
 3. The skill rewrites `…-guide.json` / `…-guide.md`; the TUI guide view and the
    shell's `groups.json` poll both pick it up. When the shell's poll sees the new
    `groups.json` (`applyGroups`), it re-renders the sidebar in place (never

@@ -2,7 +2,7 @@
 //!
 //! The byte stream is fed into a `vt100::Parser` whose screen buffer
 //! `tui-term` renders. `dif` uses two of these: one for the difit server
-//! (read-only log) and one for the resumable claude session.
+//! (read-only log) and one for the LLM session.
 //!
 //! Lifetime:
 //!   - `spawn()` creates the PTY, kicks off two threads (reader → parser,
@@ -71,7 +71,7 @@ impl PtyPane {
         let mut cmd = CommandBuilder::new(&shell);
         cmd.args(["-ic", command]);
         cmd.cwd(cwd);
-        // claude (and most TUIs spawned underneath) look at TERM to pick
+        // LLM TUIs spawned underneath look at TERM to pick
         // capabilities; xterm-256color is a safe lowest common denominator
         // that vt100 emulates well.
         cmd.env("TERM", "xterm-256color");

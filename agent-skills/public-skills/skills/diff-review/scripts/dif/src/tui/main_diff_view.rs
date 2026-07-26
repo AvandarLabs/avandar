@@ -1,7 +1,7 @@
 //! Which view is showing in the main diff pane (the left half of the shell).
 //!
 //! The shell is split into the **main view** (the left "diff view") and the
-//! claude panel (the right). The main view itself shows one of two things at a
+//! agent pane (the right). The main view itself shows one of two things at a
 //! time — the **log view** (difit's server console) or the **diff guide view**
 //! (the rendered review guide) — and `Tab` / `Shift+Tab` cycle between them.
 //! Mirrors the `tasks` crate's `View` cycle.

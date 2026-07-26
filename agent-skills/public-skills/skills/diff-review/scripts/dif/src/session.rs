@@ -1,17 +1,42 @@
-//! Pure builders for launching `dif`'s `claude` pane child.
+//! Pure builders for launching `dif`'s LLM pane child.
 //!
-//! `dif` runs one resumable `claude` session per review, in the repo root, so
-//! claude resolves the repo's `.claude/settings.json` and operates on the same
-//! tree difit is showing. Everything here is pure so it can be unit-tested
-//! without a PTY or a real claude; spawning lives in the TUI layer.
+//! `dif` runs one LLM frontend per review, in the repo root, so it operates on
+//! the same tree difit is showing. Everything here is pure so it can be
+//! unit-tested without a PTY or a real LLM; spawning lives in the TUI layer.
 //!
 //! Adapted from the `tasks` / `brain` session builders, minus their sqlite
-//! session store and SessionStart-hook attribution — `dif` owns exactly one
-//! claude pane for its lifetime, so it needs neither.
+//! session store and SessionStart-hook attribution. `dif` owns exactly one LLM
+//! pane for its lifetime, so it needs neither.
 
 use std::path::Path;
 
-/// What the claude pane should launch this run.
+/// Which LLM frontend the right pane is running.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AgentKind {
+    /// Claude Code.
+    Claude,
+    /// OpenAI Codex.
+    Codex,
+}
+
+impl AgentKind {
+    /// Human label for UI copy.
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Claude => "Claude",
+            Self::Codex => "Codex",
+        }
+    }
+
+    /// Whether this frontend supports a `dif`-chosen fresh session id.
+    #[must_use]
+    pub const fn supports_chosen_session_id(self) -> bool {
+        matches!(self, Self::Claude)
+    }
+}
+
+/// What the LLM pane should launch this run.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Plan {
     /// Resume an existing claude session by id (`claude --resume <id>`).
@@ -28,16 +53,15 @@ impl Plan {
     }
 }
 
-/// The message typed (and submitted) into a freshly-started claude pane.
+/// The message typed (and submitted) into a freshly-started LLM pane.
 ///
 /// It orients the session on the review from the first turn: it states the
 /// conversation is about the current diff and hands off to the skill.
-pub const INITIAL_REVIEW_PROMPT: &str =
-    "This conversation is about the current diff review in difit. \
+pub const INITIAL_REVIEW_PROMPT: &str = "This conversation is about the current diff review in difit. \
      Load the /diff-review skill and use it to drive this review; \
      I'll leave comments in difit as we go.";
 
-/// The prompt to submit into the claude pane on launch for `plan`.
+/// The prompt to submit into the LLM pane on launch for `plan`.
 ///
 /// A [`Plan::Fresh`] session gets the [`INITIAL_REVIEW_PROMPT`] so it starts
 /// already loading the skill; a [`Plan::Resume`] gets nothing, because that
@@ -58,39 +82,40 @@ pub fn shell_quote(s: &str) -> String {
     format!("'{escaped}'")
 }
 
-/// Options passed to `claude` in the spawned pane. We run `claude`
-/// non-interactively (`--dangerously-skip-permissions`) so the injected review
-/// comments don't stall on a permission prompt. Adjust here if you want the
-/// session to prompt for permissions instead.
-const CL_OPTIONS: &[&str] = &["--dangerously-skip-permissions"];
-
 /// Build the shell command handed to the PTY:
-/// `cd <repo_root> && claude <cl-options> --resume <id> [<prompt>]` (resume) or
-/// `cd <repo_root> && claude <cl-options> --session-id <id> [<prompt>]` (fresh).
+/// `cd <repo_root> && <llm_cmd> ... [<prompt>]`.
 ///
-/// `<cl-options>` mirrors the user's `cl` alias (see [`CL_OPTIONS`]).
-///
-/// When `prompt` is `Some(non-empty)` it is appended as a single quoted
-/// argument so claude submits it on launch and stays interactive.
+/// Claude supports `--resume <id>` and `--session-id <id>`, so `dif` can keep
+/// its existing resumable-session behavior. Codex supports `codex resume <id>`
+/// for existing sessions, but does not expose a flag for `dif` to choose the id
+/// of a fresh interactive session, so fresh Codex launches are simply seeded
+/// with the initial prompt.
 #[must_use]
-pub fn build_claude_command(repo_root: &Path, plan: &Plan, prompt: Option<&str>) -> String {
+pub fn build_llm_command(
+    repo_root: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+    plan: &Plan,
+    prompt: Option<&str>,
+) -> String {
     let mut parts = vec![
         "cd".to_owned(),
         shell_quote(&repo_root.display().to_string()),
         "&&".to_owned(),
-        "claude".to_owned(),
+        llm_cmd.trim().to_owned(),
     ];
-    for opt in CL_OPTIONS {
-        parts.push((*opt).to_owned());
-    }
-    match plan {
-        Plan::Resume(id) => {
-            parts.push("--resume".to_owned());
-            parts.push(shell_quote(id));
+    match (agent_kind, plan) {
+        (AgentKind::Claude, Plan::Resume(id)) => {
+            parts.extend(["--resume".to_owned(), shell_quote(id)]);
         }
-        Plan::Fresh(id) => {
-            parts.push("--session-id".to_owned());
-            parts.push(shell_quote(id));
+        (AgentKind::Claude, Plan::Fresh(id)) => {
+            parts.extend(["--session-id".to_owned(), shell_quote(id)]);
+        }
+        (AgentKind::Codex, Plan::Resume(id)) => {
+            parts.extend(["resume".to_owned(), shell_quote(id)]);
+        }
+        (AgentKind::Codex, Plan::Fresh(_)) => {
+            // Codex does not provide an option to choose a fresh session id.
         }
     }
     if let Some(p) = prompt {
@@ -137,33 +162,39 @@ mod tests {
 
     #[test]
     fn fresh_command_uses_session_id_flag() {
-        let cmd = build_claude_command(
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude",
             &Plan::Fresh("uuid-1".to_owned()),
             None,
         );
         assert!(cmd.starts_with("cd '/Users/x/repo' && claude"));
-        assert!(cmd.contains("--dangerously-skip-permissions"));
         assert!(cmd.contains("--session-id 'uuid-1'"));
         assert!(!cmd.contains("--resume"));
     }
 
     #[test]
-    fn command_carries_the_cl_options() {
-        let cmd = build_claude_command(
+    fn configured_claude_command_is_spliced_before_session_flags() {
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude --permission-mode bypassPermissions",
             &Plan::Resume("s".to_owned()),
             None,
         );
-        for opt in CL_OPTIONS {
-            assert!(cmd.contains(opt), "missing cl option {opt}");
-        }
+        assert_eq!(
+            cmd,
+            "cd '/Users/x/repo' && claude --permission-mode bypassPermissions --resume 's'"
+        );
     }
 
     #[test]
     fn resume_command_uses_resume_flag() {
-        let cmd = build_claude_command(
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude",
             &Plan::Resume("sess-9".to_owned()),
             None,
         );
@@ -173,8 +204,10 @@ mod tests {
 
     #[test]
     fn prompt_is_appended_as_a_quoted_arg() {
-        let cmd = build_claude_command(
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude",
             &Plan::Fresh("uuid-1".to_owned()),
             Some("Address the comment at foo.rs:12"),
         );
@@ -183,8 +216,10 @@ mod tests {
 
     #[test]
     fn empty_prompt_adds_no_trailing_arg() {
-        let cmd = build_claude_command(
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude",
             &Plan::Resume("sess-9".to_owned()),
             Some("   "),
         );
@@ -194,8 +229,10 @@ mod tests {
 
     #[test]
     fn prompt_with_a_single_quote_is_escaped() {
-        let cmd = build_claude_command(
+        let cmd = build_llm_command(
             &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "claude",
             &Plan::Fresh("u".to_owned()),
             Some("don't break"),
         );
@@ -223,7 +260,39 @@ mod tests {
 
     #[test]
     fn project_dir_name_mangles_slashes_and_dots() {
-        assert_eq!(project_dir_name(&PathBuf::from("/Users/x/repo")), "-Users-x-repo");
-        assert_eq!(project_dir_name(&PathBuf::from("/Users/x/.r")), "-Users-x--r");
+        assert_eq!(
+            project_dir_name(&PathBuf::from("/Users/x/repo")),
+            "-Users-x-repo"
+        );
+        assert_eq!(
+            project_dir_name(&PathBuf::from("/Users/x/.r")),
+            "-Users-x--r"
+        );
+    }
+
+    #[test]
+    fn claude_command_uses_configured_base_command() {
+        let cmd = build_llm_command(
+            &PathBuf::from("/Users/x/repo"),
+            AgentKind::Claude,
+            "cmddddd",
+            &Plan::Resume("sess-9".to_owned()),
+            None,
+        );
+        assert_eq!(cmd, "cd '/Users/x/repo' && cmddddd --resume 'sess-9'");
+    }
+
+    #[test]
+    fn codex_fresh_command_uses_configured_base_command_without_claude_flags() {
+        let cmd = build_llm_command(
+            &PathBuf::from("/Users/x/repo"),
+            AgentKind::Codex,
+            "codex",
+            &Plan::Fresh("ignored".to_owned()),
+            Some("Review this"),
+        );
+        assert_eq!(cmd, "cd '/Users/x/repo' && codex 'Review this'");
+        assert!(!cmd.contains("--session-id"));
+        assert!(!cmd.contains("--resume"));
     }
 }

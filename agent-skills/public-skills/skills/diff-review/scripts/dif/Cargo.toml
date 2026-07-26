@@ -3,7 +3,7 @@ name = "dif"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
-description = "Review a local diff in difit as a live conversation with claude."
+description = "Review a local diff in difit as a live conversation with an LLM."
 
 [[bin]]
 name = "dif"
@@ -30,7 +30,7 @@ tiny_http = "0.12"
 tui-term = "0.2"
 # Blocking HTTP client for the background poller (GET /api/comments-json) and
 # the difit health check. Blocking fits the dedicated poller thread; no async
-# runtime needed. Claude posts its own replies via curl, so we only GET here.
+# runtime needed. The agent posts its own replies via curl, so we only GET here.
 ureq = { version = "2", default-features = false, features = ["json"] }
 uuid = { version = "1", features = ["v4"] }
 vt100 = "0.15"

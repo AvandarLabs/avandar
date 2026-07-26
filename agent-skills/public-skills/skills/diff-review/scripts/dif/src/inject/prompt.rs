@@ -1,4 +1,4 @@
-//! Building the prompt typed into the claude pane for one reviewer comment.
+//! Building the prompt typed into the LLM pane for one reviewer comment.
 //!
 //! The prompt is deliberately minimal: it names the file and line (or line
 //! range), quotes the comment, and hands off to the `/diff-review` skill.
@@ -56,7 +56,10 @@ mod tests {
         // skill now, not in every injected prompt.
         let p = build_prompt(&comment());
         assert!(!p.contains("commit"), "no commit policy in the prompt: {p}");
-        assert!(!p.contains("api/comment-imports"), "no endpoint in the prompt: {p}");
+        assert!(
+            !p.contains("api/comment-imports"),
+            "no endpoint in the prompt: {p}"
+        );
     }
 
     #[test]

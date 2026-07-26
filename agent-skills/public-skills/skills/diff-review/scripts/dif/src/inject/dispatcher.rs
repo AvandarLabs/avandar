@@ -1,5 +1,5 @@
 //! Stateful injection driver: turns successive difit snapshots into the
-//! prompts to type into the claude pane, exactly once per reviewer comment.
+//! prompts to type into the LLM pane, exactly once per reviewer comment.
 //!
 //! Kept free of any PTY so the baseline-then-dispatch-once behavior is unit
 //! testable. The first snapshot seeds a baseline of existing reviewer comment
@@ -13,7 +13,7 @@ use crate::difit::imports::Snapshot;
 use super::dispatch::{pending_dispatches, reviewer_message_ids};
 use super::prompt::build_prompt;
 
-/// Tracks which reviewer comments have already been handed to claude.
+/// Tracks which reviewer comments have already been handed to the LLM.
 #[derive(Default)]
 pub struct Dispatcher {
     dispatched: HashSet<String>,
@@ -68,7 +68,10 @@ mod tests {
     fn comment_added_after_baseline_is_dispatched_once() {
         let mut d = Dispatcher::new();
         // Baseline: empty review.
-        assert!(d.next_prompts(&snap(r#"{"version":0,"threads":[]}"#)).is_empty());
+        assert!(
+            d.next_prompts(&snap(r#"{"version":0,"threads":[]}"#))
+                .is_empty()
+        );
         // New comment appears.
         let first = d.next_prompts(&snap(ONE_OPEN));
         assert_eq!(first.len(), 1);
