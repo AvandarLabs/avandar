@@ -10,20 +10,20 @@ file so Claude Code picks it up too.)
 
 `dif` is a Rust TUI — the "dif shell" — that wraps
 [difit](https://github.com/yoshiko-pg/difit) and turns local diff review into
-a live conversation with `claude`. Launching `dif` opens a two-pane,
+a live conversation with an LLM frontend. Launching `dif` opens a two-pane,
 alternate-screen ratatui frontend:
 
 - **LEFT — difit:** difit runs under a `PtyPane`; the pane shows the server's
   output and logs (URL, requests, status). The actual diff review happens in
   the browser difit opens; this pane is the server's console.
-- **RIGHT — Claude:** a persistent, resumable `claude` session in a `PtyPane`,
-  running in the repo root.
+- **RIGHT: LLM panel:** Claude by default, or Codex when launched with
+  `--codex`, running in the repo root.
 
 A background thread polls difit's `GET /api/comments-json`, mirrors the threads
 to the `.difit/<branch-slug>-difit-<scope-slug>.json` transcript, and detects
 new reviewer comments (any author other than `claude`). Each new comment is
 **typed once** into the
-Claude pane; Claude addresses it, then POSTs its reply to difit's
+LLM pane; the agent addresses it, then POSTs its reply to difit's
 `POST /api/comment-imports`, which pushes the reply to the browser live over
 SSE. No server restart, no manual "address the comments" handoff.
 
@@ -53,6 +53,11 @@ about one without the other.
   the guide markdown under `.difit/` must be regenerated so it always reflects
   the present diff. That regeneration is the skill's job; `dif` only triggers
   it (`Ctrl+G`) and renders the result.
+- **Do not start difit before a review exists.** If the transcript and guide
+  artifacts for the selected comparison are missing, `dif` starts only the LLM
+  pane with `/diff-review [comparison]`. It waits for the skill to write the
+  `.difit` transcript, `-guide.md`, and `-guide.json`, then starts difit, the
+  poller, the session metadata, and the browser shell.
 
 ## The docs/ contract
 
@@ -69,7 +74,7 @@ is the source-of-truth for *how*. They must agree on what.
 | User-visible behavior (panes, startup, browser open, injection) | `docs/features.md` |
 | Comment/transcript JSON shape, session file, slug/port derivation | `docs/data-model.md` |
 | Any keybinding | `docs/keybindings.md` and the in-code shortcut table |
-| difit lifecycle, the `/api/*` endpoints used, the Claude pane, the POST reply path, commit policy | `docs/integrations.md` |
+| difit lifecycle, the `/api/*` endpoints used, the LLM pane, the POST reply path, commit policy | `docs/integrations.md` |
 | `config.json` schema or loader | `docs/config.md` |
 | Testing strategy, what we test vs. skip, mocking | `docs/testing.md` |
 
@@ -84,7 +89,7 @@ defer the doc update.
   contract, the `reviewer`/`claude` authorship rules, the dispatched-once
   invariant for comment injection).
 - The "why" behind non-obvious choices (why we POST replies live instead of
-  restarting difit; why injection relies on Claude's own input queue).
+  restarting difit; why injection relies on the LLM frontend's own input queue).
 
 ## What docs/ is NOT for
 
@@ -97,7 +102,7 @@ defer the doc update.
 1. Read [docs/README.md](docs/README.md) — the index.
 2. Read [docs/architecture.md](docs/architecture.md) end-to-end.
 3. Read [docs/integrations.md](docs/integrations.md) — the difit endpoint
-   contract and the Claude injection/reply loop are the heart of this tool.
+   contract and the LLM injection/reply loop are the heart of this tool.
 4. Open the file you actually need to touch.
 5. As you change code, edit the docs alongside it.
 

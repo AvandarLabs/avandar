@@ -64,15 +64,16 @@ pub struct Shortcut {
 /// renders at the end of the statusline.
 pub const ALL: &[Shortcut] = &[
     // --- Focus & scroll ---
-    Shortcut { keys: "Alt+H / Alt+L", label: "focus", desc: "Focus the left diff view / the right Claude pane", group: Group::Focus, in_footer: false },
-    Shortcut { keys: "Alt+U / Alt+D", label: "scroll", desc: "Scroll the focused view a half-page up / down (works even while Claude is focused)", group: Group::Focus, in_footer: false },
+    Shortcut { keys: "Alt+H / Alt+L", label: "focus", desc: "Focus the left diff view / the right LLM pane", group: Group::Focus, in_footer: false },
+    Shortcut { keys: "Alt+U / Alt+D", label: "scroll", desc: "Scroll the focused view a half-page up / down (works even while the LLM is focused)", group: Group::Focus, in_footer: true },
+    Shortcut { keys: "Alt+K / Alt+J", label: "line", desc: "Scroll the focused view one line up / down (works even while the LLM is focused)", group: Group::Focus, in_footer: true },
     // --- Commands (from either pane) ---
     Shortcut { keys: "^P", label: "palette", desc: "Open the command palette", group: Group::Commands, in_footer: true },
-    Shortcut { keys: "^G", label: "guide", desc: "Regenerate the diff guide (ask Claude)", group: Group::Commands, in_footer: true },
+    Shortcut { keys: "^G", label: "guide", desc: "Regenerate the diff guide (ask the LLM)", group: Group::Commands, in_footer: true },
     Shortcut { keys: "^O", label: "browser", desc: "Open the review in the browser web shell", group: Group::Commands, in_footer: true },
-    Shortcut { keys: "^R", label: "restart", desc: "Restart the difit server", group: Group::Commands, in_footer: false },
-    Shortcut { keys: "^N", label: "new session", desc: "Start a fresh Claude session (auto-submits the review prompt)", group: Group::Commands, in_footer: false },
-    Shortcut { keys: "^Q", label: "quit", desc: "Quit dif (tears down difit, Claude, and the poller)", group: Group::Commands, in_footer: true },
+    Shortcut { keys: "^R", label: "restart", desc: "Restart the difit server", group: Group::Commands, in_footer: true },
+    Shortcut { keys: "^N", label: "new session", desc: "Start a fresh LLM session (auto-submits the review prompt)", group: Group::Commands, in_footer: false },
+    Shortcut { keys: "^Q", label: "quit", desc: "Quit dif (tears down difit, LLM, and the poller)", group: Group::Commands, in_footer: true },
     // --- Main (diff) view ---
     Shortcut { keys: "Tab / ⇧Tab", label: "view", desc: "Cycle the main view (Logs ↔ Diff guide)", group: Group::MainView, in_footer: true },
     Shortcut { keys: "↑ / ↓", label: "scroll", desc: "Scroll the active view 3 rows", group: Group::MainView, in_footer: false },
@@ -129,5 +130,32 @@ mod tests {
     fn commands_group_lists_the_web_shell_open() {
         let cmds = in_group(Group::Commands);
         assert!(cmds.iter().any(|s| s.keys == "^O" && s.desc.contains("web shell")));
+    }
+
+    #[test]
+    fn footer_advertises_global_half_page_scroll() {
+        assert!(
+            footer_subset()
+                .iter()
+                .any(|s| s.keys == "Alt+U / Alt+D" && s.label == "scroll")
+        );
+    }
+
+    #[test]
+    fn footer_advertises_restart_shortcut() {
+        assert!(
+            footer_subset()
+                .iter()
+                .any(|s| s.keys == "^R" && s.label == "restart")
+        );
+    }
+
+    #[test]
+    fn footer_advertises_global_single_line_scroll() {
+        assert!(
+            footer_subset()
+                .iter()
+                .any(|s| s.keys == "Alt+K / Alt+J" && s.label == "line")
+        );
     }
 }

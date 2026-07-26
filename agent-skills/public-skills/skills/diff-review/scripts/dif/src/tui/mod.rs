@@ -1,8 +1,9 @@
-//! The terminal UI: a two-pane shell (difit log + claude) with live comment
+//! The terminal UI: a two-pane shell (difit log + LLM) with live comment
 //! injection. [`run`] owns terminal setup/teardown around the event loop.
 
 pub mod app;
 pub mod change_alert;
+pub mod control;
 pub mod draw;
 pub mod draw_help;
 pub mod draw_palette;
@@ -22,10 +23,10 @@ use std::io::{Stdout, stdout};
 
 use anyhow::{Context, Result};
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
-use crossterm::execute;
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 
@@ -35,7 +36,7 @@ use event_loop::run_event_loop;
 
 /// Launch the review and run the TUI to completion.
 ///
-/// difit, the claude session, and the poller are all torn down when the
+/// difit, the LLM session, and the poller are all torn down when the
 /// returned [`App`](app::App) drops at the end of this function.
 pub fn run(cli: &Cli) -> Result<()> {
     let mut app = startup::launch(cli)?;

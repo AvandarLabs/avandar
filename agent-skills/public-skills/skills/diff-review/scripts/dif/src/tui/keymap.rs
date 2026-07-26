@@ -1,5 +1,5 @@
 //! Translating crossterm key events into the byte sequences a PTY child
-//! expects, and typing a prefilled prompt into a running claude pane.
+//! expects, and typing a prefilled prompt into a running LLM pane.
 //!
 //! Ported from the `tasks` crate's keymap + brain-panel injection. The byte
 //! encodings match a standard xterm: Ctrl+letter → control codes, Alt+key →
@@ -68,10 +68,10 @@ fn encode_char(c: char, ctrl: bool, alt: bool) -> Vec<u8> {
 /// window; 200ms is comfortably past it while still feeling instant.
 const SUBMIT_DELAY: std::time::Duration = std::time::Duration::from_millis(200);
 
-/// Type a prefilled prompt into a running claude pane and submit it.
+/// Type a prefilled prompt into a running LLM pane and submit it.
 ///
-/// Internal newlines are sent as `Alt+Enter` (`ESC` + `CR`) — claude's
-/// readline treats that as "insert newline", not "submit" — so a multi-line
+/// Internal newlines are sent as `Alt+Enter` (`ESC` + `CR`): claude's
+/// readline treats that as "insert newline", not "submit", so a multi-line
 /// prompt arrives intact. The submitting `Enter` is then sent as a *separate,
 /// delayed* keystroke (see [`SUBMIT_DELAY`]) so claude submits the prompt
 /// instead of keeping the newline as pasted text. Claude's own input queue

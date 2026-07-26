@@ -258,6 +258,48 @@ Build the line deterministically — don't inspect the repo by hand:
      `→ Run: sh <skill-dir>/scripts/dif/run.sh <args>` (or `dif <args>` if the
      user has sourced the optional zsh wrapper).
 
+4. **Notify a live waiting TUI, if one exists.** When `/diff-review` is running
+   inside an already-open `dif` TUI that was waiting for the first review, the
+   TUI may not yet know which comparison key you selected. Before printing the
+   final summary block, scan `.difit/.session-<current-branch-slug>-*.json` for
+   a live session metadata file that contains `comparison_update_url`. Prefer a
+   session whose `comparison_key` matches the originally requested comparison
+   (including the default when no arg was supplied); otherwise use the only live
+   session for the current branch. If there is exactly one usable URL, POST the
+   selected comparison key there:
+
+   ```bash
+   python3 - "$comparison_update_url" "$selected_comparison_key" <<'PY'
+   import json, sys, urllib.request
+
+   url = sys.argv[1]
+   comparison_key = sys.argv[2]
+   body = json.dumps({"comparisonKey": comparison_key}).encode()
+   req = urllib.request.Request(
+       url,
+       data=body,
+       headers={"Content-Type": "application/json"},
+       method="POST",
+   )
+   try:
+       with urllib.request.urlopen(req, timeout=1) as resp:
+           if resp.status not in (202, 409):
+               print(f"comparison update returned HTTP {resp.status}", file=sys.stderr)
+   except Exception as exc:
+       print(f"comparison update skipped: {exc}", file=sys.stderr)
+   PY
+   ```
+
+   Set `comparison_update_url` to the metadata file's `comparison_update_url`
+   and `selected_comparison_key` to the comparison key from the final run
+   command, e.g. `.` for `pnpm diff-review .` or `develop` for
+   `pnpm diff-review develop`. HTTP `202` means the TUI accepted the comparison
+   and will use it for starting/restarting difit and opening the browser. HTTP
+   `409` means the TUI is already online, so leave it alone. If there is no
+   live metadata file, more than one ambiguous candidate, or the POST fails,
+   continue normally; this handoff is best-effort and only matters for an
+   already-open waiting TUI.
+
 Do this once per review round; the command is cheap and deterministic.
 
 ### Required chat output

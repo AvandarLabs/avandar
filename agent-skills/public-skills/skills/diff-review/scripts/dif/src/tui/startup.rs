@@ -1,9 +1,10 @@
-//! Bringing a review online: resolve the comparison, spawn difit + claude,
-//! start the poller, and assemble the [`App`].
+//! Bringing a review online: resolve the comparison, spawn the LLM, start
+//! difit when review artifacts exist, and assemble the [`App`].
 //!
-//! The claude session is resumable across `dif` launches: we remember its id
-//! in `.difit/.claude-session-<branch>-<scope>` and `--resume` it when its
-//! transcript still exists on disk, else start a fresh session.
+//! Claude sessions are resumable across `dif` launches: we remember the id in
+//! `.difit/.claude-session-<branch>-<scope>` and `--resume` it when its
+//! transcript still exists on disk. Codex launches are supported too, but the
+//! current Codex CLI does not let `dif` choose the id for a fresh session.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -13,6 +14,7 @@ use anyhow::Result;
 
 use crate::cli::Cli;
 use crate::comparison::ComparisonKey;
+use crate::config::DifConfig;
 use crate::difit::poller::Poller;
 use crate::difit::{server, transcript};
 use crate::git::{self, Git};
@@ -21,21 +23,39 @@ use crate::inject::dispatcher::Dispatcher;
 use crate::inject::reply_watcher::ReplyWatcher;
 use crate::paths;
 use crate::pty_pane::PtyPane;
-use crate::session::{self, Plan};
+use crate::session::{self, AgentKind, Plan};
 use crate::slug;
 use crate::web;
 
 use super::app::{App, Panel};
-use super::session_meta::{self, SessionMeta};
+use super::control::ReviewControl;
 
 /// Placeholder PTY size; the first draw resizes both panes to the real layout.
 const INITIAL_ROWS: u16 = 24;
 /// Placeholder PTY columns.
 const INITIAL_COLS: u16 = 80;
 
-/// Launch difit + claude + the poller and return the assembled [`App`].
+struct LaunchSurface {
+    difit: PtyPane,
+    poller: Option<Poller>,
+    web_shell: Option<web::WebShell>,
+    open_url: Option<String>,
+    is_review_online: bool,
+}
+
+/// Launch the LLM and, when review artifacts already exist, difit + poller.
 pub fn launch(cli: &Cli) -> Result<App> {
     let repo_root = git::repo_root()?;
+    let config = DifConfig::load(&repo_root);
+    let agent_kind = if cli.codex {
+        AgentKind::Codex
+    } else {
+        AgentKind::Claude
+    };
+    let llm_cmd = match agent_kind {
+        AgentKind::Claude => config.claude_cmd,
+        AgentKind::Codex => config.codex_cmd,
+    };
     let branch = git::current_branch()?;
     let comparison = git::resolve_comparison_key(cli.comparison_key.as_deref(), &Git);
 
@@ -44,61 +64,58 @@ pub fn launch(cli: &Cli) -> Result<App> {
     let port = server::pick_port(slug::port_for(&branch_slug, &scope_slug));
 
     let transcript_path = paths::transcript_path(&repo_root, &branch_slug, &scope_slug);
-    let session_id_path = paths::session_id_path(&repo_root, &branch_slug, &scope_slug);
+    let session_id_path =
+        paths::llm_session_id_path(&repo_root, agent_kind, &branch_slug, &scope_slug);
     let session_meta_path = paths::session_meta_path(&repo_root, &branch_slug, &scope_slug);
     let guide_path = paths::guide_path(&repo_root, &branch_slug, &scope_slug);
+    let guide_json_path = paths::guide_json_path(&repo_root, &branch_slug, &scope_slug);
     let _ = fs::create_dir_all(paths::difit_dir(&repo_root));
 
-    let transcript_raw = transcript::read_raw(&transcript_path);
-    let difit = server::spawn(
+    let shell_port =
+        server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
+    let control_port =
+        server::pick_port(slug::port_for(&format!("{branch_slug}-control"), &scope_slug));
+    let review_control = ReviewControl::start(control_port)?;
+    let is_review_ready = review_files_ready(&transcript_path, &guide_path, &guide_json_path);
+    review_control.set_accepts_updates(!is_review_ready);
+    let worktree = web::meta::worktree_name(&repo_root, &branch);
+    let surface = start_launch_surface(
         &repo_root,
         &comparison,
         port,
-        transcript_raw.as_deref(),
-        false, // the web shell owns browser-open; difit must not open its own
-        INITIAL_ROWS,
-        INITIAL_COLS,
+        shell_port,
+        &transcript_path,
+        &guide_path,
+        guide_json_path.clone(),
+        branch.clone(),
+        worktree.clone(),
     )?;
-    let _ready = server::wait_until_ready(port, 50);
 
-    // Wrap difit in the browser web shell (guide sidebar + per-group filtered
-    // views) and open *that* instead of difit's own frontend. If the shell fails
-    // to start, fall back to opening raw difit so the review still works.
-    let guide_json_path = paths::guide_json_path(&repo_root, &branch_slug, &scope_slug);
-    let shell_port = server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
-    let worktree = web::meta::worktree_name(&repo_root, &branch);
-    let web_shell =
-        web::WebShell::start(port, shell_port, guide_json_path, branch, worktree).ok();
-    let open_url = web_shell
-        .as_ref()
-        .map_or_else(|| format!("http://localhost:{port}/"), web::WebShell::url);
-    super::open_target::open_url(&open_url);
-
-    let claude = spawn_claude(&repo_root, &session_id_path);
-
-    session_meta::write(
-        &session_meta_path,
-        &SessionMeta {
-            port,
-            pid: std::process::id(),
-            comments_file: transcript_path.display().to_string(),
-            comparison_key: comparison.key(),
-            shell_port,
-            shell_url: open_url,
-        },
+    let initial_prompt = if surface.is_review_online {
+        None
+    } else {
+        Some(prepare_review_prompt(cli.comparison_key.as_deref()))
+    };
+    let llm = spawn_llm(
+        &repo_root,
+        &session_id_path,
+        agent_kind,
+        &llm_cmd,
+        initial_prompt.as_deref(),
     );
-
-    let poller = Poller::start(port, transcript_path.clone(), Duration::from_secs(1));
     let git_watcher = GitWatcher::start(repo_root.clone(), Duration::from_secs(1));
     let served_sig = git::diff_signature(&repo_root);
     let dispatcher = Dispatcher::new();
 
-    Ok(App {
-        difit,
-        claude,
-        // Start on the diff main view (left), not the claude pane: the review
-        // begins by looking at the diff, and claude is already busy loading the
-        // skill from its auto-submitted initial prompt (see `spawn_claude`).
+    let open_url = surface.open_url.clone();
+    let app = App {
+        difit: surface.difit,
+        llm,
+        agent_kind,
+        llm_cmd,
+        // Start on the diff main view (left), not the LLM pane: the review
+        // begins by looking at the diff, and the LLM is already busy loading
+        // the skill from its auto-submitted initial prompt (see `spawn_llm`).
         focus: Panel::Difit,
         port,
         comparison_label: comparison_label(&comparison),
@@ -106,9 +123,10 @@ pub fn launch(cli: &Cli) -> Result<App> {
         comparison,
         transcript_path,
         session_id_path,
+        review_control,
         dispatcher,
         reply_watcher: ReplyWatcher::new(),
-        poller,
+        poller: surface.poller,
         git_watcher,
         served_sig,
         pending_change: None,
@@ -120,48 +138,201 @@ pub fn launch(cli: &Cli) -> Result<App> {
         session_meta: session_meta_path,
         palette: None,
         help_open: false,
-        web_shell,
+        web_shell: surface.web_shell,
+        open_url: surface.open_url,
+        is_review_online: surface.is_review_online,
+        shell_port,
+        control_port,
+        guide_json_path,
+        branch,
+        worktree,
+        fresh_llm_prompt: initial_prompt,
         should_quit: false,
+    };
+    app.write_session_meta(open_url);
+    Ok(app)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn start_launch_surface(
+    repo_root: &Path,
+    comparison: &ComparisonKey,
+    port: u16,
+    shell_port: u16,
+    transcript_path: &Path,
+    guide_path: &Path,
+    guide_json_path: PathBuf,
+    branch: String,
+    worktree: String,
+) -> Result<LaunchSurface> {
+    if !review_files_ready(transcript_path, guide_path, &guide_json_path) {
+        return Ok(LaunchSurface {
+            difit: spawn_waiting_pane(repo_root, comparison_label(comparison).as_str())?,
+            poller: None,
+            web_shell: None,
+            open_url: None,
+            is_review_online: false,
+        });
+    }
+    let transcript_raw = transcript::read_raw(transcript_path);
+    let difit = server::spawn(
+        repo_root,
+        comparison,
+        port,
+        transcript_raw.as_deref(),
+        false,
+        INITIAL_ROWS,
+        INITIAL_COLS,
+    )?;
+    let _ready = server::wait_until_ready(port, 50);
+    let web_shell = start_web_shell(port, shell_port, guide_json_path, branch, worktree);
+    let open_url = web_shell
+        .as_ref()
+        .map_or_else(|| format!("http://localhost:{port}/"), web::WebShell::url);
+    super::open_target::open_url(&open_url);
+    Ok(LaunchSurface {
+        difit,
+        poller: Some(Poller::start(
+            port,
+            transcript_path.to_path_buf(),
+            Duration::from_secs(1),
+        )),
+        web_shell,
+        open_url: Some(open_url),
+        is_review_online: true,
     })
 }
 
-/// Spawn the claude pane, resuming the saved session when possible.
-fn spawn_claude(repo_root: &Path, session_id_path: &Path) -> Option<PtyPane> {
-    let command = resume_candidate(repo_root, session_id_path).map_or_else(
-        || fresh_claude_command(repo_root, session_id_path),
+/// Spawn the LLM pane, resuming the saved session when possible.
+fn spawn_llm(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+    fresh_prompt_override: Option<&str>,
+) -> Option<PtyPane> {
+    let resume_id = if fresh_prompt_override.is_some() {
+        None
+    } else {
+        resume_candidate(repo_root, session_id_path, agent_kind)
+    };
+    let command = resume_id.map_or_else(
+        || {
+            fresh_llm_command_with_prompt(
+                repo_root,
+                session_id_path,
+                agent_kind,
+                llm_cmd,
+                fresh_prompt_override,
+            )
+        },
         |id| {
             // A resumed session already carries the review context.
             let plan = Plan::Resume(id);
-            session::build_claude_command(repo_root, &plan, session::initial_prompt(&plan))
+            session::build_llm_command(
+                repo_root,
+                agent_kind,
+                llm_cmd,
+                &plan,
+                session::initial_prompt(&plan),
+            )
         },
     );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS).ok()
 }
 
-/// Mint a fresh claude session and return the shell command that launches it.
+/// Mint a fresh LLM session and return the shell command that launches it.
 ///
 /// Generates a new session id, persists it to `session_id_path` (so a later
 /// `dif` launch can `--resume` this session), and builds the launch command
 /// with the initial review prompt auto-submitted on startup. Shared by the
-/// pane's first launch ([`spawn_claude`]) and the `Ctrl+N` respawn
-/// ([`App::new_claude_session`](super::app::App::new_claude_session)) so both
+/// pane's first launch ([`spawn_llm`]) and the `Ctrl+N` respawn
+/// ([`App::new_llm_session`](super::app::App::new_llm_session)) so both
 /// start a fresh session identically.
-pub(crate) fn fresh_claude_command(repo_root: &Path, session_id_path: &Path) -> String {
-    let id = uuid::Uuid::new_v4().to_string();
-    let _ = fs::write(session_id_path, &id);
-    let plan = Plan::Fresh(id);
-    // A fresh session is launched already oriented on the review (the prompt is
-    // submitted on startup).
-    session::build_claude_command(repo_root, &plan, session::initial_prompt(&plan))
+pub(crate) fn fresh_llm_command(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+) -> String {
+    fresh_llm_command_with_prompt(
+        repo_root,
+        session_id_path,
+        agent_kind,
+        llm_cmd,
+        session::initial_prompt(&Plan::Fresh(String::new())),
+    )
 }
 
-/// The saved session id, but only if `claude --resume` would find it.
-fn resume_candidate(repo_root: &Path, session_id_path: &Path) -> Option<String> {
+/// Mint a fresh LLM session with a caller-provided first prompt.
+pub(crate) fn fresh_llm_command_with_prompt(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+    prompt: Option<&str>,
+) -> String {
+    let id = uuid::Uuid::new_v4().to_string();
+    if agent_kind.supports_chosen_session_id() {
+        let _ = fs::write(session_id_path, &id);
+    }
+    let plan = Plan::Fresh(id);
+    session::build_llm_command(repo_root, agent_kind, llm_cmd, &plan, prompt)
+}
+
+/// Prompt used when no matching `.difit` review artifacts exist yet.
+pub(crate) fn prepare_review_prompt(comparison_arg: Option<&str>) -> String {
+    comparison_arg.map_or_else(
+        || "/diff-review".to_owned(),
+        |arg| format!("/diff-review {}", arg.trim()),
+    )
+}
+
+/// Whether the prepared review artifacts exist for the selected comparison.
+pub(crate) fn review_files_ready(
+    transcript_path: &Path,
+    guide_path: &Path,
+    guide_json_path: &Path,
+) -> bool {
+    transcript_path.is_file() && guide_path.is_file() && guide_json_path.is_file()
+}
+
+fn spawn_waiting_pane(repo_root: &Path, comparison_label: &str) -> Result<PtyPane> {
+    let message = format!(
+        "[dif] No prepared diff review found for {comparison_label}.\r\n\
+         [dif] Waiting for the LLM to run /diff-review and write .difit artifacts.\r\n\
+         [dif] difit and the browser shell will start automatically when ready."
+    );
+    let command = format!("printf '%s\\r\\n' {}; exec sleep 2147483647", session::shell_quote(&message));
+    PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS)
+}
+
+fn start_web_shell(
+    port: u16,
+    shell_port: u16,
+    guide_json_path: PathBuf,
+    branch: String,
+    worktree: String,
+) -> Option<web::WebShell> {
+    // Wrap difit in the browser web shell (guide sidebar + per-group filtered
+    // views). If the shell fails to start, callers fall back to raw difit.
+    web::WebShell::start(port, shell_port, guide_json_path, branch, worktree).ok()
+}
+
+/// The saved session id, but only if the selected frontend can resume it.
+fn resume_candidate(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+) -> Option<String> {
     let id = fs::read_to_string(session_id_path).ok()?.trim().to_owned();
     if id.is_empty() {
         return None;
     }
-    session_transcript_exists(repo_root, &id).then_some(id)
+    match agent_kind {
+        AgentKind::Claude => session_transcript_exists(repo_root, &id).then_some(id),
+        AgentKind::Codex => Some(id),
+    }
 }
 
 /// Whether `~/.claude/projects/<project-dir>/<id>.jsonl` exists.
@@ -178,7 +349,7 @@ fn session_transcript_exists(repo_root: &Path, id: &str) -> bool {
 }
 
 /// A short human label for the comparison, e.g. `@ develop` or `.`.
-fn comparison_label(comparison: &ComparisonKey) -> String {
+pub(crate) fn comparison_label(comparison: &ComparisonKey) -> String {
     comparison.difit_args().join(" ")
 }
 
@@ -187,11 +358,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn fresh_claude_command_persists_id_and_seeds_the_prompt() {
+    fn fresh_llm_command_persists_claude_id_and_seeds_the_prompt() {
         let dir = tempfile::tempdir().expect("tempdir");
         let session_id_path = dir.path().join("session-id");
 
-        let command = fresh_claude_command(dir.path(), &session_id_path);
+        let command = fresh_llm_command(dir.path(), &session_id_path, AgentKind::Claude, "claude");
 
         // The id is persisted so a later `dif` launch can `--resume` it...
         let id = fs::read_to_string(&session_id_path).expect("id written");
@@ -204,15 +375,82 @@ mod tests {
     }
 
     #[test]
-    fn fresh_claude_command_mints_a_distinct_id_each_call() {
+    fn fresh_llm_command_mints_a_distinct_claude_id_each_call() {
         let dir = tempfile::tempdir().expect("tempdir");
         let path = dir.path().join("session-id");
 
-        let _ = fresh_claude_command(dir.path(), &path);
+        let _ = fresh_llm_command(dir.path(), &path, AgentKind::Claude, "claude");
         let first = fs::read_to_string(&path).expect("first id");
-        let _ = fresh_claude_command(dir.path(), &path);
+        let _ = fresh_llm_command(dir.path(), &path, AgentKind::Claude, "claude");
         let second = fs::read_to_string(&path).expect("second id");
 
         assert_ne!(first, second, "each Ctrl+N respawn is a distinct session");
+    }
+
+    #[test]
+    fn fresh_llm_command_does_not_persist_codex_id() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("session-id");
+
+        let command = fresh_llm_command(dir.path(), &path, AgentKind::Codex, "codex");
+
+        assert!(!path.exists(), "codex does not accept a chosen fresh id");
+        assert!(command.contains("codex"));
+        assert!(command.contains("/diff-review"));
+        assert!(!command.contains("--session-id"));
+    }
+
+    #[test]
+    fn prepare_review_prompt_uses_only_the_user_comparison_arg() {
+        assert_eq!(prepare_review_prompt(None), "/diff-review");
+        assert_eq!(prepare_review_prompt(Some(".")), "/diff-review .");
+        assert_eq!(prepare_review_prompt(Some("develop")), "/diff-review develop");
+    }
+
+    #[test]
+    fn review_files_ready_waits_for_transcript_and_guides() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let transcript_path = dir.path().join("review.json");
+        let guide_path = dir.path().join("review-guide.md");
+        let guide_json_path = dir.path().join("review-guide.json");
+
+        assert!(!review_files_ready(
+            &transcript_path,
+            &guide_path,
+            &guide_json_path
+        ));
+
+        fs::write(&transcript_path, "[]").expect("write transcript");
+        fs::write(&guide_path, "# guide").expect("write guide");
+        assert!(!review_files_ready(
+            &transcript_path,
+            &guide_path,
+            &guide_json_path
+        ));
+
+        fs::write(&guide_json_path, "[]").expect("write structured guide");
+        assert!(review_files_ready(
+            &transcript_path,
+            &guide_path,
+            &guide_json_path
+        ));
+    }
+
+    #[test]
+    fn prepare_llm_command_seeds_slash_command_not_review_chat_prompt() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("session-id");
+        let prompt = prepare_review_prompt(Some("."));
+
+        let command = fresh_llm_command_with_prompt(
+            dir.path(),
+            &path,
+            AgentKind::Claude,
+            "claude",
+            Some(prompt.as_str()),
+        );
+
+        assert!(command.contains("/diff-review ."));
+        assert!(!command.contains(session::INITIAL_REVIEW_PROMPT));
     }
 }

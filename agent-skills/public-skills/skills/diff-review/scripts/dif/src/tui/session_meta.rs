@@ -25,6 +25,10 @@ pub struct SessionMeta {
     pub shell_port: u16,
     /// The web-shell URL opened in the browser.
     pub shell_url: String,
+    /// Local-only control server port for live TUI coordination.
+    pub control_port: u16,
+    /// Endpoint where the skill can POST the selected comparison key.
+    pub comparison_update_url: String,
 }
 
 /// Best-effort write of the session metadata as pretty JSON.

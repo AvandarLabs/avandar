@@ -70,6 +70,12 @@ impl Guide {
         self.text.as_deref()
     }
 
+    /// Path to the markdown file this guide watches.
+    #[must_use]
+    pub fn path(&self) -> &std::path::Path {
+        &self.path
+    }
+
     /// Record the plain text of the lines the draw layer just rendered and clamp
     /// the cursor back onto them (the content may have shrunk or re-wrapped).
     pub fn set_lines(&mut self, lines: Vec<String>) {

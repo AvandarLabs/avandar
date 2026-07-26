@@ -1,10 +1,10 @@
 //! Rendering the two halves of the shell: the main diff pane on the left, the
-//! claude panel on the right.
+//! agent pane on the right.
 //!
 //! The main diff pane carries a one-row tab strip (the **log view** and the
 //! **diff guide view**) and shows one of them: the log view is difit's `vt100`
 //! console via `tui-term`; the diff guide view is the guide markdown rendered
-//! by [`super::markdown`]. The claude panel is its own PTY. The focused pane's
+//! by [`super::markdown`]. The agent pane is its own PTY. The focused pane's
 //! border brightens and (for a PTY) its cursor is surfaced.
 
 use ratatui::Frame;
@@ -15,6 +15,7 @@ use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use tui_term::widget::PseudoTerminal;
 
 use crate::pty_pane::PtyPane;
+use crate::session::AgentKind;
 
 use super::app::{App, Panel};
 use super::main_diff_view::MainDiffView;
@@ -24,10 +25,10 @@ use super::shortcuts::{self, Group};
 pub fn draw(f: &mut Frame, app: &mut App) {
     // Reserve the bottom row for the keyboard-shortcut statusline.
     let root = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).split(f.area());
-    let cols = Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
-        .split(root[0]);
+    let cols =
+        Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]).split(root[0]);
     draw_main_diff(f, cols[0], app);
-    draw_claude(f, cols[1], app);
+    draw_llm(f, cols[1], app);
     draw_statusline(f, root[1]);
     // The command palette and help modal overlay both panes when open; drawn
     // last so their borders and cursor sit on top. Only one is ever open.
@@ -86,7 +87,11 @@ fn draw_statusline(f: &mut Frame, area: Rect) {
 /// Draw the main diff pane: a tab strip plus the active view (log or guide).
 fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
     let focused = app.focus == Panel::Difit;
-    let title = format!(" difit · {} · :{} (alt+h) ", app.comparison_label, app.port);
+    let title = if app.is_review_online {
+        format!(" difit · {} · :{} (alt+h) ", app.comparison_label, app.port)
+    } else {
+        format!(" difit · {} · preparing (alt+h) ", app.comparison_label)
+    };
     let block = bordered(&title, focused);
     let inner = block.inner(area);
     f.render_widget(block, area);
@@ -152,7 +157,7 @@ fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
                 Line::default(),
                 Line::from(Span::styled("  No diff guide yet.", hint)),
                 Line::from(Span::styled(
-                    "  Press Ctrl+G to ask Claude to generate one.",
+                    "  Press Ctrl+G to ask the LLM to generate one.",
                     hint,
                 )),
             ]),
@@ -168,7 +173,12 @@ fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
     let lines: Vec<String> = text
         .lines
         .iter()
-        .map(|l| l.spans.iter().map(|s| s.content.as_ref()).collect::<String>())
+        .map(|l| {
+            l.spans
+                .iter()
+                .map(|s| s.content.as_ref())
+                .collect::<String>()
+        })
         .collect();
     app.guide.set_lines(lines);
     app.guide.set_viewport(area.height, area.width);
@@ -179,19 +189,29 @@ fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
     }
 }
 
-fn draw_claude(f: &mut Frame, area: Rect, app: &mut App) {
-    let focused = app.focus == Panel::Claude;
-    if let Some(claude) = app.claude.as_mut() {
-        render_pane(f, area, " Claude (alt+l) · ^P cmds · ^Q quit ", claude, focused);
+fn draw_llm(f: &mut Frame, area: Rect, app: &mut App) {
+    let focused = app.focus == Panel::Llm;
+    if let Some(llm) = app.llm.as_mut() {
+        let title = llm_title(app.agent_kind);
+        render_pane(f, area, &title, llm, focused);
     } else {
-        let block = bordered(" Claude · session ended ", focused);
+        let title = llm_session_ended_title(app.agent_kind);
+        let block = bordered(&title, focused);
         f.render_widget(
-            Paragraph::new("\n  The claude session has ended.\n  Press ^Q to quit dif.")
+            Paragraph::new("\n  The LLM session has ended.\n  Press ^Q to quit dif.")
                 .block(block)
                 .wrap(Wrap { trim: false }),
             area,
         );
     }
+}
+
+fn llm_title(agent_kind: AgentKind) -> String {
+    format!(" {} (alt+l) · ^P cmds · ^Q quit ", agent_kind.label())
+}
+
+fn llm_session_ended_title(agent_kind: AgentKind) -> String {
+    format!(" {} session ended ", agent_kind.label())
 }
 
 /// Render one PTY pane inside a bordered block, resizing the PTY to fit.
@@ -213,4 +233,37 @@ fn bordered(title: &str, focused: bool) -> Block<'_> {
         .borders(Borders::ALL)
         .border_style(border_style)
         .title(title)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::session::AgentKind;
+
+    use super::{llm_session_ended_title, llm_title};
+
+    #[test]
+    fn llm_title_uses_agent_label_without_internal_nomenclature() {
+        assert_eq!(
+            llm_title(AgentKind::Claude),
+            " Claude (alt+l) · ^P cmds · ^Q quit "
+        );
+        assert_eq!(
+            llm_title(AgentKind::Codex),
+            " Codex (alt+l) · ^P cmds · ^Q quit "
+        );
+        assert!(!llm_title(AgentKind::Claude).contains("LLM panel"));
+    }
+
+    #[test]
+    fn ended_title_uses_agent_label_without_internal_nomenclature() {
+        assert_eq!(
+            llm_session_ended_title(AgentKind::Claude),
+            " Claude session ended "
+        );
+        assert_eq!(
+            llm_session_ended_title(AgentKind::Codex),
+            " Codex session ended "
+        );
+        assert!(!llm_session_ended_title(AgentKind::Codex).contains("LLM panel"));
+    }
 }

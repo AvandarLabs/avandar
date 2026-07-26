@@ -165,6 +165,7 @@ fn request_content_type(request: &Request) -> String {
         .map_or_else(|| "application/json".to_owned(), |h| h.value.as_str().to_owned())
 }
 
+#[allow(clippy::too_many_lines)]
 fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
     let method = request.method().to_string();
     let url = request.url().to_owned();
@@ -205,7 +206,7 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
         ),
         Route::Regenerate => {
             // Signal the TUI event loop to regenerate the diff guide (it swaps
-            // the flag back and types the request into the claude pane).
+            // the flag back and types the request into the LLM pane).
             ctx.regen.store(true, Ordering::Relaxed);
             send_status(request, 202)
         }

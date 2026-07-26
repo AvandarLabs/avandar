@@ -61,7 +61,7 @@ fn difit_program(repo_root: &Path) -> String {
 /// `exec` replaces the wrapping shell with difit so the pane's tracked PID is
 /// difit itself. That makes [`PtyPane::kill_child`](crate::pty_pane::PtyPane)
 /// land a signal directly on difit (rather than leaving an orphaned server
-/// holding the port) when the "Restart dif" palette command tears it down.
+/// holding the port) when the "Restart diff server" palette command tears it down.
 #[must_use]
 pub fn build_command(
     repo_root: &Path,
@@ -110,7 +110,7 @@ pub fn spawn(
 
 /// Block until `port` is bindable again (up to ~`tries` × 40ms).
 ///
-/// Used by "Restart dif" between killing the old server and spawning the new
+/// Used by "Restart diff server" between killing the old server and spawning the new
 /// one, so the relaunched difit binds the same port (keeping the poller valid)
 /// instead of silently auto-reassigning. Returns `true` once the port is free,
 /// `false` if it stayed occupied for the whole window.

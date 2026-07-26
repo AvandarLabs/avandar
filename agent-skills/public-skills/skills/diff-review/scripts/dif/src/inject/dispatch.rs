@@ -7,7 +7,7 @@
 //! when no `claude` message follows it in the same thread (claude hasn't
 //! answered it yet). We dispatch each open comment exactly once, tracked by
 //! message id in a `dispatched` set the caller owns, so a comment is never
-//! typed into the claude pane twice, even before claude's reply lands.
+//! typed into the LLM pane twice, even before the agent's reply lands.
 
 use std::collections::HashSet;
 use std::hash::BuildHasher;
@@ -16,12 +16,14 @@ use serde_json::Value;
 
 use crate::difit::imports::Snapshot;
 
-/// The default reviewer author label. The *effective* reviewer handle is
-/// resolved at runtime by [`crate::difit::imports::reviewer_name`] (from the
-/// `DIFF_REVIEW_REVIEWER` env var, set by `run.sh` via
-/// `scripts/get-reviewer-name.sh`), which relabels difit's `"User"` default to
-/// the reviewer's real handle. Reviewer *matching* is independent of the label:
-/// [`is_reviewer`] treats any non-[`AGENT`] author as a reviewer.
+/// The default reviewer author label.
+///
+/// The *effective* reviewer handle is resolved at runtime by
+/// [`crate::difit::imports::reviewer_name`] (from the `DIFF_REVIEW_REVIEWER`
+/// env var, set by `run.sh` via `scripts/get-reviewer-name.sh`), which relabels
+/// difit's `"User"` default to the reviewer's real handle. Reviewer *matching*
+/// is independent of the label: [`is_reviewer`] treats any non-[`AGENT`] author
+/// as a reviewer.
 pub const REVIEWER: &str = "reviewer";
 /// Our own authorship tag (claude's replies). The one author we never treat as
 /// a reviewer comment to dispatch.
@@ -34,7 +36,7 @@ fn is_reviewer(author: Option<&str>) -> bool {
     matches!(author, Some(a) if a != AGENT)
 }
 
-/// A reviewer comment ready to be typed into the claude pane.
+/// A reviewer comment ready to be typed into the LLM pane.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PendingComment {
     /// The thread message id (also the dedup key in the dispatched set).
@@ -260,7 +262,10 @@ mod tests {
                 "position":{"side":"new","line":{"start":10,"end":12}},
                 "messages":[{"id":"m1","body":"x","author":"reviewer"}]}]}"#,
         );
-        assert_eq!(pending_dispatches(&s, &HashSet::new())[0].line_label, "L10-12");
+        assert_eq!(
+            pending_dispatches(&s, &HashSet::new())[0].line_label,
+            "L10-12"
+        );
     }
 
     #[test]
