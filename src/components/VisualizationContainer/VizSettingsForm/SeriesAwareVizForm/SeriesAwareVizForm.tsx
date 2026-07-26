@@ -37,7 +37,7 @@ export type HostConfig = XYHostConfig | RadarHostConfig;
 type Props<TConfig extends HostConfig> = {
   fields: readonly QueryResultColumn[];
   config: TConfig;
-  onConfigChange: (next: TConfig) => void;
+  onConfigChange: (nextConfig: TConfig) => void;
 };
 
 /**
@@ -69,27 +69,27 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
 
   const updateChartPath = useCallback(
     (path: string, value: unknown) => {
-      const next = setValue(
+      const nextConfig = setValue(
         config as never,
         path as never,
         value as never,
       ) as TConfig;
-      onConfigChange(next);
+      onConfigChange(nextConfig);
     },
     [config, onConfigChange],
   );
 
   const updateAxisKey = useCallback(
-    (next: string | undefined) => {
+    (nextKey: string | undefined) => {
       if (isRadar) {
         onConfigChange({
           ...(config as RadarHostConfig),
-          nameKey: next,
+          nameKey: nextKey,
         } as TConfig);
       } else {
         onConfigChange({
           ...(config as XYHostConfig),
-          xAxisKey: next,
+          xAxisKey: nextKey,
         } as TConfig);
       }
     },
@@ -130,20 +130,20 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     }
     if (isRadar) {
       const radarConfig = config as RadarHostConfig;
-      const next: RadarSeries = { key: nextNumeric.name };
+      const nextSeries: RadarSeries = { key: nextNumeric.name };
       onConfigChange({
         ...radarConfig,
-        series: [...radarConfig.series, next],
+        series: [...radarConfig.series, nextSeries],
       } as TConfig);
     } else {
       const xyConfig = config as XYHostConfig;
-      const next: XYSeries = {
+      const nextSeries: XYSeries = {
         renderAs: xyConfig.vizType,
         key: nextNumeric.name,
       } as XYSeries;
       onConfigChange({
         ...xyConfig,
-        series: [...xyConfig.series, next],
+        series: [...xyConfig.series, nextSeries],
       } as TConfig);
     }
   }, [config, isRadar, numericFields, onConfigChange]);
@@ -226,8 +226,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 series={s}
                 hostVizType={config.vizType}
                 isRadarHost={isRadar}
-                onSeriesChange={(next) => {
-                  updateSeriesAt(idx, next);
+                onSeriesChange={(nextSeries) => {
+                  updateSeriesAt(idx, nextSeries);
                 }}
                 onRemove={() => {
                   removeSeriesAt(idx);
@@ -244,8 +244,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             label={axisLegend}
             spec={{ kind: "columnPicker", dataType: "any" }}
             value={axisKeyValue}
-            onChange={(next) => {
-              updateAxisKey(typeof next === "string" ? next : undefined);
+            onChange={(nextValue) => {
+              updateAxisKey(typeof nextValue === "string" ? nextValue : undefined);
             }}
             fields={fields}
           />
@@ -256,8 +256,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 label={desc.label}
                 spec={desc.control}
                 value={readSetting(config, desc.key)}
-                onChange={(next) => {
-                  updateChartPath(desc.key, next);
+                onChange={(nextValue) => {
+                  updateChartPath(desc.key, nextValue);
                 }}
               />
             );
@@ -277,8 +277,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                     label={desc.label}
                     spec={desc.control}
                     value={readSetting(config, desc.key)}
-                    onChange={(next) => {
-                      updateChartPath(desc.key, next);
+                    onChange={(nextValue) => {
+                      updateChartPath(desc.key, nextValue);
                     }}
                   />
                 );

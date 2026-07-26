@@ -1,23 +1,11 @@
-
-import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { match } from "ts-pattern";
-import type { QueryFilterGroup, QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  QueryFilterGroup,
+  QueryFilterRule,
+} from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { Knex } from "knex";
-
-/**
- * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
- * but using `havingRaw` so the predicate is rendered after GROUP BY.
- */
-export function applyHaving(
-  builder: Knex.QueryBuilder,
-  group: QueryFilterGroup,
-): Knex.QueryBuilder {
-  if (isEmptyQueryFilter(group)) {
-    return builder;
-  }
-  return builder.havingRaw(_renderFilterGroupSql(group));
-}
 
 function _renderFilterValue(value: QueryFilterRule["value"]): string {
   if (value === null || value === undefined) {
@@ -109,4 +97,18 @@ function _renderFilterGroupSql(group: QueryFilterGroup): string {
     return _renderFilterRuleSql(node);
   });
   return parts.filter(Boolean).join(` ${group.combinator} `);
+}
+
+/**
+ * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
+ * but using `havingRaw` so the predicate is rendered after GROUP BY.
+ */
+export function applyHaving(
+  builder: Knex.QueryBuilder,
+  group: QueryFilterGroup,
+): Knex.QueryBuilder {
+  if (isEmptyQueryFilter(group)) {
+    return builder;
+  }
+  return builder.havingRaw(_renderFilterGroupSql(group));
 }

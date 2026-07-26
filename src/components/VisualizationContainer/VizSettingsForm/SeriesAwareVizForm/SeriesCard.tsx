@@ -48,7 +48,7 @@ type SeriesCardProps = {
   series: XYSeries | RadarSeries;
   hostVizType: HostConfig["vizType"];
   isRadarHost: boolean;
-  onSeriesChange: (next: XYSeries | RadarSeries) => void;
+  onSeriesChange: (nextSeries: XYSeries | RadarSeries) => void;
   onRemove: () => void;
 };
 
@@ -97,37 +97,43 @@ export function SeriesCard({
 
   const setSeriesPath = useCallback(
     (path: string, value: unknown) => {
-      const next = setValue(series as never, path as never, value as never) as
-        | XYSeries
-        | RadarSeries;
-      onSeriesChange(next);
+      const nextSeries = setValue(
+        series as never,
+        path as never,
+        value as never,
+      ) as XYSeries | RadarSeries;
+      onSeriesChange(nextSeries);
     },
     [series, onSeriesChange],
   );
 
   const setKey = useCallback(
-    (next: string | null) => {
-      if (next === null) {
+    (nextKey: string | null) => {
+      if (nextKey === null) {
         return;
       }
-      onSeriesChange({ ...series, key: next });
+      onSeriesChange({ ...series, key: nextKey });
     },
     [series, onSeriesChange],
   );
 
   const setRenderAs = useCallback(
-    (next: string) => {
+    (nextRenderAs: string) => {
       if (isRadarHost) {
         return;
       }
-      const r = next as RenderAs;
-      const xy = series as XYSeries;
-      const common = { key: xy.key, label: xy.label, color: xy.color };
-      const updated: XYSeries =
-        r === "area" ?
-          { renderAs: r, ...common, fillOpacity: 0.6 }
-        : { renderAs: r, ...common };
-      onSeriesChange(updated);
+      const renderAs = nextRenderAs as RenderAs;
+      const xySeries = series as XYSeries;
+      const sharedSeriesProps = {
+        key: xySeries.key,
+        label: xySeries.label,
+        color: xySeries.color,
+      };
+      const updatedSeries: XYSeries =
+        renderAs === "area" ?
+          { renderAs, ...sharedSeriesProps, fillOpacity: 0.6 }
+        : { renderAs, ...sharedSeriesProps };
+      onSeriesChange(updatedSeries);
     },
     [isRadarHost, series, onSeriesChange],
   );
@@ -141,8 +147,8 @@ export function SeriesCard({
               label={t`Column`}
               spec={{ kind: "columnPicker", dataType: "numeric" }}
               value={series.key}
-              onChange={(next) => {
-                setKey(typeof next === "string" ? next : null);
+              onChange={(nextValue) => {
+                setKey(typeof nextValue === "string" ? nextValue : null);
               }}
               fields={numericFields}
             />
@@ -166,8 +172,8 @@ export function SeriesCard({
             <SegmentedControl
               fullWidth
               size="xs"
-              data={renderAsOptions.map((o) => {
-                return { value: o.value, label: o.label };
+              data={renderAsOptions.map((option) => {
+                return { value: option.value, label: option.label };
               })}
               value={seriesRenderAs}
               onChange={setRenderAs}
@@ -191,8 +197,8 @@ export function SeriesCard({
                       label={desc.label}
                       spec={desc.control}
                       value={readSetting(series, desc.key)}
-                      onChange={(next) => {
-                        setSeriesPath(desc.key, next);
+                      onChange={(nextValue) => {
+                        setSeriesPath(desc.key, nextValue);
                       }}
                     />
                   );
