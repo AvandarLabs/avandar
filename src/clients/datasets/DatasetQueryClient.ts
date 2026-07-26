@@ -116,7 +116,7 @@ function createDatasetQueryClient(): WithLogger<
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
         const { data } = await WorkspaceQETLClient.runQuery({
-          rawSQL: queryString,
+          rawSql: queryString,
           workspaceId,
         });
         return data;
@@ -141,7 +141,7 @@ function createDatasetQueryClient(): WithLogger<
           scalar(
             await WorkspaceQETLClient.runQuery<{ count: bigint }>({
               workspaceId,
-              rawSQL: sqlTemplate(
+              rawSql: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
               ).parse({ tableName: datasetId }),
             }),
@@ -192,7 +192,7 @@ function createDatasetQueryClient(): WithLogger<
               count: bigint;
             }>({
               workspaceId,
-              rawSQL: sqlTemplate(
+              rawSql: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
               ).parse({ tableName: datasetId }),
             }),
@@ -248,7 +248,7 @@ async function computeColumnSummary(params: {
     scalar(
       await WorkspaceQETLClient.runQuery<{ count: bigint }>({
         workspaceId,
-        rawSQL: sqlTemplate(
+        rawSql: sqlTemplate(
           'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
         ).parse({ columnName, tableName: datasetId }),
       }),
@@ -259,7 +259,7 @@ async function computeColumnSummary(params: {
     scalar(
       await WorkspaceQETLClient.runQuery<{ count: bigint }>({
         workspaceId,
-        rawSQL: sqlTemplate(
+        rawSql: sqlTemplate(
           `SELECT COUNT("$columnName$") as count
             FROM "$tableName$"
             WHERE "$columnName$" IS NULL
@@ -275,7 +275,7 @@ async function computeColumnSummary(params: {
     max_count: bigint;
   }>({
     workspaceId,
-    rawSQL: sqlTemplate(
+    rawSql: sqlTemplate(
       `SELECT MAX(cnt) as max_count FROM (
         SELECT COUNT(*) as cnt
         FROM "$tableName$"
@@ -294,7 +294,7 @@ async function computeColumnSummary(params: {
     count: bigint;
   }>({
     workspaceId,
-    rawSQL: sqlTemplate(
+    rawSql: sqlTemplate(
       `SELECT "$columnName$" AS value, COUNT(*) AS count
        FROM "$tableName$"
        WHERE
@@ -326,7 +326,7 @@ async function computeColumnSummary(params: {
           stdDev: number;
         }>({
           workspaceId,
-          rawSQL: sqlTemplate(
+          rawSql: sqlTemplate(
             `SELECT
               MAX("$columnName$") as max,
               MIN("$columnName$") as min,
@@ -373,7 +373,7 @@ async function computeColumnSummary(params: {
           days: bigint | number | null;
         }>({
           workspaceId,
-          rawSQL: sqlTemplate(singleQuery).parse({
+          rawSql: sqlTemplate(singleQuery).parse({
             columnName,
             tableName: datasetId,
           }),

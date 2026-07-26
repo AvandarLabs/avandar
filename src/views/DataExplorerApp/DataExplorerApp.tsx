@@ -181,13 +181,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
 
   useSyncLargeDatasetAutoLimit({
     query: state.query,
-    rawSQL: state.rawSQL,
+    rawSql: state.rawSql,
     onApplyAutoLimit: applyLargeDatasetAutoLimit,
   });
 
   const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
-    rawSQL: state.rawSQL,
+    rawSql: state.rawSql,
     isStructuredQueryInSync: state.isStructuredQueryInSync,
     auth: "workspace",
     workspaceId: workspace.id,
@@ -222,14 +222,14 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const querySyncSignature = useMemo(() => {
     return JSON.stringify({
       queryColumns: state.query.queryColumns,
-      rawSQL: state.rawSQL,
+      rawSql: state.rawSql,
       dataSource: state.query.dataSource,
       orderByColumn: state.query.orderByColumn,
       orderByDirection: state.query.orderByDirection,
     });
   }, [
     state.query.queryColumns,
-    state.rawSQL,
+    state.rawSql,
     state.query.dataSource,
     state.query.orderByColumn,
     state.query.orderByDirection,
@@ -369,16 +369,16 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                 <>
                   {state.openDataset.virtualDatasetId ?
                     <Menu.Item
-                      disabled={!state.rawSQL || isSavingOver}
+                      disabled={!state.rawSql || isSavingOver}
                       onClick={() => {
                         const virtualDatasetId =
                           state.openDataset?.virtualDatasetId;
-                        if (!state.rawSQL || !virtualDatasetId) {
+                        if (!state.rawSql || !virtualDatasetId) {
                           return;
                         }
                         saveOverDataset({
                           id: virtualDatasetId,
-                          data: { rawSQL: state.rawSQL },
+                          data: { rawSql: state.rawSql },
                         });
                       }}
                     >
@@ -425,17 +425,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
               : null}
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSQL === undefined
+                  queryResultData.length === 0 || state.rawSql === undefined
                 }
                 rightSection={
-                  state.rawSQL === undefined ?
+                  state.rawSql === undefined ?
                     <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSQL) {
+                  if (!state.rawSql) {
                     return;
                   }
                   // For now the Data Explorer's plan panel is not wired up, so
@@ -449,7 +449,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                         queryResultData={queryResultData}
                         columns={queryResultColumns}
                         dateColumns={dateColumns}
-                        rawSQL={state.rawSQL}
+                        rawSql={state.rawSql}
                         planSnapshot={planSnapshot}
                         onSaveSuccess={() => {
                           modals.close(modalId);
@@ -463,17 +463,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
               </Menu.Item>
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSQL === undefined
+                  queryResultData.length === 0 || state.rawSql === undefined
                 }
                 rightSection={
-                  state.rawSQL === undefined ?
+                  state.rawSql === undefined ?
                     <Tooltip label={t`Run an AI query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSQL) {
+                  if (!state.rawSql) {
                     return;
                   }
                   const modalId = modals.open({
@@ -481,7 +481,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                     size: "lg",
                     children: (
                       <SaveToDashboardModal
-                        rawSQL={state.rawSQL}
+                        rawSql={state.rawSql}
                         prompt={state.nlPrompt}
                         vizType={state.vizConfig.vizType}
                         vizConfig={state.vizConfig}
@@ -603,8 +603,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
       <OpenDatasetModal
         opened={isOpenDatasetModalOpen}
         onClose={closeOpenDatasetModal}
-        onOpen={(info, rawSQL) => {
-          dispatch.setRawSql(rawSQL);
+        onOpen={(info, rawSql) => {
+          dispatch.setRawSql(rawSql);
           dispatch.setOpenDataset(info);
           closeOpenDatasetModal();
         }}

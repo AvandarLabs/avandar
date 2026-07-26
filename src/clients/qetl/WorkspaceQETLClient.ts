@@ -17,12 +17,12 @@ export type IWorkspaceQETLClient = Module<
   {
     runQuery: {
       <RowObject extends UnknownRow = UnknownRow>(params: {
-        rawSQL: string;
+        rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js";
       }): Promise<QueryResult<RowObject>>;
       (params: {
-        rawSQL: string;
+        rawSql: string;
         workspaceId: Workspace.Id;
         returnType: "parquet";
       }): Promise<Blob>;
@@ -46,7 +46,7 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
       }
 
       const qetlClient = QETLClientFactory.create({
-        getDiceFromSQL: async (rawSQL: string) => {
+        getDiceFromSQL: async (rawSql: string) => {
           /**
            * Reuse the same TanStack Query cache as `DatasetClient.useGetAll`
            * (via `withEnsureQueryData`), so each QETL `runQuery` does not
@@ -60,7 +60,7 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
               .getAll(where("workspace_id", "eq", workspaceId))
           ).map(prop("id"));
           return allWorkspaceDatasetIds.filter((datasetId) => {
-            return rawSQL.includes(datasetId);
+            return rawSql.includes(datasetId);
           });
         },
         insertToStorageCache: async ({
@@ -101,11 +101,11 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
 
     return {
       runQuery: async <RowObject extends UnknownRow = UnknownRow>({
-        rawSQL,
+        rawSql,
         workspaceId,
         returnType = "js",
       }: {
-        rawSQL: string;
+        rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js" | "parquet";
       }): Promise<QueryResult<RowObject> | Blob> => {
@@ -122,10 +122,10 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
         });
 
         if (returnType === "parquet") {
-          return await client.runQuery({ rawSQL, returnType: "parquet" });
+          return await client.runQuery({ rawSql, returnType: "parquet" });
         }
 
-        return await client.runQuery<RowObject>({ rawSQL, returnType: "js" });
+        return await client.runQuery<RowObject>({ rawSql, returnType: "js" });
       },
     };
   },

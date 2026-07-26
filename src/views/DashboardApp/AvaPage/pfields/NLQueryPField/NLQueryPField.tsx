@@ -111,7 +111,7 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
         <Stack gap="sm">
           {isEditSQLMode ?
             <TextareaForm
-              // use the rawSQL as the key to force the textarea form to
+              // use the rawSql as the key to force the textarea form to
               // re-initialize when we re-run a query, so we can properly
               // detect dirty state
               key={rawSql}
@@ -132,8 +132,8 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
               validateOnChange={true}
               required={true}
               disabledUntilDirty={true}
-              onSubmit={(newRawSQL) => {
-                const trimmedSQL = newRawSQL.trim();
+              onSubmit={(newRawSql) => {
+                const trimmedSQL = newRawSql.trim();
                 setIsEditSQLMode(false);
                 onChange({
                   ...value,

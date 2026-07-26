@@ -18,7 +18,7 @@ type Props = {
    * Called when the user picks (or imports) a dataset. The modal applies
    * canvas-side state updates via this callback.
    */
-  onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
+  onOpen: (info: OpenDatasetInfo, rawSql: string) => void;
 };
 
 /**

@@ -19,7 +19,7 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
  *   &cols=<colName1>,<colName2>
  *   &agg=<colName>:<aggregationType>,...
  *   &orderBy=<colName>&orderDir=asc|desc
- *   &sql=<rawSQL>
+ *   &sql=<rawSql>
  *   &vc=<JSON-stringified VizConfig> (omitted when viz is the default table)
  *
  * When `sql` is present it is the authoritative query: `ds`, `cols`, `agg`,
@@ -50,7 +50,7 @@ export type ParsedUrlState = {
   aggregations?: Readonly<Record<string, QueryAggregationType.T>>;
   orderByColName?: string;
   orderDir?: OrderByDirection;
-  rawSQL?: string;
+  rawSql?: string;
   vizConfig?: VizConfig;
   openDataset?: OpenDatasetInfo;
 };
@@ -100,7 +100,7 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
   }
 
   if (search.sql) {
-    result.rawSQL = search.sql;
+    result.rawSql = search.sql;
   }
 
   if (search.vc) {
@@ -148,13 +148,13 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
 export function serializeStateToUrl(
   state: DataExplorerAppState,
 ): DataExplorerUrlSearch {
-  const { query, rawSQL, vizConfig } = state;
+  const { query, rawSql, vizConfig } = state;
   const params: DataExplorerUrlSearch = {};
 
   // Raw SQL drives execution in `useDataQuery`; structured fields are ignored
-  // when `rawSQL` is set. Omit them from the URL so refresh never pairs a
+  // when `rawSql` is set. Omit them from the URL so refresh never pairs a
   // stale `ds` from Manual Query with SQL that references other table names.
-  if (!rawSQL) {
+  if (!rawSql) {
     if (query.dataSource) {
       params.ds = query.dataSource.id;
     }
@@ -189,8 +189,8 @@ export function serializeStateToUrl(
     }
   }
 
-  if (rawSQL && !state.lastQueryError) {
-    params.sql = rawSQL;
+  if (rawSql && !state.lastQueryError) {
+    params.sql = rawSql;
   }
 
   // Omit `vc` when the viz is the same as the initial Data Explorer default
@@ -244,7 +244,7 @@ export function normalizeExplorerUrlSearch(
   const parsed = parseUrlSearch(search);
   const params: DataExplorerUrlSearch = {};
 
-  if (!parsed.rawSQL) {
+  if (!parsed.rawSql) {
     if (parsed.dsId) {
       params.ds = parsed.dsId;
     }
@@ -269,8 +269,8 @@ export function normalizeExplorerUrlSearch(
     }
   }
 
-  if (parsed.rawSQL) {
-    params.sql = parsed.rawSQL;
+  if (parsed.rawSql) {
+    params.sql = parsed.rawSql;
   }
 
   if (parsed.vizConfig && parsed.vizConfig.vizType !== "table") {
@@ -313,6 +313,6 @@ export function isDefaultExplorerState(state: DataExplorerAppState): boolean {
   return (
     state.query.dataSource === undefined &&
     state.query.queryColumns.length === 0 &&
-    state.rawSQL === undefined
+    state.rawSql === undefined
   );
 }

@@ -32,13 +32,13 @@ function _datasetQuery(): PartialStructuredQuery {
 }
 
 describe("selectSqlToExecute", () => {
-  it("returns rawSQL verbatim when set, ignoring the structured form", () => {
+  it("returns rawSql verbatim when set, ignoring the structured form", () => {
     const executionQuery = {
       ..._datasetQuery(),
       limit: 100,
     } as PartialStructuredQuery;
     const result = selectSqlToExecute({
-      rawSQL: 'SELECT COUNT(*) FROM "LONG_global_deaths.csv"',
+      rawSql: 'SELECT COUNT(*) FROM "LONG_global_deaths.csv"',
       isStructuredQueryInSync: true,
       executionQuery,
     });
@@ -46,9 +46,9 @@ describe("selectSqlToExecute", () => {
     expect(result).toBe('SELECT COUNT(*) FROM "LONG_global_deaths.csv"');
   });
 
-  it("returns rawSQL even when isStructuredQueryInSync is false", () => {
+  it("returns rawSql even when isStructuredQueryInSync is false", () => {
     const result = selectSqlToExecute({
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       isStructuredQueryInSync: false,
       executionQuery: _datasetQuery(),
     });
@@ -56,9 +56,9 @@ describe("selectSqlToExecute", () => {
     expect(result).toBe("SELECT 1");
   });
 
-  it("returns SQL generated from the structured form when rawSQL is undefined and form is in sync", () => {
+  it("returns SQL generated from the structured form when rawSql is undefined and form is in sync", () => {
     const result = selectSqlToExecute({
-      rawSQL: undefined,
+      rawSql: undefined,
       isStructuredQueryInSync: true,
       executionQuery: _datasetQuery(),
     });
@@ -67,9 +67,9 @@ describe("selectSqlToExecute", () => {
     expect(result).toMatch(/select/i);
   });
 
-  it("returns undefined when rawSQL is undefined and the structured form is not in sync", () => {
+  it("returns undefined when rawSql is undefined and the structured form is not in sync", () => {
     const result = selectSqlToExecute({
-      rawSQL: undefined,
+      rawSql: undefined,
       isStructuredQueryInSync: false,
       executionQuery: _datasetQuery(),
     });
@@ -77,9 +77,9 @@ describe("selectSqlToExecute", () => {
     expect(result).toBeUndefined();
   });
 
-  it("returns undefined when rawSQL is undefined and dataSource is missing", () => {
+  it("returns undefined when rawSql is undefined and dataSource is missing", () => {
     const result = selectSqlToExecute({
-      rawSQL: undefined,
+      rawSql: undefined,
       isStructuredQueryInSync: true,
       executionQuery: StructuredQuery.makeEmpty(),
     });

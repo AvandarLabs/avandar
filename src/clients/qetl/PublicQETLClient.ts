@@ -13,7 +13,7 @@ export type IPublicQETLClient = Module<
   EmptyObject,
   {
     runQuery: <RowObject extends UnknownRow = UnknownRow>(params: {
-      rawSQL: string;
+      rawSql: string;
       dashboardId: DashboardId;
     }) => Promise<QueryResult<RowObject>>;
   }
@@ -33,14 +33,14 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
       }
 
       const qetlClient = QETLClientFactory.create({
-        getDiceFromSQL: async (rawSQL: string) => {
+        getDiceFromSQL: async (rawSql: string) => {
           const publishedDatasetIds =
             await PublicDatasetParquetStorageClient.listDatasetIdsForDashboard({
               dashboardId,
             });
 
           return publishedDatasetIds.filter((datasetId) => {
-            return rawSQL.includes(datasetId);
+            return rawSql.includes(datasetId);
           });
         },
         insertToStorageCache: async ({
@@ -74,14 +74,14 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
 
     return {
       runQuery: async <RowObject extends UnknownRow = UnknownRow>({
-        rawSQL,
+        rawSql,
         dashboardId,
       }: {
-        rawSQL: string;
+        rawSql: string;
         dashboardId: DashboardId;
       }): Promise<QueryResult<RowObject>> => {
         const client = await _getClient({ dashboardId });
-        const queryResults = await client.runQuery<RowObject>({ rawSQL });
+        const queryResults = await client.runQuery<RowObject>({ rawSql });
         return queryResults;
       },
     };

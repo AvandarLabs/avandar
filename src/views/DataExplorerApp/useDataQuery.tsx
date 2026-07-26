@@ -22,9 +22,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
-  rawSQL: string | undefined;
+  rawSql: string | undefined;
   /**
-   * When true, `rawSQL` was generated from the manual form and row-count guard
+   * When true, `rawSql` was generated from the manual form and row-count guard
    * logic may replace it with bounded SQL before execution.
    */
   isStructuredQueryInSync?: boolean;
@@ -55,7 +55,7 @@ export function useDataQuery(
   options: UseDataQueryOptions,
 ): UseQueryResultTuple<QueryResult<UnknownRow>> {
   const { t } = useLingui();
-  const { auth, query, rawSQL, isStructuredQueryInSync = true } = options;
+  const { auth, query, rawSql, isStructuredQueryInSync = true } = options;
   const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
@@ -64,13 +64,13 @@ export function useDataQuery(
     auth === "workspace" ? options.workspaceId : options.publicAvaPageId;
 
   const queryResult = useQuery({
-    enabled: !!dataSource || !!rawSQL,
+    enabled: !!dataSource || !!rawSql,
     queryKey: [
       auth,
       workspaceId,
       query,
-      "rawSQL",
-      rawSQL,
+      "rawSql",
+      rawSql,
       "dataSource",
       dataSource,
       "select",
@@ -79,11 +79,11 @@ export function useDataQuery(
       isStructuredQueryInSync,
     ],
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
-      // When the user (or LLM) has set `rawSQL`, run it verbatim. Skip the
+      // When the user (or LLM) has set `rawSql`, run it verbatim. Skip the
       // large-dataset auto-limit resolution and the structured-form round-trip
       // entirely so direct SQL is never silently rewritten.
       const resolved =
-        rawSQL === undefined && auth === "workspace" ?
+        rawSql === undefined && auth === "workspace" ?
           await resolveManualQueryForExecution({
             query,
             workspaceId: workspaceId as Workspace.Id,
@@ -92,7 +92,7 @@ export function useDataQuery(
       const executionQuery = resolved.query;
 
       const sqlToRun = selectSqlToExecute({
-        rawSQL,
+        rawSql,
         isStructuredQueryInSync,
         executionQuery,
       });
@@ -101,13 +101,13 @@ export function useDataQuery(
         if (auth === "public") {
           // if no workspace id then this is a public query
           return await PublicQETLClient.runQuery({
-            rawSQL: sqlToRun,
+            rawSql: sqlToRun,
             dashboardId: options.publicAvaPageId,
           });
         }
 
         return await WorkspaceQETLClient.runQuery({
-          rawSQL: sqlToRun,
+          rawSql: sqlToRun,
           workspaceId: options.workspaceId,
         });
       }
@@ -128,7 +128,7 @@ export function useDataQuery(
           // directly with the DatasetRawDataClient.
           Dataset: async (): Promise<QueryResult<UnknownRow>> => {
             return await WorkspaceQETLClient.runQuery({
-              rawSQL: StructuredQuery.toRawDuckDBQuery(
+              rawSql: StructuredQuery.toRawDuckDBQuery(
                 executionQueryWithSource,
               ),
               workspaceId: options.workspaceId,

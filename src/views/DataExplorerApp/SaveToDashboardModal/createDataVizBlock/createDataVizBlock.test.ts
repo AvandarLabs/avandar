@@ -6,10 +6,10 @@ import {
 } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 
 describe("createDataVizBlock", () => {
-  it("returns a DataViz block whose props mirror the input rawSQL, prompt, and viz config", () => {
+  it("returns a DataViz block whose props mirror the input rawSql, prompt, and viz config", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
       vizConfig,
@@ -28,13 +28,13 @@ describe("createDataVizBlock", () => {
   it("stamps a unique UUID into props.id for every call", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const blockA = createDataVizBlock({
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
       vizConfig,
     });
     const blockB = createDataVizBlock({
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       prompt: "Show one",
       vizType: "table",
       vizConfig,
@@ -48,7 +48,7 @@ describe("createDataVizBlock", () => {
   it("falls back to a non-empty default prompt when prompt is undefined so the block renders", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("bar");
     const block = createDataVizBlock({
-      rawSQL: "SELECT a, b FROM t",
+      rawSql: "SELECT a, b FROM t",
       prompt: undefined,
       vizType: "bar",
       vizConfig,
@@ -66,7 +66,7 @@ describe("createDataVizBlock", () => {
   it("falls back to the default prompt when the supplied prompt is just whitespace", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("table");
     const block = createDataVizBlock({
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       prompt: "   ",
       vizType: "table",
       vizConfig,

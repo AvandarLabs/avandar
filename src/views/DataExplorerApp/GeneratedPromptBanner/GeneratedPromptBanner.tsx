@@ -20,7 +20,7 @@ import css from "./GeneratedPromptBanner.module.css";
  * asked and what is on the canvas. Renders nothing when no prompt is set.
  */
 export function GeneratedPromptBanner(): JSX.Element | null {
-  const { nlPrompt, rawSQL } = DataExplorerStateManager.useState();
+  const { nlPrompt, rawSql } = DataExplorerStateManager.useState();
 
   if (!nlPrompt) {
     return null;
@@ -52,7 +52,7 @@ export function GeneratedPromptBanner(): JSX.Element | null {
       >
         {nlPrompt}
       </Text>
-      {rawSQL ?
+      {rawSql ?
         <Popover position="bottom-end" withArrow shadow="md" width={420}>
           <Popover.Target>
             <UnstyledButton c="primary.7" className={css.showSqlButton}>
@@ -65,7 +65,7 @@ export function GeneratedPromptBanner(): JSX.Element | null {
                 <Trans>Generated SQL</Trans>
               </Text>
               <ScrollArea.Autosize mah={280}>
-                <AvaSqlBlock value={rawSQL} readOnly minRows={4} />
+                <AvaSqlBlock value={rawSql} readOnly minRows={4} />
               </ScrollArea.Autosize>
             </Stack>
           </Popover.Dropdown>

@@ -15,19 +15,19 @@ const SQL_EDITOR_MIN_ROWS = 10;
 /**
  * Read-only view of the current SQL with an "Edit query" affordance that
  * swaps the textarea into edit mode and re-runs the query on submit. Reads
- * `rawSQL` from `DataExplorerStateManager` so it stays in sync regardless of
+ * `rawSql` from `DataExplorerStateManager` so it stays in sync regardless of
  * whether the SQL came from the chat panel, the manual query form, or a
  * saved dataset.
  */
 export function SqlQueryView(): ReactNode {
   const { t } = useLingui();
-  const [{ rawSQL, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
+  const [{ rawSql, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
     DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
   const displaySql = useMemo(() => {
-    return formatSqlForDisplay(rawSQL ?? "");
-  }, [rawSQL]);
+    return formatSqlForDisplay(rawSql ?? "");
+  }, [rawSql]);
 
   const onSubmitSql = (rawValue: string): void => {
     const trimmedValue = rawValue.trim();
@@ -41,7 +41,7 @@ export function SqlQueryView(): ReactNode {
     setIsEditMode(false);
   };
 
-  if (rawSQL === undefined) {
+  if (rawSql === undefined) {
     return (
       <Stack gap="xs" px="sm">
         <Text size="sm" c="neutral.6">
@@ -80,7 +80,7 @@ export function SqlQueryView(): ReactNode {
       : null}
       {isEditMode ?
         <SqlQueryEditPanel
-          initialSql={rawSQL}
+          initialSql={rawSql}
           submitButtonLabel={t`Re-run query`}
           cancelButtonLabel={t`Cancel`}
           minRows={SQL_EDITOR_MIN_ROWS}

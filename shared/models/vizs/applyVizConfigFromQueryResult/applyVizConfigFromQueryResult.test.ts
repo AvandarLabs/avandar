@@ -67,7 +67,7 @@ describe("applyVizConfigFromQueryResult", () => {
   it("leaves table viz unchanged", () => {
     const out = applyVizConfigFromQueryResult({
       vizConfig: { vizType: "table" },
-      rawSQL: "SELECT 1",
+      rawSql: "SELECT 1",
       query: emptyQuery,
       columns: cols([{ name: "x", dataType: "double" }]),
     });
@@ -83,7 +83,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: undefined,
+      rawSql: undefined,
       query: {
         ...emptyQuery,
         queryColumns: [],
@@ -105,7 +105,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: "SELECT * FROM t",
+      rawSql: "SELECT * FROM t",
       query: emptyQuery,
       columns: cols([
         { name: "month", dataType: "timestamp" },
@@ -128,7 +128,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: "SELECT region, count FROM t",
+      rawSql: "SELECT region, count FROM t",
       query: emptyQuery,
       columns: cols([
         { name: "region", dataType: "varchar" },
@@ -143,7 +143,7 @@ describe("applyVizConfigFromQueryResult", () => {
     // "count" series must survive — the bars should still render.
     const next = applyVizConfigFromQueryResult({
       vizConfig: initial,
-      rawSQL: "SELECT region, count, total FROM t",
+      rawSql: "SELECT region, count, total FROM t",
       query: emptyQuery,
       columns: cols([
         { name: "region", dataType: "varchar" },
@@ -166,7 +166,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: undefined,
+      rawSql: undefined,
       query: { ...emptyQuery, queryColumns: [] },
       columns: cols([
         { name: "region", dataType: "varchar" },
@@ -191,7 +191,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: undefined,
+      rawSql: undefined,
       query: { ...emptyQuery, queryColumns: [] },
       columns: cols([
         { name: "region", dataType: "varchar" },
@@ -212,7 +212,7 @@ describe("applyVizConfigFromQueryResult", () => {
         layout: "group",
         withLegend: true,
       },
-      rawSQL: "SELECT * FROM t",
+      rawSql: "SELECT * FROM t",
       query: emptyQuery,
       columns: cols([
         { name: "month", dataType: "timestamp" },

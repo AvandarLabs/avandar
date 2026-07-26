@@ -58,7 +58,7 @@ export function VizConfigPField({
 
   const [queryResults] = useDataQuery({
     query: emptyStructuredQuery,
-    rawSQL: rawSql,
+    rawSql: rawSql,
     ...(workspaceId !== undefined ?
       {
         auth: "workspace" as const,

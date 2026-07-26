@@ -32,10 +32,9 @@ export const VirtualDatasetParsers =
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
-      ({ rawSql, planSteps, ...obj }) => {
+      ({ planSteps, ...obj }) => {
         return Model.make("VirtualDataset", {
           ...obj,
-          rawSQL: rawSql,
           id: obj.id as VirtualDatasetId,
           datasetId: obj.datasetId as DatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,

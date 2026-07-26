@@ -6,7 +6,7 @@ import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/St
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
-  rawSQL: string | undefined;
+  rawSql: string | undefined;
   query: PartialStructuredQuery;
   vizConfig: VizConfig;
   /** Column `name` values from the current `QueryResult`. */
@@ -28,7 +28,7 @@ type Options = {
  * Table viz returns false (no axis keys to infer here).
  */
 export function shouldHydrateVizFromQueryResult(options: Options): boolean {
-  const { rawSQL, query, vizConfig, resultColumnNames } = options;
+  const { rawSql, query, vizConfig, resultColumnNames } = options;
 
   if (vizConfig.vizType === "table") {
     return false;
@@ -52,7 +52,7 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return false;
   }
 
-  if (rawSQL !== undefined && rawSQL.trim() !== "") {
+  if (rawSql !== undefined && rawSql.trim() !== "") {
     return true;
   }
 

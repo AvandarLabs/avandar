@@ -58,7 +58,7 @@ export function DataVizPBlock({
 
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
-    rawSQL: rawSql,
+    rawSql: rawSql,
     ...(metadata.auth === "workspace" ?
       {
         auth: "workspace" as const,
@@ -84,7 +84,7 @@ export function DataVizPBlock({
     }
     return applyVizConfigFromQueryResult({
       vizConfig,
-      rawSQL: rawSql,
+      rawSql: rawSql,
       query: emptyStructuredQuery,
       columns,
     });

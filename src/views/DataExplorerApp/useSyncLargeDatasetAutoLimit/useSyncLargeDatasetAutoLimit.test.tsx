@@ -41,14 +41,14 @@ describe("useSyncLargeDatasetAutoLimit", () => {
     clearDatasetRowCountCache();
   });
 
-  it("applies auto-limit when a large dataset is selected in the manual form (no rawSQL)", async () => {
+  it("applies auto-limit when a large dataset is selected in the manual form (no rawSql)", async () => {
     setCachedDatasetRowCount(datasetId, LARGE_DATASET_ROW_THRESHOLD + 1);
     const onApplyAutoLimit = vi.fn();
 
     renderHook(() => {
       return useSyncLargeDatasetAutoLimit({
         query: _datasetQuery(),
-        rawSQL: undefined,
+        rawSql: undefined,
         onApplyAutoLimit,
       });
     });
@@ -58,14 +58,14 @@ describe("useSyncLargeDatasetAutoLimit", () => {
     });
   });
 
-  it("does NOT apply auto-limit when rawSQL is set (LLM or hand-edited SQL)", async () => {
+  it("does NOT apply auto-limit when rawSql is set (LLM or hand-edited SQL)", async () => {
     setCachedDatasetRowCount(datasetId, LARGE_DATASET_ROW_THRESHOLD + 1);
     const onApplyAutoLimit = vi.fn();
 
     renderHook(() => {
       return useSyncLargeDatasetAutoLimit({
         query: _datasetQuery(),
-        rawSQL: 'SELECT COUNT(*) FROM "LONG_global_deaths.csv"',
+        rawSql: 'SELECT COUNT(*) FROM "LONG_global_deaths.csv"',
         onApplyAutoLimit,
       });
     });
@@ -86,7 +86,7 @@ describe("useSyncLargeDatasetAutoLimit", () => {
     renderHook(() => {
       return useSyncLargeDatasetAutoLimit({
         query: { ..._datasetQuery(), limit: 5 } as PartialStructuredQuery,
-        rawSQL: undefined,
+        rawSql: undefined,
         onApplyAutoLimit,
       });
     });

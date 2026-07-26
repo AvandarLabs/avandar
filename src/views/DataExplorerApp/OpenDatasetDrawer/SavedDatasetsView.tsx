@@ -30,7 +30,7 @@ import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourc
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 
 type Props = {
-  onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
+  onOpen: (info: OpenDatasetInfo, rawSql: string) => void;
 };
 
 /**
@@ -125,7 +125,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
           sourceType: "virtual",
           virtualDatasetId: virtualDataset.id,
         },
-        virtualDataset.rawSQL,
+        virtualDataset.rawSql,
       );
     },
     onError: (error: Error) => {

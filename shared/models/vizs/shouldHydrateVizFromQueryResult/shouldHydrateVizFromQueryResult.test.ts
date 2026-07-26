@@ -35,7 +35,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns false for table viz", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: "SELECT 1",
+        rawSql: "SELECT 1",
         query: emptyQuery,
         vizConfig: { vizType: "table" },
         resultColumnNames: new Set(["a"]),
@@ -43,10 +43,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(false);
   });
 
-  it("returns true when rawSQL is non-empty", () => {
+  it("returns true when rawSql is non-empty", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: "SELECT month, total FROM t",
+        rawSql: "SELECT month, total FROM t",
         query: emptyQuery,
         vizConfig: barEmpty,
         resultColumnNames: new Set(["month", "total"]),
@@ -54,10 +54,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(true);
   });
 
-  it("returns false when both axes are valid in result (2B), even with rawSQL", () => {
+  it("returns false when both axes are valid in result (2B), even with rawSql", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: "SELECT month, total FROM t",
+        rawSql: "SELECT month, total FROM t",
         query: emptyQuery,
         vizConfig: {
           vizType: "bar",
@@ -71,10 +71,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(false);
   });
 
-  it("returns false when rawSQL is only whitespace and structured matches", () => {
+  it("returns false when rawSql is only whitespace and structured matches", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: "   \n  ",
+        rawSql: "   \n  ",
         query: _makeQueryWithColumns([
           mockColumn("month"),
           mockColumn("total_cases"),
@@ -94,7 +94,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns true when query has no columns", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: undefined,
+        rawSql: undefined,
         query: emptyQuery,
         vizConfig: barEmpty,
         resultColumnNames: new Set(["x"]),
@@ -105,7 +105,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns true when an axis key is missing from the result", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: undefined,
+        rawSql: undefined,
         query: _makeQueryWithColumns([mockColumn("month")]),
         vizConfig: {
           vizType: "bar",
@@ -122,7 +122,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns true when structured names do not overlap result", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: undefined,
+        rawSql: undefined,
         query: _makeQueryWithColumns([mockColumn("structured_only")]),
         vizConfig: barEmpty,
         resultColumnNames: new Set(["from_sql_alias", "metric"]),
@@ -133,7 +133,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns true when bar has xAxisKey but no series (incomplete config)", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: 'SELECT "Admin2", SUM("daily_new_cases") AS total_cases FROM t',
+        rawSql: 'SELECT "Admin2", SUM("daily_new_cases") AS total_cases FROM t',
         query: _makeQueryWithColumns([mockColumn("Admin2")]),
         vizConfig: {
           vizType: "bar",
@@ -150,7 +150,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
   it("returns false when structured overlaps result and axes are valid", () => {
     expect(
       shouldHydrateVizFromQueryResult({
-        rawSQL: undefined,
+        rawSql: undefined,
         query: _makeQueryWithColumns([
           mockColumn("month"),
           mockColumn("total_cases"),

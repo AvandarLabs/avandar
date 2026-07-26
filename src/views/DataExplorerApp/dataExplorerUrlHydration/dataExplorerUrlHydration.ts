@@ -10,7 +10,7 @@ type MinimalDataSource = { id: string };
 export function urlSearchHasHydrateableExplorerKeys(
   parsed: ParsedUrlState,
 ): boolean {
-  return Boolean(parsed.dsId ?? parsed.rawSQL ?? parsed.vizConfig);
+  return Boolean(parsed.dsId ?? parsed.rawSql ?? parsed.vizConfig);
 }
 
 type DeferStructuredHydrationOptions = {
@@ -30,11 +30,11 @@ type DeferStructuredHydrationOptions = {
 export function shouldDeferUrlHydrationForStructuredLoading(
   options: DeferStructuredHydrationOptions,
 ): boolean {
-  if (options.urlState.rawSQL && !options.sqlMappingMetadataLoaded) {
+  if (options.urlState.rawSql && !options.sqlMappingMetadataLoaded) {
     return true;
   }
 
-  const restoreStructured = !options.urlState.rawSQL;
+  const restoreStructured = !options.urlState.rawSql;
   if (
     restoreStructured &&
     options.urlState.dsId &&

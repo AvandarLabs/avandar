@@ -84,7 +84,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
   /**
    * When the URL has `sql`, it wins — do not restore `ds` / cols from URL.
    */
-  const restoreStructuredFromUrl = !urlState.rawSQL;
+  const restoreStructuredFromUrl = !urlState.rawSql;
 
   const isDatasetSource = useMemo(() => {
     return (
@@ -225,10 +225,10 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           }
         }
 
-        if (urlState.rawSQL) {
-          dispatch.setRawSql(urlState.rawSQL);
+        if (urlState.rawSql) {
+          dispatch.setRawSql(urlState.rawSql);
           const mapping = sqlToStructuredQuery({
-            sql: urlState.rawSQL,
+            sql: urlState.rawSql,
             datasets: buildSqlMappingDatasets(
               datasets ?? [],
               allDatasetColumns ?? [],

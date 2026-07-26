@@ -78,13 +78,13 @@ export const DashboardClient = createUsableServiceClient(
                     name: "virtualDataset",
                   });
 
-                  const innerSql = virtualDataset.rawSQL
+                  const innerSql = virtualDataset.rawSql
                     .trim()
                     .replace(/;\s*$/, "");
                   const materializedSql = `SELECT * FROM (${innerSql}) AS _virtual_publish`;
 
                   const parquetBlob = await WorkspaceQETLClient.runQuery({
-                    rawSQL: materializedSql,
+                    rawSql: materializedSql,
                     workspaceId: dashboard.workspaceId,
                     returnType: "parquet",
                   });

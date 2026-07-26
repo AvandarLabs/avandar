@@ -167,7 +167,7 @@ function renderModal(props: Partial<ModalProps> = {}): {
       <QueryClientProvider client={queryClient}>
         <AvandarUiProvider>
           <SaveToDashboardModal
-            rawSQL="SELECT 1"
+            rawSql="SELECT 1"
             prompt="Show one"
             vizType="table"
             vizConfig={{ vizType: "table" }}

@@ -179,7 +179,7 @@ export function useSelectedMapDataSource({
           geometry: unknown;
           [key: string]: unknown;
         }>({
-          rawSQL: geojsonQuery,
+          rawSql: geojsonQuery,
           workspaceId: selectedDataSource.workspaceId,
         });
 

@@ -80,7 +80,7 @@ export async function generateEntities(
     ]!;
 
   await WorkspaceQETLClient.runQuery({
-    rawSQL: sqlTemplate(`
+    rawSql: sqlTemplate(`
       DROP TABLE IF EXISTS "$entityConfigId$";
 
       CREATE TABLE "$entityConfigId$" AS (

@@ -36,7 +36,7 @@ const initialDataExplorerState: DataExplorerAppState =
 
 /**
  * Try to compute a fresh SQL string from the structured query. Used by
- * manual-form actions to keep `rawSQL` in sync. Returns undefined when the
+ * manual-form actions to keep `rawSql` in sync. Returns undefined when the
  * query has no data source.
  */
 function _regenerateRawSqlFromQuery(
@@ -54,7 +54,7 @@ function _regenerateRawSqlFromQuery(
 }
 
 /**
- * Apply a structured-query change and also refresh `rawSQL` to match,
+ * Apply a structured-query change and also refresh `rawSql` to match,
  * marking SQL ↔ form sync as `true`. Used by manual-form actions that
  * the user makes after opening the panel.
  */
@@ -66,7 +66,7 @@ function _applyQueryChange(
   return {
     ...state,
     query: newQuery,
-    rawSQL: newSql,
+    rawSql: newSql,
     isStructuredQueryInSync: true,
     sqlSyncWarnings: [],
   };
@@ -263,7 +263,7 @@ export const DataExplorerStateManager = createAppStateManager({
     ) => {
       const next = applyVizConfigFromQueryResult({
         vizConfig: state.vizConfig,
-        rawSQL: state.rawSQL,
+        rawSql: state.rawSql,
         query: state.query,
         columns,
       });
@@ -298,7 +298,7 @@ export const DataExplorerStateManager = createAppStateManager({
       if (rawSql === undefined || rawSql === "") {
         return {
           ...state,
-          rawSQL: undefined,
+          rawSql: undefined,
           isStructuredQueryInSync: true,
           sqlSyncWarnings: [],
         };
@@ -308,7 +308,7 @@ export const DataExplorerStateManager = createAppStateManager({
       // the form as potentially out of sync so the UI can surface that.
       return {
         ...state,
-        rawSQL: rawSql,
+        rawSql: rawSql,
         isStructuredQueryInSync: false,
         sqlSyncWarnings: state.sqlSyncWarnings,
       };
@@ -333,7 +333,7 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /**
-     * Record the natural-language prompt that produced the current `rawSQL`.
+     * Record the natural-language prompt that produced the current `rawSql`.
      * Used by the "Save to dashboard" flow to seed the DataViz block's
      * `nlQuery.prompt` so the saved block renders identically to one created
      * inside the dashboard editor.

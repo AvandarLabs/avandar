@@ -16,7 +16,7 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
   vizConfig: VizConfig;
-  rawSQL: string | undefined;
+  rawSql: string | undefined;
   query: PartialStructuredQuery;
   columns: readonly QueryResultColumn[];
 };
@@ -116,7 +116,7 @@ function _sameSeriesKeys(
 export function applyVizConfigFromQueryResult(
   input: ApplyVizConfigFromQueryResultInput,
 ): VizConfig {
-  const { vizConfig, rawSQL, query, columns } = input;
+  const { vizConfig, rawSql, query, columns } = input;
   const resultColumnNames = columnNameSet(columns);
 
   let next: VizConfig = vizConfig;
@@ -131,7 +131,7 @@ export function applyVizConfigFromQueryResult(
 
   if (
     shouldHydrateVizFromQueryResult({
-      rawSQL,
+      rawSql,
       query,
       vizConfig: next,
       resultColumnNames,

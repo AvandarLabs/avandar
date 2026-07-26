@@ -40,7 +40,7 @@ function syncVizFromQueryResultReducer(
 ): DataExplorerAppState {
   const next = applyVizConfigFromQueryResult({
     vizConfig: state.vizConfig,
-    rawSQL: state.rawSQL,
+    rawSql: state.rawSql,
     query: state.query,
     columns,
   });
@@ -67,7 +67,7 @@ describe("Data Explorer state sync", () => {
     const startingState: DataExplorerAppState = {
       ...INITIAL_DATA_EXPLORER_STATE,
       query: StructuredQuery.makeEmpty(),
-      rawSQL: "SELECT region, count FROM t",
+      rawSql: "SELECT region, count FROM t",
       vizConfig: initialBarConfig,
     };
 
@@ -93,7 +93,7 @@ describe("Data Explorer state sync", () => {
   it("drops series whose column disappears from the new result", () => {
     const startingState: DataExplorerAppState = {
       ...INITIAL_DATA_EXPLORER_STATE,
-      rawSQL: "SELECT a, b FROM t",
+      rawSql: "SELECT a, b FROM t",
       vizConfig: {
         vizType: "bar",
         xAxisKey: "a",

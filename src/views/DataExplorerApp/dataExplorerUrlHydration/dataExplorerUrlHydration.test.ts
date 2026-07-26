@@ -30,8 +30,8 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
     );
   });
 
-  it("returns true when rawSQL is set", () => {
-    expect(urlSearchHasHydrateableExplorerKeys(_parsed({ rawSQL: "x" }))).toBe(
+  it("returns true when rawSql is set", () => {
+    expect(urlSearchHasHydrateableExplorerKeys(_parsed({ rawSql: "x" }))).toBe(
       true,
     );
   });
@@ -60,10 +60,10 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
 describe("shouldDeferUrlHydrationForStructuredLoading", () => {
   const DS = { id: "ds-1" };
 
-  it("defers when rawSQL is set until workspace SQL mapping metadata loads", () => {
+  it("defers when rawSql is set until workspace SQL mapping metadata loads", () => {
     expect(
       shouldDeferUrlHydrationForStructuredLoading({
-        urlState: _parsed({ rawSQL: "SELECT 1" }),
+        urlState: _parsed({ rawSql: "SELECT 1" }),
         restoredDataSource: undefined,
         needsColumns: false,
         datasetColumns: undefined,
@@ -73,10 +73,10 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
     ).toBe(true);
   });
 
-  it("does not defer when rawSQL is set and SQL mapping metadata is loaded", () => {
+  it("does not defer when rawSql is set and SQL mapping metadata is loaded", () => {
     expect(
       shouldDeferUrlHydrationForStructuredLoading({
-        urlState: _parsed({ dsId: "missing", rawSQL: "SELECT 1" }),
+        urlState: _parsed({ dsId: "missing", rawSql: "SELECT 1" }),
         restoredDataSource: undefined,
         needsColumns: true,
         datasetColumns: undefined,

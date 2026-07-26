@@ -42,12 +42,12 @@ export type DataVizDashboardBlock = {
  * visualization state.
  *
  * Stamps a fresh `props.id` per call so the block has a stable identifier
- * inside the dashboard's Puck data. The prompt and rawSQL are also pushed
+ * inside the dashboard's Puck data. The prompt and rawSql are also pushed
  * into `generations` as the initial generation so the block behaves like one
  * created from the dashboard editor's NL query field.
  */
 export function createDataVizBlock(args: {
-  rawSQL: string;
+  rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
   vizConfig: VizConfig;
@@ -61,11 +61,11 @@ export function createDataVizBlock(args: {
       id: uuid(),
       nlQuery: {
         prompt: normalizedPrompt,
-        rawSql: args.rawSQL,
+        rawSql: args.rawSql,
         generations: [
           {
             prompt: normalizedPrompt,
-            rawSql: args.rawSQL,
+            rawSql: args.rawSql,
           },
         ],
       },
