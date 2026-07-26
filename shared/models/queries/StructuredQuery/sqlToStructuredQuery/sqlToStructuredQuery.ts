@@ -52,6 +52,54 @@ export type {
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
 /**
+ * Make the empty result for the case where we could not produce anything
+ * useful from the SQL.
+ */
+function _makeUnmappedResult(
+  reasons: readonly string[],
+): SqlMappingResult {
+  const query: PartialStructuredQuery = Model.make("StructuredQuery", {
+    id: uuid<StructuredQueryId>(),
+    version: 1,
+    dataSource: undefined,
+    queryColumns: [],
+    orderByColumn: undefined,
+    orderByDirection: undefined,
+    aggregations: {},
+    filters: EMPTY_QUERY_FILTER,
+    having: EMPTY_QUERY_FILTER,
+    joins: [],
+    offset: undefined,
+    limit: undefined,
+  } as const);
+  return {
+    query,
+    isFullyMapped: false,
+    unmappedReasons: reasons,
+  };
+}
+
+function _matchColumn(
+  columnName: string,
+  columns: readonly DatasetColumnRead[],
+): DatasetColumnRead | undefined {
+  return columns.find((c) => {
+    return c.name === columnName || c.originalName === columnName;
+  });
+}
+
+function _makeQueryColumn(
+  baseColumn: DatasetColumnRead,
+  aggregation: QueryAggregationTypeT | undefined,
+): QueryColumnRead {
+  return Model.make("QueryColumn", {
+    id: uuid<QueryColumnId>(),
+    baseColumn,
+    aggregation,
+  });
+}
+
+/**
  * Attempt to map an SQL string into a structured query for the manual form.
  * Always returns a result; check `isFullyMapped` to know whether anything
  * was dropped.
@@ -358,52 +406,4 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     isFullyMapped: unmappedReasons.length === 0,
     unmappedReasons,
   };
-}
-
-/**
- * Make the empty result for the case where we could not produce anything
- * useful from the SQL.
- */
-function _makeUnmappedResult(
-  reasons: readonly string[],
-): SqlMappingResult {
-  const query: PartialStructuredQuery = Model.make("StructuredQuery", {
-    id: uuid<StructuredQueryId>(),
-    version: 1,
-    dataSource: undefined,
-    queryColumns: [],
-    orderByColumn: undefined,
-    orderByDirection: undefined,
-    aggregations: {},
-    filters: EMPTY_QUERY_FILTER,
-    having: EMPTY_QUERY_FILTER,
-    joins: [],
-    offset: undefined,
-    limit: undefined,
-  } as const);
-  return {
-    query,
-    isFullyMapped: false,
-    unmappedReasons: reasons,
-  };
-}
-
-function _matchColumn(
-  columnName: string,
-  columns: readonly DatasetColumnRead[],
-): DatasetColumnRead | undefined {
-  return columns.find((c) => {
-    return c.name === columnName || c.originalName === columnName;
-  });
-}
-
-function _makeQueryColumn(
-  baseColumn: DatasetColumnRead,
-  aggregation: QueryAggregationTypeT | undefined,
-): QueryColumnRead {
-  return Model.make("QueryColumn", {
-    id: uuid<QueryColumnId>(),
-    baseColumn,
-    aggregation,
-  });
 }

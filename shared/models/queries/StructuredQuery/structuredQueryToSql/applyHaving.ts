@@ -5,6 +5,10 @@ import { match } from "ts-pattern";
 import type { QueryFilterGroup, QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { Knex } from "knex";
 
+/**
+ * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
+ * but using `havingRaw` so the predicate is rendered after GROUP BY.
+ */
 export function applyHaving(
   builder: Knex.QueryBuilder,
   group: QueryFilterGroup,

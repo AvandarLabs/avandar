@@ -141,8 +141,3 @@ export function applyFilters(
   });
   return current;
 }
-
-/**
- * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
- * but using `havingRaw` so the predicate is rendered after GROUP BY.
- */
