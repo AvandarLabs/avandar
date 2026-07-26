@@ -11,18 +11,14 @@
  *
  * This orchestrator wires together the focused helpers in this directory:
  * `sqlAstReaders` (low-level AST value readers), `resolveFromClause`
- * (FROM/JOIN), `parseFilterClauses` (WHERE/HAVING), and `mapColumns`.
+ * (FROM/JOIN), and `parseFilterClauses` (WHERE/HAVING), plus a few small
+ * private column/result helpers below.
  */
 import { Model } from "@models/Model/Model.ts";
 import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { Parser } from "node-sql-parser";
-import {
-  makeQueryColumn,
-  makeUnmappedResult,
-  matchColumn,
-} from "$/models/queries/StructuredQuery/sqlToStructuredQuery/mapColumns.ts";
 import {
   parseHavingNode,
   parseWhereNode,
@@ -33,6 +29,7 @@ import {
   identifierToString,
   matchAggregation,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type {
@@ -63,7 +60,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const unmappedReasons: string[] = [];
   const trimmed = input.sql.trim();
   if (trimmed.length === 0) {
-    return makeUnmappedResult(["SQL is empty."]);
+    return _makeUnmappedResult(["SQL is empty."]);
   }
 
   let parsedAst: unknown;
@@ -72,7 +69,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     parsedAst = parser.astify(trimmed, { database: "postgresql" });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return makeUnmappedResult([`Could not parse SQL: ${message}`]);
+    return _makeUnmappedResult([`Could not parse SQL: ${message}`]);
   }
 
   // node-sql-parser returns either a single AST or an array. We only handle
@@ -88,7 +85,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
 
   const ast = parsedAst as Record<string, unknown> | null;
   if (!ast || ast.type !== "select") {
-    return makeUnmappedResult(["The form only supports SELECT queries."]);
+    return _makeUnmappedResult(["The form only supports SELECT queries."]);
   }
 
   if (ast.with) {
@@ -118,7 +115,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     unmappedReasons,
   );
   if (!fromResolution) {
-    return makeUnmappedResult(unmappedReasons);
+    return _makeUnmappedResult(unmappedReasons);
   }
   const dataset = fromResolution.base;
   const nestedSubquery = fromResolution.nestedSubquery;
@@ -150,7 +147,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         (exprType === "column_ref" && exprObj.column === "*")
       ) {
         dataset.columns.forEach((col) => {
-          queryColumns.push(makeQueryColumn(col, undefined));
+          queryColumns.push(_makeQueryColumn(col, undefined));
         });
         return;
       }
@@ -162,14 +159,14 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
           unmappedReasons.push("Unnamed column expression in SELECT; skipped.");
           return;
         }
-        const matched = matchColumn(columnName, dataset.columns);
+        const matched = _matchColumn(columnName, dataset.columns);
         if (!matched) {
           unmappedReasons.push(
             `SELECT references column "${columnName}" not present in the dataset.`,
           );
           return;
         }
-        queryColumns.push(makeQueryColumn(matched, undefined));
+        queryColumns.push(_makeQueryColumn(matched, undefined));
         return;
       }
 
@@ -192,14 +189,14 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
           );
           return;
         }
-        const matched = matchColumn(colName, dataset.columns);
+        const matched = _matchColumn(colName, dataset.columns);
         if (!matched) {
           unmappedReasons.push(
             `Aggregate references column "${colName}" not present in the dataset.`,
           );
           return;
         }
-        const queryColumn = makeQueryColumn(matched, agg);
+        const queryColumn = _makeQueryColumn(matched, agg);
         queryColumns.push(queryColumn);
         aggregations[queryColumn.id] = agg;
         return;
@@ -361,4 +358,52 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     isFullyMapped: unmappedReasons.length === 0,
     unmappedReasons,
   };
+}
+
+/**
+ * Make the empty result for the case where we could not produce anything
+ * useful from the SQL.
+ */
+function _makeUnmappedResult(
+  reasons: readonly string[],
+): SqlMappingResult {
+  const query: PartialStructuredQuery = Model.make("StructuredQuery", {
+    id: uuid<StructuredQueryId>(),
+    version: 1,
+    dataSource: undefined,
+    queryColumns: [],
+    orderByColumn: undefined,
+    orderByDirection: undefined,
+    aggregations: {},
+    filters: EMPTY_QUERY_FILTER,
+    having: EMPTY_QUERY_FILTER,
+    joins: [],
+    offset: undefined,
+    limit: undefined,
+  } as const);
+  return {
+    query,
+    isFullyMapped: false,
+    unmappedReasons: reasons,
+  };
+}
+
+function _matchColumn(
+  columnName: string,
+  columns: readonly DatasetColumnRead[],
+): DatasetColumnRead | undefined {
+  return columns.find((c) => {
+    return c.name === columnName || c.originalName === columnName;
+  });
+}
+
+function _makeQueryColumn(
+  baseColumn: DatasetColumnRead,
+  aggregation: QueryAggregationTypeT | undefined,
+): QueryColumnRead {
+  return Model.make("QueryColumn", {
+    id: uuid<QueryColumnId>(),
+    baseColumn,
+    aggregation,
+  });
 }
