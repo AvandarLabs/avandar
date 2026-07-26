@@ -53,7 +53,7 @@ function useOrderDirectionOptions(): SelectData<OrderByDirection> {
  * Callbacks invoked when the user changes the form. Mirrors the action set on
  * `DataExplorerStateManager` so both Data Explorer and dashboard editors can
  * drive this form. Implementations are expected to regenerate the raw SQL
- * (via `structuredQueryToSQL`) and update sync metadata.
+ * (via `structuredQueryToSql`) and update sync metadata.
  */
 export type ManualQuerySetDataSourceOptions = {
   /** Applied atomically with the data source so the first query is bounded. */

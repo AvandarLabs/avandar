@@ -1,7 +1,7 @@
 import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
@@ -46,7 +46,7 @@ function _regenerateRawSqlFromQuery(
     return undefined;
   }
   try {
-    const sql = structuredQueryToSQL(query);
+    const sql = structuredQueryToSql(query);
     return sql || undefined;
   } catch {
     return undefined;

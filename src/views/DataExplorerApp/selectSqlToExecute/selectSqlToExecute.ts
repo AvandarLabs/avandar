@@ -1,4 +1,4 @@
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 type Params = {
@@ -23,7 +23,7 @@ export function selectSqlToExecute(params: Params): string | undefined {
     return rawSql;
   }
   if (isStructuredQueryInSync && executionQuery.dataSource !== undefined) {
-    return structuredQueryToSQL(executionQuery) || undefined;
+    return structuredQueryToSql(executionQuery) || undefined;
   }
   return undefined;
 }

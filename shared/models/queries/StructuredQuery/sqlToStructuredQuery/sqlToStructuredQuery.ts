@@ -59,7 +59,7 @@ export type SqlMappingInput = {
   /**
    * Datasets in the current workspace that the query may reference. We use
    * these to resolve `FROM <table>` back to a `DatasetModel`. The table name
-   * we look for is the dataset's id (matching how `structuredQueryToSQL`
+   * we look for is the dataset's id (matching how `structuredQueryToSql`
    * emits SQL).
    */
   datasets: ReadonlyArray<{

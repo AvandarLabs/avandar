@@ -365,7 +365,7 @@ function _buildJoinOnClause(
     .join(` ${combinator} `);
 }
 
-export function structuredQueryToSQL(
+export function structuredQueryToSql(
   query: PartialStructuredQuery,
   { castTimestampsToISO = false }: StructuredQueryToSQLOptions = {},
 ): string {

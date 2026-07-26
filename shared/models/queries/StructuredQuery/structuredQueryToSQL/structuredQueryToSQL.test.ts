@@ -1,6 +1,6 @@
 import { Model } from "@models/Model/Model.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL/structuredQueryToSQL.ts";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts";
 import { describe, expect, it } from "vitest";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
@@ -58,9 +58,9 @@ function _makeQuery(
   }) as PartialStructuredQuery;
 }
 
-describe("structuredQueryToSQL", () => {
+describe("structuredQueryToSql", () => {
   it("emits a basic SELECT statement when filters are empty", () => {
-    const sql = structuredQueryToSQL(_makeQuery());
+    const sql = structuredQueryToSql(_makeQuery());
     expect(sql).toContain("select");
     expect(sql).toContain('"name"');
     expect(sql).toContain('"age"');
@@ -69,7 +69,7 @@ describe("structuredQueryToSQL", () => {
   });
 
   it("renders a simple equality filter", () => {
-    const sql = structuredQueryToSQL(
+    const sql = structuredQueryToSql(
       _makeQuery({
         type: "group",
         combinator: "AND",
@@ -87,7 +87,7 @@ describe("structuredQueryToSQL", () => {
   });
 
   it("renders nested AND/OR groups with parentheses", () => {
-    const sql = structuredQueryToSQL(
+    const sql = structuredQueryToSql(
       _makeQuery({
         type: "group",
         combinator: "OR",
@@ -125,7 +125,7 @@ describe("structuredQueryToSQL", () => {
   });
 
   it("renders IN list", () => {
-    const sql = structuredQueryToSQL(
+    const sql = structuredQueryToSql(
       _makeQuery({
         type: "group",
         combinator: "AND",
@@ -143,7 +143,7 @@ describe("structuredQueryToSQL", () => {
   });
 
   it("renders IS NULL", () => {
-    const sql = structuredQueryToSQL(
+    const sql = structuredQueryToSql(
       _makeQuery({
         type: "group",
         combinator: "AND",
@@ -191,7 +191,7 @@ describe("structuredQueryToSQL", () => {
       offset: undefined,
       limit: undefined,
     }) as PartialStructuredQuery;
-    const sql = structuredQueryToSQL(query);
+    const sql = structuredQueryToSql(query);
     expect(sql.toLowerCase()).toContain("having");
     expect(sql).toContain('"count_age"');
   });
@@ -228,7 +228,7 @@ describe("structuredQueryToSQL", () => {
       offset: undefined,
       limit: undefined,
     }) as PartialStructuredQuery;
-    const sql = structuredQueryToSQL(query);
+    const sql = structuredQueryToSql(query);
     expect(sql.toLowerCase()).toContain("inner join");
     expect(sql).toContain('"profiles"');
     expect(sql).toMatch(/"a"\."id" = "b"\."user_id"/);
@@ -271,7 +271,7 @@ describe("structuredQueryToSQL", () => {
       offset: undefined,
       limit: undefined,
     }) as PartialStructuredQuery;
-    const sql = structuredQueryToSQL(query);
+    const sql = structuredQueryToSql(query);
     expect(sql.toLowerCase()).toContain("left join");
     expect(sql).toContain("(select user_id, max(score) as s from scores");
     expect(sql).toContain('as "sub"');
@@ -298,7 +298,7 @@ describe("structuredQueryToSQL", () => {
       offset: undefined,
       limit: undefined,
     }) as PartialStructuredQuery;
-    const sql = structuredQueryToSQL(query);
+    const sql = structuredQueryToSql(query);
     expect(sql).toContain('from (select "name" from "users_table"');
     expect(sql).toContain('as "adult"');
   });
