@@ -3,7 +3,7 @@ import { isDefined, propEq } from "@utils";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { useEffect, useRef } from "react";
 import css from "./PillEditPopover.module.css";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 type PillEditPopoverProps = {

@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
 import css from "./AvaSqlBlock.module.css";
 import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { ReactNode } from "react";
 

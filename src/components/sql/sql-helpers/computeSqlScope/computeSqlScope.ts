@@ -1,7 +1,7 @@
 /**
  * Helpers for reasoning about which datasets and columns are in scope inside
  * a SQL string. Used by {@link AvaSqlBlock} (and the SQL pill UI in
- * `createSqlDisplayExtension`) to mark out-of-scope column references as
+ * `createSqlDisplayCodeMirrorExtension`) to mark out-of-scope column references as
  * errors and to populate the column-pill dropdown.
  */
 import { prop } from "@utils";

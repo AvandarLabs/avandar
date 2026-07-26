@@ -4,10 +4,10 @@ import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createSqlDisplayExtension } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import { createSqlDisplayCodeMirrorExtension } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import { createSqlMentionExtension } from "@/components/sql/sql-helpers/createSqlMentionExtension";
 import css from "./SqlEditor.module.css";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { ReactNode } from "react";
 
@@ -70,7 +70,7 @@ export function SqlEditor({
       };
       const pillsEditable = !readOnly;
       return [
-        createSqlDisplayExtension(getCatalog, {
+        createSqlDisplayCodeMirrorExtension(getCatalog, {
           editable: pillsEditable,
           onPillClick: (info) => {
             onPillClickRef.current?.(info);

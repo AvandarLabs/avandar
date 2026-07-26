@@ -182,7 +182,7 @@ function _buildDecorationSet(
  * is true, pills gain a chevron and invoke `onPillClick` when activated so
  * the host UI can show an edit popover.
  */
-export function createSqlDisplayExtension(
+export function createSqlDisplayCodeMirrorExtension(
   getCatalog: () => SqlDisplayCatalog,
   options: ExtensionOptions = {},
 ): Extension {

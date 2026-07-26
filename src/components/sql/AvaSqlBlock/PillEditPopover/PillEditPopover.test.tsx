@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { PillEditPopover } from "./PillEditPopover";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
