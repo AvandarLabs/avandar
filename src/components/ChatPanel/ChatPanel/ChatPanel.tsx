@@ -1,10 +1,13 @@
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import clsx from "clsx";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
+import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import css from "./ChatPanel.module.css";
 
@@ -18,24 +21,33 @@ import css from "./ChatPanel.module.css";
 export function ChatPanel(): JSX.Element {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
+  const context = useChatPageContext();
+  const { t } = useLingui();
+  const disabled =
+    context.app !== "data-explorer" && context.app !== "dashboards";
 
   return (
     <Box h="100%" py="xs" pr="xs">
-      <Stack h="100%" bg="white" bdrs="md" className={css.shell} gap={0}>
+      <Stack
+        h="100%"
+        bdrs="md"
+        className={clsx(css.shell, disabled && css.shellDisabled)}
+        gap={0}
+      >
         <Group px="md" py="sm" justify="space-between" className={css.header}>
           <Group gap="xs">
             <IconSparkles size={16} color={mantineColorVar("primary.6")} />
             <Text size="sm" fw={600} c="neutral.9">
-              Ask Avandar
+              <Trans>Ask Avandar</Trans>
             </Text>
           </Group>
-          <Tooltip label="Close panel (⌘/)">
+          <Tooltip label={t`Close panel (⌘/)`}>
             <ActionIcon
               variant="subtle"
               size="sm"
               color="neutral"
               onClick={dispatch.close}
-              aria-label="Close chat panel"
+              aria-label={t`Close chat panel`}
             >
               <IconX size={16} />
             </ActionIcon>

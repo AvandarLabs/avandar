@@ -3,16 +3,29 @@ import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClie
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type {
+  ChatRetryContext,
+  ChatSessionSecretResponse,
+  ConsentAck,
+  RegeneratePlanResponse,
+  SchemaDriftReport,
+} from "$/types/chat.types.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",
-  ["/models", "/:workspaceId/messages"],
+  [
+    "/models",
+    "/:workspaceId/messages",
+    "/:workspaceId/regenerate-plan",
+    "/:workspaceId/session-secret",
+  ],
   {
     "/models": {
       GET: {
-        returnType: {
-          groups: ChatModelOption.OptionGroup[];
+        queryParams: {
+          useCache?: boolean;
         };
+        returnType: ChatModelOption.Catalog;
       };
     };
     "/:workspaceId/messages": {
@@ -21,19 +34,33 @@ export type ChatAPI = APITypeDef<
           workspaceId: string;
         };
         body: {
-          messages: Array<{
-            role: ChatClientMessage.ChatMessageRole;
-            content: string;
-          }>;
-          context: {
-            app: ChatPageContext.ChatApp;
-            openDatasetId?: string;
-            lastSql?: string;
-            lastError?: string;
-          };
-          model: string | undefined;
+          messages: ChatClientMessage.T[];
+          context: ChatPageContext.T;
+          model?: string;
+          consentAcks?: ConsentAck[];
+          retryContext?: ChatRetryContext;
         };
         returnType: ChatResponse.T;
+      };
+    };
+    "/:workspaceId/regenerate-plan": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        body: {
+          driftReport: SchemaDriftReport;
+          model?: string;
+        };
+        returnType: RegeneratePlanResponse;
+      };
+    };
+    "/:workspaceId/session-secret": {
+      GET: {
+        pathParams: {
+          workspaceId: string;
+        };
+        returnType: ChatSessionSecretResponse;
       };
     };
   }

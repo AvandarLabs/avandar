@@ -25,6 +25,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
+import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
@@ -95,6 +97,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
+  const planState = PlanStateManager.useState();
   const [, chatPanelDispatch] = ChatPanelStateManager.useContext();
   const [
     isOpenDatasetModalOpen,
@@ -438,9 +441,25 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                   if (!state.rawSql) {
                     return;
                   }
-                  // For now the Data Explorer's plan panel is not wired up, so
-                  // no plan is captured on save-as-new-dataset.
-                  const planSnapshot: ChatPlan | null = null;
+                  const planSnapshot: ChatPlan | null =
+                    planState.isVisible && planState.nodes.length > 0 ?
+                      {
+                        rootMessage: planState.rootMessage,
+                        steps: planState.nodes.map((n) => {
+                          return {
+                            id: n.id,
+                            description: n.description,
+                            type: n.type,
+                            code: n.code,
+                            inputs: n.inputs,
+                            predictedSchema: n.predictedSchema,
+                            ...(n.defaultViz ?
+                              { defaultViz: n.defaultViz }
+                            : {}),
+                          };
+                        }),
+                      }
+                    : null;
                   const modalId = modals.open({
                     title: t`Save as new dataset`,
                     size: "xl",
@@ -512,6 +531,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
+        <PlanFlowView />
         <Box flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import {
   IconLayoutSidebarRightCollapse,
@@ -13,15 +14,16 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
  */
 export function ChatAsideToggle(): JSX.Element {
   const [{ isOpen }, dispatch] = ChatPanelStateManager.useContext();
+  const { t } = useLingui();
 
   return (
-    <Tooltip label={isOpen ? "Close chat (⌘/)" : "Open chat (⌘/)"}>
+    <Tooltip label={isOpen ? t`Close chat (⌘/)` : t`Open chat (⌘/)`}>
       <ActionIcon
         variant="subtle"
         size="md"
         color="neutral"
         onClick={dispatch.toggle}
-        aria-label={isOpen ? "Close chat panel" : "Open chat panel"}
+        aria-label={isOpen ? t`Close chat panel` : t`Open chat panel`}
         aria-pressed={isOpen}
         visibleFrom="sm"
       >

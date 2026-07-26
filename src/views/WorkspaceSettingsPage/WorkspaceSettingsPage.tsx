@@ -7,6 +7,7 @@ import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlob
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
@@ -79,12 +80,15 @@ export function WorkspaceSettingsPage(): JSX.Element {
       <Container py="xxxl" size="xl">
         {isCurrentUserTheWorkspaceOwner ?
           <Tabs
-            tabIds={["general", "users", "roles", "tags", "billing"] as const}
+            tabIds={
+              ["general", "users", "roles", "tags", "privacy", "billing"] as const
+            }
             renderTabHeader={{
               general: "General",
               users: "Members",
               roles: "Roles",
               tags: "Tags",
+              privacy: "Privacy",
               billing: "Billing",
             }}
             renderTabPanel={{
@@ -98,18 +102,22 @@ export function WorkspaceSettingsPage(): JSX.Element {
               tags: () => {
                 return <WorkspaceTagsTab />;
               },
+              privacy: () => {
+                return <PrivacyLogTab />;
+              },
               billing: () => {
                 return <WorkspaceBillingView />;
               },
             }}
           />
         : <Tabs
-            tabIds={["general", "users", "roles", "tags"] as const}
+            tabIds={["general", "users", "roles", "tags", "privacy"] as const}
             renderTabHeader={{
               general: "General",
               users: "Members",
               roles: "Roles",
               tags: "Tags",
+              privacy: "Privacy",
             }}
             renderTabPanel={{
               general: generalTabPanel,
@@ -121,6 +129,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
               tags: () => {
                 return <WorkspaceTagsTab />;
+              },
+              privacy: () => {
+                return <PrivacyLogTab />;
               },
             }}
           />

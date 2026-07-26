@@ -4,6 +4,7 @@ import { AssistantMessage } from "@/components/ChatPanel/ChatThread/AssistantMes
 import { Composer } from "@/components/ChatPanel/ChatThread/Composer/Composer";
 import { RegenerateErrorBanner } from "@/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner";
 import { UserMessage } from "@/components/ChatPanel/ChatThread/UserMessage/UserMessage";
+import { PendingClarificationBlock } from "@/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock";
 import css from "./ChatThread.module.css";
 
 /**
@@ -22,6 +23,7 @@ export function ChatThread(): JSX.Element {
         />
       </ThreadPrimitive.Viewport>
       <RegenerateErrorBanner />
+      <PendingClarificationBlock />
       <Composer />
     </ThreadPrimitive.Root>
   );

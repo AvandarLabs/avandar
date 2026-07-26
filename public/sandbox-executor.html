@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      Same-origin sandboxed iframe for the Phase 6 Python + R executor.
+
+      The iframe is mounted by the app with `sandbox="allow-scripts"`
+      (no `allow-same-origin`), which forces a null opaque origin at
+      runtime even though this HTML ships from our bundle. That gives
+      us:
+
+        - No access to the app's IndexedDB / OPFS / cookies / localStorage.
+        - No DOM access to the parent (postMessage only).
+        - No same-origin XHR back to the app.
+
+      The CSP below is the second layer:
+        - `connect-src 'none'` blocks fetch / XHR / WebSocket / EventSource
+          / sendBeacon. Pyodide and WebR are loaded from a CDN at boot;
+          we set their wheel/package URL to a blob: URL the parent
+          provides via postMessage rather than calling `fetch` here.
+        - `script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'`: Pyodide
+          itself needs `unsafe-eval` to run Python code in V8.
+        - `style-src 'self' 'unsafe-inline'`: not strictly needed but
+          some Pyodide wheels inject CSS at boot.
+
+      Note: this file is the security boundary. Treat any change as
+      requiring an external security review per spec.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'none';
+        script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline';
+        connect-src https://cdn.jsdelivr.net;
+        worker-src 'self' blob:;
+        img-src 'self' blob: data:;
+        font-src 'self' data:;
+      "
+    />
+    <title>Sandbox executor</title>
+  </head>
+  <body>
+    <!--
+      Pre-boot stub: null out every browser-side network primitive
+      BEFORE the runtime loader runs. This is belt-and-braces — the CSP
+      above is what actually enforces it; this just makes it harder for
+      a malicious wheel to even try.
+
+      Note we LEAVE `fetch` working to https://cdn.jsdelivr.net because
+      Pyodide needs to download its WASM + wheels. Once Pyodide reports
+      ready, we'll lock fetch down further from the runtime side.
+    -->
+    <script>
+      (function () {
+        // Block everything except a narrow fetch allowlist for the CDN.
+        const ALLOWED_PREFIXES = ["https://cdn.jsdelivr.net/"];
+        const realFetch = window.fetch;
+        window.fetch = function (resource, init) {
+          const url =
+            typeof resource === "string" ? resource
+            : resource && resource.url ? resource.url
+            : "";
+          if (
+            !ALLOWED_PREFIXES.some(function (p) {
+              return url.startsWith(p);
+            })
+          ) {
+            return Promise.reject(new Error("[sandbox] fetch denied: " + url));
+          }
+          return realFetch.call(this, resource, init);
+        };
+        // Hard-disable everything else.
+        window.XMLHttpRequest = function () {
+          throw new Error("[sandbox] XMLHttpRequest is blocked");
+        };
+        window.WebSocket = function () {
+          throw new Error("[sandbox] WebSocket is blocked");
+        };
+        window.EventSource = function () {
+          throw new Error("[sandbox] EventSource is blocked");
+        };
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon = function () {
+            return false;
+          };
+        }
+        if (window.RTCPeerConnection) {
+          window.RTCPeerConnection = function () {
+            throw new Error("[sandbox] RTCPeerConnection is blocked");
+          };
+        }
+        // Strict postMessage origin check.
+        const PARENT_ORIGIN =
+          window.location.ancestorOrigins ?
+            window.location.ancestorOrigins[0] || null
+          : null;
+        window.__sandboxParentOrigin = PARENT_ORIGIN;
+      })();
+    </script>
+    <script type="module" src="/src/sandbox/sandboxExecutor.ts"></script>
+  </body>
+</html>

@@ -3,6 +3,7 @@ import type {
   ChatApp as ChatAppT,
   ChatPageContextId,
   ChatPageContextModel,
+  ChatPageContextResultColumn,
 } from "$/models/chat/ChatPageContext/ChatPageContext.types.ts";
 
 export { ChatPageContextModule as ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContextModule.ts";
@@ -12,4 +13,5 @@ export namespace ChatPageContext {
     ChatPageContextModel[K];
   export type Id = ChatPageContextId;
   export type ChatApp = ChatAppT;
+  export type ResultColumn = ChatPageContextResultColumn;
 }

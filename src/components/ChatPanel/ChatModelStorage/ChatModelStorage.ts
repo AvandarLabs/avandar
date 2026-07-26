@@ -18,6 +18,11 @@ function _readStoredChatModelId(): string | undefined {
 export const ChatModelStorage = createModule("ChatModelStorage", {
   builder: () => {
     return {
+      /** Reads the last model id the user picked, if any. */
+      readStoredChatModelId: (): string | undefined => {
+        return _readStoredChatModelId();
+      },
+
       /** Persists the user's model choice across reloads. */
       writeStoredChatModelId: (modelId: string) => {
         try {
@@ -32,38 +37,45 @@ export const ChatModelStorage = createModule("ChatModelStorage", {
       },
 
       /**
-       * Given a model id, returns it if it is in the available model catalog.
-       * Otherwise, uses the stored model id (in local storage) and resolves
-       * against the model catalog. Otherwise, falls back to the config-level
-       * default model id. If the config-level default model is not an
-       * available model, then we fall back to the first model in the
-       * `availableModels` catalog.
+       * Resolves a model id against the available catalog. Preference order:
+       * 1. `selectedModelId` if present in the catalog.
+       * 2. The stored model id from `localStorage` if present in the catalog.
+       * 3. When `honorStoredWhenMissing` is true (catalog still loading), the
+       *    stored model id is returned even if not yet in the catalog so we do
+       *    not flicker to the default while offline models hydrate.
+       * 4. `AppConfig.chat.defaultModelId` if present in the catalog.
+       * 5. The first available model id.
+       * 6. `AppConfig.chat.defaultModelId` as a last resort.
        */
       resolveChatModelId: ({
         availableModels,
         selectedModelId,
+        storedModelId,
+        honorStoredWhenMissing = false,
       }: {
         availableModels: ReadonlyArray<{ id: string }>;
-        selectedModelId: string | undefined;
+        selectedModelId?: string | undefined;
+        storedModelId?: string | undefined;
+        honorStoredWhenMissing?: boolean;
       }): string => {
-        const modelIdToResolve = selectedModelId ?? _readStoredChatModelId();
+        const resolvedStoredModelId =
+          storedModelId !== undefined ? storedModelId : (
+            _readStoredChatModelId()
+          );
+        const candidate = selectedModelId ?? resolvedStoredModelId;
 
-        // check if the user's stored model id is an available model
-        if (
-          modelIdToResolve &&
-          availableModels.some(propEq("id", modelIdToResolve))
-        ) {
-          return modelIdToResolve;
+        if (candidate && availableModels.some(propEq("id", candidate))) {
+          return candidate;
         }
 
-        // check if the config-level default model is an available model in
-        // the list.
+        if (honorStoredWhenMissing && candidate) {
+          return candidate;
+        }
+
         if (availableModels.some(propEq("id", AppConfig.chat.defaultModelId))) {
           return AppConfig.chat.defaultModelId;
         }
 
-        // otherwise just default to the first available model. If no available
-        // models, then fallback to the config-level default model.
         return availableModels[0]?.id ?? AppConfig.chat.defaultModelId;
       },
     };

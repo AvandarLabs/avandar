@@ -17,6 +17,7 @@ export function useChatModelCatalog(): UseChatModelCatalogResult {
     queryFn: async () => {
       const response = await APIClient.get({
         route: "chat/models",
+        queryParams: { useCache: true },
       });
       return response.groups;
     },
