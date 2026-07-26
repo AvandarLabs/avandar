@@ -1,6 +1,6 @@
 import { Combobox, useCombobox } from "@mantine/core";
 import { isDefined, propEq } from "@utils";
-import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope/sqlScope";
+import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { useEffect, useRef } from "react";
 import css from "./PillEditPopover.module.css";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayExtension";

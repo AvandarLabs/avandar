@@ -84,22 +84,3 @@ export function computeSqlScope(input: {
 
   return { datasetIds, columnNames, outOfScopeColumnTokens };
 }
-
-/**
- * Convenience: filter a list of catalog datasets to those that share at least
- * one in-scope dataset id. Used to build the dataset-pill dropdown.
- */
-export function listInScopeDatasets(
-  scope: SqlScope,
-  catalog: SqlDisplayCatalog,
-): ReadonlyArray<SqlDisplayCatalog["datasets"][number]> {
-  return catalog.datasets.filter((d) => {
-    return scope.datasetIds.has(d.id);
-  });
-}
-
-/**
- * Re-export so consumers can re-tokenize easily without pulling the lower
- * helper directly.
- */
-export type { SqlDisplaySegment };

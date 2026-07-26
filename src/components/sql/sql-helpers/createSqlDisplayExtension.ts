@@ -8,7 +8,7 @@ import {
   WidgetType,
 } from "@codemirror/view";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
-import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope/sqlScope";
+import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

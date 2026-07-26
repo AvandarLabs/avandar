@@ -1,4 +1,5 @@
-import { computeSqlScope, listInScopeDatasets } from "@/components/sql/sql-helpers/sqlScope/sqlScope";
+
+import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { describe, expect, it } from "vitest";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
@@ -62,17 +63,5 @@ describe("computeSqlScope", () => {
     });
     expect(scope.datasetIds.size).toBe(0);
     expect(scope.outOfScopeColumnTokens.length).toBe(0);
-  });
-});
-
-describe("listInScopeDatasets", () => {
-  it("returns only datasets whose id is in scope", () => {
-    const scope = computeSqlScope({
-      sql: `SELECT * FROM "${CASES_ID}"`,
-      catalog,
-    });
-    const inScope = listInScopeDatasets(scope, catalog);
-    expect(inScope.length).toBe(1);
-    expect(inScope[0]!.id).toBe(CASES_ID);
   });
 });

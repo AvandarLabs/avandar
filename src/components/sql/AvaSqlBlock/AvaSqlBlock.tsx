@@ -1,6 +1,5 @@
 
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
-import { computeSqlScope } from "@/components/sql/sql-helpers/sqlScope/sqlScope";
 import clsx from "clsx";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
 import { useSqlDisplayCatalog } from "@/components/sql/sql-helpers/useSqlDisplayCatalog";
