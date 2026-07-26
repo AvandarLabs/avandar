@@ -29,7 +29,7 @@ import type {
   RenderAs,
   XYSeries,
 } from "$/models/vizs/SeriesConfig";
-import type { ErasedSeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
@@ -342,7 +342,7 @@ function SeriesCard({
   }, [seriesRenderAs]);
 
   const isComposed = !isRadarHost && seriesRenderAs !== hostVizType;
-  const filtered: readonly ErasedSeriesSettingDescriptor[] =
+  const filtered: readonly AnySeriesSettingDescriptor[] =
     isComposed ?
       descriptors.filter((d) => {
         return d.composable;

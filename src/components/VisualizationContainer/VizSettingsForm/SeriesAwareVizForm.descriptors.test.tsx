@@ -22,8 +22,8 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type {
   ControlSpec,
-  ErasedChartSettingDescriptor,
-  ErasedSeriesSettingDescriptor,
+  AnyChartSettingDescriptor,
+  AnySeriesSettingDescriptor,
 } from "$/models/vizs/SettingDescriptor";
 
 const COLUMNS: readonly QueryResultColumn[] = [
@@ -216,7 +216,7 @@ function driveControl(
     const config = BASELINE_CONFIGS[vizType];
     const chartDescriptors = VizConfigs.getDescriptors(vizType).chart;
 
-    chartDescriptors.forEach((desc: ErasedChartSettingDescriptor) => {
+    chartDescriptors.forEach((desc: AnyChartSettingDescriptor) => {
       it(`changes the "${desc.label}" setting via its ${desc.control.kind} control`, () => {
         const { onConfigChange } = renderForm(config);
         const currentValue = pathGet(config as never, desc.key as never);
@@ -240,7 +240,7 @@ function driveControl(
     const config = BASELINE_CONFIGS[vizType];
     const seriesDescriptors = VizConfigs.getDescriptors(vizType).series;
 
-    seriesDescriptors.forEach((desc: ErasedSeriesSettingDescriptor) => {
+    seriesDescriptors.forEach((desc: AnySeriesSettingDescriptor) => {
       it(`changes the "${desc.label}" series setting via its ${desc.control.kind} control`, () => {
         const { onConfigChange } = renderForm(config);
         const firstSeries: unknown = (config as { series: unknown[] })

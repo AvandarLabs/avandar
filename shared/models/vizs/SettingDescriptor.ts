@@ -249,7 +249,7 @@ export type SeriesSettingDescriptor<TSeries> = {
  * (BarChartVizConfigs, LineChartVizConfigs, etc.) exports one of
  * these.
  *
- * The form layer reads descriptors through {@link ErasedVizSettingDescriptors}
+ * The form layer reads descriptors through {@link AnyVizSettingDescriptors}
  * (a type-erased view) so it can iterate them without knowing the
  * concrete config or series shapes.
  */
@@ -259,17 +259,18 @@ export type VizSettingDescriptors<TConfig, TSeries> = {
 };
 
 /**
- * Type-erased descriptor pair, used at the registry / form-dispatch
- * boundary where the concrete `TConfig` and `TSeries` are unknown.
+ * Generic (un-parameterized) descriptor pair, used at the registry /
+ * form-dispatch boundary where the concrete `TConfig` and `TSeries` are
+ * unknown.
  */
-export type ErasedChartSettingDescriptor = {
+export type AnyChartSettingDescriptor = {
   key: string;
   label: string;
   group?: string;
   control: ControlSpec;
 };
 
-export type ErasedSeriesSettingDescriptor = {
+export type AnySeriesSettingDescriptor = {
   key: string;
   label: string;
   group?: string;
@@ -278,9 +279,9 @@ export type ErasedSeriesSettingDescriptor = {
   appliesTo: RenderAs | "radar";
 };
 
-export type ErasedVizSettingDescriptors = {
-  chart: readonly ErasedChartSettingDescriptor[];
-  series: readonly ErasedSeriesSettingDescriptor[];
+export type AnyVizSettingDescriptors = {
+  chart: readonly AnyChartSettingDescriptor[];
+  series: readonly AnySeriesSettingDescriptor[];
 };
 
 /**
@@ -289,7 +290,7 @@ export type ErasedVizSettingDescriptors = {
  * vizs like pie, funnel, scatter, bubble, table). Their forms remain
  * hand-coded for now and can be migrated later.
  */
-export const EMPTY_VIZ_SETTING_DESCRIPTORS: ErasedVizSettingDescriptors = {
+export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],
   series: [],
 };
