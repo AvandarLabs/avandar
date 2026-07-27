@@ -28,7 +28,9 @@ const entry: ConsentAuditEntry.T = {
 
 describe("buildConsentAuditCsv", () => {
   it("quotes arrays, commas, quotes, and newlines like the legacy helper", () => {
-    expect(buildConsentAuditCsv([entry])).toBe(
+    const entries = [entry] as const;
+
+    expect(buildConsentAuditCsv(entries)).toBe(
       [
         "id,timestamp,workspaceId,userId,threadId,context,decision,mode,detectedPii,detectedBias,sourceColumn,valueCount,contentLengthChars,warningShown,warningDismissed,suggestionUsed,patternLocale,detectorVersion,medicalTierTriggeredBy,typedConfirmationCorrect,ackTokenNonce",
         '00000000-0000-4000-8000-000000000001,2026-07-27T12:00:00.000Z,"workspace,one","user""one","thread\none",user_message_text,approved,composite,"email|quote""value|line\nbreak","",,2,10,"pii|bias","",false,en,1.0.0,,,',

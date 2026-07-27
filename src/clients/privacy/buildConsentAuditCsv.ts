@@ -40,7 +40,9 @@ function _escapeCsvValue(value: unknown): string {
 }
 
 /** Builds a CSV download payload for browser-local consent audit records. */
-export function buildConsentAuditCsv(entries: ConsentAuditEntry.T[]): string {
+export function buildConsentAuditCsv(
+  entries: readonly ConsentAuditEntry.T[],
+): string {
   const rows = entries.map((entry) => {
     return [
       entry.id,

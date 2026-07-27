@@ -17,8 +17,8 @@ export type RecordConsentDecisionInput = {
   context: ConsentAuditEntry.T["context"];
   decision: ConsentAuditEntry.T["decision"];
   mode: ConsentAuditEntry.T["mode"];
-  detectedPii: string[];
-  detectedBias: string[];
+  detectedPii: readonly string[];
+  detectedBias: readonly string[];
   sourceColumn?: string;
   valueCount?: number;
   contentLengthChars?: number;
@@ -85,8 +85,8 @@ const consentAuditEntryClient = createDexieCrudClient({
             decision: input.decision,
             context: input.context,
             mode: input.mode,
-            detectedPii: input.detectedPii,
-            detectedBias: input.detectedBias,
+            detectedPii: [...input.detectedPii],
+            detectedBias: [...input.detectedBias],
             sourceColumn: input.sourceColumn ?? null,
             valueCount: input.valueCount ?? 0,
             contentLengthChars: input.contentLengthChars ?? null,
