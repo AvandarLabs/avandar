@@ -18,12 +18,12 @@ function _readStoredChatModelId(): string | undefined {
 export const ChatModelStorage = createModule("ChatModelStorage", {
   builder: () => {
     return {
-      /** Reads the last model id the user picked, if any. */
+      // Reads the last model id the user picked, if any.
       readStoredChatModelId: (): string | undefined => {
         return _readStoredChatModelId();
       },
 
-      /** Persists the user's model choice across reloads. */
+      // Persists the user's model choice across reloads.
       writeStoredChatModelId: (modelId: string) => {
         try {
           return window.localStorage.setItem(
@@ -36,17 +36,9 @@ export const ChatModelStorage = createModule("ChatModelStorage", {
         }
       },
 
-      /**
-       * Resolves a model id against the available catalog. Preference order:
-       * 1. `selectedModelId` if present in the catalog.
-       * 2. The stored model id from `localStorage` if present in the catalog.
-       * 3. When `honorStoredWhenMissing` is true (catalog still loading), the
-       *    stored model id is returned even if not yet in the catalog so we do
-       *    not flicker to the default while offline models hydrate.
-       * 4. `AppConfig.chat.defaultModelId` if present in the catalog.
-       * 5. The first available model id.
-       * 6. `AppConfig.chat.defaultModelId` as a last resort.
-       */
+      // Resolves a model id against the available catalog. Preference order:
+      // selected model, stored model, default model, first available model,
+      // then the configured default as a final fallback.
       resolveChatModelId: ({
         availableModels,
         selectedModelId,

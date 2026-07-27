@@ -70,8 +70,8 @@ function PlanFlowCanvas(): React.ReactNode {
   const planId = state.planId;
 
   // Plan-run orchestration (runAll / runSingle / auto-run effect) is
-  // lifted into a self-contained hook. It is called here — before the
-  // canvas-zoom effect — so hook order, dependency arrays, and effect
+  // lifted into a self-contained hook. It is called here before the
+  // canvas-zoom effect so hook order, dependency arrays, and effect
   // timing are identical to the previous inline version. `stateRef` and
   // `runOnceRef` stay owned here so `close` can reset the run-once gate.
   const { runAll, runSingle } = usePlanRun({

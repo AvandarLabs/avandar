@@ -21,8 +21,7 @@ import type {
  *
  * Each `runInSandbox` call gets a unique `requestId`; concurrent
  * runs are serialized through the single iframe (Pyodide is
- * single-threaded). If you need parallelism, that's a worker-pool
- * upgrade tracked in the spec.
+ * single-threaded). Parallel execution requires a worker-pool design.
  */
 
 const SANDBOX_URL = "/sandbox-executor.html";

@@ -1,6 +1,5 @@
 /**
- * Server-side helpers for the ack-token protocol described in
- * `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
+ * Server-side helpers for the privacy consent ack-token protocol.
  *
  *   ackToken = base64url(headerJson) + '.' + hex(HMAC-SHA256(headerJson, K))
  *
@@ -86,8 +85,8 @@ export type VerifyAckTokenResult =
 /**
  * Module-scope set of seen nonces. In a multi-instance deployment this
  * needs to move to Redis / Supabase. The single-instance edge function
- * deployment we ship today is good enough for v1: replay attacks would
- * have to land on the same edge worker within the 5-minute window.
+ * deployment we ship today limits replay detection to duplicate requests
+ * that land on the same edge worker within the token window.
  */
 const SEEN_NONCES = new Map<string, number>();
 const NONCE_CACHE_TTL_MS = 10 * 60 * 1000;

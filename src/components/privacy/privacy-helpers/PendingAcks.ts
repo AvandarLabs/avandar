@@ -8,7 +8,7 @@ import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecre
  * `crossBoundary` registers an ack here keyed by the SHA-256 hex of the
  * approved text payload. `useAvandarChatRuntime` looks up matching acks
  * just before POSTing to the chat endpoint and attaches them as
- * `body.consentAcks`. Acks are single-use — once consumed they're
+ * `body.consentAcks`. Acks are single-use; once consumed they're
  * deleted from the queue.
  *
  * Why this lives at module scope rather than React state: the consent
@@ -55,11 +55,9 @@ export const PendingAcks = createModule("PendingAcks", {
         });
       },
 
-      /**
-       * Consume the ack matching `text`, if any. The ack is removed from the
-       * queue immediately so two parallel chat turns can't both claim the
-       * same ack for the same content.
-       */
+      // Consume the ack matching `text`, if any. The ack is removed from the
+      // queue immediately so two parallel chat turns can't both claim the
+      // same ack for the same content.
       consumeAckForText: async (text: string): Promise<string | undefined> => {
         _gc();
         const hash = await SessionSecret.hashTextPayload(text);
@@ -71,7 +69,7 @@ export const PendingAcks = createModule("PendingAcks", {
         return entry.ackToken;
       },
 
-      /** Wipe all pending acks. Used on logout / workspace switch. */
+      // Wipe all pending acks. Used on logout / workspace switch.
       clearAll: (): void => {
         QUEUE.clear();
       },

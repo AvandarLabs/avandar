@@ -10,18 +10,7 @@ import { PiiWarningPanel } from "./PiiWarningPanel";
 import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
-/**
- * All five modes from the chat-interactive-workflows spec:
- *
- *   - `clean`: Mode A. Simple "Send N values" confirmation.
- *   - `pii_warning`: Mode B. Default-cancel; Send requires a checked ack.
- *   - `bias_nudge`: Mode C. Soft, non-blocking; "continue as-is" always
- *     available alongside "use suggestion".
- *   - `composite`: Mode D. Bias + PII fired together; both decisions
- *     required before submit (PII ack checkbox + bias decision).
- *   - `medical_strict`: Mode E. User must type the exact phrase
- *     `SEND HEALTH DATA` to enable the send button.
- */
+/** Consent modal state selected by the privacy boundary. */
 export type ConsentModalMode =
   | "clean"
   | "pii_warning"

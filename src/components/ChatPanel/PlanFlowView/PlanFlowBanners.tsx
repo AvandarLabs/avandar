@@ -41,7 +41,7 @@ export function PlanFlowBanners({
   const sqlStepCount = nodes.filter((n) => {
     return n.type === "sql";
   }).length;
-  // Heuristic the spec calls out: >7 SQL steps suggests Python or R
+  // More than seven SQL steps suggests Python or R
   // might be a better fit. Show the hint, but allow the user to run
   // the plan anyway.
   const showSqlStepHint = sqlStepCount > 7;
@@ -64,12 +64,12 @@ export function PlanFlowBanners({
                 <Trans>
                   The AI has proposed a {nodes.length}-step plan — that's a lot
                   of SQL. Consider whether a Python or R step would express this
-                  more cleanly. You can still approve as-is. Nothing has run yet.
-                  Click each node to read it; approve to execute.
+                  more cleanly. You can still approve as-is. Nothing has run
+                  yet. Click each node to read it; approve to execute.
                 </Trans>
               : <Trans>
-                  The AI has proposed a {nodes.length}-step plan. Nothing has run
-                  yet. Click each node to read it; approve to execute.
+                  The AI has proposed a {nodes.length}-step plan. Nothing has
+                  run yet. Click each node to read it; approve to execute.
                 </Trans>
               }
             </Text>

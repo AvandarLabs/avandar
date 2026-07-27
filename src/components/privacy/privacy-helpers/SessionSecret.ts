@@ -5,7 +5,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 /**
  * Per-workspace HMAC session secret cache. The secret is fetched from
  * `GET /chat/:workspaceId/session-secret` on first use, decoded from
- * base64, and held in memory as a `CryptoKey`. Never persisted —
+ * base64, and held in memory as a `CryptoKey`. Never persisted:
  * a localStorage / IDB write would let an XSS exfiltrate it.
  *
  * On logout / workspace switch, callers should invoke `clearAll()`
@@ -68,11 +68,9 @@ export const SessionSecret = createModule("SessionSecret", {
         CACHE.clear();
       },
 
-      /**
-       * Hash a UTF-8 string with SHA-256 and return the lowercase hex digest.
-       * Mirrors the server's `hashTextPayload` so both sides compute the same
-       * `payloadHash` for the ack header.
-       */
+      // Hash a UTF-8 string with SHA-256 and return the lowercase hex digest.
+      // Mirrors the server's `hashTextPayload` so both sides compute the same
+      // `payloadHash` for the ack header.
       hashTextPayload: async (text: string): Promise<string> => {
         const digest = await crypto.subtle.digest(
           "SHA-256",
@@ -81,11 +79,9 @@ export const SessionSecret = createModule("SessionSecret", {
         return _toHex(new Uint8Array(digest));
       },
 
-      /**
-       * Issue a signed ack token. Header is base64url-encoded JSON; signature
-       * is hex-encoded HMAC-SHA256 over the encoded header. The two are
-       * joined by a `.`.
-       */
+      // Issue a signed ack token. Header is base64url-encoded JSON; signature
+      // is hex-encoded HMAC-SHA256 over the encoded header. The two are joined
+      // by a `.`.
       issueAckToken: async (args: {
         workspaceId: Workspace.Id;
         userId: string;

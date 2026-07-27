@@ -36,19 +36,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * answers, discovery dropdown picks, assumed SQL literals after the
  * clarification cap (`generated_sql_assumptions`).
  *
- * **Design doc:** `docs/superpowers/specs/2026-05-19-chat-interactive-
- * workflows-design.md`
- * (section "`crossBoundary` API"). Audit UI: Settings → Privacy log.
- *
- * v1 scope:
- *   - PII detection (column-name + content layers, English-only)
- *   - Bias detection (English-only patterns)
- *   - Consent modal modes A–E (`ConsentModal.tsx`)
- *   - Dexie audit via `ConsentAuditLog.ts` and `ClarificationAuditLog.ts`
- *
- * Deferred (see `docs/ict4d-demo/CHECKPOINTS.md`):
- *   - Spanish / French pattern files
- *   - Server-issued nonce registry for ack replay protection
+ * The current implementation covers PII detection, English bias detection,
+ * modal consent, ack-token issuance, and local audit logging. Locale-specific
+ * bias pattern files are present as disabled stubs until they are reviewed.
  */
 
 export type CrossBoundaryContext =
@@ -83,7 +73,7 @@ export type CrossBoundaryRequest = {
   userId: string;
   threadId?: string;
   /**
-   * When true, show the consent modal even if detectors are clean — used
+   * When true, show the consent modal even if detectors are clean. Used
    * for assumed SQL filter values after the clarification cap.
    */
   explicitConsentRequired?: boolean;
@@ -240,8 +230,8 @@ export async function crossBoundary(
 /**
  * Mint an HMAC-signed ack token covering `text`, and register it in the
  * pending-acks queue so the next outgoing chat request picks it up.
- * Value-shaped (row data) consent will follow the same pattern once
- * Phase 2 lands; for v1 only text payloads ride this rail.
+ * Value-shaped row-data consent uses the same ack queue once the caller
+ * provides a concrete value payload to hash.
  */
 async function _mintAckFor(
   req: CrossBoundaryRequest,
@@ -266,7 +256,7 @@ function _chooseMode(args: {
   const hasPii = args.pii.severity !== "clean";
   const hasBias = args.biasHits.length > 0;
 
-  // Medical-strict tier wins regardless of other detections — the
+  // Medical-strict tier wins regardless of other detections; the
   // typed-confirmation gate is the highest-friction modal we ship.
   if (args.pii.isMedical) {
     return "medical_strict";

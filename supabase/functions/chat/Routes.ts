@@ -1003,10 +1003,9 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                 );
               }
             }
-            // `values` scope is wired for Phase 2+ row-data flows;
-            // until those land we don't have a value payload to hash
-            // against on this turn, so we accept-on-presence and let
-            // the future row-data path tighten the contract.
+            // `values` scope is reserved for row-data payloads. This
+            // request shape does not yet include concrete values to hash,
+            // so the text-path verification remains the enforceable path.
           }
         }
 
@@ -1380,7 +1379,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           requestBody.tool_choice = "auto";
         }
 
-        // Single OpenRouter attempt — wrapped in a helper so the
+        // Single OpenRouter attempt, wrapped in a helper so the
         // retry-on-empty escalation below can re-call it with different
         // params. Throws on non-2xx so the outer handler surfaces it.
         const runAttempt = async (
@@ -1419,12 +1418,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           dashboardBlock?: ChatGeneratedDashboardBlock;
         };
 
-        /**
-         * Parses an OpenRouter response message + content into our terminal
-         * output shapes. Defined inline so it can close over the per-request
-         * `isDataExplorer`, `isDashboards`, `lastUserPrompt`, and
-         * `priorClarifications`.
-         */
+        // Parses an OpenRouter response message and content into our terminal
+        // output shapes. Defined inline so it can close over the per-request
+        // `isDataExplorer`, `isDashboards`, `lastUserPrompt`, and
+        // `priorClarifications`.
         const parseAttempt = (
           msg: OpenRouterMessage | undefined,
           attemptText: string,
@@ -1452,7 +1449,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             }
           }
 
-          // Only honor `clarify` if no SQL was also produced this turn —
+          // Only honor `clarify` if no SQL was also produced this turn;
           // the SQL path is the terminal one.
           if (!sql) {
             const clarifyCall = calls.find((tc) => {
@@ -1523,12 +1520,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           };
         };
 
-        /**
-         * An attempt is "empty" when the model returned neither a tool
-         * call we could parse nor any plain text. That's the only case
-         * worth retrying — anything else means the model committed to
-         * something and we should ship it.
-         */
+        // An attempt is "empty" when the model returned neither a tool
+        // call we could parse nor any plain text. That's the only case
+        // worth retrying; anything else means the model committed to
+        // something and we should ship it.
         const isEmpty = (p: ParsedAttempt): boolean => {
           return (
             !p.generatedSql &&
@@ -1590,12 +1585,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
   },
 
   /**
-   * Phase 4 — Schema-Drift Regen. When a plan step's actual schema
-   * doesn't match its predicted schema, the frontend posts the drift
-   * report here and we ask the LLM to regenerate just the affected
-   * downstream steps. The response is a list of `{ stepId, code,
-   * predictedSchema }` items the frontend dispatches to
-   * `replaceStepCode`.
+   * Regenerates downstream plan steps after schema drift. When a plan step's
+   * actual schema doesn't match its predicted schema, the frontend posts the
+   * drift report here and we ask the LLM to regenerate just the affected
+   * downstream steps.
    */
   "/:workspaceId/regenerate-plan": {
     POST: POST({

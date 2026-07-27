@@ -5,11 +5,10 @@ import type { ChatClarifyRequest } from "$/types/chat.types";
 import type { Table } from "dexie";
 
 /**
- * Per-clarification telemetry per the chat-interactive-workflows spec
- * (Phase 1). Records ONLY metadata about the clarification turn — not
- * the question text, not the user's answer. Lives in the same separate
- * Dexie database as the consent audit log so the two can share the
- * "Privacy log" page without a main-schema bump.
+ * Per-clarification telemetry for the Privacy Log. Records only metadata about
+ * the clarification turn, not the question text or the user's answer. Lives in
+ * the same separate Dexie database as the consent audit log so the two can
+ * share the Privacy Log page without a main-schema bump.
  */
 export type ClarificationOutcome =
   | "answered"
@@ -58,10 +57,10 @@ const PATTERN_LOCALE = "en";
 
 type AskedAt = { id: string; askedAtMs: number };
 
-/** In-memory link between a clarification shown and the entry id used
- *  to record it. The frontend records the question on display and updates
- *  the row on outcome — Dexie .add() + .update() rather than insert-only
- *  so we can fill in `timeToAnswerMs` and `outcome` together.
+/**
+ * In-memory link between a clarification shown and the entry id used to record
+ * it. The frontend records the question on display and updates the row on
+ * outcome, so we can fill in `timeToAnswerMs` and `outcome` together.
  */
 const PENDING = new Map<string, AskedAt>();
 
@@ -83,10 +82,8 @@ function _responseShape(
 export const ClarificationAuditLog = createModule("ClarificationAuditLog", {
   builder: () => {
     return {
-      /**
-       * Record the clarification at the moment it's shown to the user. Returns
-       * the row id so the caller can settle it later with `recordOutcome`.
-       */
+      // Record the clarification at the moment it's shown to the user. Returns
+      // the row id so the caller can settle it later with `recordOutcome`.
       recordShown: async (args: {
         workspaceId: string;
         threadId?: string;
@@ -94,7 +91,7 @@ export const ClarificationAuditLog = createModule("ClarificationAuditLog", {
       }): Promise<string> => {
         const id = uuid();
         const responseShape = _responseShape(args.request);
-        // For discovery the option count is unknown at "shown" time — it
+        // For discovery the option count is unknown at "shown" time; it
         // only becomes known after the discovery query resolves. Persist
         // null for now; future work can update it once the dropdown loads.
         const optionsCount =

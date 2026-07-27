@@ -9,7 +9,7 @@ import type { Table } from "dexie";
 /**
  * Dexie-backed audit log of every consent decision the user made.
  * Local-only, never synced. The "/settings/privacy/log" page renders
- * it back to the user — workspace owner / org-wide views are
+ * it back to the user. Workspace owner / org-wide views are
  * deliberately out of scope.
  *
  * Crucially: we never store the *values* that were approved. The audit
@@ -18,7 +18,7 @@ import type { Table } from "dexie";
  *
  * Kept in its own database (`AvandarConsentAuditDB`) rather than
  * inside the main `AvandarDB` so adding the table doesn't require
- * bumping the main Dexie version — those migrations are heavy and
+ * bumping the main Dexie version because those migrations are heavy and
  * risk blocking the rest of the app on a privacy-feature ship.
  */
 
@@ -180,17 +180,13 @@ export const ConsentAuditLog = createModule("ConsentAuditLog", {
         });
       },
 
-      /**
-       * Drop everything from the audit log. Triggered from the privacy log
-       * page so the user can purge their own history.
-       */
+      // Drop everything from the audit log. Triggered from the privacy log
+      // page so the user can purge their own history.
       clearConsentLog: async (): Promise<void> => {
         await db.consent.clear();
       },
 
-      /**
-       * Render the audit log as a CSV string for download.
-       */
+      // Render the audit log as a CSV string for download.
       consentLogToCsv: (entries: ConsentAuditEntry[]): string => {
         const header = [
           "id",

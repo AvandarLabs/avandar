@@ -121,11 +121,11 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
   and do not defer anything as an optional "follow-up" for the user to
   approve. There are no follow-ups in auto mode: if it breaks a rule, you fix
   it now. The only thing you may resolve non-interactively is the base branch
-  (default to `develop`, else `main`, else the repo's obvious trunk) — pick
+  (default to `develop`, else `main`, else the repo's obvious trunk), pick
   it and proceed rather than prompting.
 - Correctness is the top priority: when a fix is behavior-sensitive, make the
   change and prove it with the finish protocol below. Never trade correctness
-  for coverage, but never skip a fix merely because it is risky — do it and
+  for coverage, but never skip a fix merely because it is risky: do it and
   verify it.
 - Stay inside the requested review scope (the files/diff under review). Do not
   hunt for issues in unrelated, untouched code. Within that scope there is no
@@ -134,7 +134,7 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
   no reviewed line still breaks a rule.
 - The only findings you may leave unfixed are **verified false positives**: a
   documented exception, a linter rule this repo disables, or a rule that does
-  not actually apply once checked. These are not "skipped" work — record each
+  not actually apply once checked. These are not "skipped" work; record each
   with a one-line reason. Everything else gets fixed.
 
 **Finish protocol (auto mode always runs this, in order, without asking):**
@@ -148,7 +148,7 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
    attributable to the set of changes under review. Do **not** fix
    pre-existing errors that exist independently of this diff (confirm by
    checking the base branch or the untouched committed state when unsure);
-   those are genuinely out of scope — report them, do not fix them.
+   those are genuinely out of scope: report them, do not fix them.
 4. **Run the relevant tests** (see "Testing At The End Of Review") and get
    them green.
 5. **Re-verify.** Re-run the review's own checks (including any repo linters
@@ -162,7 +162,7 @@ code-review rule still broken on the reviewed lines. End with a summary of
 what you fixed plus a short list of any verified false positives (with the
 reason each is not a real violation). The summary must NOT contain a
 "recommended follow-up" section that punts real rule violations back to the
-user — in auto mode there are none.
+user; in auto mode there are none.
 
 ### Pair Review Mode
 
@@ -473,14 +473,14 @@ Check these first because they are the most frequent review findings:
   default: a second pass over an array (e.g. `.map().filter()`) is a negligible
   cost until N gets very large, so clarity wins. The **only** exceptions where
   an imperative loop is acceptable:
-  1. **Async sequencing** — you must `await` each iteration in order. `for...of`
+  1. **Async sequencing**: you must `await` each iteration in order. `for...of`
      with `await` is correct; `.map(async …)` + `Promise.all` runs in parallel
      (different semantics) and an awaiting `reduce` is unreadable.
-  2. **Early exit for performance** — you can stop before the end and the input
+  2. **Early exit for performance**: you can stop before the end and the input
      is large enough that scanning it fully matters. Prefer `.find` / `.some` /
      `.every` (they already short-circuit) when they express the intent; reach
      for a raw `for` + `break` only when those cannot.
-  3. **Large N in a hot path** — when N can realistically reach **~100,000+**
+  3. **Large N in a hot path**: when N can realistically reach **~100,000+**
      AND the code runs in a latency-sensitive path (event handler, render,
      keystroke), collapse a multi-pass chain (`.map().filter().map()`) into a
      single `for...of` / `reduce`. Below ~100k the extra pass is well under
@@ -707,7 +707,7 @@ sub-checklist file.
   met (no type/lint errors introduced by the changes; no reviewed line still
   breaks a rule). The only list you may include is **verified false
   positives**, each with a one-line reason. Do NOT list "remaining findings"
-  or "recommended follow-ups" that are real rule violations left unfixed —
+  or "recommended follow-ups" that are real rule violations left unfixed:
   auto mode fixes them all. The only unfixed items you may mention are
   pre-existing issues that are independent of the diff under review (and are
   therefore out of scope).

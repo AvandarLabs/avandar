@@ -15,7 +15,8 @@ type Props = {
 };
 
 /**
- * Mode A (`clean`): a simple "Send N values?" confirmation with no warnings.
+ * Renders the `clean` mode: a simple "Send N values?" confirmation with no
+ * warnings.
  */
 export function CleanPanel({
   totalCount,

@@ -254,10 +254,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
   const visualizationSettingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
-  /**
-   * Auto-open settings once on the first successful query when nothing is in
-   * session storage yet.
-   */
+  // Auto-open settings once on the first successful query when nothing is in
+  // session storage yet.
   const hasAutoOpenedVisualizationSettingsRef = useRef(
     hasDataExplorerPanelPreferencesInSessionStorage(),
   );

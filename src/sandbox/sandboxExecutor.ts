@@ -15,8 +15,8 @@
  * (round-tripping through the parent's `crossBoundary` if it leaves
  * the browser, but in our pipeline this stays inside the browser).
  *
- * **Status**: spec-aligned implementation. NOT yet externally
- * security-reviewed; gate user-facing exposure on that review.
+ * Security-sensitive implementation: keep user-facing exposure behind a
+ * product gate until this sandbox has had a dedicated security review.
  */
 
 import { prop } from "@utils";

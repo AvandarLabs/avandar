@@ -152,8 +152,8 @@ repo) so the output stays small and tied to the diff.
 
   **Per-hit decision** (apply to every candidate below): ask *is the
   `null` in a type signature I own, or am I only receiving it from
-  something external?* If it is in a signature you own — a local variable,
-  a parameter, a return type, or module state — it must be `undefined`
+  something external?* If it is in a signature you own, such as a local
+  variable, a parameter, a return type, or module state, it must be `undefined`
   unless an external signature at that same position forces `null`.
   Otherwise, normalize.
 

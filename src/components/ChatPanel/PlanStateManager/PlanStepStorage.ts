@@ -9,7 +9,7 @@ import type { Table } from "dexie";
  * `(planId, stepId)`. Materialising to IndexedDB (rather than only as a
  * DuckDB temp view) lets us:
  *
- *   1. Survive a page reload — DuckDB-WASM views are in-memory and die on
+ *   1. Survive a page reload. DuckDB-WASM views are in-memory and die on
  *      refresh. With the parquet on disk we can re-register the view in
  *      DuckDB on next load without re-running the upstream LLM call.
  *   2. Save the analysis. When the user persists a virtual dataset, we
@@ -37,7 +37,7 @@ export type PlanStepBlob = {
   parquet: Blob;
   schema: Array<{ name: string; type: string }>;
   rowCount: number;
-  /** Wall-clock save time. We TTL nothing here — clearing is explicit. */
+  /** Wall-clock save time. We TTL nothing here; clearing is explicit. */
   savedAt: number;
 };
 
@@ -95,15 +95,13 @@ export const PlanStepStorage = createModule("PlanStepStorage", {
         return await db.steps.where("planId").equals(planId).toArray();
       },
 
-      /**
-       * Clear all step blobs for one plan. Call this when the user closes the
-       * plan or when a new plan replaces the prior one.
-       */
+      // Clear all step blobs for one plan. Call this when the user closes the
+      // plan or when a new plan replaces the prior one.
       clearPlanStepBlobs: async (planId: string): Promise<void> => {
         await db.steps.where("planId").equals(planId).delete();
       },
 
-      /** Wipe the entire materialisation cache. */
+      // Wipe the entire materialisation cache.
       clearAllPlanStepBlobs: async (): Promise<void> => {
         await db.steps.clear();
       },
