@@ -22,7 +22,6 @@ import type {
 } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatPlan } from "$/types/chat.types";
 import type { CompositeTypes } from "$/types/database.types";
 import type { SetOptional } from "type-fest";
 
@@ -154,12 +153,6 @@ export const DatasetClient = createUsableServiceClient(
           datasetDescription: string;
           columns: DatasetColumnInput[];
           rawSql: string;
-          /**
-           * If the dataset was produced by a multi-step analytic plan,
-           * the plan as JSON. Persisted onto the virtual dataset so
-           * reopening it restores the canvas.
-           */
-          planSteps?: ChatPlan | null;
         }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertVirtualDataset");
           logger.log("Creating virtual dataset", params);
@@ -174,7 +167,6 @@ export const DatasetClient = createUsableServiceClient(
               return { ...col, description: col.description ?? null };
             }),
             p_raw_sql: params.rawSql,
-            p_plan_steps: params.planSteps ?? null,
           });
           logger.log("Successfully added virtual dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);

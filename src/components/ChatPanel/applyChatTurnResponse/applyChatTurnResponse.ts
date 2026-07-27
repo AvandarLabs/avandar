@@ -9,7 +9,6 @@ export type ApplyChatTurnResponseArgs = {
     queueDashboardBlock: (
       block: NonNullable<ChatResponse.T["dashboardBlock"]>,
     ) => void;
-    loadPlan: (plan: NonNullable<ChatResponse.T["plan"]>) => void;
     setPendingClarification: (
       clarification: ChatClarifyRequestWithAudit | undefined,
     ) => void;
@@ -31,10 +30,6 @@ export async function applyChatTurnResponse(
 
   if (response.dashboardBlock) {
     handlers.queueDashboardBlock(response.dashboardBlock);
-  }
-
-  if (response.plan && response.plan.steps.length > 0) {
-    handlers.loadPlan(response.plan);
   }
 
   if (response.clarification) {

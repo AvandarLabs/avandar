@@ -49,7 +49,6 @@ type AvaSqlBlockProps = {
 
 **Migrations to `AvaSqlBlock`:**
 
-- `src/components/ChatPanel/PlanFlowView/PlanStepSqlCode.tsx`
 - `src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx`
 - `src/components/SqlEditor/SqlQueryEditPanel.tsx`
 - `src/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge.tsx`

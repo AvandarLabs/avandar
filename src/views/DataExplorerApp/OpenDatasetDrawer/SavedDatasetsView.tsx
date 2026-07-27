@@ -115,9 +115,6 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       dataset: Dataset.T;
       virtualDataset: VirtualDataset.T;
     }) => {
-      // Virtual datasets open as their raw SQL. Plan rehydration (restoring an
-      // embedded chat plan from `planSteps`) lands with the chat-plan
-      // persistence feature; until then there is no plan to restore.
       onOpen(
         {
           datasetId: dataset.id,

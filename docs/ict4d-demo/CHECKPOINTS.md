@@ -27,7 +27,6 @@ Merged branches into `feat/ict4d-demo`:
 | 232         | `claude/disable-chat-visual-feedback-74FcL` | Visually disables the chat panel composer on screens where chat is not available.                                                     |
 | —           | `claude/add-series-support-734EZ`           | Multi-series visualization improvements (the "multi-series PR with visualization improvements" the user called out).                  |
 | —           | `claude/fix-tablet-responsiveness-MqAFc`    | Modernized media query syntax + tablet-scale verification script.                                                                     |
-| —           | `claude/add-python-r-execution-hKxZd`       | **Spec only** — only the chat-interactive-workflows design doc; no implementation.                                                    |
 
 ### Notable conflict resolutions
 
@@ -323,8 +322,6 @@ flow depends on.
 - Composite consent modal (Mode D)
 - Spanish + French pattern files (English-only for v1)
 - Clarification telemetry table
-- Phases 2–7 (discovery clarifications, plan DAG, schema drift, branching,
-  Python/R sandbox, context compression)
 
 ### Verification
 
@@ -954,13 +951,12 @@ User-facing demo runbook lives at
 
 ---
 
-## Checkpoint 9b — Chat workflows Phase 0/1 hardening + Phase 2 + Phase 3 (list view) ✅
+## Checkpoint 9b — Chat workflows Phase 0/1 hardening + Phase 2 ✅
 
 The spec at
 `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
-is 7 phases totalling ~16.5 engineer-weeks. This checkpoint closes
-the remaining Phase 0/1 gaps from Checkpoints 4/5, lands all of
-Phase 2, and ships Phase 3 as a list-based DAG view.
+documents the privacy and clarification phases. This checkpoint closes the
+remaining Phase 0/1 gaps from Checkpoints 4/5 and lands all of Phase 2.
 
 ### What shipped
 
@@ -985,133 +981,6 @@ Phase 2, and ships Phase 3 as a list-based DAG view.
 - `PendingClarificationBlock` routes the user's selection through
   `crossBoundary` with context `discovery_clarification` so PII
   detection fires on column name + content.
-
-**Phase 3 — Plans + DAG (v1 list view in this checkpoint; replaced
-with xyflow canvas in Checkpoint 10)**:
-
-- New `proposePlan` tool (≤8 steps, schema-validated server-side).
-- `PlanStateManager` + `planExecutor.ts` run each step in DuckDB-WASM
-  as a `step_<id>` temp view; failures short-circuit the rest.
-- `dropPlanTempViews` cleans up.
-
-### Caveats noted
-
-- Live-AI testing was impossible inside the container (`openrouter.ai`
-  not on the allowlist). Verification gated on the Vercel preview.
-
----
-
-## Checkpoint 10 — Chat workflows Phase 3 finish + Phase 4 + Phase 9 spec ✅
-
-Same spec as Checkpoint 9. This checkpoint replaces the list view
-with the visual xyflow canvas, adds IndexedDB step materialisation
-
-- virtual-dataset plan persistence, ships Phase 4 (schema-drift
-  regen) entirely, and adds a new Phase 9 architecture section to the
-  spec.
-
-### What shipped
-
-**Phase 3 — visual canvas**:
-
-- `@xyflow/react` DAG with MiniMap, pan + zoom, layered left-to-right
-  layout (`planLayout.ts`).
-- `RoughEdge.tsx` re-traces xyflow's bezier path through
-  `roughjs/svg` for Excalidraw-style hand-drawn arrows. Per-edge seed
-  derived from the edge id keeps the wobble stable across renders.
-- `PlanStepNode.tsx`: custom node with status icon, badge,
-  description, schema hint, inline error.
-- Animated `overview` ↔ `focused` zoom via `fitView({ duration })`
-  and `setCenter`. Click a node → 350ms zoom into it; toolbar exposes
-  a Zoom in / Zoom out toggle.
-- Auto / Step run-mode toggle in the toolbar.
-
-**Phase 3 — IndexedDB materialisation** (per the user's explicit
-"do NOT use OPFS" instruction):
-
-- New `planStepStorage.ts` owns `AvandarPlanStepDB`, a dedicated
-  Dexie database keyed by `(planId, stepId)`.
-- Every successful step writes its full parquet bytes there.
-- **Storage hygiene**: blobs are cleared explicitly via
-  `clearPlanStepBlobs(planId)` when a plan is closed, replaced, or
-  the chat runtime sees a new `proposePlan` response. Never
-  accumulated by TTL — explicit cleanup avoids storage bloat.
-
-**Phase 3 — virtual dataset plan persistence**:
-
-- New `plan_steps` JSONB column on `datasets__virtual` (migration +
-  declarative schema + RPC update at
-  `supabase/migrations/20260519154902_*` and
-  `..._plan_steps_rpc.sql`).
-- `SaveAsNewDatasetForm` captures the current plan when saving from
-  a multi-step analysis.
-- `SavedDatasetsView` calls `rehydratePlan()` when opening a virtual
-  dataset that has one. Each cached parquet blob is re-registered as
-  a DuckDB view via `loadParquet`; missing blobs are recomputed by
-  re-running the step's SQL.
-
-**Phase 4 — Schema-Drift Regen** (entire phase):
-
-- New `POST /chat/:workspaceId/regenerate-plan` endpoint with a
-  forced `regenerateSteps` tool call. Body: drift report + full
-  plan. Returns rewritten SQL + updated `predictedSchema` per
-  affected step.
-- Client: `isSchemaDrift` (strict — names + order + type
-  case-insensitive) + `findAffectedDownstream` (BFS over the input
-  graph). 11 unit tests + 4 graph tests.
-- `executePlan` accepts an optional `driftRegen` context. After each
-  step succeeds, the executor diffs predicted vs actual; on drift it
-  hits the regen endpoint, dispatches `replaceStepCode`, and re-runs
-  the affected steps in plan order.
-- Cap: ≤2 regen attempts per step, tracked locally per run.
-
-**Phase 9 — Canvas Annotation + Export** (architecture only, no
-implementation):
-
-- Added "Phase 9 — Canvas Annotation + Export" section to the spec
-  doc. Covers text / arrow / sticky / pen annotations persisted in
-  IndexedDB + onto virtual datasets, and PDF + image exports via
-  `@react-pdf/renderer` + `html-to-image`.
-
-### Testing
-
-- 145 vitest tests passing (was 60 at the start of Checkpoint 9).
-- `tsc -b --noEmit` clean.
-- `eslint .` clean.
-- `vite build` succeeds.
-
-### Live verification still pending
-
-None of Phase 3 / Phase 4 has been exercised against the real LLM or
-a real Vercel preview yet — same network restriction as Checkpoint 5.
-Three smoke checks gate Phase 5 work:
-
-1. Real `proposePlan` turn — canvas renders, steps run, zoom feels right.
-2. Real schema-drift case — force a wrong predicted schema, watch
-   the regen endpoint fire.
-3. Save → close → reopen a multi-step plan as a virtual dataset.
-
-### Deferred from Checkpoint 10 (tracked in FEATURE_CHECKLIST.md)
-
-- Phase 0: `containsHealthData` workspace UI; opt-in
-  `shareAnonymousPrivacyMetrics`; server-issued ack-token nonce
-  registry (replay protection is in-memory today).
-- Phase 1: silent bias re-prompt loop; 20-question eval set.
-- Phase 2: ack-token signing for `values` scope (text scope is fine);
-  "Edit selection" hook on the consent modal.
-- Phase 3: viz **thumbnails** on each plan node (currently shows
-  schema text, not mini-charts).
-- Cross-cutting: 50-question eval harness; prompt versioning;
-  Spanish + French bias patterns themselves.
-
-### Doc cleanup
-
-- `docs/demo-features/chat-interactive-workflows.md` was removed in
-  Checkpoint 10. The spec at
-  `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
-  is the only source of architecture truth; granular status lives in
-  `docs/ict4d-demo/FEATURE_CHECKLIST.md`; what-shipped-when lives in
-  this file.
 
 ---
 
@@ -1438,9 +1307,8 @@ New toolbar button `ExportPdfButton` next to Publish. Opens
 
 Choice of libraries: `html2canvas` + `jspdf` is the most reliable
 combination for snapshotting React + Recharts SVG content; both are
-established and synchronous to integrate. RoughJS was already in the
-tree (used by `RoughEdge` in the chat plan canvas) and gives us the
-"sketch-like" stroke style for free without a heavier canvas library.
+established and synchronous to integrate. RoughJS provides the
+"sketch-like" stroke style without a heavier canvas library.
 
 Analytics: new `dashboard.pdf_export_opened` event registered in
 `analyticsEventTypes.ts` and fired when the modal opens.
@@ -1688,138 +1556,6 @@ standalone declarations, matching the pattern V2 already used.
 
 ---
 
-## Checkpoint 15 — Chat workflows Phase 5 + Phase 6 (Python) + Phase 9 + plan approval gate ✅
-
-Continuing the chat-interactive-workflows spec. This checkpoint
-lands Phase 5 (branching foundation), Phase 6 (Python sandboxed
-executor — R deferred to a follow-up), Phase 9 (canvas annotations
-
-- PDF/image export), and the plan-approval gate the spec called
-  out but Phase 3 had silently skipped.
-
-### What shipped
-
-**Plan approval gate**
-
-- `PlanState.approvalStatus`: `awaiting_approval | approved | rejected`.
-  Fresh `loadPlan` lands in `awaiting_approval`; `hydratePlan` (used
-  for virtual-dataset reopen) lands in `approved`.
-- `PlanFlowView` shows an Approve / Reject banner before any step
-  runs. The auto-run effect AND the Re-run button both gate on
-  `approvalStatus === "approved"`.
-- > 7-SQL-step heuristic: when a plan would need >7 SQL steps, the
-  > approval banner suggests reconsidering Python / R — but the user
-  > can approve as-is.
-
-**System prompt — multi-language hints**
-
-- `dataExplorerSystemPrefix` updated: prefer SQL even for multi-step
-  plans; reach for Python / R only for statistical work
-  (regressions, scikit-learn, statsmodels, tidyverse) or heavy
-  dataframe-style transformations.
-- Documented the sandbox calling convention: each `inputs` upstream
-  becomes a local pandas DataFrame named after its `step_<id>`;
-  step code must assign the final result to `result`.
-
-**Phase 5 — Branching**
-
-- New `PlanBranchStateManager` (sibling of `PlanStateManager`)
-  holding `Record<branchPlanId, BranchRecord>` + `activeBranchId`.
-  Each `BranchRecord` carries the parent plan + step ids, anchor
-  schema, anchor view name, branch title, and a (lazy-filled)
-  `plan` + `statuses` snapshot.
-- `PlanStateManager.addBranch` attaches a `PlanBranchRef` onto the
-  parent node so the node renderer can show its child branches.
-- `PlanBranchSidebar` lists Root + every branch with the active
-  one highlighted. X button closes a branch.
-- "Branch from here" CTA in the focused-step detail (only on
-  succeeded steps).
-- **Deferred** (logged in FEATURE_CHECKLIST): separate assistant-ui
-  chat thread per branch, virtual-dataset persistence of the branch
-  tree.
-
-**Phase 6 — Python + R Sandboxed Executor (Python only — R deferred)**
-
-- New `public/sandbox-executor.html`: same-origin iframe loaded with
-  `sandbox="allow-scripts"` (null opaque origin) and strict CSP
-  (`default-src 'none'`, `connect-src https://cdn.jsdelivr.net`,
-  every other network surface forbidden). Pre-boot stubs additionally
-  throw on `XMLHttpRequest`, `WebSocket`, `EventSource`,
-  `RTCPeerConnection`; `sendBeacon` is neutered.
-- `src/sandbox/sandboxProtocol.ts` is the single source of truth
-  for the wire format. Every request carries a `sandboxKey`
-  discriminator so rogue messages from extensions get dropped.
-- `src/sandbox/sandboxExecutor.ts` runs inside the iframe: lazy
-  loads Pyodide from jsdelivr (~10 MB), preloads `pyarrow`,
-  `pyarrow.parquet`, `pandas`, exposes `read_input(name)` /
-  `write_output(df)` helpers, and reads each input view as parquet.
-- `src/sandbox/sandboxClient.ts` is the parent-side client.
-  Mounts the iframe lazily on first call, waits for ready+boot,
-  posts `run` requests, and serialises concurrent runs (Pyodide is
-  single-threaded).
-- `executePlanStep` updated: SQL steps stay on the DuckDB-WASM
-  path; `python`/`r` steps pull each upstream view out of DuckDB as
-  parquet, dispatch to the sandbox, and bring the result back via
-  the existing `loadParquet`.
-- Default timeout: 30s per run, caller-overridable.
-- WebR is deferred to a follow-up — only Python is registered in
-  `availableRuntimes` today. R steps return an error from the
-  sandbox.
-- **NOT YET externally security-reviewed.** The iframe + CSP stack
-  is spec-correct, but per the design doc, "external security
-  review signed off" is in the Definition of Done. Gate user
-  exposure on that review.
-
-**Phase 9 — Canvas Annotation + Export (entire phase)**
-
-- `PlanAnnotationStateManager` with four annotation types — text,
-  sticky, arrow, stroke (perfect-freehand pen strokes).
-- `PlanCanvasToolbar` floating on the canvas top-left: Pan / Text /
-  Sticky / Arrow / Pen / Erase tools, colour swatches, undo / redo
-  (Ctrl+Z / Ctrl+Shift+Z), Export menu.
-- `PlanAnnotationOverlay` renders annotations in canvas space,
-  shares the xyflow viewport's pan/zoom transform, and gates
-  pointer events on the active tool. Pan tool → xyflow handles the
-  drag; any drawing tool → overlay captures.
-- Arrows use the same RoughJS sketch style as the auto-laid-out
-  plan edges, so user-drawn arrows visually match the AI ones.
-- 50-deep undo/redo stack with snapshot-based history.
-- `AvandarPlanAnnotationDB` Dexie database (separate from the step
-  parquet keyspace) persists annotations across reloads.
-- PNG export via `html-to-image` — toolbar / minimap / controls are
-  filtered out of the capture.
-- PDF export via dynamic-imported `@react-pdf/renderer` — page 1
-  is the overview image, then one page per step with description,
-  code, status badge, schema, row count.
-- 4 unit tests for the state manager (add / undo / redo / clear-
-  plan-only).
-
-### Testing
-
-- 27 chat-panel vitest tests passing (8 new): branch manager (4) +
-  annotation manager (4) + existing tests unchanged.
-- `tsc -b --noEmit` clean for all new code (the pre-existing
-  DashboardApp/AvaPageDataMigrationV3 errors from Checkpoint 10
-  remain; not introduced by this checkpoint).
-- `eslint .` clean.
-- `vite build` succeeds (the new chunk surfaces in the build output
-  as `PlanBranchStateManager-*.js` and `@react-pdf` lazy-imports).
-- Live verification (real LLM, real sandbox, real Pyodide load,
-  real DuckDB-WASM round-trip) still gated on the Vercel preview
-  per the constraints described in Checkpoint 10.
-
-### Deferred from Checkpoint 11 (tracked in FEATURE_CHECKLIST.md)
-
-- Phase 5: per-branch chat thread orchestration; virtual-dataset
-  persistence of branches.
-- Phase 6: WebR / R runtime; external security review; stdout/stderr
-  UI panel (currently parent-console only).
-- Phase 9: virtual-dataset persistence of annotations; per-annotation
-  drag-to-move + sticky resize handles.
-- Phase 7 (Context Compression) — not started.
-
----
-
 ## Checkpoint 16 — Manual query form in dashboards (#21 + dashboards-side of #6) ✅
 
 The Data Explorer's manual query form is now available inside the
@@ -1915,19 +1651,12 @@ SQL ↔ manual-query-form sync).
 
 ## What to do next (recommended order)
 
-1. **Live-verify Checkpoint 10 on the Vercel preview** (see "Live
-   verification still pending" above). No new chat-workflows phase
-   work should start before this.
-2. **Close the Phase 1 bias re-prompt gap** — small, ~2 hours,
+1. **Close the Phase 1 bias re-prompt gap** — small, ~2 hours,
    closes the last gap in Phase 1's Definition of Done.
-3. **Phase 5 — Branching** — ~1.5 weeks per spec. State model is
-   small; bulk of work is assistant-ui thread management.
-4. **Phase 7 — Context Compression** — ~1 week. Pairs naturally
-   with Phase 5 (branching adds tokens fast).
-5. **Phase 6 — Python + R Sandboxed Executor** — ~5 weeks + external
-   security review. Defer until 5 + 7 land.
-6. **Phase 9 — Annotation + Export** — ~1.5 weeks. Independent of
-   Phases 5–7; can be picked up whenever.
+2. **Finish Phase 2 acknowledgement signing** for value-shaped
+   clarification payloads.
+3. **Add the consent modal edit-selection hook** for discovery
+   clarification answers.
 
 Smaller gaps to close opportunistically (see FEATURE_CHECKLIST.md for
 the canonical granular list):
@@ -1936,7 +1665,6 @@ the canonical granular list):
   setting; server-issued ack-token nonce registry.
 - Phase 2: ack-token signing for `values` scope; consent modal "Edit
   selection" hook.
-- Phase 3: viz thumbnails on plan nodes.
 - Cross-cutting: 50-question eval harness; prompt versioning;
   Spanish + French bias patterns themselves.
 

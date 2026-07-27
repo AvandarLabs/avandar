@@ -7,18 +7,11 @@ import type {
   ChatRetryContext,
   ChatSessionSecretResponse,
   ConsentAck,
-  RegeneratePlanResponse,
-  SchemaDriftReport,
 } from "$/types/chat.types.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",
-  [
-    "/models",
-    "/:workspaceId/messages",
-    "/:workspaceId/regenerate-plan",
-    "/:workspaceId/session-secret",
-  ],
+  ["/models", "/:workspaceId/messages", "/:workspaceId/session-secret"],
   {
     "/models": {
       GET: {
@@ -41,18 +34,6 @@ export type ChatAPI = APITypeDef<
           retryContext?: ChatRetryContext;
         };
         returnType: ChatResponse.T;
-      };
-    };
-    "/:workspaceId/regenerate-plan": {
-      POST: {
-        pathParams: {
-          workspaceId: string;
-        };
-        body: {
-          driftReport: SchemaDriftReport;
-          model?: string;
-        };
-        returnType: RegeneratePlanResponse;
       };
     };
     "/:workspaceId/session-secret": {

@@ -6,9 +6,9 @@
  *
  * ## Dropped vs online chat (`chat.routes.ts`)
  *
- * - Tools: `generateSql`, `clarify` (incl. discovery DISTINCT), `proposePlan`,
+ * - Tools: `generateSql`, `clarify` (including discovery DISTINCT), and
  *   `addDashboardBlock` (non-SQL blocks)
- * - Long persona, plan regen, full spatial extension doc
+ * - Long persona and the full spatial extension documentation
  *
  * ## Privacy (not applicable offline)
  *

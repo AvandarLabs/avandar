@@ -505,7 +505,6 @@ export type Database = {
           created_at: string
           dataset_id: string
           id: string
-          plan_steps: Json | null
           raw_sql: string
           updated_at: string
           workspace_id: string
@@ -514,7 +513,6 @@ export type Database = {
           created_at?: string
           dataset_id: string
           id?: string
-          plan_steps?: Json | null
           raw_sql: string
           updated_at?: string
           workspace_id: string
@@ -523,7 +521,6 @@ export type Database = {
           created_at?: string
           dataset_id?: string
           id?: string
-          plan_steps?: Json | null
           raw_sql?: string
           updated_at?: string
           workspace_id?: string
@@ -1557,7 +1554,6 @@ export type Database = {
           p_dataset_description: string
           p_dataset_id: string
           p_dataset_name: string
-          p_plan_steps?: Json
           p_raw_sql: string
           p_workspace_id: string
         }

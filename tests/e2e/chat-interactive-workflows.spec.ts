@@ -4,21 +4,8 @@ import {
   getChatComposerInput,
   openChatPanelIfClosed,
 } from "./helpers/chatPanelFlow";
-import {
-  EXPECTED_CSV_COLUMN_NAMES,
-  formatImportPreviewRowCount,
-  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  SMALL_CALIFORNIA_CSV_PATH,
-} from "./helpers/constants";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
-import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
-import {
-  ensureCloudStorageCheckedAndSaveDataset,
-  parseDatasetIdFromDataManagerUrl,
-  pollUntilCloudDatasetToggleShowsOnline,
-} from "./helpers/manualUploadCloudSyncFlow";
-import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
-import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
  * E2E coverage for the chat-interactive-workflows feature
@@ -32,9 +19,8 @@ import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
  *   1. Money / determinism — running these against the real model
  *      would cost a fraction of a cent per turn but introduce
  *      flakiness via temperature.
- *   2. Coverage — by controlling the response we can force the
- *      `clarify` (free-text + fixed_options + discovery) and
- *      `proposePlan` tools to fire whenever we want.
+ *   2. Coverage: by controlling the response we can force each
+ *      `clarify` response shape to appear whenever we want.
  *
  * The "is the real LLM emitting tool calls correctly" question is
  * answered by the manual Playwright walkthrough in
@@ -52,18 +38,6 @@ type ChatResponse = {
       | { kind: "fixed_options"; options: string[]; multi: boolean }
       | { kind: "discovery"; query: string; column: string; multi: boolean };
     turnNumber: 1 | 2 | 3;
-  };
-  plan?: {
-    steps: Array<{
-      id: string;
-      description: string;
-      type: "sql" | "python" | "r" | "clarification";
-      code: string;
-      inputs: string[];
-      predictedSchema: Array<{ name: string; type: string }>;
-      defaultViz?: string;
-    }>;
-    rootMessage: string;
   };
 };
 
@@ -101,51 +75,6 @@ async function mountMockChat(args: {
       contentType: "application/json",
       body: JSON.stringify(response),
     });
-  });
-}
-
-async function uploadCsvAndOpenChat(args: {
-  page: import("@playwright/test").Page;
-  workspaceSlug: string;
-}): Promise<void> {
-  const { page, workspaceSlug } = args;
-
-  await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-
-  const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-  await uploadPanel
-    .locator('input[type="file"]')
-    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
-
-  await expect(
-    page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
-
-  const formattedPreviewRowCount = formatImportPreviewRowCount(
-    SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  );
-  await expect(
-    page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
-  ).toBeVisible({ timeout: LONG_WAIT });
-
-  await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-
-  await Promise.all(
-    EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
-      await expect(
-        page.getByRole("columnheader", { name: columnName }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }),
-  );
-
-  await expect(page.getByText("California").first()).toBeVisible({
-    timeout: SHORT_WAIT,
   });
 }
 
@@ -307,136 +236,5 @@ test.describe("chat interactive workflows", () => {
     expect(lastUserMessage).toContain(
       "[Clarification answer: (custom answer: Western corridor)]",
     );
-  });
-
-  test("proposePlan renders a multi-step plan that auto-runs against DuckDB", async ({
-    page,
-    e2eWorkerDb,
-  }) => {
-    const admin = createSupabaseAdminClient();
-    let datasetId = "";
-
-    try {
-      await signInWithEmailPassword(page, {
-        email: e2eWorkerDb.primaryUser.email,
-        password: e2eWorkerDb.primaryUser.password,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-
-      await uploadCsvAndOpenChat({
-        page,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      await ensureCloudStorageCheckedAndSaveDataset({
-        page,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      const parsedDatasetId = parseDatasetIdFromDataManagerUrl({
-        url: page.url(),
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      if (!parsedDatasetId) {
-        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-      }
-      datasetId = parsedDatasetId;
-
-      await mountMockChat({
-        page,
-        responder: () => {
-          return {
-            assistantText:
-              "Filter to confirmed cases, then aggregate by date, then plot.",
-            plan: {
-              rootMessage:
-                "Filter to confirmed cases, then aggregate by date, then plot.",
-              steps: [
-                {
-                  id: "filter_rows",
-                  description: "Keep only confirmed cases",
-                  type: "sql",
-                  code: `SELECT * FROM "${datasetId}" LIMIT ${SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT}`,
-                  inputs: [],
-                  predictedSchema: [
-                    { name: "Province_State", type: "varchar" },
-                  ],
-                },
-                {
-                  id: "aggregate",
-                  description: "Aggregate by day",
-                  type: "sql",
-                  code: `SELECT COUNT(*)::INTEGER AS "y" FROM "step_filter_rows"`,
-                  inputs: ["filter_rows"],
-                  predictedSchema: [{ name: "y", type: "integer" }],
-                },
-              ],
-            },
-          };
-        },
-      });
-      await pollUntilCloudDatasetToggleShowsOnline(page);
-      await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`, {
-        waitUntil: "domcontentloaded",
-      });
-      await dismissBlockingOverlays(page);
-      await page.getByRole("button", { name: /^open$/i }).click();
-      const openModal = page.getByRole("dialog", { name: /open dataset/i });
-      await openModal
-        .getByRole("option", { name: /small-california-covid-sample\.csv/i })
-        .click();
-      await openModal
-        .getByRole("button", {
-          name: /open small-california-covid-sample\.csv/i,
-        })
-        .click();
-      await dismissBlockingOverlays(page);
-      await expect
-        .poll(
-          async () => {
-            return page
-              .getByRole("columnheader", {
-                name: "Province_State",
-                exact: true,
-              })
-              .isVisible();
-          },
-          { timeout: LONG_WAIT },
-        )
-        .toBe(true);
-
-      await openChatPanelIfClosed(page);
-
-      const composer = getChatComposerInput(page);
-      await composer.fill("Break this analysis into steps");
-      await composer.press("Enter");
-
-      // The plan view renders with the root message + two step cards
-      await expect(page.getByText("Analytic plan")).toBeVisible({
-        timeout: MEDIUM_WAIT,
-      });
-      await expect(page.getByText("Keep only confirmed cases")).toBeVisible();
-      await expect(page.getByText("Aggregate by day")).toBeVisible();
-
-      await dismissBlockingOverlays(page);
-      const approveButton = page.getByRole("button", {
-        name: "Approve and run",
-      });
-      await expect(approveButton).toBeVisible({ timeout: MEDIUM_WAIT });
-      await approveButton.evaluate((node) => {
-        (node as { click: () => void }).click();
-      });
-
-      // Both steps should eventually succeed after approval (auto-run is
-      // default)
-      await expect(
-        page.getByText("All steps succeeded.", { exact: false }),
-      ).toBeVisible({ timeout: LONG_WAIT });
-    } finally {
-      if (datasetId) {
-        await deleteDatasetAndShares({
-          supabaseAdminClient: admin,
-          datasetId,
-        });
-      }
-    }
   });
 });

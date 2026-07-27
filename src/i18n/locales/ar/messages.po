@@ -41,7 +41,7 @@ msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى "
 "جميع الأعمدة."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "ترتيب حسب"
 
@@ -147,7 +147,7 @@ msgstr "رابط المصدر"
 msgid " access"
 msgstr "الوصول"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "لا يمكن عرض {chartName}."
 
@@ -156,7 +156,7 @@ msgid "Allow online syncing"
 msgstr "السماح بالمزامنة عبر الإنترنت"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "إعدادات الرسم البياني"
 
@@ -219,6 +219,12 @@ msgstr "توسيع"
 msgid "Notes"
 msgstr "ملاحظات"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "دور مخصص"
@@ -240,15 +246,11 @@ msgstr "يجب نقل الأعضاء المعينين لهذه المجموعة 
 msgid "Delete failed"
 msgstr "فشل الحذف"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "رفض"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "فتح"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
 msgstr "التجميعات"
 
@@ -358,9 +360,13 @@ msgid "A local record of every clarifying question the AI has asked in this "
 msgstr "سجل محلي لكل سؤال توضيحي طرحه الذكاء الاصطناعي في هذه المساحة العمل. "
 "يتم تخزين البيانات الوصفية فقط — وليس نص السؤال أو إجابتك."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
 msgstr "لا يمكن عرض {chartName}"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset failed to process"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -397,7 +403,7 @@ msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط
 "عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك، "
 "يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
 msgstr "أضف أعمدة إلى الاستعلام أعلاه لبدء تعريف الفلاتر."
 
@@ -462,7 +468,7 @@ msgstr "تم تحديث مجموعة الأدوار"
 msgid "No matches"
 msgstr "لا توجد تطابقات"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "احتفظ بـ SQL كما هو"
 
@@ -501,10 +507,6 @@ msgstr "تحديث كلمة المرور لـ {0}"
 msgid "Column info"
 msgstr "معلومات العمود"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "مدخل خطوة الخطة"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود الذكاء الاصطناعي"
@@ -513,10 +515,6 @@ msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود ال�
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF (صفحات متعددة)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -553,10 +551,6 @@ msgstr "من مجموعة البيانات المشتقة"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "اختيار فردي"
-
-#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
-msgid "Processing — {eta} remaining"
-msgstr "جارٍ المعالجة — {eta} المتبقية"
 
 #: src/routes/register.tsx
 msgid "However, we are not allowing new registrations at the moment."
@@ -652,10 +646,6 @@ msgstr "البيانات الوصفية"
 msgid "Range"
 msgstr "النطاق"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "إغلاق الفرع"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "أدخل البريد الإلكتروني"
@@ -721,10 +711,6 @@ msgstr "إغلاق الدردشة (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "فشل الإنشاء"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "فشل"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -800,11 +786,6 @@ msgstr "التسمية"
 msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
-"canvas."
-msgstr "تم رفض الخطة. اطلب من الدردشة اقتراح خطة مختلفة، أو أغلق هذه اللوحة."
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "مفقود"
@@ -818,8 +799,8 @@ msgstr "انحراف معياري واحد حول المتوسط"
 msgid "Name column"
 msgstr "عمود الاسم"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "يتم الافتراض على \"Y مقابل X\""
 
@@ -897,26 +878,13 @@ msgstr "/شهر"
 msgid "Filters for this chart"
 msgstr "الفلاتر لهذا الرسم البياني"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "فرع من هنا"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "تم تخطيه"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "فشل الاستعلام."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "تراجع"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "فرع من \"{truncated}\""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -995,10 +963,6 @@ msgstr "كتالوج البيانات المفتوحة العامة لا يزا�
 "يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، "
 "<2>أخبرنا</2>!"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "مسح"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "تم الكشف عن معلومات صحية"
@@ -1057,17 +1021,9 @@ msgstr "أدخل اسمًا للحقل"
 msgid "Select Plan"
 msgstr "اختر خطة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "اللون {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "القيمة الافتراضية (اختياري)"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "تكبير"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1125,7 +1081,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته، واسم العمود في اللوحة "
 "الجانبية."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1164,13 +1120,6 @@ msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! �
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the "
-"dataset, so it can be reopened on the canvas."
-msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث "
-"يمكن إعادة فتحه على اللوحة."
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
@@ -1179,7 +1128,7 @@ msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspa
 msgid "Suggested:"
 msgstr "مقترح:"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "استبدال SQL بتغييرات النموذج"
 
@@ -1190,10 +1139,6 @@ msgstr "لم تتطابق مجموعة البيانات مع المخطط الم
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "خطة تحليلية"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1207,6 +1152,11 @@ msgstr "تم تحميل الملف جزئيًا"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "طرق الدفع"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1249,11 +1199,6 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء "
 "الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
 
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "من الخطوة {0}"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "المسح إلى:"
@@ -1274,6 +1219,10 @@ msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه. س�
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Used suggestion"
 msgstr "اقتراح مستخدم"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" finished processing and is ready to use."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1332,29 +1281,21 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
 "المبكر."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "خطوة"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "الأقصى"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "جاهز"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "استيراد البيانات"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Descending"
 msgstr "تنازلي"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "محور الفئة"
 
@@ -1398,10 +1339,10 @@ msgstr "معرّف مساحة العمل"
 msgid "Generate a query to configure this visualization."
 msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Select a column"
 msgstr "اختر عمودًا"
@@ -1417,11 +1358,7 @@ msgstr "قم بالتعليق، ثم التصدير"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "فروع الخطة"
-
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور "
@@ -1439,9 +1376,9 @@ msgstr "بحث عن النماذج"
 msgid "Cannot sync this entity"
 msgstr "لا يمكن مزامنة هذا الكيان"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "إزالة السلاسل"
 
@@ -1469,7 +1406,7 @@ msgstr "الأضيق"
 msgid "Graphite"
 msgstr "جرافيت"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "not in"
 msgstr "ليس في"
 
@@ -1546,10 +1483,6 @@ msgstr "نطاق البيانات"
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "حذف التعليق"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "إلى"
@@ -1590,7 +1523,7 @@ msgstr "فشل تحميل الملف الشخصي"
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "أنت حاليًا على خطة <0>{currentFeaturePlanName}</0>."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Result size"
 msgstr "حجم النتيجة"
 
@@ -1794,7 +1727,7 @@ msgstr "تأكيد الإجراء"
 msgid "Data Preview"
 msgstr "معاينة البيانات"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "ليس فارغًا"
 
@@ -1831,10 +1764,6 @@ msgstr "تم حفظ اللوحة بنجاح!"
 msgid "N/A"
 msgstr "غير متوفر"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "تكبير"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "مدير عالمي"
@@ -1859,6 +1788,10 @@ msgstr "نقطة البيانات"
 msgid "Back to editor"
 msgstr "العودة إلى المحرر"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about a minute"
+msgstr ""
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
 msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة العمل."
@@ -1870,10 +1803,6 @@ msgstr "يرجى التحقق من بريدك الإلكتروني"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
 msgstr "لم يتمكن من التقاط اللوحة"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "صورة PNG"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
@@ -1907,17 +1836,13 @@ msgstr "فكر في إعادة صياغة"
 msgid "Add people or user groups"
 msgstr "إضافة أشخاص أو مجموعات مستخدمين"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Size column"
 msgstr "عمود الحجم"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
 msgstr "القيم"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(فرع بلا عنوان)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -1948,7 +1873,7 @@ msgstr "رمز الاستجابة السريعة"
 msgid "Role"
 msgstr "الدور"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "فارغ"
 
@@ -1995,7 +1920,7 @@ msgstr "الدردشة مفعلة في مستكشف البيانات ولوحا�
 msgid "Forgot your password?"
 msgstr "نسيت كلمة المرور؟"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "شريط"
 
@@ -2029,7 +1954,6 @@ msgstr "لا توجد حقول"
 msgid "Failed to update workspace name"
 msgstr "فشل في تحديث اسم مساحة العمل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "تصدير"
@@ -2044,16 +1968,6 @@ msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "معاينة:"
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
-"whether a Python or R step would express this more cleanly. You can "
-"still approve as-is. Nothing has run yet. Click each node to read it; "
-"approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة — هذا الكثير من SQL. فكر فيما "
-"إذا كانت خطوة Python أو R ستعبر عن ذلك بشكل أنظف. يمكنك الموافقة كما "
-"هي. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2096,14 +2010,6 @@ msgstr "تم التنزيل على هذا المتصفح"
 msgid "Pay monthly"
 msgstr "الدفع شهريًا"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "إعادة التشغيل"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "إعادة"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "اختر نموذجًا"
@@ -2145,7 +2051,7 @@ msgid "Data"
 msgstr "البيانات"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
-#: src/lib/offline/useOfflineGate.ts
+#: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
 msgid "Unavailable offline"
 msgstr "غير متاح دون اتصال"
 
@@ -2197,6 +2103,10 @@ msgstr "{0} تم حذفه من هذا المتصفح."
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة "
 "أخرى لاحقًا."
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "less than a minute"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2310,19 +2220,13 @@ msgstr "إجابة توضيحية"
 msgid "Generated SQL"
 msgstr "SQL المُولد"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Maximum rows to return"
 msgstr "الحد الأقصى لعدد الصفوف للعودة"
 
 #: src/routes/update-password.tsx
 msgid "Password update failed"
 msgstr "فشل تحديث كلمة المرور"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart "
-"from the top."
-msgstr "فشل خطوة. انقر على العقدة الحمراء لإعادة المحاولة، أو استخدم إعادة "
-"التشغيل للبدء من الأعلى."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2366,16 +2270,12 @@ msgstr "إضافة مجموعة البيانات إلى مساحة العمل"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "فريد إلى حد كبير: <0>{0}</0> قيم مميزة عبر <1>{1}</1> صفوف."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "تشغيل الخطوة"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
 msgstr "قم بتشغيل استعلام AI أولاً."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "عمود Y"
 
@@ -2431,7 +2331,7 @@ msgstr "نطاق الأرقام"
 msgid "Columns"
 msgstr "الأعمدة"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
 msgstr "هل تريد الكتابة فوق SQL؟"
 
@@ -2489,11 +2389,6 @@ msgstr "مجموعة البيانات"
 msgid "Remove failed"
 msgstr "إزالة فاشلة"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} أعمدة"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2521,7 +2416,7 @@ msgstr "النهاية (على سبيل المثال 2024-12-31)"
 msgid "No datasets match your search."
 msgstr "لا توجد مجموعات بيانات تتطابق مع بحثك."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "in"
 msgstr "في"
 
@@ -2537,13 +2432,8 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "الخطة الجذرية"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -2570,11 +2460,7 @@ msgstr "اسم العمود"
 msgid "Sent password reset email"
 msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "إعادة (Ctrl+Shift+Z)"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
 msgstr "اختر العمود للفرز حسبه"
 
@@ -2607,11 +2493,11 @@ msgstr "غابة"
 msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "سلسلة"
 
@@ -2633,17 +2519,13 @@ msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخر�
 msgid "Purchase {seatsToAdd} seat"
 msgstr "شراء {seatsToAdd} مقعد"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "فتح على اللوحة"
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى المحاولة مرة أخرى لاحقًا أو "
 "التواصل مع الدعم."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 msgstr "لا يمكن عرض {chartName} لأنه يوجد محاور أو سلاسل مفقودة."
@@ -2675,7 +2557,7 @@ msgstr "توضيحات"
 msgid "Entity deleted"
 msgstr "تم حذف الكيان"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns"
 msgstr "اختر الأعمدة"
 
@@ -2732,8 +2614,8 @@ msgstr "فشل تسجيل الخروج"
 msgid "You have successfully connected to {0}"
 msgstr "لقد اتصلت بنجاح بـ {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
 msgstr "عمود X"
 
@@ -2783,7 +2665,7 @@ msgstr "الأكثر شيوعًا"
 msgid "Passwords do not match"
 msgstr "كلمات المرور غير متطابقة"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
@@ -2834,11 +2716,6 @@ msgstr "عدد الصفوف التي سيتم تخطيها"
 msgid "From CSV"
 msgstr "من CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} صفوف{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "دقيقة"
@@ -2859,10 +2736,6 @@ msgstr "تمت إزالة نموذج الدردشة غير المتصل"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "أداة"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "جارٍ التشغيل…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -2890,9 +2763,9 @@ msgstr "اختر واحدًا"
 msgid "No fields have been added"
 msgstr "لم تتم إضافة أي حقول"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
 msgstr "ما هي السلسلة؟"
 
@@ -2958,7 +2831,7 @@ msgstr "لم يتمكن من إزالة نموذج الدردشة غير الم�
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Direction"
 msgstr "الاتجاه"
 
@@ -2999,9 +2872,9 @@ msgstr "تم الكشف"
 msgid "Delete Dataset"
 msgstr "حذف مجموعة البيانات"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add series"
 msgstr "إضافة سلسلة"
 
@@ -3048,8 +2921,8 @@ msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} 
 msgid "System sans"
 msgstr "نظام بدون"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "تسمية السلسلة"
 
@@ -3145,7 +3018,7 @@ msgstr "{0}ثانية"
 msgid "Please fix the highlighted fields."
 msgstr "يرجى إصلاح الحقول المميزة."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "between"
 msgstr "بين"
 
@@ -3161,7 +3034,7 @@ msgstr "جميع الأعضاء في "
 msgid "Some data should be manually entered"
 msgstr "يجب إدخال بعض البيانات يدويًا"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على محور Y. اختر محور X أدناه."
@@ -3187,16 +3060,15 @@ msgstr "جارٍ تحميل النماذج..."
 msgid "Update frequency"
 msgstr "تكرار التحديث"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" could not be parsed: {message}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "السماح بالمزامنة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "ملاحظة لاصقة"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "تصاعدي"
 
@@ -3266,10 +3138,6 @@ msgstr "تصفية"
 msgid "This cannot be undone."
 msgstr "لا يمكن التراجع عن هذا."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "الموافقة والتشغيل"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "يجب أن يكون اسم مجموعة البيانات مكونًا من حرفين على الأقل."
@@ -3291,7 +3159,7 @@ msgstr "إعادة تعيين"
 msgid "Enter a name for this profile type"
 msgstr "أدخل اسمًا لهذا النوع من الملف الشخصي"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "المنطقة"
 
@@ -3299,7 +3167,7 @@ msgstr "المنطقة"
 msgid "No fields have been configured yet"
 msgstr "لم يتم تكوين أي حقول بعد"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "does not contain"
 msgstr "لا يحتوي على"
 
@@ -3340,7 +3208,12 @@ msgstr "هذا {resource} مشترك مع: "
 msgid "Upload"
 msgstr "رفع"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#. placeholder {0}: eta.minutes
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about {0} minutes"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
 msgstr "اختر الأعمدة للاستعلام"
 
@@ -3375,10 +3248,6 @@ msgstr "خشونة ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} أعمدة · {1} صفوف"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "تراجع (Ctrl+Z)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
 msgstr "تمت إزالة المستخدم"
@@ -3391,6 +3260,10 @@ msgstr "تقييد {displayName} للوصول إلى التطبيق"
 #: src/routes/update-password.tsx
 msgid "Confirm Password"
 msgstr "تأكيد كلمة المرور"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Column types updated"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3412,7 +3285,7 @@ msgstr "مستكشف البيانات"
 msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "احسب الصفوف في {datasetName} حسب {secondGroupBy}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. اختر محور الفئة أدناه."
@@ -3550,7 +3423,7 @@ msgstr "يمكن لمشرفي إعدادات مساحة العمل فقط فتح
 msgid "Pick which global filters apply to this visualization."
 msgstr "اختر الفلاتر العالمية التي تنطبق على هذه التصويرية."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "كل سلسلة هي سحابة واحدة من الفقاعات. يحدد عمود الحجم نصف قطر الفقاعة."
@@ -3602,7 +3475,7 @@ msgstr "فشل معالجة البيانات"
 msgid "This feature is not implemented yet."
 msgstr "لم يتم تنفيذ هذه الميزة بعد."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في "
@@ -3648,10 +3521,6 @@ msgid "When on, members of this group only get access if they already have "
 msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة على الوصول فقط إذا كان لديهم "
 "بالفعل وصول إلى {app} في مساحة العمل. عند الإيقاف، يحصل كل عضو في "
 "المجموعة على الوصول هنا، حتى لو لم يكن بإمكانهم عادةً فتح {app}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "تلقائي"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -3710,11 +3579,11 @@ msgstr "نسخ رابط المشاركة"
 msgid "Canonical URLs"
 msgstr "عناوين URL القياسية"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "عرض كـ"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Line"
 msgstr "خط"
 
@@ -3785,10 +3654,6 @@ msgstr "المالك لديه دائمًا وصول إداري. لتغيير ا�
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "نشط"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
@@ -3796,10 +3661,6 @@ msgstr "اختر القيمة الأولى التي نراها"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "تمت معالجة البيانات بنجاح"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "قلم"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -3872,7 +3733,7 @@ msgstr "جميع القرارات"
 msgid "Show labels"
 msgstr "عرض التسميات"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "محور X"
 
@@ -3972,8 +3833,8 @@ msgstr "تم تعطيل موصل جداول بيانات Google أثناء صي�
 msgid "Remove"
 msgstr "إزالة"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "لا توجد أعمدة رقمية"
 
@@ -4054,7 +3915,7 @@ msgstr "تم تحديث الاشتراك بنجاح"
 msgid "Default value"
 msgstr "القيمة الافتراضية"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
 msgstr "لا توجد أعمدة رقمية متاحة لإضافتها إلى هذه السلسلة."
 
@@ -4079,7 +3940,7 @@ msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 msgid "Multi-select"
 msgstr "تحديد متعدد"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "كل سلسلة هي سحابة واحدة من النقاط (X، Y). أضف المزيد لمقارنة أزواج "
@@ -4138,10 +3999,6 @@ msgstr "التصورات"
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "تصدير اللوحة"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
@@ -4161,7 +4018,7 @@ msgstr "مدير"
 msgid "Published"
 msgstr "تم النشر"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "الفلاتر (أين)"
 
@@ -4195,10 +4052,6 @@ msgstr "محرر"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "يمكن فقط للأشخاص والمجموعات المذكورة أعلاه الوصول إلى هذا {resource}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "معلق"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4287,10 +4140,6 @@ msgstr "أعمدة مجموعة البيانات"
 msgid "Could not prepare the offline chat model."
 msgstr "لم يتمكن من إعداد نموذج الدردشة غير المتصل."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "الفروع"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "ستكون مجموعة البيانات هذه متاحة فقط في وضع عدم الاتصال"
@@ -4312,7 +4161,7 @@ msgstr "حاول مرة أخرى."
 msgid "We should join data into the same {entityConfigName} when…"
 msgstr "يجب علينا دمج البيانات في نفس {entityConfigName} عندما..."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "يحتوي على"
 
@@ -4345,13 +4194,13 @@ msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. �
 msgid "Filter id (stable)"
 msgstr "معرف الفلتر (ثابت)"
 
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "لا توجد أعمدة متاحة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "تحريك"
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset ready"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4482,10 +4331,6 @@ msgstr "أنت على الخطة المجانية"
 msgid "Count"
 msgstr "العدد"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
-msgid "Some datasets are missing data"
-msgstr "بعض مجموعات البيانات تفتقر إلى البيانات"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
@@ -4566,12 +4411,12 @@ msgstr "نوع العمود غير صالح"
 msgid "Syncing dataset online..."
 msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يقود الرسم البياني."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "عمود"
 
@@ -4631,7 +4476,6 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها "
 "لتحديد {entityConfigName} بشكل فريد."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "نص"
@@ -4640,7 +4484,7 @@ msgstr "نص"
 msgid "Role group deleted"
 msgstr "تم حذف مجموعة الدور"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
 msgstr "حدد ترتيب الفرز"
 
@@ -4662,10 +4506,6 @@ msgstr "البحث في لوحات المعلومات"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "عنوان البريد الإلكتروني غير صالح"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "نجحت جميع الخطوات. انقر على أي عقدة لفتحها على اللوحة."
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4736,10 +4576,6 @@ msgstr "يرجى المحاولة مرة أخرى أو التواصل مع ال�
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "الوصول العام"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "راجع ووافق على الخطة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4854,7 +4690,7 @@ msgstr "خط تحرير"
 msgid "Untitled dashboard"
 msgstr "لوحة معلومات بدون عنوان"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Limit"
 msgstr "حد"
 
@@ -4889,7 +4725,6 @@ msgstr "الدور ومجموعات المستخدمين"
 msgid "Clear all"
 msgstr "مسح الكل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4935,18 +4770,10 @@ msgstr "مجموعة البيانات الكاملة"
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
-"node to read it; approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة. لم يتم تشغيل أي شيء بعد. انقر "
-"على كل عقدة لقراءتها؛ وافق للتنفيذ."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "بعض"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "سهم"
@@ -4961,13 +4788,13 @@ msgstr "قيم، مفصولة بفواصل"
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} قيم إضافية مرتبطة بـ {1} صفوف"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing, {remainingLabel} remaining"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "فضفاض"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "نص التعليق"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

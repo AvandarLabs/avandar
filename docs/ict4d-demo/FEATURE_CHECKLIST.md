@@ -18,7 +18,6 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
   - [x] PR #232 (chat panel disabled state)
   - [x] `claude/add-series-support-734EZ` (multi-series viz — explicitly called out by user)
   - [x] `claude/fix-tablet-responsiveness-MqAFc`
-  - [x] `claude/add-python-r-execution-hKxZd` (spec doc only — implementation is item #2 below)
 
 ## Feature work
 
@@ -30,11 +29,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
   is now wired. Full Phase 2.5 consumer migration of ~80 files to
   `usePlatform()` is deferred — not required for the demo loop.)
 - [~] **3. Merge other `claude/` session branches** — all visible ones merged in step 0
-- [~] **4. Pull and finish work from `claude/` branches that only have plans**
-  - [x] Plan pulled from `claude/add-python-r-execution-hKxZd`
-  - [~] Implementation of the chat-interactive-workflows plan (see
+- [~] **4. Finish privacy and clarification chat workflows**
+  - [~] Implementation of the chat-interactive-workflows design (see
     `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
-    for the full plan and per-phase architecture)
+    for the privacy and clarification architecture)
     - [x] Phase 0 - PII detector (16 tests green)
     - [x] Phase 0 - Bias detector (11 tests green)
     - [x] Phase 0 - Consent modal Modes A/B/C/D/E (composite + medical-strict shipped)
@@ -61,64 +59,13 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
     - [x] Phase 2 - PII detection on column name + content for discovery selections
     - [ ] Phase 2 - Ack-token signing for `values` scope payloads (text scope is signed end-to-end; `values` is "accept-on-presence" in `chat.routes.ts`)
     - [ ] Phase 2 - "Edit selection" hook on the consent modal (spec sketches dropping values before approval; UI not built)
-    - [x] Phase 3 - `proposePlan` tool with ≤8-step plans, schema-validated server-side
-    - [x] Phase 3 - `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle
-    - [x] Phase 3 - xyflow visual DAG canvas with RoughJS hand-drawn edges (`PlanFlowView`, `PlanStepNode`, `RoughEdge`)
-    - [x] Phase 3 - Animated zoom-in / zoom-out modes with `fitView` + `setCenter`
-    - [x] Phase 3 - Auto vs Step run-mode toggle in the toolbar
-    - [x] Phase 3 - IndexedDB step materialisation (`AvandarPlanStepDB` Dexie database, keyed by `(planId, stepId)`, explicit cleanup on Close / replace)
-    - [x] Phase 3 - Save as virtual dataset persists the full plan in a new `plan_steps` JSONB column on `datasets__virtual`
-    - [x] Phase 3 - Reopening a virtual dataset rehydrates the plan + every cached intermediate (`rehydratePlan` + parquet roundtrip through `loadParquet`)
-    - [x] Phase 3 - Click failed node to retry; failed-step banner with explanation
-    - [ ] Phase 3 - Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts)
-    - [x] Phase 4 - Schema-drift detection (`isSchemaDrift`, strict: names + order + type case-insensitive) + downstream-walker (`findAffectedDownstream`)
-    - [x] Phase 4 - `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool call
-    - [x] Phase 4 - Frontend regen loop: detect drift -> hit endpoint -> dispatch `replaceStepCode` -> re-run affected steps in plan order
-    - [x] Phase 4 - `regenAttempts` cap (≤2 attempts per step, tracked locally per run)
-    - [~] Phase 5 - Branching
-      - [x] Phase 5 - `PlanBranchStateManager` + `BranchRecord` (parent plan id, parent step id, anchor schema/view, title, plan + status snapshot)
-      - [x] Phase 5 - `PlanBranchSidebar` shows Root + every branch; click to switch, X to close
-      - [x] Phase 5 - `addBranch` action on `PlanStateManager` attaches a branch ref to a parent node
-      - [x] Phase 5 - "Branch from here" CTA in the focused-step detail (only on succeeded steps)
-      - [x] Phase 5 - 4 unit tests for the state manager (open / switch / close / clear-all)
-      - [ ] Phase 5 - Separate assistant-ui chat thread per branch (currently the chat thread is shared; switching branches changes which plan the canvas renders but messages still feed the root). Requires assistant-ui multi-thread orchestration — follow-up.
-      - [ ] Phase 5 - Persist branches into the virtual-dataset JSONB column so reopening a saved analysis restores the branch tree.
-    - [~] Phase 6 - Python + R sandboxed executor
-      - [x] Phase 6 - Sandboxed iframe at `/sandbox-executor.html`, mounted with `sandbox="allow-scripts"` (null opaque origin) + strict CSP (`default-src 'none'`, `connect-src https://cdn.jsdelivr.net`, no XHR/WebSocket/EventSource/sendBeacon/RTCPeerConnection)
-      - [x] Phase 6 - Pre-boot network stubs (`fetch` allowlist, `XMLHttpRequest`/`WebSocket`/`EventSource`/`RTCPeerConnection` thrown) before runtime init
-      - [x] Phase 6 - Pyodide lazy load (~10 MB) from jsdelivr; `pyarrow` + `pyarrow.parquet` + `pandas` pre-imported on boot
-      - [x] Phase 6 - postMessage protocol (`sandboxProtocol.ts`) with `sandboxKey` discriminator on every request to reject rogue messages
-      - [x] Phase 6 - Parent-side `runInSandbox` client (`sandboxClient.ts`) — mounts iframe, awaits ready, queues runs sequentially
-      - [x] Phase 6 - `executePlanStep` dispatches `python`/`r` steps to the sandbox; inputs read as parquet from DuckDB, results round-tripped back as parquet via `loadParquet`
-      - [x] Phase 6 - 30-second default timeout per run with caller override
-      - [x] Phase 6 - System prompt updated: prefer SQL; >7 SQL steps should reconsider; calling conventions documented (`read_input(name)` / `result` variable / `write_output`)
-      - [~] Phase 6 - WebR (R runtime) — **partial, out of scope for the demo but still planned post-demo.** Python is enough for the analytic use cases the demo covers. Today only Python is wired in `sandboxExecutor.ts` (`availableRuntimes: ["python"]`) and R steps return an error from the sandbox. The iframe + CSP + parquet bridge are runtime-agnostic, so when WebR is added it slots into the same harness with its own lazy-load + an R-side parquet roundtrip via R's `arrow` package.
-      - [ ] Phase 6 - External security review — REQUIRED before exposing python/r to users. The iframe + CSP stack is the spec-correct foundation, but the threat model needs an independent pass (WASM escape paths, CSP bypasses, postMessage replay).
-      - [ ] Phase 6 - stdout/stderr UI — currently piped to the parent console only.
-    - [ ] Phase 7 - Context compression (summariser pass, routing-decision cache, OpenRouter prompt caching, `chat_token_usage` table + dashboard)
-    - [~] Phase 9 - Canvas annotation + export
-      - [x] Phase 9 - `PlanAnnotationStateManager` with text / sticky / arrow / pen annotation types
-      - [x] Phase 9 - `PlanCanvasToolbar` with Pan / Text / Sticky / Arrow / Pen / Erase tools + colour palette + Undo / Redo (Ctrl+Z / Ctrl+Shift+Z)
-      - [x] Phase 9 - `PlanAnnotationOverlay` renders annotations in canvas-space, pans/zooms with xyflow viewport, pointer events gated by active tool
-      - [x] Phase 9 - RoughJS-styled arrows match the existing plan-edge sketch aesthetic
-      - [x] Phase 9 - `perfect-freehand` pen strokes
-      - [x] Phase 9 - 50-deep undo / redo stack
-      - [x] Phase 9 - IndexedDB persistence (`AvandarPlanAnnotationDB` Dexie database, keyed by `(planId, annotationId)`)
-      - [x] Phase 9 - PNG export via `html-to-image` (configurable pixel ratio + background; toolbar + minimap excluded from capture)
-      - [x] Phase 9 - PDF export via `@react-pdf/renderer` — page 1 is the canvas overview image, then one page per step (description + code + status + schema + row count)
-      - [x] Phase 9 - 4 unit tests for the state manager (add / undo / redo / clear-plan-only)
-      - [ ] Phase 9 - Save annotations into the virtual-dataset JSONB column so reopening a dataset restores the annotations alongside the plan. Currently annotations stay in IndexedDB (per device).
-      - [ ] Phase 9 - Per-annotation drag-to-move handles (current overlay supports create + delete; moving requires the user to delete + redraw).
-      - [ ] Phase 9 - Sticky-note resize handles.
-    - [x] Plan approval gate - Plans land in `awaiting_approval` and the user must approve before any step runs. Includes a >7-SQL-step hint that suggests reconsidering Python / R.
-    - [x] Multi-language plans - The `proposePlan` tool's `type` enum accepts `sql | python | r | clarification`; executor dispatches by type so a plan can mix languages freely.
     - [ ] Cross-cutting - 50-question eval harness with correctness + clarification-count + token-spend scoring
     - [ ] Cross-cutting - System prompt versioning with prompt-version label round-tripped to client
-    - [ ] Cross-cutting - avandarlabs.com privacy page copy (sandboxing + PII + bias detection)
+    - [ ] Cross-cutting - avandarlabs.com privacy page copy (PII + bias detection)
     - [ ] Cross-cutting - Spanish + French bias patterns themselves (currently stubs pending social-sector advisor review)
 - [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer + Dashboards. Supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`.)
 - [x] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer + Dashboards. Knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards reuse the same `ManualQueryForm` + `useSqlToStructuredQuery` infra via a per-block `useDashboardManualQueryState` hook in `NLQueryPField`.)
-- [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
+- [ ] **7. Tokenize generated SQL: column names + dataset IDs as clickable pills**
 - [x] **8. Multilingual voice dictation in chat panel (Whisper, 6 languages, web + desktop)**
   - **Web** uses `@huggingface/transformers` (ONNX). Mic icon next to the model picker; first click prompts to download a Whisper model from Hugging Face. Model weights stream into an IndexedDB-backed cache (no OPFS). A floating bottom-left progress indicator shows `Downloading <model> for voice prompting` with %; toast appears on success. Subsequent clicks record from the mic, run Whisper locally, and inject the transcript into the composer. Web build offers tiny / base / small.
   - **Desktop** uses `smart-whisper` (whisper.cpp via N-API) running in the Bun-main process; weights cached on disk under `<userData>/whisper-models/` so the user can download once and stay offline forever. Adds Medium, Large v3, and Large v3 Turbo to the model picker — those three are gated to Desktop and rendered disabled-with-tooltip in the web build ("These are too big for web and are only available on Avandar Desktop"). React side talks to main via typed IPC contracts (`VoiceContracts.*`); download progress is polled (~500 ms) from `voice.getStatus`.

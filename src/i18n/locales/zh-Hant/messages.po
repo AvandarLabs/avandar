@@ -39,7 +39,7 @@ msgstr "返回線上以查看或使頁面可離線使用。"
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "排序依據"
 
@@ -143,7 +143,7 @@ msgstr "來源 URL"
 msgid " access"
 msgstr "訪問"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "無法顯示 {chartName}。"
 
@@ -152,7 +152,7 @@ msgid "Allow online syncing"
 msgstr "允許在線同步"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "圖表設定"
 
@@ -214,6 +214,12 @@ msgstr "展開"
 msgid "Notes"
 msgstr "備註"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "自定義角色"
@@ -235,15 +241,11 @@ msgstr "仍然分配給此組的成員必須先移動。"
 msgid "Delete failed"
 msgstr "刪除失敗"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "拒絕"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "打開"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
 msgstr "聚合"
 
@@ -352,9 +354,13 @@ msgid "A local record of every clarifying question the AI has asked in this "
 "answer."
 msgstr "在此工作區中，AI 所提出的每個澄清問題的本地記錄。僅儲存元數據 — 永遠不會儲存問題文本或您的回答。"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
 msgstr "無法顯示 {chartName}"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset failed to process"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -387,7 +393,7 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
 msgstr "在上面的查詢中添加欄位以開始定義過濾器。"
 
@@ -450,7 +456,7 @@ msgstr "角色組已更新"
 msgid "No matches"
 msgstr "沒有匹配項"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "保持 SQL 不變"
 
@@ -489,10 +495,6 @@ msgstr "正在更新 {0} 的密碼"
 msgid "Column info"
 msgstr "列信息"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "計劃步驟輸入"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我了解這些數據將發送給 AI 提供者"
@@ -501,10 +503,6 @@ msgstr "我了解這些數據將發送給 AI 提供者"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "已保存的數據集"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF（多頁）"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -539,10 +537,6 @@ msgstr "來自衍生數據集"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "單選"
-
-#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
-msgid "Processing — {eta} remaining"
-msgstr "處理中 — 剩餘 {eta}"
 
 #: src/routes/register.tsx
 msgid "However, we are not allowing new registrations at the moment."
@@ -635,10 +629,6 @@ msgstr "元數據"
 msgid "Range"
 msgstr "範圍"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "關閉分支"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "輸入電子郵件"
@@ -702,10 +692,6 @@ msgstr "關閉聊天 (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "創建失敗"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "失敗"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -779,11 +765,6 @@ msgstr "標籤"
 msgid "Create a dashboard"
 msgstr "創建儀表板"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
-"canvas."
-msgstr "計劃被拒絕。請要求聊天提出不同的計劃，或關閉此畫布。"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "缺失"
@@ -797,8 +778,8 @@ msgstr "均值周圍的一個標準差"
 msgid "Name column"
 msgstr "名稱欄位"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "默認為 \"Y 對 X\""
 
@@ -874,26 +855,13 @@ msgstr "/月"
 msgid "Filters for this chart"
 msgstr "此圖表的篩選器"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "從這裡分支"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "跳過"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "查詢失敗。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "撤銷"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "從 \"{truncated}\" 分支"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -970,10 +938,6 @@ msgid "The public open data catalog is still in <0/><1/>We are adding more open 
 msgstr "公共開放資料目錄仍在 <0/><1/> "
 "我們正在根據用戶告訴我們想要的資料集來添加更多開放資料集。如果您希望在這裡看到某個資料集，<2>告訴我們</2>！"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "擦除"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "檢測到健康資訊"
@@ -1032,17 +996,9 @@ msgstr "為該欄位輸入名稱"
 msgid "Select Plan"
 msgstr "選擇計劃"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "顏色 {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "預設值（可選）"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "放大"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1099,7 +1055,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
 msgstr "配置此過濾器：在側邊面板中設置其 ID、標籤和列名稱。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1134,12 +1090,6 @@ msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候�
 msgid "Bias detected:"
 msgstr "檢測到偏見："
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the "
-"dataset, so it can be reopened on the canvas."
-msgstr "生成此結果的 {0} 步驟分析將與資料集一起保存，以便可以在畫布上重新打開。"
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成員看到的名稱。"
@@ -1148,7 +1098,7 @@ msgstr "{workspaceName} 中其他成員看到的名稱。"
 msgid "Suggested:"
 msgstr "建議："
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "用表單更改覆蓋 SQL"
 
@@ -1159,10 +1109,6 @@ msgstr "資料集未符合預期的架構"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "登出"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "分析計劃"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1176,6 +1122,11 @@ msgstr "檔案部分加載"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "付款方式"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1215,11 +1166,6 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 "only."
 msgstr "您在此工作區中每次批准（或取消）向 AI 提供者發送數據的本地記錄。最近 90 天，僅存儲在此設備上。"
 
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "來自步驟 {0}"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "掃描至："
@@ -1239,6 +1185,10 @@ msgstr "在下方輸入或粘貼電子郵件。您的工作區將按成員計費
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Used suggestion"
 msgstr "使用的建議"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" finished processing and is ready to use."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1293,29 +1243,21 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "步驟"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "最大"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "準備好"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "匯入數據"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Descending"
 msgstr "降序"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "類別軸"
 
@@ -1359,10 +1301,10 @@ msgstr "工作區 ID"
 msgid "Generate a query to configure this visualization."
 msgstr "生成查詢以配置此可視化。"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Select a column"
 msgstr "選擇一個欄位"
@@ -1378,11 +1320,7 @@ msgstr "標註後再匯出"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "計劃分支"
-
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
@@ -1399,9 +1337,9 @@ msgstr "搜尋模型"
 msgid "Cannot sync this entity"
 msgstr "無法同步此實體"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "移除系列"
 
@@ -1429,7 +1367,7 @@ msgstr "最窄"
 msgid "Graphite"
 msgstr "石墨"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "not in"
 msgstr "不在"
 
@@ -1505,10 +1443,6 @@ msgstr "數據範圍"
 msgid "Data preview"
 msgstr "數據預覽"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "刪除註解"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "至"
@@ -1549,7 +1483,7 @@ msgstr "配置文件加載失敗"
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "您目前在<0>{currentFeaturePlanName}</0>計劃中。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Result size"
 msgstr "結果大小"
 
@@ -1750,7 +1684,7 @@ msgstr "確認操作"
 msgid "Data Preview"
 msgstr "數據預覽"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "不為空"
 
@@ -1786,10 +1720,6 @@ msgstr "儀表板成功儲存！"
 msgid "N/A"
 msgstr "不適用"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "縮小"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "全域管理員"
@@ -1814,6 +1744,10 @@ msgstr "數據點"
 msgid "Back to editor"
 msgstr "返回編輯器"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about a minute"
+msgstr ""
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
 msgstr "您沒有權限打開工作區的這部分。"
@@ -1825,10 +1759,6 @@ msgstr "請檢查您的電子郵件"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
 msgstr "無法捕捉儀表板"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "PNG 圖像"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
@@ -1862,17 +1792,13 @@ msgstr "考慮重新措辭"
 msgid "Add people or user groups"
 msgstr "添加人員或用戶組"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Size column"
 msgstr "大小列"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
 msgstr "值"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(無標題分支)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -1903,7 +1829,7 @@ msgstr "QR 碼"
 msgid "Role"
 msgstr "角色"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "為空"
 
@@ -1950,7 +1876,7 @@ msgstr "在資料探索器和儀表板中啟用聊天"
 msgid "Forgot your password?"
 msgstr "忘記密碼了嗎？"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "條"
 
@@ -1984,7 +1910,6 @@ msgstr "沒有字段"
 msgid "Failed to update workspace name"
 msgstr "更新工作區名稱失敗"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "匯出"
@@ -1998,15 +1923,6 @@ msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "預覽："
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
-"whether a Python or R step would express this more cleanly. You can "
-"still approve as-is. Nothing has run yet. Click each node to read it; "
-"approve to execute."
-msgstr "AI 提出了 {0} 步驟計劃——這是很多 SQL。考慮是否使用 Python 或 R "
-"步驟會更清晰。您仍然可以按原樣批准。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2046,14 +1962,6 @@ msgstr "在此瀏覽器上下載"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "每月付款"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "重新執行"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "重做"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2096,7 +2004,7 @@ msgid "Data"
 msgstr "數據"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
-#: src/lib/offline/useOfflineGate.ts
+#: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
 msgid "Unavailable offline"
 msgstr "離線不可用"
 
@@ -2146,6 +2054,10 @@ msgstr "{0} 已從此瀏覽器中刪除。"
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "某些已發佈的數據集無法加載。請稍後再試。"
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "less than a minute"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2256,18 +2168,13 @@ msgstr "澄清答案"
 msgid "Generated SQL"
 msgstr "生成的 SQL"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Maximum rows to return"
 msgstr "最大返回行數"
 
 #: src/routes/update-password.tsx
 msgid "Password update failed"
 msgstr "密碼更新失敗"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart "
-"from the top."
-msgstr "步驟失敗。點擊紅色節點重試，或使用重新執行從頭開始。"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2311,16 +2218,12 @@ msgstr "將資料集添加到工作區"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "執行步驟"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
 msgstr "請先運行 AI 查詢。"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Y 欄"
 
@@ -2376,7 +2279,7 @@ msgstr "數字範圍"
 msgid "Columns"
 msgstr "列"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
 msgstr "覆蓋 SQL 嗎？"
 
@@ -2434,11 +2337,6 @@ msgstr "資料集"
 msgid "Remove failed"
 msgstr "移除失敗"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} 列"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2466,7 +2364,7 @@ msgstr "結束（例如：2024-12-31）"
 msgid "No datasets match your search."
 msgstr "沒有資料集符合您的搜索。"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "in"
 msgstr "在"
 
@@ -2482,13 +2380,8 @@ msgstr "此 Excel 工作表中只有一個工作表。"
 msgid "Make dataset offline-only?"
 msgstr "將資料集設為離線專用？"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "根計劃"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -2515,11 +2408,7 @@ msgstr "列名稱"
 msgid "Sent password reset email"
 msgstr "已發送密碼重置電子郵件"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "重做 (Ctrl+Shift+Z)"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
 msgstr "選擇排序的列"
 
@@ -2552,11 +2441,11 @@ msgstr "森林"
 msgid "Allow manual edit"
 msgstr "允許手動編輯"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "系列"
 
@@ -2578,16 +2467,12 @@ msgstr "實體加載失敗。請稍後再試或聯繫支持。"
 msgid "Purchase {seatsToAdd} seat"
 msgstr "購買 {seatsToAdd} 個座位"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "在畫布上打開"
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "配置文件管理頁面加載失敗。請稍後再試或聯繫支持。"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 msgstr "因缺少軸或系列，無法顯示 {chartName}。"
@@ -2618,7 +2503,7 @@ msgstr "澄清"
 msgid "Entity deleted"
 msgstr "實體已刪除"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns"
 msgstr "選擇列"
 
@@ -2675,8 +2560,8 @@ msgstr "登出失敗"
 msgid "You have successfully connected to {0}"
 msgstr "您已成功連接到 {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
 msgstr "X 欄"
 
@@ -2726,7 +2611,7 @@ msgstr "最常見"
 msgid "Passwords do not match"
 msgstr "密碼不匹配"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。值按類別軸（\"{axisKeyValue}\"）分組。"
@@ -2774,11 +2659,6 @@ msgstr "要跳過的行數"
 msgid "From CSV"
 msgstr "從 CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} 行{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "分鐘"
@@ -2799,10 +2679,6 @@ msgstr "離線聊天模型已移除"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "工具"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "運行中…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -2829,9 +2705,9 @@ msgstr "選擇一個"
 msgid "No fields have been added"
 msgstr "尚未添加任何欄位"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
 msgstr "什麼是系列？"
 
@@ -2897,7 +2773,7 @@ msgstr "無法移除離線聊天模型"
 msgid "Create a new account"
 msgstr "創建新帳戶"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Direction"
 msgstr "方向"
 
@@ -2937,9 +2813,9 @@ msgstr "已檢測到"
 msgid "Delete Dataset"
 msgstr "刪除資料集"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add series"
 msgstr "添加系列"
 
@@ -2984,8 +2860,8 @@ msgstr "{fieldName} 必須至少 {minLength} 個字符長"
 msgid "System sans"
 msgstr "系統無襯線"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "系列標籤"
 
@@ -3079,7 +2955,7 @@ msgstr "{0}秒"
 msgid "Please fix the highlighted fields."
 msgstr "請修正標示的欄位。"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "between"
 msgstr "之間"
 
@@ -3095,7 +2971,7 @@ msgstr "所有成員的 "
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
 msgstr "每個系列都是一個繪製在 Y 軸上的數值欄。請選擇下面的 X 軸。"
@@ -3121,16 +2997,15 @@ msgstr "加載模型中..."
 msgid "Update frequency"
 msgstr "更新頻率"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" could not be parsed: {message}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "允許同步"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "便利貼"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "升序"
 
@@ -3199,10 +3074,6 @@ msgstr "過濾"
 msgid "This cannot be undone."
 msgstr "這無法撤銷。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "批准並執行"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "資料集名稱必須至少 2 個字元。"
@@ -3224,7 +3095,7 @@ msgstr "重置"
 msgid "Enter a name for this profile type"
 msgstr "為此配置文件類型輸入名稱"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "區域"
 
@@ -3232,7 +3103,7 @@ msgstr "區域"
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "does not contain"
 msgstr "不包含"
 
@@ -3271,7 +3142,12 @@ msgstr "此 {resource} 與以下人員共享："
 msgid "Upload"
 msgstr "上傳"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#. placeholder {0}: eta.minutes
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about {0} minutes"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
 msgstr "選擇要查詢的欄位"
 
@@ -3306,10 +3182,6 @@ msgstr "粗糙度 ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} 欄 · {1} 行"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "撤銷 (Ctrl+Z)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
 msgstr "用戶已移除"
@@ -3322,6 +3194,10 @@ msgstr "限制 {displayName} 的應用訪問"
 #: src/routes/update-password.tsx
 msgid "Confirm Password"
 msgstr "確認密碼"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Column types updated"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3343,7 +3219,7 @@ msgstr "數據探索器"
 msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "按 {secondGroupBy} 計算 {datasetName} 中的行數"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。請選擇下面的類別軸。"
@@ -3480,7 +3356,7 @@ msgstr "只有工作區設定管理員可以打開工作區設定。"
 msgid "Pick which global filters apply to this visualization."
 msgstr "選擇適用於此視覺化的全域篩選。"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
@@ -3530,7 +3406,7 @@ msgstr "資料處理失敗"
 msgid "This feature is not implemented yet."
 msgstr "此功能尚未實現。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "此資料集很大，因此我們應用了 100 行的限制。您可以隨時更改此限制。"
@@ -3574,10 +3450,6 @@ msgid "When on, members of this group only get access if they already have "
 "access here, even if they normally can't open {app}."
 msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {app} 訪問權限時才能訪問。當禁用時，該組的每個成員都可以在此訪問，即使他們通常無法打開 "
 "{app}。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "自動"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -3632,11 +3504,11 @@ msgstr "複製分享連結"
 msgid "Canonical URLs"
 msgstr "標準網址"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "呈現為"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Line"
 msgstr "行"
 
@@ -3706,10 +3578,6 @@ msgstr "擁有者始終具有管理員訪問權限。要更改擁有者，請使
 msgid "Loading datasets…"
 msgstr "載入數據集中…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "活躍"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
@@ -3717,10 +3585,6 @@ msgstr "選擇我們看到的第一個值"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "數據處理成功"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "筆"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -3789,7 +3653,7 @@ msgstr "所有決策"
 msgid "Show labels"
 msgstr "顯示標籤"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "X 軸"
 
@@ -3889,8 +3753,8 @@ msgstr "在此功能維護期間，Google Sheets 連接器已被禁用。"
 msgid "Remove"
 msgstr "移除"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "沒有數值欄"
 
@@ -3969,7 +3833,7 @@ msgstr "訂閱成功更新"
 msgid "Default value"
 msgstr "默認值"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
 msgstr "沒有可添加到此系列的數值欄位。"
 
@@ -3994,7 +3858,7 @@ msgstr "選擇規則（例如：最常見）"
 msgid "Multi-select"
 msgstr "多選"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "每個系列是一個 (X, Y) 點雲。添加更多以在同一圖表上比較多個指標對。"
@@ -4052,10 +3916,6 @@ msgstr "視覺化"
 msgid "Switch Workspace"
 msgstr "切換工作區"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "導出畫布"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "您可以查看此儀表板，因為它已與您共享。"
@@ -4075,7 +3935,7 @@ msgstr "管理員"
 msgid "Published"
 msgstr "已發布"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "篩選器（位置）"
 
@@ -4107,10 +3967,6 @@ msgstr "編輯者"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "待處理"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4198,10 +4054,6 @@ msgstr "數據集欄位"
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "分支"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "此資料集將僅限離線使用"
@@ -4222,7 +4074,7 @@ msgstr "再試一次。"
 msgid "We should join data into the same {entityConfigName} when…"
 msgstr "當…時，我們應將數據合併到同一 {entityConfigName}"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "包含"
 
@@ -4254,13 +4106,13 @@ msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯
 msgid "Filter id (stable)"
 msgstr "篩選器 ID（穩定）"
 
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "沒有可用的欄位"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "平移"
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset ready"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4389,10 +4241,6 @@ msgstr "您目前使用的是免費方案"
 msgid "Count"
 msgstr "計數"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
-msgid "Some datasets are missing data"
-msgstr "某些數據集缺少數據"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
@@ -4470,12 +4318,12 @@ msgstr "無效的欄位類型"
 msgid "Syncing dataset online..."
 msgstr "正在將資料集同步至線上..."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "添加一個系列以選擇哪個數字列驅動圖表。"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "欄位"
 
@@ -4533,7 +4381,6 @@ msgid "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {entityConfigName}。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "文本"
@@ -4542,7 +4389,7 @@ msgstr "文本"
 msgid "Role group deleted"
 msgstr "角色群組已刪除"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
 msgstr "選擇排序順序"
 
@@ -4564,10 +4411,6 @@ msgstr "搜尋儀表板"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "電子郵件地址無效"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "所有步驟均成功。點擊任何節點以在畫布上打開它。"
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4635,10 +4478,6 @@ msgstr "請重試或聯繫支持。"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "一般訪問"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "審核並批准計劃"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4750,7 +4589,7 @@ msgstr "編輯 serif"
 msgid "Untitled dashboard"
 msgstr "無標題儀表板"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Limit"
 msgstr "限制"
 
@@ -4784,7 +4623,6 @@ msgstr "角色與用戶群組"
 msgid "Clear all"
 msgstr "清除所有"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4829,17 +4667,10 @@ msgstr "整個數據集"
 msgid "Invalid date"
 msgstr "無效的日期"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
-"node to read it; approve to execute."
-msgstr "AI 提出了 {0} 步計劃。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "一些"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "箭頭"
@@ -4854,13 +4685,13 @@ msgstr "值，以逗號分隔"
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} 個值與 {1} 行相關聯"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing, {remainingLabel} remaining"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "鬆散"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "註解文本"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

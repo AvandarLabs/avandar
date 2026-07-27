@@ -1,8 +1,8 @@
 /**
  * Auxiliary chat types not yet promoted to dedicated models under
- * `shared/models/chat/`. These cover plans, clarifications, dashboard-block
- * generation, retry context, voice hints, schema-drift regen, session
- * secrets, consent acks, and the OpenRouter models endpoint envelope.
+ * `shared/models/chat/`. These cover clarifications, dashboard-block
+ * generation, retry context, voice hints, session secrets, consent acks, and
+ * the OpenRouter models endpoint envelope.
  *
  * Shared by both the frontend (`src/`) and the edge function
  * (`supabase/functions/chat/`). The frontend imports through the `$/` alias
@@ -117,40 +117,6 @@ export type ChatClarifyRequest = {
 };
 
 /**
- * A single step in a multi-step analytic plan proposed by the LLM. The
- * frontend stores these in the plan state manager and renders them as
- * nodes in an xyflow DAG.
- */
-export type ChatPlanStep = {
-  /** Stable id the LLM uses to reference this step from `inputs`. */
-  id: string;
-  /** One-sentence description for the DAG node label. */
-  description: string;
-  /**
-   * Execution engine for this step. Only `sql` and `clarification` are
-   * currently implemented; `python` and `r` are reserved for future use.
-   */
-  type: "sql" | "python" | "r" | "clarification";
-  /** SQL or code for the step. */
-  code: string;
-  /** ids of steps this step depends on. */
-  inputs: string[];
-  /**
-   * The LLM's prediction of the output schema. Used to detect schema
-   * drift (see `SchemaDriftReport`) and to pre-pick a default viz.
-   */
-  predictedSchema: Array<{ name: string; type: string }>;
-  /** Default visualization for the step's output. */
-  defaultViz?: "table" | "bar" | "line" | "scatter" | "pie";
-};
-
-export type ChatPlan = {
-  steps: ChatPlanStep[];
-  /** The LLM's one-paragraph summary of the plan, shown above the DAG. */
-  rootMessage: string;
-};
-
-/**
  * Sent on the next turn when the user clicks "Try Again" on a prior
  * assistant message. The backend uses these fields to inject a system
  * note telling the model NOT to repeat the same output. Only the field
@@ -164,57 +130,8 @@ export type ChatRetryContext = {
   priorGeneratedSql?: string;
   /** Question the prior turn asked via `clarify`, if any. */
   priorClarificationQuestion?: string;
-  /** rootMessage of the plan the prior turn proposed, if any. */
-  priorPlanRootMessage?: string;
   /** Kind of dashboard block the prior turn appended, if any. */
   priorDashboardBlockKind?: string;
-};
-
-/**
- * Schema-drift regeneration. After a plan step executes, the
- * frontend diffs `actualSchema` against the LLM's `predictedSchema`.
- * If they differ, the frontend asks the model to regenerate the
- * affected downstream steps via this request shape.
- */
-export type SchemaDriftReport = {
-  /** The plan step that produced unexpected columns. */
-  driftedStepId: string;
-  driftedStepDescription: string;
-  predictedSchema: Array<{ name: string; type: string }>;
-  actualSchema: Array<{ name: string; type: string }>;
-  /** Downstream step ids that need to be regenerated. */
-  affectedStepIds: string[];
-  /**
-   * The current plan in full so the LLM can see the surrounding
-   * context: what each step does and how steps reference each other.
-   */
-  plan: ChatPlan;
-};
-
-/**
- * One regenerated step. The frontend swaps the matching step's `code`
- * and re-runs.
- */
-export type RegeneratedStep = {
-  stepId: string;
-  /** Replacement SQL for the step. */
-  code: string;
-  /**
-   * Updated `predictedSchema` so a second drift-detection pass can
-   * notice if THIS regeneration also drifts (cap-bounded by the
-   * caller).
-   */
-  predictedSchema: Array<{ name: string; type: string }>;
-};
-
-export type RegeneratePlanResponse = {
-  /**
-   * Steps the model rewrote. Caller dispatches `replaceStepCode` for
-   * each and re-runs the plan from `driftedStepId` forward.
-   */
-  steps: RegeneratedStep[];
-  /** Plain-text explanation for the chat thread. */
-  explanation: string;
 };
 
 /**

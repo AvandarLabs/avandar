@@ -40,7 +40,7 @@ msgstr "Return online to view or make the page available offline."
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "No columns detected for this dataset. Falling back to all columns."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "Sort by"
 
@@ -146,7 +146,7 @@ msgstr "Source URL"
 msgid " access"
 msgstr " access"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "The {chartName} cannot be displayed."
 
@@ -155,7 +155,7 @@ msgid "Allow online syncing"
 msgstr "Allow online syncing"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "Chart settings"
 
@@ -219,6 +219,14 @@ msgstr "Expand"
 msgid "Notes"
 msgstr "Notes"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr "Detected column types for {changedCount} columns in "
+"\"{sourceFileName}\" differed from the import preview and have been "
+"overwritten with the actual values."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "Custom role"
@@ -240,15 +248,11 @@ msgstr "Members still assigned to this group must be moved first."
 msgid "Delete failed"
 msgstr "Delete failed"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "Reject"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Open"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
 msgstr "Aggregations"
 
@@ -360,9 +364,13 @@ msgstr "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
 "answer."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
 msgstr "Cannot display {chartName}"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset failed to process"
+msgstr "Dataset failed to process"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -399,7 +407,7 @@ msgstr "Your current plan only supports up to {0} datasets. To increase the "
 "number of datasets you can add to your workspace you can purchase more "
 "seats. Each seat allows you to add 10 more datasets!"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
 msgstr "Add columns to the query above to start defining filters."
 
@@ -463,7 +471,7 @@ msgstr "Role group updated"
 msgid "No matches"
 msgstr "No matches"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "Keep SQL as-is"
 
@@ -502,10 +510,6 @@ msgstr "Updating password for {0}"
 msgid "Column info"
 msgstr "Column info"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "Plan step input"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "I understand this data will be sent to the AI provider"
@@ -514,10 +518,6 @@ msgstr "I understand this data will be sent to the AI provider"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "Saved datasets"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF (multi-page)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -554,10 +554,6 @@ msgstr "From derived dataset"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Single select"
-
-#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
-msgid "Processing — {eta} remaining"
-msgstr "Processing — {eta} remaining"
 
 #: src/routes/register.tsx
 msgid "However, we are not allowing new registrations at the moment."
@@ -654,10 +650,6 @@ msgstr "Metadata"
 msgid "Range"
 msgstr "Range"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "Close branch"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Enter email"
@@ -722,10 +714,6 @@ msgstr "Close chat (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Create failed"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "Failed"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -801,12 +789,6 @@ msgstr "Label"
 msgid "Create a dashboard"
 msgstr "Create a dashboard"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
-"canvas."
-msgstr "Plan rejected. Ask the chat to propose a different plan, or close this "
-"canvas."
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "missing"
@@ -820,8 +802,8 @@ msgstr "One standard deviation around the mean"
 msgid "Name column"
 msgstr "Name column"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "Defaults to \"Y vs X\""
 
@@ -899,26 +881,13 @@ msgstr "/month"
 msgid "Filters for this chart"
 msgstr "Filters for this chart"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "Branch from here"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "Skipped"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "Query failed."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "Undo"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "Branch from \"{truncated}\""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -996,10 +965,6 @@ msgstr "The public open data catalog is still in <0/><1/>We are adding more "
 "open datasets as users tell us which datasets they want in Avandar. If "
 "there is a dataset you would like to see here, <2>tell us</2>!"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "Erase"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "Health information detected"
@@ -1058,17 +1023,9 @@ msgstr "Enter a name for the field"
 msgid "Select Plan"
 msgstr "Select Plan"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "Color {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "Default value (optional)"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "Zoom in"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1127,7 +1084,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 msgstr "Configure this filter: set its id, label, and column name in the side "
 "panel."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1166,13 +1123,6 @@ msgstr "{0} to be notified when it's your turn to register! If you are already "
 msgid "Bias detected:"
 msgstr "Bias detected:"
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the "
-"dataset, so it can be reopened on the canvas."
-msgstr "The {0}-step analysis that produced this result will be saved with the "
-"dataset, so it can be reopened on the canvas."
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "The name other members see in {workspaceName}."
@@ -1181,7 +1131,7 @@ msgstr "The name other members see in {workspaceName}."
 msgid "Suggested:"
 msgstr "Suggested:"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "Overwrite SQL with form changes"
 
@@ -1192,10 +1142,6 @@ msgstr "Dataset did not match the expected schema"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "Sign Out"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "Analytic plan"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1209,6 +1155,13 @@ msgstr "File was partially loaded"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "Payment Methods"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr "Detected column types for 1 column in \"{sourceFileName}\" differed "
+"from the import preview and have been overwritten with the actual "
+"values."
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1253,11 +1206,6 @@ msgstr "A local record of every time you approved (or cancelled) sending data "
 "to an AI provider in this workspace. Last 90 days, stored on this "
 "device only."
 
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "from step {0}"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "Scans to:"
@@ -1277,6 +1225,10 @@ msgstr "Type or paste an email below. Your workspace will be billed per member."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Used suggestion"
 msgstr "Used suggestion"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" finished processing and is ready to use."
+msgstr "\"{sourceFileName}\" finished processing and is ready to use."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1334,29 +1286,21 @@ msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "Please <0>email us</0> if you would like early access."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "Step"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "Max"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "Ready"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "Import data"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Descending"
 msgstr "Descending"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "Category axis"
 
@@ -1400,10 +1344,10 @@ msgstr "Workspace ID"
 msgid "Generate a query to configure this visualization."
 msgstr "Generate a query to configure this visualization."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Select a column"
 msgstr "Select a column"
@@ -1419,11 +1363,7 @@ msgstr "Annotate, then export"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}, {1}, and {2} are fixed for every workspace."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "Plan branches"
-
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "Each series is a numeric column plotted on the Y axis. Values are "
@@ -1441,9 +1381,9 @@ msgstr "Search models"
 msgid "Cannot sync this entity"
 msgstr "Cannot sync this entity"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "Remove series"
 
@@ -1471,7 +1411,7 @@ msgstr "Narrowest"
 msgid "Graphite"
 msgstr "Graphite"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "not in"
 msgstr "not in"
 
@@ -1548,10 +1488,6 @@ msgstr "Data scope"
 msgid "Data preview"
 msgstr "Data preview"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "Delete annotation"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "to"
@@ -1592,7 +1528,7 @@ msgstr "Profile failed to load"
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Result size"
 msgstr "Result size"
 
@@ -1801,7 +1737,7 @@ msgstr "Confirm Action"
 msgid "Data Preview"
 msgstr "Data Preview"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "is not null"
 
@@ -1838,10 +1774,6 @@ msgstr "Dashboard saved successfully!"
 msgid "N/A"
 msgstr "N/A"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "Zoom out"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "Global Admin"
@@ -1866,6 +1798,10 @@ msgstr "Data Point"
 msgid "Back to editor"
 msgstr "Back to editor"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about a minute"
+msgstr "about a minute"
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
 msgstr "You do not have permission to open this part of the workspace."
@@ -1877,10 +1813,6 @@ msgstr "Please check your email"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
 msgstr "Couldn't capture dashboard"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "PNG image"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
@@ -1914,17 +1846,13 @@ msgstr "Consider rephrasing"
 msgid "Add people or user groups"
 msgstr "Add people or user groups"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Size column"
 msgstr "Size column"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
 msgstr "Values"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(untitled branch)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -1956,7 +1884,7 @@ msgstr "QR code"
 msgid "Role"
 msgstr "Role"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "is null"
 
@@ -2003,7 +1931,7 @@ msgstr "Chat is enabled in Data Explorer and Dashboards"
 msgid "Forgot your password?"
 msgstr "Forgot your password?"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "Bar"
 
@@ -2037,7 +1965,6 @@ msgstr "No fields"
 msgid "Failed to update workspace name"
 msgstr "Failed to update workspace name"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "Export"
@@ -2052,17 +1979,6 @@ msgstr "Create groups for your workspace members. Datasets and dashboards can "
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Preview:"
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
-"whether a Python or R step would express this more cleanly. You can "
-"still approve as-is. Nothing has run yet. Click each node to read it; "
-"approve to execute."
-msgstr "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
-"whether a Python or R step would express this more cleanly. You can "
-"still approve as-is. Nothing has run yet. Click each node to read it; "
-"approve to execute."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2105,14 +2021,6 @@ msgstr "Downloaded on this browser"
 msgid "Pay monthly"
 msgstr "Pay monthly"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "Re-run"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "Redo"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Choose a model"
@@ -2154,7 +2062,7 @@ msgid "Data"
 msgstr "Data"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
-#: src/lib/offline/useOfflineGate.ts
+#: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
 msgid "Unavailable offline"
 msgstr "Unavailable offline"
 
@@ -2205,6 +2113,10 @@ msgstr "{0} was deleted from this browser."
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Some published datasets could not be loaded. Please try again later."
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "less than a minute"
+msgstr "less than a minute"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2319,19 +2231,13 @@ msgstr "Clarification answer"
 msgid "Generated SQL"
 msgstr "Generated SQL"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Maximum rows to return"
 msgstr "Maximum rows to return"
 
 #: src/routes/update-password.tsx
 msgid "Password update failed"
 msgstr "Password update failed"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart "
-"from the top."
-msgstr "A step failed. Click the red node to retry, or use Re-run to restart "
-"from the top."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2375,16 +2281,12 @@ msgstr "Add dataset to workspace"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "Run step"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
 msgstr "Run an AI query first."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Y column"
 
@@ -2440,7 +2342,7 @@ msgstr "Number range"
 msgid "Columns"
 msgstr "Columns"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
 msgstr "Overwrite SQL?"
 
@@ -2498,11 +2400,6 @@ msgstr "dataset"
 msgid "Remove failed"
 msgstr "Remove failed"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} cols"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2530,7 +2427,7 @@ msgstr "End (e.g. 2024-12-31)"
 msgid "No datasets match your search."
 msgstr "No datasets match your search."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "in"
 msgstr "in"
 
@@ -2546,13 +2443,8 @@ msgstr "There is only one sheet in this excel sheet."
 msgid "Make dataset offline-only?"
 msgstr "Make dataset offline-only?"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "Root plan"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -2579,11 +2471,7 @@ msgstr "Column Name"
 msgid "Sent password reset email"
 msgstr "Sent password reset email"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "Redo (Ctrl+Shift+Z)"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
 msgstr "Select column to sort by"
 
@@ -2616,11 +2504,11 @@ msgstr "Forest"
 msgid "Allow manual edit"
 msgstr "Allow manual edit"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Series"
 
@@ -2643,17 +2531,13 @@ msgstr "The entity failed to load. Please try again later or reach out to "
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Purchase {seatsToAdd} seat"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "Open on canvas"
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "The profile manager page failed to load. Please try again later or "
 "reach out to support."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 msgstr "The {chartName} cannot be displayed because there are missing axes or "
@@ -2686,7 +2570,7 @@ msgstr "Clarifications"
 msgid "Entity deleted"
 msgstr "Entity deleted"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns"
 msgstr "Select columns"
 
@@ -2743,8 +2627,8 @@ msgstr "Sign out failed"
 msgid "You have successfully connected to {0}"
 msgstr "You have successfully connected to {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
 msgstr "X column"
 
@@ -2794,7 +2678,7 @@ msgstr "Most common"
 msgid "Passwords do not match"
 msgstr "Passwords do not match"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Each series is a numeric column plotted on the radial value. Values are "
@@ -2845,11 +2729,6 @@ msgstr "Number of rows to skip"
 msgid "From CSV"
 msgstr "From CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} rows{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "min"
@@ -2871,10 +2750,6 @@ msgstr "Offline chat model removed"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "Tool"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "Running…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -2902,9 +2777,9 @@ msgstr "Pick one"
 msgid "No fields have been added"
 msgstr "No fields have been added"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
 msgstr "What is a series?"
 
@@ -2970,7 +2845,7 @@ msgstr "Could not remove offline chat model"
 msgid "Create a new account"
 msgstr "Create a new account"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Direction"
 msgstr "Direction"
 
@@ -3011,9 +2886,9 @@ msgstr "Detected"
 msgid "Delete Dataset"
 msgstr "Delete Dataset"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add series"
 msgstr "Add series"
 
@@ -3060,8 +2935,8 @@ msgstr "{fieldName} must be at least {minLength} characters long"
 msgid "System sans"
 msgstr "System sans"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "Series label"
 
@@ -3157,7 +3032,7 @@ msgstr "{0}s"
 msgid "Please fix the highlighted fields."
 msgstr "Please fix the highlighted fields."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "between"
 msgstr "between"
 
@@ -3173,7 +3048,7 @@ msgstr "all members of "
 msgid "Some data should be manually entered"
 msgstr "Some data should be manually entered"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
 msgstr "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -3200,16 +3075,15 @@ msgstr "Loading models..."
 msgid "Update frequency"
 msgstr "Update frequency"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" could not be parsed: {message}"
+msgstr "\"{sourceFileName}\" could not be parsed: {message}"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "Allow syncing"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "Sticky note"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "Ascending"
 
@@ -3279,10 +3153,6 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "Approve and run"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "Dataset name must be at least 2 characters."
@@ -3304,7 +3174,7 @@ msgstr "Reset"
 msgid "Enter a name for this profile type"
 msgstr "Enter a name for this profile type"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "Area"
 
@@ -3312,7 +3182,7 @@ msgstr "Area"
 msgid "No fields have been configured yet"
 msgstr "No fields have been configured yet"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "does not contain"
 msgstr "does not contain"
 
@@ -3354,7 +3224,12 @@ msgstr "This {resource} is shared with: "
 msgid "Upload"
 msgstr "Upload"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#. placeholder {0}: eta.minutes
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about {0} minutes"
+msgstr "about {0} minutes"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
 msgstr "Select columns to query"
 
@@ -3389,10 +3264,6 @@ msgstr "Roughness ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} columns · {1} rows"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "Undo (Ctrl+Z)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
 msgstr "User removed"
@@ -3405,6 +3276,10 @@ msgstr "Limit {displayName} to app access"
 #: src/routes/update-password.tsx
 msgid "Confirm Password"
 msgstr "Confirm Password"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Column types updated"
+msgstr "Column types updated"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3426,7 +3301,7 @@ msgstr "Data Explorer"
 msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "Count rows in {datasetName} by {secondGroupBy}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3565,7 +3440,7 @@ msgstr "Only workspace settings administrators can open workspace settings."
 msgid "Pick which global filters apply to this visualization."
 msgstr "Pick which global filters apply to this visualization."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "Each series is one cloud of bubbles. The size column determines bubble "
@@ -3617,7 +3492,7 @@ msgstr "Data processing failed"
 msgid "This feature is not implemented yet."
 msgstr "This feature is not implemented yet."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -3663,10 +3538,6 @@ msgid "When on, members of this group only get access if they already have "
 msgstr "When on, members of this group only get access if they already have "
 "{app} access in the workspace. When off, every member of the group gets "
 "access here, even if they normally can't open {app}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "Auto"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -3724,11 +3595,11 @@ msgstr "Copy share link"
 msgid "Canonical URLs"
 msgstr "Canonical URLs"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "Render as"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Line"
 msgstr "Line"
 
@@ -3799,10 +3670,6 @@ msgstr "The owner always has admin access. To change owner, use the {resource} "
 msgid "Loading datasets…"
 msgstr "Loading datasets…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "active"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Choose the first value we see"
@@ -3810,10 +3677,6 @@ msgstr "Choose the first value we see"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "Data processed successfully"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "Pen"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -3884,7 +3747,7 @@ msgstr "All decisions"
 msgid "Show labels"
 msgstr "Show labels"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "X axis"
 
@@ -3986,8 +3849,8 @@ msgstr "Google sheets connector is disabled while this feature is under "
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "No numeric columns"
 
@@ -4069,7 +3932,7 @@ msgstr "Subscription updated successfully"
 msgid "Default value"
 msgstr "Default value"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
 msgstr "No numeric columns available to add to this series."
 
@@ -4094,7 +3957,7 @@ msgstr "Select rule (e.g. most frequent)"
 msgid "Multi-select"
 msgstr "Multi-select"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "Each series is one (X, Y) cloud of points. Add more to compare multiple "
@@ -4153,10 +4016,6 @@ msgstr "Visualizations"
 msgid "Switch Workspace"
 msgstr "Switch Workspace"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "Export canvas"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "You can view this dashboard because it was shared with you."
@@ -4176,7 +4035,7 @@ msgstr "Admin"
 msgid "Published"
 msgstr "Published"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "Filters (Where)"
 
@@ -4210,10 +4069,6 @@ msgstr "Editor"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "Only the people and groups listed above can access this {resource}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "Pending"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4301,10 +4156,6 @@ msgstr "Dataset columns"
 msgid "Could not prepare the offline chat model."
 msgstr "Could not prepare the offline chat model."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "Branches"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "This dataset will be offline-only"
@@ -4325,7 +4176,7 @@ msgstr "Try again."
 msgid "We should join data into the same {entityConfigName} when…"
 msgstr "We should join data into the same {entityConfigName} when…"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "contains"
 
@@ -4359,13 +4210,13 @@ msgstr "What this person or group can do. Viewer = read only, Editor = edit "
 msgid "Filter id (stable)"
 msgstr "Filter id (stable)"
 
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "No columns available"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "Pan"
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset ready"
+msgstr "Dataset ready"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4496,10 +4347,6 @@ msgstr "You're on the Free plan"
 msgid "Count"
 msgstr "Count"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
-msgid "Some datasets are missing data"
-msgstr "Some datasets are missing data"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
@@ -4580,12 +4427,12 @@ msgstr "Invalid column type"
 msgid "Syncing dataset online..."
 msgstr "Syncing dataset online..."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Add a series to choose which numeric column drives the chart."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "Column"
 
@@ -4645,7 +4492,6 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "Text"
@@ -4654,7 +4500,7 @@ msgstr "Text"
 msgid "Role group deleted"
 msgstr "Role group deleted"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
 msgstr "Select sort order"
 
@@ -4676,10 +4522,6 @@ msgstr "Search dashboards"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "Invalid email address"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "All steps succeeded. Click any node to open it on the canvas."
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4751,10 +4593,6 @@ msgstr "Please try again or reach out to support."
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "General access"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "Review and approve the plan"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4869,7 +4707,7 @@ msgstr "Editorial serif"
 msgid "Untitled dashboard"
 msgstr "Untitled dashboard"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Limit"
 msgstr "Limit"
 
@@ -4904,7 +4742,6 @@ msgstr "Role & user groups"
 msgid "Clear all"
 msgstr "Clear all"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4950,18 +4787,10 @@ msgstr "Whole dataset"
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
-"node to read it; approve to execute."
-msgstr "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
-"node to read it; approve to execute."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "Some"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "Arrow"
@@ -4976,13 +4805,13 @@ msgstr "Values, comma-separated"
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} more values tied at {1} rows"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing, {remainingLabel} remaining"
+msgstr "Processing, {remainingLabel} remaining"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "Loose"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "Annotation text"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

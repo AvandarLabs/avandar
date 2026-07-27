@@ -24,6 +24,7 @@ import { prop } from "@utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
+import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs/deleteObsoleteIndexedDBs";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
@@ -37,6 +38,7 @@ type Schemas = {
   v3: { version: 3; models: [LocalDatasetModel, LocalPublicDatasetModel] };
   v4: { version: 4; models: [LocalDatasetModel, LocalPublicDatasetModel] };
   v5: { version: 5; models: [LocalDatasetModel, LocalPublicDatasetModel] };
+  v6: { version: 6; models: [LocalDatasetModel, LocalPublicDatasetModel] };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -157,8 +159,31 @@ const DBDefinitions = [
         });
     },
   }),
+
+  /**
+   * Deletes IndexedDB databases owned by retired features. Their data is
+   * intentionally discarded rather than converted.
+   */
+  AvaDexieVersionManager.defineVersion<6>({
+    db,
+    version: 6,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId", "parseStatus"],
+      },
+      LocalPublicDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["dashboardId"],
+      },
+    },
+
+    upgrader: async () => {
+      await deleteObsoleteIndexedDBs();
+    },
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
-export const CURRENT_AVA_DEXIE_VERSION = "v5" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v6" as const satisfies keyof Schemas;

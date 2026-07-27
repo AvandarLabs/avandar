@@ -56,7 +56,6 @@ function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
     user_message_text: t`Chat message`,
     clarification_answer: t`Clarification answer`,
     discovery_clarification: t`Discovery clarification`,
-    plan_step_input: t`Plan step input`,
     generated_sql_assumptions: t`Generated SQL assumptions`,
   };
 }

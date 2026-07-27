@@ -78,7 +78,7 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 |---|---|---|---|---|
-| #015–#043 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. All G3 infrastructure ported + green (type-check/eslint/vitest). **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because feat's runtime interweaves G3's privacy/plan/clarify turn logic with G4 dashboard-block generation and G5 offline WebLLM chat — not cleanly separable. Complete the runtime integration in coordination with G4/G5. Not pushed. |
+| #015–#032 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. Core chat, privacy, and clarification infrastructure ported + green (type-check/eslint/vitest). **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because the source runtime interweaves privacy and clarification turn logic with G4 dashboard-block generation and G5 offline WebLLM chat. Complete the runtime integration in coordination with G4/G5. Not pushed. |
 
 GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`59cdb59c`, 2026-07-26) are merged into `develop` and merged back into `feat/ict4d-demo`.
 
@@ -375,33 +375,31 @@ Append-only log of `/deslop update` runs.
   - **Mergeback outcome:** drift on the G2 path set fell from 210 files /
     +3023 −11701 to 19 files / +1713 −1180 (all legit feat-ahead: the G4/G5
     dashboard surface — V4 schema, Filter PBlocks, DataVizPBlock/pfields,
-    getDashboardPuckConfig — plus feat-only bits DataExplorerApp PlanFlowView
-    wiring, VirtualDataset `planSteps`, offline `useLocalDatasetIds`, i18n
+    getDashboardPuckConfig — plus feat-only Data Explorer integration
+    wiring, offline `useLocalDatasetIds`, i18n
     RegenerateErrorBanner, `registerSessionExpiredHandler`). Adopted develop's
     `rawSQL`→`rawSql` and `URL`→`Url` renames codebase-wide, the
     `src/components/sql/` relocation of SqlEditor/AvaSqlBlock, and collapsed
     ~27 pre-existing feat flat/dir duplicate modules to develop's dir form.
     Left the 2 `src/components/offline/{OfflineGated,OfflineIndicator}` flat
     dups for the offline group. type-check + eslint + vitest green.
-  - **GROUP-3 plan refreshed** against the post-G2 develop: new
-    `src/components/sql/` import paths, `rawSql`/`Url` naming, `node-sql-parser`
-    already present, and G3 now owns the `DataExplorerApp` plan-flow
-    reconnection ([E2] deferral) + adding `planSteps` to develop's
-    VirtualDataset (`#036`).
+  - **GROUP-3 guide refreshed** against the post-G2 develop: new
+    `src/components/sql/` import paths, `rawSql`/`Url` naming, and
+    `node-sql-parser` already present.
   - **Analyzed-commit marker still `eb86cfc9`;** feat tip advanced through the
     G1 + G2 mergeback commits, all accounted for in this log.
 - `2026-07-26` — **GROUP-3 cut + migrated (in flight).** Cut
   `refactor-g3/ai-chat-panel` off `develop @ f37ba802` in a worktree and ported
-  GROUP-3 (rows #015–#043, ~95 files / +14.4k). type-check, eslint (G3 source),
+  GROUP-3 (rows #015–#032). type-check, eslint (G3 source),
   and vitest (14 files/110 tests + 9 ChatPanel/58) all green. Committed
   (`401419f2`), not pushed. Rows flipped `[ ]` → `[~]`.
   - **Deferred (flagged on the in-flight row):** `useAvandarChatRuntime.ts` kept
-    at develop's slim version — feat's runtime interweaves G3's privacy/plan/
-    clarify turn wiring with G4 dashboard-block generation and G5 offline WebLLM
-    chat that landed on the same turn path after G3, so it can't be cleanly
-    extracted to G3-only. All G3 infra (privacy detectors, crossBoundary, consent
-    modal, plan state managers, canvas, sandbox, clarification, audit logs) is
-    ported + unit-tested but not yet threaded into the live turn lifecycle. Also
+    at develop's slim version because the source runtime interweaves G3's privacy
+    and clarification turn wiring with G4 dashboard-block generation and G5
+    offline WebLLM chat that landed on the same turn path after G3, so it cannot
+    be cleanly extracted to G3-only. The privacy detectors, crossBoundary,
+    consent modal, clarification UI, and audit logs are ported + unit-tested but
+    not yet threaded into the live turn lifecycle. Also
     stripped G5 offline (`OfflineChatDownloadControl`, Composer offline branch)
     and G4 dashboard branch (useChatPageContext). Complete the runtime wiring in
     coordination with G4/G5.

@@ -52,15 +52,13 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 export type CrossBoundaryContext =
   | "discovery_clarification"
   | "generated_sql_assumptions"
-  | "plan_step_input"
   | "user_message_text"
   | "clarification_answer";
 
 export type CrossBoundaryRequest = {
   /**
    * For value-shaped requests, the actual values being sent. Required
-   * for `discovery_clarification`, `plan_step_input`, and
-   * `clarification_answer`.
+   * for `discovery_clarification` and `clarification_answer`.
    */
   values?: readonly unknown[];
 

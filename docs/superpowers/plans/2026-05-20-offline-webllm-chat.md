@@ -19,7 +19,7 @@
 | Offline trigger | `navigator.onLine === false` → local only, no prompt |
 | Failed POST | Offer local **only if** model downloaded; toast with reject if still online |
 | Voice | Swap: unload WebLLM → Whisper → transcribe → user sends; reload WebLLM on next chat turn |
-| Scope v1 | Data Explorer + Dashboards (dashboard: text blocks + DataViz SQL; no `proposePlan` offline) |
+| Scope v1 | Data Explorer + Dashboards (dashboard text blocks + DataViz SQL) |
 | Time budget | 2-pass default; +1 fix pass on DuckDB error; stream phase labels in assistant text |
 
 ---
@@ -77,6 +77,6 @@
 
 ## Out of scope (v1)
 
-- `proposePlan`, schema-drift regen, discovery clarify (use simple `fixed_options` / proceed)
+- Discovery clarification (use simple `fixed_options` or proceed)
 - Desktop native LLM (webview WebLLM only)
 - Workspace-default offline model in Supabase

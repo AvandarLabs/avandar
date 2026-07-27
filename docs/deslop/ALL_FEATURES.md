@@ -57,7 +57,7 @@ plans (with verified real paths — they supersede the per-feature
 
 1. ~~`GROUP-1-data-foundation-ingestion.md`~~ — rows #077, #094, #001, #002, #003. **✅ MERGED into `develop` (`914bcbba`; develop tip `3bb77f4f`) on 2026-07-24.** Group doc + per-feature plans deleted; see the Completed migrations log in `STATE.md`.
 2. ~~`GROUP-2-data-explorer-querying.md`~~ — #008–#013, #096, #097, #044–#047, #049. **✅ MERGED into `develop` (`59cdb59c`; base `3bb77f4f`) on 2026-07-26.** Group doc + per-feature plans deleted; cleanup merged back into `feat/ict4d-demo`. See the Completed migrations log in `STATE.md`.
-3. `GROUP-3-ai-chat-panel.md` — #015–#043 (chat core + privacy + plan workflows) ← **next**
+3. `GROUP-3-ai-chat-panel.md` — #015–#032 (chat core + privacy + clarification workflows) ← **next**
 4. `GROUP-4-dashboards.md` — #064–#076, #048
 5. `GROUP-5-platform-i18n-standalone.md` — #056–#063, #079–#082, #090, #095, #091–#093
 
@@ -156,7 +156,7 @@ index.
 
 The chat-interactive-workflows spec is
 `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
-Phases 0-9 cumulatively land below.
+Privacy foundation features land below.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
@@ -168,7 +168,7 @@ Phases 0-9 cumulatively land below.
 | 27 | `[~]` | **privacy-discovery-spanish-french-stubs** — Locale stub files for Spanish + French patterns (UX copy translated; patterns themselves pending advisor review). | CHECKPOINT 5 |
 | 28 | `[~]` | **privacy-isrowdatamessage-helper** — Server helper that detects row-shaped messages (for Phase 2+ values-scope enforcement). | CHECKPOINT 5 |
 
-## E. Chat interactive workflows — Phases 1-9
+## E. Chat clarification workflows
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
@@ -176,17 +176,6 @@ Phases 0-9 cumulatively land below.
 | 30 | `[~]` | **chat-clarification-card-and-bias-check** — Inline `ClarificationCard` (free-text / fixed-options-single / fixed-options-multi), keyboard behavior, bias check on outgoing user messages + on LLM clarification questions. | CHECKPOINT 4 + 5 |
 | 31 | `[~]` | **chat-clarification-telemetry** — Separate Dexie DB `AvandarClarificationAuditDB`, recordShown/recordOutcome with timing, Privacy log "Clarifications" sub-tab. | CHECKPOINT 5 + 9b |
 | 32 | `[~]` | **chat-discovery-clarifications** — Phase 2: LLM emits a read-only `SELECT DISTINCT`, dropdown populates from local DuckDB, selection routes through `crossBoundary` with `discovery_clarification` context. Shared `isReadOnlyDiscoveryQuery` validator. | CHECKPOINT 9b |
-| 33 | `[~]` | **chat-plan-propose** — Phase 3: `proposePlan` tool with ≤8-step plans, schema-validated server-side; `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle (`step_<id>`). | CHECKPOINT 9b + 10 |
-| 34 | `[~]` | **chat-plan-canvas** — xyflow visual DAG canvas with `RoughEdge` (RoughJS-styled bezier), custom `PlanStepNode`, animated zoom-in/zoom-out via `fitView`+`setCenter`, Auto/Step run-mode toggle. | CHECKPOINT 10 |
-| 35 | `[~]` | **chat-plan-step-materialization** — `planStepStorage.ts` Dexie DB keyed by `(planId, stepId)`; explicit cleanup on Close / replace / new `proposePlan`; **no OPFS**. | CHECKPOINT 10 |
-| 36 | `[~]` | **chat-plan-virtual-dataset-persistence** — Save-as-virtual-dataset persists the full plan in a new `plan_steps` JSONB column; reopening rehydrates the plan and re-registers cached parquet blobs (`rehydratePlan` + `loadParquet`). | CHECKPOINT 10 |
-| 37 | `[~]` | **chat-plan-schema-drift-regen** — Phase 4: `isSchemaDrift` strict comparator + `findAffectedDownstream` BFS; `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool; frontend regen loop with ≤2-attempt cap per step. | CHECKPOINT 10 |
-| 38 | `[~]` | **chat-plan-branching** — Phase 5: `PlanBranchStateManager` + `PlanBranchSidebar` + "Branch from here" CTA on succeeded steps. (Per-branch chat thread + virtual-dataset persistence intentionally deferred upstream.) | CHECKPOINT 15 |
-| 39 | `[~]` | **chat-plan-python-sandbox** — Phase 6: Sandboxed iframe at `/sandbox-executor.html` with strict CSP + pre-boot network stubs, lazy Pyodide load, parquet bridge via `pyarrow`, `sandboxClient`/`sandboxProtocol`, 30 s default timeout. WebR explicitly deferred. | CHECKPOINT 15 |
-| 40 | `[~]` | **chat-plan-approval-gate** — `approvalStatus: awaiting_approval | approved | rejected`; Approve/Reject banner blocks auto-run; >7-SQL-step heuristic suggests Python/R. | CHECKPOINT 15 |
-| 41 | `[~]` | **chat-plan-annotations** — Phase 9: `PlanAnnotationStateManager` (text/sticky/arrow/pen via perfect-freehand), `PlanCanvasToolbar`, `PlanAnnotationOverlay` sharing xyflow viewport, RoughJS arrows, 50-deep undo/redo, `AvandarPlanAnnotationDB` Dexie persistence. | CHECKPOINT 15 |
-| 42 | `[~]` | **chat-plan-png-pdf-export** — PNG export via `html-to-image` (toolbar/minimap excluded); PDF export via dynamic-imported `@react-pdf/renderer` — page 1 overview + one page per step (description / code / status / schema / row count). | CHECKPOINT 15 |
-| 43 | `[~]` | **chat-multi-language-plans** — `proposePlan` `type` enum accepts `sql | python | r | clarification`; executor dispatches by type. R returns error today (Python only registered in `availableRuntimes`). | CHECKPOINT 15 |
 
 ## F. Manual querying & SQL form
 

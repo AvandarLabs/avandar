@@ -40,7 +40,7 @@ msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Hakuna safu zilizogundulika kwa dataset hii. Kurudi kwenye safu zote."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "Panga kwa"
 
@@ -146,7 +146,7 @@ msgstr "URL ya chanzo"
 msgid " access"
 msgstr " ufikiaji"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr " {chartName} haiwezi kuonyeshwa."
 
@@ -155,7 +155,7 @@ msgid "Allow online syncing"
 msgstr "Ruhusu usawazishaji mtandaoni"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
 
@@ -219,6 +219,12 @@ msgstr "Panua"
 msgid "Notes"
 msgstr "Maelezo"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
+"differed from the import preview and have been overwritten with the "
+"actual values."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "Jukumu la kawaida"
@@ -240,15 +246,11 @@ msgstr "Wajumbe bado waliotengwa kwa kundi hili lazima wahamishwe kwanza."
 msgid "Delete failed"
 msgstr "Kufuta kumeshindwa"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "Kataa"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Fungua"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
 msgstr "Mkusanyiko"
 
@@ -361,9 +363,13 @@ msgstr "Rekodi ya ndani ya kila swali la ufafanuzi ambalo AI imeuliza katika "
 "nafasi hii ya kazi. Metadata pekee inahifadhiwa — kamwe si maandiko ya "
 "swali au jibu lako."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
 msgstr "Haiwezi kuonyesha {chartName}"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset failed to process"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -401,7 +407,7 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "datasets unazoweza kuongeza kwenye eneo lako la kazi unaweza kununua "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
 msgstr "Ongeza safu kwenye swali hapo juu ili kuanza kufafanua filtria."
 
@@ -466,7 +472,7 @@ msgstr "Kikundi cha jukumu kimeboreshwa"
 msgid "No matches"
 msgstr "Hakuna mechi"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "Hifadhi SQL kama ilivyo"
 
@@ -505,10 +511,6 @@ msgstr "Inasasisha nenosiri kwa {0}"
 msgid "Column info"
 msgstr "Taarifa ya safu"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "Kuingiza hatua ya mpango"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "Ninaelewa kuwa data hii itatumwa kwa mtoa huduma wa AI"
@@ -517,10 +519,6 @@ msgstr "Ninaelewa kuwa data hii itatumwa kwa mtoa huduma wa AI"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "Seti za data zilizohifadhiwa"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF (kurasa nyingi)"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -557,10 +555,6 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Chaguo moja"
-
-#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
-msgid "Processing — {eta} remaining"
-msgstr "Inashughulika — {eta} iliyobaki"
 
 #: src/routes/register.tsx
 msgid "However, we are not allowing new registrations at the moment."
@@ -659,10 +653,6 @@ msgstr "Metadata"
 msgid "Range"
 msgstr "Muktadha"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "Funga tawi"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Ingiza barua pepe"
@@ -727,10 +717,6 @@ msgstr "Funga mazungumzo (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Kuunda kumeshindikana"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "Kumeshindikana"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -807,12 +793,6 @@ msgstr "Lebo"
 msgid "Create a dashboard"
 msgstr "Unda dashibodi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this "
-"canvas."
-msgstr "Mpango umekataliwa. Omba gumzo kupendekeza mpango tofauti, au funga "
-"canvas hii."
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "imekosekana"
@@ -826,8 +806,8 @@ msgstr "Kiwango kimoja cha kawaida karibu na wastani"
 msgid "Name column"
 msgstr "Safu ya jina"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "Inarudiwa kwa \"Y dhidi ya X\""
 
@@ -905,26 +885,13 @@ msgstr "/mwezi"
 msgid "Filters for this chart"
 msgstr "Vichujio vya chati hii"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "Tenga kutoka hapa"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "Imepuuziliwa mbali"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "Uchunguzi umeshindikana."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "Futa"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "Tenga kutoka \"{truncated}\""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1003,10 +970,6 @@ msgstr "Katalogi ya data za umma bado iko katika <0/><1/>Tunaongeza datasets "
 "wanazotaka katika Avandar. Ikiwa kuna dataset unayotaka kuiona hapa, "
 "<2>tuambie</2>!"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "Futa"
-
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "Taarifa za afya zimegunduliwa"
@@ -1065,17 +1028,9 @@ msgstr "Ingiza jina la uwanja"
 msgid "Select Plan"
 msgstr "Chagua Mpango"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "Rangi {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "Thamani ya kawaida (hiari)"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "Pandisha"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1133,7 +1088,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 msgstr "Sanidi kichujio hiki: weka id, lebo, na jina la safu katika paneli ya "
 "upande."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1173,13 +1128,6 @@ msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the "
-"dataset, so it can be reopened on the canvas."
-msgstr "Uchambuzi wa hatua {0} uliozalisha matokeo haya utaokolewa na dataset, "
-"ili uweze kufunguliwa tena kwenye canvas."
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
@@ -1188,7 +1136,7 @@ msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 msgid "Suggested:"
 msgstr "Ilipendekezwa:"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "Badilisha SQL kwa mabadiliko ya fomu"
 
@@ -1199,10 +1147,6 @@ msgstr "Dataset haikukidhi muundo unaotarajiwa"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "Toka"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "Mpango wa uchambuzi"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1216,6 +1160,11 @@ msgstr "Faili ilipakiwa kwa sehemu"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "Njia za Malipo"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
+"the import preview and have been overwritten with the actual values."
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1261,11 +1210,6 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 "mtoa huduma wa AI katika eneo hili la kazi. Siku 90 zilizopita, "
 "zimehifadhiwa kwenye kifaa hiki pekee."
 
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "kutoka hatua {0}"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "Inasoma hadi:"
@@ -1286,6 +1230,10 @@ msgstr "Andika au bandika barua pepe hapa chini. Eneo lako la kazi litatozwa "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Used suggestion"
 msgstr "Pendekezo lililotumika"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" finished processing and is ready to use."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1345,29 +1293,21 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
 "wa mapema."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "Hatua"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "Max"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "Tayari"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "Ingiza data"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Descending"
 msgstr "Kushuka"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "Mhimili wa jamii"
 
@@ -1411,10 +1351,10 @@ msgstr "Kitambulisho cha eneo la kazi"
 msgid "Generate a query to configure this visualization."
 msgstr "Buni query ili kuunda picha hii."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Select a column"
 msgstr "Chagua safu"
@@ -1430,11 +1370,7 @@ msgstr "Ongeza maelezo, kisha export"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}, {1}, na {2} zimewekwa kwa kila eneo la kazi."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "Mikondo ya mpango"
-
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
@@ -1452,9 +1388,9 @@ msgstr "Tafuta mifano"
 msgid "Cannot sync this entity"
 msgstr "Haiwezi kusawazisha hii kitu"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "Ondoa mfululizo"
 
@@ -1482,7 +1418,7 @@ msgstr "Nyembamba zaidi"
 msgid "Graphite"
 msgstr "Graphite"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "not in"
 msgstr "siko ndani ya"
 
@@ -1560,10 +1496,6 @@ msgstr "Muktadha wa data"
 msgid "Data preview"
 msgstr "Mapitio ya data"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "Futa maelezo"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
 msgstr "kwa"
@@ -1604,7 +1536,7 @@ msgstr "Wasifu haujafanikiwa kupakia"
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
 msgstr "Kwa sasa uko kwenye mpango wa <0>{currentFeaturePlanName}</0>."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Result size"
 msgstr "Ukubwa wa matokeo"
 
@@ -1813,7 +1745,7 @@ msgstr "Thibitisha Kitendo"
 msgid "Data Preview"
 msgstr "Mapitio ya Data"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
 msgstr "si tupu"
 
@@ -1850,10 +1782,6 @@ msgstr "Dashibodi imehifadhiwa kwa mafanikio!"
 msgid "N/A"
 msgstr "S/H"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "Pandisha mbali"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "Msimamizi wa Kimataifa"
@@ -1878,6 +1806,10 @@ msgstr "Pointi za Data"
 msgid "Back to editor"
 msgstr "Rudi kwa mhariri"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about a minute"
+msgstr ""
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
@@ -1889,10 +1821,6 @@ msgstr "Tafadhali angalia barua yako pepe"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture dashboard"
 msgstr "Haiwezi kunasa dashibodi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "Picha ya PNG"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
@@ -1927,17 +1855,13 @@ msgstr "Fikiria kubadilisha maneno"
 msgid "Add people or user groups"
 msgstr "Ongeza watu au vikundi vya watumiaji"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Size column"
 msgstr "Safu ya ukubwa"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Values"
 msgstr "Thamani"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(tawi lisilo na jina)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -1969,7 +1893,7 @@ msgstr "Nambari ya QR"
 msgid "Role"
 msgstr "Jukumu"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "ni tupu"
 
@@ -2016,7 +1940,7 @@ msgstr "Chat imewezeshwa katika Data Explorer na Dashboards"
 msgid "Forgot your password?"
 msgstr "Umesahau nenosiri lako?"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "Bar"
 
@@ -2050,7 +1974,6 @@ msgstr "Hakuna maeneo"
 msgid "Failed to update workspace name"
 msgstr "Imeshindwa kuboresha jina la eneo la kazi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "Export"
@@ -2066,17 +1989,6 @@ msgstr "Unda makundi kwa wanachama wa ofisi yako. Seti za data na dashboards "
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Muonekano:"
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider "
-"whether a Python or R step would express this more cleanly. You can "
-"still approve as-is. Nothing has run yet. Click each node to read it; "
-"approve to execute."
-msgstr "AI imependekeza mpango wa hatua {0} — hiyo ni SQL nyingi. Fikiria ikiwa "
-"hatua ya Python au R ingeeleza hii kwa uwazi zaidi. Unaweza bado "
-"kuidhinisha kama ilivyo. Hakuna kilichofanyika bado. Bonyeza kila node "
-"ili kuisoma; idhinisha ili kutekeleza."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2119,14 +2031,6 @@ msgstr "Imepakuliwa kwenye kivinjari hiki"
 msgid "Pay monthly"
 msgstr "Lipa kila mwezi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "Rudisha tena"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "Fanya upya"
-
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Chagua mfano"
@@ -2168,7 +2072,7 @@ msgid "Data"
 msgstr "Data"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
-#: src/lib/offline/useOfflineGate.ts
+#: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
 msgid "Unavailable offline"
 msgstr "Haipatikani bila mtandao"
 
@@ -2220,6 +2124,10 @@ msgstr "{0} imefutwa kutoka kivinjari hiki."
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Seti kadhaa za data zilizochapishwa hazikuweza kupakiwa. Tafadhali "
 "jaribu tena baadaye."
+
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "less than a minute"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2334,19 +2242,13 @@ msgstr "Jibu la ufafanuzi"
 msgid "Generated SQL"
 msgstr "SQL iliyozalishwa"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Maximum rows to return"
 msgstr "Mistari ya juu ya kurudisha"
 
 #: src/routes/update-password.tsx
 msgid "Password update failed"
 msgstr "Kusasisha nenosiri kumeshindikana"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart "
-"from the top."
-msgstr "Hatua moja imefeli. Bonyeza node nyekundu kujaribu tena, au tumia "
-"Re-run kuanzisha tena kutoka juu."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -2390,16 +2292,12 @@ msgstr "Ongeza seti ya data kwenye eneo la kazi"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Kawaida sana: <0>{0}</0> thamani tofauti katika <1>{1}</1> mistari."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "Kimbia hatua"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
 msgstr "Kimbia swali la AI kwanza."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Safu ya Y"
 
@@ -2456,7 +2354,7 @@ msgstr "Muda wa nambari"
 msgid "Columns"
 msgstr "Safu"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
 msgstr "Badilisha SQL?"
 
@@ -2514,11 +2412,6 @@ msgstr "seti ya data"
 msgid "Remove failed"
 msgstr "Ondoa iliyo fail"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} cols"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2546,7 +2439,7 @@ msgstr "Mwisho (mfano. 2024-12-31)"
 msgid "No datasets match your search."
 msgstr "Hakuna seti za data zinazolingana na utafutaji wako."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "in"
 msgstr "katika"
 
@@ -2562,13 +2455,8 @@ msgstr "Kuna karatasi moja tu katika karatasi hii ya excel."
 msgid "Make dataset offline-only?"
 msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "Mpango wa mzizi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -2595,11 +2483,7 @@ msgstr "Jina la Safu"
 msgid "Sent password reset email"
 msgstr "Imetumwa barua ya kuweka upya nenosiri"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "Fanya tena (Ctrl+Shift+Z)"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
 msgstr "Chagua safu ya kupanga"
 
@@ -2632,11 +2516,11 @@ msgstr "Msitu"
 msgid "Allow manual edit"
 msgstr "Ruhusu kuhariri kwa mkono"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Mfululizo"
 
@@ -2660,17 +2544,13 @@ msgstr "Kitu hakikupata kupakia. Tafadhali jaribu tena baadaye au wasiliana na "
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Nunua kiti {seatsToAdd}"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "Fungua kwenye canvas"
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "Ukurasa wa meneja wa profaili umeshindwa kupakia. Tafadhali jaribu tena "
 "baadaye au wasiliana na msaada."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 msgstr "{chartName} haiwezi kuonyeshwa kwa sababu kuna axes au series "
@@ -2704,7 +2584,7 @@ msgstr "Mwelekeo"
 msgid "Entity deleted"
 msgstr "Kitu kimefutwa"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns"
 msgstr "Chagua safu"
 
@@ -2762,8 +2642,8 @@ msgstr "Kutoka nje kumeshindikana"
 msgid "You have successfully connected to {0}"
 msgstr "Umepata kuunganishwa kwa {0} kwa mafanikio"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
 msgstr "Safu ya X"
 
@@ -2813,7 +2693,7 @@ msgstr "Ya kawaida zaidi"
 msgid "Passwords do not match"
 msgstr "Nywila hazifanani"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
@@ -2865,11 +2745,6 @@ msgstr "Idadi ya safu za kupuuzia"
 msgid "From CSV"
 msgstr "Kutoka CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} safu{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "dakika"
@@ -2891,10 +2766,6 @@ msgstr "Mfano wa mazungumzo ya mtandaoni umeondolewa"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "Chombo"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "Inatekelezwa…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -2922,9 +2793,9 @@ msgstr "Chagua moja"
 msgid "No fields have been added"
 msgstr "Hakuna maeneo yaliyoongezwa"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
 msgstr "Nini maana ya series?"
 
@@ -2990,7 +2861,7 @@ msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
 msgid "Create a new account"
 msgstr "Unda akaunti mpya"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Direction"
 msgstr "Mwelekeo"
 
@@ -3032,9 +2903,9 @@ msgstr "Imetambuliwa"
 msgid "Delete Dataset"
 msgstr "Futa Dataset"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add series"
 msgstr "Ongeza mfululizo"
 
@@ -3081,8 +2952,8 @@ msgstr "{fieldName} lazima iwe na urefu wa angalau {minLength} wahusika"
 msgid "System sans"
 msgstr "Mfumo sans"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "Lebo ya series"
 
@@ -3179,7 +3050,7 @@ msgstr "{0}s"
 msgid "Please fix the highlighted fields."
 msgstr "Tafadhali rekebisha maeneo yaliyoangaziwa."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "between"
 msgstr "katika"
 
@@ -3195,7 +3066,7 @@ msgstr "wanachama wote wa "
 msgid "Some data should be manually entered"
 msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye axis ya Y. Chagua "
@@ -3223,16 +3094,15 @@ msgstr "Inapakia mifano..."
 msgid "Update frequency"
 msgstr "Mara kwa mara ya sasisho"
 
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "\"{sourceFileName}\" could not be parsed: {message}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "Ruhusu usawazishaji"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "Kumbukumbu ya sticky"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "Kuongeza"
 
@@ -3302,10 +3172,6 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "Hali hii haiwezi kubadilishwa."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "Thibitisha na uendeshe"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "Jina la dataset linapaswa kuwa na angalau herufi 2."
@@ -3327,7 +3193,7 @@ msgstr "Rekebisha"
 msgid "Enter a name for this profile type"
 msgstr "Ingiza jina la aina hii ya wasifu"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "Eneo"
 
@@ -3335,7 +3201,7 @@ msgstr "Eneo"
 msgid "No fields have been configured yet"
 msgstr "Hakuna maeneo yaliyowekwa bado"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "does not contain"
 msgstr "haijumuishi"
 
@@ -3377,7 +3243,12 @@ msgstr "Hii {resource} inashirikiwa na: "
 msgid "Upload"
 msgstr "Pakia"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#. placeholder {0}: eta.minutes
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "about {0} minutes"
+msgstr ""
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
 msgstr "Chagua safu za kuuliza"
 
@@ -3412,10 +3283,6 @@ msgstr "Ukali ({0})"
 msgid "{0} columns · {1} rows"
 msgstr "{0} safu · {1} safu"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "Rejea (Ctrl+Z)"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
 msgstr "Mtumiaji ameondolewa"
@@ -3428,6 +3295,10 @@ msgstr "Punguza {displayName} kwa ufikiaji wa programu"
 #: src/routes/update-password.tsx
 msgid "Confirm Password"
 msgstr "Thibitisha Neno la Siri"
+
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Column types updated"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3449,7 +3320,7 @@ msgstr "Mchambuzi wa Data"
 msgid "Count rows in {datasetName} by {secondGroupBy}"
 msgstr "Hesabu mistari katika {datasetName} kwa {secondGroupBy}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
@@ -3589,7 +3460,7 @@ msgstr "Ni wasimamizi pekee wa mipangilio ya eneo la kazi wanaweza kufungua "
 msgid "Pick which global filters apply to this visualization."
 msgstr "Chagua vichujio vya kimataifa vinavyotumika kwa uonyeshaji huu."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "Kila series ni wingu moja la mipira. Safu ya ukubwa inaamua radius ya "
@@ -3641,7 +3512,7 @@ msgstr "Usindikaji wa data umeshindwa"
 msgid "This feature is not implemented yet."
 msgstr "Kipengele hiki hakijatekelezwa bado."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "Seti hii ya data ni kubwa, hivyo tumetumia kikomo cha safu 100. Unaweza "
@@ -3689,10 +3560,6 @@ msgstr "Wakati umewezeshwa, wanachama wa kundi hili wanapata ufikiaji tu ikiwa "
 "tayari wana ufikiaji wa {app} katika eneo la kazi. Wakati umezimwa, "
 "kila mwanachama wa kundi anapata ufikiaji hapa, hata kama kawaida "
 "hawawezi kufungua {app}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "Auto"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -3751,11 +3618,11 @@ msgstr "Nakili kiungo cha kushiriki"
 msgid "Canonical URLs"
 msgstr "URLs za Kikanuni"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "Onyesha kama"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Line"
 msgstr "Mstari"
 
@@ -3826,10 +3693,6 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia "
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "hai"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
@@ -3837,10 +3700,6 @@ msgstr "Chagua thamani ya kwanza tunayoona"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "Data imechakatwa kwa mafanikio"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "Kalamu"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -3914,7 +3773,7 @@ msgstr "Maamuzi yote"
 msgid "Show labels"
 msgstr "Onyesha lebo"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "Msingi wa X"
 
@@ -4016,8 +3875,8 @@ msgstr "Kiunganishi cha Google sheets kimezimwa wakati kipengele hiki kiko "
 msgid "Remove"
 msgstr "Ondoa"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "Hakuna safu za nambari"
 
@@ -4098,7 +3957,7 @@ msgstr "Usajili umeboreshwa kwa mafanikio"
 msgid "Default value"
 msgstr "Thamani ya kawaida"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
 msgstr "Hakuna safu za nambari zinazopatikana kuongezwa kwenye mfululizo huu."
 
@@ -4124,7 +3983,7 @@ msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
 msgid "Multi-select"
 msgstr "Chaguo nyingi"
 
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "Kila series ni wingu moja la (X, Y) la alama. Ongeza zaidi ili "
@@ -4183,10 +4042,6 @@ msgstr "Mchoro"
 msgid "Switch Workspace"
 msgstr "Badilisha Nafasi ya Kazi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "Hamisha canvas"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Unaweza kuona dashibodi hii kwa sababu ilishirikiwa nawe."
@@ -4206,7 +4061,7 @@ msgstr "Admin"
 msgid "Published"
 msgstr "Imepakiwa"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "Filita (Wapi)"
 
@@ -4242,10 +4097,6 @@ msgstr "Mhariri"
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "Ni watu na vikundi vilivyoorodheshwa hapo juu pekee wanaoweza kufikia "
 "{resource} hii."
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "Inasubiri"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4335,10 +4186,6 @@ msgstr "Safu za seti za data"
 msgid "Could not prepare the offline chat model."
 msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "Matawi"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
 msgstr "Hii dataset itakuwa ya mtandaoni pekee"
@@ -4360,7 +4207,7 @@ msgstr "Jaribu tena."
 msgid "We should join data into the same {entityConfigName} when…"
 msgstr "Tunapaswa kuunganisha data katika {entityConfigName} sawa wakati..."
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "ina"
 
@@ -4394,13 +4241,13 @@ msgstr "Kile mtu huyu au kundi linaweza kufanya. Mtazamaji = kusoma tu, Mhariri 
 msgid "Filter id (stable)"
 msgstr "Kitambulisho cha chujio (thabiti)"
 
-#: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "Hakuna safu zinazopatikana"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "Pan"
+#: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
+msgid "Dataset ready"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4532,10 +4379,6 @@ msgstr "Uko kwenye mpango wa Bure"
 msgid "Count"
 msgstr "Idadi"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
-msgid "Some datasets are missing data"
-msgstr "Seti za data zingine hazina data"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
@@ -4617,12 +4460,12 @@ msgstr "Aina ya safu isiyo sahihi"
 msgid "Syncing dataset online..."
 msgstr "Inasawazisha dataset mtandaoni..."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Ongeza mfululizo kuchagua ni safu ipi ya nambari inayoendesha chati."
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Column"
 msgstr "Safu"
 
@@ -4684,7 +4527,6 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "Kwa kila dataset uliyoongeza, tafadhali eleza ni safu zipi zinapaswa "
 "kutumika kutambulisha {entityConfigName} kipekee."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "Maandishi"
@@ -4693,7 +4535,7 @@ msgstr "Maandishi"
 msgid "Role group deleted"
 msgstr "Kikundi cha jukumu kimefutwa"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
 msgstr "Chagua mpangilio wa kuagiza"
 
@@ -4715,10 +4557,6 @@ msgstr "Tafuta dashibodi"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "Anwani ya barua pepe isiyo sahihi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "Hatua zote zimefanikiwa. Bonyeza node yoyote kuifungua kwenye canvas."
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4790,10 +4628,6 @@ msgstr "Tafadhali jaribu tena au wasiliana na msaada."
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "Ufikiaji wa jumla"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "Kagua na kubali mpango"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4908,7 +4742,7 @@ msgstr "Serif ya toleo"
 msgid "Untitled dashboard"
 msgstr "Dashibodi isiyo na jina"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Limit"
 msgstr "Kikomo"
 
@@ -4943,7 +4777,6 @@ msgstr "Jukumu na vikundi vya watumiaji"
 msgid "Clear all"
 msgstr "Futa yote"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4989,18 +4822,10 @@ msgstr "Dataset nzima"
 msgid "Invalid date"
 msgstr "Tarehe isiyo sahihi"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each "
-"node to read it; approve to execute."
-msgstr "AI imependekeza mpango wa hatua {0}. Hakuna chochote kimefanyika bado. "
-"Bonyeza kila node ili kuisoma; idhinisha ili kuitekeleza."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "Baadhi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "Panya"
@@ -5015,13 +4840,13 @@ msgstr "Thamani, zilizotengwa kwa koma"
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} thamani zaidi zimefungwa kwenye {1} safu"
 
+#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
+msgid "Processing, {remainingLabel} remaining"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "Huru"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "Maandishi ya maelezo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

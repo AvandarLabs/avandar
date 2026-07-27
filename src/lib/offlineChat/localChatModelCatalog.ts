@@ -73,7 +73,7 @@ export const LOCAL_CHAT_MODELS: readonly LocalChatModel[] = [
     mlcModelId: "Qwen2.5-7B-Instruct-q4f16_1-MLC",
     displayName: "Qwen 2.5 7B (offline)",
     description:
-      "High-quality 7B instruct model. Best for difficult schemas and multi-step SQL offline.",
+      "High-quality 7B instruct model. Best for difficult schemas and complex SQL offline.",
     approxSizeMb: 4500,
     minRamGb: 24,
     systemRequirements: buildRamRequirementLabel(24),

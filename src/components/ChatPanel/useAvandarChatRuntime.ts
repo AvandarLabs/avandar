@@ -4,10 +4,8 @@ import { Model } from "@models";
 import { isNotNull, matchLiteral, prop } from "@utils";
 import { useMemo, useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse";
+import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -86,9 +84,6 @@ function buildRetryContext(
       400,
     );
   }
-  if (response.plan?.rootMessage) {
-    ctx.priorPlanRootMessage = response.plan.rootMessage.slice(0, 800);
-  }
   if (response.dashboardBlock?.kind) {
     ctx.priorDashboardBlockKind = response.dashboardBlock.kind.slice(0, 40);
   }
@@ -122,17 +117,12 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const { parseSql } = useSqlToStructuredQuery();
-  const planDispatch = PlanStateManager.useDispatch();
-  const planState = PlanStateManager.useState();
   const { t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
   // inside `run()`. Including `pageContext` or `parseSql` in the adapter
   // useMemo deps recreates the adapter whenever SQL or dataset metadata
   // changes, which thrashes assistant-ui's local runtime and drops side
   // effects such as `setRawSql` (CHECKPOINTS bug #29).
-  const planStateRef = useRef(planState);
-  planStateRef.current = planState;
-
   const pageContextRef = useRef(pageContext);
   pageContextRef.current = pageContext;
 
@@ -357,16 +347,6 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                   },
                 });
               },
-              loadPlan: (plan) => {
-                const prior = planStateRef.current;
-                if (prior.nodes.length > 0) {
-                  void dropPlanTempViews({
-                    planId: prior.planId ?? undefined,
-                    nodes: prior.nodes,
-                  });
-                }
-                planDispatch.loadPlan(plan);
-              },
               setPendingClarification:
                 chatPanelDispatch.setPendingClarification,
               recordClarificationShown: async (clarification) => {
@@ -485,12 +465,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
       },
     };
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
-  }, [
-    dataExplorerDispatch,
-    dashboardEditorDispatch,
-    chatPanelDispatch,
-    planDispatch,
-  ]);
+  }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);
 
   // `useLocalRuntime` builds an Assistant UI runtime that keeps thread state
   // in the browser and routes each turn through the adapter's `run` function.

@@ -4,9 +4,9 @@ import {
 } from "@assistant-ui/react-markdown";
 import clsx from "clsx";
 import remarkGfm from "remark-gfm";
-import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { ChatSyntaxHighlighter } from "@/components/ChatPanel/ChatThread/chatSyntaxHighlighter";
 import { MarkdownCodeHeader } from "@/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader";
+import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import css from "../ChatThread.module.css";
 
 const SQL_LANGUAGES = new Set(["sql", "duckdb"]);
