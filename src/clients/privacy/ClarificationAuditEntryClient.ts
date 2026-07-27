@@ -1,0 +1,118 @@
+import { uuid } from "$/lib/uuid";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
+import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+import type {
+  ClarificationOutcome,
+  ClarificationResponseShapeLabel,
+} from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry.types";
+import type { ChatClarifyRequest } from "$/types/chat.types";
+
+type PendingClarification = {
+  id: ClarificationAuditEntry.Id;
+  askedAtMs: number;
+};
+
+const PENDING = new Map<ClarificationAuditEntry.Id, PendingClarification>();
+
+function _responseShape(
+  request: ChatClarifyRequest,
+): ClarificationResponseShapeLabel {
+  if (request.responseShape.kind === "free_text") {
+    return "free_text";
+  }
+  if (request.responseShape.kind === "discovery") {
+    return request.responseShape.multi ? "discovery_multi" : "discovery_single";
+  }
+  return request.responseShape.multi ?
+      "fixed_options_multi"
+    : "fixed_options_single";
+}
+
+const clarificationAuditEntryClient = createDexieCrudClient({
+  db: AvaDexie.DB,
+  modelName: "ClarificationAuditEntry",
+  parsers: ClarificationAuditEntryParsers,
+  queries: ({ dbTable }) => {
+    return {
+      listClarificationLog: async (
+        workspaceId: string,
+      ): Promise<ClarificationAuditEntry.T[]> => {
+        const rows = await dbTable
+          .where("workspaceId")
+          .equals(workspaceId)
+          .toArray();
+        return rows.sort((firstEntry, secondEntry) => {
+          return secondEntry.timestamp - firstEntry.timestamp;
+        });
+      },
+    };
+  },
+  mutations: ({ dbTable }) => {
+    return {
+      recordShown: async (options: {
+        workspaceId: string;
+        threadId?: string;
+        request: ChatClarifyRequest;
+      }): Promise<ClarificationAuditEntry.Id> => {
+        const id = uuid() as ClarificationAuditEntry.Id;
+        const askedAtMs = Date.now();
+        const optionsCount =
+          options.request.responseShape.kind === "fixed_options" ?
+            options.request.responseShape.options.length
+          : null;
+        PENDING.set(id, { id, askedAtMs });
+        try {
+          await dbTable.add({
+            id,
+            workspaceId: options.workspaceId,
+            threadId: options.threadId ?? null,
+            timestamp: askedAtMs,
+            turnNumber: options.request.turnNumber,
+            responseShape: _responseShape(options.request),
+            questionLengthChars: options.request.question.length,
+            rationaleProvided: Boolean(options.request.rationale),
+            optionsCount,
+            outcome: "answered",
+            biasReprompts: 0,
+            timeToAnswerMs: null,
+            ledToSuccessfulSql: null,
+            patternLocale: "en",
+          });
+        } catch (error) {
+          console.warn("[privacy] clarification audit write failed:", error);
+        }
+        return id;
+      },
+      recordOutcome: async (options: {
+        id: ClarificationAuditEntry.Id;
+        outcome: ClarificationOutcome;
+      }): Promise<void> => {
+        const pending = PENDING.get(options.id);
+        PENDING.delete(options.id);
+        try {
+          await dbTable.update(options.id, {
+            outcome: options.outcome,
+            timeToAnswerMs: pending ? Date.now() - pending.askedAtMs : null,
+          });
+        } catch (error) {
+          console.warn(
+            "[privacy] clarification audit outcome write failed:",
+            error,
+          );
+        }
+      },
+    };
+  },
+});
+
+/** Hook-enabled client for browser-local clarification audit records. */
+export const ClarificationAuditEntryClient = createUsableServiceClient(
+  clarificationAuditEntryClient,
+  {
+    queryFns: ["listClarificationLog"],
+    mutationFns: ["recordShown", "recordOutcome"],
+  },
+);
