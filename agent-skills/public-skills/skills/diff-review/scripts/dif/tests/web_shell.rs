@@ -84,6 +84,15 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         "active group headings should still show a distinct hover background"
     );
     assert!(
+        css_text
+            .contains(".files {\n  max-height: 45vh;\n  overflow-y: auto;\n  overflow-x: hidden;"),
+        "expanded group file lists should scroll independently"
+    );
+    assert!(
+        css_text.contains(".grp-body {\n  overflow: hidden;\n  max-height: calc(45vh + 40px);"),
+        "the expanded accordion should leave room for its scroll area and orientation"
+    );
+    assert!(
         css_text.contains(".test-plan-panel {\n  padding: 8px 6px 16px;\n  color: var(--ink-2);\n  font-size: 13.5px;"),
         "test plan base font size should be 1px larger"
     );

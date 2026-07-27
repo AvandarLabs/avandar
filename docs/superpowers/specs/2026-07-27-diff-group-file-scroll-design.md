@@ -22,8 +22,10 @@ Each expanded group's file list will be its own vertical scroll area:
 ## Implementation
 
 The change belongs in the web shell stylesheet. The `.files` container will
-receive `max-height: 45vh`, `overflow-y: auto`, and `overflow-x: hidden`.
-No JavaScript or data-model changes are needed.
+receive `max-height: 45vh`, `overflow-y: auto`, and `overflow-x: hidden`. The
+expanded `.grp-body` cap will become `calc(45vh + 40px)` so the file-list
+viewport and one-line orientation both remain accessible. No JavaScript or
+data-model changes are needed.
 
 The existing web-shell asset integration test will first gain an assertion for
 the group file-list scroll contract. The assertion will be run before the CSS

@@ -163,6 +163,9 @@ See the design mockup (published separately) for the visual. Principles:
   - Clicking a **group heading** toggles that group open or closed with an
     animated accordion. When closed, only the heading row remains visible: no
     orientation summary and no file rows.
+  - Each expanded group's file list is capped at `45vh` and scrolls
+    independently, keeping the group heading and orientation visible while
+    preserving scroll chaining into the surrounding sidebar.
   - The collapsed rail, palette, and file rows show filtered difit views in the
     main area.
     Clicking a **file** switches to its group *and* scrolls the main view to

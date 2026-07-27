@@ -656,7 +656,7 @@ kbd {
 }
 .grp-body {
   overflow: hidden;
-  max-height: 560px;
+  max-height: calc(45vh + 40px);
   opacity: 1;
   transition:
     max-height 0.2s var(--ease),
@@ -667,6 +667,9 @@ kbd {
   opacity: 0;
 }
 .files {
+  max-height: 45vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 6px 6px;
 }
 .fitem {

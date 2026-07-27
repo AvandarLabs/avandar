@@ -39,6 +39,10 @@ assert!(
     ),
     "expanded group file lists should scroll independently"
 );
+assert!(
+    css_text.contains(".grp-body {\n  overflow: hidden;\n  max-height: calc(45vh + 40px);"),
+    "the expanded accordion should leave room for its scroll area and orientation"
+);
 ```
 
 - [ ] **Step 2: Run the focused test to verify it fails**
@@ -62,6 +66,12 @@ Change the `.files` rule to:
   overflow-x: hidden;
   padding: 0 6px 6px;
 }
+```
+
+Change the expanded `.grp-body` maximum height from `560px` to:
+
+```css
+max-height: calc(45vh + 40px);
 ```
 
 - [ ] **Step 4: Document the behavior**
