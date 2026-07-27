@@ -4,10 +4,6 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type {
-  ClarificationOutcome,
-  ClarificationResponseShapeLabel,
-} from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry.types";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
 type PendingClarification = {
@@ -19,7 +15,7 @@ const PENDING = new Map<ClarificationAuditEntry.Id, PendingClarification>();
 
 function _responseShape(
   request: ChatClarifyRequest,
-): ClarificationResponseShapeLabel {
+): ClarificationAuditEntry.T["responseShape"] {
   if (request.responseShape.kind === "free_text") {
     return "free_text";
   }
@@ -88,7 +84,7 @@ const clarificationAuditEntryClient = createDexieCrudClient({
       },
       recordOutcome: async (options: {
         id: ClarificationAuditEntry.Id;
-        outcome: ClarificationOutcome;
+        outcome: ClarificationAuditEntry.T["outcome"];
       }): Promise<void> => {
         const pending = PENDING.get(options.id);
         PENDING.delete(options.id);
