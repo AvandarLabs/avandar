@@ -1,3 +1,9 @@
+/**
+ * Client-side mirror of the backend discovery-query validator. Keeping the
+ * same contract on both sides lets generated clarification queries fail before
+ * the user waits on local DuckDB execution.
+ */
+
 /** Maximum length accepted for LLM-generated discovery queries. */
 export const MAX_DISCOVERY_QUERY_CHARS = 2000;
 

@@ -63,17 +63,18 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export async function rehydratePlan(options: Options): Promise<void> {}
   ```
 
-- Attach member documentation to the exported member it describes, not to the
-  top of the file. File-level block comments are only for context that applies
-  to the whole file and has no better function, constant, object, class, or
-  type to attach to. They are complementary context, not a substitute for
-  member JSDoc, because IDE intellisense surfaces member comments.
+- Document exported members directly even when the file also has a file-level
+  block comment. File-level comments are fine when they add whole-file purpose
+  or design context, but they are complementary context, not a substitute for
+  member JSDoc. IDE intellisense surfaces member comments, so exported
+  functions, constants, objects, classes, and types still need their own
+  comments.
 
   This is bad:
 
   ```ts
   /**
-   * Validates discovery queries before local execution.
+   * Discovery query helpers shared by client and server validators.
    */
 
   export const MAX_QUERY_CHARS = 2000;
@@ -84,6 +85,10 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   This is good:
 
   ```ts
+  /**
+   * Discovery query helpers shared by client and server validators.
+   */
+
   /** Maximum length accepted for generated discovery queries. */
   export const MAX_QUERY_CHARS = 2000;
 

@@ -1,3 +1,10 @@
+/**
+ * Backend validation for generated discovery clarification queries.
+ *
+ * The client mirrors this validator so malformed or write-shaped queries are
+ * rejected before they are persisted into a response or executed locally.
+ */
+
 /** Maximum length accepted for LLM-generated discovery queries. */
 export const MAX_DISCOVERY_QUERY_CHARS = 2000;
 

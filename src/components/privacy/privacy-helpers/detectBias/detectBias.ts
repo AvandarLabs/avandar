@@ -1,3 +1,11 @@
+/**
+ * Client-side bias heuristics for user-typed text and LLM-generated
+ * clarification questions.
+ *
+ * Bias hits are soft nudges: callers may surface suggestions, but the detector
+ * does not make hard blocking decisions.
+ */
+
 export type BiasCategory =
   | "gender_generalization"
   | "ethnic_cultural_generalization"
