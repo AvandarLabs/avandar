@@ -2,7 +2,9 @@
 
 This file covers the **terminal TUI**. The browser **web shell** is a separate
 surface with its own command palette (`⌘K` / `Ctrl+K`) and navigation hotkeys
-(`Ctrl+1..9` groups, `Ctrl+F` full diff, `Ctrl+H` toggle sidebar) — see
+(`Ctrl+1..9` groups, `Ctrl+F` full diff, `Ctrl+H` toggle sidebar, `Ctrl+D` diff
+guide tab, `Ctrl+T` test plan tab on macOS; `Alt+Shift` is the leader on
+Windows/Linux) — see
 [web-shell.md](web-shell.md#header-chrome-command-palette--hotkeys).
 
 Global (work from either pane):
@@ -50,14 +52,15 @@ When the **main** (diff) view is focused (read-only). Keys common to both views:
 
 | Key | Action |
 | --- | --- |
-| `Tab` / `Shift+Tab` | cycle the main view forward / backward (Logs ↔ Diff guide) |
+| `Tab` / `Shift+Tab` | cycle the main view forward / backward (Logs ↔ Test plan ↔ Diff guide) |
 | `Up` / `Down` | scroll the active view 3 rows |
 | `PageUp` / `PageDown` | scroll the active view 20 rows |
 | mouse wheel | scroll the focused pane |
 
 There are **no bare-letter shortcuts to switch views** — use `Tab` /
-`Shift+Tab`. In the **diff guide** view, the bare letters instead drive a basic
-vim pager with a visible cursor (drawn over the fully styled/colored markdown):
+`Shift+Tab`. In the **Test plan** and **Diff guide** views, the bare letters
+drive a basic vim pager with a visible cursor (drawn over the fully
+styled/colored markdown):
 
 | Key | Action |
 | --- | --- |

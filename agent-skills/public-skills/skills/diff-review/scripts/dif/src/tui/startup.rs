@@ -43,40 +43,42 @@ struct LaunchSurface {
     is_review_online: bool,
 }
 
+struct ReviewPaths {
+    transcript: PathBuf,
+    session_id: PathBuf,
+    session_meta: PathBuf,
+    guide: PathBuf,
+    guide_json: PathBuf,
+    diff_summary: PathBuf,
+    test_plan: PathBuf,
+}
+
 /// Launch the LLM and, when review artifacts already exist, difit + poller.
 pub fn launch(cli: &Cli) -> Result<App> {
     let repo_root = git::repo_root()?;
     let config = DifConfig::load(&repo_root);
-    let agent_kind = if cli.codex {
-        AgentKind::Codex
-    } else {
-        AgentKind::Claude
-    };
-    let llm_cmd = match agent_kind {
-        AgentKind::Claude => config.claude_cmd,
-        AgentKind::Codex => config.codex_cmd,
-    };
+    let (agent_kind, llm_cmd) = selected_agent(cli, config);
     let branch = git::current_branch()?;
     let comparison = git::resolve_comparison_key(cli.comparison_key.as_deref(), &Git);
 
     let branch_slug = slug::branch_slug(&branch);
     let scope_slug = comparison.scope_slug();
     let port = server::pick_port(slug::port_for(&branch_slug, &scope_slug));
-
-    let transcript_path = paths::transcript_path(&repo_root, &branch_slug, &scope_slug);
-    let session_id_path =
-        paths::llm_session_id_path(&repo_root, agent_kind, &branch_slug, &scope_slug);
-    let session_meta_path = paths::session_meta_path(&repo_root, &branch_slug, &scope_slug);
-    let guide_path = paths::guide_path(&repo_root, &branch_slug, &scope_slug);
-    let guide_json_path = paths::guide_json_path(&repo_root, &branch_slug, &scope_slug);
+    let review_paths = review_paths(&repo_root, agent_kind, &branch_slug, &scope_slug);
     let _ = fs::create_dir_all(paths::difit_dir(&repo_root));
 
     let shell_port =
         server::pick_port(slug::port_for(&format!("{branch_slug}-shell"), &scope_slug));
-    let control_port =
-        server::pick_port(slug::port_for(&format!("{branch_slug}-control"), &scope_slug));
+    let control_port = server::pick_port(slug::port_for(
+        &format!("{branch_slug}-control"),
+        &scope_slug,
+    ));
     let review_control = ReviewControl::start(control_port)?;
-    let is_review_ready = review_files_ready(&transcript_path, &guide_path, &guide_json_path);
+    let is_review_ready = review_files_ready(
+        &review_paths.transcript,
+        &review_paths.guide,
+        &review_paths.guide_json,
+    );
     review_control.set_accepts_updates(!is_review_ready);
     let worktree = web::meta::worktree_name(&repo_root, &branch);
     let surface = start_launch_surface(
@@ -84,11 +86,13 @@ pub fn launch(cli: &Cli) -> Result<App> {
         &comparison,
         port,
         shell_port,
-        &transcript_path,
-        &guide_path,
-        guide_json_path.clone(),
+        &review_paths.transcript,
+        &review_paths.guide,
+        review_paths.guide_json.clone(),
         branch.clone(),
         worktree.clone(),
+        review_paths.diff_summary.clone(),
+        review_paths.test_plan.clone(),
     )?;
 
     let initial_prompt = if surface.is_review_online {
@@ -98,7 +102,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
     };
     let llm = spawn_llm(
         &repo_root,
-        &session_id_path,
+        &review_paths.session_id,
         agent_kind,
         &llm_cmd,
         initial_prompt.as_deref(),
@@ -113,16 +117,13 @@ pub fn launch(cli: &Cli) -> Result<App> {
         llm,
         agent_kind,
         llm_cmd,
-        // Start on the diff main view (left), not the LLM pane: the review
-        // begins by looking at the diff, and the LLM is already busy loading
-        // the skill from its auto-submitted initial prompt (see `spawn_llm`).
-        focus: Panel::Difit,
+        focus: initial_focus(),
         port,
         comparison_label: comparison_label(&comparison),
         repo_root,
         comparison,
-        transcript_path,
-        session_id_path,
+        transcript_path: review_paths.transcript,
+        session_id_path: review_paths.session_id,
         review_control,
         dispatcher,
         reply_watcher: ReplyWatcher::new(),
@@ -133,9 +134,10 @@ pub fn launch(cli: &Cli) -> Result<App> {
         warned_sig: None,
         last_inject_at: None,
         active_diff_view: super::main_diff_view::MainDiffView::Log,
-        guide: super::guide::Guide::new(guide_path),
+        guide: super::guide::Guide::new(review_paths.guide),
+        test_plan: super::guide::Guide::new(review_paths.test_plan.clone()),
         vim: super::vim::VimState::new(),
-        session_meta: session_meta_path,
+        session_meta: review_paths.session_meta,
         palette: None,
         help_open: false,
         web_shell: surface.web_shell,
@@ -143,7 +145,9 @@ pub fn launch(cli: &Cli) -> Result<App> {
         is_review_online: surface.is_review_online,
         shell_port,
         control_port,
-        guide_json_path,
+        guide_json_path: review_paths.guide_json,
+        diff_summary_path: review_paths.diff_summary,
+        test_plan_path: review_paths.test_plan,
         branch,
         worktree,
         fresh_llm_prompt: initial_prompt,
@@ -151,6 +155,36 @@ pub fn launch(cli: &Cli) -> Result<App> {
     };
     app.write_session_meta(open_url);
     Ok(app)
+}
+
+/// The initial keyboard focus for a new TUI launch.
+const fn initial_focus() -> Panel {
+    Panel::Llm
+}
+
+fn selected_agent(cli: &Cli, config: DifConfig) -> (AgentKind, String) {
+    if cli.codex {
+        (AgentKind::Codex, config.codex_cmd)
+    } else {
+        (AgentKind::Claude, config.claude_cmd)
+    }
+}
+
+fn review_paths(
+    repo_root: &Path,
+    agent_kind: AgentKind,
+    branch_slug: &str,
+    scope_slug: &str,
+) -> ReviewPaths {
+    ReviewPaths {
+        transcript: paths::transcript_path(repo_root, branch_slug, scope_slug),
+        session_id: paths::llm_session_id_path(repo_root, agent_kind, branch_slug, scope_slug),
+        session_meta: paths::session_meta_path(repo_root, branch_slug, scope_slug),
+        guide: paths::guide_path(repo_root, branch_slug, scope_slug),
+        guide_json: paths::guide_json_path(repo_root, branch_slug, scope_slug),
+        diff_summary: paths::diff_summary_path(repo_root, branch_slug, scope_slug),
+        test_plan: paths::test_plan_path(repo_root, branch_slug, scope_slug),
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -164,6 +198,8 @@ fn start_launch_surface(
     guide_json_path: PathBuf,
     branch: String,
     worktree: String,
+    diff_summary_path: PathBuf,
+    test_plan_path: PathBuf,
 ) -> Result<LaunchSurface> {
     if !review_files_ready(transcript_path, guide_path, &guide_json_path) {
         return Ok(LaunchSurface {
@@ -185,7 +221,15 @@ fn start_launch_surface(
         INITIAL_COLS,
     )?;
     let _ready = server::wait_until_ready(port, 50);
-    let web_shell = start_web_shell(port, shell_port, guide_json_path, branch, worktree);
+    let web_shell = start_web_shell(
+        port,
+        shell_port,
+        guide_json_path,
+        branch,
+        worktree,
+        diff_summary_path,
+        test_plan_path,
+    );
     let open_url = web_shell
         .as_ref()
         .map_or_else(|| format!("http://localhost:{port}/"), web::WebShell::url);
@@ -303,7 +347,10 @@ fn spawn_waiting_pane(repo_root: &Path, comparison_label: &str) -> Result<PtyPan
          [dif] Waiting for the LLM to run /diff-review and write .difit artifacts.\r\n\
          [dif] difit and the browser shell will start automatically when ready."
     );
-    let command = format!("printf '%s\\r\\n' {}; exec sleep 2147483647", session::shell_quote(&message));
+    let command = format!(
+        "printf '%s\\r\\n' {}; exec sleep 2147483647",
+        session::shell_quote(&message)
+    );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS)
 }
 
@@ -313,10 +360,21 @@ fn start_web_shell(
     guide_json_path: PathBuf,
     branch: String,
     worktree: String,
+    diff_summary_path: PathBuf,
+    test_plan_path: PathBuf,
 ) -> Option<web::WebShell> {
     // Wrap difit in the browser web shell (guide sidebar + per-group filtered
     // views). If the shell fails to start, callers fall back to raw difit.
-    web::WebShell::start(port, shell_port, guide_json_path, branch, worktree).ok()
+    web::WebShell::start(
+        port,
+        shell_port,
+        guide_json_path,
+        branch,
+        worktree,
+        diff_summary_path,
+        test_plan_path,
+    )
+    .ok()
 }
 
 /// The saved session id, but only if the selected frontend can resume it.
@@ -404,7 +462,10 @@ mod tests {
     fn prepare_review_prompt_uses_only_the_user_comparison_arg() {
         assert_eq!(prepare_review_prompt(None), "/diff-review");
         assert_eq!(prepare_review_prompt(Some(".")), "/diff-review .");
-        assert_eq!(prepare_review_prompt(Some("develop")), "/diff-review develop");
+        assert_eq!(
+            prepare_review_prompt(Some("develop")),
+            "/diff-review develop"
+        );
     }
 
     #[test]
@@ -434,6 +495,11 @@ mod tests {
             &guide_path,
             &guide_json_path
         ));
+    }
+
+    #[test]
+    fn initial_focus_starts_on_llm_panel() {
+        assert_eq!(initial_focus(), Panel::Llm);
     }
 
     #[test]

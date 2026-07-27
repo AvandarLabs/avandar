@@ -162,12 +162,21 @@ mod tests {
         assert!(cmd.contains("--keep-alive"));
         assert!(cmd.contains("--include-untracked"));
         assert!(!cmd.contains("--comment"));
-        assert!(!cmd.contains("--no-open"), "open_browser=true omits --no-open");
+        assert!(
+            !cmd.contains("--no-open"),
+            "open_browser=true omits --no-open"
+        );
     }
 
     #[test]
     fn command_for_uncommitted_passes_dot() {
-        let cmd = build_command(Path::new("/r"), &ComparisonKey::Uncommitted, 4500, None, true);
+        let cmd = build_command(
+            Path::new("/r"),
+            &ComparisonKey::Uncommitted,
+            4500,
+            None,
+            true,
+        );
         assert!(cmd.contains(" '.' "));
     }
 
@@ -189,10 +198,16 @@ mod tests {
             true,
         );
         assert!(
-            cmd.contains(&format!("exec {}", shell_quote(&local.display().to_string()))),
+            cmd.contains(&format!(
+                "exec {}",
+                shell_quote(&local.display().to_string())
+            )),
             "expected exec of local difit shim, got: {cmd}"
         );
-        assert!(!cmd.contains("exec difit "), "should not fall back to PATH difit");
+        assert!(
+            !cmd.contains("exec difit "),
+            "should not fall back to PATH difit"
+        );
     }
 
     #[test]
@@ -207,7 +222,10 @@ mod tests {
             None,
             true,
         );
-        assert!(cmd.contains("&& exec difit "), "expected PATH fallback, got: {cmd}");
+        assert!(
+            cmd.contains("&& exec difit "),
+            "expected PATH fallback, got: {cmd}"
+        );
     }
 
     #[test]

@@ -28,14 +28,28 @@
       kind: "action", glyph: collapsed ? "»" : "«",
       label: (collapsed ? "Expand" : "Collapse") + " diff guide",
       sub: (collapsed ? "show" : "hide") + " the guide sidebar",
-      hint: ["Ctrl", "H"],
+      hint: platformHotkeyLabel("H").split("+"),
       keywords: "collapse expand toggle diff guide sidebar panel show hide",
       run: function () { els.body.classList.toggle("collapsed"); },
     });
     acts.push({
+      kind: "view", glyph: "▤", label: "Diff guide tab",
+      sub: "show the guide sidebar panel",
+      hint: platformHotkeyLabel("D").split("+"),
+      keywords: "diff guide tab sidebar panel",
+      run: function () { sideMode = "guide"; renderAll(); },
+    });
+    acts.push({
+      kind: "view", glyph: "☑", label: "Test plan tab",
+      sub: "show the manual test plan",
+      hint: platformHotkeyLabel("T").split("+"),
+      keywords: "test plan manual qa verification tab sidebar panel",
+      run: function () { sideMode = "test-plan"; renderAll(); },
+    });
+    acts.push({
       kind: "view", glyph: "≡", label: "Full diff",
       sub: "all " + totalFiles() + " files",
-      hint: ["Ctrl", "F"],
+      hint: platformHotkeyLabel("F").split("+"),
       keywords: "full diff all files overview everything",
       run: function () { selectView("full"); },
     });
@@ -55,7 +69,7 @@
         kind: "group", num: g.n, mk: kindColor(g.kind),
         label: "Group " + pad(g.n) + (g.name ? " — " + g.name : ""),
         sub: (g.ticket ? g.ticket + " · " : "") + gfiles.length + " files",
-        hint: g.n <= 9 ? ["Ctrl", String(g.n)] : null,
+        hint: g.n <= 9 ? platformHotkeyLabel(String(g.n)).split("+") : null,
         keywords: (g.name || "") + " " + (g.ticket || "") + " " + (g.kind || "") + " group " + g.n,
         run: (function (n) { return function () { selectView("g" + n); }; })(g.n),
       });

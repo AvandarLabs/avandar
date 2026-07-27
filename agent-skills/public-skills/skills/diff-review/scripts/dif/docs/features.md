@@ -39,14 +39,16 @@ On launch `dif`:
 The shell is split into the **main view** (the left "diff view") and the
 right **Claude/Codex** pane.
 
-- **Left: the main view**: a one-row tab strip plus one of two views. `Tab` /
-  `Shift+Tab` cycle them; `l` jumps to the log view and `d` to the diff guide
-  view (both work when the main view is focused; `Alt+H` focuses it).
+- **Left: the main view**: a one-row tab strip plus one of three views. `Tab` /
+  `Shift+Tab` cycle them in order: Logs, Test plan, Diff guide.
   - **Log view** (`Logs`): difit's server log (URL, requests, status), plus
     `dif`'s own activity lines (see below). Read-only; scroll with the mouse
     wheel, arrows/PageUp/PageDown, `Alt+U`/`Alt+D` for a half-page, or
     `Alt+K`/`Alt+J` for one line. The `Alt` bindings also scroll while the
     Claude or Codex pane is focused.
+  - **Test plan view** (`Test plan`): the review's manual test plan, rendered
+    from markdown. The `diff-review` skill writes it as a separate artifact from
+    the diff guide, and `dif` refreshes it in place.
   - **Diff guide view** (`Diff guide`): the review's diff guide, rendered from
     markdown with full styling (colored headings, **bold**, `code`, lists, and
     tables render as such). The guide is a guide to what's *left* to review; the
@@ -154,7 +156,7 @@ the poller are untouched. Claude fresh session ids are persisted, so a later
 `dif` launch can resume them when possible. Codex fresh sessions currently do
 not persist a `dif`-chosen id because the Codex CLI does not expose that option.
 
-## The diff guide and reviewed state
+## The diff guide, test plan, and reviewed state
 
 The diff guide lives at `.difit/<branch>-difit-<scope>-guide.md` and is always a
 guide to **what's left to review**, organized as numbered groups (Group 1, Group
@@ -172,9 +174,14 @@ guide to **what's left to review**, organized as numbered groups (Group 1, Group
   "what have I already reviewed?" can still be answered even though those items
   no longer clutter the guide.
 
-`dif` renders the guide; the skill writes both files. See
+`dif` renders the guide; the skill writes the guide and reviewed-state files. See
 [data-model.md](data-model.md#files-under-difit) and the
 `diff-review` skill.
+
+The diff summary lives at `.difit/<branch>-difit-<scope>-summary.md` and is shown
+only in the browser web shell sidebar. The manual test plan lives at
+`.difit/<branch>-difit-<scope>-test-plan.md`; `dif` shows it as its own TUI tab
+before Diff guide, while the browser shows it as a separate sidebar tab.
 
 ## Session continuity
 

@@ -29,6 +29,10 @@ pub enum Route {
     InjectJs,
     /// `GET /__wrap/groups.json` — the group roster for the sidebar.
     Groups,
+    /// `GET /__wrap/diff-summary.md` — high-level summary shown in the sidebar.
+    DiffSummary,
+    /// `GET /__wrap/test-plan.md` — manual test plan shown in the sidebar.
+    TestPlan,
     /// `GET /__wrap/meta.json` — the header identity (branch + worktree).
     Meta,
     /// `POST /__wrap/regenerate` — ask the TUI to regenerate the diff guide.
@@ -90,13 +94,17 @@ pub fn route(method: &str, path: &str, query: &str, referer: Option<&str>) -> Ro
         "/" => Route::ShellPage,
         "/__wrap/inject.js" => Route::InjectJs,
         "/__wrap/groups.json" => Route::Groups,
+        "/__wrap/diff-summary.md" => Route::DiffSummary,
+        "/__wrap/test-plan.md" => Route::TestPlan,
         "/__wrap/meta.json" => Route::Meta,
         "/__wrap/regenerate" => Route::Regenerate,
         "/__wrap/difit" => Route::DifitDoc,
-        "/api/diff" => Route::ApiDiff { filter: diff_filter_in_referer(referer) },
-        _ => path.strip_prefix("/__wrap/").map_or(Route::Proxy, |asset| {
-            Route::ShellAsset(asset.to_owned())
-        }),
+        "/api/diff" => Route::ApiDiff {
+            filter: diff_filter_in_referer(referer),
+        },
+        _ => path
+            .strip_prefix("/__wrap/")
+            .map_or(Route::Proxy, |asset| Route::ShellAsset(asset.to_owned())),
     }
 }
 
@@ -113,37 +121,86 @@ mod tests {
     fn wrap_namespace_routes() {
         assert_eq!(route("GET", "/__wrap/inject.js", "", None), Route::InjectJs);
         assert_eq!(route("GET", "/__wrap/groups.json", "", None), Route::Groups);
+        assert_eq!(
+            route("GET", "/__wrap/diff-summary.md", "", None),
+            Route::DiffSummary
+        );
+        assert_eq!(
+            route("GET", "/__wrap/test-plan.md", "", None),
+            Route::TestPlan
+        );
         assert_eq!(route("GET", "/__wrap/meta.json", "", None), Route::Meta);
-        assert_eq!(route("POST", "/__wrap/regenerate", "", None), Route::Regenerate);
-        assert_eq!(route("GET", "/__wrap/shell.css", "", None), Route::ShellAsset("shell.css".to_owned()));
-        assert_eq!(route("GET", "/__wrap/shell.js", "", None), Route::ShellAsset("shell.js".to_owned()));
+        assert_eq!(
+            route("POST", "/__wrap/regenerate", "", None),
+            Route::Regenerate
+        );
+        assert_eq!(
+            route("GET", "/__wrap/shell.css", "", None),
+            Route::ShellAsset("shell.css".to_owned())
+        );
+        assert_eq!(
+            route("GET", "/__wrap/shell.js", "", None),
+            Route::ShellAsset("shell.js".to_owned())
+        );
     }
 
     #[test]
     fn difit_doc_ignores_the_query() {
         assert_eq!(route("GET", "/__wrap/difit", "", None), Route::DifitDoc);
-        assert_eq!(route("GET", "/__wrap/difit", "group=2", None), Route::DifitDoc);
-        assert_eq!(route("GET", "/__wrap/difit", "view=new", None), Route::DifitDoc);
+        assert_eq!(
+            route("GET", "/__wrap/difit", "group=2", None),
+            Route::DifitDoc
+        );
+        assert_eq!(
+            route("GET", "/__wrap/difit", "view=new", None),
+            Route::DifitDoc
+        );
     }
 
     #[test]
     fn api_diff_takes_filter_from_referer() {
         assert_eq!(
-            route("GET", "/api/diff", "", Some("http://localhost:4790/__wrap/difit?group=3")),
-            Route::ApiDiff { filter: DiffFilter::Group(3) }
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?group=3")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::Group(3)
+            }
         );
         // "new files not in guide" view
         assert_eq!(
-            route("GET", "/api/diff", "", Some("http://localhost:4790/__wrap/difit?view=new")),
-            Route::ApiDiff { filter: DiffFilter::Ungrouped }
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit?view=new")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::Ungrouped
+            }
         );
         // full-view iframe: referer has no group/view
         assert_eq!(
-            route("GET", "/api/diff", "", Some("http://localhost:4790/__wrap/difit")),
-            Route::ApiDiff { filter: DiffFilter::None }
+            route(
+                "GET",
+                "/api/diff",
+                "",
+                Some("http://localhost:4790/__wrap/difit")
+            ),
+            Route::ApiDiff {
+                filter: DiffFilter::None
+            }
         );
         // no referer at all
-        assert_eq!(route("GET", "/api/diff", "", None), Route::ApiDiff { filter: DiffFilter::None });
+        assert_eq!(
+            route("GET", "/api/diff", "", None),
+            Route::ApiDiff {
+                filter: DiffFilter::None
+            }
+        );
     }
 
     #[test]
@@ -165,11 +222,23 @@ mod tests {
     fn diff_filter_parsers() {
         assert_eq!(diff_filter_in_query("group=5"), DiffFilter::Group(5));
         assert_eq!(diff_filter_in_query("view=new"), DiffFilter::Ungrouped);
-        assert_eq!(diff_filter_in_query("x=1&view=new&group=2"), DiffFilter::Ungrouped);
+        assert_eq!(
+            diff_filter_in_query("x=1&view=new&group=2"),
+            DiffFilter::Ungrouped
+        );
         assert_eq!(diff_filter_in_query("nope=1"), DiffFilter::None);
-        assert_eq!(diff_filter_in_referer(Some("http://h/__wrap/difit?group=5")), DiffFilter::Group(5));
-        assert_eq!(diff_filter_in_referer(Some("http://h/__wrap/difit?view=new")), DiffFilter::Ungrouped);
-        assert_eq!(diff_filter_in_referer(Some("http://h/__wrap/difit")), DiffFilter::None);
+        assert_eq!(
+            diff_filter_in_referer(Some("http://h/__wrap/difit?group=5")),
+            DiffFilter::Group(5)
+        );
+        assert_eq!(
+            diff_filter_in_referer(Some("http://h/__wrap/difit?view=new")),
+            DiffFilter::Ungrouped
+        );
+        assert_eq!(
+            diff_filter_in_referer(Some("http://h/__wrap/difit")),
+            DiffFilter::None
+        );
         assert_eq!(diff_filter_in_referer(None), DiffFilter::None);
     }
 }

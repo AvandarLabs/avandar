@@ -13,7 +13,7 @@
 
 use std::io::Read;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 
 /// A fully-read upstream response.
 pub struct Upstream {
@@ -37,7 +37,11 @@ fn collect(status: u16, resp: ureq::Response) -> Result<Upstream> {
     resp.into_reader()
         .read_to_end(&mut body)
         .context("reading upstream body")?;
-    Ok(Upstream { status, content_type, body })
+    Ok(Upstream {
+        status,
+        content_type,
+        body,
+    })
 }
 
 /// Buffered GET. Forwards a non-2xx upstream status + body rather than erroring.
@@ -51,9 +55,17 @@ pub fn get(difit_port: u16, path_and_query: &str) -> Result<Upstream> {
 }
 
 /// Buffered POST (e.g. `/api/comment-imports`). Forwards non-2xx verbatim.
-pub fn post(difit_port: u16, path_and_query: &str, content_type: &str, body: &[u8]) -> Result<Upstream> {
+pub fn post(
+    difit_port: u16,
+    path_and_query: &str,
+    content_type: &str,
+    body: &[u8],
+) -> Result<Upstream> {
     let url = url(difit_port, path_and_query);
-    match ureq::post(&url).set("Content-Type", content_type).send_bytes(body) {
+    match ureq::post(&url)
+        .set("Content-Type", content_type)
+        .send_bytes(body)
+    {
         Ok(resp) => collect(resp.status(), resp),
         Err(ureq::Error::Status(code, resp)) => collect(code, resp),
         Err(e) => Err(anyhow!("proxy POST {url}: {e}")),
@@ -64,7 +76,10 @@ pub fn post(difit_port: u16, path_and_query: &str, content_type: &str, body: &[u
 /// reader that yields difit's event stream until the client disconnects.
 ///
 /// `ureq`'s default agent has no read timeout, so the stream stays open.
-pub fn open_stream(difit_port: u16, path_and_query: &str) -> Result<(String, Box<dyn Read + Send + Sync>)> {
+pub fn open_stream(
+    difit_port: u16,
+    path_and_query: &str,
+) -> Result<(String, Box<dyn Read + Send + Sync>)> {
     let url = url(difit_port, path_and_query);
     let resp = ureq::get(&url)
         .call()

@@ -124,7 +124,10 @@ mod tests {
     #[test]
     fn allowed_returns_the_group_file_set() {
         let g = Groups::from_json(SAMPLE.as_bytes());
-        assert_eq!(g.allowed(1), HashSet::from(["src/a.ts".to_owned(), "src/b.ts".to_owned()]));
+        assert_eq!(
+            g.allowed(1),
+            HashSet::from(["src/a.ts".to_owned(), "src/b.ts".to_owned()])
+        );
         assert_eq!(g.allowed(3), HashSet::from(["src/c.ts".to_owned()]));
     }
 
@@ -138,7 +141,11 @@ mod tests {
         let g = Groups::from_json(SAMPLE.as_bytes());
         assert_eq!(
             g.all_files(),
-            HashSet::from(["src/a.ts".to_owned(), "src/b.ts".to_owned(), "src/c.ts".to_owned()])
+            HashSet::from([
+                "src/a.ts".to_owned(),
+                "src/b.ts".to_owned(),
+                "src/c.ts".to_owned()
+            ])
         );
     }
 
@@ -150,7 +157,11 @@ mod tests {
 
     #[test]
     fn load_missing_file_is_empty() {
-        assert!(Groups::load(Path::new("/no/such/guide.json")).groups.is_empty());
+        assert!(
+            Groups::load(Path::new("/no/such/guide.json"))
+                .groups
+                .is_empty()
+        );
     }
 
     #[test]

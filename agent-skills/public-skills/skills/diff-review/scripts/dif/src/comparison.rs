@@ -139,8 +139,14 @@ mod tests {
 
     #[test]
     fn difit_args_for_aliases_pass_through() {
-        assert_eq!(ComparisonKey::Uncommitted.difit_args(), vec![".".to_owned()]);
-        assert_eq!(ComparisonKey::Staged.difit_args(), vec!["staged".to_owned()]);
+        assert_eq!(
+            ComparisonKey::Uncommitted.difit_args(),
+            vec![".".to_owned()]
+        );
+        assert_eq!(
+            ComparisonKey::Staged.difit_args(),
+            vec!["staged".to_owned()]
+        );
     }
 
     #[test]
@@ -154,7 +160,10 @@ mod tests {
 
     #[test]
     fn scope_slug_collapses_branch_punctuation() {
-        assert_eq!(ComparisonKey::parse("feat/share").scope_slug(), "at-feat-share");
+        assert_eq!(
+            ComparisonKey::parse("feat/share").scope_slug(),
+            "at-feat-share"
+        );
     }
 
     #[test]

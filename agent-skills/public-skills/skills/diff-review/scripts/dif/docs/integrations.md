@@ -45,8 +45,8 @@ difit dies with the TUI: dropping the `PtyPane` kills the child.
 
 ### Delayed startup when no prepared review exists
 
-If the selected branch and comparison do not yet have all three prepared files
-under `.difit/` (the transcript, `-guide.md`, and `-guide.json`), `dif` does
+If the selected branch and comparison do not yet have the three startup-critical
+prepared files under `.difit/` (the transcript, `-guide.md`, and `-guide.json`), `dif` does
 not start difit, does not start the poller, and does not open the browser
 shell. The left pane is only a status pane in this mode. It does write
 `.session-<branch>-<scope>.json` with a local `comparison_update_url` so the
@@ -68,10 +68,10 @@ If the skill chooses a comparison inside that already-open TUI (for example the
 user launched bare `pnpm diff-review`, then the final summary says
 `Run: pnpm diff-review .`), it POSTs `{ "comparisonKey": "." }` to the metadata
 file's `comparison_update_url`. While offline, `App` accepts that update and
-retargets the in-memory comparison, transcript path, guide paths, difit port,
-and shell port before checking `review_files_ready`. Once difit is online, the
-control endpoint returns `409` and comparison changes are ignored; a live review
-is never switched out from under the browser.
+retargets the in-memory comparison, transcript path, guide paths, summary path,
+test-plan path, difit port, and shell port before checking `review_files_ready`.
+Once difit is online, the control endpoint returns `409` and comparison changes
+are ignored; a live review is never switched out from under the browser.
 
 ### Restarting difit in place ("Restart diff server")
 

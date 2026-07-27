@@ -29,6 +29,18 @@
       .catch(endRegenInFlight); // request failed → let them try again
   }
   if (els.regenBtn) els.regenBtn.addEventListener("click", regenerateGuide);
+  if (els.guideTab) {
+    els.guideTab.addEventListener("click", function () {
+      sideMode = "guide";
+      renderAll();
+    });
+  }
+  if (els.testPlanTab) {
+    els.testPlanTab.addEventListener("click", function () {
+      sideMode = "test-plan";
+      renderAll();
+    });
+  }
 
   // "Show new changes": difit told us the working tree changed. Trigger difit's
   // OWN in-place reload (via inject.js) — no iframe reload, so an in-progress

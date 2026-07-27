@@ -7,8 +7,8 @@
 
 use std::io::{Read, Write};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use tiny_http::{Header, Request, Response, Server, StatusCode};
 
@@ -28,15 +28,24 @@ pub const INJECT_JS: &str = include_str!("frontend/inject.js");
 /// last; see `frontend/shell/shell.js`). The parts are concatenated at compile
 /// time and served as one `/__wrap/shell.js`.
 pub const SHELL_JS: &str = concat!(
-    include_str!("frontend/shell/shell.js"), "\n",
-    include_str!("frontend/shell/tooltip.js"), "\n",
-    include_str!("frontend/shell/helpers.js"), "\n",
-    include_str!("frontend/shell/iframe.js"), "\n",
-    include_str!("frontend/shell/render.js"), "\n",
-    include_str!("frontend/shell/data.js"), "\n",
-    include_str!("frontend/shell/spotlight.js"), "\n",
-    include_str!("frontend/shell/hotkeys.js"), "\n",
-    include_str!("frontend/shell/chrome.js"), "\n",
+    include_str!("frontend/shell/shell.js"),
+    "\n",
+    include_str!("frontend/shell/tooltip.js"),
+    "\n",
+    include_str!("frontend/shell/helpers.js"),
+    "\n",
+    include_str!("frontend/shell/iframe.js"),
+    "\n",
+    include_str!("frontend/shell/render.js"),
+    "\n",
+    include_str!("frontend/shell/data.js"),
+    "\n",
+    include_str!("frontend/shell/spotlight.js"),
+    "\n",
+    include_str!("frontend/shell/hotkeys.js"),
+    "\n",
+    include_str!("frontend/shell/chrome.js"),
+    "\n",
     include_str!("frontend/shell/boot.js"),
 );
 
@@ -46,6 +55,10 @@ pub struct Ctx {
     pub difit_port: u16,
     /// The `…-guide.json` this review's group filter + sidebar read from.
     pub guide_json_path: PathBuf,
+    /// The `…-summary.md` high-level summary served to the sidebar.
+    pub diff_summary_path: PathBuf,
+    /// The `…-test-plan.md` manual test plan served to the sidebar.
+    pub test_plan_path: PathBuf,
     /// The branch under review — the header title (served at `/__wrap/meta.json`).
     pub branch: String,
     /// The worktree's directory name — the header pill when it differs from the branch.
@@ -72,7 +85,12 @@ fn header(name: &str, value: &str) -> Option<Header> {
     Header::from_bytes(name.as_bytes(), value.as_bytes()).ok()
 }
 
-fn send_bytes(request: Request, status: u16, content_type: &str, body: Vec<u8>) -> std::io::Result<()> {
+fn send_bytes(
+    request: Request,
+    status: u16,
+    content_type: &str,
+    body: Vec<u8>,
+) -> std::io::Result<()> {
     let mut resp = Response::from_data(body).with_status_code(StatusCode(status));
     if let Some(h) = header("Content-Type", content_type) {
         resp = resp.with_header(h);
@@ -85,7 +103,12 @@ fn send_bytes(request: Request, status: u16, content_type: &str, body: Vec<u8>) 
 /// injected difit doc, the filtered `/api/diff`) so a browser never runs a stale
 /// copy after `dif` relaunches with a rebuilt frontend. difit's own hashed
 /// static assets still go through plain [`send_bytes`] and stay cacheable.
-fn send_bytes_nostore(request: Request, status: u16, content_type: &str, body: Vec<u8>) -> std::io::Result<()> {
+fn send_bytes_nostore(
+    request: Request,
+    status: u16,
+    content_type: &str,
+    body: Vec<u8>,
+) -> std::io::Result<()> {
     let mut resp = Response::from_data(body).with_status_code(StatusCode(status));
     if let Some(h) = header("Content-Type", content_type) {
         resp = resp.with_header(h);
@@ -162,7 +185,10 @@ fn request_content_type(request: &Request) -> String {
         .headers()
         .iter()
         .find(|h| h.field.equiv("Content-Type"))
-        .map_or_else(|| "application/json".to_owned(), |h| h.value.as_str().to_owned())
+        .map_or_else(
+            || "application/json".to_owned(),
+            |h| h.value.as_str().to_owned(),
+        )
 }
 
 #[allow(clippy::too_many_lines)]
@@ -181,8 +207,14 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             // Append the build tag to the asset URLs so the browser fetches the
             // current frontend after a relaunch (belt-and-suspenders with no-store).
             let html = SHELL_HTML
-                .replace("/__wrap/shell.css", &format!("/__wrap/shell.css?v={}", ctx.asset_version))
-                .replace("/__wrap/shell.js", &format!("/__wrap/shell.js?v={}", ctx.asset_version));
+                .replace(
+                    "/__wrap/shell.css",
+                    &format!("/__wrap/shell.css?v={}", ctx.asset_version),
+                )
+                .replace(
+                    "/__wrap/shell.js",
+                    &format!("/__wrap/shell.js?v={}", ctx.asset_version),
+                );
             send_bytes_nostore(request, 200, "text/html; charset=utf-8", html.into_bytes())
         }
         Route::InjectJs => send_bytes_nostore(
@@ -195,9 +227,24 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             Some((ct, body)) => send_bytes_nostore(request, 200, ct, body.as_bytes().to_vec()),
             None => send_status(request, 404),
         },
-        Route::Groups => {
-            send_bytes_nostore(request, 200, "application/json", groups::read_raw(&ctx.guide_json_path))
-        }
+        Route::Groups => send_bytes_nostore(
+            request,
+            200,
+            "application/json",
+            groups::read_raw(&ctx.guide_json_path),
+        ),
+        Route::DiffSummary => send_bytes_nostore(
+            request,
+            200,
+            "text/markdown; charset=utf-8",
+            std::fs::read(&ctx.diff_summary_path).unwrap_or_default(),
+        ),
+        Route::TestPlan => send_bytes_nostore(
+            request,
+            200,
+            "text/markdown; charset=utf-8",
+            std::fs::read(&ctx.test_plan_path).unwrap_or_default(),
+        ),
         Route::Meta => send_bytes_nostore(
             request,
             200,
@@ -219,24 +266,30 @@ fn handle(mut request: Request, ctx: &Ctx) -> std::io::Result<()> {
             ),
             Err(_) => send_status(request, 502),
         },
-        Route::ApiDiff { filter } => match proxy::get(ctx.difit_port, &with_query("/api/diff", query)) {
-            Ok(up) => {
-                let proxy::Upstream { status, content_type, body } = up;
-                let body = match filter {
-                    DiffFilter::None => body,
-                    DiffFilter::Group(n) => {
-                        let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(n);
-                        filter::filter_diff(&body, &allowed)
-                    }
-                    DiffFilter::Ungrouped => {
-                        let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
-                        filter::filter_ungrouped(&body, &guide)
-                    }
-                };
-                send_bytes_nostore(request, status, &content_type, body)
+        Route::ApiDiff { filter } => {
+            match proxy::get(ctx.difit_port, &with_query("/api/diff", query)) {
+                Ok(up) => {
+                    let proxy::Upstream {
+                        status,
+                        content_type,
+                        body,
+                    } = up;
+                    let body = match filter {
+                        DiffFilter::None => body,
+                        DiffFilter::Group(n) => {
+                            let allowed = groups::Groups::load(&ctx.guide_json_path).allowed(n);
+                            filter::filter_diff(&body, &allowed)
+                        }
+                        DiffFilter::Ungrouped => {
+                            let guide = groups::Groups::load(&ctx.guide_json_path).all_files();
+                            filter::filter_ungrouped(&body, &guide)
+                        }
+                    };
+                    send_bytes_nostore(request, status, &content_type, body)
+                }
+                Err(_) => send_status(request, 502),
             }
-            Err(_) => send_status(request, 502),
-        },
+        }
         Route::Proxy => {
             let pq = with_query(path, query);
             if is_sse(path) {
@@ -291,14 +344,34 @@ mod tests {
         // Ordering: the IIFE open precedes a feature fragment, which precedes
         // boot — i.e. shell.js → features → boot.
         let open = SHELL_JS.find("(function () {").expect("IIFE open present");
-        let feature = SHELL_JS.find("hover tooltip").expect("a feature fragment present");
-        let boot = SHELL_JS.find("===== boot =====").expect("boot fragment present");
-        assert!(open < feature && feature < boot, "entry → features → boot order");
+        let feature = SHELL_JS
+            .find("hover tooltip")
+            .expect("a feature fragment present");
+        let boot = SHELL_JS
+            .find("===== boot =====")
+            .expect("boot fragment present");
+        assert!(
+            open < feature && feature < boot,
+            "entry → features → boot order"
+        );
         // A couple of key symbols from different fragments actually made it in.
-        for sym in ["selectView", "renderSidebar", "buildActions", "showNewChanges"] {
+        for sym in [
+            "selectView",
+            "renderSidebar",
+            "buildActions",
+            "showNewChanges",
+            "renderGuideTabPanel",
+            "renderTestPlanTabPanel",
+            "diff-summary.md",
+            "test-plan.md",
+            "Alt+Shift+",
+        ] {
             assert!(SHELL_JS.contains(sym), "assembled bundle is missing {sym}");
         }
         // The console diagnostic hook was removed and stays removed.
-        assert!(!SHELL_JS.contains("__difShell"), "the __difShell hook must not return");
+        assert!(
+            !SHELL_JS.contains("__difShell"),
+            "the __difShell hook must not return"
+        );
     }
 }

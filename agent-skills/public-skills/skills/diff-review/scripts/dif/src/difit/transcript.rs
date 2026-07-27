@@ -43,9 +43,10 @@ pub fn write(path: &Path, entries: &[ImportEntry]) -> Result<()> {
 
 /// A hidden sibling temp path in the same directory as `path`.
 fn tmp_sibling(path: &Path) -> std::path::PathBuf {
-    let name = path
-        .file_name()
-        .map_or_else(|| ".transcript".to_owned(), |n| n.to_string_lossy().into_owned());
+    let name = path.file_name().map_or_else(
+        || ".transcript".to_owned(),
+        |n| n.to_string_lossy().into_owned(),
+    );
     let pid = std::process::id();
     path.with_file_name(format!(".{name}.{pid}.tmp"))
 }

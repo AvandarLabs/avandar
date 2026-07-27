@@ -2,6 +2,30 @@
   // Fragment concatenated into the IIFE opened in shell.js — see that file for
   // the module map. Not standalone-valid; parse the assembled shell.js.
   function renderSidebar() {
+    renderSideTabs();
+    if (sideMode === "test-plan") {
+      renderTestPlanTabPanel();
+      return;
+    }
+    renderGuideTabPanel();
+  }
+
+  function renderSideTabs() {
+    if (!els.guideTab || !els.testPlanTab) return;
+    var guideActive = sideMode === "guide";
+    els.guideTab.classList.toggle("active", guideActive);
+    els.testPlanTab.classList.toggle("active", !guideActive);
+    els.guideTab.setAttribute("aria-selected", guideActive ? "true" : "false");
+    els.testPlanTab.setAttribute("aria-selected", guideActive ? "false" : "true");
+  }
+
+  function renderTestPlanTabPanel() {
+    els.sideProg.textContent = "";
+    els.sideScroll.innerHTML = renderTestPlanMarkdown(testPlan);
+    setupCopyButtons(els.sideScroll);
+  }
+
+  function renderGuideTabPanel() {
     var total = totalFiles();
     els.sideProg.textContent = total ? reviewedTotal() + "/" + total : "";
 
@@ -12,7 +36,10 @@
     }
 
     var newFiles = newFilePaths();
-    var h = '<button class="nav-item ' + (view === "full" ? "active" : "") + '" data-view="full">'
+    var h = diffSummary.trim()
+      ? '<div class="diff-summary">' + renderSummaryMarkdown(diffSummary.trim()) + '</div>'
+      : "";
+    h += '<button class="nav-item ' + (view === "full" ? "active" : "") + '" data-view="full">'
       + '<svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
       + '<span class="lbl">Full diff</span><span class="rt">' + total + ' files</span></button>';
     if (newFiles.length) {
@@ -29,8 +56,10 @@
       var rev = gfiles.filter(reviewedLive).length;
       var done = gfiles.length > 0 && rev === gfiles.length;
       var active = view === "g" + g.n;
-      h += '<div class="grp-block ' + (active ? "active" : "") + '">'
-        + '<button class="grp-head" data-view="g' + g.n + '">'
+      var collapsed = collapsedGroups[g.n] === true;
+      h += '<div class="grp-block ' + (active ? "active" : "") + '" data-group-block="g' + g.n + '">'
+        + '<button class="grp-head" data-group-head="' + g.n + '" aria-expanded="' + (!collapsed) + '">'
+        + '<svg class="grp-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
         + '<span class="kindmark" style="background:' + kindColor(g.kind) + '"></span>'
         + '<span class="grp-min">'
         + '<span class="grp-ticket">' + pad(g.n) + (g.ticket ? " · " + esc(g.ticket) : "") + '</span>'
@@ -38,6 +67,7 @@
         + '</span>'
         + '<span class="grp-frac">' + (done ? "✓" : rev + "/" + gfiles.length) + '</span>'
         + '</button>';
+      h += '<div class="grp-body ' + (collapsed ? "collapsed" : "") + '">';
       if (g.orient) h += '<div class="grp-orient">' + esc(g.orient) + '</div>';
       h += '<div class="files">';
       gfiles.forEach(function (f) {
@@ -49,14 +79,31 @@
           + '</span>'
           + '</button>';
       });
-      h += '</div></div>';
+      h += '</div></div></div>';
     });
     els.sideScroll.innerHTML = h;
+    Array.prototype.forEach.call(els.sideScroll.querySelectorAll("[data-group-head]"), function (n) {
+      n.addEventListener("click", function () {
+        var groupNumber = n.getAttribute("data-group-head");
+        var nextCollapsed = collapsedGroups[groupNumber] !== true;
+        collapsedGroups[groupNumber] = nextCollapsed;
+        n.setAttribute("aria-expanded", nextCollapsed ? "false" : "true");
+        var body = n.parentElement && n.parentElement.querySelector(".grp-body");
+        if (body) body.classList.toggle("collapsed", nextCollapsed);
+      });
+    });
     Array.prototype.forEach.call(els.sideScroll.querySelectorAll("[data-view]"), function (n) {
       n.addEventListener("click", function () {
         var f = n.getAttribute("data-file");
         if (f) selectFile(n.getAttribute("data-view"), f);
         else selectView(n.getAttribute("data-view"));
+      });
+    });
+    Array.prototype.forEach.call(els.sideScroll.querySelectorAll("[data-group-block]"), function (n) {
+      n.addEventListener("click", function (e) {
+        if (e.target.closest("[data-group-head]") || e.target.closest("[data-view]")) return;
+        var groupBlock = e.target.closest("[data-group-block]");
+        if (groupBlock) selectView(groupBlock.getAttribute("data-group-block"));
       });
     });
   }

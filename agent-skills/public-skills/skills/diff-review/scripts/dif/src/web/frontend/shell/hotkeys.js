@@ -11,12 +11,23 @@
     return modKey(e) && !e.altKey && (e.key === "k" || e.key === "K");
   }
 
-  // A plain-Ctrl navigation combo → a nav intent, or null.
+  function navLeader(e) {
+    if (IS_MAC) return e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey;
+    return e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey;
+  }
+
+  function platformHotkeyLabel(key) {
+    return IS_MAC ? "Ctrl+" + key : "Alt+Shift+" + key;
+  }
+
+  // A platform navigation combo -> a nav intent, or null.
   function navCombo(e) {
-    if (!e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return null;
+    if (!navLeader(e)) return null;
     if (/^Digit[1-9]$/.test(e.code)) return { type: "group", n: parseInt(e.code.slice(5), 10) };
     if (e.key === "f" || e.key === "F") return { type: "full" };
     if (e.key === "h" || e.key === "H") return { type: "toggle-side" };
+    if (e.key === "d" || e.key === "D") return { type: "guide-tab" };
+    if (e.key === "t" || e.key === "T") return { type: "test-plan-tab" };
     return null;
   }
 
@@ -31,6 +42,8 @@
     if (c.type === "full") selectView("full");
     else if (c.type === "spotlight") toggleSpotlight();
     else if (c.type === "toggle-side") els.body.classList.toggle("collapsed");
+    else if (c.type === "guide-tab") { sideMode = "guide"; renderAll(); }
+    else if (c.type === "test-plan-tab") { sideMode = "test-plan"; renderAll(); }
     else if (c.type === "group" && groupExists(c.n)) selectView("g" + c.n);
   }
 

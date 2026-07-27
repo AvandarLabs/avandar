@@ -32,7 +32,13 @@
 
   var groups = [];
   var view = "full"; // "full" | "g<n>" | "new"
+  var sideMode = "guide"; // "guide" | "test-plan"
+  var collapsedGroups = {};
   var lastGroupsJson = "";
+  var lastSummaryText = "";
+  var lastTestPlanText = "";
+  var diffSummary = "";
+  var testPlan = "";
   var difitReady = false;
   var readyTimer = null;
   var pendingScroll = null;
@@ -93,6 +99,8 @@
     ifrError: document.getElementById("ifrError"),
     ifrRetry: document.getElementById("ifrRetry"),
     regenBtn: document.getElementById("regenBtn"),
+    guideTab: document.getElementById("guideTab"),
+    testPlanTab: document.getElementById("testPlanTab"),
     showChangesBtn: document.getElementById("showChangesBtn"),
     brandTitle: document.getElementById("brandTitle"),
     worktreePill: document.getElementById("worktreePill"),

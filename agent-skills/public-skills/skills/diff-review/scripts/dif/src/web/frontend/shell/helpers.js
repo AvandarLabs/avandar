@@ -67,6 +67,95 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
   }
+  function copyIconSvg() {
+    return '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">'
+      + '<rect x="5" y="4" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/>'
+      + '<path d="M3 10.5V3.8C3 2.8 3.8 2 4.8 2h5.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>'
+      + '</svg>';
+  }
+  function copyButton(value, label) {
+    return '<button class="copy-btn" type="button" data-copy="' + esc(value) + '" title="' + esc(label || "Copy") + '" aria-label="' + esc(label || "Copy") + '">'
+      + copyIconSvg()
+      + '</button>';
+  }
+  function setupCopyButtons(root) {
+    Array.prototype.forEach.call(root.querySelectorAll("[data-copy]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var value = btn.getAttribute("data-copy") || "";
+        var done = function () {
+          btn.classList.add("copied");
+          window.setTimeout(function () { btn.classList.remove("copied"); }, 900);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(done).catch(function () {});
+        }
+      });
+    });
+  }
+  function renderInlineMarkdown(text) {
+    return esc(text)
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  }
+  function renderSummaryMarkdown(md) {
+    var lines = md.replace(/\r\n/g, "\n").split("\n").filter(function (line) {
+      return line.trim();
+    });
+    if (lines.length && lines.every(function (line) { return /^[-*]\s+/.test(line.trim()); })) {
+      return "<ul>" + lines.map(function (line) {
+        return "<li>" + renderInlineMarkdown(line.trim().replace(/^[-*]\s+/, "")) + "</li>";
+      }).join("") + "</ul>";
+    }
+    return renderInlineMarkdown(md);
+  }
+  function renderTestPlanMarkdown(md) {
+    if (!md.trim()) {
+      return '<div class="side-empty">No test plan yet.<br>Ask the LLM to regenerate the diff guide if this diff needs one.</div>';
+    }
+    var lines = md.replace(/\r\n/g, "\n").split("\n");
+    var html = '<div class="test-plan-panel">';
+    var inCode = false;
+    var codeLang = "";
+    var codeLines = [];
+    var flushCode = function () {
+      var code = codeLines.join("\n");
+      html += '<div class="copy-block">'
+        + '<div class="copy-head"><span>' + esc(codeLang || "text") + '</span>' + copyButton(code, "Copy code") + '</div>'
+        + '<pre><code>' + esc(code) + '</code></pre>'
+        + '</div>';
+      codeLines = [];
+      codeLang = "";
+    };
+    lines.forEach(function (line) {
+      var fence = line.match(/^```(.*)$/);
+      if (fence) {
+        if (inCode) { flushCode(); inCode = false; }
+        else { inCode = true; codeLang = fence[1].trim(); }
+        return;
+      }
+      if (inCode) { codeLines.push(line); return; }
+      if (!line.trim()) return;
+      var heading = line.match(/^#{1,3}\s+(.+)$/);
+      if (heading) {
+        html += '<h3>' + renderInlineMarkdown(heading[1]) + '</h3>';
+        return;
+      }
+      var step = line.match(/^(\d+)\.\s+(.+)$/);
+      if (step) {
+        html += '<div class="plan-step"><span class="plan-num">' + esc(step[1]) + '</span><p>' + renderInlineMarkdown(step[2]) + '</p></div>';
+        return;
+      }
+      var quote = line.match(/^>\s*(.+)$/);
+      if (quote) {
+        html += '<div class="copy-quote"><blockquote>' + renderInlineMarkdown(quote[1]) + '</blockquote>' + copyButton(quote[1], "Copy text") + '</div>';
+        return;
+      }
+      html += '<p>' + renderInlineMarkdown(line) + '</p>';
+    });
+    if (inCode) flushCode();
+    return html + '</div>';
+  }
   function checkSvg(f) {
     if (reviewedLive(f)) {
       return '<svg class="check" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--ok-wash)" stroke="var(--ok)" stroke-width="1.2"/><path d="M5 8.2l2 2 4-4.4" stroke="var(--ok)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';

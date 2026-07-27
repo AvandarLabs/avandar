@@ -45,7 +45,8 @@ impl TableBuilder {
 
     /// Finish the current cell.
     pub fn end_cell(&mut self) {
-        self.cur_row.push(std::mem::take(&mut self.cur_cell).trim().to_owned());
+        self.cur_row
+            .push(std::mem::take(&mut self.cur_cell).trim().to_owned());
     }
 
     /// Finish the current row (header or body).
@@ -201,7 +202,10 @@ mod tests {
         assert!(text[0].starts_with('┌') && text[0].contains('┬'));
         assert!(text[1].contains("File") && text[1].contains("Status"));
         assert!(text[2].starts_with('├'));
-        assert!(text.iter().any(|l| l.contains("a.rs") && l.contains("done")));
+        assert!(
+            text.iter()
+                .any(|l| l.contains("a.rs") && l.contains("done"))
+        );
         assert!(text.last().unwrap().starts_with('└'));
     }
 
@@ -214,6 +218,9 @@ mod tests {
         t.end_row();
         let lines = t.render(12);
         let header: String = lines[1].iter().map(|s| s.content.as_ref()).collect();
-        assert!(header.contains('…'), "narrow column should truncate: {header:?}");
+        assert!(
+            header.contains('…'),
+            "narrow column should truncate: {header:?}"
+        );
     }
 }

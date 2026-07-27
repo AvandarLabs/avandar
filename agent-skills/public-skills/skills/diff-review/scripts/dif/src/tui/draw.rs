@@ -1,11 +1,10 @@
 //! Rendering the two halves of the shell: the main diff pane on the left, the
 //! agent pane on the right.
 //!
-//! The main diff pane carries a one-row tab strip (the **log view** and the
-//! **diff guide view**) and shows one of them: the log view is difit's `vt100`
-//! console via `tui-term`; the diff guide view is the guide markdown rendered
-//! by [`super::markdown`]. The agent pane is its own PTY. The focused pane's
-//! border brightens and (for a PTY) its cursor is surfaced.
+//! The main diff pane carries a one-row tab strip. Its log view is difit's
+//! `vt100` console via `tui-term`; markdown-backed views render the test plan
+//! or diff guide through [`super::markdown`]. The agent pane is its own PTY.
+//! The focused pane's border brightens and (for a PTY) its cursor is surfaced.
 
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
@@ -103,7 +102,20 @@ fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
 
     match app.active_diff_view {
         MainDiffView::Log => draw_log_view(f, rows[1], &mut app.difit, focused),
-        MainDiffView::Guide => draw_guide_view(f, rows[1], app),
+        MainDiffView::TestPlan => draw_markdown_view(
+            f,
+            rows[1],
+            &mut app.test_plan,
+            "No test plan yet.",
+            "Press Ctrl+G to ask the LLM to generate one.",
+        ),
+        MainDiffView::Guide => draw_markdown_view(
+            f,
+            rows[1],
+            &mut app.guide,
+            "No diff guide yet.",
+            "Press Ctrl+G to ask the LLM to generate one.",
+        ),
     }
 }
 
@@ -144,22 +156,24 @@ fn draw_log_view(f: &mut Frame, area: Rect, pane: &mut PtyPane, focused: bool) {
     }
 }
 
-/// The diff guide view: the guide markdown rendered, scrolled, and clamped to
-/// the content height. An absent guide shows a hint to generate one.
-fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
+/// Draw a markdown-backed main view.
+fn draw_markdown_view(
+    f: &mut Frame,
+    area: Rect,
+    doc: &mut super::guide::Guide,
+    empty_title: &'static str,
+    empty_hint: &'static str,
+) {
     if area.height == 0 || area.width == 0 {
         return;
     }
-    let Some(md) = app.guide.text() else {
+    let Some(md) = doc.text() else {
         let hint = Style::default().fg(Color::Rgb(122, 134, 173));
         f.render_widget(
             Paragraph::new(vec![
                 Line::default(),
-                Line::from(Span::styled("  No diff guide yet.", hint)),
-                Line::from(Span::styled(
-                    "  Press Ctrl+G to ask the LLM to generate one.",
-                    hint,
-                )),
+                Line::from(Span::styled(format!("  {empty_title}"), hint)),
+                Line::from(Span::styled(format!("  {empty_hint}"), hint)),
             ]),
             area,
         );
@@ -180,11 +194,11 @@ fn draw_guide_view(f: &mut Frame, area: Rect, app: &mut App) {
                 .collect::<String>()
         })
         .collect();
-    app.guide.set_lines(lines);
-    app.guide.set_viewport(area.height, area.width);
-    let (vscroll, hscroll) = app.guide.scroll();
+    doc.set_lines(lines);
+    doc.set_viewport(area.height, area.width);
+    let (vscroll, hscroll) = doc.scroll();
     f.render_widget(Paragraph::new(text).scroll((vscroll, hscroll)), area);
-    if let Some(pos) = app.guide.cursor_screen_pos((area.x, area.y)) {
+    if let Some(pos) = doc.cursor_screen_pos((area.x, area.y)) {
         f.set_cursor_position(pos);
     }
 }

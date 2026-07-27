@@ -42,6 +42,20 @@ pub fn guide_json_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) ->
     difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-guide.json"))
 }
 
+/// The high-level diff summary for this review:
+/// `<repo>/.difit/<branch>-difit-<scope>-summary.md`.
+#[must_use]
+pub fn diff_summary_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
+    difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-summary.md"))
+}
+
+/// The manual test plan for this review:
+/// `<repo>/.difit/<branch>-difit-<scope>-test-plan.md`.
+#[must_use]
+pub fn test_plan_path(repo_root: &Path, branch_slug: &str, scope_slug: &str) -> PathBuf {
+    difit_dir(repo_root).join(format!("{branch_slug}-difit-{scope_slug}-test-plan.md"))
+}
+
 /// The reviewed-state file for this review:
 /// `<repo>/.difit/<branch>-difit-<scope>-reviewed.json`.
 ///
@@ -102,6 +116,24 @@ mod tests {
         assert_eq!(
             p,
             PathBuf::from("/r/.difit/feat-share-difit-dot-guide.json")
+        );
+    }
+
+    #[test]
+    fn diff_summary_matches_skill_filename() {
+        let p = diff_summary_path(Path::new("/r"), "feat-share", "dot");
+        assert_eq!(
+            p,
+            PathBuf::from("/r/.difit/feat-share-difit-dot-summary.md")
+        );
+    }
+
+    #[test]
+    fn test_plan_matches_skill_filename() {
+        let p = test_plan_path(Path::new("/r"), "feat-share", "at-develop");
+        assert_eq!(
+            p,
+            PathBuf::from("/r/.difit/feat-share-difit-at-develop-test-plan.md")
         );
     }
 

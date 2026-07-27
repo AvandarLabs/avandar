@@ -14,8 +14,8 @@ session side by side, with the diff guide rendered in a TUI pane. The web shell
 adds a **browser** surface: a single-origin page that wraps difit's own web
 frontend and adds
 
-- a **diff-guide tab** that *is the navigation*, and
-- **per-group tabs**, each a partial difit showing only that group's files,
+- a left sidebar with **Diff guide** and **Test plan** panels,
+- **per-group filtered views**, each a partial difit showing only that group's files,
 - all sharing **one difit process, one origin, one `localStorage`**, so
   "viewed" state and comments stay in sync across every view with no extra
   machinery.
@@ -33,8 +33,8 @@ findings for the human to vet before their own pass.
 ## Goals / non-goals
 
 **Goals**
-- One browser origin: guide + full diff + per-group partial diffs, in an
-  in-page iframe tab bar.
+- One browser origin: guide + test plan + full diff + per-group partial diffs,
+  with navigation in the left sidebar.
 - A group view shows **only** that group's files (data-filtered, not DOM-hidden).
 - "Viewed" state and comments are shared across all views automatically.
 - Never fork difit; survive difit version bumps with minimal breakage surface.
@@ -75,7 +75,8 @@ long as we keep the non-`files` fields of `/api/diff` identical across responses
         │  GET /                → shell page           │
         │  GET /__wrap/*        → shell assets,        │
         │                          inject.js,          │
-        │                          groups.json         │
+        │                          groups.json,        │
+        │                          summary/test plan   │
         │  GET /__wrap/difit?group=N → difit HTML,     │
         │                          proxied + <script>  │
         │                          injected            │
@@ -148,19 +149,26 @@ design; the filter does not depend on it. It handles polish + resilience:
 
 See the design mockup (published separately) for the visual. Principles:
 
-- **The diff guide is a left sidebar and the primary navigation** — not a tab.
+- **The diff guide is a left sidebar and the primary navigation**.
   It stays visible while you review a partial diff, so you can read a group's
   explanations *and* switch between partial diffs without leaving the view.
-  - The sidebar lists a **Full diff** item, then each **group** (number,
-    ticket, name, kind dot, reviewed fraction) with its one-line orientation
-    and its file rows (viewed check, tag, thread count). The **group heading is
-    a single line** — the number/ticket flow inline before the name (not stacked
-    on their own row) to spend less vertical space per group.
-  - Clicking a **group** shows that group's filtered difit in the main area.
+  - The sidebar has two local tabs: **Diff guide** (default) and **Test plan**.
+    The test plan is a separate artifact, not content embedded in the guide.
+  - The Diff guide panel shows the `-summary.md` summary under the title before
+    the **Full diff** item, then each **group** (number, ticket, name, kind dot,
+    reviewed fraction) with its one-line orientation and its file rows (viewed
+    check, tag, thread count). The **group heading is a single line**: the
+    number/ticket flow inline before the name (not stacked on their own row) to
+    spend less vertical space per group.
+  - Clicking a **group heading** toggles that group open or closed with an
+    animated accordion. When closed, only the heading row remains visible: no
+    orientation summary and no file rows.
+  - The collapsed rail, palette, and file rows show filtered difit views in the
+    main area.
     Clicking a **file** switches to its group *and* scrolls the main view to
     that file (with a brief highlight).
   - The sidebar **collapses to a slim rail** (via the top-bar toggle, the
-    sidebar chevron, or `Ctrl+H`). The rail keeps `Full` + a numbered button per
+    sidebar chevron, or the platform toggle shortcut). The rail keeps `Full` + a numbered button per
     group so you can still switch views one-handed while maximizing diff width,
     then expand again.
   - **The collapse animates as a single width transition.** Both the full
@@ -246,10 +254,12 @@ JS/CSS (no React — the shell has no build step). Opened by the top-bar
 **"Jump to…"** button or the palette hotkey. It flattens the guide into actions:
 
 - **Full diff** (a view action),
+- **Diff guide** and **Test plan** sidebar tabs,
 - one action per **group** (`Group NN — name`),
 - one action per **file** (searchable by path; runs its group's view), and
 - **UI actions**: "Collapse / Expand diff guide" (label follows the current
-  sidebar state; hotkey `Ctrl+H`) and, when applicable, "Show new changes".
+  sidebar state; platform shortcut shown in the row) and, when applicable,
+  "Show new changes".
 
 Filtering: a **bare number** (`2`) narrows straight to that group's command (per
 the reviewer's request); otherwise every space-separated token must appear in an
@@ -398,14 +408,18 @@ retry loop.
 
 ### Hotkeys
 
-Leader is **Ctrl** (on macOS the browser reserves **Cmd**+digit for tab
-switching, so Ctrl+digit is free; the palette uses the platform Mod key):
+Leader is **Ctrl** on macOS (the browser reserves **Cmd**+digit for tab
+switching, so Ctrl+digit is free; the palette uses the platform Mod key). On
+Windows/Linux the leader is **Alt+Shift**, because browsers reserve
+`Ctrl+D`/`Ctrl+T`, and plain `Alt+D` usually focuses the address bar.
 
 | Key | Action |
 | --- | --- |
-| `Ctrl`+`1`…`9` | Jump to group N |
-| `Ctrl`+`F` | Full diff |
-| `Ctrl`+`H` | Collapse / expand the guide sidebar |
+| `Ctrl`+`1`…`9` (macOS) / `Alt+Shift`+`1`…`9` (Windows/Linux) | Jump to group N |
+| `Ctrl`+`F` / `Alt+Shift`+`F` | Full diff |
+| `Ctrl`+`H` / `Alt+Shift`+`H` | Collapse / expand the guide sidebar |
+| `Ctrl`+`D` / `Alt+Shift`+`D` | Show the Diff guide sidebar tab |
+| `Ctrl`+`T` / `Alt+Shift`+`T` | Show the Test plan sidebar tab |
 | `⌘K` / `Ctrl`+`K` | Toggle the command palette |
 
 Hotkeys never fire while focus is in an editable field (so difit's comment boxes
@@ -415,10 +429,10 @@ combos up to the shell via `postMessage` (`{source:"dif-web-shell",
 type:"hotkey", combo}`), so the hotkeys work even when focus is inside difit.
 This reuses the same message channel as the existing `difit-ready` signal.
 
-> Cross-platform note: on Windows/Linux `Ctrl`+digit / `Ctrl`+`F` are browser
-> shortcuts (tab switch / find) and cannot be reliably suppressed from a page.
-> The palette (`⌘K`/`Ctrl`+`K`) and its bare-number group filter are the
-> portable path there; the direct Ctrl jumps are aimed at the macOS default.
+> Cross-platform note: on Windows/Linux `Ctrl`+digit / `Ctrl`+`F` /
+> `Ctrl`+`D` / `Ctrl`+`T` are browser shortcuts and cannot be reliably
+> suppressed from a page. `Alt+Shift` avoids the common browser reservations
+> while keeping the same letter/digit choices.
 
 ## Implementation plan (Rust)
 
@@ -487,7 +501,7 @@ axum. Reuse `ureq` (already a dep) for upstream calls to difit.
     fragments are hoisted function/listener definitions). The fragments are not
     individually parse-valid; lint/syntax-check the assembled `/__wrap/shell.js`.
     A unit test (`server::tests::shell_js_is_one_well_formed_iife`) guards the
-    assembled shape (single wrapper, entry→features→boot order, key symbols
+    assembled shape (single wrapper, entry to features to boot order, key symbols
     present).
 
 Pure-first, mirroring how the crate already isolates logic (`inject/`,
@@ -503,7 +517,7 @@ unit-tested; the only I/O is in `server.rs` / `proxy.rs`.
 - **Shell port**: `pick_port` off a dedicated hash (e.g. `port_for(branch,
   scope)` xor a constant), with the same free-port fallback difit uses.
 - **`tui/session_meta.rs`**: keep `port` = difit's **internal** port so the
-  skill's live-POST flow is **unchanged** — a `POST /api/comment-imports`
+  skill's live-POST flow is **unchanged**: a `POST /api/comment-imports`
   straight to difit still reaches the proxied browser, because difit broadcasts
   over SSE and the proxy streams that through. Add `shell_port: u16` +
   `shell_url: String` (informational; the human's surface).
@@ -511,9 +525,9 @@ unit-tested; the only I/O is in `server.rs` / `proxy.rs`.
 ### Companion skill change
 
 The sidebar renders per-group **orientation + per-file tags + thread counts +
-status** (per the approved mockup); those live only in the guide prose today. So
-when the skill writes `…-guide.md` + `…-reviewed.json`, it must **also** write a
-structured `…-guide.json`:
+status**, a high-level summary, and a separate manual test plan. When the skill
+writes `…-guide.md` + `…-reviewed.json`, it also writes structured
+`…-guide.json`, `…-summary.md`, and `…-test-plan.md`:
 
 ```jsonc
 [
@@ -522,11 +536,12 @@ structured `…-guide.json`:
 ]
 ```
 
-The skill already computes all of this for the markdown; emitting the JSON twin
-is trivial and lets the web shell's sidebar read exact data with **no markdown
-parsing**. The TUI keeps rendering the markdown; only the web shell reads the
-JSON. This is the one required change outside the Rust binary — a small addition
-to the SKILL's guide-writing step (Initial / Continue / Diff-guide modes).
+The skill already computes the group data for the markdown; emitting the JSON
+twin lets the web shell's sidebar read exact data with **no markdown parsing**.
+The summary and test plan stay as markdown. The TUI renders `-guide.md` and
+`-test-plan.md`; only the web shell reads the JSON and summary. This companion
+contract lives in the SKILL's guide-writing step (Initial / Continue /
+Diff-guide modes).
 
 ## Risks & mitigations
 

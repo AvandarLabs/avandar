@@ -102,7 +102,10 @@ mod tests {
     #[test]
     fn reviewer_comments_are_never_logged_as_replies() {
         let mut w = ReplyWatcher::new();
-        assert!(w.new_reply_locations(&snap(r#"{"version":0,"threads":[]}"#)).is_empty());
+        assert!(
+            w.new_reply_locations(&snap(r#"{"version":0,"threads":[]}"#))
+                .is_empty()
+        );
         let only_reviewer = r#"{"version":1,"threads":[{"id":"t1","filePath":"a.rs",
             "position":{"side":"new","line":1},
             "messages":[{"id":"m1","body":"q","author":"reviewer"}]}]}"#;
