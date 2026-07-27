@@ -1,23 +1,19 @@
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import type { UUID } from "@utils/types/common.types";
+import type {
+  ClarificationOutcomes,
+  ClarificationResponseShapeLabels,
+} from "./ClarificationAuditEntry.constants";
 
 /** Branded identifier for a local clarification audit record. */
 export type ClarificationAuditEntryId = UUID<"ClarificationAuditEntry">;
 
 /** A clarification outcome persisted in the local audit log. */
-export type ClarificationOutcome =
-  | "answered"
-  | "cancelled"
-  | "cap_reached"
-  | "neutral_failure";
+export type ClarificationOutcome = (typeof ClarificationOutcomes)[number];
 
 /** A clarification response shape persisted in the local audit log. */
 export type ClarificationResponseShapeLabel =
-  | "free_text"
-  | "fixed_options_single"
-  | "fixed_options_multi"
-  | "discovery_single"
-  | "discovery_multi";
+  (typeof ClarificationResponseShapeLabels)[number];
 
 /** Complete browser-local clarification audit row. */
 export type ClarificationAuditEntryRead = {

@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import {
+  ConsentAuditContexts,
+  ConsentAuditMedicalTiers,
+  ConsentAuditModes,
+  ConsentAuditWarnings,
+  ConsentDecisionKinds,
+} from "./ConsentAuditEntry.constants";
 import type {
   ConsentAuditContext,
   ConsentAuditEntryId,
@@ -9,45 +16,13 @@ import type {
   ConsentDecisionKind,
 } from "./ConsentAuditEntry.types";
 
-/** Consent decisions persisted in the local audit log. */
-export const ConsentDecisionKinds = [
-  "approved",
-  "used_suggestion",
-  "cancelled",
-  "edited",
-] as const satisfies readonly ConsentDecisionKind[];
-
-/** Cross-boundary contexts that can require consent. */
-export const ConsentAuditContexts = [
-  "discovery_clarification",
-  "generated_sql_assumptions",
-  "plan_step_input",
-  "user_message_text",
-  "clarification_answer",
-] as const satisfies readonly ConsentAuditContext[];
-
-/** Consent-modal modes persisted with the decision. */
-export const ConsentAuditModes = [
-  "clean",
-  "pii_warning",
-  "bias_nudge",
-  "composite",
-  "medical_strict",
-] as const satisfies readonly ConsentAuditMode[];
-
-/** Warning categories shown or dismissed during consent. */
-export const ConsentAuditWarnings = [
-  "pii",
-  "bias",
-  "medical",
-] as const satisfies readonly ConsentAuditWarning[];
-
-/** Sources that can trigger the medical data consent tier. */
-export const ConsentAuditMedicalTiers = [
-  "column",
-  "content",
-  "workspace_flag",
-] as const satisfies readonly ConsentAuditMedicalTier[];
+export {
+  ConsentAuditContexts,
+  ConsentAuditMedicalTiers,
+  ConsentAuditModes,
+  ConsentAuditWarnings,
+  ConsentDecisionKinds,
+};
 
 /** Checks whether a string is a persisted consent decision. */
 export function isValidConsentDecisionKind(

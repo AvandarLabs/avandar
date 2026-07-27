@@ -1,37 +1,31 @@
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import type { UUID } from "@utils/types/common.types";
+import type {
+  ConsentAuditContexts,
+  ConsentAuditMedicalTiers,
+  ConsentAuditModes,
+  ConsentAuditWarnings,
+  ConsentDecisionKinds,
+} from "./ConsentAuditEntry.constants";
 
 /** Branded identifier for a local consent audit record. */
 export type ConsentAuditEntryId = UUID<"ConsentAuditEntry">;
 
 /** A consent decision persisted in the local audit log. */
-export type ConsentDecisionKind =
-  | "approved"
-  | "used_suggestion"
-  | "cancelled"
-  | "edited";
+export type ConsentDecisionKind = (typeof ConsentDecisionKinds)[number];
 
 /** A cross-boundary context that can require consent. */
-export type ConsentAuditContext =
-  | "discovery_clarification"
-  | "generated_sql_assumptions"
-  | "plan_step_input"
-  | "user_message_text"
-  | "clarification_answer";
+export type ConsentAuditContext = (typeof ConsentAuditContexts)[number];
 
 /** A consent-modal mode persisted with the decision. */
-export type ConsentAuditMode =
-  | "clean"
-  | "pii_warning"
-  | "bias_nudge"
-  | "composite"
-  | "medical_strict";
+export type ConsentAuditMode = (typeof ConsentAuditModes)[number];
 
 /** A warning category shown or dismissed during consent. */
-export type ConsentAuditWarning = "pii" | "bias" | "medical";
+export type ConsentAuditWarning = (typeof ConsentAuditWarnings)[number];
 
 /** A source that can trigger the medical data consent tier. */
-export type ConsentAuditMedicalTier = "column" | "content" | "workspace_flag";
+export type ConsentAuditMedicalTier =
+  (typeof ConsentAuditMedicalTiers)[number];
 
 /** Complete browser-local consent audit row. */
 export type ConsentAuditEntryRead = {

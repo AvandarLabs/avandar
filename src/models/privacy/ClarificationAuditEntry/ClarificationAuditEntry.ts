@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import {
+  ClarificationOutcomes,
+  ClarificationResponseShapeLabels,
+} from "./ClarificationAuditEntry.constants";
 import type {
   ClarificationAuditEntryId,
   ClarificationAuditEntryModel,
@@ -6,22 +10,7 @@ import type {
   ClarificationResponseShapeLabel,
 } from "./ClarificationAuditEntry.types";
 
-/** Clarification outcomes persisted in the local audit log. */
-export const ClarificationOutcomes = [
-  "answered",
-  "cancelled",
-  "cap_reached",
-  "neutral_failure",
-] as const satisfies readonly ClarificationOutcome[];
-
-/** Clarification response shapes persisted in the local audit log. */
-export const ClarificationResponseShapeLabels = [
-  "free_text",
-  "fixed_options_single",
-  "fixed_options_multi",
-  "discovery_single",
-  "discovery_multi",
-] as const satisfies readonly ClarificationResponseShapeLabel[];
+export { ClarificationOutcomes, ClarificationResponseShapeLabels };
 
 /** Checks whether a string is a persisted clarification outcome. */
 export function isValidClarificationOutcome(
