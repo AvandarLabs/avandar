@@ -276,6 +276,11 @@ repo) so the output stays small and tied to the diff.
 - All exported classes, objects, and functions need docstrings.
 - If an exported object defines top-level methods inline, those methods need
   docstrings too.
+- Function docstrings should explain the function's purpose and output, not
+  its interior implementation details. Use `//` comments inside the function
+  body for how the function works. Exception: mention complex or unconventional
+  architectural/design decisions in the docstring only when developers using
+  the function need that context.
 - Follow input contravariance and output covariance: readonly at module
   boundaries for inputs, mutable outputs for callers.
 - Apply readonly wrappers to function parameters, not to local variables,

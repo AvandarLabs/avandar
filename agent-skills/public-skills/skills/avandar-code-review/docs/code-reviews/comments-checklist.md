@@ -37,17 +37,19 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   }
   ```
 
-- Keep exported-function JSDoc focused on what the function is for and what
-  callers get back. Do not use the block comment above an exported function
-  to narrate implementation details, branching, sequencing, or internal
-  helpers; those belong in `//` comments inside the function body when they
-  are needed.
+- Keep function JSDoc focused on what the function is: its purpose and the
+  output callers get back. Do not use the block comment above a function to
+  narrate implementation details, branching, sequencing, or internal helpers;
+  those belong in `//` comments inside the function body when they are needed.
+  Exception: function JSDoc may mention complex or unconventional
+  architectural/design decisions only when understanding those decisions is
+  crucial to developers using the function.
 
   This is bad:
 
   ```ts
   /**
-   * First reads from IndexedDB, then registers a DuckDB view, then dispatches
+   * Reads from IndexedDB before registering a DuckDB view, then dispatches
    * status updates. Falls back to running SQL when no blob exists.
    */
   export async function rehydratePlan(options: Options): Promise<void> {}

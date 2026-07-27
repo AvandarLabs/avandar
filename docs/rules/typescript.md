@@ -18,10 +18,13 @@
 ## General Code Style & Formatting
 
 - Use JSDoc to document public classes and methods.
-- JSDoc on exported functions should describe the function's purpose and
-  output at a high level. Do not use exported-function JSDoc to explain the
-  implementation details or control flow. Use `//` comments inside the
-  function body when a reader needs to understand how the function works.
+- JSDoc on functions should describe what the function is: its purpose and
+  output at a high level. Do not use function JSDoc to explain interior
+  implementation details, sequencing, branching, or helper mechanics. Use `//`
+  comments inside the function body when a reader needs to understand how the
+  function works. Exception: a function JSDoc may mention complex or
+  unconventional architectural/design decisions only when understanding those
+  decisions is crucial to developers using the function.
 - File-level JSDoc is fine when it adds context about the whole file's purpose
   or design. It is complementary documentation, not a replacement for JSDoc on
   exported members, because IDE intellisense surfaces member comments rather
