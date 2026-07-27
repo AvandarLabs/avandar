@@ -1,7 +1,7 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -39,13 +39,16 @@ vi.mock("@assistant-ui/react", () => {
   };
 });
 
-vi.mock("@/clients/privacy/ClarificationAuditEntryClient", () => {
-  return {
-    ClarificationAuditEntryClient: {
-      recordOutcome: recordOutcomeMock,
-    },
-  };
-});
+vi.mock(
+  "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient",
+  () => {
+    return {
+      ClarificationAuditEntryClient: {
+        recordOutcome: recordOutcomeMock,
+      },
+    };
+  },
+);
 
 vi.mock(
   "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager",

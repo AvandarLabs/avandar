@@ -1,9 +1,9 @@
-import { fireEvent } from "@testing-library/react";
 import { modals } from "@mantine/modals";
+import { fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
-import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv";
+import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
+import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render, screen } from "@/test-utils";
 import { PrivacyLogTab } from "./PrivacyLogTab";
@@ -42,27 +42,33 @@ vi.mock("@ui", async (importOriginal) => {
   };
 });
 
-vi.mock("@/clients/privacy/ConsentAuditEntryClient", () => {
-  return {
-    ConsentAuditEntryClient: {
-      QueryKeys: {
-        listConsentLog: listConsentLogQueryKeyMock,
+vi.mock(
+  "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient",
+  () => {
+    return {
+      ConsentAuditEntryClient: {
+        QueryKeys: {
+          listConsentLog: listConsentLogQueryKeyMock,
+        },
+        useClearConsentLog: useClearConsentLogMock,
+        useListConsentLog: useListConsentLogMock,
       },
-      useClearConsentLog: useClearConsentLogMock,
-      useListConsentLog: useListConsentLogMock,
-    },
-  };
-});
+    };
+  },
+);
 
-vi.mock("@/clients/privacy/ClarificationAuditEntryClient", () => {
-  return {
-    ClarificationAuditEntryClient: {
-      useListClarificationLog: useListClarificationLogMock,
-    },
-  };
-});
+vi.mock(
+  "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient",
+  () => {
+    return {
+      ClarificationAuditEntryClient: {
+        useListClarificationLog: useListClarificationLogMock,
+      },
+    };
+  },
+);
 
-vi.mock("@/clients/privacy/buildConsentAuditCsv", () => {
+vi.mock("@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv", () => {
   return {
     buildConsentAuditCsv: buildConsentAuditCsvMock,
   };

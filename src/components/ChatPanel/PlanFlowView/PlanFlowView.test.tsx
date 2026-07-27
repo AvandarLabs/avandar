@@ -1,6 +1,6 @@
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { PlanAnnotationClient } from "@/clients/chat/PlanAnnotationClient";
+import { PlanAnnotationClient } from "@/clients/chat/PlanAnnotationClient/PlanAnnotationClient";
 import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
@@ -63,7 +63,7 @@ const {
   };
 });
 
-vi.mock("@/clients/chat/PlanAnnotationClient", () => {
+vi.mock("@/clients/chat/PlanAnnotationClient/PlanAnnotationClient", () => {
   return {
     PlanAnnotationClient: {
       clearAnnotationsForPlan: clearAnnotationsForPlanMock,

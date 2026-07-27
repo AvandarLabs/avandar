@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { PlanAnnotationClient } from "@/clients/chat/PlanAnnotationClient";
+import { PlanAnnotationClient } from "@/clients/chat/PlanAnnotationClient/PlanAnnotationClient";
 import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/layoutPlan/layoutPlan";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 import {

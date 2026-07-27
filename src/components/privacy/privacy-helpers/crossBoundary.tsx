@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
-import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient";
+import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";

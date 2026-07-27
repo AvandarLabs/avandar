@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { useCallback } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import {
   clarificationAnswerNeedsCrossBoundary,
