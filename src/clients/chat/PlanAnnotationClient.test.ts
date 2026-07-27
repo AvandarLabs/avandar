@@ -1,8 +1,9 @@
 import "fake-indexeddb/auto";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
+import { PlanAnnotationParsers } from "@/models/chat/PlanAnnotation/PlanAnnotationParsers";
 import { PlanAnnotationClient } from "./PlanAnnotationClient";
+import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 
 function createAnnotation(
   overrides: Partial<PlanAnnotation.Text> = {},
@@ -28,6 +29,10 @@ describe("PlanAnnotationClient", () => {
 
   it("upserts one annotation by id", async () => {
     const annotation = createAnnotation();
+    const parserSpy = vi.spyOn(
+      PlanAnnotationParsers,
+      "fromModelInsertToDBInsert",
+    );
 
     await PlanAnnotationClient.putAnnotation(annotation);
     await PlanAnnotationClient.putAnnotation({
@@ -43,11 +48,16 @@ describe("PlanAnnotationClient", () => {
         updatedAt: 2,
       }),
     ]);
+    expect(parserSpy).toHaveBeenCalledTimes(2);
   });
 
   it("bulk upserts annotations and ignores an empty collection", async () => {
     const firstAnnotation = createAnnotation();
     const secondAnnotation = createAnnotation({ planId: "plan-2" });
+    const parserSpy = vi.spyOn(
+      PlanAnnotationParsers,
+      "fromModelInsertToDBInsert",
+    );
 
     await PlanAnnotationClient.putAnnotations([
       firstAnnotation,
@@ -62,10 +72,12 @@ describe("PlanAnnotationClient", () => {
     expect(await AvaDexie.DB.PlanAnnotation.get(firstAnnotation.id)).toEqual(
       expect.objectContaining({ text: "Updated in bulk" }),
     );
+    expect(parserSpy).toHaveBeenCalledTimes(3);
   });
 
   it("lists only annotations belonging to the requested plan", async () => {
     const planAnnotation = createAnnotation();
+    const parserSpy = vi.spyOn(PlanAnnotationParsers, "fromDBReadToModelRead");
     await AvaDexie.DB.PlanAnnotation.bulkPut([
       planAnnotation,
       createAnnotation({ planId: "plan-2" }),
@@ -74,6 +86,18 @@ describe("PlanAnnotationClient", () => {
     expect(await PlanAnnotationClient.listAnnotationsForPlan("plan-1")).toEqual(
       [planAnnotation],
     );
+    expect(parserSpy).toHaveBeenCalledWith(planAnnotation);
+  });
+
+  it("rejects invalid rows read from IndexedDB", async () => {
+    await AvaDexie.DB.PlanAnnotation.put({
+      ...createAnnotation(),
+      kind: "invalid",
+    } as unknown as PlanAnnotation.T);
+
+    await expect(
+      PlanAnnotationClient.listAnnotationsForPlan("plan-1"),
+    ).rejects.toThrow("[PlanAnnotation:DBReadSchema]");
   });
 
   it("deletes an annotation by id", async () => {

@@ -14,7 +14,10 @@ const planAnnotationClient = createDexieCrudClient({
       listAnnotationsForPlan: async (
         planId: string,
       ): Promise<PlanAnnotation.T[]> => {
-        return dbTable.where("planId").equals(planId).toArray();
+        const rows = await dbTable.where("planId").equals(planId).toArray();
+        return rows.map((row) => {
+          return PlanAnnotationParsers.fromDBReadToModelRead(row);
+        });
       },
     };
   },
@@ -22,7 +25,9 @@ const planAnnotationClient = createDexieCrudClient({
     return {
       /** Inserts or replaces one annotation by its primary key. */
       putAnnotation: async (annotation: PlanAnnotation.T): Promise<void> => {
-        await dbTable.put(annotation);
+        await dbTable.put(
+          PlanAnnotationParsers.fromModelInsertToDBInsert(annotation),
+        );
       },
 
       /** Inserts or replaces annotations by their primary keys. */
@@ -32,7 +37,11 @@ const planAnnotationClient = createDexieCrudClient({
         if (annotations.length === 0) {
           return;
         }
-        await dbTable.bulkPut(annotations);
+        await dbTable.bulkPut(
+          annotations.map((annotation) => {
+            return PlanAnnotationParsers.fromModelInsertToDBInsert(annotation);
+          }),
+        );
       },
 
       /** Deletes one annotation by its primary key. */

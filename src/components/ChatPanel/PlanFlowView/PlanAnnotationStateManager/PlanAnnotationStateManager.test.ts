@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
-import { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 import { act, renderHook } from "@/test-utils";
+import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 
 function setup() {
   return renderHook(
