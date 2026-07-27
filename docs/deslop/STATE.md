@@ -35,34 +35,36 @@ let it drift.
 
 - **Header status**: `Ready for Phase 2 — Session 3 (2026-06-05)`
 - **Last analyzed commit on `feat/ict4d-demo`**:
-  `eb86cfc9d159c0984c58198127927bd911506c54`
-  (subject: _fix: use createUsePuck selector for selectedItem and
-  remove nested form in ManualQueryForm (#251)_)
-- **Last update run on**: `2026-06-25`
-- **Active rows**: 59 remaining (all `[ ]`). On 2026-07-24 the 5
+  `6a1366e26660753f17b90bd36f6e17e3a10bdafd`
+  (subject: _refactor(chat): remove planning feature_)
+- **Last update run on**: `2026-07-27`
+- **Active rows**: 48 remaining. On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
   (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
   #049, #096, #097) merged (`59cdb59c`). All flipped to `[x]`; their
   `[x]` rows are kept in `ALL_FEATURES.md` (with merge SHA) and the group
-  + per-feature plan files were deleted. On 2026-06-26 the 3 earlier completed rows
-  (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
-  `[x]` checkoff rows are gone; completion is recorded only in the
-  Completed migrations log below. Also on 2026-06-26 the 6
-  voice/speech-to-text rows (#050–#055, section "G. Multilingual
-  voice dictation") were removed entirely — PR #254 deleted all voice
-  features from `feat/ict4d-demo`, so there is nothing to migrate.
-  Index numbering is intentionally non-dense (retired #4/#5/#6/#7
-  folded into #1, #14 into #9, #084..#089 into #083; #050..#055
-  retired as voice-removed; #097 added 2026-06-25).
+  - per-feature plan files were deleted. On 2026-06-26 the 3 earlier completed rows
+    (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
+    `[x]` checkoff rows are gone; completion is recorded only in the
+    Completed migrations log below. Also on 2026-06-26 the 6
+    voice/speech-to-text rows (#050–#055, section "G. Multilingual
+    voice dictation") were removed entirely — PR #254 deleted all voice
+    features from `feat/ict4d-demo`, so there is nothing to migrate.
+    On 2026-07-27 rows #033–#043 were retired when the chat workflow
+    capability was removed from the source branch; their feature files
+    and dedicated migration plans were deleted.
+    Index numbering is intentionally non-dense (retired #4/#5/#6/#7
+    folded into #1, #14 into #9, #084..#089 into #083; #050..#055
+    retired as voice-removed; #097 added 2026-06-25).
 - **Planning status**: **complete — Phase 2 batched into 5 group
   PRs (2026-06-26).** GROUP-1 (2026-07-24) and GROUP-2 (2026-07-26) are
-  now merged and merged back into `feat/ict4d-demo`; GROUP-3 through
-  GROUP-5 remain. The consolidated group plans at
+  now merged and merged back into `feat/ict4d-demo`; GROUP-3 is in
+  flight and GROUP-4 through GROUP-5 remain. The consolidated group plans at
   `docs/deslop/GROUP-3..5-*.md` are the source of truth for the rest
   and supersede the per-feature `NNN-<slug>.md` plans where they
-  disagree. Next step: cut `refactor-g3/ai-chat-panel` off the current
-  `develop` tip (past `59cdb59c`) and migrate GROUP-3; its plan was
-  refreshed against the post-G2 develop on 2026-07-26.
+  disagree. Next step: remove the retired workflow surface from the
+  existing `refactor-g3/ai-chat-panel` branch, then finish its runtime
+  integration and verification.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -76,9 +78,9 @@ Refactor branches currently open (pushed to origin, not yet merged
 into `develop`). Each row is added by `/deslop migrate` and removed
 by `/deslop complete`.
 
-| Feature index | Slug | Refactor branch | Started | Notes |
-|---|---|---|---|---|
-| #015–#032 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. Core chat, privacy, and clarification infrastructure ported + green (type-check/eslint/vitest). **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because the source runtime interweaves privacy and clarification turn logic with G4 dashboard-block generation and G5 offline WebLLM chat. Complete the runtime integration in coordination with G4/G5. Not pushed. |
+| Feature index       | Slug            | Refactor branch             | Started    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | --------------- | --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #015–#032 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. Core chat, privacy, and clarification infrastructure ported and under review. Rows #033–#043 were retired on the source branch on 2026-07-27 and must be removed from this branch before it merges. **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because the source runtime interweaves privacy and clarification turn logic with G4 dashboard-block generation and G5 offline WebLLM chat. Complete the runtime integration in coordination with G4/G5. Not pushed. |
 
 GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`59cdb59c`, 2026-07-26) are merged into `develop` and merged back into `feat/ict4d-demo`.
 
@@ -89,29 +91,29 @@ GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`59cdb59c`, 2026-07-26) are merged
 Append a row when `/deslop complete <feature-slug>` succeeds. This is
 the durable record once the per-feature markdown has been deleted.
 
-| Feature index | Slug | Merge SHA on `develop` | Completed |
-|---|---|---|---|
-| 78 | `lingui-scaffold` | `2881b0bb` (PR #242) | 2026-06-10 |
-| 83 | `billing-ptrck-series` | `a40d64a3` (PR #237) | 2026-06-25 |
-| 61 | `web-offline-mode` | `50fb7884` (PR #252) | 2026-06-25 |
-| 77 | `analytics-client-events` (GROUP-1) | `914bcbba` | 2026-07-24 |
-| 94 | `chat-models-catalog-regeneration` (GROUP-1) | `914bcbba` | 2026-07-24 |
-| 1 | `async-dataset-import-pipeline` (GROUP-1) | `914bcbba` | 2026-07-24 |
-| 2 | `app-wide-dropzone` (GROUP-1) | `914bcbba` | 2026-07-24 |
-| 3 | `dataset-drawer` (GROUP-1) | `914bcbba` | 2026-07-24 |
-| 8 | `floating-query-windows` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 9 | `viz-multi-series-and-chart-types` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 10 | `viz-settings-fieldsets` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 11 | `codemirror-sql-editor` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 12 | `sql-pill-rendering` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 13 | `chart-number-formatting` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 44 | `sql-to-structured-query` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 45 | `structured-query-to-sql` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 46 | `recursive-filter-ui` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 47 | `sql-form-sync-data-explorer` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 49 | `duckdb-sql-parser-updates` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 96 | `data-explorer-url-session-sync` (GROUP-2) | `59cdb59c` | 2026-07-26 |
-| 97 | `data-explorer-auto-open-ai-panel` (GROUP-2) | `59cdb59c` | 2026-07-26 |
+| Feature index | Slug                                         | Merge SHA on `develop` | Completed  |
+| ------------- | -------------------------------------------- | ---------------------- | ---------- |
+| 78            | `lingui-scaffold`                            | `2881b0bb` (PR #242)   | 2026-06-10 |
+| 83            | `billing-ptrck-series`                       | `a40d64a3` (PR #237)   | 2026-06-25 |
+| 61            | `web-offline-mode`                           | `50fb7884` (PR #252)   | 2026-06-25 |
+| 77            | `analytics-client-events` (GROUP-1)          | `914bcbba`             | 2026-07-24 |
+| 94            | `chat-models-catalog-regeneration` (GROUP-1) | `914bcbba`             | 2026-07-24 |
+| 1             | `async-dataset-import-pipeline` (GROUP-1)    | `914bcbba`             | 2026-07-24 |
+| 2             | `app-wide-dropzone` (GROUP-1)                | `914bcbba`             | 2026-07-24 |
+| 3             | `dataset-drawer` (GROUP-1)                   | `914bcbba`             | 2026-07-24 |
+| 8             | `floating-query-windows` (GROUP-2)           | `59cdb59c`             | 2026-07-26 |
+| 9             | `viz-multi-series-and-chart-types` (GROUP-2) | `59cdb59c`             | 2026-07-26 |
+| 10            | `viz-settings-fieldsets` (GROUP-2)           | `59cdb59c`             | 2026-07-26 |
+| 11            | `codemirror-sql-editor` (GROUP-2)            | `59cdb59c`             | 2026-07-26 |
+| 12            | `sql-pill-rendering` (GROUP-2)               | `59cdb59c`             | 2026-07-26 |
+| 13            | `chart-number-formatting` (GROUP-2)          | `59cdb59c`             | 2026-07-26 |
+| 44            | `sql-to-structured-query` (GROUP-2)          | `59cdb59c`             | 2026-07-26 |
+| 45            | `structured-query-to-sql` (GROUP-2)          | `59cdb59c`             | 2026-07-26 |
+| 46            | `recursive-filter-ui` (GROUP-2)              | `59cdb59c`             | 2026-07-26 |
+| 47            | `sql-form-sync-data-explorer` (GROUP-2)      | `59cdb59c`             | 2026-07-26 |
+| 49            | `duckdb-sql-parser-updates` (GROUP-2)        | `59cdb59c`             | 2026-07-26 |
+| 96            | `data-explorer-url-session-sync` (GROUP-2)   | `59cdb59c`             | 2026-07-26 |
+| 97            | `data-explorer-auto-open-ai-panel` (GROUP-2) | `59cdb59c`             | 2026-07-26 |
 
 ---
 
@@ -146,7 +148,7 @@ Append-only log of `/deslop update` runs.
   - **Skipped — already on `develop` or noise.** `f35623d6`
     (DataVizPBlock NL prompt fix — empty diff vs develop;
     landed via the merge of #238 `Cleaned up chat panel
-    architecture` which is `98d6535c`, develop's tip). `4fc6f42a`,
+architecture` which is `98d6535c`, develop's tip). `4fc6f42a`,
     `79fb1c5d`, `8dfa4b73`, `e3b59244`, `84235ccc`, `b8875042`
     (formatter / test-utils plumbing subsumed in the two new
     feature diffs above).
@@ -188,8 +190,8 @@ Append-only log of `/deslop update` runs.
   `#094 chat-models-catalog-regeneration`, and the `#083`-`#086`
   PTRCK billing series. DuckDbClient scope expansion (12 files,
   +1819/-322) also folded into #001's plan as in-scope. Worktree
-  + branch removed; row #001 stays `[ ]`. See plan file's Notes
-  section for the full sequencing implication.
+  - branch removed; row #001 stays `[ ]`. See plan file's Notes
+    section for the full sequencing implication.
 - `2026-06-10` — **inventory reshuffle + PTRCK fold + in-flight registration.**
   Operator request: order /deslop continue so blockers come first.
   - **Folded #083+#084+#085+#086+#087+#088+#089 into a single
@@ -218,7 +220,7 @@ Append-only log of `/deslop update` runs.
     docs end-to-end. Agent confirmed all 95 inventory rows are
     doc-backed.
   - Verified PTRCK uniqueness via `git cherry origin/develop
-    origin/feat/ict4d-demo` — zero `-` lines; all PTRCK commits
+origin/feat/ict4d-demo` — zero `-` lines; all PTRCK commits
     unique to `feat/ict4d-demo`.
   - Verified profile-page row #90 — real net diff +257/-79.
   - **1 new row added.** #96 `data-explorer-url-session-sync`
@@ -258,7 +260,7 @@ Append-only log of `/deslop update` runs.
       `a40d64a3`. Row flipped `[~]` → `[x]`; plan
       `083-billing-ptrck-series.md` deleted; removed from in-flight.
     - **#061 `web-offline-mode`** — PR #252 (`refactor 061/web offline
-      mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
+mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
       plan `061-web-offline-mode.md` deleted; removed from in-flight.
       **Drift:** a later feat/ict4d-demo-only service-worker tweak
       (`1a436512`) is not on `develop` — flagged on the row.
@@ -371,7 +373,7 @@ Append-only log of `/deslop update` runs.
     them in the Completed migrations log; deleted the 12 per-feature plans
     (#008–#013, #044–#047, #049, #096) and `GROUP-2-data-explorer-querying.md`
     (#097 never had a plan file); deleted the `refactor-g2/...` local branch
-    + worktree (remote already gone).
+    - worktree (remote already gone).
   - **Mergeback outcome:** drift on the G2 path set fell from 210 files /
     +3023 −11701 to 19 files / +1713 −1180 (all legit feat-ahead: the G4/G5
     dashboard surface — V4 schema, Filter PBlocks, DataVizPBlock/pfields,
@@ -403,3 +405,9 @@ Append-only log of `/deslop update` runs.
     stripped G5 offline (`OfflineChatDownloadControl`, Composer offline branch)
     and G4 dashboard branch (useChatPageContext). Complete the runtime wiring in
     coordination with G4/G5.
+- `2026-07-27` — **Retired chat workflow rows removed from the source.**
+  Deleted inventory rows and feature files #033–#043, narrowed GROUP-3 to
+  rows #015–#032, and removed the related UI, tools, persistence, sandbox,
+  dependencies, and tests from `feat/ict4d-demo` in `6a1366e2`. The
+  in-flight `refactor-g3/ai-chat-panel` branch now needs the same removal
+  applied surgically on top of its reviewed architecture.

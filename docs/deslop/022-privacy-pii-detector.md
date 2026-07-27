@@ -9,7 +9,7 @@
 
 ## Notes for future you
 
-- This is **the first row of the chat-interactive-workflows phase-0 privacy guardrails**. The spec is `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md` (read it for the broader context — phases 0–9 are rows #022–#043 in inventory order).
+- This is **the first row of the chat-interactive-workflows privacy guardrails**. The spec is `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md` (read it for the broader context: privacy and clarification are rows #022–#032 in inventory order).
 - Pure-function module — no React, no Supabase, no IO. 16 unit tests cover it. The fix-cost of a bug here is low because all callers (rows #024 / #025 / #030) detect via this module.
 
 ## What this feature is

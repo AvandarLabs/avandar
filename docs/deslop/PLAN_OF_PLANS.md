@@ -84,7 +84,7 @@ planning is complete.
   - 3b: #10–#13, #96 (Data Explorer remainder).
   - 3c: #15–#21, #94 (Chat panel core).
   - 3d: #22–#28 (Privacy phase-0 guardrails).
-  - 3e: #29–#43 (Chat-interactive-workflows phases 1–9).
+  - 3e: #29–#32 (Chat clarification workflows).
   - 3f: #44–#49 (Manual SQL ↔ form sync).
   - 3h: #56–#63 (Desktop platform foundation + offline modes).
   - 3i: #64–#75 (Dashboards — polish, filters, publishing).
@@ -141,6 +141,10 @@ planning is complete.
   blocker. **Next step:** cut `refactor-g2/data-explorer-querying`
   off the current `develop` tip and migrate GROUP-2 (rows #008–#013,
   #096, #097, #044–#047, #049) per `docs/deslop/GROUP-2-*.md`.
+- **2026-07-27 — chat workflow scope reduced.** Rows #033–#043 were
+  retired and removed from the inventory, their per-feature migration
+  files were deleted, and GROUP-3 now contains only rows #015–#032:
+  core chat, privacy guardrails, and clarification workflows.
 
 ## Phase 2 ready
 

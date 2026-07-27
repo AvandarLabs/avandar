@@ -10,7 +10,7 @@
 ## Notes for future you
 
 - Currently gated behind a local `HIDE_EXPORT_AS_PDF = true` flag (commit `6fee1d3d`). **Migrate the gate alongside the feature** so it ships defaulted-off. Removing the gate is a separate operator decision.
-- Annotator is freehand/arrow/text with RoughJS — same aesthetic as the plan canvas annotations (#041) but **separate code path** (this is for dashboards, that's for plan canvas).
+- Annotator is freehand/arrow/text with RoughJS and is independent of chat.
 - PDF pipeline: `<PuckPageRender>` off-screen → `html2canvas` at 2× DPI → `jspdf` paginated portrait letter.
 
 ## What this feature is
