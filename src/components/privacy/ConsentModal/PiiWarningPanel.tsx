@@ -24,8 +24,8 @@ type Props = {
 };
 
 /**
- * Mode B (`pii_warning`): default-cancel warning; the Send button stays
- * disabled until the user checks the acknowledgement.
+ * Renders the consent modal content for non-medical PII findings.
+ * Returns the warning panel with details and acknowledgement controls.
  */
 export function PiiWarningPanel({
   pii,

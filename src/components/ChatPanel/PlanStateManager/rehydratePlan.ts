@@ -14,23 +14,8 @@ import type { ChatPlan, ChatPlanStep } from "$/types/chat.types";
 export type RehydrateDispatch = ReturnType<typeof PlanStateManager.useDispatch>;
 
 /**
- * Rehydrate a previously-persisted analytic plan into the canvas.
- *
- * Steps:
- *   1. Install the plan structure in PlanStateManager via
- *      `hydratePlan`, so the DAG renders immediately with everything
- *      marked `pending`.
- *   2. For each step we already have a parquet blob for in
- *      IndexedDB, re-register it as a DuckDB temp view and mark the
- *      step `succeeded`. The user sees the prior analysis without any
- *      LLM round-trip.
- *   3. For steps with no blob (e.g. opened from a virtual dataset on
- *      a fresh device), re-run the SQL locally: this only touches
- *      DuckDB-WASM, no LLM call.
- *
- * The caller passes the plan plus the planId to use. For
- * virtual-dataset opens, the planId is derived from the virtual
- * dataset id so the IndexedDB cache is stable across sessions.
+ * Restores a persisted analytic plan into the plan canvas.
+ * Resolves after the plan state reflects the available step results.
  */
 export async function rehydratePlan(args: {
   planId: string;

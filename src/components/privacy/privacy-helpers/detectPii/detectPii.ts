@@ -337,6 +337,10 @@ function _maxSeverity(hits: readonly PiiPatternHit[]): PiiSeverity {
     : "clean";
 }
 
+/**
+ * Inspects optional column names and row values for personal or medical data.
+ * Returns severity, detected hits, and whether medical data was found.
+ */
 export function detectPii(input: {
   columnName?: string;
   values?: readonly unknown[];

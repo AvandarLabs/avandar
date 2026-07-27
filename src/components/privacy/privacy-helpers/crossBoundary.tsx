@@ -105,13 +105,8 @@ export type CrossBoundaryResult =
   | { approved: false; reason: "cancelled" | "edited_to_empty" };
 
 /**
- * Run detectors, surface the consent modal when required, and return an
- * approved payload (with `ackToken`) for the caller to send onward.
- *
- * @see Module comment above for architecture and design-doc link.
- *
- * Resolves with `{ approved: false, reason: "cancelled" }` if the user
- * dismisses the modal — callers should abort that send (no error toast).
+ * Checks an outbound chat payload against the privacy boundary.
+ * Resolves with an approved payload or a rejection reason.
  */
 export async function crossBoundary(
   req: CrossBoundaryRequest,

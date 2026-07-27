@@ -11,9 +11,8 @@ type Props = {
 };
 
 /**
- * Captioned row of PII-detection badges. Hits are unique by label (column and
- * content layers never share a label and each layer dedupes), so the label is
- * a safe stable key.
+ * Renders a captioned row of PII-detection badges.
+ * Returns one badge for each supplied PII hit using the requested color.
  */
 export function PiiHitBadges({ label, hits, color }: Props): React.ReactNode {
   return (

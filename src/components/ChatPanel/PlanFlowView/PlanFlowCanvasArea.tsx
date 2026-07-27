@@ -29,10 +29,8 @@ type Props = {
 };
 
 /**
- * The plan canvas region: the branch sidebar next to the xyflow DAG,
- * with the annotation overlay and the export toolbar layered over the
- * canvas surface. The `canvasContainerRef` is owned by `PlanFlowCanvas`
- * (for exports + the overlay) and forwarded onto the canvas `Box`.
+ * Renders the interactive plan canvas region.
+ * Returns the branch sidebar, DAG canvas, annotation overlay, and export tools.
  */
 export function PlanFlowCanvasArea({
   rfNodes,

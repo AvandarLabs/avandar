@@ -19,8 +19,8 @@ type Props = {
 };
 
 /**
- * The footer action bar shared by every consent mode: Cancel, an optional
- * "Use suggestion" button, and the mode-colored primary Send button.
+ * Renders the consent modal footer actions.
+ * Returns cancel, optional suggestion, and primary send controls.
  */
 export function ConsentActions({
   mode,

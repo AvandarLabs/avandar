@@ -14,8 +14,8 @@ type Props = {
 };
 
 /**
- * Mode C (`bias_nudge`): a soft, non-blocking nudge. "Continue as-is" is
- * always available alongside "Use suggestion" in the action bar.
+ * Renders the consent modal content for bias-only findings.
+ * Returns the soft nudge panel with detected labels and optional rewrite copy.
  */
 export function BiasNudgePanel({
   bias,

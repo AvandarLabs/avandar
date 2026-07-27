@@ -18,16 +18,8 @@ import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/Clarifica
 import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
 
 /**
- * Renders the inline clarification card above the composer when the
- * backend has asked one. On answer:
- *
- *   - Custom / free-text answers go through `crossBoundary` (PII + bias).
- *   - Discovery preset picks cross as `discovery_clarification`.
- *   - Fixed-option preset picks skip the modal (LLM-emitted options only).
- *   - "None of the above" sends a structured marker for follow-up clarify.
- *
- * The answer is appended as a new user message so the backend can count it
- * against the 3-clarifications-per-question cap.
+ * Renders the pending clarification prompt above the composer.
+ * Returns a clarification card when a question is pending, otherwise `null`.
  */
 export function PendingClarificationBlock(): React.ReactNode {
   const pending = ChatPanelStateManager.useState().pendingClarification;

@@ -32,8 +32,8 @@ type Props = {
 };
 
 /**
- * Mode E (`medical_strict`): the user must type the exact confirmation phrase
- * and check the acknowledgement before Send enables.
+ * Renders the consent modal content for medical-data findings.
+ * Returns the strict confirmation panel with acknowledgement controls.
  */
 export function MedicalStrictPanel({
   pii,

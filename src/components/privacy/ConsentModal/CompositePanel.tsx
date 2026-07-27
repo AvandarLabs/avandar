@@ -28,8 +28,8 @@ type Props = {
 };
 
 /**
- * Mode D (`composite`): bias + PII fired together. Both decisions are required
- * before submit (PII ack checkbox plus a bias decision in the action bar).
+ * Renders the consent modal content for combined PII and bias findings.
+ * Returns the composite review panel with details and acknowledgement controls.
  */
 export function CompositePanel({
   pii,

@@ -9,8 +9,8 @@ type Props = {
 };
 
 /**
- * Captioned row of bias-detection badges. `detectBias` dedupes hits by label
- * via a `seen` Set, so the label is a safe stable key.
+ * Renders a captioned row of bias-detection badges.
+ * Returns one badge for each supplied bias hit.
  */
 export function BiasHitBadges({ label, hits }: Props): React.ReactNode {
   return (

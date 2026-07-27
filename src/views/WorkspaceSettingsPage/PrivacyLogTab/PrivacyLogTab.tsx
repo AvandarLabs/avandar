@@ -58,13 +58,8 @@ function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
 }
 
 /**
- * "Privacy log" tab in workspace settings. Renders two sub-tabs:
- *
- *   - Consent: last 90 days of consent decisions from `ConsentAuditLog`.
- *   - Clarifications: clarification turn metadata from
- *     `ClarificationAuditLog`.
- *
- * Both sources are local-only and stored on this device.
+ * Renders the workspace settings privacy log.
+ * Returns tabbed panels for consent decisions and clarification audits.
  */
 export function PrivacyLogTab(): React.ReactNode {
   return (

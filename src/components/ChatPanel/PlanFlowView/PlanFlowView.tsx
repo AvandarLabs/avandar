@@ -22,23 +22,8 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
 /**
- * Visual plan canvas.
- *
- * The plan renders as an xyflow DAG with RoughJS-styled hand-drawn
- * edges. Two view modes share the canvas:
- *
- *   - `overview`: the full DAG, pannable and zoomable. The user sees
- *     every step + its mini-status at a glance.
- *   - `focused`: zoomed in on a single step. The Data Explorer's
- *     existing visualization container shows that step's result; the
- *     user reads / tweaks viz settings as if it were a single-query
- *     analysis.
- *
- * Transitions between the two are animated by xyflow's `fitView({
- * duration })` so it feels like a real canvas zoom.
- *
- * Run-mode toggle: "auto" runs all steps sequentially as soon as the
- * plan arrives; "step" pauses between steps so the user can inspect.
+ * Renders the visual plan workspace for the active chat plan.
+ * Returns the provider-wrapped plan canvas when visible, otherwise `null`.
  */
 export function PlanFlowView(): React.ReactNode {
   const state = PlanStateManager.useState();

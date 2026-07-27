@@ -2,27 +2,15 @@ import type { PlanStepNodeData } from "@/components/ChatPanel/PlanFlowView/PlanS
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { Edge, Node } from "@xyflow/react";
 
-/**
- * Compute a left-to-right layered layout for the plan DAG.
- *
- * Layer assignment:
- *   - For each node, layer = 1 + max(layer of inputs).
- *   - Nodes with no inputs go in layer 0.
- *
- * Vertical position:
- *   - Within a layer, nodes stack top-to-bottom in the order they
- *     appear in `nodes` (the LLM's emitted order).
- *
- * This is intentionally not Dagre or ELK: the DAGs we see at this scale
- * (≤8 nodes) are tiny, the dependency graphs the LLM emits are almost
- * always near-linear, and a layered layout is plenty readable. Saves
- * us a heavyweight dependency.
- */
 const NODE_WIDTH = 280;
 const NODE_HEIGHT = 140;
 const H_GAP = 80;
 const V_GAP = 40;
 
+/**
+ * Builds the React Flow representation for a plan DAG.
+ * Returns positioned nodes and edges with focus metadata applied.
+ */
 export function layoutPlan(args: {
   nodes: readonly PlanNode[];
   focusedStepId: string | undefined;
