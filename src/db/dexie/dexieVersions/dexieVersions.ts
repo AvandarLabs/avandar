@@ -30,8 +30,8 @@ import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 import type { PlanStepBlob } from "@/models/chat/PlanStepBlob/PlanStepBlob";
-import type { ClarificationAuditEntryModel } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry.types";
-import type { ConsentAuditEntryModel } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry.types";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const db = new Dexie("AvandarDB");
 
@@ -45,8 +45,8 @@ type Schemas = {
     models: [
       LocalDatasetModel,
       LocalPublicDatasetModel,
-      ConsentAuditEntryModel,
-      ClarificationAuditEntryModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
     ];
   };
   v6: {
@@ -54,8 +54,8 @@ type Schemas = {
     models: [
       LocalDatasetModel,
       LocalPublicDatasetModel,
-      ConsentAuditEntryModel,
-      ClarificationAuditEntryModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
       PlanAnnotation.Model,
       PlanStepBlob.Model,
     ];

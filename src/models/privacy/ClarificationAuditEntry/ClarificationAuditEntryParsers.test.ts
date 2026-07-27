@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { ClarificationAuditEntryParsers } from "./ClarificationAuditEntryParsers";
-import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
 import {
   isValidClarificationOutcome,
   isValidClarificationResponseShapeLabel,
-} from "./ClarificationAuditEntry.types";
+} from "./ClarificationAuditEntry";
+import { ClarificationAuditEntryParsers } from "./ClarificationAuditEntryParsers";
+import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
 
 const row: ClarificationAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000002" as ClarificationAuditEntry.Id,
@@ -31,9 +31,9 @@ describe("ClarificationAuditEntryParsers", () => {
   });
 
   it("round trips the Dexie row without changing it", () => {
-    expect(
-      ClarificationAuditEntryParsers.fromDBReadToModelRead(row),
-    ).toEqual(row);
+    expect(ClarificationAuditEntryParsers.fromDBReadToModelRead(row)).toEqual(
+      row,
+    );
     expect(
       ClarificationAuditEntryParsers.fromModelInsertToDBInsert(row),
     ).toEqual(row);

@@ -8,7 +8,7 @@ import { callIpc } from "$/platform/ipc/client.ts";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type {

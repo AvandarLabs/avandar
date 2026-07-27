@@ -1,6 +1,7 @@
 import "fake-indexeddb/auto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
 import { ClarificationAuditEntryClient } from "./ClarificationAuditEntryClient";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 import type { ChatClarifyRequest } from "$/types/chat.types";
@@ -58,6 +59,11 @@ describe("ClarificationAuditEntryClient", () => {
   });
 
   it("records fixed-option request metadata", async () => {
+    const parserSpy = vi.spyOn(
+      ClarificationAuditEntryParsers,
+      "fromModelInsertToDBInsert",
+    );
+
     await ClarificationAuditEntryClient.recordShown({
       workspaceId: "workspace-1",
       threadId: "thread-1",
@@ -75,6 +81,7 @@ describe("ClarificationAuditEntryClient", () => {
         timestamp: NOW,
       }),
     ]);
+    expect(parserSpy).toHaveBeenCalledOnce();
   });
 
   it("records discovery requests with an unknown option count", async () => {
@@ -104,6 +111,10 @@ describe("ClarificationAuditEntryClient", () => {
       request: _createRequest(),
     });
     vi.setSystemTime(NOW + 500);
+    const parserSpy = vi.spyOn(
+      ClarificationAuditEntryParsers,
+      "fromModelUpdateToDBUpdate",
+    );
 
     await ClarificationAuditEntryClient.recordOutcome({
       id,
@@ -111,6 +122,10 @@ describe("ClarificationAuditEntryClient", () => {
     });
 
     expect(await AvaDexie.DB.ClarificationAuditEntry.get(id)).toMatchObject({
+      outcome: "cancelled",
+      timeToAnswerMs: 500,
+    });
+    expect(parserSpy).toHaveBeenCalledWith({
       outcome: "cancelled",
       timeToAnswerMs: 500,
     });
@@ -132,6 +147,10 @@ describe("ClarificationAuditEntryClient", () => {
   });
 
   it("lists only workspace entries with newest first", async () => {
+    const parserSpy = vi.spyOn(
+      ClarificationAuditEntryParsers,
+      "fromDBReadToModelRead",
+    );
     await AvaDexie.DB.ClarificationAuditEntry.bulkAdd([
       _createEntry({ timestamp: NOW - 1 }),
       _createEntry({ timestamp: NOW - 3 }),
@@ -146,6 +165,18 @@ describe("ClarificationAuditEntryClient", () => {
         return entry.timestamp;
       }),
     ).toEqual([NOW - 1, NOW - 2, NOW - 3]);
+    expect(parserSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it("rejects invalid rows read from IndexedDB", async () => {
+    await AvaDexie.DB.ClarificationAuditEntry.put({
+      ..._createEntry(),
+      outcome: "invalid",
+    } as unknown as ClarificationAuditEntry.T);
+
+    await expect(
+      ClarificationAuditEntryClient.listClarificationLog("workspace-1"),
+    ).rejects.toThrow("[ClarificationAuditEntry:DBReadSchema]");
   });
 
   it("does not reject when audit record or outcome writes fail", async () => {

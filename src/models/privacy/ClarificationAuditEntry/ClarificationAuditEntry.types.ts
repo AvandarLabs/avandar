@@ -4,45 +4,20 @@ import type { UUID } from "@utils/types/common.types";
 /** Branded identifier for a local clarification audit record. */
 export type ClarificationAuditEntryId = UUID<"ClarificationAuditEntry">;
 
-/** Clarification outcomes persisted in the local audit log. */
-export const ClarificationOutcomes = [
-  "answered",
-  "cancelled",
-  "cap_reached",
-  "neutral_failure",
-] as const;
-
 /** A clarification outcome persisted in the local audit log. */
-export type ClarificationOutcome = (typeof ClarificationOutcomes)[number];
-
-/** Checks whether a string is a persisted clarification outcome. */
-export function isValidClarificationOutcome(
-  value: string,
-): value is ClarificationOutcome {
-  return (ClarificationOutcomes as readonly string[]).includes(value);
-}
-
-/** Clarification response shapes persisted in the local audit log. */
-export const ClarificationResponseShapeLabels = [
-  "free_text",
-  "fixed_options_single",
-  "fixed_options_multi",
-  "discovery_single",
-  "discovery_multi",
-] as const;
+export type ClarificationOutcome =
+  | "answered"
+  | "cancelled"
+  | "cap_reached"
+  | "neutral_failure";
 
 /** A clarification response shape persisted in the local audit log. */
 export type ClarificationResponseShapeLabel =
-  (typeof ClarificationResponseShapeLabels)[number];
-
-/** Checks whether a string is a persisted clarification response shape. */
-export function isValidClarificationResponseShapeLabel(
-  value: string,
-): value is ClarificationResponseShapeLabel {
-  return (ClarificationResponseShapeLabels as readonly string[]).includes(
-    value,
-  );
-}
+  | "free_text"
+  | "fixed_options_single"
+  | "fixed_options_multi"
+  | "discovery_single"
+  | "discovery_multi";
 
 /** Complete browser-local clarification audit row. */
 export type ClarificationAuditEntryRead = {

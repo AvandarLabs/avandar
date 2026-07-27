@@ -33,6 +33,7 @@ const clarificationAuditEntryClient = createDexieCrudClient({
   parsers: ClarificationAuditEntryParsers,
   queries: ({ dbTable }) => {
     return {
+      /** Lists clarification audit entries for one workspace, newest first. */
       listClarificationLog: async (
         workspaceId: string,
       ): Promise<ClarificationAuditEntry.T[]> => {
@@ -40,14 +41,19 @@ const clarificationAuditEntryClient = createDexieCrudClient({
           .where("workspaceId")
           .equals(workspaceId)
           .toArray();
-        return rows.sort((firstEntry, secondEntry) => {
-          return secondEntry.timestamp - firstEntry.timestamp;
-        });
+        return rows
+          .map((row) => {
+            return ClarificationAuditEntryParsers.fromDBReadToModelRead(row);
+          })
+          .sort((firstEntry, secondEntry) => {
+            return secondEntry.timestamp - firstEntry.timestamp;
+          });
       },
     };
   },
   mutations: ({ dbTable }) => {
     return {
+      /** Records that a clarification was shown without blocking on failure. */
       recordShown: async (options: {
         workspaceId: string;
         threadId?: string;
@@ -61,7 +67,7 @@ const clarificationAuditEntryClient = createDexieCrudClient({
           : null;
         PENDING.set(id, { id, askedAtMs });
         try {
-          await dbTable.add({
+          const entry: ClarificationAuditEntry.T = {
             id,
             workspaceId: options.workspaceId,
             threadId: options.threadId ?? null,
@@ -76,12 +82,16 @@ const clarificationAuditEntryClient = createDexieCrudClient({
             timeToAnswerMs: null,
             ledToSuccessfulSql: null,
             patternLocale: "en",
-          });
+          };
+          await dbTable.add(
+            ClarificationAuditEntryParsers.fromModelInsertToDBInsert(entry),
+          );
         } catch (error) {
           console.warn("[privacy] clarification audit write failed:", error);
         }
         return id;
       },
+      /** Records a clarification outcome without blocking on failure. */
       recordOutcome: async (options: {
         id: ClarificationAuditEntry.Id;
         outcome: ClarificationAuditEntry.T["outcome"];
@@ -89,10 +99,14 @@ const clarificationAuditEntryClient = createDexieCrudClient({
         const pending = PENDING.get(options.id);
         PENDING.delete(options.id);
         try {
-          await dbTable.update(options.id, {
+          const update: ClarificationAuditEntry.T<"Update"> = {
             outcome: options.outcome,
             timeToAnswerMs: pending ? Date.now() - pending.askedAtMs : null,
-          });
+          };
+          await dbTable.update(
+            options.id,
+            ClarificationAuditEntryParsers.fromModelUpdateToDBUpdate(update),
+          );
         } catch (error) {
           console.warn(
             "[privacy] clarification audit outcome write failed:",

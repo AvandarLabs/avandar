@@ -2,18 +2,15 @@ import { makeParserRegistry } from "@clients";
 import { identity } from "@utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
-import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 import {
   ClarificationOutcomes,
   ClarificationResponseShapeLabels,
-} from "./ClarificationAuditEntry.types";
-import type {
-  ClarificationAuditEntryId,
-  ClarificationAuditEntryModel,
-} from "./ClarificationAuditEntry.types";
+} from "./ClarificationAuditEntry";
+import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
+import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 
 const DBReadSchema = z.object({
-  id: uuidType<ClarificationAuditEntryId>(),
+  id: uuidType<ClarificationAuditEntry.Id>(),
   workspaceId: z.string(),
   threadId: z.string().nullable(),
   timestamp: z.number(),
@@ -31,7 +28,7 @@ const DBReadSchema = z.object({
 
 /** Parser registry for browser-local clarification audit rows. */
 export const ClarificationAuditEntryParsers =
-  makeParserRegistry<ClarificationAuditEntryModel>().build({
+  makeParserRegistry<ClarificationAuditEntry.Model>().build({
     modelName: "ClarificationAuditEntry",
     DBReadSchema,
     fromDBReadToModelRead: identity,
@@ -40,7 +37,7 @@ export const ClarificationAuditEntryParsers =
   });
 
 /** Do not remove these tests! */
-type CrudTypes = ClarificationAuditEntryModel;
+type CrudTypes = ClarificationAuditEntry.Model;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

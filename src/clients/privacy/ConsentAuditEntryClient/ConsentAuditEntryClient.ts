@@ -41,6 +41,7 @@ const consentAuditEntryClient = createDexieCrudClient({
   parsers: ConsentAuditEntryParsers,
   queries: ({ dbTable }) => {
     return {
+      /** Lists retained consent audit entries matching the supplied filters. */
       listConsentLog: async (
         options: ConsentLogQueryOptions = {},
       ): Promise<ConsentAuditEntry.T[]> => {
@@ -53,19 +54,26 @@ const consentAuditEntryClient = createDexieCrudClient({
           .reverse()
           .sortBy("timestamp");
 
-        return rows.filter((entry) => {
-          return (
-            (!options.workspaceId ||
-              entry.workspaceId === options.workspaceId) &&
-            (!options.context || entry.context === options.context) &&
-            (!options.decision || entry.decision === options.decision)
-          );
-        });
+        return rows
+          .map((row) => {
+            return ConsentAuditEntryParsers.fromDBReadToModelRead(row);
+          })
+          .filter((entry) => {
+            return (
+              (!options.workspaceId ||
+                entry.workspaceId === options.workspaceId) &&
+              (!options.context || entry.context === options.context) &&
+              (!options.decision || entry.decision === options.decision)
+            );
+          });
       },
     };
   },
   mutations: ({ dbTable }) => {
     return {
+      /**
+       * Records one consent decision without blocking the caller on failure.
+       */
       recordConsentDecision: async (
         input: RecordConsentDecisionInput,
       ): Promise<void> => {
@@ -76,7 +84,7 @@ const consentAuditEntryClient = createDexieCrudClient({
         ].filter(isDefined);
 
         try {
-          await dbTable.add({
+          const entry: ConsentAuditEntry.T = {
             id: uuid() as ConsentAuditEntry.Id,
             workspaceId: input.workspaceId,
             userId: input.userId,
@@ -102,11 +110,15 @@ const consentAuditEntryClient = createDexieCrudClient({
             medicalTierTriggeredBy: input.isMedical ? "column" : null,
             typedConfirmationCorrect: input.typedConfirmationCorrect,
             ackTokenNonce: input.ackTokenNonce ?? null,
-          });
+          };
+          await dbTable.add(
+            ConsentAuditEntryParsers.fromModelInsertToDBInsert(entry),
+          );
         } catch (error) {
           console.warn("[privacy] consent audit write failed:", error);
         }
       },
+      /** Deletes every browser-local consent audit entry. */
       clearConsentLog: async (): Promise<void> => {
         await dbTable.clear();
       },

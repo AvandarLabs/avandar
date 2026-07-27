@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
-import type { ConsentAuditEntry } from "./ConsentAuditEntry";
 import {
   isValidConsentAuditContext,
   isValidConsentAuditMedicalTier,
   isValidConsentAuditMode,
   isValidConsentAuditWarning,
   isValidConsentDecisionKind,
-} from "./ConsentAuditEntry.types";
+} from "./ConsentAuditEntry";
+import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
+import type { ConsentAuditEntry } from "./ConsentAuditEntry";
 
 const row: ConsentAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000001" as ConsentAuditEntry.Id,

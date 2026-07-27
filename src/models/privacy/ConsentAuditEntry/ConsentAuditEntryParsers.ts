@@ -2,21 +2,18 @@ import { makeParserRegistry } from "@clients";
 import { identity } from "@utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
-import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 import {
   ConsentAuditContexts,
   ConsentAuditMedicalTiers,
   ConsentAuditModes,
   ConsentAuditWarnings,
   ConsentDecisionKinds,
-} from "./ConsentAuditEntry.types";
-import type {
-  ConsentAuditEntryId,
-  ConsentAuditEntryModel,
-} from "./ConsentAuditEntry.types";
+} from "./ConsentAuditEntry";
+import type { ConsentAuditEntry } from "./ConsentAuditEntry";
+import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 
 const DBReadSchema = z.object({
-  id: uuidType<ConsentAuditEntryId>(),
+  id: uuidType<ConsentAuditEntry.Id>(),
   workspaceId: z.string(),
   userId: z.string(),
   threadId: z.string().nullable(),
@@ -41,7 +38,7 @@ const DBReadSchema = z.object({
 
 /** Parser registry for browser-local consent audit rows. */
 export const ConsentAuditEntryParsers =
-  makeParserRegistry<ConsentAuditEntryModel>().build({
+  makeParserRegistry<ConsentAuditEntry.Model>().build({
     modelName: "ConsentAuditEntry",
     DBReadSchema,
     fromDBReadToModelRead: identity,
@@ -50,7 +47,7 @@ export const ConsentAuditEntryParsers =
   });
 
 /** Do not remove these tests! */
-type CrudTypes = ConsentAuditEntryModel;
+type CrudTypes = ConsentAuditEntry.Model;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

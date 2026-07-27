@@ -1,6 +1,7 @@
 import "fake-indexeddb/auto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { ConsentAuditEntryParsers } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntryParsers";
 import { ConsentAuditEntryClient } from "./ConsentAuditEntryClient";
 import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
@@ -48,6 +49,11 @@ describe("ConsentAuditEntryClient", () => {
   });
 
   it("records computed warnings and consent metadata", async () => {
+    const parserSpy = vi.spyOn(
+      ConsentAuditEntryParsers,
+      "fromModelInsertToDBInsert",
+    );
+
     await ConsentAuditEntryClient.recordConsentDecision({
       workspaceId: "workspace-1",
       userId: "user-1",
@@ -89,6 +95,7 @@ describe("ConsentAuditEntryClient", () => {
         ackTokenNonce: "nonce-1",
       }),
     ]);
+    expect(parserSpy).toHaveBeenCalledOnce();
   });
 
   it("excludes entries older than the default 90-day retention window", async () => {
@@ -139,6 +146,10 @@ describe("ConsentAuditEntryClient", () => {
   });
 
   it("returns newest entries first", async () => {
+    const parserSpy = vi.spyOn(
+      ConsentAuditEntryParsers,
+      "fromDBReadToModelRead",
+    );
     await AvaDexie.DB.ConsentAuditEntry.bulkAdd([
       _createEntry({ timestamp: NOW - 1 }),
       _createEntry({ timestamp: NOW - 3 }),
@@ -150,6 +161,18 @@ describe("ConsentAuditEntryClient", () => {
         return entry.timestamp;
       }),
     ).toEqual([NOW - 1, NOW - 2, NOW - 3]);
+    expect(parserSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it("rejects invalid rows read from IndexedDB", async () => {
+    await AvaDexie.DB.ConsentAuditEntry.put({
+      ..._createEntry(),
+      decision: "invalid",
+    } as unknown as ConsentAuditEntry.T);
+
+    await expect(ConsentAuditEntryClient.listConsentLog()).rejects.toThrow(
+      "[ConsentAuditEntry:DBReadSchema]",
+    );
   });
 
   it("clears every consent audit entry", async () => {

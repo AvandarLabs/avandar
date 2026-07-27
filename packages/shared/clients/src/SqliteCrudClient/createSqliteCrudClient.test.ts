@@ -1,10 +1,10 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { __setIpcBridgeForTests } from "$/platform/ipc/client.ts";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   ReplyEnvelope,
