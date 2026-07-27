@@ -28,6 +28,8 @@ import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
+import type { ClarificationAuditEntryModel } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry.types";
+import type { ConsentAuditEntryModel } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry.types";
 
 const db = new Dexie("AvandarDB");
 
@@ -36,6 +38,15 @@ type Schemas = {
   v2: { version: 2; models: [LocalDatasetModel] };
   v3: { version: 3; models: [LocalDatasetModel, LocalPublicDatasetModel] };
   v4: { version: 4; models: [LocalDatasetModel, LocalPublicDatasetModel] };
+  v5: {
+    version: 5;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntryModel,
+      ClarificationAuditEntryModel,
+    ];
+  };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -115,8 +126,39 @@ const DBDefinitions = [
 
     upgrader: async () => {},
   }),
+
+  AvaDexieVersionManager.defineVersion<5>({
+    db,
+    version: 5,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["dashboardId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
+    },
+
+    upgrader: async () => {},
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
-export const CURRENT_AVA_DEXIE_VERSION = "v4" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v5" as const satisfies keyof Schemas;
