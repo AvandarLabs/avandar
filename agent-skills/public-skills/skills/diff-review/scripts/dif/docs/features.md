@@ -8,6 +8,7 @@ dif <branch>         # vs <branch>
 dif .                # uncommitted worktree changes
 dif staged|working   # staged / working tree
 dif <branch> --codex # run the right pane with Codex instead of Claude
+dif <branch> -cx     # short alias for --codex
 ```
 
 On launch `dif`:
@@ -28,10 +29,11 @@ On launch `dif`:
 5. Once the LLM writes the transcript and both guide artifacts, `dif` starts
    difit for the selected comparison, opens the browser web shell, refreshes
    live-session metadata, and begins polling for comments automatically.
-6. Starts the right pane in the repo root. Claude is the default; `--codex`
-   selects Codex. When a prepared review already exists, a **fresh** session is
-   launched with the normal review-orientation prompt. A resumed Claude session
-   gets no such message because that orientation is already in its context.
+6. Starts the right pane in the repo root. Claude is the default; `--codex` and
+   `-cx` select Codex. When a prepared review already exists, a **fresh** session
+   is launched with the normal review-orientation prompt. A resumed Claude
+   session gets no such message because that orientation is already in its
+   context.
 7. Focuses the **diff main view** (left), not the LLM pane.
 
 ## The two halves

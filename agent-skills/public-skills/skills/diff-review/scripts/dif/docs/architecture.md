@@ -2,7 +2,7 @@
 
 `dif` is a Ratatui TUI that runs difit and an LLM frontend side by side, and
 pipes new difit comments into the LLM automatically. Claude is the default;
-`--codex` runs the right pane with Codex instead.
+`--codex` or `-cx` runs the right pane with Codex instead.
 
 ## Module map
 
@@ -10,7 +10,7 @@ pipes new difit comments into the LLM automatically. Claude is the default;
 src/
 ├── main.rs            entry: parse CLI, call tui::run
 ├── lib.rs             module declarations
-├── cli.rs             clap surface (optional comparison key, --codex, config)
+├── cli.rs             clap surface (optional comparison key, --codex / -cx, config)
 ├── config.rs          repo-local .difit/dif.config.json + `dif config`
 ├── comparison.rs      ComparisonKey + difit args + scope slug + CommitPolicy
 ├── slug.rs            slugify, branch_slug, deterministic port_for

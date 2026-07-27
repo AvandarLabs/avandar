@@ -23,11 +23,12 @@ If `config set` receives a name without `=value`, it prompts once on
 | `claude_cmd` | `claude` | Base command for Claude. `dif` appends `--resume <id>` or `--session-id <id>` and the optional prompt. |
 | `codex_cmd` | `codex` | Base command for Codex. `dif` appends Codex-compatible args, such as `resume <id>` when a saved id exists, plus the optional prompt. |
 
-Launches default to Claude. Pass `--codex` to run the right pane with
+Launches default to Claude. Pass `--codex` or `-cx` to run the right pane with
 Codex instead:
 
 ```sh
 pnpm diff-review develop --codex
+pnpm diff-review develop -cx
 ```
 
 ## Command registry

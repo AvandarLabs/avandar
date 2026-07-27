@@ -56,7 +56,7 @@ The LLM pane starts with the minimal slash command that prepares the review:
 `/diff-review` plus the comparison argument the user explicitly passed to the
 TUI. Examples: `dif .` seeds `/diff-review .`, `dif develop` seeds
 `/diff-review develop`, and bare `dif` seeds `/diff-review`. Flags such as
-`--codex` are never included in that prompt.
+`--codex` / `-cx` are never included in that prompt.
 
 Each UI tick calls `review_files_ready` through `App::update_difit_log`. Once
 the transcript and both guide files exist, the same left `PtyPane` is respawned
@@ -143,7 +143,7 @@ runs the same `regenerate_guide()`. Both the TUI guide view and the shell's
 ## The LLM Pane
 
 The right pane runs a terminal LLM frontend in the repo root. Claude is the
-default; `--codex` selects Codex. The base commands come from the repo-local
+default; `--codex` / `-cx` select Codex. The base commands come from the repo-local
 `.difit/dif.config.json` values `claude_cmd` and `codex_cmd`, both managed by
 `dif config` and defaulting to `claude` and `codex`.
 

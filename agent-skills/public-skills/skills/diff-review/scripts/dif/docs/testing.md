@@ -19,7 +19,7 @@ suite with `cargo test` (it finishes in a couple of seconds).
 - `git`: explicit-arg parsing and the develop→main default (faked
   `BranchProbe`); `diff_signature` moves on an edit and on a new untracked file
   (real temp repo, skipped if `git` is absent).
-- `cli`: argument capture, `--codex`, and `config set` parsing.
+- `cli`: argument capture, `--codex` / `-cx`, and `config set` parsing.
 - `difit::imports`: server→import conversion, field omission, id fallback,
   code-snapshot only on the thread root.
 - `difit::transcript`: empty/missing detection, write→read round-trip, no
