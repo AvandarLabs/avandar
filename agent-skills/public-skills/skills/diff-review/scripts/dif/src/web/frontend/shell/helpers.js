@@ -98,6 +98,17 @@
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   }
+  function renderSummaryMarkdown(md) {
+    var lines = md.replace(/\r\n/g, "\n").split("\n").filter(function (line) {
+      return line.trim();
+    });
+    if (lines.length && lines.every(function (line) { return /^[-*]\s+/.test(line.trim()); })) {
+      return "<ul>" + lines.map(function (line) {
+        return "<li>" + renderInlineMarkdown(line.trim().replace(/^[-*]\s+/, "")) + "</li>";
+      }).join("") + "</ul>";
+    }
+    return renderInlineMarkdown(md);
+  }
   function renderTestPlanMarkdown(md) {
     if (!md.trim()) {
       return '<div class="side-empty">No test plan yet.<br>Ask the LLM to regenerate the diff guide if this diff needs one.</div>';

@@ -640,7 +640,9 @@ functional enhancements often do.
 
 **Diff summary rules (`…-summary.md`):**
 
-- At most **3 sentences**. Never write a fourth sentence.
+- Write the summary as a markdown bullet list.
+- At most **3 bullets**. Never write a fourth bullet.
+- Each bullet is at most **1 sentence**. Never write a multi-sentence bullet.
 - Describe the diff at a high level: what area it touches and what changed.
 - Do not list every file, repeat the chat summary, or include test steps.
 

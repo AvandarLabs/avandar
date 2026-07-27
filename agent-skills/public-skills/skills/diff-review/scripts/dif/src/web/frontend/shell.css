@@ -487,6 +487,9 @@ kbd {
   background: var(--accent-wash);
   color: var(--accent-ink);
 }
+.nav-item.active:hover {
+  background: color-mix(in oklch, var(--accent) 14%, var(--accent-wash));
+}
 .nav-item:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
@@ -546,8 +549,20 @@ kbd {
   background: var(--surface);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 13.5px;
   line-height: 1.45;
+}
+.diff-summary ul {
+  margin: 0;
+  padding-left: 14px;
+  list-style-position: outside;
+}
+.diff-summary li {
+  margin: 0 0 4px;
+  padding-left: 1px;
+}
+.diff-summary li:last-child {
+  margin-bottom: 0;
 }
 .diff-summary code,
 .test-plan-panel code {
@@ -558,6 +573,7 @@ kbd {
 .grp-block {
   margin-bottom: 2px;
   border-radius: var(--radius-sm);
+  cursor: pointer;
 }
 .grp-block.active {
   background: var(--accent-wash);
@@ -588,6 +604,9 @@ kbd {
 }
 .grp-block:not(.active) .grp-head:hover {
   background: var(--panel-2);
+}
+.grp-block.active .grp-head:hover {
+  background: color-mix(in oklch, var(--accent) 14%, var(--accent-wash));
 }
 .kindmark {
   width: 7px;
@@ -630,7 +649,7 @@ kbd {
   flex: 0 0 auto;
 }
 .grp-orient {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--ink-2);
   padding: 0 10px 6px 36px;
   line-height: 1.4;
@@ -735,12 +754,12 @@ kbd {
 .test-plan-panel {
   padding: 8px 6px 16px;
   color: var(--ink-2);
-  font-size: 12.5px;
+  font-size: 13.5px;
 }
 .test-plan-panel h3 {
   margin: 10px 4px 7px;
   color: var(--ink);
-  font-size: 12.5px;
+  font-size: 13.5px;
 }
 .test-plan-panel p {
   margin: 0;
@@ -766,7 +785,7 @@ kbd {
   background: var(--accent-wash);
   border-radius: 999px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .copy-block {
@@ -786,14 +805,14 @@ kbd {
   background: var(--panel-2);
   border-bottom: 1px solid var(--line-soft);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
 }
 .copy-block pre {
   margin: 0;
   padding: 8px;
   overflow-x: auto;
   font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 12.5px;
   line-height: 1.45;
 }
 .copy-quote {

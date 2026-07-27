@@ -198,7 +198,11 @@ mod tests {
         git(&tmp, &["commit", "-q", "-m", "init"]);
 
         let base = diff_signature(&tmp).expect("signature");
-        assert_eq!(base, diff_signature(&tmp).unwrap(), "stable when nothing changes");
+        assert_eq!(
+            base,
+            diff_signature(&tmp).unwrap(),
+            "stable when nothing changes"
+        );
 
         // An uncommitted edit must move the signature.
         std::fs::write(tmp.join("f.txt"), "one\ntwo\n").unwrap();
@@ -207,7 +211,11 @@ mod tests {
 
         // A brand-new untracked file must also move it.
         std::fs::write(tmp.join("g.txt"), "new\n").unwrap();
-        assert_ne!(changed, diff_signature(&tmp).unwrap(), "untracked file must change it");
+        assert_ne!(
+            changed,
+            diff_signature(&tmp).unwrap(),
+            "untracked file must change it"
+        );
 
         let _ = std::fs::remove_dir_all(&tmp);
     }

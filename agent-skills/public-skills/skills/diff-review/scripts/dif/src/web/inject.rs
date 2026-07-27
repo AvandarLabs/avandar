@@ -48,8 +48,12 @@ fn find_ci(haystack: &str, needle: &str) -> Option<usize> {
     if need.is_empty() || hay.len() < need.len() {
         return None;
     }
-    (0..=hay.len() - need.len())
-        .find(|&i| hay[i..i + need.len()].iter().zip(need).all(|(a, b)| a.eq_ignore_ascii_case(b)))
+    (0..=hay.len() - need.len()).find(|&i| {
+        hay[i..i + need.len()]
+            .iter()
+            .zip(need)
+            .all(|(a, b)| a.eq_ignore_ascii_case(b))
+    })
 }
 
 #[cfg(test)]
@@ -74,7 +78,10 @@ mod tests {
     fn appends_when_no_body_close() {
         let html = b"<div id=\"root\"></div>";
         let out = s(&inject_script(html));
-        assert!(out.ends_with(SCRIPT_TAG), "tag appended at end when no </body>");
+        assert!(
+            out.ends_with(SCRIPT_TAG),
+            "tag appended at end when no </body>"
+        );
     }
 
     #[test]

@@ -75,7 +75,10 @@ impl Renderer {
             Event::Rule => self.rule(),
             Event::TaskListMarker(done) => {
                 let mark = if *done { "[x] " } else { "[ ] " };
-                self.push_span(Span::styled(mark, Style::default().fg(Color::Rgb(122, 134, 173))));
+                self.push_span(Span::styled(
+                    mark,
+                    Style::default().fg(Color::Rgb(122, 134, 173)),
+                ));
             }
             _ => {}
         }
@@ -289,11 +292,10 @@ mod tests {
     fn heading_text_is_bold() {
         let t = render("# Group 1", 60);
         // Word-wrap splits the heading into per-word spans; each carries BOLD.
-        let bold = t
-            .lines
-            .iter()
-            .flat_map(|l| l.spans.iter())
-            .any(|s| s.content.contains("Group") && s.style.add_modifier.contains(Modifier::BOLD));
+        let bold =
+            t.lines.iter().flat_map(|l| l.spans.iter()).any(|s| {
+                s.content.contains("Group") && s.style.add_modifier.contains(Modifier::BOLD)
+            });
         assert!(bold, "heading should be bold");
     }
 
@@ -320,7 +322,10 @@ mod tests {
     fn table_renders_with_borders_and_cells() {
         let md = "| File | Status |\n| --- | --- |\n| a.rs | done |";
         let out = plain(&render(md, 60));
-        assert!(out.contains('┌') && out.contains('│'), "no table borders: {out:?}");
+        assert!(
+            out.contains('┌') && out.contains('│'),
+            "no table borders: {out:?}"
+        );
         assert!(out.contains("File") && out.contains("Status"));
         assert!(out.contains("a.rs") && out.contains("done"));
     }

@@ -117,10 +117,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         llm,
         agent_kind,
         llm_cmd,
-        // Start on the diff main view (left), not the LLM pane: the review
-        // begins by looking at the diff, and the LLM is already busy loading
-        // the skill from its auto-submitted initial prompt (see `spawn_llm`).
-        focus: Panel::Difit,
+        focus: initial_focus(),
         port,
         comparison_label: comparison_label(&comparison),
         repo_root,
@@ -158,6 +155,11 @@ pub fn launch(cli: &Cli) -> Result<App> {
     };
     app.write_session_meta(open_url);
     Ok(app)
+}
+
+/// The initial keyboard focus for a new TUI launch.
+const fn initial_focus() -> Panel {
+    Panel::Llm
 }
 
 fn selected_agent(cli: &Cli, config: DifConfig) -> (AgentKind, String) {
@@ -493,6 +495,11 @@ mod tests {
             &guide_path,
             &guide_json_path
         ));
+    }
+
+    #[test]
+    fn initial_focus_starts_on_llm_panel() {
+        assert_eq!(initial_focus(), Panel::Llm);
     }
 
     #[test]

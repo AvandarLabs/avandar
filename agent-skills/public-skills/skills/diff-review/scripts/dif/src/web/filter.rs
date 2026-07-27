@@ -74,7 +74,7 @@ pub fn filter_ungrouped<S: BuildHasher>(body: &[u8], guide_files: &HashSet<Strin
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
 
     fn set(paths: &[&str]) -> HashSet<String> {
         paths.iter().map(|s| (*s).to_owned()).collect()
@@ -101,18 +101,37 @@ mod tests {
 
     #[test]
     fn keeps_only_allowed_files_in_order() {
-        let out = parse(&filter_diff(sample().to_string().as_bytes(), &set(&["src/a.ts", "src/c.ts"])));
-        let paths: Vec<&str> = out["files"].as_array().unwrap()
-            .iter().map(|f| f["path"].as_str().unwrap()).collect();
+        let out = parse(&filter_diff(
+            sample().to_string().as_bytes(),
+            &set(&["src/a.ts", "src/c.ts"]),
+        ));
+        let paths: Vec<&str> = out["files"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|f| f["path"].as_str().unwrap())
+            .collect();
         assert_eq!(paths, vec!["src/a.ts", "src/c.ts"]);
     }
 
     #[test]
     fn preserves_every_non_files_field_by_value() {
         let input = sample();
-        let out = parse(&filter_diff(input.to_string().as_bytes(), &set(&["src/a.ts"])));
-        for key in ["commit", "baseCommitish", "targetCommitish", "isEmpty", "repositoryId"] {
-            assert_eq!(out[key], input[key], "field {key} must be preserved unchanged");
+        let out = parse(&filter_diff(
+            input.to_string().as_bytes(),
+            &set(&["src/a.ts"]),
+        ));
+        for key in [
+            "commit",
+            "baseCommitish",
+            "targetCommitish",
+            "isEmpty",
+            "repositoryId",
+        ] {
+            assert_eq!(
+                out[key], input[key],
+                "field {key} must be preserved unchanged"
+            );
         }
     }
 
@@ -126,20 +145,43 @@ mod tests {
     fn matches_rename_by_old_or_new_path() {
         let body = json!({
             "files": [ { "path": "src/new.ts", "oldPath": "src/old.ts", "status": "renamed" } ]
-        }).to_string();
+        })
+        .to_string();
         // matched by new path
-        assert_eq!(parse(&filter_diff(body.as_bytes(), &set(&["src/new.ts"])))["files"].as_array().unwrap().len(), 1);
+        assert_eq!(
+            parse(&filter_diff(body.as_bytes(), &set(&["src/new.ts"])))["files"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
         // matched by old path (skill may have grouped under the pre-rename name)
-        assert_eq!(parse(&filter_diff(body.as_bytes(), &set(&["src/old.ts"])))["files"].as_array().unwrap().len(), 1);
+        assert_eq!(
+            parse(&filter_diff(body.as_bytes(), &set(&["src/old.ts"])))["files"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
         // unrelated → dropped
-        assert_eq!(parse(&filter_diff(body.as_bytes(), &set(&["src/other.ts"])))["files"].as_array().unwrap().len(), 0);
+        assert_eq!(
+            parse(&filter_diff(body.as_bytes(), &set(&["src/other.ts"])))["files"]
+                .as_array()
+                .unwrap()
+                .len(),
+            0
+        );
     }
 
     #[test]
     fn fail_open_when_no_files_array() {
         let body = json!({ "error": "no diff", "isEmpty": true }).to_string();
         let out = filter_diff(body.as_bytes(), &set(&["src/a.ts"]));
-        assert_eq!(parse(&out), parse(body.as_bytes()), "body without files must pass through unchanged");
+        assert_eq!(
+            parse(&out),
+            parse(body.as_bytes()),
+            "body without files must pass through unchanged"
+        );
     }
 
     #[test]
@@ -151,15 +193,25 @@ mod tests {
     #[test]
     fn ungrouped_keeps_only_files_absent_from_the_guide() {
         // Guide covers a.ts + c.ts; b.ts is the "new" file.
-        let out = parse(&filter_ungrouped(sample().to_string().as_bytes(), &set(&["src/a.ts", "src/c.ts"])));
-        let paths: Vec<&str> = out["files"].as_array().unwrap()
-            .iter().map(|f| f["path"].as_str().unwrap()).collect();
+        let out = parse(&filter_ungrouped(
+            sample().to_string().as_bytes(),
+            &set(&["src/a.ts", "src/c.ts"]),
+        ));
+        let paths: Vec<&str> = out["files"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|f| f["path"].as_str().unwrap())
+            .collect();
         assert_eq!(paths, vec!["src/b.ts"]);
     }
 
     #[test]
     fn ungrouped_empty_guide_keeps_everything() {
-        let out = parse(&filter_ungrouped(sample().to_string().as_bytes(), &set(&[])));
+        let out = parse(&filter_ungrouped(
+            sample().to_string().as_bytes(),
+            &set(&[]),
+        ));
         assert_eq!(out["files"].as_array().unwrap().len(), 3);
     }
 
@@ -167,11 +219,24 @@ mod tests {
     fn ungrouped_excludes_renames_by_old_or_new_path() {
         let body = json!({
             "files": [ { "path": "src/new.ts", "oldPath": "src/old.ts", "status": "renamed" } ]
-        }).to_string();
+        })
+        .to_string();
         // guide lists the pre-rename name → excluded from "new"
-        assert_eq!(parse(&filter_ungrouped(body.as_bytes(), &set(&["src/old.ts"])))["files"].as_array().unwrap().len(), 0);
+        assert_eq!(
+            parse(&filter_ungrouped(body.as_bytes(), &set(&["src/old.ts"])))["files"]
+                .as_array()
+                .unwrap()
+                .len(),
+            0
+        );
         // guide unrelated → kept as new
-        assert_eq!(parse(&filter_ungrouped(body.as_bytes(), &set(&["src/x.ts"])))["files"].as_array().unwrap().len(), 1);
+        assert_eq!(
+            parse(&filter_ungrouped(body.as_bytes(), &set(&["src/x.ts"])))["files"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[test]

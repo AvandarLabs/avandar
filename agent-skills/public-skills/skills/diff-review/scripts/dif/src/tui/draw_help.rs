@@ -35,7 +35,10 @@ pub fn draw_help(f: &mut Frame, area: Rect) {
                 "Keyboard shortcuts",
                 Style::default().fg(accent).add_modifier(Modifier::BOLD),
             ),
-            Span::styled("  ·  Esc to close ", Style::default().fg(Color::Rgb(122, 134, 173))),
+            Span::styled(
+                "  ·  Esc to close ",
+                Style::default().fg(Color::Rgb(122, 134, 173)),
+            ),
         ]));
     let inner = block.inner(modal);
     f.render_widget(block, modal);

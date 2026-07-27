@@ -164,9 +164,7 @@ pub fn open_url(url: &str) {
 fn open_in_editor(path: &str, line: u32) {
     let nvim_cmd = format!("nvim '+{line}' {}", shell_quote(path));
     if std::env::var_os("TMUX").is_some() {
-        let _ = Command::new("tmux")
-            .args(["new-window", &nvim_cmd])
-            .spawn();
+        let _ = Command::new("tmux").args(["new-window", &nvim_cmd]).spawn();
     } else {
         let _ = Command::new("osascript")
             .args(["-e", &iterm_new_tab_script(&nvim_cmd)])

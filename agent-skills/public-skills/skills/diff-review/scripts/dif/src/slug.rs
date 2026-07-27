@@ -71,7 +71,10 @@ mod tests {
     #[test]
     fn slugify_lowercases_and_collapses() {
         assert_eq!(slugify("Feat/Share Modal"), "feat-share-modal");
-        assert_eq!(slugify("refactor-061/web-offline-mode"), "refactor-061-web-offline-mode");
+        assert_eq!(
+            slugify("refactor-061/web-offline-mode"),
+            "refactor-061-web-offline-mode"
+        );
     }
 
     #[test]

@@ -87,8 +87,9 @@ side only provides the path helpers so both halves agree on the names.
 - **`-guide.md`** — GitHub-flavored markdown. Always a guide to what is *left* to
   review, organized as numbered groups (`Group 1`, `Group 2`, …). The diff guide
   view renders headings, bold/italic, inline code, lists, and tables.
-- **`-summary.md`** — markdown containing at most three sentences. The browser
-  web shell shows it under the "Diff guide" title before the "Full diff" row.
+- **`-summary.md`** — markdown containing up to three one-sentence bullets. The
+  browser web shell shows it under the "Diff guide" title before the "Full diff"
+  row.
 - **`-test-plan.md`** — markdown containing numbered manual test steps. The TUI
   renders it in a separate Test plan tab before Diff guide; the browser web
   shell renders it in a separate sidebar tab, not inside the guide.

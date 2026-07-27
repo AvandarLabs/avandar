@@ -62,6 +62,35 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
         .call()
         .unwrap();
     assert_eq!(css.content_type(), "text/css");
+    let css_text = css.into_string().unwrap();
+    assert!(
+        css_text.contains("font-size: 13.5px;"),
+        "diff summary font size should be 1px larger"
+    );
+    assert!(
+        css_text.contains(".diff-summary ul"),
+        "diff summary bullets should have compact list styling"
+    );
+    assert!(
+        css_text.contains(".grp-orient {\n  font-size: 13.5px;"),
+        "group summary font size should be 1.5px larger"
+    );
+    assert!(
+        css_text.contains(".nav-item.active:hover {\n  background:"),
+        "active full diff nav item should show a distinct hover background"
+    );
+    assert!(
+        css_text.contains(".grp-block.active .grp-head:hover {\n  background:"),
+        "active group headings should still show a distinct hover background"
+    );
+    assert!(
+        css_text.contains(".test-plan-panel {\n  padding: 8px 6px 16px;\n  color: var(--ink-2);\n  font-size: 13.5px;"),
+        "test plan base font size should be 1px larger"
+    );
+    assert!(
+        css_text.contains("font-size: 12.5px;"),
+        "test plan code blocks should be 1px larger"
+    );
     let js_resp = ureq::get(&format!("{base}/__wrap/shell.js"))
         .call()
         .unwrap();
@@ -75,6 +104,22 @@ fn serves_shell_assets_and_fails_soft_without_difit() {
     );
     let js = js_resp.into_string().unwrap();
     assert!(js.contains("selectView"), "serves shell.js");
+    assert!(
+        js.contains("renderSummaryMarkdown"),
+        "summary markdown renderer supports bullets"
+    );
+    assert!(
+        js.contains("<ul>"),
+        "summary bullet renderer emits unordered lists"
+    );
+    assert!(
+        js.contains("data-group-block"),
+        "group block should carry a click target"
+    );
+    assert!(
+        js.contains("closest(\"[data-group-block]\")"),
+        "clicking inside a group block should select the group"
+    );
 
     // inject.js.
     let inject = ureq::get(&format!("{base}/__wrap/inject.js"))

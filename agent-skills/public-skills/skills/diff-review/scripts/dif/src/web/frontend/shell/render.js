@@ -37,7 +37,7 @@
 
     var newFiles = newFilePaths();
     var h = diffSummary.trim()
-      ? '<div class="diff-summary">' + renderInlineMarkdown(diffSummary.trim()) + '</div>'
+      ? '<div class="diff-summary">' + renderSummaryMarkdown(diffSummary.trim()) + '</div>'
       : "";
     h += '<button class="nav-item ' + (view === "full" ? "active" : "") + '" data-view="full">'
       + '<svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
@@ -57,7 +57,7 @@
       var done = gfiles.length > 0 && rev === gfiles.length;
       var active = view === "g" + g.n;
       var collapsed = collapsedGroups[g.n] === true;
-      h += '<div class="grp-block ' + (active ? "active" : "") + '">'
+      h += '<div class="grp-block ' + (active ? "active" : "") + '" data-group-block="g' + g.n + '">'
         + '<button class="grp-head" data-group-head="' + g.n + '" aria-expanded="' + (!collapsed) + '">'
         + '<svg class="grp-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
         + '<span class="kindmark" style="background:' + kindColor(g.kind) + '"></span>'
@@ -97,6 +97,13 @@
         var f = n.getAttribute("data-file");
         if (f) selectFile(n.getAttribute("data-view"), f);
         else selectView(n.getAttribute("data-view"));
+      });
+    });
+    Array.prototype.forEach.call(els.sideScroll.querySelectorAll("[data-group-block]"), function (n) {
+      n.addEventListener("click", function (e) {
+        if (e.target.closest("[data-group-head]") || e.target.closest("[data-view]")) return;
+        var groupBlock = e.target.closest("[data-group-block]");
+        if (groupBlock) selectView(groupBlock.getAttribute("data-group-block"));
       });
     });
   }

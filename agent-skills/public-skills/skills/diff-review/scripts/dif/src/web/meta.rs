@@ -91,7 +91,10 @@ mod tests {
         // branch. The dir path ends with the full branch → no redundant pill.
         let p = PathBuf::from("/Users/x/src/worktrees/avandar/feat/web-shell");
         assert_eq!(worktree_name(&p, "feat/web-shell"), "feat/web-shell");
-        assert!(!show_worktree("feat/web-shell", &worktree_name(&p, "feat/web-shell")));
+        assert!(!show_worktree(
+            "feat/web-shell",
+            &worktree_name(&p, "feat/web-shell")
+        ));
     }
 
     #[test]
