@@ -17,22 +17,18 @@ type UnionModelSpec = {
   Update: Partial<UnionRow>;
 };
 
-const TextSchema = z
-  .object({
-    id: z.string(),
-    kind: z.literal("text"),
-    text: z.string(),
-  })
-  .strict();
+const TextSchema = z.strictObject({
+  id: z.string(),
+  kind: z.literal("text"),
+  text: z.string(),
+});
 
-const PointSchema = z
-  .object({
-    id: z.string(),
-    kind: z.literal("point"),
-    x: z.number(),
-    y: z.number(),
-  })
-  .strict();
+const PointSchema = z.strictObject({
+  id: z.string(),
+  kind: z.literal("point"),
+  x: z.number(),
+  y: z.number(),
+});
 
 const DBReadSchema = z.discriminatedUnion("kind", [TextSchema, PointSchema]);
 

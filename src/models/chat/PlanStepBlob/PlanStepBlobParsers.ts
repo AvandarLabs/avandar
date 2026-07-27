@@ -5,24 +5,20 @@ import { z } from "zod";
 import type { PlanStepBlobId, PlanStepBlobModel } from "./PlanStepBlob.types";
 import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 
-const DBReadSchema = z
-  .object({
-    id: brandedStringType<PlanStepBlobId>(),
-    planId: z.string(),
-    stepId: z.string(),
-    parquet: z.instanceof(Blob),
-    schema: z.array(
-      z
-        .object({
-          name: z.string(),
-          type: z.string(),
-        })
-        .strict(),
-    ),
-    rowCount: z.number(),
-    savedAt: z.number(),
-  })
-  .strict();
+const DBReadSchema = z.strictObject({
+  id: brandedStringType<PlanStepBlobId>(),
+  planId: z.string(),
+  stepId: z.string(),
+  parquet: z.instanceof(Blob),
+  schema: z.array(
+    z.strictObject({
+      name: z.string(),
+      type: z.string(),
+    }),
+  ),
+  rowCount: z.number(),
+  savedAt: z.number(),
+});
 
 /** Parser registry for browser-local plan step Blobs. */
 export const PlanStepBlobParsers =
