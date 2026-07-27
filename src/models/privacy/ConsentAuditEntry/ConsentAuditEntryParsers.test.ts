@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
 import type { ConsentAuditEntry } from "./ConsentAuditEntry";
+import {
+  isValidConsentAuditContext,
+  isValidConsentAuditMedicalTier,
+  isValidConsentAuditMode,
+  isValidConsentAuditWarning,
+  isValidConsentDecisionKind,
+} from "./ConsentAuditEntry.types";
 
 const row: ConsentAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000001" as ConsentAuditEntry.Id,
@@ -27,6 +34,15 @@ const row: ConsentAuditEntry.T = {
 };
 
 describe("ConsentAuditEntryParsers", () => {
+  it("validates the runtime consent audit literal unions", () => {
+    expect(isValidConsentDecisionKind("approved")).toBe(true);
+    expect(isValidConsentAuditContext("user_message_text")).toBe(true);
+    expect(isValidConsentAuditMode("clean")).toBe(true);
+    expect(isValidConsentAuditWarning("pii")).toBe(true);
+    expect(isValidConsentAuditMedicalTier("column")).toBe(true);
+    expect(isValidConsentDecisionKind("invalid")).toBe(false);
+  });
+
   it("round trips the Dexie row without changing it", () => {
     expect(ConsentAuditEntryParsers.fromDBReadToModelRead(row)).toEqual(row);
     expect(ConsentAuditEntryParsers.fromModelInsertToDBInsert(row)).toEqual(

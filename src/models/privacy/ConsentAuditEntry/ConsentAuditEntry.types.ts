@@ -15,6 +15,13 @@ export const ConsentDecisionKinds = [
 /** A consent decision persisted in the local audit log. */
 export type ConsentDecisionKind = (typeof ConsentDecisionKinds)[number];
 
+/** Checks whether a string is a persisted consent decision. */
+export function isValidConsentDecisionKind(
+  value: string,
+): value is ConsentDecisionKind {
+  return (ConsentDecisionKinds as readonly string[]).includes(value);
+}
+
 /** Cross-boundary contexts that can require consent. */
 export const ConsentAuditContexts = [
   "discovery_clarification",
@@ -26,6 +33,13 @@ export const ConsentAuditContexts = [
 
 /** A cross-boundary context that can require consent. */
 export type ConsentAuditContext = (typeof ConsentAuditContexts)[number];
+
+/** Checks whether a string is a cross-boundary consent context. */
+export function isValidConsentAuditContext(
+  value: string,
+): value is ConsentAuditContext {
+  return (ConsentAuditContexts as readonly string[]).includes(value);
+}
 
 /** Consent-modal modes persisted with the decision. */
 export const ConsentAuditModes = [
@@ -39,11 +53,25 @@ export const ConsentAuditModes = [
 /** A consent-modal mode persisted with the decision. */
 export type ConsentAuditMode = (typeof ConsentAuditModes)[number];
 
+/** Checks whether a string is a persisted consent-modal mode. */
+export function isValidConsentAuditMode(
+  value: string,
+): value is ConsentAuditMode {
+  return (ConsentAuditModes as readonly string[]).includes(value);
+}
+
 /** Warning categories shown or dismissed during consent. */
 export const ConsentAuditWarnings = ["pii", "bias", "medical"] as const;
 
 /** A warning category shown or dismissed during consent. */
 export type ConsentAuditWarning = (typeof ConsentAuditWarnings)[number];
+
+/** Checks whether a string is a consent warning category. */
+export function isValidConsentAuditWarning(
+  value: string,
+): value is ConsentAuditWarning {
+  return (ConsentAuditWarnings as readonly string[]).includes(value);
+}
 
 /** Sources that can trigger the medical data consent tier. */
 export const ConsentAuditMedicalTiers = [
@@ -55,6 +83,13 @@ export const ConsentAuditMedicalTiers = [
 /** A source that can trigger the medical data consent tier. */
 export type ConsentAuditMedicalTier =
   (typeof ConsentAuditMedicalTiers)[number];
+
+/** Checks whether a string is a medical consent-tier source. */
+export function isValidConsentAuditMedicalTier(
+  value: string,
+): value is ConsentAuditMedicalTier {
+  return (ConsentAuditMedicalTiers as readonly string[]).includes(value);
+}
 
 /** Complete browser-local consent audit row. */
 export type ConsentAuditEntryRead = {
