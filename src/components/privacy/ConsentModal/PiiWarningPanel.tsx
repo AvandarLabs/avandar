@@ -4,7 +4,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 type Props = {
   /** PII findings driving the warning. */

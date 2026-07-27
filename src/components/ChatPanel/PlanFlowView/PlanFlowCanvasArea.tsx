@@ -1,10 +1,10 @@
 import { Box, Group } from "@mantine/core";
 import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/layoutPlan/layoutPlan";
 import { PlanAnnotationOverlay } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay";
 import { PlanBranchSidebar } from "@/components/ChatPanel/PlanFlowView/PlanBranchSidebar";
 import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout/planLayout";
 import { PlanStepNode } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
 import { RoughEdge } from "@/components/ChatPanel/PlanFlowView/RoughEdge";
 import type { AnnotationTool } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
@@ -101,7 +101,10 @@ export function PlanFlowCanvasArea({
             containerRef={canvasContainerRef}
           />
         : null}
-        <PlanCanvasToolbar onExportPng={onExportPng} onExportPdf={onExportPdf} />
+        <PlanCanvasToolbar
+          onExportPng={onExportPng}
+          onExportPdf={onExportPdf}
+        />
       </Box>
     </Group>
   );

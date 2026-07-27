@@ -25,7 +25,7 @@ import type {
   SandboxBootResponse,
   SandboxResponse,
   SandboxRunRequest,
-} from "@/sandbox/sandboxProtocol";
+} from "@/sandbox/SandboxProtocol";
 
 declare global {
   interface Window {

@@ -2,8 +2,9 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/layoutPlan/layoutPlan";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
-import { PlanAnnotationStorage } from "@/components/ChatPanel/PlanFlowView/planAnnotationStorage";
+import { PlanAnnotationStorage } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStorage";
 import {
   exportPlanCanvasAsPdf,
   exportPlanCanvasAsPng,
@@ -11,7 +12,6 @@ import {
 import { PlanFlowBanners } from "@/components/ChatPanel/PlanFlowView/PlanFlowBanners";
 import { PlanFlowCanvasArea } from "@/components/ChatPanel/PlanFlowView/PlanFlowCanvasArea";
 import { PlanFlowHeader } from "@/components/ChatPanel/PlanFlowView/PlanFlowHeader";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout/planLayout";
 import { PlanStepSqlCode } from "@/components/ChatPanel/PlanFlowView/PlanStepSqlCode";
 import { usePlanRun } from "@/components/ChatPanel/PlanFlowView/usePlanRun";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager/PlanBranchStateManager";

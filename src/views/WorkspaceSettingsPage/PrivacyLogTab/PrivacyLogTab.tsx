@@ -16,14 +16,14 @@ import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/clarificationAuditLog";
-import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/consentAuditLog";
+import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
+import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type {
   ClarificationAuditEntry,
   ClarificationOutcome,
-} from "@/components/privacy/privacy-helpers/clarificationAuditLog";
-import type { ConsentAuditEntry } from "@/components/privacy/privacy-helpers/consentAuditLog";
+} from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
+import type { ConsentAuditEntry } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
 
 type FilterValue = "all" | ConsentAuditEntry["decision"];
 
@@ -60,9 +60,9 @@ function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
 /**
  * "Privacy log" tab in workspace settings. Renders two sub-tabs:
  *
- *   - Consent: last 90 days of consent decisions from `consentAuditLog`.
+ *   - Consent: last 90 days of consent decisions from `ConsentAuditLog`.
  *   - Clarifications: clarification turn metadata from
- *     `clarificationAuditLog`.
+ *     `ClarificationAuditLog`.
  *
  * Both sources are local-only and stored on this device.
  */

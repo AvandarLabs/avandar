@@ -1,6 +1,6 @@
 import { prop } from "@utils";
 import { describe, expect, test } from "vitest";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout/planLayout";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/layoutPlan/layoutPlan";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
 function makeNode(args: { id: string; inputs?: string[] }): PlanNode {

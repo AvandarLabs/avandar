@@ -4,7 +4,7 @@ import {
   rehydratePlanStep,
   stepViewName,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
+import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/PlanStepStorage";
 import type {
   PlanStateManager,
   PlanStepStatus,

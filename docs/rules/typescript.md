@@ -232,6 +232,16 @@
 
 ## File, Directory, and Module Conventions
 
+- If a file contains exactly one non-type export, name the file exactly after
+  that export. Type-only exports do not count. For example, a file that exports
+  `detectBias` plus exported types should be named `detectBias.ts`.
+- If a file intentionally exports a collection of helper or utility functions,
+  name the file after the collection's shared purpose and suffix it with either
+  `Helpers.ts` or `Utils.ts`.
+- If a collection is more idiomatically called through a module or namespace,
+  export only that module object or `@modules` module. Do not export the
+  individual helper functions. Name the file exactly after the exported module
+  object.
 - When a module can not be encapsulated in a single file, create a directory
   to represent the module. Some examples of when a module should be a directory
   are: when a module has a `.test` file, has tightly-coupled helper functions,

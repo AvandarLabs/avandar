@@ -7,8 +7,8 @@ import { CompositePanel } from "./CompositePanel";
 import { ConsentActions } from "./ConsentActions";
 import { MedicalStrictPanel } from "./MedicalStrictPanel";
 import { PiiWarningPanel } from "./PiiWarningPanel";
-import type { BiasHit } from "@/components/privacy/privacy-helpers/biasDetector/biasDetector";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 /**
  * All five modes from the chat-interactive-workflows spec:

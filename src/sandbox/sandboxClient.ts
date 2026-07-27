@@ -1,12 +1,12 @@
 import { uuid } from "$/lib/uuid";
-import { SANDBOX_KEY } from "@/sandbox/sandboxProtocol";
+import { SandboxProtocol } from "@/sandbox/SandboxProtocol";
 import type {
   SandboxBootRequest,
   SandboxResponse,
   SandboxRunRequest,
   SandboxRunResponse,
   SandboxRuntime,
-} from "@/sandbox/sandboxProtocol";
+} from "@/sandbox/SandboxProtocol";
 
 /**
  * Parent-side client for the Python/R sandbox iframe.
@@ -127,7 +127,7 @@ async function _bootIfNeeded(preload: SandboxRuntime[]): Promise<void> {
   await h.ready;
   // Send boot, await boot_response.
   const bootRequest: SandboxBootRequest = {
-    sandboxKey: SANDBOX_KEY,
+    sandboxKey: SandboxProtocol.sandboxKey,
     kind: "boot",
     requestId: uuid(),
     preload,
@@ -159,7 +159,7 @@ export async function runInSandbox(args: {
 
   const requestId = uuid();
   const request: SandboxRunRequest = {
-    sandboxKey: SANDBOX_KEY,
+    sandboxKey: SandboxProtocol.sandboxKey,
     kind: "run",
     requestId,
     runtime: args.runtime,

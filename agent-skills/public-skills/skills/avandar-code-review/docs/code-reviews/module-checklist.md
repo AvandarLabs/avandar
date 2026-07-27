@@ -5,12 +5,38 @@ Use this checklist only when the diff includes TypeScript or TSX files.
 - Keep one module per file.
 - The only exception is a file that intentionally groups a collection of
   related utility functions.
+- If a file contains exactly one non-type export, its file name must match that
+  export exactly. Ignore `export type` and other type-only exports when counting
+  exports. For example, a file that exports `detectBias` plus exported types
+  should be named `detectBias.ts`.
+- If a file exports a collection of helper or utility functions, its name must
+  describe the collection or shared purpose and end with either `Helpers.ts` or
+  `Utils.ts`.
+- If a helper collection is more idiomatically called through a module, such as
+  `ModuleName.utilFnName()`, do not export the individual helpers. Export only a
+  single module object or `@modules` module, and name the file exactly after
+  that exported module.
+
+  **Find candidates** (changed `.ts` / `.tsx` files whose single runtime export
+  does not match the file base name):
+
+  ```bash
+  for f in <files-under-review-ending-in-.ts-or-.tsx>; do
+    base="$(basename "$f" | sed -E 's/\.(test|types|constants|module)\.[^.]+$//; s/\.[^.]+$//')"
+    exports="$(grep -Eho '^export +(const|function|class|enum) +[A-Za-z0-9_]+' "$f" \
+      | awk '{print $3}' | sort -u)"
+    count="$(printf '%s\n' "$exports" | sed '/^$/d' | wc -l | tr -d ' ')"
+    if [ "$count" = 1 ] && [ "$exports" != "$base" ]; then
+      printf '%s exports %s\n' "$f" "$exports"
+    fi
+  done
+  ```
 - If a module cannot be encapsulated in a single file, represent it as a
   directory module instead of continuing to grow one file.
 - Use a directory module when a module has a companion `.test` file,
   tightly-coupled helper files, or React sub-components in separate files.
 - **A unit split across two or more same-base-name files MUST live in its own
-  directory — never loose alongside unrelated modules.** As soon as a single
+  directory, never loose alongside unrelated modules.** As soon as a single
   unit is represented by more than one file that shares its base name, group
   those files into a `<Name>/` directory and colocate them there. This covers
   every split, including:
@@ -27,7 +53,7 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   module again. The directory and its primary file both take the unit's name
   (`X/X.ts`), per the naming rule below.
 
-  **Does not trigger** for a standalone file with no same-base-name sibling —
+  **Does not trigger** for a standalone file with no same-base-name sibling:
   that stays flat. The rule fires only once a *second* file for the same unit
   exists in the directory.
 

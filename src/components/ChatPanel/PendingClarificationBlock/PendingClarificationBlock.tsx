@@ -9,7 +9,7 @@ import {
   formatClarificationAnswerForThread,
 } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/clarificationAuditLog";
+import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
 import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

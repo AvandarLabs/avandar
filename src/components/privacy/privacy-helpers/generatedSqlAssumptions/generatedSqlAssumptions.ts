@@ -1,4 +1,4 @@
-import { detectPii } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
+import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 /** Matches user messages that answer an inline clarification card. */
 export const CLARIFICATION_ANSWER_MARKER_RE = /^\[Clarification answer:/m;

@@ -2,17 +2,17 @@ import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
-import { detectBias } from "@/components/privacy/privacy-helpers/biasDetector/biasDetector";
-import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/consentAuditLog";
-import { PendingAcks } from "@/components/privacy/privacy-helpers/pendingAcks";
-import { detectPii } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
-import { SessionSecret } from "@/components/privacy/privacy-helpers/sessionSecret";
+import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
+import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
 } from "@/components/privacy/ConsentModal/ConsentModal";
-import type { BiasHit } from "@/components/privacy/privacy-helpers/biasDetector/biasDetector";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/piiDetector/piiDetector";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
@@ -27,7 +27,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * **What it does:**
  *   1. Run local PII + bias detectors (no LLM).
  *   2. If needed, open `ConsentModal` so the user explicitly approves.
- *   3. On approval, mint an HMAC `ackToken` and queue it in `pendingAcks.ts`.
+ *   3. On approval, mint an HMAC `ackToken` and queue it in `PendingAcks.ts`.
  *   4. `useAvandarChatRuntime` attaches matching acks on the next
  *      `chat/.../messages` POST; the edge function verifies them or returns
  *      `UNAPPROVED_DATA_TRANSFER`.
@@ -44,7 +44,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  *   - PII detection (column-name + content layers, English-only)
  *   - Bias detection (English-only patterns)
  *   - Consent modal modes A–E (`ConsentModal.tsx`)
- *   - Dexie audit via `consentAuditLog.ts` and `clarificationAuditLog.ts`
+ *   - Dexie audit via `ConsentAuditLog.ts` and `ClarificationAuditLog.ts`
  *
  * Deferred (see `docs/ict4d-demo/CHECKPOINTS.md`):
  *   - Spanish / French pattern files

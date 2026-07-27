@@ -9,13 +9,16 @@
  * browser extensions / other iframes.
  */
 
-export const SANDBOX_KEY = "avandar-sandbox-v1";
+/** Shared runtime constants for the sandbox message protocol. */
+export const SandboxProtocol = {
+  sandboxKey: "avandar-sandbox-v1",
+} as const;
 
 export type SandboxRuntime = "python" | "r";
 
 /** Parent → sandbox: load runtimes and wait for ready. */
 export type SandboxBootRequest = {
-  sandboxKey: typeof SANDBOX_KEY;
+  sandboxKey: typeof SandboxProtocol.sandboxKey;
   kind: "boot";
   requestId: string;
   /** Which runtimes the iframe should preload. */
@@ -34,7 +37,7 @@ export type SandboxBootResponse = {
 
 /** Parent → sandbox: execute one plan step. */
 export type SandboxRunRequest = {
-  sandboxKey: typeof SANDBOX_KEY;
+  sandboxKey: typeof SandboxProtocol.sandboxKey;
   kind: "run";
   requestId: string;
   runtime: SandboxRuntime;
