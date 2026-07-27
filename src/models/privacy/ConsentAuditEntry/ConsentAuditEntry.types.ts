@@ -1,5 +1,3 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
-import type { UUID } from "@utils/types/common.types";
 import type {
   ConsentAuditContexts,
   ConsentAuditMedicalTiers,
@@ -7,6 +5,8 @@ import type {
   ConsentAuditWarnings,
   ConsentDecisionKinds,
 } from "./ConsentAuditEntry.constants";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { UUID } from "@utils/types/common.types";
 
 /** Branded identifier for a local consent audit record. */
 export type ConsentAuditEntryId = UUID<"ConsentAuditEntry">;
@@ -24,8 +24,7 @@ export type ConsentAuditMode = (typeof ConsentAuditModes)[number];
 export type ConsentAuditWarning = (typeof ConsentAuditWarnings)[number];
 
 /** A source that can trigger the medical data consent tier. */
-export type ConsentAuditMedicalTier =
-  (typeof ConsentAuditMedicalTiers)[number];
+export type ConsentAuditMedicalTier = (typeof ConsentAuditMedicalTiers)[number];
 
 /** Complete browser-local consent audit row. */
 export type ConsentAuditEntryRead = {

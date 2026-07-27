@@ -3,7 +3,6 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type {
   ChatClarifyRequest,
   ChatGeneratedDashboardBlock,
-  ChatPlan,
 } from "$/types/chat.types.ts";
 
 type ModelType = "ChatResponse";
@@ -27,12 +26,6 @@ export type ChatResponseRead = Model.Base<
      * turn with a `[Clarification answer: ...]` user message.
      */
     clarification?: ChatClarifyRequest;
-    /**
-     * Present when the model called the `proposePlan` tool. The frontend
-     * switches the canvas to the plan view (xyflow DAG) and runs each
-     * step in DuckDB.
-     */
-    plan?: ChatPlan;
     /**
      * Present when the model called the `addDashboardBlock` tool while the
      * user was editing a dashboard. The frontend appends the block to the

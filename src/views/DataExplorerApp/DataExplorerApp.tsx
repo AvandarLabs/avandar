@@ -25,8 +25,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { PlanFlowView } from "@/components/ChatPanel/PlanFlowView/PlanFlowView";
-import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
@@ -53,7 +51,6 @@ import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import type { ChatPlan } from "$/types/chat.types";
 import type { ReactNode } from "react";
 
 const QUERY_DETAILS_WIDTH = 380;
@@ -97,7 +94,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const { t } = useLingui();
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
-  const planState = PlanStateManager.useState();
   const [, chatPanelDispatch] = ChatPanelStateManager.useContext();
   const [
     isOpenDatasetModalOpen,
@@ -439,25 +435,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                   if (!state.rawSql) {
                     return;
                   }
-                  const planSnapshot: ChatPlan | null =
-                    planState.isVisible && planState.nodes.length > 0 ?
-                      {
-                        rootMessage: planState.rootMessage,
-                        steps: planState.nodes.map((n) => {
-                          return {
-                            id: n.id,
-                            description: n.description,
-                            type: n.type,
-                            code: n.code,
-                            inputs: n.inputs,
-                            predictedSchema: n.predictedSchema,
-                            ...(n.defaultViz ?
-                              { defaultViz: n.defaultViz }
-                            : {}),
-                          };
-                        }),
-                      }
-                    : null;
                   const modalId = modals.open({
                     title: t`Save as new dataset`,
                     size: "xl",
@@ -467,7 +444,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                         columns={queryResultColumns}
                         dateColumns={dateColumns}
                         rawSql={state.rawSql}
-                        planSnapshot={planSnapshot}
                         onSaveSuccess={() => {
                           modals.close(modalId);
                         }}
@@ -529,7 +505,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
-        <PlanFlowView />
         <Box flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

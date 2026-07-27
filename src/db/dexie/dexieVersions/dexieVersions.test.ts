@@ -6,7 +6,7 @@ import {
   CURRENT_AVA_DEXIE_VERSION,
 } from "./dexieVersions";
 
-const db = AvaDexieVersionManager.getVersion("v6");
+const db = AvaDexieVersionManager.getVersion("v7");
 
 const v5Schemas = {
   LocalDatasetEntry: {
@@ -31,38 +31,26 @@ const v5Schemas = {
   },
 } as const;
 
-const v6Schemas = {
-  ...v5Schemas,
-  PlanAnnotation: {
-    primaryKey: "id",
-    indexes: ["planId", "createdAt"],
-  },
-  PlanStepBlob: {
-    primaryKey: "id",
-    indexes: ["planId", "stepId", "savedAt"],
-  },
-} as const;
+const v7Schemas = v5Schemas;
 
 afterAll(async () => {
   await db.delete();
 });
 
-describe("AvaDexie v6 schema", () => {
-  it("is current and preserves every v5 table while adding both plan tables", async () => {
+describe("AvaDexie v7 schema", () => {
+  it("is current and removes the planning tables", async () => {
     await db.open();
 
-    expect(CURRENT_AVA_DEXIE_VERSION).toBe("v6");
+    expect(CURRENT_AVA_DEXIE_VERSION).toBe("v7");
     expect(
       db.tables
         .map(({ name }) => {
           return name;
         })
         .sort(),
-    ).toEqual(
-      [...Object.keys(v6Schemas), "meta"].sort(),
-    );
+    ).toEqual([...Object.keys(v7Schemas), "meta"].sort());
 
-    Object.entries(v6Schemas).forEach(
+    Object.entries(v7Schemas).forEach(
       ([tableName, { primaryKey, indexes }]) => {
         const table = db.table(tableName);
 
@@ -76,21 +64,25 @@ describe("AvaDexie v6 schema", () => {
     );
   });
 
-  it("uses a no-op upgrader that preserves existing v5 rows", async () => {
+  it("drops planning rows while preserving existing privacy audit rows", async () => {
     db.close();
     await Dexie.delete("AvandarDB");
 
-    const v5Database = new Dexie("AvandarDB");
-    v5Database.version(5).stores({
+    const v6Database = new Dexie("AvandarDB");
+    v6Database.version(6).stores({
       meta: "&key",
       LocalDataset: "&datasetId,userId,workspaceId",
       LocalPublicDataset: "&datasetId,dashboardId",
       ConsentAuditEntry: "&id,workspaceId,userId,timestamp,context,decision",
       ClarificationAuditEntry: "&id,workspaceId,timestamp,outcome,turnNumber",
+      PlanAnnotation: "&id,planId,createdAt",
+      PlanStepBlob: "&id,planId,stepId,savedAt",
     });
-    await v5Database.open();
-    await v5Database.table("ConsentAuditEntry").put({ id: "preserved-entry" });
-    v5Database.close();
+    await v6Database.open();
+    await v6Database.table("ConsentAuditEntry").put({ id: "preserved-entry" });
+    await v6Database.table("PlanAnnotation").put({ id: "deleted-annotation" });
+    await v6Database.table("PlanStepBlob").put({ id: "deleted-step" });
+    v6Database.close();
 
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
       // JSDOM does not implement the application reload triggered by upgrades.
@@ -104,5 +96,15 @@ describe("AvaDexie v6 schema", () => {
     await expect(
       db.table("ConsentAuditEntry").get("preserved-entry"),
     ).resolves.toMatchObject({ id: "preserved-entry" });
+    expect(
+      db.tables.map(({ name }) => {
+        return name;
+      }),
+    ).not.toContain("PlanAnnotation");
+    expect(
+      db.tables.map(({ name }) => {
+        return name;
+      }),
+    ).not.toContain("PlanStepBlob");
   });
 });

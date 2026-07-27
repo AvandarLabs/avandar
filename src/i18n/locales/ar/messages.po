@@ -248,10 +248,6 @@ msgstr "يجب نقل الأعضاء المعينين لهذه المجموعة 
 msgid "Delete failed"
 msgstr "فشل الحذف"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "رفض"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "فتح"
@@ -512,10 +508,6 @@ msgstr "مجموعات البيانات المحفوظة"
 #~ msgid "Roles"
 #~ msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF (صفحات متعددة)"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
 msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية لإضافة مجموعة بيانات الكتالوج هذه."
@@ -640,10 +632,6 @@ msgstr "البيانات الوصفية"
 msgid "Range"
 msgstr "النطاق"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "إغلاق الفرع"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -706,10 +694,6 @@ msgstr "إغلاق الدردشة (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "فشل الإنشاء"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "فشل"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -788,10 +772,6 @@ msgstr "التسمية"
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
-msgstr "تم رفض الخطة. اطلب من الدردشة اقتراح خطة مختلفة، أو أغلق هذه اللوحة."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -885,26 +865,13 @@ msgstr "/شهر"
 msgid "Filters for this chart"
 msgstr "الفلاتر لهذا الرسم البياني"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "فرع من هنا"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "تم تخطيه"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "فشل الاستعلام."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "تراجع"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "فرع من \"{truncated}\""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -978,10 +945,6 @@ msgstr "اختر خطة تناسب مساحة العمل الخاصة بك بش�
 msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
 msgstr "كتالوج البيانات المفتوحة العامة لا يزال في <0/><1/>نحن نضيف المزيد من مجموعات البيانات المفتوحة كما يخبرنا المستخدمون بالمجموعات التي يريدونها في Avandar. إذا كانت هناك مجموعة بيانات تود رؤيتها هنا، <2>أخبرنا</2>!"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "مسح"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "تم الكشف عن معلومات صحية"
@@ -1040,17 +1003,9 @@ msgstr "أدخل اسمًا للحقل"
 msgid "Select Plan"
 msgstr "اختر خطة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "اللون {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "القيمة الافتراضية (اختياري)"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "تكبير"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1144,11 +1099,6 @@ msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! �
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr "سيتم حفظ تحليل {0} خطوة الذي أنتج هذه النتيجة مع مجموعة البيانات، بحيث يمكن إعادة فتحه على اللوحة."
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
@@ -1173,10 +1123,6 @@ msgstr ""
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "خطة تحليلية"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1224,11 +1170,6 @@ msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخ
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
 msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
-
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "من الخطوة {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -1312,18 +1253,10 @@ msgstr "لم يتم الكشف عن أي كلام"
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول المبكر."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "خطوة"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "الأقصى"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "جاهز"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
@@ -1396,10 +1329,6 @@ msgstr "قم بالتعليق، ثم التصدير"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "فروع الخطة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
@@ -1518,10 +1447,6 @@ msgstr "نطاق البيانات"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "معاينة البيانات"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "حذف التعليق"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
@@ -1804,10 +1729,6 @@ msgstr "تم حفظ اللوحة بنجاح!"
 msgid "N/A"
 msgstr "غير متوفر"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "تكبير"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "مدير عالمي"
@@ -1852,10 +1773,6 @@ msgstr "يرجى التحقق من بريدك الإلكتروني"
 msgid "Couldn't capture dashboard"
 msgstr "لم يتمكن من التقاط اللوحة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "صورة PNG"
-
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
@@ -1899,10 +1816,6 @@ msgstr "القيم"
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Unable to download the voice model."
 msgstr "غير قادر على تنزيل نموذج الصوت."
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(فرع بلا عنوان)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2016,7 +1929,6 @@ msgstr "لا توجد حقول"
 msgid "Failed to update workspace name"
 msgstr "فشل في تحديث اسم مساحة العمل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "تصدير"
@@ -2029,11 +1941,6 @@ msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "معاينة:"
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة — هذا الكثير من SQL. فكر فيما إذا كانت خطوة Python أو R ستعبر عن ذلك بشكل أنظف. يمكنك الموافقة كما هي. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2071,14 +1978,6 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "الدفع شهريًا"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "إعادة التشغيل"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "إعادة"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2296,10 +2195,6 @@ msgstr "الحد الأقصى لعدد الصفوف للعودة"
 msgid "Password update failed"
 msgstr "فشل تحديث كلمة المرور"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
-msgstr "فشل خطوة. انقر على العقدة الحمراء لإعادة المحاولة، أو استخدم إعادة التشغيل للبدء من الأعلى."
-
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "أي شخص في {app}"
@@ -2341,10 +2236,6 @@ msgstr "إضافة مجموعة البيانات إلى مساحة العمل"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "فريد إلى حد كبير: <0>{0}</0> قيم مميزة عبر <1>{1}</1> صفوف."
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "تشغيل الخطوة"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
@@ -2466,11 +2357,6 @@ msgstr "عرض"
 msgid "Remove failed"
 msgstr "إزالة فاشلة"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} أعمدة"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2514,11 +2400,6 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "الخطة الجذرية"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -2550,10 +2431,6 @@ msgstr "لم يتم مشاركة أي شيء معك هنا."
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "إعادة (Ctrl+Shift+Z)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
@@ -2624,10 +2501,6 @@ msgstr "لم نلتقط أي شيء — حاول مرة أخرى بالقرب م
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "شراء {seatsToAdd} مقعد"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "فتح على اللوحة"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach out to support."
@@ -2811,11 +2684,6 @@ msgstr "عدد الصفوف التي سيتم تخطيها"
 msgid "From CSV"
 msgstr "من CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} صفوف{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "دقيقة"
@@ -2839,10 +2707,6 @@ msgstr "جارٍ إعداد التنزيل…"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "أداة"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "جارٍ التشغيل…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -3171,11 +3035,6 @@ msgstr "تكرار التحديث"
 msgid "Allow syncing"
 msgstr "السماح بالمزامنة"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "ملاحظة لاصقة"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "تصاعدي"
@@ -3247,10 +3106,6 @@ msgstr "لا يمكن التراجع عن هذا."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Show the first 20 rows of {name}"
 #~ msgstr "عرض أول 20 صفًا من {name}"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "الموافقة والتشغيل"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not access the microphone."
@@ -3356,10 +3211,6 @@ msgstr "خشونة ({0})"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} أعمدة · {1} صفوف"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "تراجع (Ctrl+Z)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -3617,10 +3468,6 @@ msgstr "تحذير"
 msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
 msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة على الوصول فقط إذا كان لديهم بالفعل وصول إلى {app} في مساحة العمل. عند الإيقاف، يحصل كل عضو في المجموعة على الوصول هنا، حتى لو لم يكن بإمكانهم عادةً فتح {app}."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "تلقائي"
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
 msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numRejectedStr}"
@@ -3760,10 +3607,6 @@ msgstr "المالك لديه دائمًا وصول إداري. لتغيير ا�
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "نشط"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
@@ -3775,10 +3618,6 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "تمت معالجة البيانات بنجاح"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "قلم"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4119,10 +3958,6 @@ msgstr "الإعدادات"
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "تصدير اللوحة"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
@@ -4172,10 +4007,6 @@ msgstr "محرر"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "يمكن فقط للأشخاص والمجموعات المذكورة أعلاه الوصول إلى هذا {resource}."
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "معلق"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4262,10 +4093,6 @@ msgstr "أعمدة مجموعة البيانات"
 msgid "Could not prepare the offline chat model."
 msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "الفروع"
-
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
 msgid "Starting {0}…"
@@ -4329,10 +4156,6 @@ msgstr "معرف الفلتر (ثابت)"
 #: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
 msgid "No columns available"
 msgstr "لا توجد أعمدة متاحة"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "تحريك"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4616,7 +4439,6 @@ msgstr "تم حفظ مجموعة البيانات"
 msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
 msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها لتحديد {entityConfigName} بشكل فريد."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "نص"
@@ -4650,10 +4472,6 @@ msgstr "البحث في لوحات المعلومات"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "عنوان البريد الإلكتروني غير صالح"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "نجحت جميع الخطوات. انقر على أي عقدة لفتحها على اللوحة."
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4729,10 +4547,6 @@ msgstr "يرجى المحاولة مرة أخرى أو التواصل مع ال�
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "الوصول العام"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "راجع ووافق على الخطة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4882,7 +4696,6 @@ msgstr "الدور ومجموعات المستخدمين"
 msgid "Clear all"
 msgstr "مسح الكل"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4927,16 +4740,10 @@ msgstr "مجموعة البيانات الكاملة"
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "اقترحت الذكاء الاصطناعي خطة من {0} خطوة. لم يتم تشغيل أي شيء بعد. انقر على كل عقدة لقراءتها؛ وافق للتنفيذ."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "بعض"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "سهم"
@@ -4958,10 +4765,6 @@ msgstr "+{0} قيم إضافية مرتبطة بـ {1} صفوف"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "فضفاض"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "نص التعليق"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

@@ -21,15 +21,14 @@
  * much as possible with defaults or data we can get from the backend.
  */
 import { prop } from "@utils";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs/deleteObsoleteIndexedDBs";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
-import type { PlanStepBlob } from "@/models/chat/PlanStepBlob/PlanStepBlob";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
@@ -49,15 +48,13 @@ type Schemas = {
       ClarificationAuditEntry.Model,
     ];
   };
-  v6: {
-    version: 6;
+  v7: {
+    version: 7;
     models: [
       LocalDatasetModel,
       LocalPublicDatasetModel,
       ConsentAuditEntry.Model,
       ClarificationAuditEntry.Model,
-      PlanAnnotation.Model,
-      PlanStepBlob.Model,
     ];
   };
 };
@@ -95,7 +92,8 @@ const DBDefinitions = [
       // When a user upgardes the database in a different browser, this will run
       // again). But this is safe right now because we have not launched the
       // platform yet.
-      const { data: datasets } = await AvaSupabase.db().from("datasets")
+      const { data: datasets } = await AvaSupabase.db()
+        .from("datasets")
         .select("*")
         .throwOnError();
       const datasetIds = datasets.map(prop("id"));
@@ -171,9 +169,13 @@ const DBDefinitions = [
     upgrader: async () => {},
   }),
 
-  AvaDexieVersionManager.defineVersion<6>({
+  /**
+   * Removes retired feature tables and deletes their older standalone
+   * databases. Planning data is intentionally discarded.
+   */
+  AvaDexieVersionManager.defineVersion<7>({
     db,
-    version: 6,
+    version: 7,
     models: {
       LocalDataset: {
         primaryKey: "datasetId",
@@ -197,21 +199,15 @@ const DBDefinitions = [
         primaryKey: "id",
         columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
       },
-      PlanAnnotation: {
-        primaryKey: "id",
-        columnsToIndex: ["planId", "createdAt"],
-      },
-      PlanStepBlob: {
-        primaryKey: "id",
-        columnsToIndex: ["planId", "stepId", "savedAt"],
-      },
     },
 
-    upgrader: async () => {},
+    upgrader: async () => {
+      await deleteObsoleteIndexedDBs();
+    },
   }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
 /** Registry key for the current AvaDexie schema version. */
-export const CURRENT_AVA_DEXIE_VERSION = "v6" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v7" as const satisfies keyof Schemas;

@@ -248,10 +248,6 @@ msgstr "Wajumbe bado waliotengwa kwa kundi hili lazima wahamishwe kwanza."
 msgid "Delete failed"
 msgstr "Kufuta kumeshindwa"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "Kataa"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Fungua"
@@ -512,10 +508,6 @@ msgstr "Seti za data zilizohifadhiwa"
 #~ msgid "Roles"
 #~ msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF (kurasa nyingi)"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
 msgstr "Huwezi kuongeza seti zaidi za data kwenye mpango wako wa sasa. Pandisha hadhi ili kuongeza seti hii ya katalogi."
@@ -640,10 +632,6 @@ msgstr "Metadata"
 msgid "Range"
 msgstr "Muktadha"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "Funga tawi"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -706,10 +694,6 @@ msgstr "Funga mazungumzo (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Kuunda kumeshindikana"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "Kumeshindikana"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -788,10 +772,6 @@ msgstr "Lebo"
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
 msgstr "Unda dashibodi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
-msgstr "Mpango umekataliwa. Omba gumzo kupendekeza mpango tofauti, au funga canvas hii."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -885,26 +865,13 @@ msgstr "/mwezi"
 msgid "Filters for this chart"
 msgstr "Vichujio vya chati hii"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "Tenga kutoka hapa"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "Imepuuziliwa mbali"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "Uchunguzi umeshindikana."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "Futa"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "Tenga kutoka \"{truncated}\""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -978,10 +945,6 @@ msgstr "Chagua mpango unaofaa zaidi kwa eneo lako la kazi."
 msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
 msgstr "Katalogi ya data za umma bado iko katika <0/><1/>Tunaongeza datasets zaidi za wazi kadri watumiaji wanavyotujulisha ni datasets gani wanazotaka katika Avandar. Ikiwa kuna dataset unayotaka kuiona hapa, <2>tuambie</2>!"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "Futa"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "Taarifa za afya zimegunduliwa"
@@ -1040,17 +1003,9 @@ msgstr "Ingiza jina la uwanja"
 msgid "Select Plan"
 msgstr "Chagua Mpango"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "Rangi {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "Thamani ya kawaida (hiari)"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "Pandisha"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1144,11 +1099,6 @@ msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko kw
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr "Uchambuzi wa hatua {0} uliozalisha matokeo haya utaokolewa na dataset, ili uweze kufunguliwa tena kwenye canvas."
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
@@ -1173,10 +1123,6 @@ msgstr ""
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "Toka"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "Mpango wa uchambuzi"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1224,11 +1170,6 @@ msgstr "Kuunganisha na Google Sheets na vyanzo vingine vya data kuna katika mcha
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
 msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa mtoa huduma wa AI katika eneo hili la kazi. Siku 90 zilizopita, zimehifadhiwa kwenye kifaa hiki pekee."
-
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "kutoka hatua {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -1312,18 +1253,10 @@ msgstr "Hakuna sauti iliyogunduliwa"
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji wa mapema."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "Hatua"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "Max"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "Tayari"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
@@ -1396,10 +1329,6 @@ msgstr "Ongeza maelezo, kisha export"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}, {1}, na {2} zimewekwa kwa kila eneo la kazi."
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "Mikondo ya mpango"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
@@ -1518,10 +1447,6 @@ msgstr "Muktadha wa data"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Mapitio ya data"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "Futa maelezo"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
@@ -1804,10 +1729,6 @@ msgstr "Dashibodi imehifadhiwa kwa mafanikio!"
 msgid "N/A"
 msgstr "S/H"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "Pandisha mbali"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "Msimamizi wa Kimataifa"
@@ -1852,10 +1773,6 @@ msgstr "Tafadhali angalia barua yako pepe"
 msgid "Couldn't capture dashboard"
 msgstr "Haiwezi kunasa dashibodi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "Picha ya PNG"
-
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
@@ -1899,10 +1816,6 @@ msgstr "Thamani"
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Unable to download the voice model."
 msgstr "Haiwezekani kupakua mfano wa sauti."
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(tawi lisilo na jina)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2016,7 +1929,6 @@ msgstr "Hakuna maeneo"
 msgid "Failed to update workspace name"
 msgstr "Imeshindwa kuboresha jina la eneo la kazi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "Export"
@@ -2029,11 +1941,6 @@ msgstr "Unda makundi kwa wanachama wa ofisi yako. Seti za data na dashboards zin
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Muonekano:"
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "AI imependekeza mpango wa hatua {0} — hiyo ni SQL nyingi. Fikiria ikiwa hatua ya Python au R ingeeleza hii kwa uwazi zaidi. Unaweza bado kuidhinisha kama ilivyo. Hakuna kilichofanyika bado. Bonyeza kila node ili kuisoma; idhinisha ili kutekeleza."
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2071,14 +1978,6 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "Lipa kila mwezi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "Rudisha tena"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "Fanya upya"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2296,10 +2195,6 @@ msgstr "Mistari ya juu ya kurudisha"
 msgid "Password update failed"
 msgstr "Kusasisha nenosiri kumeshindikana"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
-msgstr "Hatua moja imefeli. Bonyeza node nyekundu kujaribu tena, au tumia Re-run kuanzisha tena kutoka juu."
-
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "Mtu yeyote katika {app}"
@@ -2341,10 +2236,6 @@ msgstr "Ongeza seti ya data kwenye eneo la kazi"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Kawaida sana: <0>{0}</0> thamani tofauti katika <1>{1}</1> mistari."
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "Kimbia hatua"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
@@ -2466,11 +2357,6 @@ msgstr "Tazama"
 msgid "Remove failed"
 msgstr "Ondoa iliyo fail"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} cols"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2514,11 +2400,6 @@ msgstr "Kuna karatasi moja tu katika karatasi hii ya excel."
 msgid "Make dataset offline-only?"
 msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "Mpango wa mzizi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -2550,10 +2431,6 @@ msgstr "Hakuna kitu kimegawanywa kwako hapa."
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "Imetumwa barua ya kuweka upya nenosiri"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "Fanya tena (Ctrl+Shift+Z)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
@@ -2624,10 +2501,6 @@ msgstr "Hatukupata chochote — jaribu tena karibu na mzunguko."
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Nunua kiti {seatsToAdd}"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "Fungua kwenye canvas"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach out to support."
@@ -2811,11 +2684,6 @@ msgstr "Idadi ya safu za kupuuzia"
 msgid "From CSV"
 msgstr "Kutoka CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} safu{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "dakika"
@@ -2839,10 +2707,6 @@ msgstr "Inajiandaa kupakua…"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "Chombo"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "Inatekelezwa…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -3171,11 +3035,6 @@ msgstr "Mara kwa mara ya sasisho"
 msgid "Allow syncing"
 msgstr "Ruhusu usawazishaji"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "Kumbukumbu ya sticky"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "Kuongeza"
@@ -3247,10 +3106,6 @@ msgstr "Hali hii haiwezi kubadilishwa."
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Show the first 20 rows of {name}"
 #~ msgstr "Onyesha safu 20 za kwanza za {name}"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "Thibitisha na uendeshe"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not access the microphone."
@@ -3356,10 +3211,6 @@ msgstr "Ukali ({0})"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} safu · {1} safu"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "Rejea (Ctrl+Z)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -3617,10 +3468,6 @@ msgstr "Onyo"
 msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
 msgstr "Wakati umewezeshwa, wanachama wa kundi hili wanapata ufikiaji tu ikiwa tayari wana ufikiaji wa {app} katika eneo la kazi. Wakati umezimwa, kila mwanachama wa kundi anapata ufikiaji hapa, hata kama kawaida hawawezi kufungua {app}."
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "Auto"
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
 msgstr "Safu {numSuccessRows} zimepangwa kwa mafanikio, lakini {numRejectedStr}"
@@ -3760,10 +3607,6 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia mipa
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "hai"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
@@ -3775,10 +3618,6 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "Data imechakatwa kwa mafanikio"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "Kalamu"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4119,10 +3958,6 @@ msgstr "Mipangilio"
 msgid "Switch Workspace"
 msgstr "Badilisha Nafasi ya Kazi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "Hamisha canvas"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Unaweza kuona dashibodi hii kwa sababu ilishirikiwa nawe."
@@ -4172,10 +4007,6 @@ msgstr "Mhariri"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "Ni watu na vikundi vilivyoorodheshwa hapo juu pekee wanaoweza kufikia {resource} hii."
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "Inasubiri"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4262,10 +4093,6 @@ msgstr "Safu za seti za data"
 msgid "Could not prepare the offline chat model."
 msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "Matawi"
-
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
 msgid "Starting {0}…"
@@ -4329,10 +4156,6 @@ msgstr "Kitambulisho cha chujio (thabiti)"
 #: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
 msgid "No columns available"
 msgstr "Hakuna safu zinazopatikana"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "Pan"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4616,7 +4439,6 @@ msgstr "Dataset imehifadhiwa"
 msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
 msgstr "Kwa kila dataset uliyoongeza, tafadhali eleza ni safu zipi zinapaswa kutumika kutambulisha {entityConfigName} kipekee."
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "Maandishi"
@@ -4650,10 +4472,6 @@ msgstr "Tafuta dashibodi"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "Anwani ya barua pepe isiyo sahihi"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "Hatua zote zimefanikiwa. Bonyeza node yoyote kuifungua kwenye canvas."
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4729,10 +4547,6 @@ msgstr "Tafadhali jaribu tena au wasiliana na msaada."
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "Ufikiaji wa jumla"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "Kagua na kubali mpango"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4882,7 +4696,6 @@ msgstr "Jukumu na vikundi vya watumiaji"
 msgid "Clear all"
 msgstr "Futa yote"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4927,16 +4740,10 @@ msgstr "Dataset nzima"
 msgid "Invalid date"
 msgstr "Tarehe isiyo sahihi"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "AI imependekeza mpango wa hatua {0}. Hakuna chochote kimefanyika bado. Bonyeza kila node ili kuisoma; idhinisha ili kuitekeleza."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "Baadhi"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "Panya"
@@ -4958,10 +4765,6 @@ msgstr "+{0} thamani zaidi zimefungwa kwenye {1} safu"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "Huru"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "Maandishi ya maelezo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

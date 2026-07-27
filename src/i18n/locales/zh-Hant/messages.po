@@ -248,10 +248,6 @@ msgstr "仍然分配給此組的成員必須先移動。"
 msgid "Delete failed"
 msgstr "刪除失敗"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Reject"
-msgstr "拒絕"
-
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "打開"
@@ -512,10 +508,6 @@ msgstr "已保存的數據集"
 #~ msgid "Roles"
 #~ msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PDF (multi-page)"
-msgstr "PDF（多頁）"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this catalog dataset."
 msgstr "您當前的計劃無法添加更多數據集。升級以添加此目錄數據集。"
@@ -640,10 +632,6 @@ msgstr "元數據"
 msgid "Range"
 msgstr "範圍"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Close branch"
-msgstr "關閉分支"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -706,10 +694,6 @@ msgstr "關閉聊天 (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "創建失敗"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Failed"
-msgstr "失敗"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -788,10 +772,6 @@ msgstr "標籤"
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
 msgstr "創建儀表板"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Plan rejected. Ask the chat to propose a different plan, or close this canvas."
-msgstr "計劃被拒絕。請要求聊天提出不同的計劃，或關閉此畫布。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -885,26 +865,13 @@ msgstr "/月"
 msgid "Filters for this chart"
 msgstr "此圖表的篩選器"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from here"
-msgstr "從這裡分支"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Skipped"
-msgstr "跳過"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
 msgid "Query failed."
 msgstr "查詢失敗。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Undo"
 msgstr "撤銷"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Branch from \"{truncated}\""
-msgstr "從 \"{truncated}\" 分支"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -978,10 +945,6 @@ msgstr "選擇最適合您工作區的計劃。"
 msgid "The public open data catalog is still in <0/><1/>We are adding more open datasets as users tell us which datasets they want in Avandar. If there is a dataset you would like to see here, <2>tell us</2>!"
 msgstr "公共開放資料目錄仍在 <0/><1/> 我們正在根據用戶告訴我們想要的資料集來添加更多開放資料集。如果您希望在這裡看到某個資料集，<2>告訴我們</2>！"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Erase"
-msgstr "擦除"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Health information detected"
 msgstr "檢測到健康資訊"
@@ -1040,17 +1003,9 @@ msgstr "為該欄位輸入名稱"
 msgid "Select Plan"
 msgstr "選擇計劃"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Color {c}"
-msgstr "顏色 {c}"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Default value (optional)"
 msgstr "預設值（可選）"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom in"
-msgstr "放大"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Your user profile is not loaded yet. Please retry."
@@ -1144,11 +1099,6 @@ msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候�
 msgid "Bias detected:"
 msgstr "檢測到偏見："
 
-#. placeholder {0}: planSnapshot.steps.length
-#: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-msgid "The {0}-step analysis that produced this result will be saved with the dataset, so it can be reopened on the canvas."
-msgstr "生成此結果的 {0} 步驟分析將與資料集一起保存，以便可以在畫布上重新打開。"
-
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成員看到的名稱。"
@@ -1173,10 +1123,6 @@ msgstr ""
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
 msgstr "登出"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Analytic plan"
-msgstr "分析計劃"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1224,11 +1170,6 @@ msgstr "正在開發連接 Google Sheets 和其他數據來源的功能，將很
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to an AI provider in this workspace. Last 90 days, stored on this device only."
 msgstr "您在此工作區中每次批准（或取消）向 AI 提供者發送數據的本地記錄。最近 90 天，僅存儲在此設備上。"
-
-#. placeholder {0}: b.parentStepId
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "from step {0}"
-msgstr "來自步驟 {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -1312,18 +1253,10 @@ msgstr "未檢測到語音"
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Step"
-msgstr "步驟"
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "最大"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Ready"
-msgstr "準備好"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
@@ -1396,10 +1329,6 @@ msgstr "標註後再匯出"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Plan branches"
-msgstr "計劃分支"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis (\"{axisKeyValue}\")."
@@ -1518,10 +1447,6 @@ msgstr "數據範圍"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "數據預覽"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Delete annotation"
-msgstr "刪除註解"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "to"
@@ -1804,10 +1729,6 @@ msgstr "儀表板成功儲存！"
 msgid "N/A"
 msgstr "不適用"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Zoom out"
-msgstr "縮小"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "全域管理員"
@@ -1852,10 +1773,6 @@ msgstr "請檢查您的電子郵件"
 msgid "Couldn't capture dashboard"
 msgstr "無法捕捉儀表板"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "PNG image"
-msgstr "PNG 圖像"
-
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing dataset…"
 msgstr "處理數據集中…"
@@ -1899,10 +1816,6 @@ msgstr "值"
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Unable to download the voice model."
 msgstr "無法下載語音模型。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "(untitled branch)"
-msgstr "(無標題分支)"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2016,7 +1929,6 @@ msgstr "沒有字段"
 msgid "Failed to update workspace name"
 msgstr "更新工作區名稱失敗"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "匯出"
@@ -2029,11 +1941,6 @@ msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "預覽："
-
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan — that's a lot of SQL. Consider whether a Python or R step would express this more cleanly. You can still approve as-is. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "AI 提出了 {0} 步驟計劃——這是很多 SQL。考慮是否使用 Python 或 R 步驟會更清晰。您仍然可以按原樣批准。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2071,14 +1978,6 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "每月付款"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Re-run"
-msgstr "重新執行"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo"
-msgstr "重做"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2296,10 +2195,6 @@ msgstr "最大返回行數"
 msgid "Password update failed"
 msgstr "密碼更新失敗"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "A step failed. Click the red node to retry, or use Re-run to restart from the top."
-msgstr "步驟失敗。點擊紅色節點重試，或使用重新執行從頭開始。"
-
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "在 {app} 中的任何人"
@@ -2341,10 +2236,6 @@ msgstr "將資料集添加到工作區"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Run step"
-msgstr "執行步驟"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
@@ -2466,11 +2357,6 @@ msgstr "查看"
 msgid "Remove failed"
 msgstr "移除失敗"
 
-#. placeholder {0}: step.actualSchema.length
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid " · {0} cols"
-msgstr " · {0} 列"
-
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -2514,11 +2400,6 @@ msgstr "此 Excel 工作表中只有一個工作表。"
 msgid "Make dataset offline-only?"
 msgstr "將資料集設為離線專用？"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Root plan"
-msgstr "根計劃"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -2550,10 +2431,6 @@ msgstr "這裡沒有任何內容與您共享。"
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "已發送密碼重置電子郵件"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Redo (Ctrl+Shift+Z)"
-msgstr "重做 (Ctrl+Shift+Z)"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
@@ -2624,10 +2501,6 @@ msgstr "我們沒有捕捉到任何內容 — 再試一次，靠近麥克風一�
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "購買 {seatsToAdd} 個座位"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Open on canvas"
-msgstr "在畫布上打開"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach out to support."
@@ -2811,11 +2684,6 @@ msgstr "要跳過的行數"
 msgid "From CSV"
 msgstr "從 CSV"
 
-#. placeholder {0}: step.rowCount ?? 0
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "{0} rows{colCountSuffix}"
-msgstr "{0} 行{colCountSuffix}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
 msgstr "分鐘"
@@ -2839,10 +2707,6 @@ msgstr "準備下載中…"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Tool"
 msgstr "工具"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Running…"
-msgstr "運行中…"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "Ask a workspace settings administrator to update your roles."
@@ -3171,11 +3035,6 @@ msgstr "更新頻率"
 msgid "Allow syncing"
 msgstr "允許同步"
 
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Sticky note"
-msgstr "便利貼"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm.tsx
 msgid "Ascending"
 msgstr "升序"
@@ -3247,10 +3106,6 @@ msgstr "這無法撤銷。"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Show the first 20 rows of {name}"
 #~ msgstr "顯示 {name} 的前 20 行"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Approve and run"
-msgstr "批准並執行"
 
 #: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 msgid "Could not access the microphone."
@@ -3356,10 +3211,6 @@ msgstr "粗糙度 ({0})"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} 欄 · {1} 行"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Undo (Ctrl+Z)"
-msgstr "撤銷 (Ctrl+Z)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -3617,10 +3468,6 @@ msgstr "警告"
 msgid "When on, members of this group only get access if they already have {app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {app}."
 msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {app} 訪問權限時才能訪問。當禁用時，該組的每個成員都可以在此訪問，即使他們通常無法打開 {app}。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Auto"
-msgstr "自動"
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
 msgstr "成功解析 {numSuccessRows} 行，但 {numRejectedStr}"
@@ -3760,10 +3607,6 @@ msgstr "擁有者始終具有管理員訪問權限。要更改擁有者，請使
 msgid "Loading datasets…"
 msgstr "載入數據集中…"
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "active"
-msgstr "活躍"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
@@ -3775,10 +3618,6 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
 msgstr "數據處理成功"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pen"
-msgstr "筆"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4119,10 +3958,6 @@ msgstr "設置"
 msgid "Switch Workspace"
 msgstr "切換工作區"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Export canvas"
-msgstr "導出畫布"
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "您可以查看此儀表板，因為它已與您共享。"
@@ -4172,10 +4007,6 @@ msgstr "編輯者"
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only the people and groups listed above can access this {resource}."
 msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
-
-#: src/components/ChatPanel/PlanFlowView/PlanStepNode.tsx
-msgid "Pending"
-msgstr "待處理"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -4262,10 +4093,6 @@ msgstr "數據集欄位"
 msgid "Could not prepare the offline chat model."
 msgstr ""
 
-#: src/components/ChatPanel/PlanFlowView/PlanBranchSidebar.tsx
-msgid "Branches"
-msgstr "分支"
-
 #. placeholder {0}: model.displayName
 #: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
 msgid "Starting {0}…"
@@ -4329,10 +4156,6 @@ msgstr "篩選器 ID（穩定）"
 #: src/components/VisualizationContainer/VizSettingsForm/Control.tsx
 msgid "No columns available"
 msgstr "沒有可用的欄位"
-
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
-msgid "Pan"
-msgstr "平移"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4616,7 +4439,6 @@ msgstr "資料集已儲存"
 msgid "For each dataset you've added, please specify which columns should be used to uniquely identify a {entityConfigName}."
 msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {entityConfigName}。"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Text"
 msgstr "文本"
@@ -4650,10 +4472,6 @@ msgstr "搜尋儀表板"
 #: src/routes/register.tsx
 msgid "Invalid email address"
 msgstr "電子郵件地址無效"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "All steps succeeded. Click any node to open it on the canvas."
-msgstr "所有步驟均成功。點擊任何節點以在畫布上打開它。"
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4729,10 +4547,6 @@ msgstr "請重試或聯繫支持。"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "一般訪問"
-
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "Review and approve the plan"
-msgstr "審核並批准計劃"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4882,7 +4696,6 @@ msgstr "角色與用戶群組"
 msgid "Clear all"
 msgstr "清除所有"
 
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
 #: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Close"
@@ -4927,16 +4740,10 @@ msgstr "整個數據集"
 msgid "Invalid date"
 msgstr "無效的日期"
 
-#. placeholder {0}: state.nodes.length
-#: src/components/ChatPanel/PlanFlowView/PlanFlowView.tsx
-msgid "The AI has proposed a {0}-step plan. Nothing has run yet. Click each node to read it; approve to execute."
-msgstr "AI 提出了 {0} 步計劃。尚未執行任何操作。點擊每個節點以閱讀；批准以執行。"
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
 msgstr "一些"
 
-#: src/components/ChatPanel/PlanFlowView/PlanCanvasToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Arrow"
 msgstr "箭頭"
@@ -4958,10 +4765,6 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Loose"
 msgstr "鬆散"
-
-#: src/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay.tsx
-msgid "Annotation text"
-msgstr "註解文本"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"

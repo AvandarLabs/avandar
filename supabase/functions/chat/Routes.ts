@@ -35,11 +35,8 @@ import type {
   ChatClarifyRequest,
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
-  ChatPlan,
-  ChatPlanStep,
   ChatRetryContext,
   ChatSessionSecretResponse,
-  RegeneratePlanResponse,
 } from "$/types/chat.types.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
@@ -265,30 +262,6 @@ function _parseClarify(
   }
   return undefined;
 }
-
-type RawPlanStep = {
-  id?: unknown;
-  description?: unknown;
-  type?: unknown;
-  code?: unknown;
-  inputs?: unknown;
-  predictedSchema?: unknown;
-  defaultViz?: unknown;
-};
-
-type RawProposePlanArgs = {
-  steps?: unknown;
-  rootMessage?: unknown;
-};
-
-const ALLOWED_PLAN_STEP_TYPES = new Set<ChatPlanStep["type"]>([
-  "sql",
-  "python",
-  "r",
-  "clarification",
-]);
-const ALLOWED_DEFAULT_VIZ = new Set(["table", "bar", "line", "scatter", "pie"]);
-const MAX_PLAN_STEPS = 8;
 
 const ALLOWED_DASHBOARD_VIZ_TYPES = new Set<ChatDashboardVizType>([
   "table",
@@ -535,86 +508,6 @@ function _dashboardBlockSummary(block: ChatGeneratedDashboardBlock): string {
   }
 }
 
-function _parseProposePlan(argsJson: string | undefined): ChatPlan | undefined {
-  if (!argsJson) {
-    return undefined;
-  }
-  let parsed: RawProposePlanArgs;
-  try {
-    parsed = JSON.parse(argsJson) as RawProposePlanArgs;
-  } catch {
-    return undefined;
-  }
-  if (!Array.isArray(parsed.steps) || parsed.steps.length === 0) {
-    return undefined;
-  }
-  const rootMessage =
-    typeof parsed.rootMessage === "string" ? parsed.rootMessage.trim() : "";
-
-  const cleaned: ChatPlanStep[] = [];
-  for (const raw of (parsed.steps as RawPlanStep[]).slice(0, MAX_PLAN_STEPS)) {
-    if (!raw || typeof raw !== "object") {
-      continue;
-    }
-    if (
-      typeof raw.id !== "string" ||
-      typeof raw.description !== "string" ||
-      typeof raw.code !== "string"
-    ) {
-      continue;
-    }
-    const id = raw.id.trim();
-    const description = raw.description.trim();
-    const code = raw.code.trim();
-    if (id.length === 0 || description.length === 0 || code.length === 0) {
-      continue;
-    }
-    const stepType =
-      (
-        typeof raw.type === "string" &&
-        ALLOWED_PLAN_STEP_TYPES.has(raw.type as ChatPlanStep["type"])
-      ) ?
-        (raw.type as ChatPlanStep["type"])
-      : "sql";
-    const inputs: string[] =
-      Array.isArray(raw.inputs) ?
-        raw.inputs.filter((i): i is string => {
-          return typeof i === "string";
-        })
-      : [];
-    const predictedSchema: Array<{ name: string; type: string }> =
-      Array.isArray(raw.predictedSchema) ?
-        (raw.predictedSchema as Array<{ name?: unknown; type?: unknown }>)
-          .filter((c) => {
-            return typeof c?.name === "string" && typeof c?.type === "string";
-          })
-          .map((c) => {
-            return { name: c.name as string, type: c.type as string };
-          })
-      : [];
-    const defaultViz =
-      (
-        typeof raw.defaultViz === "string" &&
-        ALLOWED_DEFAULT_VIZ.has(raw.defaultViz)
-      ) ?
-        (raw.defaultViz as ChatPlanStep["defaultViz"])
-      : undefined;
-    cleaned.push({
-      id,
-      description,
-      type: stepType,
-      code,
-      inputs,
-      predictedSchema,
-      ...(defaultViz ? { defaultViz } : {}),
-    });
-  }
-  if (cleaned.length === 0) {
-    return undefined;
-  }
-  return { steps: cleaned, rootMessage };
-}
-
 /**
  * Shared persona for all Avandar chat surfaces. A clear expert role in the
  * system prompt improves tool use, clarification quality, and plain-language
@@ -715,53 +608,6 @@ a reasonable assumption, state it briefly in \`assistantText\`, and call
 in the SQL that they did not explicitly provide, or that look like personal
 data, before the query runs.
 
-MULTI-STEP PLANS
-
-When the analysis is clearer broken into 2-N steps — especially when an
-intermediate result feeds the next, or the user wants a "build up to it"
-breakdown — call the \`proposePlan\` tool. Each step has a stable id;
-later steps reference earlier ones via the temp view \`step_<id>\`.
-
-Plans can mix languages. Each step's \`type\` is one of:
-- \`sql\`: a DuckDB SELECT. PREFER this. Even when the analysis spans
-  many steps, multi-step SQL is the default.
-- \`python\`: when the work is genuinely statistical (regression,
-  clustering, fuzzy matching, custom dedup) or a heavy
-  pandas-style dataframe transformation that SQL handles awkwardly.
-- \`r\`: when the work is statistics-heavy and tidyverse idioms apply
-  (hypothesis tests, mixed models, time-series decomposition).
-
-Heuristic — if a plan is going to need MORE than 7 SQL steps, that
-is still allowed, but PAUSE and ask: would a single Python or R step
-express this more cleanly? When in doubt, stay with SQL.
-
-DO NOT use Python or R for things SQL does well: filtering,
-aggregation, JOINs, window functions, ORDER BY/LIMIT, simple
-arithmetic. Reach for Python only when you genuinely can't do it in
-SQL or it would take >7 steps.
-
-Calling conventions for non-SQL steps:
-- Each \`inputs\` entry maps to a local variable named after the
-  upstream view (e.g. \`step_filter\`). For python, the variable is
-  a pandas.DataFrame. For r, it's a tibble.
-- The step's \`code\` must assign the final result to a variable
-  named \`result\` (pandas.DataFrame for python, tibble for r). The
-  runtime serialises \`result\` back to parquet for downstream SQL
-  steps to reference as \`step_<id>\`.
-- Don't import anything that would need network access — the
-  sandbox blocks all outbound connections. The standard scientific
-  stack (pandas, numpy, scipy, scikit-learn, statsmodels for python;
-  tidyverse, broom for r) is pre-installed.
-
-When NOT to use \`proposePlan\`:
-- Single-query answers — use \`generateSql\` directly.
-- When the user explicitly asks for "just the SQL" or "one query".
-
-After you call \`proposePlan\`, the user will see the plan as a
-visual DAG and APPROVE OR REJECT it before any step runs. Phrase
-step descriptions clearly enough that a non-technical user can
-read them and decide.
-
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;
 
@@ -820,11 +666,6 @@ function _buildRetryContextNote(
   if (retryContext.priorClarificationQuestion) {
     lines.push(
       `Previously asked clarification: "${retryContext.priorClarificationQuestion}"`,
-    );
-  }
-  if (retryContext.priorPlanRootMessage) {
-    lines.push(
-      `Previously proposed plan summary: "${retryContext.priorPlanRootMessage}"`,
     );
   }
   if (retryContext.priorDashboardBlockKind) {
@@ -961,7 +802,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             priorAssistantText: z.string().max(2000).optional(),
             priorGeneratedSql: z.string().max(8000).optional(),
             priorClarificationQuestion: z.string().max(400).optional(),
-            priorPlanRootMessage: z.string().max(800).optional(),
             priorDashboardBlockKind: z.string().max(40).optional(),
           })
           .optional(),
@@ -1190,72 +1030,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                   },
                 },
               ]),
-            {
-              type: "function",
-              function: {
-                name: "proposePlan",
-                description:
-                  "Propose a multi-step analytic plan (≤8 SQL steps) when the analysis is clearer broken down than as a single query.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    rootMessage: {
-                      type: "string",
-                      description:
-                        "One short paragraph explaining the plan to the user, shown above the DAG.",
-                      maxLength: 400,
-                    },
-                    steps: {
-                      type: "array",
-                      minItems: 2,
-                      maxItems: MAX_PLAN_STEPS,
-                      items: {
-                        type: "object",
-                        properties: {
-                          id: {
-                            type: "string",
-                            description:
-                              "Stable id used by `step_<id>` references in later steps.",
-                            maxLength: 40,
-                          },
-                          description: { type: "string", maxLength: 200 },
-                          type: {
-                            type: "string",
-                            enum: ["sql", "python", "r", "clarification"],
-                          },
-                          code: { type: "string" },
-                          inputs: {
-                            type: "array",
-                            items: { type: "string" },
-                            default: [],
-                          },
-                          predictedSchema: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                name: { type: "string" },
-                                type: { type: "string" },
-                              },
-                              required: ["name", "type"],
-                              additionalProperties: false,
-                            },
-                          },
-                          defaultViz: {
-                            type: "string",
-                            enum: ["table", "bar", "line", "scatter", "pie"],
-                          },
-                        },
-                        required: ["id", "description", "type", "code"],
-                        additionalProperties: false,
-                      },
-                    },
-                  },
-                  required: ["steps", "rootMessage"],
-                  additionalProperties: false,
-                },
-              },
-            },
           ];
           requestBody.tool_choice = "auto";
         }
@@ -1414,7 +1188,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           text: string;
           generatedSql?: ChatResponse.GeneratedSql;
           clarification?: ChatClarifyRequest;
-          plan?: ChatPlan;
           dashboardBlock?: ChatGeneratedDashboardBlock;
         };
 
@@ -1429,7 +1202,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
           let sql: ChatResponse.GeneratedSql | undefined;
           let clar: ChatClarifyRequest | undefined;
-          let pln: ChatPlan | undefined;
           let block: ChatGeneratedDashboardBlock | undefined;
 
           const sqlCall = calls.find((tc) => {
@@ -1466,29 +1238,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             }
           }
 
-          // proposePlan is terminal like generateSql.
-          if (!sql && !clar) {
-            const planCall = calls.find((tc) => {
-              return tc?.function?.name === "proposePlan";
-            });
-            if (planCall?.function) {
-              const p = _parseProposePlan(planCall.function.arguments);
-              if (p) {
-                pln = p;
-              }
-            }
-          }
-
           // Fallback: the model occasionally inlines a SELECT (or a
           // fenced ```sql block) in plain text instead of invoking the
           // `generateSql` tool.
-          if (
-            !sql &&
-            !clar &&
-            !pln &&
-            isDataExplorer &&
-            attemptText.length > 0
-          ) {
+          if (!sql && !clar && isDataExplorer && attemptText.length > 0) {
             const extracted = extractSqlFromAssistantText(attemptText);
             if (extracted) {
               sql = {
@@ -1499,7 +1252,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           }
 
           // Dashboard block creation. Only honored on the dashboards surface.
-          if (isDashboards && !sql && !clar && !pln) {
+          if (isDashboards && !sql && !clar) {
             const blockCall = calls.find((tc) => {
               return tc?.function?.name === "addDashboardBlock";
             });
@@ -1515,7 +1268,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             text: attemptText,
             generatedSql: sql,
             clarification: clar,
-            plan: pln,
             dashboardBlock: block,
           };
         };
@@ -1528,7 +1280,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           return (
             !p.generatedSql &&
             !p.clarification &&
-            !p.plan &&
             !p.dashboardBlock &&
             p.text.length === 0
           );
@@ -1561,14 +1312,12 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           parsed = parseAttempt(attempt.message, attempt.text);
         }
 
-        const { text, generatedSql, clarification, plan, dashboardBlock } =
-          parsed;
+        const { text, generatedSql, clarification, dashboardBlock } = parsed;
 
         const assistantText =
           text ||
           (generatedSql ?
             "Here is the SQL I ran. Results are on the canvas to the left."
-          : plan ? plan.rootMessage || "Here is a plan to answer your question."
           : clarification ? clarification.question
           : dashboardBlock ? _dashboardBlockSummary(dashboardBlock)
           : "I could not generate a query for that. Try rephrasing.");
@@ -1577,267 +1326,9 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
           ...(clarification ? { clarification } : {}),
-          ...(plan ? { plan } : {}),
           ...(dashboardBlock ? { dashboardBlock } : {}),
         });
         return result;
-      }),
-  },
-
-  /**
-   * Regenerates downstream plan steps after schema drift. When a plan step's
-   * actual schema doesn't match its predicted schema, the frontend posts the
-   * drift report here and we ask the LLM to regenerate just the affected
-   * downstream steps.
-   */
-  "/:workspaceId/regenerate-plan": {
-    POST: POST({
-      path: "/:workspaceId/regenerate-plan",
-      schema: { workspaceId: z.uuid() },
-    })
-      .bodySchema({
-        driftReport: z.object({
-          driftedStepId: z.string(),
-          driftedStepDescription: z.string(),
-          predictedSchema: z.array(
-            z.object({ name: z.string(), type: z.string() }),
-          ),
-          actualSchema: z.array(
-            z.object({ name: z.string(), type: z.string() }),
-          ),
-          affectedStepIds: z.array(z.string()),
-          plan: z.object({
-            steps: z.array(
-              z.object({
-                id: z.string(),
-                description: z.string(),
-                type: z.enum(["sql", "python", "r", "clarification"]),
-                code: z.string(),
-                inputs: z.array(z.string()),
-                predictedSchema: z.array(
-                  z.object({ name: z.string(), type: z.string() }),
-                ),
-                defaultViz: z
-                  .enum(["table", "bar", "line", "scatter", "pie"])
-                  .optional(),
-              }),
-            ),
-            rootMessage: z.string(),
-          }),
-        }),
-        model: z.string().optional(),
-      })
-      .action(async ({ body }): Promise<RegeneratePlanResponse> => {
-        const { driftReport, model: requestedModel } = body;
-        const model = _resolveChatModel(requestedModel);
-
-        const driftedStep = driftReport.plan.steps.find((s) => {
-          return s.id === driftReport.driftedStepId;
-        });
-        if (!driftedStep) {
-          return {
-            steps: [],
-            explanation:
-              "Could not find the drifted step in the plan; nothing to regenerate.",
-          };
-        }
-
-        const affectedSet = new Set(driftReport.affectedStepIds);
-        const affectedSteps = driftReport.plan.steps.filter((s) => {
-          return affectedSet.has(s.id);
-        });
-        if (affectedSteps.length === 0) {
-          return {
-            steps: [],
-            explanation:
-              "No downstream steps depend on the drifted step; nothing to regenerate.",
-          };
-        }
-
-        const fmtSchema = (
-          cols: Array<{ name: string; type: string }>,
-        ): string => {
-          return cols
-            .map((c) => {
-              return `${c.name}:${c.type}`;
-            })
-            .join(", ");
-        };
-
-        const regenSystemPrompt = `${avandarPersonaPrefix}
-The user is working with a multi-step SQL plan in DuckDB.
-
-A previously-executed step produced columns that don't match what the
-plan predicted. You must regenerate ONLY the downstream steps that
-depend on the drifted step, updating their SQL so they work against
-the actual schema.
-
-Drifted step: ${driftReport.driftedStepDescription}
-Drifted step id: ${driftReport.driftedStepId}
-Predicted schema for drifted step: ${fmtSchema(driftReport.predictedSchema)}
-Actual schema for drifted step:    ${fmtSchema(driftReport.actualSchema)}
-
-Each downstream step references the drifted step via the DuckDB view
-\`"step_${driftReport.driftedStepId.replace(/[^a-zA-Z0-9_]/g, "_")}"\`.
-
-The full plan context is below; only rewrite SQL for the listed
-affected step ids:
-${driftReport.plan.steps
-  .map((s) => {
-    return `- ${s.id} (${s.description})\n    inputs: [${s.inputs.join(", ")}]\n    sql: ${s.code}`;
-  })
-  .join("\n")}
-
-Affected step ids: ${driftReport.affectedStepIds.join(", ")}
-
-Call the \`regenerateSteps\` tool with the corrected SQL and updated
-\`predictedSchema\` for each affected step.`;
-
-        const requestBody: Record<string, unknown> = {
-          model,
-          messages: [
-            { role: "system", content: regenSystemPrompt },
-            {
-              role: "user",
-              content: `Please regenerate the affected steps to match the drifted step's actual schema.`,
-            },
-          ],
-          temperature: 0.2,
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "regenerateSteps",
-                description:
-                  "Emit the regenerated SQL for each step in the affected step ids.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    explanation: { type: "string", maxLength: 400 },
-                    steps: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          stepId: { type: "string" },
-                          code: { type: "string" },
-                          predictedSchema: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                name: { type: "string" },
-                                type: { type: "string" },
-                              },
-                              required: ["name", "type"],
-                              additionalProperties: false,
-                            },
-                          },
-                        },
-                        required: ["stepId", "code", "predictedSchema"],
-                        additionalProperties: false,
-                      },
-                    },
-                  },
-                  required: ["steps", "explanation"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: {
-            type: "function",
-            function: { name: "regenerateSteps" },
-          },
-        };
-
-        const response = await fetch(
-          "https://openrouter.ai/api/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${openRouterApiKey}`,
-              "HTTP-Referer": openRouterReferer,
-              "X-Title": "Avandar",
-            },
-            body: JSON.stringify(requestBody),
-          },
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`OpenRouter API error: ${errorText}`);
-        }
-
-        const data = (await response.json()) as OpenRouterCompletion;
-        const message = data.choices?.[0]?.message;
-        const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
-        const tool = toolCalls.find((tc) => {
-          return tc?.function?.name === "regenerateSteps";
-        });
-        if (!tool?.function?.arguments) {
-          return {
-            steps: [],
-            explanation:
-              message?.content ??
-              "The model declined to regenerate the affected steps.",
-          };
-        }
-        try {
-          const parsed = JSON.parse(tool.function.arguments) as {
-            steps?: unknown;
-            explanation?: unknown;
-          };
-          const stepsRaw = Array.isArray(parsed.steps) ? parsed.steps : [];
-          const cleaned: RegeneratePlanResponse["steps"] = [];
-          for (const s of stepsRaw) {
-            if (
-              typeof s?.stepId !== "string" ||
-              typeof s?.code !== "string" ||
-              !Array.isArray(s?.predictedSchema)
-            ) {
-              continue;
-            }
-            if (!affectedSet.has(s.stepId)) {
-              continue;
-            }
-            const schema = (
-              s.predictedSchema as Array<{
-                name?: unknown;
-                type?: unknown;
-              }>
-            )
-              .filter((c) => {
-                return (
-                  typeof c?.name === "string" && typeof c?.type === "string"
-                );
-              })
-              .map((c) => {
-                return {
-                  name: c.name as string,
-                  type: c.type as string,
-                };
-              });
-            cleaned.push({
-              stepId: s.stepId,
-              code: s.code.trim(),
-              predictedSchema: schema,
-            });
-          }
-          return {
-            steps: cleaned,
-            explanation:
-              typeof parsed.explanation === "string" ?
-                parsed.explanation
-              : "Regenerated downstream steps to match the drifted schema.",
-          };
-        } catch {
-          return {
-            steps: [],
-            explanation: "The model's regen response was malformed.",
-          };
-        }
       }),
   },
 

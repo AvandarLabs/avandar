@@ -19,6 +19,7 @@ export default [
       ".agents/**",
       ".claude",
       ".claude/**",
+      "agent-skills/**",
       "apps/desktop/build/**",
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
