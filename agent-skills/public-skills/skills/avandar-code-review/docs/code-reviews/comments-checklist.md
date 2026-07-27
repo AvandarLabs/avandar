@@ -37,6 +37,32 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   }
   ```
 
+- Keep exported-function JSDoc focused on what the function is for and what
+  callers get back. Do not use the block comment above an exported function
+  to narrate implementation details, branching, sequencing, or internal
+  helpers; those belong in `//` comments inside the function body when they
+  are needed.
+
+  This is bad:
+
+  ```ts
+  /**
+   * First reads from IndexedDB, then registers a DuckDB view, then dispatches
+   * status updates. Falls back to running SQL when no blob exists.
+   */
+  export async function rehydratePlan(options: Options): Promise<void> {}
+  ```
+
+  This is good:
+
+  ```ts
+  /**
+   * Restores a persisted analytic plan into the plan canvas.
+   * Resolves after the plan state reflects the available step results.
+   */
+  export async function rehydratePlan(options: Options): Promise<void> {}
+  ```
+
 - Comments must describe the code as it exists today, not the external plan
   that produced it. Flag any comment that references planning artifacts a
   reader cannot resolve from the codebase: roadmap phase numbers ("Phase 3"),

@@ -18,6 +18,10 @@
 ## General Code Style & Formatting
 
 - Use JSDoc to document public classes and methods.
+- JSDoc on exported functions should describe the function's purpose and
+  output at a high level. Do not use exported-function JSDoc to explain the
+  implementation details or control flow. Use `//` comments inside the
+  function body when a reader needs to understand how the function works.
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).
@@ -268,6 +272,7 @@
 
   This applies equally to `*.constants.ts` and `*.types.ts` (and their `.tsx`
   equivalents). A bare `constants.ts` or `types.ts` is never allowed.
+
 - Never create barrel files. The only barrel files allowed are the `index.ts`
   files exporting the contents of our libraries in `packages/`.
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
