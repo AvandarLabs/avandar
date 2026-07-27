@@ -144,6 +144,10 @@ const RULES: BiasRule[] = [
   },
 ];
 
+/**
+ * Scans prompt text for phrasing that may encode biased assumptions and returns
+ * one deduplicated hit per matching rule.
+ */
 export function detectBias(text: string): BiasDetectionResult {
   if (!text.trim()) {
     return { hits: [] };
