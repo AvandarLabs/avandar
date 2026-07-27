@@ -1,24 +1,3 @@
-/**
- * Identifies "row-data" tool messages: messages that carry actual
- * row-level data values to the LLM rather than schema, status, or
- * error strings.
- *
- * Used (per the chat-interactive-workflows spec) to enforce
- * that any row-data crossing the LLM boundary carries a valid ack token
- * (see `verifyAckToken`).
- *
- * v1 heuristic (English-only, deliberately conservative):
- *   - tool-result messages whose content is a JSON array of length > 0
- *     where each element is an object or primitive → row data
- *   - tool-result messages whose content is a JSON object with an
- *     `errors` / `error` / `status` / `schema` top-level key only,
- *     and no other large field → safe
- *   - anything else with array/object payloads → row data
- *
- * Prefer false positives. The spec is explicit: an over-eager row-data
- * classifier just demands a token; under-eager would let data slip.
- */
-
 export type RowDataInspection = {
   isRowData: boolean;
   reason: string;
@@ -34,6 +13,10 @@ const KNOWN_SAFE_KEYS = new Set([
   "code",
 ]);
 
+/**
+ * Identifies whether tool-message content carries row-level data values.
+ * Returns the row-data decision and the reason for that classification.
+ */
 export function isRowDataMessage(content: string): RowDataInspection {
   const trimmed = content.trim();
   if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {

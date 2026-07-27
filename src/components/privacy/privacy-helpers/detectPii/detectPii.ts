@@ -1,19 +1,3 @@
-/**
- * Client-side PII heuristics. Used by `crossBoundary` to decide whether to
- * elevate the consent modal before any data leaves the browser for the LLM.
- *
- * Two layers (per the chat-interactive-workflows spec):
- *   A. Column-name keyword match (categorised)
- *   B. Content regex over the actual values being sent
- *
- * Both layers run client-side and never call an LLM. We prefer false
- * positives: a one-click nudge is cheap, a false negative breaks the
- * promise that the LLM never sees row-level data without consent.
- *
- * v1 scope: English only. Spanish + French pattern files stubbed at
- * `src/components/privacy/privacy-helpers/patterns/*` once those locales ship.
- */
-
 export type PiiCategory =
   | "direct_identifier"
   | "government_id"

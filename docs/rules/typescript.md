@@ -22,6 +22,11 @@
   output at a high level. Do not use exported-function JSDoc to explain the
   implementation details or control flow. Use `//` comments inside the
   function body when a reader needs to understand how the function works.
+- File-level JSDoc is only for context that applies to the whole file and has
+  no better identifier to attach to. It does not replace JSDoc on exported
+  members, because IDE intellisense surfaces member comments, not file headers.
+  When a file-level block describes a function, constant, object, or type, move
+  that comment to the member instead.
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).

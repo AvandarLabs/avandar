@@ -1,24 +1,12 @@
-/**
- * Client-side mirror of the backend's `discoveryQuery.ts`. Both files
- * implement the exact same validator so the two ends agree on what a
- * "discovery clarification" query is allowed to look like.
- *
- * The discovery query runs in the user's local DuckDB-WASM, so even a
- * relaxed validator wouldn't leak data to the LLM. But:
- *
- *   1. We want a single source of truth for the contract.
- *   2. We don't want a hostile or malformed query to wedge a worker.
- *   3. Validating client-side lets us fail fast before the user
- *      sees a loading spinner that never resolves.
- *
- * The two files agree by convention (no shared package): there's a
- * roundtrip test pinning them together.
- */
-
+/** Maximum length accepted for LLM-generated discovery queries. */
 export const MAX_DISCOVERY_QUERY_CHARS = 2000;
 
 const LEADING_KEYWORD_RE = /^\s*(?:with|select)\b/i;
 
+/**
+ * Validates an LLM-generated discovery query before local DuckDB execution.
+ * Returns whether the query is shaped like one read-only SELECT or CTE.
+ */
 export function isReadOnlyDiscoveryQuery(q: string): boolean {
   if (typeof q !== "string") {
     return false;

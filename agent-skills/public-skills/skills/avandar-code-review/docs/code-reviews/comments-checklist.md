@@ -63,6 +63,37 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export async function rehydratePlan(options: Options): Promise<void> {}
   ```
 
+- Attach member documentation to the exported member it describes, not to the
+  top of the file. File-level block comments are only for context that applies
+  to the whole file and has no better function, constant, object, class, or
+  type to attach to. They are complementary context, not a substitute for
+  member JSDoc, because IDE intellisense surfaces member comments.
+
+  This is bad:
+
+  ```ts
+  /**
+   * Validates discovery queries before local execution.
+   */
+
+  export const MAX_QUERY_CHARS = 2000;
+
+  export function isReadOnlyDiscoveryQuery(query: string): boolean {}
+  ```
+
+  This is good:
+
+  ```ts
+  /** Maximum length accepted for generated discovery queries. */
+  export const MAX_QUERY_CHARS = 2000;
+
+  /**
+   * Validates a generated discovery query before local execution.
+   * Returns whether the query is read-only.
+   */
+  export function isReadOnlyDiscoveryQuery(query: string): boolean {}
+  ```
+
 - Comments must describe the code as it exists today, not the external plan
   that produced it. Flag any comment that references planning artifacts a
   reader cannot resolve from the codebase: roadmap phase numbers ("Phase 3"),

@@ -1,14 +1,3 @@
-/**
- * Client-side bias heuristics for user-typed text and LLM-generated
- * clarification questions. Per the chat-interactive-workflows spec,
- * bias hits are **always a soft nudge, never a hard block**. The
- * consent modal lets the user continue as-is, edit themselves, or
- * accept the curated suggestion.
- *
- * v1 ships English-only patterns curated internally. The spec mandates a
- * social-sector-advisor review before non-English patterns ship.
- */
-
 export type BiasCategory =
   | "gender_generalization"
   | "ethnic_cultural_generalization"
