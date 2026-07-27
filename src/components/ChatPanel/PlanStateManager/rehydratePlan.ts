@@ -1,5 +1,5 @@
 import { makeMap } from "@utils";
-import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient";
+import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient/PlanStepBlobClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   rehydratePlanStep,

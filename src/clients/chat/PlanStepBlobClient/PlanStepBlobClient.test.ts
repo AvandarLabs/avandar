@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { PlanStepBlobParsers } from "@/models/chat/PlanStepBlob/PlanStepBlobParsers";
 import { PlanStepBlobClient } from "./PlanStepBlobClient";
+import type { PutPlanStepBlobArgs } from "./PlanStepBlobClient";
 import type { PlanStepBlob } from "@/models/chat/PlanStepBlob/PlanStepBlob";
 
 vi.hoisted(() => {
@@ -13,15 +14,15 @@ vi.hoisted(() => {
   });
 });
 
-const savedAt = 1_721_234_567_890;
+const SAVED_AT = 1_721_234_567_890;
 
-function createBlobInput(
+function _createBlobInput(
   overrides: {
     planId?: string;
     stepId?: string;
     text?: string;
   } = {},
-) {
+): PutPlanStepBlobArgs {
   return {
     planId: overrides.planId ?? "plan-1",
     stepId: overrides.stepId ?? "step-1",
@@ -43,12 +44,12 @@ describe("PlanStepBlobClient", () => {
   });
 
   it("stores a Blob with a deterministic id and current save time", async () => {
-    vi.spyOn(Date, "now").mockReturnValue(savedAt);
+    vi.spyOn(Date, "now").mockReturnValue(SAVED_AT);
     const parserSpy = vi.spyOn(
       PlanStepBlobParsers,
       "fromModelInsertToDBInsert",
     );
-    const input = createBlobInput();
+    const input = _createBlobInput();
 
     await PlanStepBlobClient.putPlanStepBlob(input);
 
@@ -61,19 +62,19 @@ describe("PlanStepBlobClient", () => {
       stepId: "step-1",
       schema: input.schema,
       rowCount: 2,
-      savedAt,
+      savedAt: SAVED_AT,
     });
     expect(await stored?.parquet.text()).toBe("parquet bytes");
     expect(parserSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "plan-1|step-1",
-        savedAt,
+        savedAt: SAVED_AT,
       }),
     );
   });
 
   it("gets a Blob by its plan and step ids through the read parser", async () => {
-    const input = createBlobInput();
+    const input = _createBlobInput();
     await PlanStepBlobClient.putPlanStepBlob(input);
     const parserSpy = vi.spyOn(PlanStepBlobParsers, "fromDBReadToModelRead");
 
@@ -92,12 +93,12 @@ describe("PlanStepBlobClient", () => {
   });
 
   it("lists only Blobs belonging to the requested plan", async () => {
-    await PlanStepBlobClient.putPlanStepBlob(createBlobInput());
+    await PlanStepBlobClient.putPlanStepBlob(_createBlobInput());
     await PlanStepBlobClient.putPlanStepBlob(
-      createBlobInput({ stepId: "step-2", text: "second" }),
+      _createBlobInput({ stepId: "step-2", text: "second" }),
     );
     await PlanStepBlobClient.putPlanStepBlob(
-      createBlobInput({ planId: "plan-2", text: "other plan" }),
+      _createBlobInput({ planId: "plan-2", text: "other plan" }),
     );
     const parserSpy = vi.spyOn(PlanStepBlobParsers, "fromDBReadToModelRead");
 
@@ -117,9 +118,9 @@ describe("PlanStepBlobClient", () => {
   it("rejects invalid rows read from IndexedDB", async () => {
     await AvaDexie.DB.PlanStepBlob.put({
       id: "plan-1|step-1" as PlanStepBlob.Id,
-      ...createBlobInput(),
+      ..._createBlobInput(),
       rowCount: "invalid",
-      savedAt,
+      savedAt: SAVED_AT,
     } as unknown as PlanStepBlob.T);
 
     await expect(
@@ -134,9 +135,9 @@ describe("PlanStepBlobClient", () => {
   });
 
   it("clears one plan without affecting another", async () => {
-    await PlanStepBlobClient.putPlanStepBlob(createBlobInput());
+    await PlanStepBlobClient.putPlanStepBlob(_createBlobInput());
     await PlanStepBlobClient.putPlanStepBlob(
-      createBlobInput({ planId: "plan-2" }),
+      _createBlobInput({ planId: "plan-2" }),
     );
 
     await PlanStepBlobClient.clearPlanStepBlobs("plan-1");
@@ -147,9 +148,9 @@ describe("PlanStepBlobClient", () => {
   });
 
   it("clears all persisted plan step Blobs", async () => {
-    await PlanStepBlobClient.putPlanStepBlob(createBlobInput());
+    await PlanStepBlobClient.putPlanStepBlob(_createBlobInput());
     await PlanStepBlobClient.putPlanStepBlob(
-      createBlobInput({ planId: "plan-2" }),
+      _createBlobInput({ planId: "plan-2" }),
     );
 
     await PlanStepBlobClient.clearAllPlanStepBlobs();

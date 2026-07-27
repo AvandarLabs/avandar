@@ -1,5 +1,5 @@
 import { makeIdLookupMap } from "@utils";
-import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient";
+import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient/PlanStepBlobClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import {

@@ -13,7 +13,7 @@ export type PutPlanStepBlobArgs = Pick<
 /** Identifies one materialized plan step. */
 export type GetPlanStepBlobArgs = Pick<PlanStepBlob.T, "planId" | "stepId">;
 
-function buildPlanStepBlobId(planId: string, stepId: string): PlanStepBlob.Id {
+function _buildPlanStepBlobId(planId: string, stepId: string): PlanStepBlob.Id {
   return `${planId}|${stepId}` as PlanStepBlob.Id;
 }
 
@@ -25,10 +25,10 @@ const planStepBlobClient = createDexieCrudClient({
     return {
       /** Gets one materialized plan step by its plan and step identifiers. */
       getPlanStepBlob: async (
-        args: GetPlanStepBlobArgs,
+        args: Readonly<GetPlanStepBlobArgs>,
       ): Promise<PlanStepBlob.T | undefined> => {
         const row = await dbTable.get(
-          buildPlanStepBlobId(args.planId, args.stepId),
+          _buildPlanStepBlobId(args.planId, args.stepId),
         );
         return row ? PlanStepBlobParsers.fromDBReadToModelRead(row) : undefined;
       },
@@ -45,10 +45,12 @@ const planStepBlobClient = createDexieCrudClient({
   mutations: ({ dbTable }) => {
     return {
       /** Inserts or replaces one materialized plan step. */
-      putPlanStepBlob: async (args: PutPlanStepBlobArgs): Promise<void> => {
+      putPlanStepBlob: async (
+        args: Readonly<PutPlanStepBlobArgs>,
+      ): Promise<void> => {
         const row: PlanStepBlob.T = {
           ...args,
-          id: buildPlanStepBlobId(args.planId, args.stepId),
+          id: _buildPlanStepBlobId(args.planId, args.stepId),
           savedAt: Date.now(),
         };
         await dbTable.put(PlanStepBlobParsers.fromModelInsertToDBInsert(row));
