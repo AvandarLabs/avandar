@@ -8,6 +8,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::pty_pane::PtyPane;
+use crate::session::AgentKind;
 
 /// Encode a key event into bytes for a PTY child. Returns `None` for keys we
 /// don't forward (e.g. bare modifiers).
@@ -58,25 +59,33 @@ fn encode_char(c: char, ctrl: bool, alt: bool) -> Vec<u8> {
     }
 }
 
-/// Delay between typing a prompt's body and sending the submit `Enter`.
+/// Delay between typing a prompt's body and sending the submit/queue key.
 ///
 /// Claude Code coalesces input that arrives in one burst and treats a newline
 /// inside that burst as a *pasted* newline (literal text), not a submit. So a
 /// trailing `CR` in the same write is kept as another line and the prompt sits
-/// unsent. Sending the `Enter` after a gap makes claude see a discrete
-/// keypress, which submits. The gap need only exceed claude's paste-coalescing
-/// window; 200ms is comfortably past it while still feeling instant.
+/// unsent. Sending the final key after a gap makes the frontend see a discrete
+/// keypress. The gap need only exceed claude's paste-coalescing window; 200ms
+/// is comfortably past it while still feeling instant.
 const SUBMIT_DELAY: std::time::Duration = std::time::Duration::from_millis(200);
 
-/// Type a prefilled prompt into a running LLM pane and submit it.
+/// Keystroke that submits or queues an injected prompt for the active frontend.
+#[must_use]
+fn submit_key_for_agent(agent_kind: AgentKind) -> Vec<u8> {
+    match agent_kind {
+        AgentKind::Claude => vec![b'\r'],
+        AgentKind::Codex => vec![b'\t'],
+    }
+}
+
+/// Type a prefilled prompt into a running LLM pane and submit or queue it.
 ///
 /// Internal newlines are sent as `Alt+Enter` (`ESC` + `CR`): claude's
 /// readline treats that as "insert newline", not "submit", so a multi-line
-/// prompt arrives intact. The submitting `Enter` is then sent as a *separate,
-/// delayed* keystroke (see [`SUBMIT_DELAY`]) so claude submits the prompt
-/// instead of keeping the newline as pasted text. Claude's own input queue
-/// absorbs prompts that arrive while it is busy.
-pub fn send_prompt_to_pty(pty: &PtyPane, prompt: &str) {
+/// prompt arrives intact. The final `Enter` or `Tab` is then sent as a
+/// *separate, delayed* keystroke (see [`SUBMIT_DELAY`]). Claude uses `Enter`
+/// to submit; Codex uses `Tab` to queue the message behind any active work.
+pub fn send_prompt_to_pty(pty: &PtyPane, prompt: &str, agent_kind: AgentKind) {
     let trimmed = prompt.trim();
     if trimmed.is_empty() {
         return;
@@ -97,7 +106,7 @@ pub fn send_prompt_to_pty(pty: &PtyPane, prompt: &str) {
     let tx = pty.input_sender();
     std::thread::spawn(move || {
         std::thread::sleep(SUBMIT_DELAY);
-        let _ = tx.send(vec![b'\r']);
+        let _ = tx.send(submit_key_for_agent(agent_kind));
     });
 }
 
@@ -154,6 +163,12 @@ mod tests {
         );
     }
 
+    #[test]
+    fn submit_key_uses_enter_for_claude_and_tab_for_codex() {
+        assert_eq!(submit_key_for_agent(AgentKind::Claude), vec![b'\r']);
+        assert_eq!(submit_key_for_agent(AgentKind::Codex), vec![b'\t']);
+    }
+
     /// A prompt must be *submitted*, not just typed. We run a child that blocks
     /// on `read` (which only returns once a newline arrives) and echoes a
     /// marker; the marker appears only if the deferred Enter was delivered.
@@ -174,7 +189,7 @@ mod tests {
         // Let the child reach `read` before we type.
         std::thread::sleep(Duration::from_millis(200));
 
-        send_prompt_to_pty(&pty, "hello");
+        send_prompt_to_pty(&pty, "hello", AgentKind::Claude);
 
         // Poll for the echoed marker (covers the 200ms submit delay + shell).
         let mut found = false;

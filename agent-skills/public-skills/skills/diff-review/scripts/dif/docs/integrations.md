@@ -171,10 +171,12 @@ new Codex id on fresh launch.
 
 New comments are typed into the pane via the same keystroke-injection trick the
 `tasks`/`brain` shells use (`send_prompt_to_pty`): characters typed, internal
-newlines as `Alt+Enter`. The submitting `Enter` is sent as a separate,
-~200ms-delayed keystroke, not appended to the same burst. Claude Code coalesces
-a fast input burst and treats a newline inside it as pasted text, whereas a
-discrete delayed `Enter` submits it. The same path is used for Codex.
+newlines as `Alt+Enter`. The final submit/queue key is sent as a separate,
+~200ms-delayed keystroke, not appended to the same burst. Claude receives a
+delayed `Enter`; Claude Code coalesces a fast input burst and treats a newline
+inside it as pasted text, whereas a discrete delayed `Enter` submits it. Codex
+receives a delayed `Tab`, which queues the prompt behind any active work instead
+of steering or interrupting the current turn.
 
 ## Injection: baseline, then once-each
 

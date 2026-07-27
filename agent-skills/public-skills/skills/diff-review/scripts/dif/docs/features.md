@@ -87,11 +87,11 @@ log:
 ## Live comment handling
 
 Leave comments in the browser as usual. Each new reviewer comment is typed into
-the LLM pane automatically **and submitted for you** (no manual Enter), with a
-handoff to the `/diff-review` skill. The agent first decides whether the
-comment needs a code change or is just a question: a question gets an answer
-posted back as a reply (which appears in the browser live); a change gets edited
-(committing or not per the
+the LLM pane automatically **and submitted or queued for you** (Claude uses
+Enter; Codex uses Tab), with a handoff to the `/diff-review` skill. The agent
+first decides whether the comment needs a code change or is just a question: a
+question gets an answer posted back as a reply (which appears in the browser
+live); a change gets edited (committing or not per the
 [commit policy](integrations.md#commit-policy-by-comparison)) and explained in
 the chat, with at most a terse `Done.` posted to the thread. You never have to
 tell the agent to "address the comments," and replies appear without a restart.

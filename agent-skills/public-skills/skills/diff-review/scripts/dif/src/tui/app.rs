@@ -305,7 +305,7 @@ impl App {
     /// which the diff guide view then picks up on its next refresh.
     pub fn regenerate_guide(&mut self) {
         if let Some(llm) = self.llm.as_ref().filter(|p| p.is_alive()) {
-            send_prompt_to_pty(llm, REGENERATE_GUIDE_PROMPT);
+            send_prompt_to_pty(llm, REGENERATE_GUIDE_PROMPT, self.agent_kind);
             self.last_inject_at = Some(Instant::now());
         }
     }
@@ -575,7 +575,7 @@ impl App {
             self.last_inject_at = Some(Instant::now());
         }
         for prompt in prompts {
-            send_prompt_to_pty(llm, &prompt);
+            send_prompt_to_pty(llm, &prompt, self.agent_kind);
         }
     }
 

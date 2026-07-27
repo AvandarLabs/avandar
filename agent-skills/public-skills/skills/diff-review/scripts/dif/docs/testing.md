@@ -33,7 +33,8 @@ suite with `cargo test` (it finishes in a couple of seconds).
 - `inject::dispatcher`: baseline-then-dispatch-once across snapshots.
 - `inject::reply_watcher`: baseline-then-log-once for new `claude` replies, with
   the `file:Lx` location; reviewer comments never logged as replies.
-- `tui::keymap`: key→bytes encodings.
+- `tui::keymap`: key→bytes encodings and injected prompt delivery, including
+  frontend-specific delayed submit keys (`Enter` for Claude, `Tab` for Codex).
 - `tui::control`: local control endpoint accepts one comparison update while
   offline, rejects invalid payloads, and returns `409` once updates are disabled.
 - `tui::palette`: command registry (Restart diff server, Regenerate diff guide,
