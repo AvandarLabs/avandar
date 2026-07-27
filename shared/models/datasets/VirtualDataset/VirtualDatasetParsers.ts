@@ -17,13 +17,6 @@ import type {
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { ChatPlan } from "$/types/chat.types.ts";
 
-/**
- * The persisted plan lives in a `jsonb` column. Zod's strictest match
- * for Supabase's generated `Json` type is just unknown-ish JSON, so we
- * keep the parse loose here and do the strict typing at the boundary
- * where we hydrate into `PlanStateManager`. We allow `null` for legacy
- * rows that pre-date the column.
- */
 const DBReadSchema = z.object({
   id: z.uuid(),
   dataset_id: z.uuid(),
@@ -51,14 +44,6 @@ export const VirtualDatasetParsers =
         });
       },
     ),
-    /**
-     * The `planSteps` column holds an opaque JSONB blob whose nested keys are
-     * camelCase (matching the `ChatPlan` shape from
-     * `shared/types/chat.types.ts`). `snakeCaseKeysDeep` would rewrite those
-     * nested keys and break the round-trip, so we extract `planSteps`,
-     * snake-case everything else, and reattach the blob untouched at
-     * `plan_steps`.
-     */
     fromModelInsertToDBInsert: (model) => {
       const { planSteps, ...rest } = model;
       const snake = snakeCaseKeysDeep(rest);
