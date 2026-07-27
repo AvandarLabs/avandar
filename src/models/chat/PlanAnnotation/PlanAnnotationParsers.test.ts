@@ -50,6 +50,50 @@ const annotations: PlanAnnotation.T[] = [
   },
 ];
 
+const variantUpdates: Array<{
+  kind: PlanAnnotation.Kind;
+  update: PlanAnnotation.T<"Update">;
+}> = [
+  {
+    kind: "text",
+    update: {
+      kind: "text",
+      x: 11,
+      y: 21,
+      fontSize: 18,
+      rotation: 90,
+    },
+  },
+  {
+    kind: "sticky",
+    update: {
+      kind: "sticky",
+      x: 31,
+      y: 41,
+      width: 220,
+      height: 140,
+    },
+  },
+  {
+    kind: "arrow",
+    update: {
+      kind: "arrow",
+      fromX: 5,
+      fromY: 6,
+      toX: 7,
+      toY: 8,
+    },
+  },
+  {
+    kind: "stroke",
+    update: {
+      kind: "stroke",
+      points: [[5, 6, 0.75]],
+      strokeWidth: 5,
+    },
+  },
+];
+
 describe("PlanAnnotationParsers", () => {
   it.each(annotations)("parses a $kind annotation", (annotation) => {
     expect(PlanAnnotationParsers.DBReadSchema.parse(annotation)).toEqual(
@@ -57,19 +101,34 @@ describe("PlanAnnotationParsers", () => {
     );
   });
 
-  it("converts every parser direction without changing the row", () => {
+  it("converts DB reads without changing the row", () => {
     const annotation = annotations[0]!;
+    expect(PlanAnnotationParsers.fromDBReadToModelRead(annotation)).toEqual(
+      annotation,
+    );
+  });
+
+  it.each(annotations)("preserves every $kind insert field", (annotation) => {
+    expect(PlanAnnotationParsers.fromModelInsertToDBInsert(annotation)).toEqual(
+      annotation,
+    );
+  });
+
+  it.each(variantUpdates)(
+    "preserves every $kind update field",
+    ({ update }) => {
+      expect(PlanAnnotationParsers.fromModelUpdateToDBUpdate(update)).toEqual(
+        update,
+      );
+    },
+  );
+
+  it("preserves shared update fields", () => {
     const update: PlanAnnotation.T<"Update"> = {
       text: "Updated",
       updatedAt: 1_700_000_000_200,
     };
 
-    expect(PlanAnnotationParsers.fromDBReadToModelRead(annotation)).toEqual(
-      annotation,
-    );
-    expect(PlanAnnotationParsers.fromModelInsertToDBInsert(annotation)).toEqual(
-      annotation,
-    );
     expect(PlanAnnotationParsers.fromModelUpdateToDBUpdate(update)).toEqual(
       update,
     );

@@ -47,45 +47,31 @@ const StrokeAnnotationSchema = AnnotationBaseSchema.extend({
   strokeWidth: z.number(),
 }).strict();
 
-const AnnotationSchema = z.discriminatedUnion("kind", [
+const AnnotationSchemas = [
   TextAnnotationSchema,
   StickyAnnotationSchema,
   ArrowAnnotationSchema,
   StrokeAnnotationSchema,
-]);
+] as const;
 
-const AnnotationStorageKeysSchema = AnnotationBaseSchema.extend({
-  kind: z.enum(["text", "sticky", "arrow", "stroke"]),
-  x: z.number().optional(),
-  y: z.number().optional(),
-  fontSize: z.number().optional(),
-  rotation: z.number().optional(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  fromX: z.number().optional(),
-  fromY: z.number().optional(),
-  toX: z.number().optional(),
-  toY: z.number().optional(),
-  points: z
-    .array(z.tuple([z.number(), z.number(), z.number().optional()]))
-    .optional(),
-  strokeWidth: z.number().optional(),
-});
+const DBReadSchema = z.discriminatedUnion("kind", AnnotationSchemas);
 
-const DBReadSchema = Object.assign(AnnotationSchema, {
-  shape: AnnotationStorageKeysSchema.shape,
-});
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+
+const dbKeys = [
+  ...new Set(
+    AnnotationSchemas.flatMap((schema) => {
+      return Object.keys(schema.shape);
+    }),
+  ),
+] as Array<Extract<KeysOfUnion<PlanAnnotationModel["DBRead"]>, string>>;
 
 /** Parser registry for browser-local plan annotations. */
 export const PlanAnnotationParsers =
   makeParserRegistry<PlanAnnotationModel>().build({
     modelName: "PlanAnnotation",
-    DBReadSchema: DBReadSchema as unknown as z.ZodObject<{
-      [K in keyof PlanAnnotationModel["DBRead"]]: z.ZodType<
-        PlanAnnotationModel["DBRead"][K],
-        PlanAnnotationModel["DBRead"][K]
-      >;
-    }>,
+    DBReadSchema,
+    dbKeys,
     fromDBReadToModelRead: identity,
     fromModelInsertToDBInsert: identity,
     fromModelUpdateToDBUpdate: identity,

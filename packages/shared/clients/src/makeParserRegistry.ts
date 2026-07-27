@@ -4,9 +4,21 @@ import { pick } from "@utils/objects/pick/pick.ts";
 import type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { z } from "zod";
 
-type GenericDBReadSchema<M extends CrudModelSpec> = z.ZodObject<{
+type ObjectDBReadSchema<M extends CrudModelSpec> = z.ZodObject<{
   [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
 }>;
+
+type GenericDBReadSchema<M extends CrudModelSpec> = z.ZodType<
+  M["DBRead"],
+  M["DBRead"]
+>;
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+
+type DBReadKey<M extends CrudModelSpec> = Extract<
+  KeysOfUnion<M["DBRead"]>,
+  string
+>;
 
 type CrudTransformerFunctions<M extends CrudModelSpec> = {
   /**
@@ -38,11 +50,26 @@ export type ModelCrudParserRegistry<M extends CrudModelSpec> = {
   DBReadSchema: GenericDBReadSchema<M>;
 } & CrudTransformerFunctions<M>;
 
+type ParserRegistrySchemaConfig<M extends CrudModelSpec> =
+  | {
+      DBReadSchema: ObjectDBReadSchema<M>;
+      dbKeys?: ReadonlyArray<DBReadKey<M>>;
+    }
+  | {
+      DBReadSchema: GenericDBReadSchema<M>;
+      /**
+       * Database keys retained when a non-object schema parses a model union.
+       *
+       * Object schemas derive these keys from their Zod shape automatically.
+       */
+      dbKeys: ReadonlyArray<DBReadKey<M>>;
+    };
+
 type ParserRegistryBuilderFn<M extends CrudModelSpec> = (
   config: {
     modelName: M["modelName"];
-    DBReadSchema: GenericDBReadSchema<M>;
-  } & CrudTransformerFunctions<M>,
+  } & ParserRegistrySchemaConfig<M> &
+    CrudTransformerFunctions<M>,
 ) => ModelCrudParserRegistry<M>;
 
 /**
@@ -82,10 +109,14 @@ export function makeParserRegistry<M extends CrudModelSpec = never>(): {
     build: (
       config: {
         modelName: M["modelName"];
-        DBReadSchema: GenericDBReadSchema<M>;
-      } & CrudTransformerFunctions<M>,
+      } & ParserRegistrySchemaConfig<M> &
+        CrudTransformerFunctions<M>,
     ): ModelCrudParserRegistry<M> => {
-      const dbKeys = objectKeys(config.DBReadSchema.shape);
+      const dbKeys: ReadonlyArray<DBReadKey<M>> =
+        config.dbKeys ??
+        (objectKeys(
+          (config.DBReadSchema as ObjectDBReadSchema<M>).shape,
+        ) as unknown as Array<DBReadKey<M>>);
 
       return {
         ...config,
