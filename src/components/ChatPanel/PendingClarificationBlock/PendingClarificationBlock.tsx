@@ -3,19 +3,20 @@ import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { useCallback } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import {
   clarificationAnswerNeedsCrossBoundary,
   formatClarificationAnswerForThread,
 } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
 import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
 /**
  * Renders the pending clarification prompt above the composer.
@@ -92,8 +93,8 @@ export function PendingClarificationBlock(): React.ReactNode {
         if (!result.approved) {
           const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
           if (auditId) {
-            await ClarificationAuditLog.recordOutcome({
-              id: auditId,
+            await ClarificationAuditEntryClient.recordOutcome({
+              id: auditId as ClarificationAuditEntry.Id,
               outcome: "cancelled",
             });
           }
@@ -119,8 +120,8 @@ export function PendingClarificationBlock(): React.ReactNode {
         if (!result.approved) {
           const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
           if (auditId) {
-            await ClarificationAuditLog.recordOutcome({
-              id: auditId,
+            await ClarificationAuditEntryClient.recordOutcome({
+              id: auditId as ClarificationAuditEntry.Id,
               outcome: "cancelled",
             });
           }
@@ -141,8 +142,8 @@ export function PendingClarificationBlock(): React.ReactNode {
 
     const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
     if (auditId) {
-      await ClarificationAuditLog.recordOutcome({
-        id: auditId,
+      await ClarificationAuditEntryClient.recordOutcome({
+        id: auditId as ClarificationAuditEntry.Id,
         outcome: "answered",
       });
     }

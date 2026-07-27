@@ -15,20 +15,19 @@ import {
 import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ClarificationAuditLog } from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
-import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
+import { useMemo, useState } from "react";
+import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
+import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type {
-  ClarificationAuditEntry,
-  ClarificationOutcome,
-} from "@/components/privacy/privacy-helpers/ClarificationAuditLog";
-import type { ConsentAuditEntry } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
-type FilterValue = "all" | ConsentAuditEntry["decision"];
+type FilterValue = "all" | ConsentAuditEntry.T["decision"];
+type ClarificationOutcome = ClarificationAuditEntry.T["outcome"];
 
 /** Returns localized labels for consent decisions. */
-function useDecisionLabels(): Record<ConsentAuditEntry["decision"], string> {
+function useDecisionLabels(): Record<ConsentAuditEntry.T["decision"], string> {
   const { t } = useLingui();
   return {
     approved: t`Approved`,
@@ -38,7 +37,7 @@ function useDecisionLabels(): Record<ConsentAuditEntry["decision"], string> {
   };
 }
 
-const DECISION_COLOR: Record<ConsentAuditEntry["decision"], string> = {
+const DECISION_COLOR: Record<ConsentAuditEntry.T["decision"], string> = {
   approved: "green",
   used_suggestion: "blue",
   cancelled: "gray",
@@ -46,7 +45,7 @@ const DECISION_COLOR: Record<ConsentAuditEntry["decision"], string> = {
 };
 
 /** Returns localized labels for consent contexts. */
-function useContextLabels(): Record<ConsentAuditEntry["context"], string> {
+function useContextLabels(): Record<ConsentAuditEntry.T["context"], string> {
   const { t } = useLingui();
   return {
     user_message_text: t`Chat message`,
@@ -85,26 +84,19 @@ export function PrivacyLogTab(): React.ReactNode {
 function ConsentLogPanel(): React.ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
+  const [entries = [], isLoading] = ConsentAuditEntryClient.useListConsentLog({
+    workspaceId: workspace.id,
+  });
+  const [clearConsentLog] = ConsentAuditEntryClient.useClearConsentLog({
+    queryToInvalidate: ConsentAuditEntryClient.QueryKeys.listConsentLog({
+      workspaceId: workspace.id,
+    }),
+  });
   const [filter, setFilter] = useState<FilterValue>("all");
   const decisionLabels = useDecisionLabels();
   const contextLabels = useContextLabels();
 
-  const load = useCallback(async (): Promise<void> => {
-    const rows = await ConsentAuditLog.listConsentLog({
-      workspaceId: workspace.id,
-    });
-    setEntries(rows);
-  }, [workspace.id]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
   const filtered = useMemo(() => {
-    if (!entries) {
-      return null;
-    }
     if (filter === "all") {
       return entries;
     }
@@ -114,10 +106,10 @@ function ConsentLogPanel(): React.ReactNode {
   }, [entries, filter]);
 
   const downloadCsv = (): void => {
-    if (!entries || entries.length === 0) {
+    if (entries.length === 0) {
       return;
     }
-    const csv = ConsentAuditLog.consentLogToCsv(entries);
+    const csv = buildConsentAuditCsv(entries);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -141,14 +133,13 @@ function ConsentLogPanel(): React.ReactNode {
       labels: { confirm: t`Clear log`, cancel: t`Cancel` },
       confirmProps: { color: "red" },
       onConfirm: async () => {
-        await ConsentAuditLog.clearConsentLog();
-        await load();
+        await clearConsentLog(undefined);
         notifySuccess(t`Privacy log cleared.`);
       },
     });
   };
 
-  if (entries === null) {
+  if (isLoading) {
     return (
       <Group justify="center" py="xl">
         <Loader />
@@ -212,7 +203,7 @@ function ConsentLogPanel(): React.ReactNode {
         </Group>
       </Group>
 
-      {filtered && filtered.length === 0 ?
+      {filtered.length === 0 ?
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
             <Trans>
@@ -242,7 +233,7 @@ function ConsentLogPanel(): React.ReactNode {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {(filtered ?? []).map((entry) => {
+            {filtered.map((entry) => {
               return (
                 <Table.Tr key={entry.id}>
                   <Table.Td>
@@ -352,27 +343,12 @@ function ClarificationLogPanel(): React.ReactNode {
   const workspace = useCurrentWorkspace();
   const outcomeLabels = useOutcomeLabels();
   const legacyOutcomeLabels = useLegacyOutcomeLabels();
-  const [entries, setEntries] = useState<ClarificationAuditEntry[] | null>(
-    null,
-  );
+  const [entries = [], isLoading] =
+    ClarificationAuditEntryClient.useListClarificationLog({
+      arg: workspace.id,
+    });
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load(): Promise<void> {
-      const rows = await ClarificationAuditLog.listClarificationLog(
-        workspace.id,
-      );
-      if (!cancelled) {
-        setEntries(rows);
-      }
-    }
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [workspace.id]);
-
-  if (entries === null) {
+  if (isLoading) {
     return (
       <Group justify="center" py="xl">
         <Loader />

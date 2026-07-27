@@ -1,8 +1,8 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
+import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient";
 import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
-import { ConsentAuditLog } from "@/components/privacy/privacy-helpers/ConsentAuditLog";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
@@ -125,7 +125,7 @@ export async function crossBoundary(
   // Clean send when there is nothing to flag.
   if (mode === null) {
     const ackToken = await _mintAckFor(req, req.text ?? "");
-    await ConsentAuditLog.recordConsentDecision({
+    await ConsentAuditEntryClient.recordConsentDecision({
       workspaceId: req.workspaceId,
       userId: req.userId,
       context: req.context,
@@ -161,7 +161,7 @@ export async function crossBoundary(
   });
 
   if (decision.action === "cancel") {
-    await ConsentAuditLog.recordConsentDecision({
+    await ConsentAuditEntryClient.recordConsentDecision({
       workspaceId: req.workspaceId,
       userId: req.userId,
       context: req.context,
@@ -190,7 +190,7 @@ export async function crossBoundary(
 
   const ackToken = await _mintAckFor(req, finalText ?? "");
 
-  await ConsentAuditLog.recordConsentDecision({
+  await ConsentAuditEntryClient.recordConsentDecision({
     workspaceId: req.workspaceId,
     userId: req.userId,
     context: req.context,
