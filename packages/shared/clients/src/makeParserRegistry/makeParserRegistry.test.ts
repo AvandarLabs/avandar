@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "./makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
