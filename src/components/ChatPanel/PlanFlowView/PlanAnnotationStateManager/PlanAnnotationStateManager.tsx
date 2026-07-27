@@ -1,5 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
+import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 
 /**
  * Canvas Annotation + Export.
@@ -21,58 +22,7 @@ import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/c
  * the plan clears the redo stack too.
  */
 
-export type AnnotationKind = "text" | "sticky" | "arrow" | "stroke";
-
-export type AnnotationBase = {
-  id: string;
-  /** Plan this annotation belongs to. */
-  planId: string;
-  createdAt: number;
-  updatedAt: number;
-  /** Optional plain text label / content. */
-  text?: string;
-  /** Colour as a CSS string. Default is theme-aware. */
-  color?: string;
-};
-
-export type TextAnnotation = AnnotationBase & {
-  kind: "text";
-  x: number;
-  y: number;
-  fontSize: number;
-  /** Rotation in degrees. */
-  rotation?: number;
-};
-
-export type StickyAnnotation = AnnotationBase & {
-  kind: "sticky";
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type ArrowAnnotation = AnnotationBase & {
-  kind: "arrow";
-  fromX: number;
-  fromY: number;
-  toX: number;
-  toY: number;
-};
-
-export type StrokeAnnotation = AnnotationBase & {
-  kind: "stroke";
-  /** Raw pointer samples; smoothed by perfect-freehand at render. */
-  points: Array<[number, number, number?]>;
-  strokeWidth: number;
-};
-
-export type Annotation =
-  | TextAnnotation
-  | StickyAnnotation
-  | ArrowAnnotation
-  | StrokeAnnotation;
-
+/** Interaction tools available on the plan annotation canvas. */
 export type AnnotationTool =
   | "pan"
   | "text"
@@ -83,17 +33,18 @@ export type AnnotationTool =
 
 const HISTORY_CAP = 50;
 
+/** In-memory editing state for annotations across loaded plans. */
 export type PlanAnnotationState = {
   /** All annotations across all plans, keyed by id. Filter by planId. */
-  annotations: Record<string, Annotation>;
+  annotations: Record<string, PlanAnnotation.T>;
   /** Active drawing tool. */
   activeTool: AnnotationTool;
   /** Currently selected annotation id (for delete + edit). */
-  selectedId: string | undefined;
+  selectedId: PlanAnnotation.Id | undefined;
   /** Undo stack: snapshots of `annotations` before each mutation. */
-  undoStack: ReadonlyArray<Record<string, Annotation>>;
+  undoStack: ReadonlyArray<Record<string, PlanAnnotation.T>>;
   /** Redo stack: snapshots produced by `undo`. */
-  redoStack: ReadonlyArray<Record<string, Annotation>>;
+  redoStack: ReadonlyArray<Record<string, PlanAnnotation.T>>;
 };
 
 const initialState: PlanAnnotationState = {
@@ -105,9 +56,9 @@ const initialState: PlanAnnotationState = {
 };
 
 function _push(
-  history: ReadonlyArray<Record<string, Annotation>>,
-  next: Record<string, Annotation>,
-): ReadonlyArray<Record<string, Annotation>> {
+  history: ReadonlyArray<Record<string, PlanAnnotation.T>>,
+  next: Record<string, PlanAnnotation.T>,
+): ReadonlyArray<Record<string, PlanAnnotation.T>> {
   const updated = [...history, next];
   if (updated.length > HISTORY_CAP) {
     return updated.slice(updated.length - HISTORY_CAP);
@@ -115,6 +66,7 @@ function _push(
   return updated;
 }
 
+/** State manager for plan annotation editing, selection, and history. */
 export const PlanAnnotationStateManager = createAppStateManager({
   name: "ChatPlanAnnotations",
   initialState,
@@ -128,17 +80,19 @@ export const PlanAnnotationStateManager = createAppStateManager({
 
     selectAnnotation: (
       state: PlanAnnotationState,
-      id?: string,
+      id?: PlanAnnotation.Id,
     ): PlanAnnotationState => {
       return { ...state, selectedId: id };
     },
 
     addAnnotation: (
       state: PlanAnnotationState,
-      args: { annotation: Omit<Annotation, "id" | "createdAt" | "updatedAt"> },
+      args: {
+        annotation: Omit<PlanAnnotation.T, "id" | "createdAt" | "updatedAt">;
+      },
     ): PlanAnnotationState => {
       const now = Date.now();
-      const id = uuid();
+      const id = uuid() as PlanAnnotation.Id;
       // The discriminated union doesn't survive object spread without
       // a deliberate cast through unknown; we trust the caller's
       // `args.annotation.kind` to be consistent with its other fields.
@@ -147,7 +101,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
         id,
         createdAt: now,
         updatedAt: now,
-      } as unknown as Annotation;
+      } as unknown as PlanAnnotation.T;
       return {
         ...state,
         annotations: { ...state.annotations, [id]: nextState },
@@ -159,7 +113,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
 
     updateAnnotation: (
       state: PlanAnnotationState,
-      args: { id: string; patch: Partial<Annotation> },
+      args: { id: PlanAnnotation.Id; patch: Partial<PlanAnnotation.T> },
     ): PlanAnnotationState => {
       const existing = state.annotations[args.id];
       if (!existing) {
@@ -169,7 +123,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
         ...existing,
         ...args.patch,
         updatedAt: Date.now(),
-      } as Annotation;
+      } as PlanAnnotation.T;
       return {
         ...state,
         annotations: { ...state.annotations, [args.id]: nextState },
@@ -180,7 +134,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
 
     deleteAnnotation: (
       state: PlanAnnotationState,
-      id: string,
+      id: PlanAnnotation.Id,
     ): PlanAnnotationState => {
       if (!state.annotations[id]) {
         return state;
@@ -227,7 +181,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
      */
     loadAnnotations: (
       state: PlanAnnotationState,
-      args: { planId: string; annotations: Annotation[] },
+      args: { planId: string; annotations: PlanAnnotation.T[] },
     ): PlanAnnotationState => {
       // Strip any annotations that don't belong to other plans we
       // still have loaded.
@@ -236,7 +190,7 @@ export const PlanAnnotationStateManager = createAppStateManager({
           return a.planId !== args.planId;
         }),
       );
-      const merged: Record<string, Annotation> = {
+      const merged: Record<string, PlanAnnotation.T> = {
         ...kept,
         ...Object.fromEntries(
           args.annotations.map((a) => {

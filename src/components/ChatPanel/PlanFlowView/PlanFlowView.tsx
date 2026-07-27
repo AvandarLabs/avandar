@@ -2,9 +2,9 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { PlanAnnotationClient } from "@/clients/chat/PlanAnnotationClient";
 import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/layoutPlan/layoutPlan";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
-import { PlanAnnotationStorage } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStorage";
 import {
   exportPlanCanvasAsPdf,
   exportPlanCanvasAsPng,
@@ -143,7 +143,7 @@ function PlanFlowCanvas(): React.ReactNode {
       // Wipe annotations + branches in IndexedDB + memory.
       annotationDispatch.clearPlanAnnotations(planId);
       try {
-        await PlanAnnotationStorage.clearAnnotationsForPlan(planId);
+        await PlanAnnotationClient.clearAnnotationsForPlan(planId);
       } catch {
         // best-effort
       }
@@ -178,8 +178,10 @@ function PlanFlowCanvas(): React.ReactNode {
     [branchDispatch],
   );
 
-  // Annotation persistence: load on plan mount, save on every
-  // annotation change for the active plan.
+  // Annotation persistence: load once on each plan switch, then save every
+  // annotation change for the active plan. This remains imperative because a
+  // subscribed query could refetch and merge stale persisted rows over newer
+  // in-memory edits.
   useEffect(
     function loadPlanAnnotations() {
       if (!planId) {
@@ -189,7 +191,7 @@ function PlanFlowCanvas(): React.ReactNode {
       void (async () => {
         try {
           const loaded =
-            await PlanAnnotationStorage.listAnnotationsForPlan(planId);
+            await PlanAnnotationClient.listAnnotationsForPlan(planId);
           if (!cancelled && loaded.length > 0) {
             annotationDispatch.loadAnnotations({
               planId,
@@ -220,7 +222,7 @@ function PlanFlowCanvas(): React.ReactNode {
       if (planAnnotations.length === 0) {
         return;
       }
-      void PlanAnnotationStorage.putAnnotations(planAnnotations);
+      void PlanAnnotationClient.putAnnotations(planAnnotations);
     },
     [annotationState.annotations, planId],
   );

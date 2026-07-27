@@ -7,13 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import rough from "roughjs";
 import { activeAnnotationColor } from "@/components/ChatPanel/PlanFlowView/annotationColor";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
-import type {
-  Annotation,
-  ArrowAnnotation,
-  StickyAnnotation,
-  StrokeAnnotation,
-  TextAnnotation,
-} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
+import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 
 /**
  * Annotation overlay rendered on top of the xyflow canvas.
@@ -112,7 +106,7 @@ export function PlanAnnotationOverlay({
         const text = window.prompt(t`Annotation text`);
         if (text && text.trim().length > 0) {
           const annotation: Omit<
-            TextAnnotation,
+            PlanAnnotation.Text,
             "id" | "createdAt" | "updatedAt"
           > = {
             kind: "text",
@@ -129,7 +123,7 @@ export function PlanAnnotationOverlay({
         const text = window.prompt(t`Sticky note`);
         if (text && text.trim().length > 0) {
           const annotation: Omit<
-            StickyAnnotation,
+            PlanAnnotation.Sticky,
             "id" | "createdAt" | "updatedAt"
           > = {
             kind: "sticky",
@@ -171,7 +165,7 @@ export function PlanAnnotationOverlay({
       const [x, y] = screenToCanvas(e.clientX, e.clientY);
       if (tool === "arrow" && arrowStart) {
         const annotation: Omit<
-          ArrowAnnotation,
+          PlanAnnotation.Arrow,
           "id" | "createdAt" | "updatedAt"
         > = {
           kind: "arrow",
@@ -187,7 +181,7 @@ export function PlanAnnotationOverlay({
       } else if (tool === "pen" && strokeInProgress) {
         if (strokeInProgress.length >= 2) {
           const annotation: Omit<
-            StrokeAnnotation,
+            PlanAnnotation.Stroke,
             "id" | "createdAt" | "updatedAt"
           > = {
             kind: "stroke",
@@ -294,7 +288,7 @@ function AnnotationRenderer({
   isPanMode,
   isEraseMode,
 }: {
-  annotation: Annotation;
+  annotation: PlanAnnotation.T;
   isSelected: boolean;
   onSelect: () => void;
   onDelete: () => void;
@@ -423,7 +417,7 @@ function ArrowRender({
   isPanMode,
   onDelete,
 }: {
-  annotation: ArrowAnnotation;
+  annotation: PlanAnnotation.Arrow;
   isSelected: boolean;
   onClick: (e: React.MouseEvent | React.KeyboardEvent) => void;
   isPanMode: boolean;
@@ -590,7 +584,7 @@ function StrokeWrapper({
   isPanMode,
   onDelete,
 }: {
-  annotation: StrokeAnnotation;
+  annotation: PlanAnnotation.Stroke;
   isSelected: boolean;
   onClick: (e: React.MouseEvent | React.KeyboardEvent) => void;
   isPanMode: boolean;

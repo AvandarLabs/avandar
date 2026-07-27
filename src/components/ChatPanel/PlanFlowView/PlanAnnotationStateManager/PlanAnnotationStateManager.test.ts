@@ -1,10 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
+import { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
 import { act, renderHook } from "@/test-utils";
-import type {
-  Annotation,
-  TextAnnotation,
-} from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager/PlanAnnotationStateManager";
 
 function setup() {
   return renderHook(
@@ -15,8 +12,11 @@ function setup() {
   );
 }
 
-type NewAnnotation = Omit<Annotation, "id" | "createdAt" | "updatedAt">;
-type NewTextAnnotation = Omit<TextAnnotation, "id" | "createdAt" | "updatedAt">;
+type NewAnnotation = Omit<PlanAnnotation.T, "id" | "createdAt" | "updatedAt">;
+type NewTextAnnotation = Omit<
+  PlanAnnotation.Text,
+  "id" | "createdAt" | "updatedAt"
+>;
 
 function textAnnotation(args: {
   planId: string;
