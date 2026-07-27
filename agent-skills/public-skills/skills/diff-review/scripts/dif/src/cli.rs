@@ -6,6 +6,7 @@
 //! [`crate::git::resolve_comparison_key`].
 
 use clap::{Args, Parser, Subcommand};
+use std::ffi::OsString;
 
 /// Review a local diff in difit as a live conversation with an LLM.
 #[derive(Debug, Parser)]
@@ -56,10 +57,31 @@ pub enum ConfigAction {
 }
 
 impl Cli {
+    /// Parse from an argument iterator, accepting `-cx` as `--codex`.
+    pub fn try_parse_from<I, T>(args: I) -> Result<Self, clap::Error>
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<OsString>,
+    {
+        <Self as Parser>::try_parse_from(args.into_iter().map(normalize_arg))
+    }
+
     /// Parse from the process arguments.
     #[must_use]
     pub fn parse_args() -> Self {
-        Self::parse()
+        Self::try_parse_from(std::env::args_os()).unwrap_or_else(|err| err.exit())
+    }
+}
+
+fn normalize_arg<T>(arg: T) -> OsString
+where
+    T: Into<OsString>,
+{
+    let arg = arg.into();
+    if arg == "-cx" {
+        OsString::from("--codex")
+    } else {
+        arg
     }
 }
 
@@ -88,6 +110,13 @@ mod tests {
     #[test]
     fn codex_flag_selects_codex_for_review() {
         let cli = Cli::try_parse_from(["dif", "develop", "--codex"]).expect("parse");
+        assert!(cli.codex);
+        assert_eq!(cli.comparison_key.as_deref(), Some("develop"));
+    }
+
+    #[test]
+    fn codex_short_alias_selects_codex_for_review() {
+        let cli = Cli::try_parse_from(["dif", "develop", "-cx"]).expect("parse");
         assert!(cli.codex);
         assert_eq!(cli.comparison_key.as_deref(), Some("develop"));
     }

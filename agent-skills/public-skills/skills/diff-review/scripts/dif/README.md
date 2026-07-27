@@ -7,7 +7,7 @@ directory). It opens a two-pane terminal shell:
 - **Left: difit:** the difit server's log, or a waiting status while the LLM
   prepares the first review. The diff itself is reviewed in the browser shell
   once difit starts.
-- **Right: Claude/Codex:** Claude by default, or Codex with `--codex`.
+- **Right: Claude/Codex:** Claude by default, or Codex with `--codex` or `-cx`.
 
 A background thread polls difit for new reviewer comments. Each new comment is
 typed into the LLM pane automatically; the agent addresses it and POSTs its
@@ -20,6 +20,7 @@ dif <branch>         # vs <branch>
 dif .                # uncommitted worktree changes
 dif staged|working   # staged / working tree
 dif <branch> --codex # use Codex instead of Claude
+dif <branch> -cx     # short alias for --codex
 ```
 
 | Key | Action |
