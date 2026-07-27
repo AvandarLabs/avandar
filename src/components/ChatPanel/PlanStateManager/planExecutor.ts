@@ -1,7 +1,7 @@
 import { makeIdLookupMap } from "@utils";
+import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/PlanStepStorage";
 import {
   findAffectedDownstream,
   isSchemaDrift,
@@ -13,7 +13,7 @@ import type {
   PlanNode,
   PlanStateManager,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
-import type { PlanStepBlob } from "@/components/ChatPanel/PlanStateManager/PlanStepStorage";
+import type { PlanStepBlob } from "@/models/chat/PlanStepBlob/PlanStepBlob";
 import type { SandboxRuntime } from "@/sandbox/SandboxProtocol";
 import type * as duckdb from "@duckdb/duckdb-wasm";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -179,7 +179,7 @@ export async function executePlanStep(args: {
         duckDbConnection ?
           await materializeParquet(duckDbConnection)
         : await DuckDbClient.withConnection(materializeParquet);
-      await PlanStepStorage.putPlanStepBlob({
+      await PlanStepBlobClient.putPlanStepBlob({
         planId,
         stepId: step.id,
         parquet: parquetBlob,
@@ -293,7 +293,7 @@ async function _executeSandboxStep(args: {
     // Persist to IndexedDB so the analysis is reloadable across page
     // refreshes: same pattern as SQL steps.
     try {
-      await PlanStepStorage.putPlanStepBlob({
+      await PlanStepBlobClient.putPlanStepBlob({
         planId,
         stepId: step.id,
         parquet: resultBlob,
@@ -468,7 +468,7 @@ export async function dropPlanTempViews(args: {
   }
   if (args.planId) {
     try {
-      await PlanStepStorage.clearPlanStepBlobs(args.planId);
+      await PlanStepBlobClient.clearPlanStepBlobs(args.planId);
     } catch {
       // Swallow.
     }
@@ -478,7 +478,7 @@ export async function dropPlanTempViews(args: {
 /**
  * Reload a previously-materialised plan from IndexedDB into DuckDB.
  *
- * Reads each step's parquet blob from `PlanStepStorage` and registers
+ * Reads each step's persisted parquet Blob and registers
  * a fresh temp view (`step_<id>`) for it. Returns the rehydrated
  * `actualSchema` / `rowCount` per step so the caller can dispatch
  * `markStepSucceeded` on the plan state.
@@ -487,9 +487,11 @@ export async function dropPlanTempViews(args: {
  *   - The user re-opens a virtual dataset that was saved with a plan
  *   - A page reload brings the plan back from local storage
  */
-export async function rehydratePlanStep(args: { blob: PlanStepBlob }): Promise<{
+export async function rehydratePlanStep(args: {
+  blob: PlanStepBlob.T;
+}): Promise<{
   viewName: string;
-  schema: PlanStepBlob["schema"];
+  schema: PlanStepBlob.T["schema"];
   rowCount: number;
 }> {
   const { blob } = args;

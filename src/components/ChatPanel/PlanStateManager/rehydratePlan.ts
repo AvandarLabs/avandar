@@ -1,10 +1,10 @@
 import { makeMap } from "@utils";
+import { PlanStepBlobClient } from "@/clients/chat/PlanStepBlobClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   rehydratePlanStep,
   stepViewName,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import { PlanStepStorage } from "@/components/ChatPanel/PlanStateManager/PlanStepStorage";
 import type {
   PlanStateManager,
   PlanStepStatus,
@@ -34,7 +34,7 @@ export async function rehydratePlan(args: {
     }),
   });
 
-  const existingBlobs = await PlanStepStorage.listPlanStepBlobs(planId);
+  const existingBlobs = await PlanStepBlobClient.listPlanStepBlobs(planId);
   const blobsByStep = makeMap(existingBlobs, { key: "stepId" });
 
   // Step 2 + 3: re-register parquet blobs we already have, run SQL
@@ -93,7 +93,7 @@ export async function rehydratePlan(args: {
           `SELECT * FROM "${viewName}"`,
           { returnType: "parquet" },
         );
-        await PlanStepStorage.putPlanStepBlob({
+        await PlanStepBlobClient.putPlanStepBlob({
           planId,
           stepId: step.id,
           parquet: parquetBlob,
