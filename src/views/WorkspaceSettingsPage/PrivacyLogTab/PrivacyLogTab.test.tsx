@@ -1,28 +1,44 @@
 import { fireEvent } from "@testing-library/react";
+import { modals } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient";
 import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { render, screen, waitFor, within } from "@/test-utils";
+import { render, screen } from "@/test-utils";
 import { PrivacyLogTab } from "./PrivacyLogTab";
 import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const {
   clearConsentLogMock,
+  clearConsentLogAsyncMock,
   listConsentLogQueryKeyMock,
+  notifySuccessMock,
   useClearConsentLogMock,
   useListClarificationLogMock,
   useListConsentLogMock,
   buildConsentAuditCsvMock,
 } = vi.hoisted(() => {
+  const clearConsentLogAsync = vi.fn();
   return {
-    clearConsentLogMock: vi.fn().mockResolvedValue(undefined),
+    clearConsentLogMock: Object.assign(vi.fn(), {
+      async: clearConsentLogAsync,
+    }),
+    clearConsentLogAsyncMock: clearConsentLogAsync,
     listConsentLogQueryKeyMock: vi.fn().mockReturnValue(["consent-log"]),
+    notifySuccessMock: vi.fn(),
     useClearConsentLogMock: vi.fn(),
     useListClarificationLogMock: vi.fn(),
     useListConsentLogMock: vi.fn(),
     buildConsentAuditCsvMock: vi.fn().mockReturnValue("audit,csv"),
+  };
+});
+
+vi.mock("@ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@ui")>();
+  return {
+    ...actual,
+    notifySuccess: notifySuccessMock,
   };
 });
 
@@ -87,12 +103,22 @@ const consentEntry = {
 } satisfies ConsentAuditEntry.T;
 
 describe("PrivacyLogTab", () => {
+  let confirmModalOptions:
+    | Parameters<typeof modals.openConfirmModal>[0]
+    | undefined;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    confirmModalOptions = undefined;
     vi.mocked(useCurrentWorkspace).mockReturnValue(workspace);
     useListConsentLogMock.mockReturnValue([[consentEntry], false]);
     useListClarificationLogMock.mockReturnValue([[], false]);
     useClearConsentLogMock.mockReturnValue([clearConsentLogMock, false]);
+    clearConsentLogAsyncMock.mockResolvedValue(undefined);
+    vi.spyOn(modals, "openConfirmModal").mockImplementation((options) => {
+      confirmModalOptions = options;
+      return "clear-consent-log";
+    });
     vi.stubGlobal("URL", {
       createObjectURL: vi.fn().mockReturnValue("blob:audit"),
       revokeObjectURL: vi.fn(),
@@ -115,21 +141,41 @@ describe("PrivacyLogTab", () => {
     });
   });
 
-  it("clears consent entries through a mutation that invalidates the active query", async () => {
+  it("waits for the clear mutation before reporting success", async () => {
+    let resolveClearMutation!: () => void;
+    clearConsentLogAsyncMock.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveClearMutation = resolve;
+      }),
+    );
     render(<PrivacyLogTab />);
 
     fireEvent.click(screen.getByRole("button", { name: "Clear log" }));
-    const dialog = await screen.findByRole("dialog", {
-      name: "Clear privacy log",
-    });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Clear log" }));
+    const confirmationPromise = confirmModalOptions?.onConfirm?.();
 
-    await waitFor(() => {
-      expect(clearConsentLogMock).toHaveBeenCalledTimes(1);
-    });
+    expect(clearConsentLogAsyncMock).toHaveBeenCalledWith(undefined);
+    expect(clearConsentLogMock).not.toHaveBeenCalled();
+    expect(notifySuccessMock).not.toHaveBeenCalled();
     expect(ConsentAuditEntryClient.useClearConsentLog).toHaveBeenCalledWith({
       queryToInvalidate: ["consent-log"],
     });
+
+    resolveClearMutation();
+    await confirmationPromise;
+
+    expect(notifySuccessMock).toHaveBeenCalledWith("Privacy log cleared.");
+  });
+
+  it("does not report success when clearing the consent log fails", async () => {
+    clearConsentLogAsyncMock.mockRejectedValue(new Error("clear failed"));
+    render(<PrivacyLogTab />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear log" }));
+
+    await expect(confirmModalOptions?.onConfirm?.()).rejects.toThrow(
+      "clear failed",
+    );
+    expect(notifySuccessMock).not.toHaveBeenCalled();
   });
 
   it("builds the CSV from consent entries returned by the list hook", () => {

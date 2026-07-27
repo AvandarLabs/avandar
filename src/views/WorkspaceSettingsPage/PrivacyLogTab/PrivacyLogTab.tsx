@@ -133,7 +133,7 @@ function ConsentLogPanel(): React.ReactNode {
       labels: { confirm: t`Clear log`, cancel: t`Cancel` },
       confirmProps: { color: "red" },
       onConfirm: async () => {
-        await clearConsentLog(undefined);
+        await clearConsentLog.async(undefined);
         notifySuccess(t`Privacy log cleared.`);
       },
     });
