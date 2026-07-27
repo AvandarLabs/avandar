@@ -70,7 +70,7 @@ import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
 import type { ConsentAuditEntry } from "./ConsentAuditEntry";
 
 const row: ConsentAuditEntry.T = {
-  id: "consent-1" as ConsentAuditEntry.Id,
+  id: "00000000-0000-4000-8000-000000000001" as ConsentAuditEntry.Id,
   workspaceId: "workspace-1",
   userId: "user-1",
   threadId: null,
@@ -105,7 +105,7 @@ The clarification test follows the same structure with:
 
 ```ts
 const row: ClarificationAuditEntry.T = {
-  id: "clarification-1" as ClarificationAuditEntry.Id,
+  id: "00000000-0000-4000-8000-000000000002" as ClarificationAuditEntry.Id,
   workspaceId: "workspace-1",
   threadId: null,
   timestamp: 1_700_000_000_000,
