@@ -28,8 +28,8 @@ import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { PlanAnnotationModel } from "@/models/chat/PlanAnnotation/PlanAnnotation.types";
-import type { PlanStepBlobModel } from "@/models/chat/PlanStepBlob/PlanStepBlob.types";
+import type { PlanAnnotation } from "@/models/chat/PlanAnnotation/PlanAnnotation";
+import type { PlanStepBlob } from "@/models/chat/PlanStepBlob/PlanStepBlob";
 import type { ClarificationAuditEntryModel } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry.types";
 import type { ConsentAuditEntryModel } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry.types";
 
@@ -56,8 +56,8 @@ type Schemas = {
       LocalPublicDatasetModel,
       ConsentAuditEntryModel,
       ClarificationAuditEntryModel,
-      PlanAnnotationModel,
-      PlanStepBlobModel,
+      PlanAnnotation.Model,
+      PlanStepBlob.Model,
     ];
   };
 };
@@ -213,4 +213,5 @@ const DBDefinitions = [
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
+/** Registry key for the current AvaDexie schema version. */
 export const CURRENT_AVA_DEXIE_VERSION = "v6" as const satisfies keyof Schemas;

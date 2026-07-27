@@ -7,6 +7,9 @@ import type {
 
 /** Namespace entry point for the plan step Blob AvaModel. */
 export namespace PlanStepBlob {
+  /** Dexie CRUD model specification for plan step Blobs. */
+  export type Model = PlanStepBlobModel;
+
   /** A plan step Blob model shape for the requested CRUD operation. */
   export type T<K extends keyof PlanStepBlobModel = "Read"> =
     PlanStepBlobModel[K];

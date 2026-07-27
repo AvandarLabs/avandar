@@ -12,6 +12,9 @@ import type {
 
 /** Namespace entry point for the plan annotation AvaModel. */
 export namespace PlanAnnotation {
+  /** Dexie CRUD model specification for plan annotations. */
+  export type Model = PlanAnnotationModel;
+
   /** A plan annotation model shape for the requested CRUD operation. */
   export type T<K extends keyof PlanAnnotationModel = "Read"> =
     PlanAnnotationModel[K];
