@@ -976,13 +976,17 @@ The verbatim "chat == difit reply" rule applies to **Case A only**.
 
 1. **Locate the live difit server + transcript.** `dif` writes
    `.difit/.session-<branch-slug>-<scope-slug>.json` with `port`, `pid`,
-   `comments_file`, and `comparison_key`. **Read it for the `port` (where you
-   POST the reply) and the `comparison_key` (which sets the commit policy).** The
-   injected prompt no longer carries either, so this file is your source of truth
-   for both. If several `.session-*.json` files exist, pick the one whose
-   `<branch-slug>` matches the current branch. Read the transcript at
-   `comments_file` (mirrored live by `dif`'s poller) once for context — don't
-   re-read mid-work, and **never write it yourself** (the poller owns it).
+   `comments_file`, and `comparison_key`. Read it for the `port` (where you POST
+   the reply) and the comparison identity. The `comparison_key` is not enough
+   to decide the git state when difit's actual arguments can include unstaged
+   and untracked changes independently. **Recover the exact comparison
+   arguments from the command that launched the review or the live process, and
+   record separately whether staged, unstaged, and untracked changes are
+   included. Never infer one category from another.** If several
+   `.session-*.json` files exist, pick the one whose `<branch-slug>` matches the
+   current branch. Read the transcript at `comments_file` (mirrored live by
+   `dif`'s poller) once for context; don't re-read mid-work, and **never write it
+   yourself** (the poller owns it).
 
 2. **Identify what needs a response.** Walk the transcript. For each thread:
    - The thread root and any `claude`-authored replies are *prior context*.
@@ -998,13 +1002,29 @@ The verbatim "chat == difit reply" rule applies to **Case A only**.
    edit** — you just answer it in the reply (step 4). Only edit when the comment
    actually **requests a change**. A comment can be both; handle both halves.
 
-   When a change *is* warranted, make it per the commit policy, which is set by
-   the `comparison_key` in the session file (step 1):
-   - **branch comparison** (`develop` / `main` / `@ …`) → edit the files, run
-     any relevant checks, and **commit** with a focused message naming the
-     comment(s) (e.g. `fix(modal): drop morph fallback per review`).
-   - **`.` / `staged` / `working`** → edit and **fold the change into the
-     existing uncommitted changes. Do not commit.**
+   When a change *is* warranted, make it visible to the same comparison after
+   the review server restarts. Apply this policy from the exact arguments
+   resolved in step 1:
+   - **Neither unstaged nor untracked changes are included** (for example,
+     `pnpm diff-review develop`) → edit the files, run relevant checks, and
+     **commit every comment-addressing change** with a focused message naming
+     the comment(s), such as
+     `fix(modal): drop morph fallback per review`.
+   - **Unstaged changes are included** → tracked edits may remain unstaged.
+     Otherwise, stage every tracked edit before considering the comment
+     addressed.
+   - **Untracked changes are included** → new files may remain untracked.
+     Otherwise, fully stage every new file before considering the comment
+     addressed. `git add -N` is not a substitute for staging it.
+   - **Both unstaged and untracked changes are included** → changes in either
+     category may remain uncommitted and unstaged.
+
+   These categories are independent. A review may include unstaged changes but
+   exclude untracked files, or include untracked files but exclude unstaged
+   changes. In either mixed case, leave only the included category as-is and
+   stage the excluded category. Before replying, inspect `git status` and verify
+   that every file changed for the comment is committed, staged, or deliberately
+   left in a category the exact comparison arguments include.
    Follow the user's normal CLAUDE.md rules (worktree, no force-pushes, etc.).
 
 4. **Compose only the new entries** (not a full transcript). The live endpoint
@@ -1067,8 +1087,14 @@ The verbatim "chat == difit reply" rule applies to **Case A only**.
 - Reusing an `id` that's already in the transcript. dedup keeps the
   existing one; your new content is silently dropped. → Increment the
   round number; use a fresh slug.
-- Committing on a `.`/`staged`/`working` review, or *not* committing on a branch
-  review. → Match the commit policy in step 3.
+- Treating staged, unstaged, and untracked changes as one "working tree"
+  category. Difit can include them independently. → Inspect the exact
+  comparison arguments and apply step 3 to each changed file.
+- Leaving a changed file in a category the review excludes, including using
+  `git add -N` for a new file when untracked changes are excluded. The fix can
+  disappear when the review server restarts. → Fully stage that file, or commit
+  the whole comment-addressing change when neither unstaged nor untracked
+  changes are included.
 - **Declining** to act on a requested change without saying so. If you choose
   *not* to make a change the reviewer asked for, post a reply explaining why —
   otherwise the next round can't tell it was deliberate. (Making the change and
