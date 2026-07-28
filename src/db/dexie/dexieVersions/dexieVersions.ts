@@ -24,7 +24,7 @@ import { prop } from "@utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs/deleteObsoleteIndexedDBs";
+import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
