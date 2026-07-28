@@ -121,7 +121,7 @@ describe("ConsentAuditEntryClient", () => {
       }),
       _createEntry({
         workspaceId: "workspace-1",
-        context: "plan_step_input",
+        context: "discovery_clarification",
         decision: "approved",
       }),
       _createEntry({

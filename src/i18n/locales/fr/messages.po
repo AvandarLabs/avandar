@@ -491,10 +491,6 @@ msgstr "Mise à jour du mot de passe pour {0}"
 msgid "Column info"
 msgstr "Informations sur la colonne"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "Entrée de l'étape du plan"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "Je comprends que ces données seront envoyées au fournisseur d'IA"

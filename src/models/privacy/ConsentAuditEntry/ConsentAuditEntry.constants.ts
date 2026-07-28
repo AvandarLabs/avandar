@@ -10,7 +10,6 @@ export const ConsentDecisionKinds = [
 export const ConsentAuditContexts = [
   "discovery_clarification",
   "generated_sql_assumptions",
-  "plan_step_input",
   "user_message_text",
   "clarification_answer",
 ] as const;

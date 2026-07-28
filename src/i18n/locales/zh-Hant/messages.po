@@ -491,10 +491,6 @@ msgstr "正在更新 {0} 的密碼"
 msgid "Column info"
 msgstr "列信息"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
-msgid "Plan step input"
-msgstr "計劃步驟輸入"
-
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我了解這些數據將發送給 AI 提供者"
