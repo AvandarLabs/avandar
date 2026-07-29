@@ -204,14 +204,4 @@ describe("ClarificationAuditEntryClient", () => {
     expect(update).toHaveBeenCalledOnce();
     expect(recordWarning).toHaveBeenCalledTimes(2);
   });
-
-  it("exposes usable query and mutation hooks", () => {
-    expect(ClarificationAuditEntryClient.useListClarificationLog).toBeTypeOf(
-      "function",
-    );
-    expect(ClarificationAuditEntryClient.useRecordShown).toBeTypeOf("function");
-    expect(ClarificationAuditEntryClient.useRecordOutcome).toBeTypeOf(
-      "function",
-    );
-  });
 });

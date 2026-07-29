@@ -185,12 +185,4 @@ describe("ConsentAuditEntryClient", () => {
 
     expect(await AvaDexie.DB.ConsentAuditEntry.count()).toBe(0);
   });
-
-  it("exposes usable query and mutation hooks", () => {
-    expect(ConsentAuditEntryClient.useListConsentLog).toBeTypeOf("function");
-    expect(ConsentAuditEntryClient.useRecordConsentDecision).toBeTypeOf(
-      "function",
-    );
-    expect(ConsentAuditEntryClient.useClearConsentLog).toBeTypeOf("function");
-  });
 });

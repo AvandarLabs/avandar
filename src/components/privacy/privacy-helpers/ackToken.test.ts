@@ -39,17 +39,8 @@ describe("hashTextPayload", () => {
   });
 });
 
-describe("issueAckToken", () => {
-  // Without mocking the session-secret fetcher we can't actually
-  // mint a token: `issueAckToken` calls `getSessionSecret`, which
-  // hits the `/chat/:workspaceId/session-secret` endpoint. We exercise
-  // the happy-path inside `useAvandarChatRuntime` integration tests
-  // once the test harness can stub the edge function.
-  //
-  // For now we just document the contract: callers must pass
-  // workspaceId + userId + payloadHash. If any are missing TypeScript
-  // catches it at compile time.
-  it("is a function", () => {
-    expect(typeof SessionSecret.issueAckToken).toBe("function");
-  });
-});
+// `issueAckToken` is exercised end-to-end (issue then backend verify) inside
+// the `useAvandarChatRuntime` integration tests once the harness can stub the
+// `/chat/:workspaceId/session-secret` edge function. No unit test here: a bare
+// existence/type check would be tautological (see docs/rules/testing.md).
+describe.todo("issueAckToken: happy-path once the edge function can be stubbed");
