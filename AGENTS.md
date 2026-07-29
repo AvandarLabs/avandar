@@ -100,6 +100,10 @@ Implement functionality using red/green TDD.
 
 [See our SQL rules](docs/rules/sql.md)
 
+## Testing
+
+[See our testing rules](docs/rules/testing.md)
+
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.

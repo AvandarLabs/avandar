@@ -363,6 +363,7 @@ recommendedFix }`. It must not modify code.
 | `react-hooks` | react-hooks-checklist | diff uses hooks |
 | `css-modules` | css-modules-checklist | diff touches `*.module.css` |
 | `sql` | sql-checklist | diff has `.sql` |
+| `tests` | tests-checklist | diff has a `*.test.*` / `*.spec.*` file |
 | `lib:@avandar/utils` | libraries/avandar-utils-checklist | package present |
 | `lib:@avandar/models` | libraries/avandar-models-checklist | package present |
 | `lib:@avandar/modules` | libraries/avandar-modules-checklist | package present |
@@ -629,6 +630,21 @@ SKILL file.
 - **Gate:** the diff includes at least one `.sql` file.
 - **Reference:**
   [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+
+### Phase: tests
+
+- **Gate:** the diff adds or modifies a test file (`*.test.ts`, `*.test.tsx`,
+  `*.spec.ts`, `*.spec.tsx`, or the repo's equivalent unit/integration test
+  naming). This phase reviews the **quality of the test code**, which is
+  separate from **running** the tests (see "Testing At The End Of Review").
+- **Reference:**
+  [`docs/code-reviews/tests-checklist.md`](docs/code-reviews/tests-checklist.md)
+- **Covers:** tautological and assertion-free tests (for example
+  `expect(typeof x).toBe("function")`, which only fails if a symbol is deleted
+  or renamed and stays green through any behavioral break), tests that assert
+  implementation structure instead of observable behavior, placeholder tests,
+  and runtime assertions that only restate what the type system already
+  guarantees.
 
 ## Library-Gated Phases
 
