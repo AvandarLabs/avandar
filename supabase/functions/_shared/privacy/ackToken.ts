@@ -93,11 +93,11 @@ const NONCE_CACHE_TTL_MS = 10 * 60 * 1000;
 
 function _gcNonces(): void {
   const now = Date.now();
-  for (const [nonce, seenAt] of SEEN_NONCES) {
+  SEEN_NONCES.forEach((seenAt, nonce) => {
     if (now - seenAt > NONCE_CACHE_TTL_MS) {
       SEEN_NONCES.delete(nonce);
     }
-  }
+  });
 }
 
 function _base64UrlDecode(input: string): Uint8Array {
