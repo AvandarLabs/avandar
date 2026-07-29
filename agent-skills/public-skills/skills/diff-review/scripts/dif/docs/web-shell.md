@@ -161,11 +161,18 @@ See the design mockup (published separately) for the visual. Principles:
     number/ticket flow inline before the name (not stacked on their own row) to
     spend less vertical space per group.
   - Clicking a **group heading** toggles that group open or closed with an
-    animated accordion. When closed, only the heading row remains visible: no
-    orientation summary and no file rows.
-  - Each expanded group's file list is capped at `45vh` and scrolls
-    independently, keeping the group heading and orientation visible while
-    preserving scroll chaining into the surrounding sidebar.
+    animated accordion (`.grp-body` animates `grid-template-rows` `1fr`↔`0fr`
+    over an inner `overflow:hidden` wrapper, so it eases to the content's real
+    height with no fixed `max-height` to clip a tall group). When closed, only
+    the heading row remains visible: no orientation summary and no file rows.
+  - Each expanded group's file list keeps its **own scroll**, capped at `45vh`
+    (`.files { max-height: 45vh; overflow-y: auto }`), so the heading and
+    orientation stay put while a long list scrolls independently. The
+    grid-template-rows collapse above sizes `.grp-body` to the content's real
+    height, so the parent no longer clips the inner list's final rows the way
+    the old `calc(45vh + 40px)` cap did (that clip was what hid a group's last
+    file). `.side-scroll` also carries extra bottom padding so the sidebar's own
+    last row clears the viewport edge.
   - The collapsed rail, palette, and file rows show filtered difit views in the
     main area.
     Clicking a **file** switches to its group *and* scrolls the main view to

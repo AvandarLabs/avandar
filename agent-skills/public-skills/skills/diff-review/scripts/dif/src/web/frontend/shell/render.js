@@ -68,6 +68,7 @@
         + '<span class="grp-frac">' + (done ? "✓" : rev + "/" + gfiles.length) + '</span>'
         + '</button>';
       h += '<div class="grp-body ' + (collapsed ? "collapsed" : "") + '">';
+      h += '<div class="grp-body-inner">';
       if (g.orient) h += '<div class="grp-orient">' + esc(g.orient) + '</div>';
       h += '<div class="files">';
       gfiles.forEach(function (f) {
@@ -79,7 +80,7 @@
           + '</span>'
           + '</button>';
       });
-      h += '</div></div></div>';
+      h += '</div></div></div></div>';
     });
     els.sideScroll.innerHTML = h;
     Array.prototype.forEach.call(els.sideScroll.querySelectorAll("[data-group-head]"), function (n) {

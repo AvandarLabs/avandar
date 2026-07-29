@@ -329,9 +329,18 @@ The summary tells the reviewer:
    continue mode also: commits made, comments addressed, comments still
    open if any).
 2. Logical groupings of files — group by the underlying concern (a
-   feature, a refactor, a fix). Order groups so earlier ones supply
-   context for later ones. Within a group, order files so a reviewer can
-   read top-to-bottom without back-tracking.
+   feature, a refactor, a fix). **Prefer many small, tightly-scoped groups
+   over a few massive ones.** Each group should be a single constrained
+   logical unit a reviewer can hold in their head, not a grab-bag. When a
+   large group has a natural sub-concern seam (a subsystem, layer, feature
+   area, or directory), split it there and give each part its own group and
+   number. This is a bias, not a hard cap: there is no file-count limit. If
+   a group is genuinely one cohesive unit that splitting would only
+   fragment, leaving it large is correct: do not force an unnatural split
+   just to lower a count. (The `Generated - review not required` catch-all
+   is naturally large and is never split.) Order groups so earlier ones
+   supply context for later ones. Within a group, order files so a reviewer
+   can read top-to-bottom without back-tracking.
 3. Per-file: comment count and a short tag (≤6 words) explaining why
    that file sits in that group.
 4. *Optional* one- or two-sentence file-purpose note beneath a file row
@@ -457,7 +466,10 @@ You own five files:
 present in the diff at that moment. Never omit a file** — not lockfiles, not
 generated output, not binaries. This is a hard rule across all three files
 (`-guide.md`, `-guide.json`, `-reviewed.json`): the group roster is a **complete
-partition** of the diff's files at write time.
+partition** of the diff's files at write time. Do not eyeball this on a large
+diff: `scripts/check-guide-coverage.py` is the deterministic gate and you MUST
+run it until it exits 0 every time you (re)write the guide (see
+[When to (re)write the guide](#when-to-rewrite-the-guide)).
 
 Why: it's what makes the web shell's **"new files not in guide"** signal
 trustworthy. With a complete guide, the only files difit shows that the guide
@@ -491,8 +503,22 @@ it never disappears.)
   request, or after a mark-reviewed request, rewrite the guide from the current
   diff + the reviewed state.
 
-Always run the validator on the transcript as usual; the guide itself is plain
-markdown and needs no validation.
+Always run the validator on the transcript as usual. The guide markdown needs
+no schema validation, but **every time you write or regenerate the guide you
+MUST run the coverage gate** on the `-guide.json` and not finish until it exits
+0:
+
+```bash
+python3 <skill-dir>/scripts/check-guide-coverage.py <guide-json-path> <comparison-key>
+```
+
+It compares the union of every file across the guide's groups against the diff's
+file set and exits non-zero, listing the offenders, if any file is missing from
+the guide or stale in it. This is the deterministic enforcement of the
+[Completeness](#completeness--the-guide-lists-every-file-in-the-diff) rule: do
+not rely on eyeballing 100+ file diffs. If it fails, add the missing files (a
+generated/non-reviewable file goes in the `Generated - review not required`
+group) or drop the stale ones, then re-run until it passes.
 
 ### Guide format
 
@@ -1202,6 +1228,7 @@ For `/diff-review cleanup`:
 | Session metadata | `<repo>/.difit/.session-<branch-slug>-<scope-slug>.json` |
 | Slug rules | `scripts/dif/src/comparison.rs` + `scripts/dif/src/slug.rs` (bundled CLI) |
 | Validate the transcript | `python3 <skill-dir>/scripts/validate.py <path>` |
+| Gate guide coverage (every file grouped) | `python3 <skill-dir>/scripts/check-guide-coverage.py <guide-json-path> <comparison-key>` |
 | Ensure the `diff-review` package.json script | `python3 <skill-dir>/scripts/ensure-command.py` |
 | Detect package manager | `sh <skill-dir>/scripts/detect-pm.sh` |
 | Resolve reviewer handle | `sh <skill-dir>/scripts/get-reviewer-name.sh` (GitHub/git handle, default `reviewer`) |

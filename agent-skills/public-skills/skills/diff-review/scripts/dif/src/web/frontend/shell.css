@@ -459,7 +459,9 @@ kbd {
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1 1 auto;
-  padding: 6px;
+  /* Extra bottom padding so the last group/file row clears the viewport edge
+     and isn't cut off when the list is scrolled to the end. */
+  padding: 6px 6px 24px;
 }
 
 .nav-item {
@@ -654,18 +656,30 @@ kbd {
   padding: 0 10px 6px 36px;
   line-height: 1.4;
 }
+/* Collapse via grid-template-rows 1fr <-> 0fr: animates to the content's real
+   height with no magic max-height, so a tall group is never clipped. The inner
+   wrapper owns the overflow clip during the transition. */
 .grp-body {
-  overflow: hidden;
-  max-height: calc(45vh + 40px);
+  display: grid;
+  grid-template-rows: 1fr;
   opacity: 1;
   transition:
-    max-height 0.2s var(--ease),
+    grid-template-rows 0.2s var(--ease),
     opacity 0.16s var(--ease);
 }
 .grp-body.collapsed {
-  max-height: 0;
+  grid-template-rows: 0fr;
   opacity: 0;
 }
+.grp-body-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+/* Each expanded group keeps its own scroll (capped at 45vh) so the heading and
+   orientation stay put while a long file list scrolls independently. The
+   grid-template-rows collapse above sizes .grp-body to this content instead of
+   a fixed max-height, so the parent no longer clips the inner list's last rows
+   the way the old calc(45vh + 40px) cap did. */
 .files {
   max-height: 45vh;
   overflow-y: auto;
