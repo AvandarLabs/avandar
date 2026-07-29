@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  isValidClarificationOutcome,
-  isValidClarificationResponseShapeLabel,
-} from "./ClarificationAuditEntry";
+import { ClarificationAuditEntry } from "./ClarificationAuditEntry";
 import { ClarificationAuditEntryParsers } from "./ClarificationAuditEntryParsers";
-import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
 
 const row: ClarificationAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000002" as ClarificationAuditEntry.Id,
@@ -25,9 +21,17 @@ const row: ClarificationAuditEntry.T = {
 
 describe("ClarificationAuditEntryParsers", () => {
   it("validates the runtime clarification audit literal unions", () => {
-    expect(isValidClarificationOutcome("answered")).toBe(true);
-    expect(isValidClarificationResponseShapeLabel("free_text")).toBe(true);
-    expect(isValidClarificationOutcome("invalid")).toBe(false);
+    expect(ClarificationAuditEntry.isValidClarificationOutcome("answered")).toBe(
+      true,
+    );
+    expect(
+      ClarificationAuditEntry.isValidClarificationResponseShapeLabel(
+        "free_text",
+      ),
+    ).toBe(true);
+    expect(ClarificationAuditEntry.isValidClarificationOutcome("invalid")).toBe(
+      false,
+    );
   });
 
   it("round trips the Dexie row without changing it", () => {

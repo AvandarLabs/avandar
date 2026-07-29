@@ -1,13 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  isValidConsentAuditContext,
-  isValidConsentAuditMedicalTier,
-  isValidConsentAuditMode,
-  isValidConsentAuditWarning,
-  isValidConsentDecisionKind,
-} from "./ConsentAuditEntry";
+import { ConsentAuditEntry } from "./ConsentAuditEntry";
 import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
-import type { ConsentAuditEntry } from "./ConsentAuditEntry";
 
 const row: ConsentAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000001" as ConsentAuditEntry.Id,
@@ -35,12 +28,16 @@ const row: ConsentAuditEntry.T = {
 
 describe("ConsentAuditEntryParsers", () => {
   it("validates the runtime consent audit literal unions", () => {
-    expect(isValidConsentDecisionKind("approved")).toBe(true);
-    expect(isValidConsentAuditContext("user_message_text")).toBe(true);
-    expect(isValidConsentAuditMode("clean")).toBe(true);
-    expect(isValidConsentAuditWarning("pii")).toBe(true);
-    expect(isValidConsentAuditMedicalTier("column")).toBe(true);
-    expect(isValidConsentDecisionKind("invalid")).toBe(false);
+    expect(ConsentAuditEntry.isValidConsentDecisionKind("approved")).toBe(true);
+    expect(
+      ConsentAuditEntry.isValidConsentAuditContext("user_message_text"),
+    ).toBe(true);
+    expect(ConsentAuditEntry.isValidConsentAuditMode("clean")).toBe(true);
+    expect(ConsentAuditEntry.isValidConsentAuditWarning("pii")).toBe(true);
+    expect(ConsentAuditEntry.isValidConsentAuditMedicalTier("column")).toBe(
+      true,
+    );
+    expect(ConsentAuditEntry.isValidConsentDecisionKind("invalid")).toBe(false);
   });
 
   it("round trips the Dexie row without changing it", () => {

@@ -1,20 +1,10 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-import {
-  ConsentAuditContexts,
-  ConsentAuditMedicalTiers,
-  ConsentAuditModes,
-  ConsentAuditWarnings,
-  ConsentDecisionKinds,
-} from "./ConsentAuditEntry.constants";
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
-  ConsentAuditContext,
   ConsentAuditEntryId,
   ConsentAuditEntryModel,
-  ConsentAuditMedicalTier,
-  ConsentAuditMode,
-  ConsentAuditWarning,
-  ConsentDecisionKind,
 } from "./ConsentAuditEntry.types";
+
+export { ConsentAuditEntryModule as ConsentAuditEntry } from "./ConsentAuditEntryModule";
 
 export {
   ConsentAuditContexts,
@@ -22,42 +12,7 @@ export {
   ConsentAuditModes,
   ConsentAuditWarnings,
   ConsentDecisionKinds,
-};
-
-/** Checks whether a string is a persisted consent decision. */
-export function isValidConsentDecisionKind(
-  value: string,
-): value is ConsentDecisionKind {
-  return (ConsentDecisionKinds as readonly string[]).includes(value);
-}
-
-/** Checks whether a string is a cross-boundary consent context. */
-export function isValidConsentAuditContext(
-  value: string,
-): value is ConsentAuditContext {
-  return (ConsentAuditContexts as readonly string[]).includes(value);
-}
-
-/** Checks whether a string is a persisted consent-modal mode. */
-export function isValidConsentAuditMode(
-  value: string,
-): value is ConsentAuditMode {
-  return (ConsentAuditModes as readonly string[]).includes(value);
-}
-
-/** Checks whether a string is a consent warning category. */
-export function isValidConsentAuditWarning(
-  value: string,
-): value is ConsentAuditWarning {
-  return (ConsentAuditWarnings as readonly string[]).includes(value);
-}
-
-/** Checks whether a string is a medical consent-tier source. */
-export function isValidConsentAuditMedicalTier(
-  value: string,
-): value is ConsentAuditMedicalTier {
-  return (ConsentAuditMedicalTiers as readonly string[]).includes(value);
-}
+} from "./ConsentAuditEntry.constants";
 
 /** Namespace entry point for the consent audit AvaModel. */
 export namespace ConsentAuditEntry {

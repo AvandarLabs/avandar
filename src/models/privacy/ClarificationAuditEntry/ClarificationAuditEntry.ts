@@ -1,32 +1,15 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-import {
-  ClarificationOutcomes,
-  ClarificationResponseShapeLabels,
-} from "./ClarificationAuditEntry.constants";
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
   ClarificationAuditEntryId,
   ClarificationAuditEntryModel,
-  ClarificationOutcome,
-  ClarificationResponseShapeLabel,
 } from "./ClarificationAuditEntry.types";
 
-export { ClarificationOutcomes, ClarificationResponseShapeLabels };
+export { ClarificationAuditEntryModule as ClarificationAuditEntry } from "./ClarificationAuditEntryModule";
 
-/** Checks whether a string is a persisted clarification outcome. */
-export function isValidClarificationOutcome(
-  value: string,
-): value is ClarificationOutcome {
-  return (ClarificationOutcomes as readonly string[]).includes(value);
-}
-
-/** Checks whether a string is a persisted clarification response shape. */
-export function isValidClarificationResponseShapeLabel(
-  value: string,
-): value is ClarificationResponseShapeLabel {
-  return (ClarificationResponseShapeLabels as readonly string[]).includes(
-    value,
-  );
-}
+export {
+  ClarificationOutcomes,
+  ClarificationResponseShapeLabels,
+} from "./ClarificationAuditEntry.constants";
 
 /** Namespace entry point for the clarification audit AvaModel. */
 export namespace ClarificationAuditEntry {
