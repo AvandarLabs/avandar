@@ -25,11 +25,14 @@
   function works. Exception: a function JSDoc may mention complex or
   unconventional architectural/design decisions only when understanding those
   decisions is crucial to developers using the function.
-- File-level JSDoc is fine when it adds context about the whole file's purpose
-  or design. It is complementary documentation, not a replacement for JSDoc on
-  exported members, because IDE intellisense surfaces member comments rather
-  than file headers. When a file-level block is the only documentation for a
-  function, constant, object, or type, add member-level JSDoc too.
+- Do not use file-level comments. A file-level comment is a block comment at
+  the very top of the file that describes the file as a whole rather than a
+  specific member. Document the file's members directly instead: attach JSDoc
+  to each exported member, and fold any whole-file purpose or design context
+  into the JSDoc of the main export (the member the file is named after). The
+  main export must always be documented. IDE intellisense surfaces member
+  comments, not file headers, so a file-level block leaves the real API
+  undocumented in the editor.
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).

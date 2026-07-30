@@ -5,9 +5,9 @@ both block (`/** ... */`) and line (`//`) comments. This applies to
 TypeScript, TSX, JavaScript, JSX, and most C-family languages.
 
 - Use block comments (`/** ... */`) only as documentation attached to an
-  identifier (functions, types, exports, etc.) or as a file-level header.
-  Any comment inside a function body must use `//` line comments, even when
-  it spans multiple lines.
+  identifier (functions, types, exports, etc.). Do not use file-level header
+  comments (see the file-level-comment rule below). Any comment inside a
+  function body must use `//` line comments, even when it spans multiple lines.
 
   This is bad:
 
@@ -65,12 +65,13 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export async function rehydratePlan(options: Options): Promise<void> {}
   ```
 
-- Document exported members directly even when the file also has a file-level
-  block comment. File-level comments are fine when they add whole-file purpose
-  or design context, but they are complementary context, not a substitute for
-  member JSDoc. IDE intellisense surfaces member comments, so exported
-  functions, constants, objects, classes, and types still need their own
-  comments.
+- Do not use file-level comments. A file-level comment is a block comment at
+  the very top of the file that describes the file as a whole rather than a
+  specific member. Document members directly instead: every exported member
+  gets its own JSDoc, and the main export (the member the file is named after)
+  must always be documented. Fold any whole-file purpose or design context into
+  the main export's JSDoc. IDE intellisense surfaces member comments, not file
+  headers, so a file-level block leaves the real API undocumented in the editor.
 
   This is bad:
 
@@ -87,16 +88,13 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   This is good:
 
   ```ts
-  /**
-   * Discovery query helpers shared by client and server validators.
-   */
-
   /** Maximum length accepted for generated discovery queries. */
   export const MAX_QUERY_CHARS = 2000;
 
   /**
-   * Validates a generated discovery query before local execution.
-   * Returns whether the query is read-only.
+   * Validates a generated discovery query before local execution, so the
+   * client and server share one read-only check. Returns whether the query is
+   * read-only.
    */
   export function isReadOnlyDiscoveryQuery(query: string): boolean {}
   ```
