@@ -9,16 +9,21 @@ export function toHex(bytes: Uint8Array): string {
   return out;
 }
 
+/** Encodes bytes as standard padded base64. */
+export function base64Encode(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
+
 /**
  * Encodes bytes as unpadded base64url (`+`/`/` become `-`/`_`, trailing `=`
  * stripped). Used to encode the ack-token header on the issuing (client) side.
  */
 export function base64UrlEncode(bytes: Uint8Array): string {
-  let binary = "";
-  for (const b of bytes) {
-    binary += String.fromCharCode(b);
-  }
-  return btoa(binary)
+  return base64Encode(bytes)
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");

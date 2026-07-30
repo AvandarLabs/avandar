@@ -1,16 +1,8 @@
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
+import { base64Encode } from "$/utils/privacy/sessionSecretUtils.ts";
 import { z } from "zod";
 import type { ChatSessionSecretResponse } from "$/types/chat.types.ts";
-
-function _arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary);
-}
 
 /**
  * Returns the secret used to sign acknowledgements for flagged chat payloads,
@@ -26,7 +18,7 @@ export const GetChatSessionSecret = GET({
     userId: user.id,
   });
   return {
-    sessionSecret: _arrayBufferToBase64(secret),
+    sessionSecret: base64Encode(new Uint8Array(secret)),
     issuedAt: Date.now(),
   };
 });
