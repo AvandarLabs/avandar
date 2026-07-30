@@ -8,7 +8,7 @@ import { resolveRoleGroupIdForAcceptedInvite } from "@sbfn/workspaces/inviteRole
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
-import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types.ts";
+import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 import type {
   AppType,
   RoleLevel,
@@ -21,7 +21,7 @@ const SLUG_MAX_LENGTH = 20;
 /**
  * This is the route handler for all workspaces endpoints.
  */
-export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
+export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
   /**
    * Validate a workspace slug.
    * All error messages use the word "ID" instead of "slug" because the

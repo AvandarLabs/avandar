@@ -1,14 +1,14 @@
-import type { ChatAPI } from "@sbfn/chat/chat.types";
-import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types";
-import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types";
-import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types";
-import type { HealthzAPI } from "@sbfn/healthz/healthz.types";
-import type { PolarPublicAPI } from "@sbfn/polar-public/polar-public.types";
-import type { QueriesAPI } from "@sbfn/queries/queries.types";
-import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.types";
-import type { SupportAPI } from "@sbfn/support/support.routes.types";
-import type { WaitlistAPI } from "@sbfn/waitlist/waitlist.types";
-import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types";
+import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types";
+import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/GoogleAuthCallbackRoutes.types";
+import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types";
+import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types";
+import type { HealthzAPI } from "@sbfn/healthz/HealthzRoutes.types";
+import type { PolarPublicAPI } from "@sbfn/polar-public/PolarPublicRoutes.types";
+import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types";
+import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
+import type { SupportAPI } from "@sbfn/support/SupportRoutes.types";
+import type { WaitlistAPI } from "@sbfn/waitlist/WaitlistRoutes.types";
+import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types";
 import type { Simplify } from "type-fest";
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

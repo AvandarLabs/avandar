@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/chat/Routes.ts";
+import { ChatRoutes } from "@sbfn/chat/ChatRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(ChatRoutes).serve();

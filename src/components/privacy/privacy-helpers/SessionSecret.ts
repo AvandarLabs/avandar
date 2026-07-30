@@ -54,10 +54,10 @@ function _getSessionSecret(workspaceId: Workspace.Id): Promise<CachedSecret> {
 
 /**
  * Client side of the privacy consent ack-token protocol, and the browser
- * counterpart to `supabase/functions/_shared/privacy/ackToken.ts` (the Deno
- * edge verifier). The frontend uses it to prove to the backend that the user
- * saw and approved a specific payload before any private data is forwarded to
- * the LLM. It does two jobs: (1) caches the per-workspace HMAC session secret
+ * counterpart to `supabase/functions/_shared/privacy/verifyAckToken.ts` (the
+ * Deno edge verifier). It proves that the user approved a payload before
+ * private data is forwarded to the LLM. It does two jobs: (1) caches the
+ * per-workspace HMAC session secret
  * fetched from `GET /chat/:workspaceId/session-secret`, held only in memory as
  * a `CryptoKey` (never persisted, so an XSS cannot exfiltrate it), and
  * (2) issues signed ack tokens (`issueAckToken`) and hashes payloads

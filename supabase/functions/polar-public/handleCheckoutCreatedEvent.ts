@@ -1,6 +1,6 @@
 import { webhookSuccessResponse } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { infer as zInfer } from "zod";
-import type { WebhookResponse } from "@sbfn/polar-public/polar-public.types.ts";
+import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type {
   PolarEventDataSchemas,
   PolarWebhookHandlerOptions,

@@ -4,7 +4,7 @@ import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { redirect } from "@sbfn/_shared/MiniServer/redirect.ts";
 import { z } from "zod";
-import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types.ts";
+import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/GoogleAuthCallbackRoutes.types.ts";
 import type { TokenPayload } from "google-auth-library";
 
 const GoogleTokensSchema = z.object({
@@ -19,7 +19,7 @@ const AuthStateSchema = z.object({
   userId: z.uuid(),
 });
 
-export const Routes = defineRoutes<GoogleAuthCallbackAPI>(
+export const GoogleAuthCallbackRoutes = defineRoutes<GoogleAuthCallbackAPI>(
   "google-auth-callback",
   {
     /**

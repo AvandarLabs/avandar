@@ -2,7 +2,7 @@ import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { DuckDBSpatialExtensionDocumentation } from "@sbfn/queries/DuckDBSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
 import { z } from "zod";
-import type { QueriesAPI } from "@sbfn/queries/queries.types.ts";
+import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types.ts";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 if (!openaiApiKey) {
@@ -14,7 +14,7 @@ const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 /**
  * This is the route handler for all queries endpoints.
  */
-export const Routes = defineRoutes<QueriesAPI>("queries", {
+export const QueriesRoutes = defineRoutes<QueriesAPI>("queries", {
   "/:workspaceId/generate": {
     GET: GET({
       path: "/:workspaceId/generate",

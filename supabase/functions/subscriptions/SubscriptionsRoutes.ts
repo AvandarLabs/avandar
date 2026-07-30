@@ -15,13 +15,13 @@ import { z } from "zod";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
-} from "@sbfn/subscriptions/subscriptions.routes.types.ts";
+} from "@sbfn/subscriptions/SubscriptionsRoutes.types.ts";
 import type { User } from "$/models/User/User.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
  */
-export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
+export const SubscriptionsRoutes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   "/fetch-and-sync": {
     GET: FetchAndSyncUserSubscriptions,
   },

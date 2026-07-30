@@ -1,66 +1,11 @@
-/**
- * Server-side helpers for the privacy consent ack-token protocol.
- *
- *   ackToken = base64url(headerJson) + '.' + hex(HMAC-SHA256(headerJson, K))
- *
- * where `K` is a session secret derived per (workspace, user) pair from
- * `SB_SECRET_KEY`. The client and server both derive `K` independently
- * via `deriveSessionSecret(workspaceId, userId)`: no secret material
- * ever has to round-trip on the wire.
- *
- * The header carries:
- *
- *   - `nonce`        : UUID, single-use within the token's TTL
- *   - `workspaceId`  : must match the route's `workspaceId`
- *   - `userId`       : must match the authenticated user
- *   - `issuedAt`     : wall-clock ms
- *   - `expiresAt`    : `issuedAt + 5 * 60 * 1000`
- *   - `payloadHash`  : SHA-256 hex of the canonicalised approved payload
- *
- * The backend rejects:
- *   - bad signature
- *   - expired tokens
- *   - mismatched workspaceId / userId
- *   - mismatched payloadHash (i.e. the values in the body don't match
- *     what was approved client-side)
- *   - duplicate nonces (replayed tokens): best-effort, see notes.
- */
-
+import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
 import { base64UrlDecode } from "$/utils/privacy/sessionSecretUtils.ts";
 
-const SB_SECRET_KEY = Deno.env.get("SB_SECRET_KEY");
-
-if (!SB_SECRET_KEY) {
-  throw new Error(
-    "SB_SECRET_KEY is required to derive ack-token session secrets",
-  );
-}
-
-const TEXT_ENCODER = new TextEncoder();
-
 /**
- * Derives a per-(workspace, user) HMAC key from the global server secret.
- * Used both for issuing ack tokens (on the server's `session-secret`
- * endpoint, which exposes the derived key to the client) and for
- * verifying them on chat requests.
+ * Header fields signed into a privacy consent acknowledgement token.
+ * A nonce is a unique value intended to be used once, which lets the server
+ * reject a replayed token during its short validity window.
  */
-export async function deriveSessionSecret(args: {
-  workspaceId: string;
-  userId: string;
-}): Promise<ArrayBuffer> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    TEXT_ENCODER.encode(SB_SECRET_KEY!),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const message = TEXT_ENCODER.encode(
-    `ackToken:v1:${args.workspaceId}:${args.userId}`,
-  );
-  return crypto.subtle.sign("HMAC", key, message);
-}
-
 export type AckHeader = {
   nonce: string;
   workspaceId: string;
@@ -92,6 +37,7 @@ export type VerifyAckTokenResult =
  */
 const SEEN_NONCES = new Map<string, number>();
 const NONCE_CACHE_TTL_MS = 10 * 60 * 1000;
+const TEXT_ENCODER = new TextEncoder();
 
 function _gcNonces(): void {
   const now = Date.now();
@@ -106,28 +52,27 @@ function _hexDecode(input: string): Uint8Array {
   if (input.length % 2 !== 0) {
     throw new Error("hex string must have even length");
   }
-  const out = new Uint8Array(input.length / 2);
-  for (let i = 0; i < out.length; i++) {
-    out[i] = parseInt(input.slice(i * 2, i * 2 + 2), 16);
-  }
-  return out;
+  const output = new Uint8Array(input.length / 2);
+  output.forEach((_, index) => {
+    output[index] = parseInt(input.slice(index * 2, index * 2 + 2), 16);
+  });
+  return output;
 }
 
 function _timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) {
     return false;
   }
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a[i]! ^ b[i]!;
-  }
-  return diff === 0;
+  let difference = 0;
+  a.forEach((value, index) => {
+    difference |= value ^ b[index]!;
+  });
+  return difference === 0;
 }
 
 /**
- * Verifies an ack token against the expected (workspaceId, userId,
- * payloadHash). Returns a discriminated union so the caller can decide
- * how to surface the specific failure mode.
+ * Verifies an ack token against the authenticated workspace, user, and
+ * approved payload hash. Returns a discriminated union for failure handling.
  */
 export async function verifyAckToken(args: {
   token: string;
@@ -165,7 +110,6 @@ export async function verifyAckToken(args: {
     workspaceId: args.expectedWorkspaceId,
     userId: args.expectedUserId,
   });
-
   const key = await crypto.subtle.importKey(
     "raw",
     secret,
@@ -173,7 +117,7 @@ export async function verifyAckToken(args: {
     false,
     ["sign"],
   );
-  const expectedSig = new Uint8Array(
+  const expectedSignature = new Uint8Array(
     await crypto.subtle.sign("HMAC", key, TEXT_ENCODER.encode(headerB64)),
   );
 
@@ -184,7 +128,7 @@ export async function verifyAckToken(args: {
     return { valid: false, reason: "malformed" };
   }
 
-  if (!_timingSafeEqual(signature, expectedSig)) {
+  if (!_timingSafeEqual(signature, expectedSignature)) {
     return { valid: false, reason: "bad_signature" };
   }
 
@@ -192,7 +136,6 @@ export async function verifyAckToken(args: {
   if (now > header.expiresAt) {
     return { valid: false, reason: "expired" };
   }
-
   if (header.workspaceId !== args.expectedWorkspaceId) {
     return { valid: false, reason: "wrong_workspace" };
   }

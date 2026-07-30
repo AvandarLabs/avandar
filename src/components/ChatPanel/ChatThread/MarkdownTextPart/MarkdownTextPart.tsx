@@ -4,26 +4,11 @@ import {
 } from "@assistant-ui/react-markdown";
 import clsx from "clsx";
 import remarkGfm from "remark-gfm";
-import { ChatSyntaxHighlighter } from "@/components/ChatPanel/ChatThread/ChatSyntaxHighlighter";
 import { MarkdownCodeHeader } from "@/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader";
-import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
+import { ChatSyntaxHighlighterRouter } from "./ChatSyntaxHighlighterRouter";
 import css from "./MarkdownTextPart.module.css";
 
-const SQL_LANGUAGES = new Set(["sql", "duckdb"]);
-
-type Props = Parameters<typeof ChatSyntaxHighlighter>[0];
-
-/**
- * Routes fenced code blocks to {@link AvaSqlBlock} when the language is SQL
- * (so dataset/column pills appear inline), and falls back to the Prism-based
- * {@link ChatSyntaxHighlighter} for every other language.
- */
-export function ChatSyntaxHighlighterRouter(props: Props): React.ReactNode {
-  if (SQL_LANGUAGES.has(props.language.toLowerCase())) {
-    return <AvaSqlBlock value={props.code} readOnly />;
-  }
-  return <ChatSyntaxHighlighter {...props} />;
-}
+export { ChatSyntaxHighlighterRouter } from "./ChatSyntaxHighlighterRouter";
 
 const markdownComponents = memoizeMarkdownComponents({
   SyntaxHighlighter: ChatSyntaxHighlighterRouter,

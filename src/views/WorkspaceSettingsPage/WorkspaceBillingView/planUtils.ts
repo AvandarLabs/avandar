@@ -17,7 +17,7 @@ import {
   PaidPlanVariants,
   SubscriptionPlan,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.types";
+import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
 
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];

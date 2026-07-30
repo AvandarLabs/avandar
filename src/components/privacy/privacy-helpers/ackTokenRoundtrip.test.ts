@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
  * End-to-end protocol test for HMAC ack tokens. We import the client-
  * side `issueAckToken` (mocked to use a known key) and inline a
  * minimal server-side `verifyAckToken` that mirrors what
- * `supabase/functions/_shared/privacy/ackToken.ts` does. This validates
+ * `supabase/functions/_shared/privacy/verifyAckToken.ts` does. This validates
  * that the wire format the two sides agree on actually round-trips,
  * which is what the live integration depends on.
  *

@@ -72,7 +72,8 @@ export type CrossBoundaryResult =
  * model/API, and `crossBoundary` is the only supported way to move user-typed
  * text or concrete cell values across it (chat messages, clarification answers,
  * discovery dropdown picks, assumed SQL literals). It runs the local PII + bias
- * detectors, opens `ConsentModal` when approval is needed, and on approval mints
+ * detectors, opens `ConsentModal` when approval is needed, and on approval
+ * mints
  * an HMAC ack token queued in `PendingAcks` for `useAvandarChatRuntime` to
  * attach to the next chat POST (which the edge function verifies, else returns
  * `UNAPPROVED_DATA_TRANSFER`). Resolves with an approved payload or a rejection

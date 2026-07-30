@@ -150,7 +150,7 @@ export type ChatSessionSecretResponse = {
  * Client-side proof that the user consented to send a specific
  * payload to the LLM. The backend verifies the HMAC + payload hash
  * before forwarding any flagged content. See
- * `supabase/functions/_shared/privacy/ackToken.ts`.
+ * `supabase/functions/_shared/privacy/verifyAckToken.ts`.
  */
 export type ConsentAck = {
   ackToken: string;

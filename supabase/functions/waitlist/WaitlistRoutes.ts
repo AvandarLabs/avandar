@@ -1,11 +1,11 @@
 import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { z } from "zod";
-import type { WaitlistAPI } from "@sbfn/waitlist/waitlist.types.ts";
+import type { WaitlistAPI } from "@sbfn/waitlist/WaitlistRoutes.types.ts";
 
 /**
  * This is the route handler for all waitlist endpoints.
  */
-export const Routes = defineRoutes<WaitlistAPI>("waitlist", {
+export const WaitlistRoutes = defineRoutes<WaitlistAPI>("waitlist", {
   /**
    * Verify that the `signupCode` is valid and assigned to the given `email`
    * on the waitlist.

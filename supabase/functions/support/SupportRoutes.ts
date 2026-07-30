@@ -1,7 +1,7 @@
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SignJWT } from "jsr:@panva/jose@6";
 import { z } from "zod";
-import type { SupportAPI } from "@sbfn/support/support.routes.types.ts";
+import type { SupportAPI } from "@sbfn/support/SupportRoutes.types.ts";
 import type { User } from "@supabase/supabase-js";
 
 const UserMetadataSchema = z.object({
@@ -54,7 +54,7 @@ async function _generateFeaturebaseJWT(
 /**
  * This is the route handler for all support endpoints.
  */
-export const Routes = defineRoutes<SupportAPI>("support", {
+export const SupportRoutes = defineRoutes<SupportAPI>("support", {
   "/featurebase-jwt": {
     GET: GET("/featurebase-jwt").action(async ({ user, supabaseClient }) => {
       const { data: memberships } = await supabaseClient

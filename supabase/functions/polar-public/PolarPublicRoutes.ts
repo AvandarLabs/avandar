@@ -9,7 +9,7 @@ import {
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { match } from "ts-pattern";
 import { any, iso, object, record, string } from "zod";
-import type { PolarPublicAPI } from "@sbfn/polar-public/polar-public.types.ts";
+import type { PolarPublicAPI } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 
 const MinimalPolarWebhookEventSchema = object({
   type: string(),
@@ -22,7 +22,7 @@ const MinimalPolarWebhookEventSchema = object({
  * accessible (e.g. webhook events). All actions in this
  * function must have JWT verification disabled.
  */
-export const Routes = defineRoutes<PolarPublicAPI>("polar-public", {
+export const PolarPublicRoutes = defineRoutes<PolarPublicAPI>("polar-public", {
   /**
    * Handles all Polar webhook events.
    */

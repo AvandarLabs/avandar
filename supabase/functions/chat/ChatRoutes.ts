@@ -6,15 +6,8 @@ import {
   GET,
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import {
-  deriveSessionSecret,
-  verifyAckToken,
-} from "@sbfn/_shared/privacy/ackToken.ts";
-import {
-  isReadOnlyDiscoveryQuery,
-  MAX_DISCOVERY_QUERY_CHARS,
-} from "@sbfn/_shared/privacy/isReadOnlyDiscoveryQuery.ts";
-import { hashTextPayload } from "$/utils/privacy/sessionSecretUtils.ts";
+import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
+import { verifyAckToken } from "@sbfn/_shared/privacy/verifyAckToken.ts";
 import cachedChatModelsCatalogJSON from "@sbfn/chat/chat-models-catalog.gen.json" with { type: "json" };
 import {
   buildSqlSystemPrompt,
@@ -25,9 +18,14 @@ import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { modelSchema } from "$/lib/zodHelpers.ts";
+import {
+  isReadOnlyDiscoveryQuery,
+  MAX_DISCOVERY_QUERY_CHARS,
+} from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
+import { hashTextPayload } from "$/utils/privacy/sessionSecretUtils.ts";
 import { z } from "zod";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-import type { ChatAPI } from "@sbfn/chat/chat.types.ts";
+import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -94,7 +92,7 @@ const REFINEMENT_HINTS =
   /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;
 
 // OpenRouter speaks the OpenAI Chat Completions wire format, so we POST
-// directly the same way `queries.routes.ts` calls OpenAI. The brief names
+// directly the same way `QueriesRoutes.ts` calls OpenAI. The brief names
 // Vercel AI SDK as the target stack; using it here means npm: imports inside
 // a Deno edge function, which adds runtime risk we don't need yet. We can
 // migrate once the rest of the chat flow is stable.
@@ -721,7 +719,7 @@ async function _fetchSchemaForWorkspace(args: {
  * `generateSql` tool. When it does, the resulting SQL is returned to the
  * client which auto-applies it to the Data Explorer canvas.
  */
-export const Routes = defineRoutes<ChatAPI>("chat", {
+export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
   /**
    * Returns the OpenRouter model catalog for the chat panel model picker.
    * The edge function proxies OpenRouter so the API key stays server-side.

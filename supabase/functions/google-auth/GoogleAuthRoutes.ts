@@ -6,9 +6,9 @@ import {
 import { getAuthURL } from "@sbfn/google-auth/getAuthURL.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
 import { z } from "zod";
-import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types.ts";
+import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types.ts";
 
-export const Routes = defineRoutes<GoogleAuthAPI>("google-auth", {
+export const GoogleAuthRoutes = defineRoutes<GoogleAuthAPI>("google-auth", {
   /**
    * This function is used to initiate the Google OAuth2 flow. It returns
    * an authorization URL that the frontend can use to redirect the user.

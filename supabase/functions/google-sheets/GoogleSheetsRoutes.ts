@@ -5,9 +5,9 @@ import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/asse
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { google } from "googleapis";
 import { string } from "zod";
-import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types.ts";
+import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types.ts";
 
-export const Routes = defineRoutes<GoogleSheetsAPI>("google-sheets", {
+export const GoogleSheetsRoutes = defineRoutes<GoogleSheetsAPI>("google-sheets", {
   // TODO(jpsyx): update this to use DuckDB WASM so we can send the data as
   // a parquet binary blob instead.
   "/:id": {
