@@ -8,13 +8,13 @@ import {
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import {
   deriveSessionSecret,
-  hashTextPayload,
   verifyAckToken,
 } from "@sbfn/_shared/privacy/ackToken.ts";
 import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
 } from "@sbfn/_shared/privacy/isReadOnlyDiscoveryQuery.ts";
+import { hashTextPayload } from "$/utils/privacy/sessionSecretUtils.ts";
 import cachedChatModelsCatalogJSON from "@sbfn/chat/chat-models-catalog.gen.json" with { type: "json" };
 import {
   buildSqlSystemPrompt,

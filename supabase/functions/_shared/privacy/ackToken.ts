@@ -26,6 +26,8 @@
  *   - duplicate nonces (replayed tokens): best-effort, see notes.
  */
 
+import { base64UrlDecode } from "$/utils/privacy/sessionSecretUtils.ts";
+
 const SB_SECRET_KEY = Deno.env.get("SB_SECRET_KEY");
 
 if (!SB_SECRET_KEY) {
@@ -100,17 +102,6 @@ function _gcNonces(): void {
   });
 }
 
-function _base64UrlDecode(input: string): Uint8Array {
-  const pad = input.length % 4 === 0 ? 0 : 4 - (input.length % 4);
-  const b64 = input.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad);
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
-  }
-  return bytes;
-}
-
 function _hexDecode(input: string): Uint8Array {
   if (input.length % 2 !== 0) {
     throw new Error("hex string must have even length");
@@ -153,7 +144,7 @@ export async function verifyAckToken(args: {
 
   let header: AckHeader;
   try {
-    const headerBytes = _base64UrlDecode(headerB64);
+    const headerBytes = base64UrlDecode(headerB64);
     header = JSON.parse(new TextDecoder().decode(headerBytes)) as AckHeader;
   } catch {
     return { valid: false, reason: "malformed" };
@@ -219,27 +210,4 @@ export async function verifyAckToken(args: {
   SEEN_NONCES.set(header.nonce, now);
 
   return { valid: true, header };
-}
-
-/**
- * Canonicalise + hash a payload for inclusion in the ack header. The
- * client and server must agree on the canonical form; the cheapest
- * agreement is "JSON.stringify of a sorted-keys version of the
- * payload". For text-shaped payloads (user message), we hash the raw
- * UTF-8 bytes directly.
- */
-export async function hashTextPayload(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    TEXT_ENCODER.encode(text),
-  );
-  return _toHex(new Uint8Array(digest));
-}
-
-function _toHex(bytes: Uint8Array): string {
-  let out = "";
-  for (const b of bytes) {
-    out += b.toString(16).padStart(2, "0");
-  }
-  return out;
 }
