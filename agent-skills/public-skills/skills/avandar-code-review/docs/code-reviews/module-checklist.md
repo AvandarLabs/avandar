@@ -5,10 +5,15 @@ Use this checklist only when the diff includes TypeScript or TSX files.
 - Keep one module per file.
 - The only exception is a file that intentionally groups a collection of
   related utility functions.
-- If a file contains exactly one non-type export, its file name must match that
-  export exactly. Ignore `export type` and other type-only exports when counting
-  exports. For example, a file that exports `detectBias` plus exported types
-  should be named `detectBias.ts`.
+- If a file has exactly one non-type, non-constant export (a function, class,
+  enum, or module object), its file name must match that export exactly. Ignore
+  `export type` / other type-only exports AND exported constants when counting:
+  a file may also export supporting constants and still take the name of its
+  single main export. Name the file after what a reader would consider the main
+  export (the function or the module object). For example, a file that exports
+  `detectBias` plus a supporting `MAX_BIAS_SCORE` constant and some exported
+  types should be named `detectBias.ts`. (A file whose exports are *only*
+  constants follows the `*.constants.ts` rule below instead.)
 - If a file exports a collection of helper or utility functions, its name must
   describe the collection or shared purpose and end with either `Helpers.ts` or
   `Utils.ts`.
@@ -17,17 +22,20 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   single module object or `@modules` module, and name the file exactly after
   that exported module.
 
-  **Find candidates** (changed `.ts` / `.tsx` files whose single runtime export
-  does not match the file base name):
+  **Find candidates** (changed `.ts` / `.tsx` files whose single main runtime
+  export does not match the file base name). Count only main exports (functions,
+  classes, enums, and module objects declared with a `create*Module(...)`
+  builder); supporting `export const` constants are ignored, so they no longer
+  disqualify the file name:
 
   ```bash
   for f in <files-under-review-ending-in-.ts-or-.tsx>; do
     base="$(basename "$f" | sed -E 's/\.(test|types|constants|module)\.[^.]+$//; s/\.[^.]+$//')"
-    exports="$(grep -Eho '^export +(const|function|class|enum) +[A-Za-z0-9_]+' "$f" \
-      | awk '{print $3}' | sort -u)"
+    exports="$(grep -Eho '^export +(function|class|enum) +[A-Za-z0-9_]+|^export +const +[A-Za-z0-9_]+ *= *create[A-Za-z]*Module\b' "$f" \
+      | sed -E 's/^export +(function|class|enum|const) +//; s/ *=.*//' | sort -u)"
     count="$(printf '%s\n' "$exports" | sed '/^$/d' | wc -l | tr -d ' ')"
     if [ "$count" = 1 ] && [ "$exports" != "$base" ]; then
-      printf '%s exports %s\n' "$f" "$exports"
+      printf '%s main export %s (supporting constants ignored)\n' "$f" "$exports"
     fi
   done
   ```

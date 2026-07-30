@@ -244,9 +244,15 @@
 
 ## File, Directory, and Module Conventions
 
-- If a file contains exactly one non-type export, name the file exactly after
-  that export. Type-only exports do not count. For example, a file that exports
-  `detectBias` plus exported types should be named `detectBias.ts`.
+- If a file has exactly one non-type, non-constant export (a function, class,
+  enum, or module object), name the file exactly after that export. Type-only
+  exports do not count, and neither do exported constants: a file may also
+  export supporting constants and still take the name of its single main
+  export. Name the file after what a reader would consider the main export (the
+  function or the module object). For example, a file that exports `detectBias`,
+  a supporting `MAX_BIAS_SCORE` constant, and some exported types should still be
+  named `detectBias.ts`. (A file whose exports are *only* constants follows the
+  `*.constants.ts` rule below instead.)
 - If a file intentionally exports a collection of helper or utility functions,
   name the file after the collection's shared purpose and suffix it with either
   `Helpers.ts` or `Utils.ts`.
