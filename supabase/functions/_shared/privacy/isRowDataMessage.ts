@@ -1,10 +1,3 @@
-/**
- * Row-data classifier for tool messages that may cross the LLM boundary.
- *
- * The privacy boundary uses this file's decision to require an ack token before
- * row-level values are allowed into model-bound requests.
- */
-
 export type RowDataInspection = {
   isRowData: boolean;
   reason: string;
