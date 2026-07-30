@@ -15,32 +15,6 @@ import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/de
 import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-/**
- * Privacy chokepoint for anything that leaves the browser for the LLM.
- *
- * **What "crossBoundary" means:** Avandar keeps row-level data in DuckDB on
- * the client. The "boundary" is browser → model/API. `crossBoundary()` is
- * the only supported way to move user-typed text or concrete cell values
- * across that boundary. Call it before appending chat text, sending
- * clarification answers, applying generated SQL with assumed filters, etc.
- *
- * **What it does:**
- *   1. Run local PII + bias detectors (no LLM).
- *   2. If needed, open `ConsentModal` so the user explicitly approves.
- *   3. On approval, mint an HMAC `ackToken` and queue it in `PendingAcks.ts`.
- *   4. `useAvandarChatRuntime` attaches matching acks on the next
- *      `chat/.../messages` POST; the edge function verifies them or returns
- *      `UNAPPROVED_DATA_TRANSFER`.
- *
- * **Call sites (grep `crossBoundary(`):** chat user messages, clarification
- * answers, discovery dropdown picks, assumed SQL literals after the
- * clarification cap (`generated_sql_assumptions`).
- *
- * The current implementation covers PII detection, English bias detection,
- * modal consent, ack-token issuance, and local audit logging. Locale-specific
- * bias pattern files are present as disabled stubs until they are reviewed.
- */
-
 export type CrossBoundaryContext =
   | "discovery_clarification"
   | "generated_sql_assumptions"
@@ -93,8 +67,16 @@ export type CrossBoundaryResult =
   | { approved: false; reason: "cancelled" | "edited_to_empty" };
 
 /**
- * Checks an outbound chat payload against the privacy boundary.
- * Resolves with an approved payload or a rejection reason.
+ * The privacy chokepoint for anything leaving the browser for the LLM. Avandar
+ * keeps row-level data in DuckDB on the client; the boundary is browser to
+ * model/API, and `crossBoundary` is the only supported way to move user-typed
+ * text or concrete cell values across it (chat messages, clarification answers,
+ * discovery dropdown picks, assumed SQL literals). It runs the local PII + bias
+ * detectors, opens `ConsentModal` when approval is needed, and on approval mints
+ * an HMAC ack token queued in `PendingAcks` for `useAvandarChatRuntime` to
+ * attach to the next chat POST (which the edge function verifies, else returns
+ * `UNAPPROVED_DATA_TRANSFER`). Resolves with an approved payload or a rejection
+ * reason.
  */
 export async function crossBoundary(
   req: CrossBoundaryRequest,

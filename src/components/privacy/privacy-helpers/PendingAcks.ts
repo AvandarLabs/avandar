@@ -1,25 +1,6 @@
 import { createModule } from "@modules";
 import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
 
-/**
- * Module-scope queue of consent ack tokens that have been approved by
- * the user but haven't yet been attached to a backend chat request.
- *
- * `crossBoundary` registers an ack here keyed by the SHA-256 hex of the
- * approved text payload. `useAvandarChatRuntime` looks up matching acks
- * just before POSTing to the chat endpoint and attaches them as
- * `body.consentAcks`. Acks are single-use; once consumed they're
- * deleted from the queue.
- *
- * Why this lives at module scope rather than React state: the consent
- * flow can race with assistant-ui's internal composer state, and the
- * ack must survive across the brief window between modal close and the
- * adapter.run call that follows. Module scope avoids the race entirely.
- *
- * Stale entries that never get consumed are expired by `expiresAt` so
- * an abandoned clarification doesn't leak memory.
- */
-
 export type PendingAck = {
   ackToken: string;
   /** SHA-256 hex of the approved text. */
@@ -40,6 +21,16 @@ function _gc(): void {
   }
 }
 
+/**
+ * Module-scope, single-use queue of consent ack tokens the user has approved
+ * but that haven't yet been attached to a backend chat request. `crossBoundary`
+ * registers an ack keyed by the SHA-256 hex of the approved payload;
+ * `useAvandarChatRuntime` looks up matching acks just before POSTing and
+ * attaches them as `body.consentAcks`, deleting each on use. It lives at module
+ * scope rather than React state so the ack survives the race between modal
+ * close and the follow-up `adapter.run`; stale entries expire via `expiresAt`
+ * so an abandoned clarification doesn't leak memory.
+ */
 export const PendingAcks = createModule("PendingAcks", {
   builder: () => {
     return {
