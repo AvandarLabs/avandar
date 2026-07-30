@@ -25,14 +25,22 @@
   function works. Exception: a function JSDoc may mention complex or
   unconventional architectural/design decisions only when understanding those
   decisions is crucial to developers using the function.
-- Do not use file-level comments. A file-level comment is a block comment at
-  the very top of the file that describes the file as a whole rather than a
-  specific member. Document the file's members directly instead: attach JSDoc
-  to each exported member, and fold any whole-file purpose or design context
-  into the JSDoc of the main export (the member the file is named after). The
-  main export must always be documented. IDE intellisense surfaces member
-  comments, not file headers, so a file-level block leaves the real API
-  undocumented in the editor.
+- Do not use file-level comments in a file that has a main export. A file-level
+  comment is a detached block comment that describes the file as a whole rather
+  than a specific member; it counts as file-level whether it sits at the very
+  top of the file or just below the import block. Document the file's members
+  directly instead: attach JSDoc to each exported member, and fold any
+  whole-file purpose or design context into the JSDoc of the main export (the
+  member the file is named after). The main export must always carry its own
+  block comment. IDE intellisense surfaces member comments, not detached file
+  headers, so a file-level block leaves the real API undocumented in the editor.
+- Exception: a file that has no main export may use a file-level comment to
+  describe the whole file. "Main export" means the export whose name matches the
+  file name; when none exists, a file-level comment is the right home for
+  whole-file context. This covers test files (no export named after the file, so
+  a header describing the suite is expected), and files that are a collection of
+  same-kind exports with no single primary one (a `*.types.ts` type collection, a
+  `*.constants.ts` bundle, or a group of sibling helpers).
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).

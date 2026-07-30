@@ -65,13 +65,28 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export async function rehydratePlan(options: Options): Promise<void> {}
   ```
 
-- Do not use file-level comments. A file-level comment is a block comment at
-  the very top of the file that describes the file as a whole rather than a
-  specific member. Document members directly instead: every exported member
+- Do not use file-level comments in a file that has a main export. A file-level
+  comment is a detached block comment describing the file as a whole rather than
+  a specific member; it counts whether it sits at the very top of the file or
+  just below the import block (a common miss: a header that moved down after
+  imports were added). Document members directly instead: every exported member
   gets its own JSDoc, and the main export (the member the file is named after)
-  must always be documented. Fold any whole-file purpose or design context into
-  the main export's JSDoc. IDE intellisense surfaces member comments, not file
-  headers, so a file-level block leaves the real API undocumented in the editor.
+  must always carry its own block comment. Fold any whole-file purpose or design
+  context into the main export's JSDoc. IDE intellisense surfaces member
+  comments, not detached headers, so a file-level block leaves the real API
+  undocumented in the editor.
+
+  Detecting it: a detached block comment is one whose closing `*/` is followed
+  by a blank line (a member docstring sits directly above its declaration with
+  no blank line). In a file with a main export, flag any such block above the
+  code.
+
+- Exception: a file with no main export may keep a file-level comment describing
+  the whole file. "Main export" means the export whose name matches the file
+  name. Test files have none, so a header describing the suite is expected and
+  correct; the same applies to same-kind collections with no single primary
+  export (`*.types.ts`, `*.constants.ts`, a group of sibling helpers). Do not
+  flag file-level comments in those files.
 
   This is bad:
 
