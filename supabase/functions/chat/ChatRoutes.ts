@@ -9,12 +9,10 @@ import {
 import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
 import { verifyAckToken } from "@sbfn/_shared/privacy/verifyAckToken.ts";
 import cachedChatModelsCatalogJSON from "@sbfn/chat/chat-models-catalog.gen.json" with { type: "json" };
-import {
-  buildSqlSystemPrompt,
-  cleanGeneratedSql,
-  extractSqlFromAssistantText,
-} from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
+import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
+import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { curateOpenRouterModels } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
+import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { modelSchema } from "$/lib/zodHelpers.ts";
@@ -351,7 +349,7 @@ function _parseAddDashboardBlock(
       if (!prompt || !sqlRaw || !vizTypeRaw) {
         return undefined;
       }
-      const sql = cleanGeneratedSql(sqlRaw).trim();
+      const sql = cleanLlmGeneratedSql(sqlRaw).trim();
       const vizType = vizTypeRaw as ChatDashboardVizType;
       if (sql.length === 0 || !ALLOWED_DASHBOARD_VIZ_TYPES.has(vizType)) {
         return undefined;
@@ -1210,7 +1208,7 @@ export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
               const args = JSON.parse(sqlCall.function.arguments ?? "{}");
               if (typeof args.sql === "string" && args.sql.trim()) {
                 sql = {
-                  sql: cleanGeneratedSql(args.sql),
+                  sql: cleanLlmGeneratedSql(args.sql),
                   prompt: lastUserPrompt,
                 };
               }
@@ -1243,7 +1241,7 @@ export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
             const extracted = extractSqlFromAssistantText(attemptText);
             if (extracted) {
               sql = {
-                sql: cleanGeneratedSql(extracted),
+                sql: cleanLlmGeneratedSql(extracted),
                 prompt: lastUserPrompt,
               };
             }

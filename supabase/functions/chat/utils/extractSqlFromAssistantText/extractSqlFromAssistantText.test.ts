@@ -1,18 +1,5 @@
-import {
-  cleanGeneratedSql,
-  extractSqlFromAssistantText,
-} from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
+import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
 import { describe, expect, it } from "vitest";
-
-describe("cleanGeneratedSql", () => {
-  it("strips ``` fencing", () => {
-    expect(cleanGeneratedSql("```\nSELECT 1\n```")).toBe("SELECT 1");
-  });
-
-  it("strips a leading sql language hint", () => {
-    expect(cleanGeneratedSql("sql SELECT 1")).toBe("SELECT 1");
-  });
-});
 
 describe("extractSqlFromAssistantText", () => {
   it("returns undefined for empty input", () => {
@@ -43,9 +30,9 @@ describe("extractSqlFromAssistantText", () => {
   it("recognizes WITH ... SELECT patterns", () => {
     const text =
       "WITH grouped AS (SELECT region, COUNT(*) AS n FROM cases GROUP BY region) SELECT * FROM grouped";
-    const out = extractSqlFromAssistantText(text);
-    expect(out).toContain("WITH grouped AS");
-    expect(out).toContain("SELECT * FROM grouped");
+    const sql = extractSqlFromAssistantText(text);
+    expect(sql).toContain("WITH grouped AS");
+    expect(sql).toContain("SELECT * FROM grouped");
   });
 
   it("ignores prose that contains the word SELECT without an actual query", () => {
@@ -56,7 +43,7 @@ describe("extractSqlFromAssistantText", () => {
 
   it("ignores text with no SQL markers", () => {
     expect(
-      extractSqlFromAssistantText("I'm not sure what you mean — clarify?"),
+      extractSqlFromAssistantText("I'm not sure what you mean: clarify?"),
     ).toBeUndefined();
   });
 });
