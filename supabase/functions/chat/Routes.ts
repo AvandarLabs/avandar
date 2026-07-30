@@ -14,7 +14,7 @@ import {
 import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,
-} from "@sbfn/_shared/privacy/discoveryQuery.ts";
+} from "@sbfn/_shared/privacy/isReadOnlyDiscoveryQuery.ts";
 import cachedChatModelsCatalogJSON from "@sbfn/chat/chat-models-catalog.gen.json" with { type: "json" };
 import {
   buildSqlSystemPrompt,
