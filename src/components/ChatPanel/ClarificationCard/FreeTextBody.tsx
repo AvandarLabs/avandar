@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Textarea } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 
-export type FreeTextBodyProps = {
+type Props = {
   placeholder: string | undefined;
   onSubmit: (text: string) => void;
 };
@@ -11,19 +11,19 @@ export type FreeTextBodyProps = {
 export function FreeTextBody({
   placeholder,
   onSubmit,
-}: FreeTextBodyProps): React.ReactNode {
+}: Readonly<Props>): React.ReactNode {
   const [value, setValue] = useState("");
   const reference = useRef<HTMLTextAreaElement>(null);
   const { t } = useLingui();
 
-  useEffect(() => {
+  useEffect(function focusAnswerInput() {
     reference.current?.focus();
   }, []);
 
-  const submit = () => {
-    const trimmed = value.trim();
-    if (trimmed) {
-      onSubmit(trimmed);
+  const onSubmitAnswer = () => {
+    const trimmedAnswer = value.trim();
+    if (trimmedAnswer) {
+      onSubmit(trimmedAnswer);
     }
   };
 
@@ -35,18 +35,27 @@ export function FreeTextBody({
         autosize
         minRows={1}
         maxRows={4}
+        aria-label={t`Clarification answer`}
         value={value}
-        onChange={(event) => {return setValue(event.currentTarget.value)}}
+        onChange={(event) => {
+          setValue(event.currentTarget.value);
+        }}
         onKeyDown={(event) => {
-          if (event.nativeEvent.isComposing) return;
+          if (event.nativeEvent.isComposing) {
+            return;
+          }
           if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
-            submit();
+            onSubmitAnswer();
           }
         }}
       />
       <Group justify="flex-end" gap="xs">
-        <Button size="xs" onClick={submit} disabled={value.trim().length === 0}>
+        <Button
+          size="xs"
+          onClick={onSubmitAnswer}
+          disabled={value.trim().length === 0}
+        >
           <Trans>Send answer</Trans>
         </Button>
       </Group>

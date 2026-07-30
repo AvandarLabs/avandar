@@ -14,9 +14,9 @@ import css from "./AssistantMessage.module.css";
 export function AssistantMessage(): React.ReactNode {
   const { t } = useLingui();
   return (
-    <MessagePrimitive.Root className={css.assistantRow}>
-      <div className={css.assistantStack}>
-        <div className={css.assistantBubble}>
+    <MessagePrimitive.Root className={css.assistantMessageRow}>
+      <div className={css.assistantMessageStack}>
+        <div className={css.assistantMessageBubble}>
           <MessagePrimitive.If hasContent={false}>
             <Loader
               type="dots"
@@ -28,7 +28,7 @@ export function AssistantMessage(): React.ReactNode {
           <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
         </div>
         <MessagePrimitive.If hasContent={true}>
-          <ActionBarPrimitive.Root className={css.assistantActions}>
+          <ActionBarPrimitive.Root className={css.assistantMessageActions}>
             <ActionBarPrimitive.Reload
               className={css.assistantMessageTryAgainButton}
               aria-label={t`Try again`}

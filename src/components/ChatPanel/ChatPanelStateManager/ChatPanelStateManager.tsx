@@ -52,7 +52,7 @@ export const ChatPanelStateManager = createAppStateManager({
       return { ...state, isOpen: !state.isOpen };
     },
     setPendingClarification: (
-      state: ChatPanelState,
+      state: Readonly<ChatPanelState>,
       pendingClarification: PendingClarification | undefined,
     ) => {
       return { ...state, pendingClarification };

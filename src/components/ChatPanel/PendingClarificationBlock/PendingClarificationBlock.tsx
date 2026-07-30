@@ -1,163 +1,32 @@
-import { useThreadRuntime } from "@assistant-ui/react";
-import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
-import { useCallback } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import {
-  clarificationAnswerNeedsCrossBoundary,
-  formatClarificationAnswerForThread,
-} from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useClarificationSubmission } from "./useClarificationSubmission";
+import { useDiscoveryResolver } from "./useDiscoveryResolver";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
-import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
-/**
- * Renders the pending clarification prompt above the composer.
- * Returns a clarification card when a question is pending, otherwise `null`.
- */
+/** Renders the pending clarification prompt above the composer. */
 export function PendingClarificationBlock(): React.ReactNode {
-  const pending = ChatPanelStateManager.useState().pendingClarification;
-  const dispatch = ChatPanelStateManager.useDispatch();
-  const runtime = useThreadRuntime();
+  const pendingClarification = ChatPanelStateManager.useState()
+    .pendingClarification as ChatClarifyRequestWithAudit | undefined;
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
-  const { t } = useLingui();
+  const resolveDiscovery = useDiscoveryResolver();
+  const onSubmit = useClarificationSubmission({
+    request: pendingClarification,
+    userId: user?.id,
+    workspaceId: workspace.id,
+  });
 
-  const resolveDiscovery = useCallback<DiscoveryResolver>(
-    async (args) => {
-      try {
-        const result = await DuckDbClient.runRawQuery<Record<string, unknown>>(
-          args.query,
-        );
-        const values = result.data
-          .map((row) => {
-            const keys = Object.keys(row);
-            if (keys.length === 0) {
-              return null;
-            }
-            const v = row[keys[0]!];
-            if (v === null || v === undefined) {
-              return null;
-            }
-            return String(v);
-          })
-          .filter((v): v is string => {
-            return v !== null && v.length > 0;
-          });
-        const seen = new Set<string>();
-        const deduped: string[] = [];
-        for (const v of values) {
-          if (!seen.has(v)) {
-            seen.add(v);
-            deduped.push(v);
-            if (deduped.length >= 100) {
-              break;
-            }
-          }
-        }
-        return { values: deduped };
-      } catch (e) {
-        return {
-          error: e instanceof Error ? e.message : t`Discovery query failed.`,
-        };
-      }
-    },
-    [t],
-  );
-
-  if (!pending) {
-    return null;
-  }
-
-  const submit = async (answer: ClarificationSubmitAnswer) => {
-    let resolvedAnswer = answer;
-
-    if (
-      user &&
-      clarificationAnswerNeedsCrossBoundary(answer, pending.responseShape)
-    ) {
-      if (answer.kind === "custom") {
-        const result = await crossBoundary({
-          text: answer.text,
-          context: "clarification_answer",
-          workspaceId: workspace.id,
-          userId: user.id,
-        });
-        if (!result.approved) {
-          const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
-          if (auditId) {
-            await ClarificationAuditEntryClient.recordOutcome({
-              id: auditId as ClarificationAuditEntry.Id,
-              outcome: "cancelled",
-            });
-          }
-          return;
-        }
-        if (typeof result.payload.text === "string") {
-          resolvedAnswer = { kind: "custom", text: result.payload.text };
-        }
-      } else if (
-        answer.kind === "preset" &&
-        pending.responseShape.kind === "discovery"
-      ) {
-        const values =
-          Array.isArray(answer.value) ? answer.value : [answer.value];
-        const result = await crossBoundary({
-          values,
-          sourceColumn: pending.responseShape.column,
-          sourceQuery: pending.responseShape.query,
-          context: "discovery_clarification",
-          workspaceId: workspace.id,
-          userId: user.id,
-        });
-        if (!result.approved) {
-          const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
-          if (auditId) {
-            await ClarificationAuditEntryClient.recordOutcome({
-              id: auditId as ClarificationAuditEntry.Id,
-              outcome: "cancelled",
-            });
-          }
-          return;
-        }
-        const approvedValues = result.payload.values as readonly string[];
-        resolvedAnswer = {
-          kind: "preset",
-          value:
-            Array.isArray(answer.value) ?
-              [...approvedValues]
-            : (approvedValues[0] ?? ""),
-        };
-      }
-    }
-
-    dispatch.setPendingClarification(undefined);
-
-    const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
-    if (auditId) {
-      await ClarificationAuditEntryClient.recordOutcome({
-        id: auditId as ClarificationAuditEntry.Id,
-        outcome: "answered",
-      });
-    }
-
-    runtime?.append(formatClarificationAnswerForThread(resolvedAnswer));
-  };
-
-  return (
-    <Box px="md" pb="xs">
-      <ClarificationCard
-        request={pending}
-        onAnswer={submit}
-        resolveDiscovery={resolveDiscovery}
-      />
-    </Box>
-  );
+  return pendingClarification ?
+      <Box px="md" pb="xs">
+        <ClarificationCard
+          request={pendingClarification}
+          onAnswer={onSubmit}
+          resolveDiscovery={resolveDiscovery}
+        />
+      </Box>
+    : null;
 }

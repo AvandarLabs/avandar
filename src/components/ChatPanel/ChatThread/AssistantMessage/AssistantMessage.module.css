@@ -1,17 +1,17 @@
-.assistantRow {
+.assistantMessageRow {
   align-self: flex-start;
   display: flex;
   justify-content: flex-start;
   max-width: 95%;
 }
 
-.assistantStack {
+.assistantMessageStack {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.assistantBubble {
+.assistantMessageBubble {
   background: var(--mantine-color-neutral-0);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-md);
@@ -19,7 +19,7 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
 }
 
-.assistantActions {
+.assistantMessageActions {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);

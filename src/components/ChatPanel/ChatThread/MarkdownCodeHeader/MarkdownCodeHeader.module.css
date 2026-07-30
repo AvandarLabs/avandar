@@ -1,20 +1,32 @@
 /*
  * The `--chat-code-header-*` custom properties are declared on
- * `.messageMarkdown` in MarkdownTextPart.module.css (the owner of the
+ * `.markdownTextPartMarkdown` in MarkdownTextPart.module.css (the owner of the
  * code-block visual system) and cascade down to this header, which is
  * always rendered as a descendant of the markdown container.
  */
-.codeBlockLanguage {
+.markdownCodeHeaderRoot {
+  align-items: center;
+  background: var(--mantine-color-neutral-9);
+  border: 1px solid var(--chat-code-border);
+  border-bottom: none;
+  border-radius: var(--mantine-radius-sm) var(--mantine-radius-sm) 0 0;
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--mantine-spacing-xs);
+  padding: 4px 6px 4px 10px;
+}
+
+.markdownCodeHeaderLanguage {
   color: var(--chat-code-header-fg);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.04em;
 }
 
-.codeBlockCopyButton {
+.markdownCodeHeaderCopyButton {
   color: var(--chat-code-header-fg);
 }
 
-.codeBlockCopyButton:hover {
+.markdownCodeHeaderCopyButton:hover {
   background: var(--chat-code-header-hover-bg);
   color: var(--mantine-color-white);
 }

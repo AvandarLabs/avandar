@@ -11,7 +11,7 @@
   border-left: 1px solid var(--ava-border-default);
 }
 
-.shellDisabled {
+.chatPanelShellDisabled {
   /*
    * Subtle, opaque off-white. Distinguishable from the active state
    * but never transparent.

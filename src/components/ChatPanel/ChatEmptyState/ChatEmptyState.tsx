@@ -3,23 +3,18 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, TruncatedText } from "@ui";
-import { isDefined, where } from "@utils";
+import { getRandomItem, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { getCachedDatasetColumnSummaries } from "@/components/ChatPanel/ChatEmptyState/getCachedDatasetColumnSummaries";
-import {
-  pickAverageColumn,
-  pickGroupByColumn,
-} from "@/components/ChatPanel/ChatEmptyState/pickChatSuggestionColumns/pickChatSuggestionColumns";
+import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /**
  * Returns the localized label for the page chip shown in the empty state.
@@ -42,16 +37,6 @@ function usePageLabel(app: ChatPageContext.ChatApp): string {
     .exhaustive();
 }
 
-function _pickRandomDataset(
-  datasets: readonly Dataset.T[],
-): Dataset.T | undefined {
-  if (datasets.length === 0) {
-    return undefined;
-  }
-  const index = Math.floor(Math.random() * datasets.length);
-  return datasets[index];
-}
-
 /**
  * Empty-state shown above the composer when the thread has no messages yet.
  * Shows the current page context as a chip and, for Data Explorer, three
@@ -63,7 +48,6 @@ export function ChatEmptyState(): React.ReactNode {
   const queryClient = useQueryClient();
   const { openDataset } = DataExplorerStateManager.useState();
   const threadRuntime = useThreadRuntime();
-  const { t } = useLingui();
   const pageLabel = usePageLabel(context.app);
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -71,14 +55,13 @@ export function ChatEmptyState(): React.ReactNode {
 
   const suggestionTarget = useMemo(() => {
     const availableDatasets = datasets ?? [];
-    const randomDataset = _pickRandomDataset(availableDatasets);
-    if (openDataset) {
-      return { datasetId: openDataset.datasetId, name: openDataset.name };
-    }
-    if (randomDataset) {
-      return { datasetId: randomDataset.id, name: randomDataset.name };
-    }
-    return undefined;
+    const randomDataset = getRandomItem(availableDatasets);
+    return (
+      openDataset ? { datasetId: openDataset.datasetId, name: openDataset.name }
+      : randomDataset ?
+        { datasetId: randomDataset.id, name: randomDataset.name }
+      : undefined
+    );
   }, [datasets, openDataset]);
 
   const [datasetColumns] = DatasetColumnClient.useGetAll({
@@ -88,63 +71,13 @@ export function ChatEmptyState(): React.ReactNode {
     },
   });
 
-  const suggestions = useMemo(() => {
-    const fallbackTarget = t`your dataset`;
-    const datasetName = suggestionTarget?.name ?? fallbackTarget;
-    const columns = datasetColumns ?? [];
-    const cachedSummaries =
-      suggestionTarget ?
-        getCachedDatasetColumnSummaries({
-          queryClient,
-          datasetId: suggestionTarget.datasetId,
-          workspaceId: workspace.id,
-          columns,
-        })
-      : new Map();
-
-    if (context.app === "dashboards") {
-      const groupByColumn = pickGroupByColumn(columns, cachedSummaries);
-      return [
-        groupByColumn ?
-          t`Add a bar chart of ${datasetName} grouped by ${groupByColumn}`
-        : t`Add a bar chart of row counts in ${datasetName}`,
-        t`Add a line chart showing trends in ${datasetName} over time`,
-        t`Add a table of the top 10 rows of ${datasetName}`,
-      ];
-    }
-    if (context.app !== "data-explorer") {
-      return [];
-    }
-
-    const pickedGroupBy = pickGroupByColumn(columns, cachedSummaries);
-    const averageColumn = pickAverageColumn(columns);
-
-    const secondGroupBy =
-      !averageColumn && pickedGroupBy ?
-        pickGroupByColumn(columns, cachedSummaries, {
-          excludeColumnNames: [pickedGroupBy],
-        })
-      : undefined;
-
-    return [
-      t`Show the first 20 rows of ${datasetName}`,
-      pickedGroupBy ?
-        t`Count rows in ${datasetName} by ${pickedGroupBy}`
-      : t`Count how many rows there are in ${datasetName}`,
-      averageColumn ? t`What is the average ${averageColumn} in ${datasetName}?`
-      : pickedGroupBy ?
-        secondGroupBy ? t`Count rows in ${datasetName} by ${secondGroupBy}`
-        : t`What are the distinct values of ${pickedGroupBy} in ${datasetName}?`
-      : undefined,
-    ].filter(isDefined);
-  }, [
-    context.app,
-    datasetColumns,
+  const suggestions = useChatSuggestions({
+    app: context.app,
+    columns: datasetColumns,
     queryClient,
     suggestionTarget,
-    t,
-    workspace.id,
-  ]);
+    workspaceId: workspace.id,
+  });
 
   const sendPrompt = (text: string) => {
     threadRuntime?.append({

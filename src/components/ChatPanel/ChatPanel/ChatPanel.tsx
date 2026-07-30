@@ -31,7 +31,7 @@ export function ChatPanel(): React.ReactNode {
       <Stack
         h="100%"
         bdrs="md"
-        className={clsx(css.shell, disabled && css.shellDisabled)}
+        className={clsx(css.shell, disabled && css.chatPanelShellDisabled)}
         gap={0}
       >
         <Group px="md" py="sm" justify="space-between" className={css.header}>

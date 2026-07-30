@@ -9,3 +9,11 @@ import type { ChatClarifyRequest } from "$/types/chat.types";
 export type ChatClarifyRequestWithAudit = ChatClarifyRequest & {
   auditId?: string;
 };
+
+/** Resolves a discovery query to concrete column values or an error. */
+export type DiscoveryResolver = (
+  parameters: Readonly<{
+    query: string;
+    column: string;
+  }>,
+) => Promise<{ values: string[] } | { error: string }>;

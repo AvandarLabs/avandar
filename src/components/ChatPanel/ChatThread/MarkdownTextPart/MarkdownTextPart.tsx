@@ -14,10 +14,20 @@ const markdownComponents = memoizeMarkdownComponents({
   SyntaxHighlighter: ChatSyntaxHighlighterRouter,
   CodeHeader: MarkdownCodeHeader,
   pre: ({ className, ...props }) => {
-    return <pre {...props} className={clsx(css.codeBlockPre, className)} />;
+    return (
+      <pre
+        {...props}
+        className={clsx(css.markdownTextPartCodeBlockPre, className)}
+      />
+    );
   },
   code: ({ className, ...props }) => {
-    return <code {...props} className={clsx(css.codeBlockCode, className)} />;
+    return (
+      <code
+        {...props}
+        className={clsx(css.markdownTextPartCodeBlockCode, className)}
+      />
+    );
   },
 });
 
@@ -29,7 +39,7 @@ const markdownComponents = memoizeMarkdownComponents({
 export function MarkdownTextPart(): React.ReactNode {
   return (
     <MarkdownTextPrimitive
-      className={css.messageMarkdown}
+      className={css.markdownTextPartMarkdown}
       remarkPlugins={[remarkGfm]}
       components={markdownComponents}
     />

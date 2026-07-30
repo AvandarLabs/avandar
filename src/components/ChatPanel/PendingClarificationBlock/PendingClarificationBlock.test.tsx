@@ -1,4 +1,5 @@
 import { useThreadRuntime } from "@assistant-ui/react";
+import { Model } from "@models";
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
@@ -8,8 +9,9 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render } from "@/test-utils";
 import { PendingClarificationBlock } from "./PendingClarificationBlock";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/clarificationAnswer/clarificationAnswer";
+import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
   appendMock,
@@ -118,12 +120,27 @@ describe("PendingClarificationBlock", () => {
     vi.mocked(useThreadRuntime).mockReturnValue({
       append: appendMock,
     } as unknown as ReturnType<typeof useThreadRuntime>);
-    vi.mocked(useCurrentWorkspace).mockReturnValue({
-      id: "workspace-1",
-    } as ReturnType<typeof useCurrentWorkspace>);
-    vi.mocked(useCurrentUser).mockReturnValue({
-      id: "user-1",
-    } as User.T);
+    vi.mocked(useCurrentWorkspace).mockReturnValue(
+      Model.make("Workspace", {
+        id: "workspace-1" as Workspace.Id,
+        ownerId: "user-1" as User.Id,
+        name: "Test workspace",
+        slug: "test-workspace",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+        subscription: undefined,
+      }),
+    );
+    vi.mocked(useCurrentUser).mockReturnValue(
+      Model.make("User", {
+        id: "user-1" as User.Id,
+        aud: "authenticated",
+        app_metadata: {},
+        user_metadata: {},
+        created_at: "2026-01-01T00:00:00.000Z",
+        email: "test@example.com",
+      }),
+    );
   });
 
   it("records the answered outcome with the pending audit id", async () => {

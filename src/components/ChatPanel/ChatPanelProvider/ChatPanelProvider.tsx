@@ -32,7 +32,7 @@ type Props = {
 export function ChatPanelProvider({
   children,
   isChatAvailable = true,
-}: Props): React.ReactNode {
+}: Readonly<Props>): React.ReactNode {
   return (
     <ChatPanelStateManager.Provider
       initialStateOverrides={{

@@ -1,3 +1,5 @@
+import { createModule } from "@modules";
+import { makeSet, propIsDefined, sortObjList } from "@utils";
 import { AvaDataTypeModule } from "$/models/datasets/AvaDataType/AvaDataTypeModule";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -85,7 +87,7 @@ function _normalizeColumnName(columnName: string): string {
  * True when the column name is exactly `id`, `uuid`, or `uid` (any casing).
  * Applies regardless of whether the column is stored as text or numeric.
  */
-export function isIdentifierColumnName(columnName: string): boolean {
+function _isIdentifierColumnName(columnName: string): boolean {
   return IDENTIFIER_EXACT_NAMES.has(_normalizeColumnName(columnName));
 }
 
@@ -93,41 +95,37 @@ export function isIdentifierColumnName(columnName: string): boolean {
  * Returns whether a column name is unlikely to be a meaningful group-by
  * dimension (identifiers, audit fields, etc.).
  */
-export function isNonGroupableColumnName(columnName: string): boolean {
+function _isNonGroupableColumnName(columnName: string): boolean {
   const normalized = _normalizeColumnName(columnName);
-  if (NON_GROUPABLE_EXACT_NAMES.has(normalized)) {
-    return true;
-  }
-  return normalized.endsWith("_id");
+  return (
+    NON_GROUPABLE_EXACT_NAMES.has(normalized) || normalized.endsWith("_id")
+  );
 }
 
 /**
  * True when a numeric column name suggests values are codes or identifiers
  * (phone, SSN, zip, etc.) rather than quantities where an average is useful.
  */
-export function isNonAverageableColumnName(columnName: string): boolean {
-  if (isIdentifierColumnName(columnName)) {
-    return true;
-  }
-
+function _isNonAverageableColumnName(columnName: string): boolean {
   const normalized = _normalizeColumnName(columnName);
-  if (NON_AVERAGEABLE_EXACT_NAMES.has(normalized)) {
-    return true;
-  }
-  if (normalized.endsWith("_year") || normalized.endsWith("_code")) {
-    return true;
-  }
-
-  return NON_AVERAGEABLE_NAME_SUBSTRINGS.some((fragment) => {
-    return normalized.includes(fragment);
-  });
+  return (
+    _isIdentifierColumnName(columnName) ||
+    NON_AVERAGEABLE_EXACT_NAMES.has(normalized) ||
+    normalized.endsWith("_year") ||
+    normalized.endsWith("_code") ||
+    NON_AVERAGEABLE_NAME_SUBSTRINGS.some((fragment) => {
+      return normalized.includes(fragment);
+    })
+  );
 }
 
 function _sortByColumnIdx(
   columns: readonly ColumnMeta[],
 ): readonly ColumnMeta[] {
-  return [...columns].sort((left, right) => {
-    return left.columnIdx - right.columnIdx;
+  return sortObjList(columns, {
+    sortBy: (column) => {
+      return column.columnIdx;
+    },
   });
 }
 
@@ -135,7 +133,7 @@ function _textColumns(columns: readonly ColumnMeta[]): readonly ColumnMeta[] {
   return _sortByColumnIdx(columns).filter((column) => {
     return (
       AvaDataTypeModule.isText(column.dataType) &&
-      !isNonGroupableColumnName(column.name)
+      !_isNonGroupableColumnName(column.name)
     );
   });
 }
@@ -144,16 +142,16 @@ function _textColumns(columns: readonly ColumnMeta[]): readonly ColumnMeta[] {
  * Picks a varchar column for "count by …" suggestions. Uses cached column
  * summaries when available (enum-like first, then lowest cardinality).
  */
-export function pickGroupByColumn(
+function _pickGroupByColumn(
   columns: readonly ColumnMeta[],
   cachedSummariesByName?: ReadonlyMap<string, ColumnSummary>,
-  options?: { excludeColumnNames?: readonly string[] },
+  options?: Readonly<{ excludeColumnNames?: readonly string[] }>,
 ): string | undefined {
-  const excluded = new Set(
-    (options?.excludeColumnNames ?? []).map(_normalizeColumnName),
-  );
+  const excludedColumnNames = makeSet(options?.excludeColumnNames ?? [], {
+    hashFn: _normalizeColumnName,
+  });
   const textColumns = _textColumns(columns).filter((column) => {
-    return !excluded.has(_normalizeColumnName(column.name));
+    return !excludedColumnNames.has(_normalizeColumnName(column.name));
   });
   if (textColumns.length === 0) {
     return undefined;
@@ -163,31 +161,32 @@ export function pickGroupByColumn(
     return textColumns[0]?.name;
   }
 
-  const withDistinct = textColumns.map((column) => {
+  const columnsWithDistinctCounts = textColumns.map((column) => {
     const summary = cachedSummariesByName.get(column.name);
     const distinctValuesCount =
       summary?.type === "text" ? summary.distinctValuesCount : undefined;
     return { column, distinctValuesCount };
   });
 
-  const enumLike = withDistinct.find((entry) => {
+  const enumLikeColumn = columnsWithDistinctCounts.find((entry) => {
     return (
       entry.distinctValuesCount !== undefined &&
       entry.distinctValuesCount < ENUM_LIKE_DISTINCT_MAX
     );
   });
-  if (enumLike) {
-    return enumLike.column.name;
+  if (enumLikeColumn) {
+    return enumLikeColumn.column.name;
   }
 
-  const withKnownDistinct = withDistinct.filter((entry) => {
-    return entry.distinctValuesCount !== undefined;
-  });
-  if (withKnownDistinct.length > 0) {
-    withKnownDistinct.sort((left, right) => {
-      return left.distinctValuesCount! - right.distinctValuesCount!;
-    });
-    return withKnownDistinct[0]?.column.name;
+  const columnsWithKnownDistinctCounts = columnsWithDistinctCounts.filter(
+    propIsDefined("distinctValuesCount"),
+  );
+  if (columnsWithKnownDistinctCounts.length > 0) {
+    return sortObjList(columnsWithKnownDistinctCounts, {
+      sortBy: (entry) => {
+        return entry.distinctValuesCount;
+      },
+    })[0]?.column.name;
   }
 
   return textColumns[0]?.name;
@@ -196,14 +195,28 @@ export function pickGroupByColumn(
 /**
  * Picks the first numeric column for "average …" suggestions.
  */
-export function pickAverageColumn(
+function _pickAverageColumn(
   columns: readonly ColumnMeta[],
 ): string | undefined {
   const numericColumns = _sortByColumnIdx(columns).filter((column) => {
     return (
       AvaDataTypeModule.isNumeric(column.dataType) &&
-      !isNonAverageableColumnName(column.name)
+      !_isNonAverageableColumnName(column.name)
     );
   });
   return numericColumns[0]?.name;
 }
+
+/** Selects columns suitable for generated chat suggestions. */
+export const ChatSuggestionColumnPicker = createModule(
+  "ChatSuggestionColumnPicker",
+  {
+    builder: {
+      isIdentifierColumnName: _isIdentifierColumnName,
+      isNonAverageableColumnName: _isNonAverageableColumnName,
+      isNonGroupableColumnName: _isNonGroupableColumnName,
+      pickAverageColumn: _pickAverageColumn,
+      pickGroupByColumn: _pickGroupByColumn,
+    },
+  },
+);

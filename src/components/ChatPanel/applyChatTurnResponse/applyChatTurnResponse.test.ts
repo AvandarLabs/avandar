@@ -1,8 +1,10 @@
+import { Model } from "@models";
 import { describe, expect, it, vi } from "vitest";
 import { applyChatTurnResponse } from "./applyChatTurnResponse";
+import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 
-function createHandlers() {
+function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
   return {
     queueDashboardBlock: vi.fn(),
     setPendingClarification: vi.fn(),
@@ -12,9 +14,8 @@ function createHandlers() {
 
 describe("applyChatTurnResponse", () => {
   it("preserves dashboard, clarification, and generated SQL handling", async () => {
-    const handlers = createHandlers();
-    const response = {
-      __type: "ChatResponse",
+    const handlers = _createHandlers();
+    const responseData: Omit<ChatResponse.T, "__type"> = {
       assistantText: "Here is the result.",
       generatedSql: {
         prompt: "Show totals",
@@ -33,7 +34,8 @@ describe("applyChatTurnResponse", () => {
         },
         turnNumber: 1,
       },
-    } satisfies ChatResponse.T;
+    };
+    const response = Model.make("ChatResponse", responseData);
 
     const result = await applyChatTurnResponse({
       response,
