@@ -3,10 +3,21 @@ import { APIClient } from "@/clients/APIClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
- * Per-workspace HMAC session secret cache. The secret is fetched from
- * `GET /chat/:workspaceId/session-secret` on first use, decoded from
- * base64, and held in memory as a `CryptoKey`. Never persisted:
- * a localStorage / IDB write would let an XSS exfiltrate it.
+ * Client side of the privacy consent ack-token protocol. This module is
+ * the browser counterpart to `supabase/functions/_shared/privacy/ackToken.ts`
+ * (the Deno edge verifier): the frontend uses it to prove to the backend
+ * that the user saw and approved a specific payload before any private
+ * data is forwarded to the LLM. It does two jobs:
+ *
+ *   1. Caches the per-workspace HMAC session secret. The secret is fetched
+ *      from `GET /chat/:workspaceId/session-secret` on first use, decoded
+ *      from base64, and held in memory as a `CryptoKey`. Never persisted:
+ *      a localStorage / IDB write would let an XSS exfiltrate it.
+ *   2. Issues signed ack tokens (`issueAckToken`) and hashes payloads
+ *      (`hashTextPayload`) using that key. These must compute byte-for-byte
+ *      the same values as the server, or verification fails; the
+ *      `ackTokenRoundtrip.test.ts` guards that the two implementations stay
+ *      in lockstep.
  *
  * On logout / workspace switch, callers should invoke `clearAll()`
  * (we cannot eagerly invalidate from here without coupling to auth).
