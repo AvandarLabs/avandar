@@ -3,9 +3,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, TruncatedText } from "@ui";
-import { getRandomItem, where } from "@utils";
+import { getRandomItem, matchLiteral, where } from "@utils";
 import { useMemo } from "react";
-import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
@@ -21,20 +20,12 @@ import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageCont
  */
 function usePageLabel(app: ChatPageContext.ChatApp): string {
   const { t } = useLingui();
-  return match(app)
-    .with("data-explorer", () => {
-      return t`Data Explorer`;
-    })
-    .with("data-sources", () => {
-      return t`Data Sources`;
-    })
-    .with("dashboards", () => {
-      return t`Dashboards`;
-    })
-    .with("other", () => {
-      return t`Avandar`;
-    })
-    .exhaustive();
+  return matchLiteral(app, {
+    "data-explorer": t`Data Explorer`,
+    "data-sources": t`Data Sources`,
+    dashboards: t`Dashboards`,
+    other: t`Avandar`,
+  });
 }
 
 /**
