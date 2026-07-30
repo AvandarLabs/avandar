@@ -668,586 +668,572 @@ async function _fetchSchemaForWorkspace(args: {
  * `generateSql` tool. When it does, the resulting SQL is returned to the
  * client which auto-applies it to the Data Explorer canvas.
  */
-export const ChatMessagesRoute = {
-  /**
-   * Handles a chat turn for the Ask Avandar panel in a workspace.
-   * The client sends the thread, page context, and optional model id; we call
-   * OpenRouter and may invoke `generateSql` on the Data Explorer.
-   * The response is assistant text plus optional SQL for the canvas to run.
-   */
-  "/:workspaceId/messages": {
-    POST: POST({
-      path: "/:workspaceId/messages",
-      schema: {
-        workspaceId: z.uuid(),
-      },
-    })
-      .bodySchema({
-        messages: modelSchema("ChatClientMessage", {
-          role: z.enum(["user", "assistant", "system"]),
-          content: z.string(),
-        }).array(),
-        context: modelSchema("ChatPageContext", {
-          app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
-          openDatasetId: z.string().optional(),
-          lastSql: z.string().optional(),
-          lastResultColumns: z
-            .array(z.object({ name: z.string(), dataType: z.string() }))
-            .readonly()
-            .optional(),
-          lastError: z.string().optional(),
-          dashboardId: z.string().optional(),
-        }),
-        model: z.string().optional(),
-        consentAcks: z
-          .array(
-            z.object({
-              ackToken: z.string(),
-              scope: z.union([
-                z.object({
-                  kind: z.literal("message_index"),
-                  index: z.number().int().nonnegative(),
-                }),
-                z.object({
-                  kind: z.literal("values"),
-                  sourceColumn: z.string().optional(),
-                }),
-              ]),
-            }),
-          )
-          .optional(),
-        retryContext: z
-          .object({
-            priorAssistantText: z.string().max(2000).optional(),
-            priorGeneratedSql: z.string().max(8000).optional(),
-            priorClarificationQuestion: z.string().max(400).optional(),
-            priorDashboardBlockKind: z.string().max(40).optional(),
-          })
-          .optional(),
-      })
-      .action(async ({ pathParams, body, supabaseClient, user }) => {
-        const { workspaceId } = pathParams;
-        const {
-          messages,
-          context,
-          model: requestedModel,
-          consentAcks,
-          retryContext,
-        } = body;
-        const model = _resolveChatModel(requestedModel);
-
-        // Verify any consent acks BEFORE we burn an LLM call. Each ack
-        // proves the user actually approved a flagged payload through
-        // the client-side consent modal. If any ack is invalid the whole
-        // request is rejected with UNAPPROVED_DATA_TRANSFER (400).
-        if (consentAcks && consentAcks.length > 0) {
-          for (const ack of consentAcks) {
-            if (ack.scope.kind === "message_index") {
-              const msg = messages[ack.scope.index];
-              if (!msg) {
-                return _rejectUnapprovedTransfer(
-                  `consentAck scope.index=${ack.scope.index} out of range`,
-                );
-              }
-              const expectedHash = await hashTextPayload(msg.content);
-              const result = await verifyAckToken({
-                token: ack.ackToken,
-                expectedWorkspaceId: workspaceId,
-                expectedUserId: user.id,
-                expectedPayloadHash: expectedHash,
-              });
-              if (!result.valid) {
-                return _rejectUnapprovedTransfer(
-                  `consentAck failed verification: ${result.reason}`,
-                );
-              }
-            }
-            // `values` scope is reserved for row-data payloads. This
-            // request shape does not yet include concrete values to hash,
-            // so the text-path verification remains the enforceable path.
-          }
-        }
-
-        const isDataExplorer = context.app === "data-explorer";
-        const isDashboards = context.app === "dashboards";
-        const needsSchema = isDataExplorer || isDashboards;
-
-        // Only fetch the schema when we'll actually use it.
-        const schema =
-          needsSchema ?
-            await _fetchSchemaForWorkspace({ supabaseClient, workspaceId })
-          : { datasets: [], columns: [] };
-
-        const lastUserPrompt =
-          [...messages].reverse().find((m) => {
-            return m.role === "user";
-          })?.content ?? "";
-
-        const sqlSystemPrompt =
-          needsSchema ?
-            buildSqlSystemPrompt({
-              prompt: lastUserPrompt,
-              datasets: schema.datasets,
-              columns: schema.columns,
-            })
-          : "";
-
-        const hasLastSql =
-          typeof context.lastSql === "string" && context.lastSql.length > 0;
-
-        const isLikelyRefinement =
-          isDataExplorer && hasLastSql && REFINEMENT_HINTS.test(lastUserPrompt);
-
-        const refinementContext =
-          isLikelyRefinement && hasLastSql ?
-            `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\``
-          : "";
-
-        // When the prior SQL produced a runtime error and the client passed
-        // it back, surface it so the model can fix the query in this turn.
-        const errorContext =
-          isDataExplorer && hasLastSql && context.lastError ?
-            `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\`\n\nError:\n${context.lastError}`
-          : "";
-
-        // Tell the model the *current* result schema the user is looking at.
-        // After manual SQL edits or pill swaps the user-visible columns can
-        // diverge from the dataset schemas, so this is the source of truth
-        // for "what's on the canvas right now."
-        const resultColumnsContext =
-          (
-            isDataExplorer &&
-            context.lastResultColumns &&
-            context.lastResultColumns.length > 0
-          ) ?
-            `\n\nThe user is currently looking at a result with these columns:\n${context.lastResultColumns
-              .map((c) => {
-                return `- ${c.name} (${c.dataType})`;
-              })
-              .join(
-                "\n",
-              )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
-          : "";
-
-        const retryContextNote = _buildRetryContextNote(retryContext);
-
-        const systemContent =
-          (isDataExplorer ?
-            `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
-          : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
-          : genericSystemPrompt) + retryContextNote;
-
-        const requestBody: Record<string, unknown> = {
-          model,
-          messages: [{ role: "system", content: systemContent }, ...messages],
-          temperature: 0.3,
-        };
-
-        const priorClarifications = _countClarificationsInHistory(messages);
-        const clarificationCapReached =
-          priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
-
-        if (isDataExplorer) {
-          requestBody.tools = [
-            {
-              type: "function",
-              function: {
-                name: "generateSql",
-                description:
-                  "Submit a DuckDB SELECT statement that answers the user's data question. Use this whenever the user asks about their data.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    sql: {
-                      type: "string",
-                      description:
-                        "Valid DuckDB SELECT. Wrap all table IDs and column names in double quotes.",
-                    },
-                  },
-                  required: ["sql"],
-                  additionalProperties: false,
-                },
-              },
-            },
-            ...(clarificationCapReached ?
-              []
-            : [
-                {
-                  type: "function",
-                  function: {
-                    name: "clarify",
-                    description:
-                      "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata; the UI always offers Something else and None of the above, so re-clarify if their answer is still ambiguous. Use this BEFORE generateSql when ambiguous.",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        question: {
-                          type: "string",
-                          maxLength: 200,
-                          description:
-                            "≤25 words, neutrally phrased, single question.",
-                        },
-                        rationale: {
-                          type: "string",
-                          maxLength: 200,
-                          description:
-                            "Optional one-sentence explanation of why you are asking.",
-                        },
-                        responseShape: {
-                          oneOf: [
-                            {
-                              type: "object",
-                              properties: {
-                                kind: { const: "free_text" },
-                                placeholder: { type: "string", maxLength: 80 },
-                              },
-                              required: ["kind"],
-                              additionalProperties: false,
-                            },
-                            {
-                              type: "object",
-                              properties: {
-                                kind: { const: "fixed_options" },
-                                options: {
-                                  type: "array",
-                                  minItems: 2,
-                                  maxItems: 8,
-                                  items: { type: "string", maxLength: 80 },
-                                },
-                                multi: { type: "boolean" },
-                              },
-                              required: ["kind", "options", "multi"],
-                              additionalProperties: false,
-                            },
-                            {
-                              type: "object",
-                              properties: {
-                                kind: { const: "discovery" },
-                                query: {
-                                  type: "string",
-                                  description:
-                                    "A short DuckDB SELECT statement whose results populate the dropdown. Read-only; no semicolons.",
-                                  maxLength: MAX_DISCOVERY_QUERY_CHARS,
-                                },
-                                column: {
-                                  type: "string",
-                                  description:
-                                    "The column the user is choosing values from. Informs PII detection.",
-                                  maxLength: 80,
-                                },
-                                multi: { type: "boolean" },
-                              },
-                              required: ["kind", "query", "column", "multi"],
-                              additionalProperties: false,
-                            },
-                          ],
-                        },
-                      },
-                      required: ["question", "responseShape"],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-              ]),
-          ];
-          requestBody.tool_choice = "auto";
-        }
-
-        if (isDashboards) {
-          requestBody.tools = [
-            {
-              type: "function",
-              function: {
-                name: "addDashboardBlock",
-                description:
-                  "Append a new dashboard block (P-block) to the page the user is editing. Set `kind` and the fields for that block type.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    kind: {
-                      type: "string",
-                      enum: [
-                        "DataViz",
-                        "HeadingBlock",
-                        "ParagraphBlock",
-                        "QuoteBlock",
-                        "DividerBlock",
-                        "CalloutBlock",
-                        "ListBlock",
-                        "CodeBlock",
-                        "TableBlock",
-                        "Card",
-                      ],
-                      description:
-                        "Block type to create. Use HeadingBlock for titles, ParagraphBlock for body text, DataViz only for SQL-driven charts/tables.",
-                    },
-                    prompt: {
-                      type: "string",
-                      description: "DataViz only: short label for the chart.",
-                      maxLength: 200,
-                    },
-                    sql: {
-                      type: "string",
-                      description:
-                        "DataViz only: DuckDB SELECT. Wrap dataset ids and column names in double quotes.",
-                    },
-                    vizType: {
-                      type: "string",
-                      enum: ["table", "bar", "line", "area", "scatter", "pie"],
-                      description: "DataViz only: visualization type.",
-                    },
-                    text: {
-                      type: "string",
-                      description:
-                        "HeadingBlock or ParagraphBlock: display text.",
-                    },
-                    level: {
-                      type: "number",
-                      description: "HeadingBlock only: 1, 2, 3, or 4.",
-                    },
-                    align: {
-                      type: "string",
-                      enum: ["left", "center", "right"],
-                      description: "HeadingBlock or ParagraphBlock alignment.",
-                    },
-                    quote: {
-                      type: "string",
-                      description: "QuoteBlock: quotation body.",
-                    },
-                    cite: {
-                      type: "string",
-                      description: "QuoteBlock: attribution.",
-                    },
-                    title: {
-                      type: "string",
-                      description: "CalloutBlock or Card title.",
-                    },
-                    body: {
-                      type: "string",
-                      description: "CalloutBlock body text.",
-                    },
-                    tone: {
-                      type: "string",
-                      enum: ["info", "warning", "neutral"],
-                      description: "CalloutBlock tone.",
-                    },
-                    items: {
-                      type: "array",
-                      items: { type: "string" },
-                      description: "ListBlock: list item strings.",
-                    },
-                    listType: {
-                      type: "string",
-                      enum: ["ordered", "unordered"],
-                      description: "ListBlock list style.",
-                    },
-                    code: {
-                      type: "string",
-                      description: "CodeBlock source code.",
-                    },
-                    language: {
-                      type: "string",
-                      description: "CodeBlock language hint.",
-                    },
-                    data: {
-                      type: "string",
-                      description: "TableBlock: CSV or delimited table text.",
-                    },
-                    delimiter: {
-                      type: "string",
-                      enum: ["comma", "tab", "pipe"],
-                      description: "TableBlock delimiter.",
-                    },
-                    hasHeader: {
-                      type: "boolean",
-                      description: "TableBlock: first row is header.",
-                    },
-                  },
-                  required: ["kind"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ];
-          requestBody.tool_choice = "auto";
-        }
-
-        // Single OpenRouter attempt, wrapped in a helper so the
-        // retry-on-empty escalation below can re-call it with different
-        // params. Throws on non-2xx so the outer handler surfaces it.
-        const runAttempt = async (
-          attemptBody: Record<string, unknown>,
-        ): Promise<{
-          message: OpenRouterMessage | undefined;
-          text: string;
-        }> => {
-          const r = await fetch(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${openRouterApiKey}`,
-                "HTTP-Referer": openRouterReferer,
-                "X-Title": "Avandar",
-              },
-              body: JSON.stringify(attemptBody),
-            },
-          );
-          if (!r.ok) {
-            const errorText = await r.text();
-            throw new Error(`OpenRouter API error: ${errorText}`);
-          }
-          const d = (await r.json()) as OpenRouterCompletion;
-          const m = d.choices?.[0]?.message;
-          return { message: m, text: (m?.content ?? "").trim() };
-        };
-
-        type ParsedAttempt = {
-          text: string;
-          generatedSql?: ChatResponse.GeneratedSql;
-          clarification?: ChatClarifyRequest;
-          dashboardBlock?: ChatGeneratedDashboardBlock;
-        };
-
-        // Parses an OpenRouter response message and content into our terminal
-        // output shapes. Defined inline so it can close over the per-request
-        // `isDataExplorer`, `isDashboards`, `lastUserPrompt`, and
-        // `priorClarifications`.
-        const parseAttempt = (
-          msg: OpenRouterMessage | undefined,
-          attemptText: string,
-        ): ParsedAttempt => {
-          const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
-          let sql: ChatResponse.GeneratedSql | undefined;
-          let clar: ChatClarifyRequest | undefined;
-          let block: ChatGeneratedDashboardBlock | undefined;
-
-          const sqlCall = calls.find((tc) => {
-            return tc?.function?.name === "generateSql";
-          });
-          if (sqlCall?.function) {
-            try {
-              const args = JSON.parse(sqlCall.function.arguments ?? "{}");
-              if (typeof args.sql === "string" && args.sql.trim()) {
-                sql = {
-                  sql: cleanLlmGeneratedSql(args.sql),
-                  prompt: lastUserPrompt,
-                };
-              }
-            } catch {
-              // Malformed tool args: ignore.
-            }
-          }
-
-          // Only honor `clarify` if no SQL was also produced this turn;
-          // the SQL path is the terminal one.
-          if (!sql) {
-            const clarifyCall = calls.find((tc) => {
-              return tc?.function?.name === "clarify";
-            });
-            if (clarifyCall?.function) {
-              const p = _parseClarify(
-                clarifyCall.function.arguments,
-                priorClarifications,
-              );
-              if (p) {
-                clar = p;
-              }
-            }
-          }
-
-          // Fallback: the model occasionally inlines a SELECT (or a
-          // fenced ```sql block) in plain text instead of invoking the
-          // `generateSql` tool.
-          if (!sql && !clar && isDataExplorer && attemptText.length > 0) {
-            const extracted = extractSqlFromAssistantText(attemptText);
-            if (extracted) {
-              sql = {
-                sql: cleanLlmGeneratedSql(extracted),
-                prompt: lastUserPrompt,
-              };
-            }
-          }
-
-          // Dashboard block creation. Only honored on the dashboards surface.
-          if (isDashboards && !sql && !clar) {
-            const blockCall = calls.find((tc) => {
-              return tc?.function?.name === "addDashboardBlock";
-            });
-            if (blockCall?.function) {
-              const p = _parseAddDashboardBlock(blockCall.function.arguments);
-              if (p) {
-                block = p;
-              }
-            }
-          }
-
-          return {
-            text: attemptText,
-            generatedSql: sql,
-            clarification: clar,
-            dashboardBlock: block,
-          };
-        };
-
-        // An attempt is "empty" when the model returned neither a tool
-        // call we could parse nor any plain text. That's the only case
-        // worth retrying; anything else means the model committed to
-        // something and we should ship it.
-        const isEmpty = (p: ParsedAttempt): boolean => {
-          return (
-            !p.generatedSql &&
-            !p.clarification &&
-            !p.dashboardBlock &&
-            p.text.length === 0
-          );
-        };
-
-        // Attempt 1: normal call.
-        let attempt = await runAttempt(requestBody);
-        let parsed = parseAttempt(attempt.message, attempt.text);
-
-        // Attempt 2 (only when attempt 1 returned nothing): literal repeat
-        // with a bumped temperature so we get a meaningfully different
-        // draw rather than the same emptiness twice.
-        if (isEmpty(parsed)) {
-          attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
-          parsed = parseAttempt(attempt.message, attempt.text);
-        }
-
-        // Attempt 3 (only when attempts 1 and 2 returned nothing): force
-        // the model into one of the registered tools. Skipped on the
-        // generic surface where the request has no tools to pick from.
-        const hasTools =
-          Array.isArray(requestBody.tools) &&
-          (requestBody.tools as unknown[]).length > 0;
-        if (isEmpty(parsed) && hasTools) {
-          attempt = await runAttempt({
-            ...requestBody,
-            temperature: 0.5,
-            tool_choice: "required",
-          });
-          parsed = parseAttempt(attempt.message, attempt.text);
-        }
-
-        const { text, generatedSql, clarification, dashboardBlock } = parsed;
-
-        const assistantText =
-          text ||
-          (generatedSql ?
-            "Here is the SQL I ran. Results are on the canvas to the left."
-          : clarification ? clarification.question
-          : dashboardBlock ? _dashboardBlockSummary(dashboardBlock)
-          : "I could not generate a query for that. Try rephrasing.");
-
-        const result: ChatResponse.T = Model.make("ChatResponse", {
-          assistantText,
-          ...(generatedSql ? { generatedSql: generatedSql } : {}),
-          ...(clarification ? { clarification } : {}),
-          ...(dashboardBlock ? { dashboardBlock } : {}),
-        });
-        return result;
-      }),
+export const PostChatMessages = POST({
+  path: "/:workspaceId/messages",
+  schema: {
+    workspaceId: z.uuid(),
   },
-};
+})
+  .bodySchema({
+    messages: modelSchema("ChatClientMessage", {
+      role: z.enum(["user", "assistant", "system"]),
+      content: z.string(),
+    }).array(),
+    context: modelSchema("ChatPageContext", {
+      app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
+      openDatasetId: z.string().optional(),
+      lastSql: z.string().optional(),
+      lastResultColumns: z
+        .array(z.object({ name: z.string(), dataType: z.string() }))
+        .readonly()
+        .optional(),
+      lastError: z.string().optional(),
+      dashboardId: z.string().optional(),
+    }),
+    model: z.string().optional(),
+    consentAcks: z
+      .array(
+        z.object({
+          ackToken: z.string(),
+          scope: z.union([
+            z.object({
+              kind: z.literal("message_index"),
+              index: z.number().int().nonnegative(),
+            }),
+            z.object({
+              kind: z.literal("values"),
+              sourceColumn: z.string().optional(),
+            }),
+          ]),
+        }),
+      )
+      .optional(),
+    retryContext: z
+      .object({
+        priorAssistantText: z.string().max(2000).optional(),
+        priorGeneratedSql: z.string().max(8000).optional(),
+        priorClarificationQuestion: z.string().max(400).optional(),
+        priorDashboardBlockKind: z.string().max(40).optional(),
+      })
+      .optional(),
+  })
+  .action(async ({ pathParams, body, supabaseClient, user }) => {
+    const { workspaceId } = pathParams;
+    const {
+      messages,
+      context,
+      model: requestedModel,
+      consentAcks,
+      retryContext,
+    } = body;
+    const model = _resolveChatModel(requestedModel);
+
+    // Verify any consent acks BEFORE we burn an LLM call. Each ack
+    // proves the user actually approved a flagged payload through
+    // the client-side consent modal. If any ack is invalid the whole
+    // request is rejected with UNAPPROVED_DATA_TRANSFER (400).
+    if (consentAcks && consentAcks.length > 0) {
+      for (const ack of consentAcks) {
+        if (ack.scope.kind === "message_index") {
+          const msg = messages[ack.scope.index];
+          if (!msg) {
+            return _rejectUnapprovedTransfer(
+              `consentAck scope.index=${ack.scope.index} out of range`,
+            );
+          }
+          const expectedHash = await hashTextPayload(msg.content);
+          const result = await verifyAckToken({
+            token: ack.ackToken,
+            expectedWorkspaceId: workspaceId,
+            expectedUserId: user.id,
+            expectedPayloadHash: expectedHash,
+          });
+          if (!result.valid) {
+            return _rejectUnapprovedTransfer(
+              `consentAck failed verification: ${result.reason}`,
+            );
+          }
+        }
+        // `values` scope is reserved for row-data payloads. This
+        // request shape does not yet include concrete values to hash,
+        // so the text-path verification remains the enforceable path.
+      }
+    }
+
+    const isDataExplorer = context.app === "data-explorer";
+    const isDashboards = context.app === "dashboards";
+    const needsSchema = isDataExplorer || isDashboards;
+
+    // Only fetch the schema when we'll actually use it.
+    const schema =
+      needsSchema ?
+        await _fetchSchemaForWorkspace({ supabaseClient, workspaceId })
+      : { datasets: [], columns: [] };
+
+    const lastUserPrompt =
+      [...messages].reverse().find((m) => {
+        return m.role === "user";
+      })?.content ?? "";
+
+    const sqlSystemPrompt =
+      needsSchema ?
+        buildSqlSystemPrompt({
+          prompt: lastUserPrompt,
+          datasets: schema.datasets,
+          columns: schema.columns,
+        })
+      : "";
+
+    const hasLastSql =
+      typeof context.lastSql === "string" && context.lastSql.length > 0;
+
+    const isLikelyRefinement =
+      isDataExplorer && hasLastSql && REFINEMENT_HINTS.test(lastUserPrompt);
+
+    const refinementContext =
+      isLikelyRefinement && hasLastSql ?
+        `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\``
+      : "";
+
+    // When the prior SQL produced a runtime error and the client passed
+    // it back, surface it so the model can fix the query in this turn.
+    const errorContext =
+      isDataExplorer && hasLastSql && context.lastError ?
+        `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\`\n\nError:\n${context.lastError}`
+      : "";
+
+    // Tell the model the *current* result schema the user is looking at.
+    // After manual SQL edits or pill swaps the user-visible columns can
+    // diverge from the dataset schemas, so this is the source of truth
+    // for "what's on the canvas right now."
+    const resultColumnsContext =
+      (
+        isDataExplorer &&
+        context.lastResultColumns &&
+        context.lastResultColumns.length > 0
+      ) ?
+        `\n\nThe user is currently looking at a result with these columns:\n${context.lastResultColumns
+          .map((c) => {
+            return `- ${c.name} (${c.dataType})`;
+          })
+          .join(
+            "\n",
+          )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
+      : "";
+
+    const retryContextNote = _buildRetryContextNote(retryContext);
+
+    const systemContent =
+      (isDataExplorer ?
+        `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
+      : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
+      : genericSystemPrompt) + retryContextNote;
+
+    const requestBody: Record<string, unknown> = {
+      model,
+      messages: [{ role: "system", content: systemContent }, ...messages],
+      temperature: 0.3,
+    };
+
+    const priorClarifications = _countClarificationsInHistory(messages);
+    const clarificationCapReached =
+      priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
+
+    if (isDataExplorer) {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "generateSql",
+            description:
+              "Submit a DuckDB SELECT statement that answers the user's data question. Use this whenever the user asks about their data.",
+            parameters: {
+              type: "object",
+              properties: {
+                sql: {
+                  type: "string",
+                  description:
+                    "Valid DuckDB SELECT. Wrap all table IDs and column names in double quotes.",
+                },
+              },
+              required: ["sql"],
+              additionalProperties: false,
+            },
+          },
+        },
+        ...(clarificationCapReached ?
+          []
+        : [
+            {
+              type: "function",
+              function: {
+                name: "clarify",
+                description:
+                  "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata; the UI always offers Something else and None of the above, so re-clarify if their answer is still ambiguous. Use this BEFORE generateSql when ambiguous.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    question: {
+                      type: "string",
+                      maxLength: 200,
+                      description:
+                        "≤25 words, neutrally phrased, single question.",
+                    },
+                    rationale: {
+                      type: "string",
+                      maxLength: 200,
+                      description:
+                        "Optional one-sentence explanation of why you are asking.",
+                    },
+                    responseShape: {
+                      oneOf: [
+                        {
+                          type: "object",
+                          properties: {
+                            kind: { const: "free_text" },
+                            placeholder: { type: "string", maxLength: 80 },
+                          },
+                          required: ["kind"],
+                          additionalProperties: false,
+                        },
+                        {
+                          type: "object",
+                          properties: {
+                            kind: { const: "fixed_options" },
+                            options: {
+                              type: "array",
+                              minItems: 2,
+                              maxItems: 8,
+                              items: { type: "string", maxLength: 80 },
+                            },
+                            multi: { type: "boolean" },
+                          },
+                          required: ["kind", "options", "multi"],
+                          additionalProperties: false,
+                        },
+                        {
+                          type: "object",
+                          properties: {
+                            kind: { const: "discovery" },
+                            query: {
+                              type: "string",
+                              description:
+                                "A short DuckDB SELECT statement whose results populate the dropdown. Read-only; no semicolons.",
+                              maxLength: MAX_DISCOVERY_QUERY_CHARS,
+                            },
+                            column: {
+                              type: "string",
+                              description:
+                                "The column the user is choosing values from. Informs PII detection.",
+                              maxLength: 80,
+                            },
+                            multi: { type: "boolean" },
+                          },
+                          required: ["kind", "query", "column", "multi"],
+                          additionalProperties: false,
+                        },
+                      ],
+                    },
+                  },
+                  required: ["question", "responseShape"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ]),
+      ];
+      requestBody.tool_choice = "auto";
+    }
+
+    if (isDashboards) {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "addDashboardBlock",
+            description:
+              "Append a new dashboard block (P-block) to the page the user is editing. Set `kind` and the fields for that block type.",
+            parameters: {
+              type: "object",
+              properties: {
+                kind: {
+                  type: "string",
+                  enum: [
+                    "DataViz",
+                    "HeadingBlock",
+                    "ParagraphBlock",
+                    "QuoteBlock",
+                    "DividerBlock",
+                    "CalloutBlock",
+                    "ListBlock",
+                    "CodeBlock",
+                    "TableBlock",
+                    "Card",
+                  ],
+                  description:
+                    "Block type to create. Use HeadingBlock for titles, ParagraphBlock for body text, DataViz only for SQL-driven charts/tables.",
+                },
+                prompt: {
+                  type: "string",
+                  description: "DataViz only: short label for the chart.",
+                  maxLength: 200,
+                },
+                sql: {
+                  type: "string",
+                  description:
+                    "DataViz only: DuckDB SELECT. Wrap dataset ids and column names in double quotes.",
+                },
+                vizType: {
+                  type: "string",
+                  enum: ["table", "bar", "line", "area", "scatter", "pie"],
+                  description: "DataViz only: visualization type.",
+                },
+                text: {
+                  type: "string",
+                  description: "HeadingBlock or ParagraphBlock: display text.",
+                },
+                level: {
+                  type: "number",
+                  description: "HeadingBlock only: 1, 2, 3, or 4.",
+                },
+                align: {
+                  type: "string",
+                  enum: ["left", "center", "right"],
+                  description: "HeadingBlock or ParagraphBlock alignment.",
+                },
+                quote: {
+                  type: "string",
+                  description: "QuoteBlock: quotation body.",
+                },
+                cite: {
+                  type: "string",
+                  description: "QuoteBlock: attribution.",
+                },
+                title: {
+                  type: "string",
+                  description: "CalloutBlock or Card title.",
+                },
+                body: {
+                  type: "string",
+                  description: "CalloutBlock body text.",
+                },
+                tone: {
+                  type: "string",
+                  enum: ["info", "warning", "neutral"],
+                  description: "CalloutBlock tone.",
+                },
+                items: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "ListBlock: list item strings.",
+                },
+                listType: {
+                  type: "string",
+                  enum: ["ordered", "unordered"],
+                  description: "ListBlock list style.",
+                },
+                code: {
+                  type: "string",
+                  description: "CodeBlock source code.",
+                },
+                language: {
+                  type: "string",
+                  description: "CodeBlock language hint.",
+                },
+                data: {
+                  type: "string",
+                  description: "TableBlock: CSV or delimited table text.",
+                },
+                delimiter: {
+                  type: "string",
+                  enum: ["comma", "tab", "pipe"],
+                  description: "TableBlock delimiter.",
+                },
+                hasHeader: {
+                  type: "boolean",
+                  description: "TableBlock: first row is header.",
+                },
+              },
+              required: ["kind"],
+              additionalProperties: false,
+            },
+          },
+        },
+      ];
+      requestBody.tool_choice = "auto";
+    }
+
+    // Single OpenRouter attempt, wrapped in a helper so the
+    // retry-on-empty escalation below can re-call it with different
+    // params. Throws on non-2xx so the outer handler surfaces it.
+    const runAttempt = async (
+      attemptBody: Record<string, unknown>,
+    ): Promise<{
+      message: OpenRouterMessage | undefined;
+      text: string;
+    }> => {
+      const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${openRouterApiKey}`,
+          "HTTP-Referer": openRouterReferer,
+          "X-Title": "Avandar",
+        },
+        body: JSON.stringify(attemptBody),
+      });
+      if (!r.ok) {
+        const errorText = await r.text();
+        throw new Error(`OpenRouter API error: ${errorText}`);
+      }
+      const d = (await r.json()) as OpenRouterCompletion;
+      const m = d.choices?.[0]?.message;
+      return { message: m, text: (m?.content ?? "").trim() };
+    };
+
+    type ParsedAttempt = {
+      text: string;
+      generatedSql?: ChatResponse.GeneratedSql;
+      clarification?: ChatClarifyRequest;
+      dashboardBlock?: ChatGeneratedDashboardBlock;
+    };
+
+    // Parses an OpenRouter response message and content into our terminal
+    // output shapes. Defined inline so it can close over the per-request
+    // `isDataExplorer`, `isDashboards`, `lastUserPrompt`, and
+    // `priorClarifications`.
+    const parseAttempt = (
+      msg: OpenRouterMessage | undefined,
+      attemptText: string,
+    ): ParsedAttempt => {
+      const calls: OpenRouterToolCall[] = msg?.tool_calls ?? [];
+      let sql: ChatResponse.GeneratedSql | undefined;
+      let clar: ChatClarifyRequest | undefined;
+      let block: ChatGeneratedDashboardBlock | undefined;
+
+      const sqlCall = calls.find((tc) => {
+        return tc?.function?.name === "generateSql";
+      });
+      if (sqlCall?.function) {
+        try {
+          const args = JSON.parse(sqlCall.function.arguments ?? "{}");
+          if (typeof args.sql === "string" && args.sql.trim()) {
+            sql = {
+              sql: cleanLlmGeneratedSql(args.sql),
+              prompt: lastUserPrompt,
+            };
+          }
+        } catch {
+          // Malformed tool args: ignore.
+        }
+      }
+
+      // Only honor `clarify` if no SQL was also produced this turn;
+      // the SQL path is the terminal one.
+      if (!sql) {
+        const clarifyCall = calls.find((tc) => {
+          return tc?.function?.name === "clarify";
+        });
+        if (clarifyCall?.function) {
+          const p = _parseClarify(
+            clarifyCall.function.arguments,
+            priorClarifications,
+          );
+          if (p) {
+            clar = p;
+          }
+        }
+      }
+
+      // Fallback: the model occasionally inlines a SELECT (or a
+      // fenced ```sql block) in plain text instead of invoking the
+      // `generateSql` tool.
+      if (!sql && !clar && isDataExplorer && attemptText.length > 0) {
+        const extracted = extractSqlFromAssistantText(attemptText);
+        if (extracted) {
+          sql = {
+            sql: cleanLlmGeneratedSql(extracted),
+            prompt: lastUserPrompt,
+          };
+        }
+      }
+
+      // Dashboard block creation. Only honored on the dashboards surface.
+      if (isDashboards && !sql && !clar) {
+        const blockCall = calls.find((tc) => {
+          return tc?.function?.name === "addDashboardBlock";
+        });
+        if (blockCall?.function) {
+          const p = _parseAddDashboardBlock(blockCall.function.arguments);
+          if (p) {
+            block = p;
+          }
+        }
+      }
+
+      return {
+        text: attemptText,
+        generatedSql: sql,
+        clarification: clar,
+        dashboardBlock: block,
+      };
+    };
+
+    // An attempt is "empty" when the model returned neither a tool
+    // call we could parse nor any plain text. That's the only case
+    // worth retrying; anything else means the model committed to
+    // something and we should ship it.
+    const isEmpty = (p: ParsedAttempt): boolean => {
+      return (
+        !p.generatedSql &&
+        !p.clarification &&
+        !p.dashboardBlock &&
+        p.text.length === 0
+      );
+    };
+
+    // Attempt 1: normal call.
+    let attempt = await runAttempt(requestBody);
+    let parsed = parseAttempt(attempt.message, attempt.text);
+
+    // Attempt 2 (only when attempt 1 returned nothing): literal repeat
+    // with a bumped temperature so we get a meaningfully different
+    // draw rather than the same emptiness twice.
+    if (isEmpty(parsed)) {
+      attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
+      parsed = parseAttempt(attempt.message, attempt.text);
+    }
+
+    // Attempt 3 (only when attempts 1 and 2 returned nothing): force
+    // the model into one of the registered tools. Skipped on the
+    // generic surface where the request has no tools to pick from.
+    const hasTools =
+      Array.isArray(requestBody.tools) &&
+      (requestBody.tools as unknown[]).length > 0;
+    if (isEmpty(parsed) && hasTools) {
+      attempt = await runAttempt({
+        ...requestBody,
+        temperature: 0.5,
+        tool_choice: "required",
+      });
+      parsed = parseAttempt(attempt.message, attempt.text);
+    }
+
+    const { text, generatedSql, clarification, dashboardBlock } = parsed;
+
+    const assistantText =
+      text ||
+      (generatedSql ?
+        "Here is the SQL I ran. Results are on the canvas to the left."
+      : clarification ? clarification.question
+      : dashboardBlock ? _dashboardBlockSummary(dashboardBlock)
+      : "I could not generate a query for that. Try rephrasing.");
+
+    const result: ChatResponse.T = Model.make("ChatResponse", {
+      assistantText,
+      ...(generatedSql ? { generatedSql: generatedSql } : {}),
+      ...(clarification ? { clarification } : {}),
+      ...(dashboardBlock ? { dashboardBlock } : {}),
+    });
+    return result;
+  });

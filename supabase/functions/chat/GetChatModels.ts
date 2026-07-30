@@ -42,26 +42,22 @@ async function _loadLiveChatModelsResponse(): Promise<ChatModelOption.Catalog> {
 }
 
 /** Returns the OpenRouter model catalog for the chat panel model picker. */
-export const ChatModelsRoute = {
-  "/models": {
-    GET: GET("/models")
-      .querySchema({
-        useCache: z
-          .enum(["true", "false", "0", "1", "yes", "no"])
-          .optional()
-          .transform((value) => {
-            return value === "true" || value === "1" || value === "yes";
-          }),
-      })
-      .action(async ({ queryParams }): Promise<ChatModelOption.Catalog> => {
-        const isCacheNonEmpty = cachedChatModelsCatalog.groups.some((group) => {
-          return group.models.length === 0;
-        });
-
-        if (queryParams.useCache && isCacheNonEmpty) {
-          return cachedChatModelsCatalog;
-        }
-        return await _loadLiveChatModelsResponse();
+export const GetChatModels = GET("/models")
+  .querySchema({
+    useCache: z
+      .enum(["true", "false", "0", "1", "yes", "no"])
+      .optional()
+      .transform((value) => {
+        return value === "true" || value === "1" || value === "yes";
       }),
-  },
-};
+  })
+  .action(async ({ queryParams }): Promise<ChatModelOption.Catalog> => {
+    const isCacheNonEmpty = cachedChatModelsCatalog.groups.some((group) => {
+      return group.models.length === 0;
+    });
+
+    if (queryParams.useCache && isCacheNonEmpty) {
+      return cachedChatModelsCatalog;
+    }
+    return await _loadLiveChatModelsResponse();
+  });
