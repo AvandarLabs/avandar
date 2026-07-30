@@ -12,7 +12,10 @@ function _arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-/** Returns the secret used to sign chat consent acknowledgements. */
+/**
+ * Returns the secret used to sign acknowledgements for flagged chat payloads,
+ * including PII, bias, and medical-data consent before LLM transfer.
+ */
 export const GetChatSessionSecret = GET({
   path: "/:workspaceId/session-secret",
   schema: { workspaceId: z.uuid() },
