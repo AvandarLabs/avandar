@@ -29,7 +29,9 @@ export function DiscoveryBody({
   resolveDiscovery,
   onSubmit,
 }: DiscoveryBodyProps): React.ReactNode {
-  const [state, setState] = useState<DiscoveryState>({ kind: "loading" });
+  const [discoveryState, setDiscoveryState] = useState<DiscoveryState>({
+    kind: "loading",
+  });
   const { t } = useLingui();
 
   useEffect(
@@ -37,7 +39,7 @@ export function DiscoveryBody({
       let cancelled = false;
       async function run(): Promise<void> {
         if (!resolveDiscovery) {
-          setState({
+          setDiscoveryState({
             kind: "error",
             error: t`Discovery is not available in this context.`,
           });
@@ -47,12 +49,13 @@ export function DiscoveryBody({
           const result = await resolveDiscovery({ query, column });
           if (cancelled) return;
           if ("error" in result)
-            setState({ kind: "error", error: result.error });
-          else if (result.values.length === 0) setState({ kind: "empty" });
-          else setState({ kind: "ready", values: result.values });
+            setDiscoveryState({ kind: "error", error: result.error });
+          else if (result.values.length === 0)
+            setDiscoveryState({ kind: "empty" });
+          else setDiscoveryState({ kind: "ready", values: result.values });
         } catch (error) {
           if (!cancelled) {
-            setState({
+            setDiscoveryState({
               kind: "error",
               error: error instanceof Error ? error.message : t`Query failed.`,
             });
@@ -68,7 +71,7 @@ export function DiscoveryBody({
   );
 
   const queryPreview = query.length > 200 ? `${query.slice(0, 200)}…` : query;
-  if (state.kind === "loading")
+  if (discoveryState.kind === "loading")
     return (
       <Group gap="xs">
         <Loader size="xs" />
@@ -77,10 +80,10 @@ export function DiscoveryBody({
         </Text>
       </Group>
     );
-  if (state.kind === "error" || state.kind === "empty") {
+  if (discoveryState.kind === "error" || discoveryState.kind === "empty") {
     return (
       <Stack gap="xs">
-        {state.kind === "error" ?
+        {discoveryState.kind === "error" ?
           <Alert
             icon={<IconAlertCircle size={14} />}
             color="red"
@@ -88,7 +91,7 @@ export function DiscoveryBody({
             radius="sm"
             p="xs"
           >
-            <Text size="xs">{state.error}</Text>
+            <Text size="xs">{discoveryState.error}</Text>
             <Code block fz="xs" mt={4}>
               {queryPreview}
             </Code>
@@ -106,7 +109,7 @@ export function DiscoveryBody({
   }
   return (
     <FixedOptionsBody
-      options={state.values}
+      options={discoveryState.values}
       multi={multi}
       onSubmit={onSubmit}
     />
