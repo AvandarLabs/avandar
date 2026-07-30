@@ -12,6 +12,9 @@ use std::ffi::OsString;
 #[derive(Debug, Parser)]
 #[command(name = "dif", version, about)]
 pub struct Cli {
+    /// Host address passed to difit so its HTTP server is reachable locally.
+    #[arg(long, default_value = "127.0.0.1")]
+    pub host: String,
     /// Use Codex instead of Claude for the LLM pane.
     #[arg(long)]
     pub codex: bool,
@@ -119,6 +122,12 @@ mod tests {
         let cli = Cli::try_parse_from(["dif", "develop", "-cx"]).expect("parse");
         assert!(cli.codex);
         assert_eq!(cli.comparison_key.as_deref(), Some("develop"));
+    }
+
+    #[test]
+    fn host_flag_is_forwarded_as_a_cli_value() {
+        let cli = Cli::try_parse_from(["dif", "develop", "--host", "127.0.0.1"]).expect("parse");
+        assert_eq!(cli.host, "127.0.0.1");
     }
 
     #[test]

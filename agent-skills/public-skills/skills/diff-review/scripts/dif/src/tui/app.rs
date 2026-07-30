@@ -70,6 +70,8 @@ pub struct App {
     pub focus: Panel,
     /// The difit port (shown in the title; used by the dispatcher).
     pub port: u16,
+    /// Host address passed to difit on launch and restart.
+    pub difit_host: String,
     /// A label for the difit comparison, e.g. `@ develop` or `.`.
     pub comparison_label: String,
     /// The repo root difit + LLM run in (needed to relaunch difit on a
@@ -370,6 +372,7 @@ impl App {
             &self.repo_root,
             &self.comparison,
             self.port,
+            &self.difit_host,
             transcript_raw.as_deref(),
             // difit must not open its own frontend: the web shell owns the
             // browser surface, so restart spawns difit with `--no-open` (exactly
@@ -441,6 +444,7 @@ impl App {
             &self.repo_root,
             &self.comparison,
             self.port,
+            &self.difit_host,
             transcript_raw.as_deref(),
             false,
         );

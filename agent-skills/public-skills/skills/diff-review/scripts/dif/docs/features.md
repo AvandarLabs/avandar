@@ -5,6 +5,7 @@
 ```
 dif                  # vs develop if it exists, else main
 dif <branch>         # vs <branch>
+dif <branch> --host 127.0.0.1  # choose difit's local bind address
 dif .                # uncommitted worktree changes
 dif staged|working   # staged / working tree
 dif <branch> --codex # run the right pane with Codex instead of Claude
@@ -16,7 +17,8 @@ On launch `dif`:
 1. Resolves the repo root, branch, and comparison key.
 2. Looks for the matching `.difit/<branch>-difit-<scope>.json`,
    `-guide.md`, and `-guide.json` artifacts.
-3. If those artifacts exist, picks a deterministic free port, starts difit,
+3. If those artifacts exist, picks a deterministic free port, starts difit on
+   the requested host (127.0.0.1 by default),
    opens the browser web shell, seeds difit with the transcript, and starts the
    background comments poller.
 4. If those artifacts do not exist, starts no difit server, no poller, and no

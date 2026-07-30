@@ -48,7 +48,7 @@ fn difit_program(repo_root: &Path) -> String {
 
 /// Build the shell command that launches difit.
 ///
-/// Shape: `cd <repo> && exec <difit> <args…> --port <p> --keep-alive
+/// Shape: `cd <repo> && exec <difit> <args…> --port <p> --host <host> --keep-alive
 /// --include-untracked [--comment <json>] [--no-open]`, where `<difit>` is the
 /// repo's local `node_modules/.bin/difit` when present, else a bare `difit`
 /// from `PATH` (see [`difit_program`]).
@@ -67,6 +67,7 @@ pub fn build_command(
     repo_root: &Path,
     comparison: &ComparisonKey,
     port: u16,
+    host: &str,
     transcript_raw: Option<&str>,
     open_browser: bool,
 ) -> String {
@@ -82,6 +83,8 @@ pub fn build_command(
     }
     parts.push("--port".to_owned());
     parts.push(port.to_string());
+    parts.push("--host".to_owned());
+    parts.push(shell_quote(host));
     parts.push("--keep-alive".to_owned());
     parts.push("--include-untracked".to_owned());
     if !open_browser {
@@ -99,12 +102,20 @@ pub fn spawn(
     repo_root: &Path,
     comparison: &ComparisonKey,
     port: u16,
+    host: &str,
     transcript_raw: Option<&str>,
     open_browser: bool,
     rows: u16,
     cols: u16,
 ) -> Result<PtyPane> {
-    let command = build_command(repo_root, comparison, port, transcript_raw, open_browser);
+    let command = build_command(
+        repo_root,
+        comparison,
+        port,
+        host,
+        transcript_raw,
+        open_browser,
+    );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, rows, cols)
 }
 
@@ -153,6 +164,7 @@ mod tests {
             Path::new("/r"),
             &ComparisonKey::Branch("develop".to_owned()),
             4711,
+            "127.0.0.1",
             None,
             true,
         );
@@ -174,6 +186,7 @@ mod tests {
             Path::new("/r"),
             &ComparisonKey::Uncommitted,
             4500,
+            "127.0.0.1",
             None,
             true,
         );
@@ -194,6 +207,7 @@ mod tests {
             dir.path(),
             &ComparisonKey::Branch("develop".to_owned()),
             4711,
+            "127.0.0.1",
             None,
             true,
         );
@@ -219,6 +233,7 @@ mod tests {
             dir.path(),
             &ComparisonKey::Branch("develop".to_owned()),
             4711,
+            "127.0.0.1",
             None,
             true,
         );
@@ -230,7 +245,14 @@ mod tests {
 
     #[test]
     fn no_open_flag_present_when_browser_suppressed() {
-        let cmd = build_command(Path::new("/r"), &ComparisonKey::Staged, 4500, None, false);
+        let cmd = build_command(
+            Path::new("/r"),
+            &ComparisonKey::Staged,
+            4500,
+            "127.0.0.1",
+            None,
+            false,
+        );
         assert!(cmd.contains("--no-open"));
     }
 
@@ -240,6 +262,7 @@ mod tests {
             Path::new("/r"),
             &ComparisonKey::Staged,
             4500,
+            "127.0.0.1",
             Some(r#"[{"type":"thread"}]"#),
             true,
         );

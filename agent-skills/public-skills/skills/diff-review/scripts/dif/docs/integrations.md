@@ -23,7 +23,7 @@ reply posted by the agent shows up in the open browser immediately.
 log) only after the matching review artifacts exist. The command is:
 
 ```
-cd <repo> && exec <difit> <args…> --port <P> --keep-alive --include-untracked [--comment <json>]
+cd <repo> && exec <difit> <args…> --port <P> --host <H> --keep-alive --include-untracked [--comment <json>]
 ```
 
 - `<difit>` resolves to the repo's local `node_modules/.bin/difit` when it
@@ -34,6 +34,8 @@ cd <repo> && exec <difit> <args…> --port <P> --keep-alive --include-untracked 
 - `<args…>` come from the comparison key (`.`/`staged`/`working`, or `@ <branch>`).
 - `--port <P>` is a confirmed-free port (we bind-test it first; difit would
   otherwise silently auto-reassign an occupied port and strand the poller).
+- `--host <H>` defaults to `127.0.0.1`, keeping difit's listener on the same
+  local IPv4 interface used by the browser shell.
 - `--keep-alive` keeps difit up when the browser disconnects.
 - `--comment <json>` seeds difit with the existing transcript on launch.
 - The browser opens by default (difit's behavior); tests pass `--no-open`.

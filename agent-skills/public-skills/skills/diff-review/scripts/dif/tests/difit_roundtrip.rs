@@ -55,6 +55,7 @@ fn reviewer_comment_posted_to_difit_lands_in_transcript() {
         repo,
         &ComparisonKey::Uncommitted,
         port,
+        "127.0.0.1",
         None,
         false, // suppress the browser in tests
         24,
