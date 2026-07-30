@@ -32,36 +32,40 @@ export function DiscoveryBody({
   const [state, setState] = useState<DiscoveryState>({ kind: "loading" });
   const { t } = useLingui();
 
-  useEffect(() => {
-    let cancelled = false;
-    async function run(): Promise<void> {
-      if (!resolveDiscovery) {
-        setState({
-          kind: "error",
-          error: t`Discovery is not available in this context.`,
-        });
-        return;
-      }
-      try {
-        const result = await resolveDiscovery({ query, column });
-        if (cancelled) return;
-        if ("error" in result) setState({ kind: "error", error: result.error });
-        else if (result.values.length === 0) setState({ kind: "empty" });
-        else setState({ kind: "ready", values: result.values });
-      } catch (error) {
-        if (!cancelled) {
+  useEffect(
+    function resolveDiscoveryValues() {
+      let cancelled = false;
+      async function run(): Promise<void> {
+        if (!resolveDiscovery) {
           setState({
             kind: "error",
-            error: error instanceof Error ? error.message : t`Query failed.`,
+            error: t`Discovery is not available in this context.`,
           });
+          return;
+        }
+        try {
+          const result = await resolveDiscovery({ query, column });
+          if (cancelled) return;
+          if ("error" in result)
+            setState({ kind: "error", error: result.error });
+          else if (result.values.length === 0) setState({ kind: "empty" });
+          else setState({ kind: "ready", values: result.values });
+        } catch (error) {
+          if (!cancelled) {
+            setState({
+              kind: "error",
+              error: error instanceof Error ? error.message : t`Query failed.`,
+            });
+          }
         }
       }
-    }
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [query, column, resolveDiscovery, t]);
+      void run();
+      return () => {
+        cancelled = true;
+      };
+    },
+    [query, column, resolveDiscovery, t],
+  );
 
   const queryPreview = query.length > 200 ? `${query.slice(0, 200)}…` : query;
   if (state.kind === "loading")
