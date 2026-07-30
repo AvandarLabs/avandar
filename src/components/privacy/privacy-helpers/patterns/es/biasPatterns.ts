@@ -1,17 +1,12 @@
 /**
- * Spanish (es) bias-pattern stubs.
- *
+ * Stub metadata for Spanish (es) bias patterns, pending advisor review.
  * Spanish bias patterns are disabled until domain review supplies approved
- * terms. Non-English bias patterns are deliberately not machine-translated.
- *
- * Adding patterns: copy the shape from
- * `src/components/privacy/privacy-helpers/detectBias/detectBias.ts`,
- * but keep this file frozen until the locale expansion is approved. Until
- * then, `detectBias` falls back to English-only patterns and Spanish-locale
- * users see the English detector with translated UX copy.
+ * terms (non-English patterns are deliberately not machine-translated), so
+ * `detectBias` falls back to English-only patterns and Spanish-locale users see
+ * the English detector with translated UX copy. To add patterns, copy the shape
+ * from `detectBias.ts`, but keep this file frozen until the locale expansion is
+ * approved.
  */
-
-/** Stub metadata for Spanish bias patterns pending advisor review. */
 export const biasPatterns = {
   status: "stub_pending_advisor_review",
 } as const;

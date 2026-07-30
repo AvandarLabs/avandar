@@ -1,17 +1,14 @@
-/**
- * Client-side mirror of the backend discovery-query validator. Keeping the
- * same contract on both sides lets generated clarification queries fail before
- * the user waits on local DuckDB execution.
- */
-
 /** Maximum length accepted for LLM-generated discovery queries. */
 export const MAX_DISCOVERY_QUERY_CHARS = 2000;
 
 const LEADING_KEYWORD_RE = /^\s*(?:with|select)\b/i;
 
 /**
- * Validates an LLM-generated discovery query before local DuckDB execution.
- * Returns whether the query is shaped like one read-only SELECT or CTE.
+ * Validates an LLM-generated discovery query before local DuckDB execution, so
+ * generated clarification queries fail fast instead of making the user wait on
+ * DuckDB. Mirrors the backend validator so both sides enforce the same
+ * contract. Returns whether the query is shaped like one read-only SELECT or
+ * CTE.
  */
 export function isReadOnlyDiscoveryQuery(q: string): boolean {
   if (typeof q !== "string") {

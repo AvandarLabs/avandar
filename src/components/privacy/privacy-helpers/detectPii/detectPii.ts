@@ -1,11 +1,3 @@
-/**
- * Client-side PII heuristics for text and row values that may cross the LLM
- * boundary.
- *
- * The detector favors conservative warnings so callers can ask for consent
- * before sending row-level data outside the browser.
- */
-
 export type PiiCategory =
   | "direct_identifier"
   | "government_id"
