@@ -67,150 +67,6 @@ export type CrossBoundaryResult =
   | { approved: false; reason: "cancelled" | "edited_to_empty" };
 
 /**
- * The privacy chokepoint for anything leaving the browser for the LLM. Avandar
- * keeps row-level data in DuckDB on the client; the boundary is browser to
- * model/API, and `decideIfDataCanCrossBoundary` is the only supported way to
- * move user-typed text or concrete cell values across it (chat messages,
- * clarification answers,
- * discovery dropdown picks, assumed SQL literals). It runs the local PII + bias
- * detectors, opens `ConsentModal` when approval is needed, and on approval
- * mints
- * an HMAC ack token queued in `PendingAcks` for `useAvandarChatRuntime` to
- * attach to the next chat POST (which the edge function verifies, else returns
- * `UNAPPROVED_DATA_TRANSFER`). Resolves with an approved payload or a rejection
- * reason.
- */
-export async function decideIfDataCanCrossBoundary(
-  req: CrossBoundaryRequest,
-): Promise<CrossBoundaryResult> {
-  const pii: PiiDetectionResult = detectPii({
-    columnName: req.sourceColumn,
-    values: req.values,
-  });
-
-  const biasInput =
-    typeof req.text === "string" && req.text.trim().length > 0 ?
-      req.text
-    : undefined;
-  const biasHits: BiasHit[] = biasInput ? detectBias(biasInput).hits : [];
-
-  let mode = _chooseMode({ pii, biasHits });
-
-  const hasPayload =
-    (typeof req.text === "string" && req.text.trim().length > 0) ||
-    (req.values !== undefined && req.values.length > 0);
-
-  if (mode === undefined && req.explicitConsentRequired && hasPayload) {
-    mode = "clean";
-  }
-
-  // Clean send when there is nothing to flag.
-  if (mode === undefined) {
-    const ackToken = await _mintAckFor(req, req.text ?? "");
-    await ConsentAuditEntryClient.recordConsentDecision({
-      workspaceId: req.workspaceId,
-      userId: req.userId,
-      context: req.context,
-      decision: "approved",
-      mode: "clean",
-      detectedPii: [],
-      detectedBias: [],
-      sourceColumn: req.sourceColumn,
-      isMedical: false,
-      typedConfirmationCorrect: undefined,
-    });
-    return {
-      approved: true,
-      payload: {
-        ackToken,
-        values: req.values ?? [],
-        text: req.text,
-        context: req.context,
-        detected: { pii: [], bias: [] },
-        acknowledgedAt: Date.now(),
-      },
-    };
-  }
-
-  const decision = await _openModal({
-    mode,
-    pii,
-    biasHits,
-    userText: req.text,
-    sampleValues: req.values,
-    totalCount: req.values?.length,
-    columnName: req.sourceColumn,
-  });
-
-  if (decision.action === "cancel") {
-    await ConsentAuditEntryClient.recordConsentDecision({
-      workspaceId: req.workspaceId,
-      userId: req.userId,
-      context: req.context,
-      decision: "cancelled",
-      mode,
-      detectedPii: pii.hits.map((h) => {
-        return h.label;
-      }),
-      detectedBias: biasHits.map((h) => {
-        return h.label;
-      }),
-      sourceColumn: req.sourceColumn,
-      isMedical: pii.isMedical,
-      typedConfirmationCorrect:
-        mode === "medical_strict" ? false : undefined,
-    });
-    return { approved: false, reason: "cancelled" };
-  }
-
-  // When the user picked "Use suggestion" on a bias nudge, swap the
-  // suggestion into the outgoing text. The ack token must cover the
-  // FINAL text the model will see, so we hash post-swap.
-  const finalText =
-    decision.useSuggestion && biasHits[0]?.suggestion ?
-      biasHits[0].suggestion
-    : req.text;
-
-  const ackToken = await _mintAckFor(req, finalText ?? "");
-
-  await ConsentAuditEntryClient.recordConsentDecision({
-    workspaceId: req.workspaceId,
-    userId: req.userId,
-    context: req.context,
-    decision: decision.useSuggestion ? "used_suggestion" : "approved",
-    mode,
-    detectedPii: pii.hits.map((h) => {
-      return h.label;
-    }),
-    detectedBias: biasHits.map((h) => {
-      return h.label;
-    }),
-    sourceColumn: req.sourceColumn,
-    isMedical: pii.isMedical,
-    typedConfirmationCorrect: mode === "medical_strict" ? true : undefined,
-  });
-
-  return {
-    approved: true,
-    payload: {
-      ackToken,
-      values: req.values ?? [],
-      text: finalText,
-      context: req.context,
-      detected: {
-        pii: pii.hits.map((h) => {
-          return h.label;
-        }),
-        bias: biasHits.map((h) => {
-          return h.label;
-        }),
-      },
-      acknowledgedAt: Date.now(),
-    },
-  };
-}
-
-/**
  * Mint an HMAC-signed ack token covering `text`, and register it in the
  * pending-acks queue so the next outgoing chat request picks it up.
  * Value-shaped row-data consent uses the same ack queue once the caller
@@ -308,4 +164,147 @@ function _openModal(args: {
       ),
     });
   });
+}
+
+/**
+ * The privacy chokepoint for anything leaving the browser for the LLM. Avandar
+ * keeps row-level data in DuckDB on the client; the boundary is browser to
+ * model/API, and `decideIfDataCanCrossBoundary` is the only supported way to
+ * move user-typed text or concrete cell values across it (chat messages,
+ * clarification answers,
+ * discovery dropdown picks, assumed SQL literals). It runs the local PII + bias
+ * detectors, opens `ConsentModal` when approval is needed, and on approval
+ * mints
+ * an HMAC ack token queued in `PendingAcks` for `useAvandarChatRuntime` to
+ * attach to the next chat POST (which the edge function verifies, else returns
+ * `UNAPPROVED_DATA_TRANSFER`). Resolves with an approved payload or a rejection
+ * reason.
+ */
+export async function decideIfDataCanCrossBoundary(
+  req: CrossBoundaryRequest,
+): Promise<CrossBoundaryResult> {
+  const pii: PiiDetectionResult = detectPii({
+    columnName: req.sourceColumn,
+    values: req.values,
+  });
+
+  const biasInput =
+    typeof req.text === "string" && req.text.trim().length > 0 ?
+      req.text
+    : undefined;
+  const biasHits: BiasHit[] = biasInput ? detectBias(biasInput).hits : [];
+
+  let mode = _chooseMode({ pii, biasHits });
+
+  const hasPayload =
+    (typeof req.text === "string" && req.text.trim().length > 0) ||
+    (req.values !== undefined && req.values.length > 0);
+
+  if (mode === undefined && req.explicitConsentRequired && hasPayload) {
+    mode = "clean";
+  }
+
+  // Clean send when there is nothing to flag.
+  if (mode === undefined) {
+    const ackToken = await _mintAckFor(req, req.text ?? "");
+    await ConsentAuditEntryClient.recordConsentDecision({
+      workspaceId: req.workspaceId,
+      userId: req.userId,
+      context: req.context,
+      decision: "approved",
+      mode: "clean",
+      detectedPii: [],
+      detectedBias: [],
+      sourceColumn: req.sourceColumn,
+      isMedical: false,
+      typedConfirmationCorrect: undefined,
+    });
+    return {
+      approved: true,
+      payload: {
+        ackToken,
+        values: req.values ?? [],
+        text: req.text,
+        context: req.context,
+        detected: { pii: [], bias: [] },
+        acknowledgedAt: Date.now(),
+      },
+    };
+  }
+
+  const decision = await _openModal({
+    mode,
+    pii,
+    biasHits,
+    userText: req.text,
+    sampleValues: req.values,
+    totalCount: req.values?.length,
+    columnName: req.sourceColumn,
+  });
+
+  if (decision.action === "cancel") {
+    await ConsentAuditEntryClient.recordConsentDecision({
+      workspaceId: req.workspaceId,
+      userId: req.userId,
+      context: req.context,
+      decision: "cancelled",
+      mode,
+      detectedPii: pii.hits.map((h) => {
+        return h.label;
+      }),
+      detectedBias: biasHits.map((h) => {
+        return h.label;
+      }),
+      sourceColumn: req.sourceColumn,
+      isMedical: pii.isMedical,
+      typedConfirmationCorrect: mode === "medical_strict" ? false : undefined,
+    });
+    return { approved: false, reason: "cancelled" };
+  }
+
+  // When the user picked "Use suggestion" on a bias nudge, swap the
+  // suggestion into the outgoing text. The ack token must cover the
+  // FINAL text the model will see, so we hash post-swap.
+  const finalText =
+    decision.useSuggestion && biasHits[0]?.suggestion ?
+      biasHits[0].suggestion
+    : req.text;
+
+  const ackToken = await _mintAckFor(req, finalText ?? "");
+
+  await ConsentAuditEntryClient.recordConsentDecision({
+    workspaceId: req.workspaceId,
+    userId: req.userId,
+    context: req.context,
+    decision: decision.useSuggestion ? "used_suggestion" : "approved",
+    mode,
+    detectedPii: pii.hits.map((h) => {
+      return h.label;
+    }),
+    detectedBias: biasHits.map((h) => {
+      return h.label;
+    }),
+    sourceColumn: req.sourceColumn,
+    isMedical: pii.isMedical,
+    typedConfirmationCorrect: mode === "medical_strict" ? true : undefined,
+  });
+
+  return {
+    approved: true,
+    payload: {
+      ackToken,
+      values: req.values ?? [],
+      text: finalText,
+      context: req.context,
+      detected: {
+        pii: pii.hits.map((h) => {
+          return h.label;
+        }),
+        bias: biasHits.map((h) => {
+          return h.label;
+        }),
+      },
+      acknowledgedAt: Date.now(),
+    },
+  };
 }
