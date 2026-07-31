@@ -2,16 +2,14 @@ import { Model } from "@models/Model/Model.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
+import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import {
   countClarificationsInHistory,
   MAX_CLARIFICATIONS_PER_QUESTION,
   parseClarify,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import {
-  isEmptyParsedAttempt,
-  parseOpenRouterResponse,
-} from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import {
   buildChatToolConfig,
   buildRetryContextNote,
