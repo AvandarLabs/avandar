@@ -62,6 +62,59 @@ complete and Phase 3 (cutover: merge `develop` → `main`, repoint prod, delete
 `feat/ict4d-demo`, remove `docs/deslop/`) can begin. Call this out in the
 completion commit.
 
+**Because this is the last group, it must also absorb every deferral earlier
+groups pushed forward.** See "GROUP-4 residual drift to absorb" below and the
+hard final-parity gate in "How to mark this group completed". Do not declare
+deslop done on row-status alone — the `git diff origin/develop..origin/feat/ict4d-demo`
+over source must be empty (or every remaining line explicitly accepted).
+
+### GROUP-4 residual drift to absorb here (deferred on 2026-07-31)
+
+GROUP-4 (`refactor-g4/dashboards`, committed `8d3052da`) deliberately deferred a
+few file-level deltas that belong to G5-owned features. After G4 merges, these
+files will still show in `git diff origin/develop..origin/feat/ict4d-demo`
+**by design** — G5 must reconcile them, or the final-parity gate below will fail.
+
+1. **`ShareResourceButton` `size` prop (row `#095`).** feat's
+   `ShareResourceButton` takes a `size` prop and feat's
+   `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx` passes
+   `size={DASHBOARD_TOOLBAR_BUTTON_SIZE}` so the dashboard toolbar's Share
+   button matches the other toolbar buttons. G4 shipped `DashboardEditorView`
+   **without** that prop (develop's `ShareResourceButton` had no `size`). When
+   `#095` migrates `ShareResourceButton`, also **re-add the `size` prop to the
+   `<ShareResourceButton>` call in `DashboardEditorView.tsx`** (re-import
+   `DASHBOARD_TOOLBAR_BUTTON_SIZE` from
+   `@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize`). This
+   is the one residual on a G4-owned file that no other row would otherwise touch.
+
+2. **`DashboardListView.tsx` / `DashboardCard.tsx` / `formatDashboardDate.ts`
+   (rows `#081` i18n + the offline group `#056`-`#063`).** G4 restored develop's
+   versions of these three files, deferring feat's two entangled deltas:
+   - **i18n:** feat wraps their strings in `<Trans>`/`t` and `formatDashboardDate`
+     takes a `t` arg. `#081 frontend-lingui-wiring` must wrap these three files
+     (and update `SaveToDashboardListMode.tsx`'s `formatDashboardDate` call to
+     pass `t`).
+   - **offline-status:** feat's `DashboardListView` computes a per-dashboard
+     `"full"|"partial"|"none"` offline badge via `useLocalDatasetIds`
+     (`src/lib/offline/useLocalDatasetIds.ts`), `collectDatasetIds`
+     (`shared/models/Dashboard/collectDatasetIds.ts`), and `useIsTabletSize`
+     (`src/lib/hooks/ui/useIsTabletSize.ts`) — all feat-only, all owned by the
+     offline group. Bring those modules with the offline rows and re-integrate
+     the `offlineStatus` prop on `DashboardCard`.
+
+3. **Offline `addDashboardBlock` prompt path (row `#062`).**
+   `src/lib/offlineChat/` (incl. `buildOfflinePrompts.ts`) is feat-only and lands
+   whole with `#062 web-offline-webllm-chat`; it references `addDashboardBlock`
+   for the offline turn path. Naturally covered when the offline chat subsystem
+   migrates — just don't forget the prompt wiring.
+
+4. **`AvaPageDataMigrationV3` cosmetic drift (accept or reconcile).** G4 kept
+   develop's V3 (feat rewrote its `ts-pattern` `match` → `switch` — functionally
+   identical). This shows as a small residual diff on
+   `AvaPageDataMigrationV3.ts`/`.types.ts`. It is cosmetic; either adopt feat's
+   version during the final-parity pass or explicitly accept it (develop's V3 is
+   correct and tested). Not a feature gap.
+
 ### Internal split seam (fallback only — operator declined splitting for now)
 
 The group ships as a **single PR** off `refactor-g5/...`, built row-by-row in the
@@ -502,6 +555,27 @@ The operator opens exactly one PR for the group against `develop`. On merge:
 5. Delete this group plan: `rm docs/deslop/GROUP-5-platform-i18n-standalone.md`.
 6. Delete the refactor branch `refactor-g5/platform-i18n-standalone` locally + remote.
 7. Commit + push to `feat/ict4d-demo`.
+
+### Final-parity gate — run BEFORE declaring deslop done
+
+Row-status `[x]` is necessary but **not sufficient**. G5 is the last group, so
+prove there is nothing left to migrate:
+
+```sh
+git fetch origin develop feat/ict4d-demo
+# The one true completeness check — must be (near) empty over real source dirs.
+git diff --stat origin/develop..origin/feat/ict4d-demo -- \
+  src shared packages supabase scripts
+```
+
+Every remaining line must be **either** already migrated **or** on the
+explicitly-accepted list (today: only the `AvaPageDataMigrationV3` `match`→`switch`
+cosmetic diff, item 4 above — and even that is better reconciled). Walk the whole
+residual; treat anything else as an unmigrated feature and fix it now. In
+particular confirm the four "GROUP-4 residual drift to absorb" items above are
+gone from the diff. Only when the diff is empty (modulo accepted cosmetics) is
+`develop` truly at parity and Phase 3 cutover safe. Record the final residual
+(or "empty") in the completion commit + `STATE.md`.
 
 > **DESLOP IS NOW FULLY DONE.** This is the final group. With every row in
 > `ALL_FEATURES.md` at `[x]`, `develop` has full feature parity with
