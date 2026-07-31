@@ -82,7 +82,7 @@ async function _resolveDiscoveryAnswer(
   };
 }
 
-/** Applies the privacy boundary required by a clarification answer. */
+/** Validates a clarification answer and returns its approved form. */
 export async function resolveClarificationAnswer(
   parameters: Readonly<{
     answer: Readonly<ClarificationSubmitAnswer>;

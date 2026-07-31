@@ -298,14 +298,14 @@ export default [
       "src/i18n/locales/*/messages.ts",
     ],
   },
+
   /**
    * Enforce that all data crossing the LLM boundary goes through
    * `src/lib/privacy/decideIfDataCanCrossBoundary.tsx`. The ack-token issuance
-   * and the
-   * pending-acks queue are the load-bearing pieces of the consent
-   * pipeline — importing them anywhere else lets a caller forge a token
-   * or drop the queue check. The spec calls this the "single chokepoint
-   * for data crossing the LLM boundary."
+   * and the pending-acks queue are the load-bearing pieces of the consent
+   * pipeline, importing them anywhere else lets a caller forge a token
+   * or drop the queue check. This forces `decideIfDataCanCrossBoundary` as the
+   * single chokepoint for data crossing the LLM boundary.
    *
    * Adding a new caller for `issueAckToken` or `registerAck`? Don't. Add
    * a new context to `CrossBoundaryContext` and route through
