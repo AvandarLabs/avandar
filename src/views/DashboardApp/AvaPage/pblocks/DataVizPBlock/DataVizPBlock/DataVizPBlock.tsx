@@ -7,9 +7,17 @@ import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQ
 import { useMemo } from "react";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
+import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters";
+import {
+  DEFAULT_DATA_VIZ_FILTER_PROPS,
+  DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+  useLocalFilterState,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type {
   VizConfig,
   VizType,
@@ -31,7 +39,7 @@ type Props = {
    * etc.) that gets passed straight to `VisualizationContainer`.
    */
   vizConfig: VizConfig;
-};
+} & DataVizFilterProps;
 
 export { type Props as DataVizPBlockProps };
 
@@ -47,10 +55,28 @@ export { type Props as DataVizPBlockProps };
 export function DataVizPBlock({
   nlQuery,
   vizConfig,
+  globalFilterSubscription,
+  localFilters,
   puck,
 }: WithPuckProps<Props>): JSX.Element {
   const { prompt, rawSql } = nlQuery;
   const metadata = useAvaPageMetadata(puck);
+
+  const filterProps: DataVizFilterProps = useMemo(() => {
+    return {
+      globalFilterSubscription:
+        globalFilterSubscription ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+      localFilters: localFilters ?? DEFAULT_DATA_VIZ_FILTER_PROPS.localFilters,
+    };
+  }, [globalFilterSubscription, localFilters]);
+
+  const localFilterState = useLocalFilterState(filterProps.localFilters);
+
+  const filteredSql = useApplyDashboardFiltersToSql(rawSql, {
+    filterProps,
+    localFilters: filterProps.localFilters,
+    localFilterState,
+  });
 
   const emptyStructuredQuery = useMemo(() => {
     return StructuredQuery.makeEmpty();
@@ -58,7 +84,7 @@ export function DataVizPBlock({
 
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
-    rawSql: rawSql,
+    rawSql: filteredSql,
     ...(metadata.auth === "workspace" ?
       {
         auth: "workspace" as const,
@@ -123,6 +149,10 @@ export function DataVizPBlock({
       }}
     >
       <Stack gap="sm">
+        <DataVizLocalFilters
+          localFilters={filterProps.localFilters}
+          state={localFilterState}
+        />
         <Box pos="relative" w="100%" h={420}>
           <LoadingOverlay visible={isLoadingResults} zIndex={10} />
           <VisualizationContainer

@@ -1,8 +1,23 @@
-import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
-import { TextareaForm } from "@ui";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  Alert,
+  Button,
+  Fieldset,
+  Group,
+  List,
+  Paper,
+  Stack,
+  Text,
+} from "@mantine/core";
+import { IconAlertTriangle } from "@tabler/icons-react";
+import { Tabs, TextareaForm } from "@ui";
 import { useState } from "react";
+import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
+import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { mantineColorVar } from "@/lib/utils/browser/css";
+import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
@@ -41,8 +56,8 @@ export type NLQuery = {
 type Props = AvaPageFieldProps<NLQuery>;
 
 export function NLQueryPField({ value, onChange }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
     onSuccess: (sql, mutationVars) => {
@@ -61,38 +76,151 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
   });
   const { prompt, rawSql } = value;
 
+  const manualState = useDashboardManualQueryState({
+    rawSql,
+    onRawSqlChange: (nextSql) => {
+      onChange({ ...value, rawSql: nextSql });
+    },
+  });
+
   return (
-    <Stack gap="sm">
+    <Tabs
+      indicatorVariant="floating"
+      tabIds={["prompt", "manual-query", "sql"] as const}
+      renderTabHeader={{
+        prompt: t`Prompt`,
+        "manual-query": t`Manual`,
+        sql: t`SQL`,
+      }}
+      px="xs"
+      py="sm"
+      renderTabPanel={{
+        prompt: () => {
+          return (
+            <PromptTabPanel
+              prompt={prompt}
+              isRunningQuery={isRunningQuery}
+              onSubmitPrompt={(promptStr) => {
+                onChange({ ...value, prompt: promptStr });
+                if (promptStr) {
+                  generateAndRunQuery({ prompt: promptStr });
+                }
+              }}
+            />
+          );
+        },
+        "manual-query": () => {
+          if (!manualState.isParserReady) {
+            return (
+              <Text size="sm" c="dimmed" px="sm">
+                <Trans>Loading datasets…</Trans>
+              </Text>
+            );
+          }
+          return (
+            <ManualQueryForm
+              query={manualState.query}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              handlers={manualState.handlers}
+              withinPortal
+            />
+          );
+        },
+        sql: () => {
+          return (
+            <SqlTabPanel
+              rawSql={rawSql}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              sqlSyncWarnings={manualState.sqlSyncWarnings}
+              onSubmitSql={(nextSql) => {
+                onChange({ ...value, rawSql: nextSql });
+              }}
+            />
+          );
+        },
+      }}
+    />
+  );
+}
+
+function PromptTabPanel({
+  prompt,
+  isRunningQuery,
+  onSubmitPrompt,
+}: {
+  prompt: string;
+  isRunningQuery: boolean;
+  onSubmitPrompt: (prompt: string) => void;
+}): JSX.Element {
+  const { t } = useLingui();
+  return (
+    <Stack gap="sm" px="sm">
       <TextareaForm
         asField
         defaultValue={prompt}
-        description="Enter your question or instructions in natural language to generate a SQL query"
-        label="Prompt"
+        description={t`Enter your question or instructions in natural language to generate a SQL query`}
+        label={t`Prompt`}
         minRows={4}
         autosize
         isSubmitting={isRunningQuery}
-        submitButtonLabel="Generate Query"
+        submitButtonLabel={t`Generate Query`}
         styles={{
           input: {
             fontFamily: "monospace",
           },
         }}
         onSubmit={(promptStr) => {
-          const trimmedPrompt = promptStr.trim();
-          onChange({
-            ...value,
-            prompt: trimmedPrompt,
-          });
-          if (trimmedPrompt) {
-            generateAndRunQuery({ prompt: trimmedPrompt });
-          }
+          onSubmitPrompt(promptStr.trim());
         }}
       />
+    </Stack>
+  );
+}
 
+function SqlTabPanel({
+  rawSql,
+  isStructuredQueryInSync,
+  sqlSyncWarnings,
+  onSubmitSql,
+}: {
+  rawSql: string;
+  isStructuredQueryInSync: boolean;
+  sqlSyncWarnings: readonly string[];
+  onSubmitSql: (nextSql: string) => void;
+}): JSX.Element {
+  const { t } = useLingui();
+  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
+
+  return (
+    <Stack gap="sm" px="sm">
+      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
+        <Alert
+          icon={<IconAlertTriangle size={16} />}
+          color="yellow"
+          variant="light"
+          title={t`Manual form shows an approximation`}
+          data-testid="sql-sync-warning"
+        >
+          <Text size="xs" mb="xs">
+            <Trans>
+              Parts of this SQL could not be represented in the Manual form. The
+              form shows a best-effort approximation; the SQL above is what
+              actually runs.
+            </Trans>
+          </Text>
+          <List size="xs" spacing={2}>
+            {sqlSyncWarnings.map((reason) => {
+              return <List.Item key={reason}>{reason}</List.Item>;
+            })}
+          </List>
+        </Alert>
+      : null}
       <Fieldset
         legend={
           <Group justify="space-between" style={{ width: "100%" }}>
-            <span>Generated SQL</span>
+            <span>
+              <Trans>Generated SQL</Trans>
+            </span>
             {!isEditSQLMode && (
               <Button
                 size="xs"
@@ -101,7 +229,7 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
                   setIsEditSQLMode(true);
                 }}
               >
-                Edit query
+                <Trans>Edit query</Trans>
               </Button>
             )}
           </Group>
@@ -110,35 +238,13 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
       >
         <Stack gap="sm">
           {isEditSQLMode ?
-            <TextareaForm
-              // use the rawSql as the key to force the textarea form to
-              // re-initialize when we re-run a query, so we can properly
-              // detect dirty state
-              key={rawSql}
-              asField
-              defaultValue={rawSql}
-              minRows={6}
-              autosize
-              showSubmitButton={true}
-              showCancelButton={true}
-              submitButtonLabel="Save and re-run query"
-              cancelButtonLabel="Cancel"
-              isSubmitting={false}
-              styles={{
-                input: {
-                  fontFamily: "monospace",
-                },
-              }}
-              validateOnChange={true}
-              required={true}
-              disabledUntilDirty={true}
-              onSubmit={(newRawSql) => {
-                const trimmedSQL = newRawSql.trim();
+            <SqlQueryEditPanel
+              initialSql={rawSql}
+              submitButtonLabel={t`Save and re-run query`}
+              cancelButtonLabel={t`Cancel`}
+              onSubmit={(newRawSQL) => {
                 setIsEditSQLMode(false);
-                onChange({
-                  ...value,
-                  rawSql: trimmedSQL,
-                });
+                onSubmitSql(newRawSQL);
               }}
               onCancel={() => {
                 setIsEditSQLMode(false);
@@ -151,20 +257,7 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
                 border: `1px solid ${mantineColorVar("gray.3")}`,
               }}
             >
-              <Textarea
-                value={rawSql}
-                readOnly
-                minRows={6}
-                autosize
-                styles={{
-                  input: {
-                    fontFamily: "monospace",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    padding: 0,
-                  },
-                }}
-              />
+              <AvaSqlBlock value={rawSql} readOnly minRows={6} />
             </Paper>
           }
         </Stack>

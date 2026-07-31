@@ -1,18 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  fireEvent,
-  RenderOptions,
-  render as renderRtl,
-  screen,
-} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { fireEvent, render, RenderOptions, screen } from "@/test-utils";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfileId } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return {
@@ -130,7 +125,7 @@ vi.mock(
   "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig",
   () => {
     return {
-      getDashboardPuckConfig: (): Record<string, unknown> => {
+      useDashboardPuckConfig: (): Record<string, unknown> => {
         return {};
       },
       getDashboardTitleFromPuckData: (): string => {
@@ -227,15 +222,17 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 function renderWithProviders(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-): ReturnType<typeof renderRtl> {
+): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return renderRtl(ui, {
-    wrapper: ({ children }) => {
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>{children}</AvandarUiProvider>
+          <DashboardEditorStateManager.Provider>
+            {children}
+          </DashboardEditorStateManager.Provider>
         </QueryClientProvider>
       );
     },
@@ -328,6 +325,31 @@ describe("DashboardEditorView", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(
+      screen.getByRole("button", { name: /publish/i }),
+    ).not.toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("saves the dashboard when mod+S is pressed", () => {
+    renderWithProviders(
+      <DashboardEditorView
+        dashboard={_makeDashboard()}
+        workspaceSlug="test-workspace"
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("puck-add-component"));
+    expect(screen.getByRole("button", { name: /publish/i })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+
+    fireEvent.keyDown(document.documentElement, {
+      key: "s",
+      code: "KeyS",
+      metaKey: true,
+    });
 
     expect(
       screen.getByRole("button", { name: /publish/i }),

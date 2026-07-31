@@ -1,13 +1,24 @@
+import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useMemo } from "react";
 import {
   NLQuery,
   NLQueryPField,
 } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 
-export function buildNLQueryPFieldConfig(): CustomField<NLQuery> {
-  return {
-    label: "Prompt",
-    type: "custom",
-    render: NLQueryPField,
-  };
+/**
+ * React hook that builds the Puck `CustomField` config for the NL query field.
+ *
+ * The field `label` is translated via the Lingui macro, so this must be
+ * invoked from a React component / hook.
+ */
+export function useNLQueryPFieldConfig(): CustomField<NLQuery> {
+  const { t } = useLingui();
+  return useMemo(() => {
+    return {
+      label: t`Prompt`,
+      type: "custom",
+      render: NLQueryPField,
+    };
+  }, [t]);
 }

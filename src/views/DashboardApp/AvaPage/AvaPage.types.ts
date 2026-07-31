@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Simplify } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type {
   CustomFieldRender,
   Config as PuckConfig,
@@ -163,6 +164,7 @@ export type PBlockPropsRegistry = {
   DividerBlock: DividerBlockProps;
   EmbedBlock: EmbedBlockProps;
   FigureBlock: FigureBlockProps;
+  Filter: FilterPBlockProps;
   Grid: GridProps;
   HeadingBlock: HeadingBlockProps;
   ListBlock: ListBlockProps;

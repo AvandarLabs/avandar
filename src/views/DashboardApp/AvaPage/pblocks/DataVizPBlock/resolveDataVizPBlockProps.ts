@@ -1,4 +1,5 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
@@ -32,6 +33,9 @@ export function resolveDataVizPBlockProps(input: {
     vizConfig:
       props.vizConfig ??
       VizConfigs.makeEmptyConfig(props.vizType ?? DEFAULT_VIZ_TYPE),
+    globalFilterSubscription:
+      props.globalFilterSubscription ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+    localFilters: props.localFilters ?? [],
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {

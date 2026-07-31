@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
+import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps";
 import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 
 describe("resolveDataVizPBlockProps", () => {
@@ -91,6 +91,8 @@ describe("resolveDataVizPBlockProps", () => {
         layout: "group",
         withLegend: true,
       },
+      globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+      localFilters: [],
     };
     const next = resolveDataVizPBlockProps({ props, changed: {} });
     expect(next).toEqual(props);

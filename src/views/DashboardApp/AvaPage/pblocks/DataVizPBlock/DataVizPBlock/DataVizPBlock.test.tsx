@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
@@ -81,18 +82,22 @@ function renderBlock(props: {
   return render(
     <QueryClientProvider client={queryClient}>
       <AvandarUiProvider>
-        <DataVizPBlock
-          puck={fakePuckContext()}
-          nlQuery={{
-            prompt: props.prompt,
-            rawSql: props.rawSql,
-            generations: [],
-          }}
-          vizType={
-            props.vizType as Parameters<typeof DataVizPBlock>[0]["vizType"]
-          }
-          vizConfig={props.vizConfig}
-        />
+        <DashboardFilterStateManager.Provider>
+          <DataVizPBlock
+            puck={fakePuckContext()}
+            nlQuery={{
+              prompt: props.prompt,
+              rawSql: props.rawSql,
+              generations: [],
+            }}
+            vizType={
+              props.vizType as Parameters<typeof DataVizPBlock>[0]["vizType"]
+            }
+            vizConfig={props.vizConfig}
+            globalFilterSubscription={{ mode: "all", subscribedFilterIds: [] }}
+            localFilters={[]}
+          />
+        </DashboardFilterStateManager.Provider>
       </AvandarUiProvider>
     </QueryClientProvider>,
   ) as unknown as ReactElement;
