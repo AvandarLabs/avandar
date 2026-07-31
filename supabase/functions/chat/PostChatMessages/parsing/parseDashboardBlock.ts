@@ -219,30 +219,36 @@ export function parseDashboardBlock(
 export function dashboardBlockSummary(
   block: ChatGeneratedDashboardBlock,
 ): string {
-  switch (block.kind) {
-    case "DataViz":
-      return `Added "${block.prompt}" to your dashboard as a ${block.vizType}.`;
-    case "HeadingBlock":
-      return `Added a heading: "${block.text}".`;
-    case "ParagraphBlock":
+  return match(block)
+    .with({ kind: "DataViz" }, ({ prompt, vizType }) => {
+      return `Added "${prompt}" to your dashboard as a ${vizType}.`;
+    })
+    .with({ kind: "HeadingBlock" }, ({ text }) => {
+      return `Added a heading: "${text}".`;
+    })
+    .with({ kind: "ParagraphBlock" }, () => {
       return "Added a paragraph to your dashboard.";
-    case "QuoteBlock":
+    })
+    .with({ kind: "QuoteBlock" }, () => {
       return "Added a quote to your dashboard.";
-    case "DividerBlock":
+    })
+    .with({ kind: "DividerBlock" }, () => {
       return "Added a divider to your dashboard.";
-    case "CalloutBlock":
-      return `Added a callout: "${block.title}".`;
-    case "ListBlock":
-      return `Added a list with ${block.items.length} item(s) to your dashboard.`;
-    case "CodeBlock":
+    })
+    .with({ kind: "CalloutBlock" }, ({ title }) => {
+      return `Added a callout: "${title}".`;
+    })
+    .with({ kind: "ListBlock" }, ({ items }) => {
+      return `Added a list with ${items.length} item(s) to your dashboard.`;
+    })
+    .with({ kind: "CodeBlock" }, () => {
       return "Added a code block to your dashboard.";
-    case "TableBlock":
+    })
+    .with({ kind: "TableBlock" }, () => {
       return "Added a table to your dashboard.";
-    case "Card":
-      return `Added a card: "${block.title}".`;
-    default: {
-      const _exhaustive: never = block;
-      return _exhaustive;
-    }
-  }
+    })
+    .with({ kind: "Card" }, ({ title }) => {
+      return `Added a card: "${title}".`;
+    })
+    .exhaustive();
 }
