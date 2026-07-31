@@ -1,4 +1,5 @@
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
+import { match } from "ts-pattern";
 import type {
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
@@ -82,8 +83,8 @@ export function parseDashboardBlock(
     return undefined;
   }
 
-  switch (kind) {
-    case "DataViz": {
+  return match(kind)
+    .with("DataViz", () => {
       const prompt = _trimString(parsed.prompt);
       const sqlRaw = _trimString(parsed.sql);
       const vizTypeRaw = _trimString(parsed.vizType);
@@ -96,8 +97,8 @@ export function parseDashboardBlock(
         return undefined;
       }
       return { kind: "DataViz", prompt, sql, vizType };
-    }
-    case "HeadingBlock": {
+    })
+    .with("HeadingBlock", () => {
       const text = _trimString(parsed.text);
       if (!text) {
         return undefined;
@@ -120,8 +121,8 @@ export function parseDashboardBlock(
         ...(level ? { level } : {}),
         ...(align ? { align } : {}),
       };
-    }
-    case "ParagraphBlock": {
+    })
+    .with("ParagraphBlock", () => {
       const text = _trimString(parsed.text);
       if (!text) {
         return undefined;
@@ -132,18 +133,19 @@ export function parseDashboardBlock(
           (alignRaw as "left" | "center" | "right")
         : undefined;
       return { kind: "ParagraphBlock", text, ...(align ? { align } : {}) };
-    }
-    case "QuoteBlock": {
+    })
+    .with("QuoteBlock", () => {
       const quote = _trimString(parsed.quote);
       if (!quote) {
         return undefined;
       }
       const cite = _trimString(parsed.cite);
       return { kind: "QuoteBlock", quote, ...(cite ? { cite } : {}) };
-    }
-    case "DividerBlock":
+    })
+    .with("DividerBlock", () => {
       return { kind: "DividerBlock" };
-    case "CalloutBlock": {
+    })
+    .with("CalloutBlock", () => {
       const title = _trimString(parsed.title);
       const body = _trimString(parsed.body);
       if (!title || !body) {
@@ -155,8 +157,8 @@ export function parseDashboardBlock(
           (toneRaw as "info" | "warning" | "neutral")
         : undefined;
       return { kind: "CalloutBlock", title, body, ...(tone ? { tone } : {}) };
-    }
-    case "ListBlock": {
+    })
+    .with("ListBlock", () => {
       if (!Array.isArray(parsed.items)) {
         return undefined;
       }
@@ -176,16 +178,16 @@ export function parseDashboardBlock(
           (listTypeRaw as "ordered" | "unordered")
         : undefined;
       return { kind: "ListBlock", items, ...(listType ? { listType } : {}) };
-    }
-    case "CodeBlock": {
+    })
+    .with("CodeBlock", () => {
       const code = _trimString(parsed.code);
       if (!code) {
         return undefined;
       }
       const language = _trimString(parsed.language);
       return { kind: "CodeBlock", code, ...(language ? { language } : {}) };
-    }
-    case "TableBlock": {
+    })
+    .with("TableBlock", () => {
       const data = _trimString(parsed.data);
       if (!data) {
         return undefined;
@@ -203,14 +205,14 @@ export function parseDashboardBlock(
         ...(delimiter ? { delimiter } : {}),
         ...(hasHeader !== undefined ? { hasHeader } : {}),
       };
-    }
-    case "Card": {
+    })
+    .with("Card", () => {
       const title = _trimString(parsed.title);
       return title ? { kind: "Card", title } : undefined;
-    }
-    default:
+    })
+    .otherwise(() => {
       return undefined;
-  }
+    });
 }
 
 /** Builds the user-facing summary for a dashboard block response. */
