@@ -5,11 +5,11 @@ import {
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { infer as zInfer } from "zod";
-import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type {
   PolarEventDataSchemas,
   PolarWebhookHandlerOptions,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 
 type SubscriptionCreatedData = zInfer<
   typeof PolarEventDataSchemas.SubscriptionCreated

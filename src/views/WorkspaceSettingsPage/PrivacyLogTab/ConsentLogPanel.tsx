@@ -250,8 +250,10 @@ export function ConsentLogPanel(): React.ReactNode {
                           </Badge>
                         );
                       })}
-                      {entry.detectedPii.length === 0 &&
-                      entry.detectedBias.length === 0 ?
+                      {(
+                        entry.detectedPii.length === 0 &&
+                        entry.detectedBias.length === 0
+                      ) ?
                         <Text size="xs" c="dimmed">
                           <Trans>(clean)</Trans>
                         </Text>

@@ -4,7 +4,10 @@ import { useCallback } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
-/** Creates the callback that turns a discovery query into clarification options. */
+/**
+ * Creates the callback that turns a discovery query into clarification
+ * options.
+ */
 export function useDiscoveryResolver(): DiscoveryResolver {
   const { t } = useLingui();
 

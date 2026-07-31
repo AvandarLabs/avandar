@@ -3,9 +3,7 @@ import { Model } from "@models";
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
-import {
-  decideIfDataCanCrossBoundary,
-} from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
+import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render } from "@/test-utils";

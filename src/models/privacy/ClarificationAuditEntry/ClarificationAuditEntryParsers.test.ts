@@ -21,9 +21,9 @@ const row: ClarificationAuditEntry.T = {
 
 describe("ClarificationAuditEntryParsers", () => {
   it("validates the runtime clarification audit literal unions", () => {
-    expect(ClarificationAuditEntry.isValidClarificationOutcome("answered")).toBe(
-      true,
-    );
+    expect(
+      ClarificationAuditEntry.isValidClarificationOutcome("answered"),
+    ).toBe(true);
     expect(
       ClarificationAuditEntry.isValidClarificationResponseShapeLabel(
         "free_text",

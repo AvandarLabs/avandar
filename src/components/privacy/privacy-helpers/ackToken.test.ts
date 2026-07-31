@@ -43,4 +43,6 @@ describe("hashTextPayload", () => {
 // the `useAvandarChatRuntime` integration tests once the harness can stub the
 // `/chat/:workspaceId/session-secret` edge function. No unit test here: a bare
 // existence/type check would be tautological (see docs/rules/testing.md).
-describe.todo("issueAckToken: happy-path once the edge function can be stubbed");
+describe.todo(
+  "issueAckToken: happy-path once the edge function can be stubbed",
+);

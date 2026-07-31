@@ -1,5 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Badge, Card, Group, Loader, Stack, Table, Text, Title } from "@mantine/core";
+import {
+  Badge,
+  Card,
+  Group,
+  Loader,
+  Stack,
+  Table,
+  Text,
+  Title,
+} from "@mantine/core";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";

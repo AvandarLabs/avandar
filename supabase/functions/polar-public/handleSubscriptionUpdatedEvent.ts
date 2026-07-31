@@ -4,11 +4,11 @@ import {
   webhookSuccessResponse,
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type {
   PolarEventDataSchemas,
   PolarWebhookHandlerOptions,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type { z } from "zod";
 
 type SubscriptionUpdatedData = z.infer<
