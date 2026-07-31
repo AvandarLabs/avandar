@@ -80,20 +80,20 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 | ------------- | ---- | --------------- | ------- | ----- |
-| _(none)_      |      |                 |         | GROUP-3 merged 2026-07-31; see Completed migrations log. |
+| 64–76, 48 | `dashboards` (GROUP-4) | `refactor-g4/dashboards` | 2026-07-31 | Ported + verified; committed `8d3052da`, **not pushed** (operator to push + open PR). |
 
 GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26), and
 GROUP-3 (`c703e5c2`, 2026-07-31) are merged into `develop` and merged back
 into `feat/ict4d-demo`.
 
-**GROUP-4 branch prepared (not yet in flight).** On 2026-07-31 the
-`refactor-g4/dashboards` branch + worktree were cut off `origin/develop`
-@ `c703e5c2` (worktree `~/src/worktrees/avandar/refactor-g4/dashboards`).
-Nothing is ported or pushed yet, so it is **not** an in-flight row above and
-the GROUP-4 `ALL_FEATURES.md` rows remain `[ ]`. When the port lands and the
-branch is pushed, flip rows `#064`–`#076` + `#048` to `[~]` and add the
-in-flight row per `/deslop migrate` steps 7–8. The refreshed plan is
-`docs/deslop/GROUP-4-dashboards.md` (re-verified against `c703e5c2`).
+**GROUP-4 in flight (ported, not pushed).** On 2026-07-31 `refactor-g4/dashboards`
+was cut off `origin/develop` @ `c703e5c2` (worktree
+`~/src/worktrees/avandar/refactor-g4/dashboards`) and the whole group was ported
+per `docs/deslop/GROUP-4-dashboards.md` (rows `#064`–`#076` + `#048`, now `[~]`).
+The port is committed locally as `8d3052da` but **not pushed** — so origin has no
+`refactor-g4/dashboards` branch yet and no PR is open. Operator: push the branch
+and open the single group PR. On merge, run `/deslop complete` to flip the rows to
+`[x]`, log the merge SHA, and drop the plan.
 
 ---
 
@@ -506,5 +506,33 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     bumped `6ec98d45` → `c703e5c2`.
   - **Branch prepared:** `refactor-g4/dashboards` cut off `origin/develop`
     @ `c703e5c2` in worktree `~/src/worktrees/avandar/refactor-g4/dashboards`.
-    Nothing ported/pushed yet → not in the In-flight table; GROUP-4 rows stay
-    `[ ]`. These deslop-doc edits are left **uncommitted** for operator review.
+- `2026-07-31` — **GROUP-4 ported + verified (committed, NOT pushed).** Ran
+  `/deslop migrate` for the group. All 84 path-set files ported into
+  `refactor-g4/dashboards`; committed as `8d3052da`. Rows `#064`–`#076` + `#048`
+  flipped `[ ]` → `[~]` and the in-flight row was added. Key adaptations to the
+  post-G3 develop:
+  - Kept develop's V3 (feat's V3 `match`→`switch` diff is drift, not G4); added
+    `AvaPageDataMigrationV4`, appended V4 to `versionTransforms`, bumped
+    `CURRENT_SCHEMA_VERSION` 3 → 4.
+  - Applied G-series renames to the ported code: `rawSQL`→`rawSql`,
+    `analyticsClient`/`logAnalyticsEvent`→`AnalyticsClient.logEvent`,
+    `@/components/{AvaSqlBlock,SqlEditor}`→`@/components/sql/…`,
+    `structuredQueryToSQL`→`structuredQueryToSql`, `LocalDatasetClient` subdir,
+    `useOfflineGate` relocation, `applyVizConfigFromQueryResult` subdir.
+  - Ported new model `PublishSliceConfig` and the `#072` `dashboards`
+    edge function (renamed `dashboards.routes*`→`DashboardsRoutes*` to match
+    develop's PascalCase convention); wired `DashboardsAPI` into
+    `src/types/http-api.types.ts`; regenerated `routeTree.gen.ts`.
+  - New deps: `qrcode`, `@types/qrcode`, `jspdf` (others already on develop).
+  - **Deferred (not G4):** `DashboardListView`/`DashboardCard`/`formatDashboardDate`
+    restored to develop (their feat deltas are i18n + offline-status, owned by
+    G5 / the offline group); `ShareResourceButton` `size` prop dropped (owned by
+    `#095`); offline `addDashboardBlock` prompt path left to G5;
+    `HIDE_EXPORT_AS_PDF` ships `true`.
+  - **Verification:** `pnpm type-check` 0 errors; eslint clean on 75 changed
+    files; vitest 94/94 across 16 files incl. the AvaPageDataMigrationV3/V4
+    chain gate. Manual/browser + live-LLM checks (theme switch, chat-add-block,
+    filter propagation, publish/vanity/QR, PDF annotate, summary lazy-load) are
+    left for the operator — can't drive prod state / LLM here.
+  - **Not pushed** per operator instruction; feat-side deslop commits (this one
+    + the plan refresh) are also local-only.

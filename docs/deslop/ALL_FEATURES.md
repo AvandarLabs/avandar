@@ -185,7 +185,7 @@ Privacy foundation features land below.
 | 45 | `[x] (59cdb59c)` | **structured-query-to-sql** — Knex-based form-to-SQL renderer extracted from `toRawDuckDBQuery` into a reusable utility. Also renders the new WHERE clause. 5 unit tests. | CHECKPOINT 7 |
 | 46 | `[x] (59cdb59c)` | **recursive-filter-ui** — `QueryFiltersField` powered by `react-querybuilder` + `@react-querybuilder/mantine`; nested AND/OR groups; library-agnostic `QueryFilterGroup` shape. | CHECKPOINT 7 |
 | 47 | `[x] (59cdb59c)` | **sql-form-sync-data-explorer** — Bidirectional sync: `applySqlMapping` updates `isStructuredQueryInSync` + `sqlSyncWarnings`, manual edits regenerate SQL, out-of-sync confirmation Alert. | CHECKPOINT 7 |
-| 48 | `[ ]` | **sql-form-sync-dashboards** — Per-block `useDashboardManualQueryState` hook giving DataViz blocks the same SQL ↔ form parity as Data Explorer; 3-tab `NLQueryPField` (Prompt / Manual / SQL). | CHECKPOINT 16 |
+| 48 | `[~]` | **sql-form-sync-dashboards** — Per-block `useDashboardManualQueryState` hook giving DataViz blocks the same SQL ↔ form parity as Data Explorer; 3-tab `NLQueryPField` (Prompt / Manual / SQL). | CHECKPOINT 16 |
 | 49 | `[x] (59cdb59c)` | **duckdb-sql-parser-updates** — Parser-side updates so DuckDB-specific SQL parses correctly. | Commit `673419e` |
 
 ## H. Desktop platform & offline (web + desktop)
@@ -204,34 +204,34 @@ Privacy foundation features land below.
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 64 | `[ ]` | **dashboard-design-tokens** — `AvaPageRootProps` gains `theme` (default/ocean/forest/rose/amber/graphite) and `typography` (system/serif/mono); polished header (left-accent strip, tighter title leading, uppercase byline); polished DataViz card. | CHECKPOINT 9 (dashboards) |
-| 65 | `[ ]` | **dashboard-chat-in-editor** — `addDashboardBlock` tool; `DashboardEditorStateManager` queues blocks; chat composer unlocked on dashboards surface; `buildPendingDataVizBlock`. | CHECKPOINT 9 (dashboards) |
-| 66 | `[ ]` | **dashboard-export-buttons-polish** — Updated dashboard buttons and export UI styling. | Commits `9d4ac78`, `7abad7d` |
-| 67 | `[ ]` | **dashboard-modal-styles** — Modal style refresh used by dashboards (Publish, Export, etc.). | Commit `98dc225`, `5eed96a` |
+| 64 | `[~]` | **dashboard-design-tokens** — `AvaPageRootProps` gains `theme` (default/ocean/forest/rose/amber/graphite) and `typography` (system/serif/mono); polished header (left-accent strip, tighter title leading, uppercase byline); polished DataViz card. | CHECKPOINT 9 (dashboards) |
+| 65 | `[~]` | **dashboard-chat-in-editor** — `addDashboardBlock` tool; `DashboardEditorStateManager` queues blocks; chat composer unlocked on dashboards surface; `buildPendingDataVizBlock`. | CHECKPOINT 9 (dashboards) |
+| 66 | `[~]` | **dashboard-export-buttons-polish** — Updated dashboard buttons and export UI styling. | Commits `9d4ac78`, `7abad7d` |
+| 67 | `[~]` | **dashboard-modal-styles** — Modal style refresh used by dashboards (Publish, Export, etc.). | Commit `98dc225`, `5eed96a` |
 
 ## J. Dashboards — filters
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 68 | `[ ]` | **dashboard-global-filters** — `Filter` P-block (single-select, multi-select, contains); `DashboardFilterStateManager`; `applyDashboardFiltersToSql` subselect wrap. | CHECKPOINT 9 (dashboards) |
-| 69 | `[ ]` | **dashboard-per-viz-filters** — Per-viz global-filter All/Some/None opt-out; per-viz local filters with independent state; `AvaPageDataMigrationV4` seeds defaults on every DataViz block. | CHECKPOINT 14 |
+| 68 | `[~]` | **dashboard-global-filters** — `Filter` P-block (single-select, multi-select, contains); `DashboardFilterStateManager`; `applyDashboardFiltersToSql` subselect wrap. | CHECKPOINT 9 (dashboards) |
+| 69 | `[~]` | **dashboard-per-viz-filters** — Per-viz global-filter All/Some/None opt-out; per-viz local filters with independent state; `AvaPageDataMigrationV4` seeds defaults on every DataViz block. | CHECKPOINT 14 |
 
 ## K. Dashboards — publishing & sharing
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 70 | `[ ]` | **dashboard-view-before-publish** — Auth-gated preview route `/<workspaceSlug>/dashboards/preview/<dashboardId>` with "Back to editor" banner; `mode: "public" \| "preview"` prop on `DashboardViewerView`. | CHECKPOINT 6 |
-| 71 | `[ ]` | **dashboard-publish-modal** — Real modal replaces confirm dialog. URL-first copy ("Your dashboard will be published to: <url>"). | CHECKPOINT 6 + CHECKPOINT 8 polish |
-| 72 | `[ ]` | **dashboard-vanity-url** — Kebab-case slug input + live preview; `toVanitySlug` utility with 8 unit tests; public route `/d/<workspaceSlug>/<slug>` with workspace-scoped uniqueness. | CHECKPOINT 6 + 8 |
-| 73 | `[ ]` | **dashboard-share-url-row-qr** — `ShareUrlRow` shows canonical + vanity URLs with copy buttons; downloadable 256×256 QR PNG via `qrcode` library (client-side, no network). | CHECKPOINT 6 |
-| 74 | `[ ]` | **dashboard-slice-aware-publish** — `Data scope` section with `queried` (default, narrowest) / `all_columns` / `custom` modes; `node-sql-parser` `columnList` extracts referenced columns; `unparseable` sentinel for safe fallback; `buildSliceSql` materializes the slice; persists in `dashboard.config.__publishConfig`. | CHECKPOINT 13 |
-| 75 | `[ ]` | **dashboard-pdf-export-annotate** — `ExportPdfButton` next to Publish; two-step modal (export immediately / annotate then export); off-screen render via `<PuckPageRender>` + `html2canvas` 2× → `jspdf` paginated portrait letter; annotator with freehand/arrow/text (RoughJS), roughness/stroke/color sliders, undo+clear, composited before pagination. Currently gated behind a local `HIDE_EXPORT_AS_PDF = true` flag — migrate the gate alongside the feature so it ships defaulted-off. | CHECKPOINT 13; commit `6fee1d3d` (HIDE_EXPORT_AS_PDF flag) |
+| 70 | `[~]` | **dashboard-view-before-publish** — Auth-gated preview route `/<workspaceSlug>/dashboards/preview/<dashboardId>` with "Back to editor" banner; `mode: "public" \| "preview"` prop on `DashboardViewerView`. | CHECKPOINT 6 |
+| 71 | `[~]` | **dashboard-publish-modal** — Real modal replaces confirm dialog. URL-first copy ("Your dashboard will be published to: <url>"). | CHECKPOINT 6 + CHECKPOINT 8 polish |
+| 72 | `[~]` | **dashboard-vanity-url** — Kebab-case slug input + live preview; `toVanitySlug` utility with 8 unit tests; public route `/d/<workspaceSlug>/<slug>` with workspace-scoped uniqueness. | CHECKPOINT 6 + 8 |
+| 73 | `[~]` | **dashboard-share-url-row-qr** — `ShareUrlRow` shows canonical + vanity URLs with copy buttons; downloadable 256×256 QR PNG via `qrcode` library (client-side, no network). | CHECKPOINT 6 |
+| 74 | `[~]` | **dashboard-slice-aware-publish** — `Data scope` section with `queried` (default, narrowest) / `all_columns` / `custom` modes; `node-sql-parser` `columnList` extracts referenced columns; `unparseable` sentinel for safe fallback; `buildSliceSql` materializes the slice; persists in `dashboard.config.__publishConfig`. | CHECKPOINT 13 |
+| 75 | `[~]` | **dashboard-pdf-export-annotate** — `ExportPdfButton` next to Publish; two-step modal (export immediately / annotate then export); off-screen render via `<PuckPageRender>` + `html2canvas` 2× → `jspdf` paginated portrait letter; annotator with freehand/arrow/text (RoughJS), roughness/stroke/color sliders, undo+clear, composited before pagination. Currently gated behind a local `HIDE_EXPORT_AS_PDF = true` flag — migrate the gate alongside the feature so it ships defaulted-off. | CHECKPOINT 13; commit `6fee1d3d` (HIDE_EXPORT_AS_PDF flag) |
 
 ## L. Dataset summary view
 
 | # | Status | Feature | Sources |
 |---|---|---|---|
-| 76 | `[ ]` | **summary-view-redesign** — `DatasetSummaryView` doc-style outline with sticky TOC, one section per column with plain-language headline + type-appropriate viz (text/number/date), missing-rate `RingProgress` when nonzero, lazy `getColumnSummary` via `useIntersection` 200px margin. New `getDatasetMeta`/`getColumnSummary` on `DatasetQueryClient`. | CHECKPOINT 6 |
+| 76 | `[~]` | **summary-view-redesign** — `DatasetSummaryView` doc-style outline with sticky TOC, one section per column with plain-language headline + type-appropriate viz (text/number/date), missing-rate `RingProgress` when nonzero, lazy `getColumnSummary` via `useIntersection` 200px margin. New `getDatasetMeta`/`getColumnSummary` on `DatasetQueryClient`. | CHECKPOINT 6 |
 
 *Section M (Analytics) was retired on 2026-06-10 — its only row (#77 `analytics-client-events`) was relocated to Section 0 as a cross-cutting prerequisite for #001 and any other feature emitting analytics events.*
 
