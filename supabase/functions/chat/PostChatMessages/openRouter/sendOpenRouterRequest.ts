@@ -14,7 +14,7 @@ type OpenRouterCompletion = {
 };
 
 /** Sends one chat-completions request and returns its first message. */
-export async function runOpenRouterAttempt(options: {
+export async function sendOpenRouterRequest(options: {
   requestBody: Record<string, unknown>;
   apiKey: string;
   referer: string;

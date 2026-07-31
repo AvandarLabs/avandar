@@ -1,7 +1,7 @@
 import { Model } from "@models/Model/Model.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
-import { runOpenRouterAttempt } from "@sbfn/chat/PostChatMessages/openRouter/runOpenRouterAttempt.ts";
+import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import {
   countClarificationsInHistory,
   MAX_CLARIFICATIONS_PER_QUESTION,
@@ -210,7 +210,7 @@ export const PostChatMessages = POST({
     // retry-on-empty escalation below can re-call it with different
     // params. Throws on non-2xx so the outer handler surfaces it.
     const runAttempt = (attemptRequestBody: Record<string, unknown>) => {
-      return runOpenRouterAttempt({
+      return sendOpenRouterRequest({
         requestBody: attemptRequestBody,
         apiKey: openRouterApiKey,
         referer: openRouterReferer,

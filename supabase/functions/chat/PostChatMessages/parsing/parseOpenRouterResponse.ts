@@ -5,7 +5,7 @@ import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssi
 import type {
   OpenRouterMessage,
   OpenRouterToolCall,
-} from "@sbfn/chat/PostChatMessages/openRouter/runOpenRouterAttempt.ts";
+} from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
   ChatClarifyRequest,
