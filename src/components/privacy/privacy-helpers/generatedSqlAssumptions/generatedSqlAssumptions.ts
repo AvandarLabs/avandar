@@ -124,10 +124,10 @@ export function reviewGeneratedSqlAssumptions(args: {
   const seen = new Set<string>();
   const unapprovedValues: string[] = [];
 
-  extractSingleQuotedSqlLiterals(args.sql).forEach((literal) => {
+  for (const literal of extractSingleQuotedSqlLiterals(args.sql)) {
     const key = normalizeAssumptionValue(literal);
     if (seen.has(key)) {
-      return;
+      continue;
     }
     seen.add(key);
 
@@ -138,7 +138,7 @@ export function reviewGeneratedSqlAssumptions(args: {
     if (isSensitive || isUnapprovedAssumption) {
       unapprovedValues.push(literal);
     }
-  });
+  }
 
   return {
     assumptionCapReached,
