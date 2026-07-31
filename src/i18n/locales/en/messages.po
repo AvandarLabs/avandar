@@ -97,8 +97,8 @@ msgid "Or {0} to be notified when our public launch is ready."
 msgstr "Or {0} to be notified when our public launch is ready."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {pickedGroupBy}"
-msgstr "Count rows in {datasetName} by {pickedGroupBy}"
+#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
+#~ msgstr "Count rows in {datasetName} by {pickedGroupBy}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -118,7 +118,7 @@ msgstr "Choose chat model"
 msgid "most recent"
 msgstr "most recent"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "PII detected:"
 msgstr "PII detected:"
 
@@ -159,7 +159,7 @@ msgstr "Allow online syncing"
 msgid "Chart settings"
 msgstr "Chart settings"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "Discovery is not available in this context."
 
@@ -265,7 +265,8 @@ msgstr "No"
 msgid "Select a field"
 msgstr "Select a field"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
 msgstr "When"
 
@@ -288,8 +289,8 @@ msgid "Unknown error"
 msgstr "Unknown error"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a line chart showing trends in {datasetName} over time"
-msgstr "Add a line chart showing trends in {datasetName} over time"
+#~ msgid "Add a line chart showing trends in {datasetName} over time"
+#~ msgstr "Add a line chart showing trends in {datasetName} over time"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -315,11 +316,11 @@ msgstr "Upload file"
 msgid "Manage sharing"
 msgstr "Manage sharing"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
 msgstr "Privacy log cleared."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Export CSV"
 
@@ -356,7 +357,7 @@ msgstr "Monospace headlines"
 msgid "← Back"
 msgstr "← Back"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
 "answer."
@@ -433,6 +434,7 @@ msgid "Get a count of how many values there are"
 msgstr "Get a count of how many values there are"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "Something else…"
 
@@ -440,7 +442,7 @@ msgstr "Something else…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Changing plan to {newPlanName} ({newPlanSubType})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
 msgstr "Use suggestion"
 
@@ -510,7 +512,7 @@ msgstr "Updating password for {0}"
 msgid "Column info"
 msgstr "Column info"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "I understand this data will be sent to the AI provider"
 
@@ -592,7 +594,7 @@ msgstr "There are no numeric columns"
 msgid " permission"
 msgstr " permission"
 
-#: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
 msgstr "Discovery query failed."
 
@@ -663,8 +665,8 @@ msgid "Preset"
 msgstr "Preset"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-msgstr "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+#~ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+#~ msgstr "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -703,7 +705,7 @@ msgstr "Your dashboard is published at:"
 msgid "Name"
 msgstr "Name"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Your question contains language that may bias the AI's answer."
 
@@ -723,7 +725,7 @@ msgstr "Delete role group"
 msgid "Enter your email to get a reset link"
 msgstr "Enter your email to get a reset link"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "Approved"
 
@@ -738,7 +740,7 @@ msgstr "Loading plans..."
 msgid "User groups"
 msgstr "User groups"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Type your answer…"
 
@@ -763,7 +765,7 @@ msgid "Column name in SQL"
 msgstr "Column name in SQL"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "Confirm"
@@ -830,8 +832,8 @@ msgid "Password"
 msgstr "Password"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Show the first 20 rows of {datasetName}"
-msgstr "Show the first 20 rows of {datasetName}"
+#~ msgid "Show the first 20 rows of {datasetName}"
+#~ msgstr "Show the first 20 rows of {datasetName}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -868,7 +870,9 @@ msgstr "Data Summary"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "This {resource} is currently only accessible to its owner."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "Detected:"
 msgstr "Detected:"
 
@@ -881,7 +885,7 @@ msgstr "/month"
 msgid "Filters for this chart"
 msgstr "Filters for this chart"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Query failed."
 
@@ -910,7 +914,7 @@ msgstr "Couldn't capture the dashboard for annotation."
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "It may take a few minutes for your subscription to take effect."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "Continue as-is"
 
@@ -965,7 +969,8 @@ msgstr "The public open data catalog is still in <0/><1/>We are adding more "
 "open datasets as users tell us which datasets they want in Avandar. If "
 "there is a dataset you would like to see here, <2>tell us</2>!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
 msgstr "Health information detected"
 
@@ -1119,7 +1124,7 @@ msgstr "{0} to be notified when it's your turn to register! If you are already "
 "on our waitlist and have not received a sign-up code, we appreciate "
 "your patience. You will receive a sign-up code soon. We promise!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Bias detected:"
 
@@ -1127,7 +1132,7 @@ msgstr "Bias detected:"
 msgid "The name other members see in {workspaceName}."
 msgstr "The name other members see in {workspaceName}."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
 msgstr "Suggested:"
 
@@ -1163,7 +1168,7 @@ msgstr "Detected column types for 1 column in \"{sourceFileName}\" differed "
 "from the import preview and have been overwritten with the actual "
 "values."
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No values were returned from {column}. Describe what you need instead."
 
@@ -1184,7 +1189,7 @@ msgid "Untitled dataset"
 msgstr "Untitled dataset"
 
 #. placeholder {0}: entry.turnNumber
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
 
@@ -1198,7 +1203,7 @@ msgstr "Connecting to Google Sheets and other data sources are in the works and 
 "that you need to connect to, <0>please let us know so we can prioritize "
 "it</0>."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
 "an AI provider in this workspace. Last 90 days, stored on this device "
 "only."
@@ -1222,7 +1227,7 @@ msgstr "Not implemented yet"
 msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "Type or paste an email below. Your workspace will be billed per member."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Used suggestion"
 
@@ -1435,7 +1440,7 @@ msgstr "Enter a description for this dataset"
 msgid "Fields to be manually entered"
 msgstr "Fields to be manually entered"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "your dataset"
 
@@ -1446,7 +1451,7 @@ msgstr "your dataset"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1460,7 +1465,7 @@ msgstr "your dataset"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1634,7 +1639,7 @@ msgstr "Tell us about where the {singularEntityConfigName} data should come "
 msgid "Delete Entity"
 msgstr "Delete Entity"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "Personal data + biased framing detected"
 
@@ -1680,7 +1685,7 @@ msgstr "description"
 msgid "Min"
 msgstr "Min"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Outcome"
 
@@ -1786,7 +1791,7 @@ msgstr "Registration requires an internet connection."
 msgid "There are no values"
 msgstr "There are no values"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Clarification {turnNumber} of 3"
 
@@ -1838,7 +1843,8 @@ msgstr "Field Name"
 msgid "+ Add row filter"
 msgstr "+ Add row filter"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Consider rephrasing"
 msgstr "Consider rephrasing"
 
@@ -1947,7 +1953,7 @@ msgstr "Change password"
 msgid "Checkout Successful!"
 msgstr "Checkout Successful!"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
 msgstr "Answered"
 
@@ -1975,7 +1981,7 @@ msgid "Create groups for your workspace members. Datasets and dashboards can be 
 msgstr "Create groups for your workspace members. Datasets and dashboards can "
 "be configured to only share with (or restrict) certain user groups."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/RowValueList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Preview:"
@@ -2025,7 +2031,8 @@ msgstr "Pay monthly"
 msgid "Choose a model"
 msgstr "Choose a model"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Personal data detected"
 msgstr "Personal data detected"
 
@@ -2037,7 +2044,7 @@ msgstr "Apply every global filter on the dashboard."
 msgid "Collapse"
 msgstr "Collapse"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Cap reached"
 
@@ -2045,7 +2052,7 @@ msgstr "Cap reached"
 msgid "Go to billing portal"
 msgstr "Go to billing portal"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear log"
 msgstr "Clear log"
 
@@ -2087,8 +2094,8 @@ msgid "Label type"
 msgstr "Label type"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of row counts in {datasetName}"
-msgstr "Add a bar chart of row counts in {datasetName}"
+#~ msgid "Add a bar chart of row counts in {datasetName}"
+#~ msgstr "Add a bar chart of row counts in {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2187,7 +2194,7 @@ msgstr "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
 msgid "Logo"
 msgstr "Logo"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
 msgstr "Decision"
 
@@ -2222,7 +2229,8 @@ msgstr "Pay yearly"
 msgid "coverage"
 msgstr "coverage"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "Clarification answer"
 
@@ -2251,13 +2259,13 @@ msgstr "Failed to delete dataset"
 msgid "License"
 msgstr "License"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Describe your answer…"
 msgstr "Describe your answer…"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What is the average {averageColumn} in {datasetName}?"
-msgstr "What is the average {averageColumn} in {datasetName}?"
+#~ msgid "What is the average {averageColumn} in {datasetName}?"
+#~ msgstr "What is the average {averageColumn} in {datasetName}?"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -2291,8 +2299,8 @@ msgid "Y column"
 msgstr "Y column"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count how many rows there are in {datasetName}"
-msgstr "Count how many rows there are in {datasetName}"
+#~ msgid "Count how many rows there are in {datasetName}"
+#~ msgstr "Count how many rows there are in {datasetName}"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2371,11 +2379,11 @@ msgstr "Open chat (⌘/)"
 msgid "Catalog ({0})"
 msgstr "Catalog ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Send"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Generated SQL assumptions"
 msgstr "Generated SQL assumptions"
 
@@ -2459,7 +2467,7 @@ msgstr "Finished syncing {0} data"
 msgid "Select column"
 msgstr "Select column"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "Pick one or more"
 
@@ -2543,13 +2551,13 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 msgstr "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
 "cannot be undone, and the log on other devices is not affected."
 msgstr "Permanently delete all consent decisions on this device? This action "
 "cannot be undone, and the log on other devices is not affected."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "Let AI decide (legacy)"
 
@@ -2562,6 +2570,7 @@ msgstr "New field"
 msgid "Workspace created successfully!"
 msgstr "Workspace created successfully!"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "Clarifications"
@@ -2590,7 +2599,7 @@ msgstr "Pick a dashboard, or create a new one."
 msgid "Get a sum of the values"
 msgstr "Get a sum of the values"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "Type your answer..."
 
@@ -2602,7 +2611,7 @@ msgstr "Import"
 msgid "Yes"
 msgstr "Yes"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear privacy log"
 msgstr "Clear privacy log"
 
@@ -2692,7 +2701,7 @@ msgstr "Select longitude column"
 msgid "Dataset loaded successfully"
 msgstr "Dataset loaded successfully"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "I have legal authority to share this data with the AI provider"
 
@@ -2737,7 +2746,7 @@ msgstr "min"
 msgid "You don't have any dashboards yet."
 msgstr "You don't have any dashboards yet."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "No clarifications yet. The log fills in as the chat asks clarifying "
@@ -2769,7 +2778,7 @@ msgstr "For dataset <0>{0}</0>, choose the column to use as the "
 msgid "Viewer"
 msgstr "Viewer"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/SingleOptionList.tsx
 msgid "Pick one"
 msgstr "Pick one"
 
@@ -2783,7 +2792,7 @@ msgstr "No fields have been added"
 msgid "What is a series?"
 msgstr "What is a series?"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "Context"
 
@@ -2833,7 +2842,7 @@ msgstr "Preparing data for the visualizations…"
 msgid "Received a non-string value for a select field"
 msgstr "Received a non-string value for a select field"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "Time to answer"
 
@@ -2849,7 +2858,7 @@ msgstr "Create a new account"
 msgid "Direction"
 msgstr "Direction"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Edited"
 msgstr "Edited"
 
@@ -2877,7 +2886,7 @@ msgstr "Every workspace member who can open the {app} app gets this role on "
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "Please select an entity from the left sidebar, or create a new one."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "Detected"
 
@@ -2912,7 +2921,7 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "No row filters. The slice will include every row in the dataset (for "
 "the selected columns)."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "Turn"
 
@@ -2945,7 +2954,7 @@ msgstr "Series label"
 msgid "Edit {0}"
 msgstr "Edit {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "We detected both potential personal information and language that may "
@@ -2961,7 +2970,7 @@ msgid "While Avandar is in beta, we are only allowing registration if you are "
 msgstr "While Avandar is in beta, we are only allowing registration if you are "
 "on our waitlist and have received a sign-up code in your email."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "You wrote:"
 
@@ -3024,7 +3033,7 @@ msgid "Dataset \"{0}\" saved successfully"
 msgstr "Dataset \"{0}\" saved successfully"
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
 msgstr "{0}s"
 
@@ -3115,7 +3124,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
 msgstr "Looking up values in {column}…"
 
@@ -3194,7 +3203,7 @@ msgstr "Workspace name updated"
 msgid "Add column as a field"
 msgstr "Add column as a field"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
 "to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
 "etc.)."
@@ -3298,8 +3307,8 @@ msgid "Data Explorer"
 msgstr "Data Explorer"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {secondGroupBy}"
-msgstr "Count rows in {datasetName} by {secondGroupBy}"
+#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
+#~ msgstr "Count rows in {datasetName} by {secondGroupBy}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3359,7 +3368,7 @@ msgstr "Import spreadsheets, connect to Google Sheets, or add data from other "
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CleanPanel.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "Send <0>{0}</0> value{1} to the AI?"
 
@@ -3408,7 +3417,7 @@ msgstr "Remove row filter"
 msgid "Dataset deleted"
 msgstr "Dataset deleted"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
 msgstr "Discovery clarification"
 
@@ -3447,10 +3456,10 @@ msgstr "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while "
-"offline."
-msgstr "Download an offline chat model (cloud icon) to ask questions while "
-"offline."
+#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
+#~ "offline."
+#~ msgstr "Download an offline chat model (cloud icon) to ask questions while "
+#~ "offline."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -3474,7 +3483,7 @@ msgstr "File failed to load"
 msgid "There was an error on update: {0}"
 msgstr "There was an error on update: {0}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "Privacy log"
@@ -3563,6 +3572,10 @@ msgstr "Global filters"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "Role for {displayName}"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Review before sending"
+msgstr "Review before sending"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -3739,7 +3752,7 @@ msgstr "Unsaved changes will not appear in preview. Save first."
 msgid "This workspace does not have a valid subscription."
 msgstr "This workspace does not have a valid subscription."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "All decisions"
 
@@ -3776,7 +3789,7 @@ msgstr "Save — {0}"
 msgid "Error"
 msgstr "Error"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
 msgstr "Send answer"
 
@@ -3823,7 +3836,7 @@ msgstr "User group saved"
 msgid "Could not publish dashboard"
 msgstr "Could not publish dashboard"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Suggested rewrite:"
 
@@ -3900,7 +3913,7 @@ msgstr "Edit permissions"
 msgid "queried"
 msgstr "queried"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Chat message"
 
@@ -4043,7 +4056,7 @@ msgstr "Filters (Where)"
 msgid "Single-select"
 msgstr "Single-select"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "(clean)"
 msgstr "(clean)"
 
@@ -4087,8 +4100,8 @@ msgid "Text contains"
 msgstr "Text contains"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-msgstr "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
+#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
+#~ msgstr "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
@@ -4097,6 +4110,10 @@ msgstr "Role for new share"
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Expand panel"
 msgstr "Expand panel"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Send to AI?"
+msgstr "Send to AI?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4124,10 +4141,11 @@ msgid "New user group"
 msgstr "New user group"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-msgstr "What are the distinct values of {pickedGroupBy} in {datasetName}?"
+#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
+#~ msgstr "What are the distinct values of {pickedGroupBy} in {datasetName}?"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "None of the above"
 
@@ -4226,7 +4244,7 @@ msgstr "Unable to make dataset offline-only"
 msgid "Enter comment"
 msgstr "Enter comment"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "No entries yet. The log fills in as the chat panel asks for consent."
 
@@ -4234,7 +4252,7 @@ msgstr "No entries yet. The log fills in as the chat panel asks for consent."
 msgid "Dataset name"
 msgstr "Dataset name"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
 msgstr "Source column"
 
@@ -4258,7 +4276,8 @@ msgstr "Update & republish"
 msgid " · downloaded"
 msgstr " · downloaded"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
 msgstr "Cancelled"
 
@@ -4284,8 +4303,8 @@ msgid "Regenerate with the error"
 msgstr "Regenerate with the error"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a table of the top 10 rows of {datasetName}"
-msgstr "Add a table of the top 10 rows of {datasetName}"
+#~ msgid "Add a table of the top 10 rows of {datasetName}"
+#~ msgstr "Add a table of the top 10 rows of {datasetName}"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
@@ -4320,7 +4339,7 @@ msgstr "integer"
 msgid "Symbol color"
 msgstr "Symbol color"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "Custom clarification answer"
 
@@ -4371,7 +4390,7 @@ msgstr "User groups for invitee"
 msgid "Recommended"
 msgstr "Recommended"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Select all"
 msgstr "Select all"
@@ -4392,7 +4411,7 @@ msgstr "Previewing this dashboard"
 msgid "No value"
 msgstr "No value"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "Shape"
 
@@ -4581,7 +4600,7 @@ msgstr "Delete user group"
 msgid "Sync online?"
 msgstr "Sync online?"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "Neutral failure"
 
@@ -4620,7 +4639,7 @@ msgstr "Save changes"
 msgid "Google Sheet failed to load"
 msgstr "Google Sheet failed to load"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Type the confirmation phrase"
 
@@ -4689,7 +4708,7 @@ msgstr "Annual"
 msgid "anyone with "
 msgstr "anyone with "
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "The values you selected may contain personal information. The AI "
@@ -4724,6 +4743,10 @@ msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
 msgid "Hello DateValueItem"
 msgstr "Hello DateValueItem"
+
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+msgid "To confirm, type <0>{confirmationTarget}</0> below:"
+msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -4825,7 +4848,7 @@ msgstr "No models match your search"
 msgid "Recommended next steps"
 msgstr "Recommended next steps"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "From column: <0>{columnName}</0>"
 

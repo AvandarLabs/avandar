@@ -8,6 +8,7 @@ export type ChatApp = "data-explorer" | "data-sources" | "dashboards" | "other";
 
 export type ChatPageContextId = UUID<ModelType>;
 
+/** A single column in the result the user is currently looking at. */
 export type ChatPageContextResultColumn = {
   name: string;
   /** DuckDB type id, e.g. "bigint", "double", "varchar". */
@@ -20,7 +21,7 @@ export type ChatPageContextRead = Model.Base<
     app: ChatApp;
     openDatasetId?: string;
     /**
-     * The SQL that's currently driving the canvas — whether the assistant
+     * The SQL that's currently driving the canvas, whether the assistant
      * generated it, the user typed it, or it came from a manual form edit.
      * Always reflects the live document, not just the last assistant
      * generation.

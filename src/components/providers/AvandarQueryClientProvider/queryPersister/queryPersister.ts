@@ -18,7 +18,7 @@ const STORE_KEY = "avandar-react-query-cache";
  * (in `makeCacheBuster`), so an explicit bump is only needed when an
  * in-flight release would otherwise read stale-shape data.
  */
-const CACHE_SCHEMA_VERSION = "v2";
+const CACHE_SCHEMA_VERSION = "v3";
 
 const idbStorage = {
   getItem: async (key: string) => {

@@ -1,8 +1,9 @@
-import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
+import { isDefined } from "@utils";
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 
-export type ApplyChatTurnResponseArgs = {
+export type ApplyChatTurnResponseOptions = {
   response: ChatResponse.T;
   sqlApplied: boolean;
   handlers: {
@@ -23,10 +24,9 @@ export type ApplyChatTurnResponseArgs = {
  * dispatches canvas / panel side effects.
  */
 export async function applyChatTurnResponse(
-  args: ApplyChatTurnResponseArgs,
+  options: Readonly<ApplyChatTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
-  const { response, handlers } = args;
-  const sqlApplied = args.sqlApplied;
+  const { response, handlers, sqlApplied } = options;
 
   if (response.dashboardBlock) {
     handlers.queueDashboardBlock(response.dashboardBlock);
@@ -44,15 +44,15 @@ export async function applyChatTurnResponse(
     handlers.setPendingClarification(undefined);
   }
 
-  const assistantParts: Array<{ type: "text"; text: string }> = [
-    { type: "text", text: response.assistantText },
-  ];
-  if (response.generatedSql && sqlApplied) {
-    assistantParts.push({
-      type: "text",
-      text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
-    });
-  }
+  const assistantParts = [
+    { type: "text" as const, text: response.assistantText },
+    response.generatedSql && sqlApplied ?
+      {
+        type: "text" as const,
+        text: `\n\`\`\`sql\n${response.generatedSql.sql}\n\`\`\``,
+      }
+    : undefined,
+  ].filter(isDefined);
 
   return { content: assistantParts };
 }

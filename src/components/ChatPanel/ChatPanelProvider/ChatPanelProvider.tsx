@@ -18,8 +18,8 @@ function _readInitialChatPanelOpenState(): boolean {
 type Props = {
   children: ReactNode;
   /**
-   * When false, only supplies AppShell aside open/close state without chat UI
-   * or a toolbar toggle. Use on routes outside `/$workspaceSlug`.
+   * When false, only supplies AppShell aside open/close state (no chat UI,
+   * or toolbar toggle). Use on routes outside `/$workspaceSlug`.
    */
   isChatAvailable?: boolean;
 };
@@ -32,7 +32,7 @@ type Props = {
 export function ChatPanelProvider({
   children,
   isChatAvailable = true,
-}: Props): JSX.Element {
+}: Readonly<Props>): React.ReactNode {
   return (
     <ChatPanelStateManager.Provider
       initialStateOverrides={{

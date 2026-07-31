@@ -115,6 +115,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       dataset: Dataset.T;
       virtualDataset: VirtualDataset.T;
     }) => {
+      // Virtual datasets open as their raw SQL.
       onOpen(
         {
           datasetId: dataset.id,

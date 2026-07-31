@@ -1,4 +1,4 @@
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type {

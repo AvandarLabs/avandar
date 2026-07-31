@@ -1,6 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import Dexie from "dexie";
-import type { ConsentModalMode } from "@/components/Privacy/ConsentModal/ConsentModal";
+import type { ConsentModalMode } from "@/components/privacy/ConsentModal/ConsentModal";
 import type { CrossBoundaryContext } from "@/lib/privacy/crossBoundary";
 import type { Table } from "dexie";
 

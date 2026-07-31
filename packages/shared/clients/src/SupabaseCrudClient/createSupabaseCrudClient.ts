@@ -5,7 +5,7 @@ import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
   UpsertOptions,

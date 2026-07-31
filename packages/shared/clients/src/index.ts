@@ -20,8 +20,8 @@ export type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/Supabase
 export { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 
 // Parser registry
-export { makeParserRegistry } from "@clients/makeParserRegistry.ts";
-export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+export { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
+export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 
 // Mixins
 export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";

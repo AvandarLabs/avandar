@@ -1,82 +1,61 @@
+import { Model } from "@models";
 import { describe, expect, it, vi } from "vitest";
 import { applyChatTurnResponse } from "./applyChatTurnResponse";
-import type { ApplyChatTurnResponseArgs } from "./applyChatTurnResponse";
+import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 
-function createHandlers(): ApplyChatTurnResponseArgs["handlers"] {
+function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
   return {
     queueDashboardBlock: vi.fn(),
     setPendingClarification: vi.fn(),
-    recordClarificationShown: vi.fn().mockResolvedValue("audit-1"),
+    recordClarificationShown: vi.fn().mockResolvedValue("audit-id"),
   };
 }
 
 describe("applyChatTurnResponse", () => {
-  it("includes generated SQL when it was applied", async () => {
-    const result = await applyChatTurnResponse({
-      response: {
-        assistantText: "Here is the query.",
-        generatedSql: {
-          prompt: "Count rows",
-          sql: 'SELECT count(*) FROM "dataset"',
+  it("preserves dashboard, clarification, and generated SQL handling", async () => {
+    const handlers = _createHandlers();
+    const responseData: Omit<ChatResponse.T, "__type"> = {
+      assistantText: "Here is the result.",
+      generatedSql: {
+        prompt: "Show totals",
+        sql: "select 1",
+      },
+      dashboardBlock: {
+        kind: "HeadingBlock",
+        text: "Totals",
+      },
+      clarification: {
+        question: "Which period?",
+        responseShape: {
+          kind: "fixed_options",
+          options: ["This month", "Last month"],
+          multi: false,
         },
-      } as ChatResponse.T,
-      sqlApplied: true,
-      handlers: createHandlers(),
-    });
-
-    expect(result.content).toEqual([
-      { type: "text", text: "Here is the query." },
-      {
-        type: "text",
-        text: '\n```sql\nSELECT count(*) FROM "dataset"\n```',
+        turnNumber: 1,
       },
-    ]);
-  });
-
-  it("audits and installs a clarification", async () => {
-    const handlers = createHandlers();
-    const clarification = {
-      question: "Which region?",
-      responseShape: {
-        kind: "fixed_options" as const,
-        options: ["North", "South"],
-        multi: false,
-      },
-      turnNumber: 1 as const,
     };
+    const response = Model.make("ChatResponse", responseData);
 
-    await applyChatTurnResponse({
-      response: {
-        assistantText: clarification.question,
-        clarification,
-      } as ChatResponse.T,
-      sqlApplied: false,
+    const result = await applyChatTurnResponse({
+      response,
+      sqlApplied: true,
       handlers,
     });
 
+    expect(handlers.queueDashboardBlock).toHaveBeenCalledWith(
+      response.dashboardBlock,
+    );
     expect(handlers.recordClarificationShown).toHaveBeenCalledWith(
-      clarification,
+      response.clarification,
     );
     expect(handlers.setPendingClarification).toHaveBeenCalledWith({
-      ...clarification,
-      auditId: "audit-1",
+      ...response.clarification,
+      auditId: "audit-id",
     });
-  });
-
-  it("queues a generated dashboard block", async () => {
-    const handlers = createHandlers();
-    const dashboardBlock = { kind: "DividerBlock" as const };
-
-    await applyChatTurnResponse({
-      response: {
-        assistantText: "Added a divider.",
-        dashboardBlock,
-      } as ChatResponse.T,
-      sqlApplied: false,
-      handlers,
-    });
-
-    expect(handlers.queueDashboardBlock).toHaveBeenCalledWith(dashboardBlock);
+    expect(result.content).toEqual([
+      { type: "text", text: "Here is the result." },
+      { type: "text", text: "\n```sql\nselect 1\n```" },
+    ]);
   });
 });

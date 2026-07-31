@@ -3,7 +3,7 @@ import { uuid } from "$/lib/uuid";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
-} from "@/db/dexie/dexieVersions";
+} from "@/db/dexie/dexieVersions/dexieVersions";
 import { Logger } from "@/utils/Logger";
 import type { User } from "$/models/User/User";
 

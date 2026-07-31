@@ -145,6 +145,18 @@ planning is complete.
   retired and removed from the inventory, their per-feature migration
   files were deleted, and GROUP-3 now contains only rows #015–#032:
   core chat, privacy guardrails, and clarification workflows.
+- **2026-07-31 — GROUP-3 merged + mergeback.** GROUP-3 `ai-chat-panel`
+  (rows #015–#032) landed on `develop` (`c703e5c2`, base `f37ba802`)
+  and its cleanup was merged back into `feat/ict4d-demo` via a 3-way
+  merge over the G3 path set. The 18 rows are `[x]`; the group doc +
+  18 per-feature plans were deleted; no refactor branch/worktree existed
+  locally to remove. Drift on the path set collapsed 223 → 22 files
+  (6 non-i18n, all feat-ahead / deferred to G4/G5); type-check, lint,
+  and the chat/privacy/models vitest suites are green. Details in
+  `STATE.md`'s 2026-07-31 log entry. (GROUP-2 had likewise merged on
+  2026-07-26, `59cdb59c`.) **Next step:** cut `refactor-g4/dashboards`
+  off the current `develop` tip and migrate GROUP-4 per
+  `docs/deslop/GROUP-4-dashboards.md`.
 
 ## Phase 2 ready
 

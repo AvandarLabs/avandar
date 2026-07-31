@@ -95,8 +95,8 @@ msgid "Or {0} to be notified when our public launch is ready."
 msgstr "或 {0} 以在我們的公開啟動準備好時獲得通知。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {pickedGroupBy}"
-msgstr "按 {pickedGroupBy} 計算 {datasetName} 中的行數"
+#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
+#~ msgstr "按 {pickedGroupBy} 計算 {datasetName} 中的行數"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -115,7 +115,7 @@ msgstr "選擇聊天模型"
 msgid "most recent"
 msgstr "最近的"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "PII detected:"
 msgstr "檢測到 PII："
 
@@ -156,7 +156,7 @@ msgstr "允許在線同步"
 msgid "Chart settings"
 msgstr "圖表設定"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "在此上下文中無法使用發現功能。"
 
@@ -258,7 +258,8 @@ msgstr "否"
 msgid "Select a field"
 msgstr "選擇一個欄位"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
 msgstr "當"
 
@@ -281,8 +282,8 @@ msgid "Unknown error"
 msgstr "未知錯誤"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a line chart showing trends in {datasetName} over time"
-msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
+#~ msgid "Add a line chart showing trends in {datasetName} over time"
+#~ msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -308,11 +309,11 @@ msgstr "上傳檔案"
 msgid "Manage sharing"
 msgstr "管理共享"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
 msgstr "隱私日誌已清除。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "導出 CSV"
 
@@ -348,7 +349,7 @@ msgstr "等寬標題"
 msgid "← Back"
 msgstr "← 返回"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
 "answer."
@@ -419,6 +420,7 @@ msgid "Get a count of how many values there are"
 msgstr "獲取值的數量"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "其他…"
 
@@ -426,7 +428,7 @@ msgstr "其他…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "將計劃更改為 {newPlanName} ({newPlanSubType})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
 msgstr "使用建議"
 
@@ -495,7 +497,7 @@ msgstr "正在更新 {0} 的密碼"
 msgid "Column info"
 msgstr "列信息"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我了解這些數據將發送給 AI 提供者"
 
@@ -573,7 +575,7 @@ msgstr "沒有數字列"
 msgid " permission"
 msgstr "權限"
 
-#: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
 msgstr "發現查詢失敗。"
 
@@ -642,8 +644,8 @@ msgid "Preset"
 msgstr "預設"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
+#~ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+#~ msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -681,7 +683,7 @@ msgstr "您的儀表板已發布於："
 msgid "Name"
 msgstr "名稱"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的問題包含可能會影響 AI 回答的語言。"
 
@@ -701,7 +703,7 @@ msgstr "刪除角色群組"
 msgid "Enter your email to get a reset link"
 msgstr "輸入您的電子郵件以獲取重置連結"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "已批准"
 
@@ -716,7 +718,7 @@ msgstr "載入計劃中..."
 msgid "User groups"
 msgstr "用戶組"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
@@ -739,7 +741,7 @@ msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "確認"
@@ -805,8 +807,8 @@ msgid "Password"
 msgstr "密碼"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Show the first 20 rows of {datasetName}"
-msgstr "顯示 {datasetName} 的前 20 行"
+#~ msgid "Show the first 20 rows of {datasetName}"
+#~ msgstr "顯示 {datasetName} 的前 20 行"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -842,7 +844,9 @@ msgstr "數據摘要"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "此 {resource} 目前僅可由其擁有者訪問。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "Detected:"
 msgstr "檢測到："
 
@@ -855,7 +859,7 @@ msgstr "/月"
 msgid "Filters for this chart"
 msgstr "此圖表的篩選器"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "查詢失敗。"
 
@@ -884,7 +888,7 @@ msgstr "無法捕捉儀表板以進行註解。"
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "您的訂閱可能需要幾分鐘才能生效。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "保持現狀繼續"
 
@@ -938,7 +942,8 @@ msgid "The public open data catalog is still in <0/><1/>We are adding more open 
 msgstr "公共開放資料目錄仍在 <0/><1/> "
 "我們正在根據用戶告訴我們想要的資料集來添加更多開放資料集。如果您希望在這裡看到某個資料集，<2>告訴我們</2>！"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
 msgstr "檢測到健康資訊"
 
@@ -1086,7 +1091,7 @@ msgid "{0} to be notified when it's your turn to register! If you are already "
 "patience. You will receive a sign-up code soon. We promise!"
 msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候補名單上並且尚未收到註冊代碼，我們感謝您的耐心。您將很快收到註冊代碼。我們保證！"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "檢測到偏見："
 
@@ -1094,7 +1099,7 @@ msgstr "檢測到偏見："
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成員看到的名稱。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
 msgstr "建議："
 
@@ -1128,7 +1133,7 @@ msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from 
 "the import preview and have been overwritten with the actual values."
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 
@@ -1148,7 +1153,7 @@ msgid "Untitled dataset"
 msgstr "無標題資料集"
 
 #. placeholder {0}: entry.turnNumber
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
 
@@ -1160,7 +1165,7 @@ msgid "Connecting to Google Sheets and other data sources are in the works and "
 msgstr "正在開發連接 Google Sheets "
 "和其他數據來源的功能，將很快提供。如果您需要連接的數據庫或服務，<0>請告訴我們，以便我們優先處理</0>。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
 "an AI provider in this workspace. Last 90 days, stored on this device "
 "only."
@@ -1182,7 +1187,7 @@ msgstr "尚未實現"
 msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "在下方輸入或粘貼電子郵件。您的工作區將按成員計費。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "使用的建議"
 
@@ -1391,7 +1396,7 @@ msgstr "請輸入此數據集的描述"
 msgid "Fields to be manually entered"
 msgstr "需要手動輸入的欄位"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "您的數據集"
 
@@ -1402,7 +1407,7 @@ msgstr "您的數據集"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1416,7 +1421,7 @@ msgstr "您的數據集"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1583,7 +1588,7 @@ msgstr "告訴我們 {singularEntityConfigName} 數據應該來自哪裡..."
 msgid "Delete Entity"
 msgstr "刪除實體"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "檢測到個人數據 + 偏見框架"
 
@@ -1629,7 +1634,7 @@ msgstr "描述"
 msgid "Min"
 msgstr "最小"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "結果"
 
@@ -1732,7 +1737,7 @@ msgstr "註冊需要連接到互聯網。"
 msgid "There are no values"
 msgstr "沒有值"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "澄清 {turnNumber} / 3"
 
@@ -1784,7 +1789,8 @@ msgstr "字段名稱"
 msgid "+ Add row filter"
 msgstr "+ 添加行過濾器"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Consider rephrasing"
 msgstr "考慮重新措辭"
 
@@ -1892,7 +1898,7 @@ msgstr "更改密碼"
 msgid "Checkout Successful!"
 msgstr "結帳成功！"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
 msgstr "已回答"
 
@@ -1919,7 +1925,7 @@ msgid "Create groups for your workspace members. Datasets and dashboards can be 
 "configured to only share with (or restrict) certain user groups."
 msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置為僅與某些用戶群組共享（或限制）。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/RowValueList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "預覽："
@@ -1967,7 +1973,8 @@ msgstr "每月付款"
 msgid "Choose a model"
 msgstr "選擇模型"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Personal data detected"
 msgstr "檢測到個人數據"
 
@@ -1979,7 +1986,7 @@ msgstr "在儀表板上應用所有全局過濾器。"
 msgid "Collapse"
 msgstr "折疊"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "達到上限"
 
@@ -1987,7 +1994,7 @@ msgstr "達到上限"
 msgid "Go to billing portal"
 msgstr "前往計費入口"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear log"
 msgstr "清除日誌"
 
@@ -2028,8 +2035,8 @@ msgid "Label type"
 msgstr "標籤類型"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of row counts in {datasetName}"
-msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
+#~ msgid "Add a bar chart of row counts in {datasetName}"
+#~ msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2125,7 +2132,7 @@ msgstr "重複次數過多：<0>{0}</0> 在 <1>{1}%</1> 的行中出現。"
 msgid "Logo"
 msgstr "標誌"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
 msgstr "決策"
 
@@ -2159,7 +2166,8 @@ msgstr "每年支付"
 msgid "coverage"
 msgstr "覆蓋率"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "澄清答案"
 
@@ -2188,13 +2196,13 @@ msgstr "刪除資料集失敗"
 msgid "License"
 msgstr "許可證"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Describe your answer…"
 msgstr "描述您的答案…"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What is the average {averageColumn} in {datasetName}?"
-msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
+#~ msgid "What is the average {averageColumn} in {datasetName}?"
+#~ msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -2228,8 +2236,8 @@ msgid "Y column"
 msgstr "Y 欄"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count how many rows there are in {datasetName}"
-msgstr "計算 {datasetName} 中有多少行"
+#~ msgid "Count how many rows there are in {datasetName}"
+#~ msgstr "計算 {datasetName} 中有多少行"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2308,11 +2316,11 @@ msgstr "打開聊天 (⌘/)"
 msgid "Catalog ({0})"
 msgstr "目錄 ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "發送"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Generated SQL assumptions"
 msgstr "生成的 SQL 假設"
 
@@ -2396,7 +2404,7 @@ msgstr "完成同步 {0} 數據"
 msgid "Select column"
 msgstr "選擇列"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "選擇一個或多個"
 
@@ -2477,12 +2485,12 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
 msgstr "因缺少軸或系列，無法顯示 {chartName}。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
 "cannot be undone, and the log on other devices is not affected."
 msgstr "是否永久刪除此設備上的所有同意決策？此操作無法撤銷，其他設備上的日誌不受影響。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "讓 AI 決定 (舊版)"
 
@@ -2495,6 +2503,7 @@ msgstr "新增欄位"
 msgid "Workspace created successfully!"
 msgstr "工作區成功建立！"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "澄清"
@@ -2523,7 +2532,7 @@ msgstr "選擇一個儀表板，或創建一個新儀表板。"
 msgid "Get a sum of the values"
 msgstr "獲取數值總和"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "輸入您的答案..."
 
@@ -2535,7 +2544,7 @@ msgstr "匯入"
 msgid "Yes"
 msgstr "是"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear privacy log"
 msgstr "清除隱私日誌"
 
@@ -2624,7 +2633,7 @@ msgstr "選擇經度欄"
 msgid "Dataset loaded successfully"
 msgstr "資料集成功加載"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "我有法律權限與 AI 提供者分享此數據"
 
@@ -2667,7 +2676,7 @@ msgstr "分鐘"
 msgid "You don't have any dashboards yet."
 msgstr "您尚未擁有任何儀表板。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "尚無澄清。當聊天提出澄清問題時，日誌會填寫。"
@@ -2697,7 +2706,7 @@ msgstr "對於數據集 <0>{0}</0>，選擇用作 {entityConfigName} ID 的欄�
 msgid "Viewer"
 msgstr "檢視者"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/SingleOptionList.tsx
 msgid "Pick one"
 msgstr "選擇一個"
 
@@ -2711,7 +2720,7 @@ msgstr "尚未添加任何欄位"
 msgid "What is a series?"
 msgstr "什麼是系列？"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "上下文"
 
@@ -2761,7 +2770,7 @@ msgstr "正在為可視化準備數據…"
 msgid "Received a non-string value for a select field"
 msgstr "接收到非字串值的選擇欄位"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "回答時間"
 
@@ -2777,7 +2786,7 @@ msgstr "創建新帳戶"
 msgid "Direction"
 msgstr "方向"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Edited"
 msgstr "已編輯"
 
@@ -2804,7 +2813,7 @@ msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource}
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "請從左側邊欄選擇一個實體，或創建一個新實體。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "已檢測到"
 
@@ -2837,7 +2846,7 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 "selected columns)."
 msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選列）。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "轉換"
 
@@ -2870,7 +2879,7 @@ msgstr "系列標籤"
 msgid "Edit {0}"
 msgstr "編輯 {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語言。請在下方查看兩者。"
@@ -2884,7 +2893,7 @@ msgid "While Avandar is in beta, we are only allowing registration if you are "
 "on our waitlist and have received a sign-up code in your email."
 msgstr "在 Avandar 還處於測試階段時，我們僅允許在您在候補名單上並且已在電子郵件中收到註冊代碼的情況下進行註冊。"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "您寫道："
 
@@ -2947,7 +2956,7 @@ msgid "Dataset \"{0}\" saved successfully"
 msgstr "資料集 \"{0}\" 已成功儲存"
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
 msgstr "{0}秒"
 
@@ -3036,7 +3045,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努力的近似值；上面的 SQL 是實際執行的內容。"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
@@ -3115,7 +3124,7 @@ msgstr "工作區名稱已更新"
 msgid "Add column as a field"
 msgstr "將列添加為字段"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
 "to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
 "etc.)."
@@ -3216,8 +3225,8 @@ msgid "Data Explorer"
 msgstr "數據探索器"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {secondGroupBy}"
-msgstr "按 {secondGroupBy} 計算 {datasetName} 中的行數"
+#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
+#~ msgstr "按 {secondGroupBy} 計算 {datasetName} 中的行數"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3275,7 +3284,7 @@ msgstr "導入電子表格，連接到 Google Sheets，或從其他來源添加�
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CleanPanel.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "將 <0>{0}</0> 值{1} 發送到 AI 嗎？"
 
@@ -3324,7 +3333,7 @@ msgstr "移除行篩選"
 msgid "Dataset deleted"
 msgstr "資料集已刪除"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
 msgstr "發現澄清"
 
@@ -3362,9 +3371,9 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while "
-"offline."
-msgstr "下載離線聊天模型（雲圖標），以便在離線時提問。"
+#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
+#~ "offline."
+#~ msgstr "下載離線聊天模型（雲圖標），以便在離線時提問。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -3388,7 +3397,7 @@ msgstr "檔案載入失敗"
 msgid "There was an error on update: {0}"
 msgstr "更新時發生錯誤：{0}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "隱私日誌"
@@ -3473,6 +3482,10 @@ msgstr "全域篩選"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "{displayName} 的角色"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Review before sending"
+msgstr ""
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -3645,7 +3658,7 @@ msgstr "未保存的更改將不會出現在預覽中。請先保存。"
 msgid "This workspace does not have a valid subscription."
 msgstr "此工作區沒有有效的訂閱。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "所有決策"
 
@@ -3682,7 +3695,7 @@ msgstr "保存 — {0}"
 msgid "Error"
 msgstr "錯誤"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
 msgstr "發送答案"
 
@@ -3729,7 +3742,7 @@ msgstr "使用者群組已儲存"
 msgid "Could not publish dashboard"
 msgstr "無法發布儀表板"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "建議重寫："
 
@@ -3801,7 +3814,7 @@ msgstr "編輯權限"
 msgid "queried"
 msgstr "查詢的"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "聊天訊息"
 
@@ -3943,7 +3956,7 @@ msgstr "篩選器（位置）"
 msgid "Single-select"
 msgstr "單選"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "(clean)"
 msgstr "(乾淨)"
 
@@ -3985,8 +3998,8 @@ msgid "Text contains"
 msgstr "文本包含"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-msgstr "要確認，請在下方輸入 <0>{MEDICAL_CONFIRMATION_PHRASE}</0>："
+#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
+#~ msgstr "要確認，請在下方輸入 <0>{MEDICAL_CONFIRMATION_PHRASE}</0>："
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
@@ -3995,6 +4008,10 @@ msgstr "新共享的角色"
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Expand panel"
 msgstr "展開面板"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Send to AI?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4022,10 +4039,11 @@ msgid "New user group"
 msgstr "新使用者群組"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-msgstr "{datasetName} 中 {pickedGroupBy} 的不同值是什麼？"
+#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
+#~ msgstr "{datasetName} 中 {pickedGroupBy} 的不同值是什麼？"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "以上皆非"
 
@@ -4122,7 +4140,7 @@ msgstr "無法將資料集設為僅限離線使用"
 msgid "Enter comment"
 msgstr "輸入評論"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "尚無條目。當聊天面板要求同意時，日誌會填寫。"
 
@@ -4130,7 +4148,7 @@ msgstr "尚無條目。當聊天面板要求同意時，日誌會填寫。"
 msgid "Dataset name"
 msgstr "資料集名稱"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
 msgstr "來源欄位"
 
@@ -4154,7 +4172,8 @@ msgstr "更新並重新發布"
 msgid " · downloaded"
 msgstr " · 已下載"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
 msgstr "已取消"
 
@@ -4180,8 +4199,8 @@ msgid "Regenerate with the error"
 msgstr "使用錯誤重新生成"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a table of the top 10 rows of {datasetName}"
-msgstr "添加 {datasetName} 的前 10 行表格"
+#~ msgid "Add a table of the top 10 rows of {datasetName}"
+#~ msgstr "添加 {datasetName} 的前 10 行表格"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
@@ -4216,7 +4235,7 @@ msgstr "整數"
 msgid "Symbol color"
 msgstr "符號顏色"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "自定義澄清答案"
 
@@ -4263,7 +4282,7 @@ msgstr "邀請者的用戶群組"
 msgid "Recommended"
 msgstr "推薦"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Select all"
 msgstr "全選"
@@ -4284,7 +4303,7 @@ msgstr "預覽此儀表板"
 msgid "No value"
 msgstr "無值"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "形狀"
 
@@ -4466,7 +4485,7 @@ msgstr "刪除用戶群組"
 msgid "Sync online?"
 msgstr "同步到線上？"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "中立失敗"
 
@@ -4505,7 +4524,7 @@ msgstr "保存更改"
 msgid "Google Sheet failed to load"
 msgstr "Google 表單載入失敗"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
 
@@ -4572,7 +4591,7 @@ msgstr "年度"
 msgid "anyone with "
 msgstr "任何擁有 "
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
@@ -4605,6 +4624,10 @@ msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
 msgid "Hello DateValueItem"
 msgstr "Hello DateValueItem"
+
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+msgid "To confirm, type <0>{confirmationTarget}</0> below:"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -4705,7 +4728,7 @@ msgstr "沒有模型符合您的搜尋"
 msgid "Recommended next steps"
 msgstr "推薦的下一步"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "來自欄位：<0>{columnName}</0>"
 

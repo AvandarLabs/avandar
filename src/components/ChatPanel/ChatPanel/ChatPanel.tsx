@@ -18,7 +18,7 @@ import css from "./ChatPanel.module.css";
  * pushes the generated SQL to `DataExplorerStateManager` so the canvas
  * re-runs automatically.
  */
-export function ChatPanel(): JSX.Element {
+export function ChatPanel(): React.ReactNode {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
   const context = useChatPageContext();
@@ -31,7 +31,7 @@ export function ChatPanel(): JSX.Element {
       <Stack
         h="100%"
         bdrs="md"
-        className={clsx(css.shell, disabled && css.shellDisabled)}
+        className={clsx(css.shell, disabled && css.chatPanelShellDisabled)}
         gap={0}
       >
         <Group px="md" py="sm" justify="space-between" className={css.header}>

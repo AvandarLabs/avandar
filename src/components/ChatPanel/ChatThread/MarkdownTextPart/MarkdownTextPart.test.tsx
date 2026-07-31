@@ -11,7 +11,7 @@ vi.mock("@/components/sql/sql-helpers/useSqlDisplayCatalog", () => {
   };
 });
 
-vi.mock("@/components/ChatPanel/ChatThread/chatSyntaxHighlighter", () => {
+vi.mock("@/components/ChatPanel/ChatThread/ChatSyntaxHighlighter", () => {
   return {
     ChatSyntaxHighlighter: ({
       language,

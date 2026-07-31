@@ -2,24 +2,27 @@ import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, CopyButton, Text } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import css from "../ChatThread.module.css";
+import css from "./MarkdownCodeHeader.module.css";
 import type { CodeHeaderProps } from "@assistant-ui/react-markdown";
 
+type Props = CodeHeaderProps;
+
+/** Renders the copy and language controls for a fenced code block. */
 export function MarkdownCodeHeader({
   language,
   code,
-}: CodeHeaderProps): JSX.Element {
+}: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
   const displayLanguage =
     language && language !== "unknown" ? language : undefined;
 
   return (
-    <div className={css.codeBlockHeader}>
+    <div className={css.markdownCodeHeaderRoot} data-markdown-code-header>
       {displayLanguage ?
         <Text
           component="span"
           size="xs"
-          className={css.codeBlockLanguage}
+          className={css.markdownCodeHeaderLanguage}
           tt="uppercase"
         >
           {displayLanguage}
@@ -31,7 +34,7 @@ export function MarkdownCodeHeader({
             <Tooltip label={copied ? t`Copied` : t`Copy code`}>
               <ActionIcon
                 variant="subtle"
-                className={css.codeBlockCopyButton}
+                className={css.markdownCodeHeaderCopyButton}
                 size="sm"
                 aria-label={t`Copy code`}
                 onClick={copy}

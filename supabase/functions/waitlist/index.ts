@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/waitlist/waitlist.routes.ts";
+import { WaitlistRoutes } from "@sbfn/waitlist/WaitlistRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(WaitlistRoutes).serve();

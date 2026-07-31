@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";

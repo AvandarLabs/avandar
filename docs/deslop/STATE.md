@@ -38,10 +38,11 @@ let it drift.
   `6a1366e26660753f17b90bd36f6e17e3a10bdafd`
   (subject: _refactor(chat): remove planning feature_)
 - **Last update run on**: `2026-07-27`
-- **Active rows**: 48 remaining. On 2026-07-24 the 5
+- **Active rows**: 30 remaining. On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
   (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
-  #049, #096, #097) merged (`59cdb59c`). All flipped to `[x]`; their
+  #049, #096, #097) merged (`59cdb59c`); on 2026-07-31 the 18 GROUP-3 rows
+  (#015–#032) merged (`c703e5c2`). All flipped to `[x]`; their
   `[x]` rows are kept in `ALL_FEATURES.md` (with merge SHA) and the group
   - per-feature plan files were deleted. On 2026-06-26 the 3 earlier completed rows
     (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
@@ -57,14 +58,13 @@ let it drift.
     folded into #1, #14 into #9, #084..#089 into #083; #050..#055
     retired as voice-removed; #097 added 2026-06-25).
 - **Planning status**: **complete — Phase 2 batched into 5 group
-  PRs (2026-06-26).** GROUP-1 (2026-07-24) and GROUP-2 (2026-07-26) are
-  now merged and merged back into `feat/ict4d-demo`; GROUP-3 is in
-  flight and GROUP-4 through GROUP-5 remain. The consolidated group plans at
-  `docs/deslop/GROUP-3..5-*.md` are the source of truth for the rest
-  and supersede the per-feature `NNN-<slug>.md` plans where they
-  disagree. Next step: remove the retired workflow surface from the
-  existing `refactor-g3/ai-chat-panel` branch, then finish its runtime
-  integration and verification.
+  PRs (2026-06-26).** GROUP-1 (2026-07-24), GROUP-2 (2026-07-26), and
+  GROUP-3 (2026-07-31) are now merged and merged back into
+  `feat/ict4d-demo`; GROUP-4 and GROUP-5 remain. The consolidated group
+  plans at `docs/deslop/GROUP-4..5-*.md` are the source of truth for the
+  rest and supersede the per-feature `NNN-<slug>.md` plans where they
+  disagree. Next step: cut GROUP-4 (dashboards) off the current
+  `develop` tip.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -78,11 +78,14 @@ Refactor branches currently open (pushed to origin, not yet merged
 into `develop`). Each row is added by `/deslop migrate` and removed
 by `/deslop complete`.
 
-| Feature index       | Slug            | Refactor branch             | Started    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ------------------- | --------------- | --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #015–#032 (GROUP-3) | `ai-chat-panel` | `refactor-g3/ai-chat-panel` | 2026-07-26 | Cut off `develop @ f37ba802`. Core chat, privacy, and clarification infrastructure ported and under review. Rows #033–#043 were retired on the source branch on 2026-07-27 and must be removed from this branch before it merges. **Runtime wiring deferred:** `useAvandarChatRuntime.ts` kept at develop's slim version because the source runtime interweaves privacy and clarification turn logic with G4 dashboard-block generation and G5 offline WebLLM chat. Complete the runtime integration in coordination with G4/G5. Not pushed. |
+| Feature index | Slug | Refactor branch | Started | Notes |
+| ------------- | ---- | --------------- | ------- | ----- |
+| _(none)_      |      |                 |         | GROUP-3 merged 2026-07-31; see Completed migrations log. |
 
-GROUP-1 (`914bcbba`, 2026-07-24) and GROUP-2 (`59cdb59c`, 2026-07-26) are merged into `develop` and merged back into `feat/ict4d-demo`.
+GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26), and
+GROUP-3 (`c703e5c2`, 2026-07-31) are merged into `develop` and merged back
+into `feat/ict4d-demo`. No refactor branches are currently open; the next
+group to cut is GROUP-4 (dashboards).
 
 ---
 
@@ -114,6 +117,24 @@ the durable record once the per-feature markdown has been deleted.
 | 49            | `duckdb-sql-parser-updates` (GROUP-2)        | `59cdb59c`             | 2026-07-26 |
 | 96            | `data-explorer-url-session-sync` (GROUP-2)   | `59cdb59c`             | 2026-07-26 |
 | 97            | `data-explorer-auto-open-ai-panel` (GROUP-2) | `59cdb59c`             | 2026-07-26 |
+| 15           | `chat-disabled-visual-feedback` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 16           | `chat-context-memo-fix` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 17           | `chat-empty-state-improvements` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 18           | `chat-try-again-and-retry-on-empty` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 19           | `chat-recover-sql-without-tool-call` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 20           | `chat-multi-dataset-clarification` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 21           | `chat-better-pblock-generation` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 22           | `privacy-pii-detector` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 23           | `privacy-bias-detector` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 24           | `privacy-consent-modal` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 25           | `privacy-crossboundary-hmac` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 26           | `privacy-audit-log-page` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 27           | `privacy-discovery-spanish-french-stubs` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 28           | `privacy-isrowdatamessage-helper` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 29           | `chat-clarify-tool` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 30           | `chat-clarification-card-and-bias-check` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 31           | `chat-clarification-telemetry` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 32           | `chat-discovery-clarifications` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
 
 ---
 
@@ -411,3 +432,47 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
   dependencies, and tests from `feat/ict4d-demo` in `6a1366e2`. The
   in-flight `refactor-g3/ai-chat-panel` branch now needs the same removal
   applied surgically on top of its reviewed architecture.
+- `2026-07-31` — **GROUP-3 merged + mergeback.** GROUP-3 (`ai-chat-panel`,
+  rows #015–#032) landed on `develop`; its commits sit in develop's linear
+  history from base `f37ba802` through the current tip `c703e5c2`. The
+  3-way mergeback of the cleanup into `feat/ict4d-demo` was run over the
+  G3 path set (233 files: 119 A, 89 M, 22 R, 3 D) — Added/Renamed/Deleted
+  adopted develop verbatim, Modified 3-way-merged favouring develop.
+  **Bookkeeping done:** flipped all 18 rows to `[x] (c703e5c2)`; logged
+  them in the Completed migrations log; deleted the 18 per-feature plans
+  (#015–#032) and `GROUP-3-ai-chat-panel.md`. No `refactor-g3/...` branch
+  or worktree existed locally (the group landed on develop directly), so
+  none to remove.
+  - **Mergeback outcome:** drift on the G3 path set fell from 223 files /
+    +17373 −8941 to 22 files / +6454 −5841 (16 of which are the
+    regenerated i18n catalogs). Only **6 non-i18n files** retain drift,
+    all legitimately feat-ahead / deferred:
+    `useChatModelCatalog.ts` (G5-offline `hasDownloadedOfflineModels`),
+    `http-api.types.ts` (G4 `DashboardsAPI`), `WorkspaceSettingsPage.tsx`
+    (feat owner/non-owner tab split), `planUtils.ts` (feat-ahead billing),
+    `packages/shared/clients/src/index.ts` (feat-only
+    `ServerApiSessionRefresher`/`SessionExpiredError` exports), and
+    `DataExplorerApp.tsx` (excluded; only a 4-line comment-style diff left).
+  - **Entanglements resolved:** adopted develop's `Privacy/`→`privacy/`
+    lowercase directory (removed feat's capital `ConsentModal` + repointed
+    feat-only `src/lib/privacy/{crossBoundary,consentAuditLog}` imports);
+    fixed the `chatSyntaxHighlighter.tsx`→`ChatSyntaxHighlighter.tsx`
+    case rename (would have broken on case-sensitive CI); adopted develop's
+    supabase-function route-file PascalCase renames (`*.routes.ts`→
+    `*Routes.ts`) and the `makeParserRegistry`/`dexieVersions`/
+    `buildSqlSystemPrompt` flat→dir moves; removed 3 rename-orphans
+    (`buildSqlSystemPrompt.test.ts`, feat's flat
+    `useChatPanelComposerAutoFocus.ts`, feat's `deleteObsoleteIndexedDBs/`
+    dir). Re-added feat's `DashboardsAPI` line that `--theirs` had dropped
+    from `http-api.types.ts` (this also cleared a downstream cascade of
+    8 subscription/billing type errors).
+  - **Verification green:** `pnpm type-check` 0 errors (matches feat's
+    pre-mergeback baseline of 0); `eslint` clean on 139 changed frontend
+    files; vitest 378 (chat/privacy/models/dexie) + 29 (clients) + 19
+    (chat edge function) passing; catalogs `i18n:compile` clean.
+  - **Left for the operator:** catalogs were regenerated via
+    `lingui extract` (source-locations updated for the privacy move);
+    ~3 new untranslated strings vs feat's pre-existing ~11 — run
+    `pnpm i18n:update-translations` to fill them. Working tree is **left
+    dirty (uncommitted, not pushed)** for `dif`/difit review per the
+    mergeback rule.

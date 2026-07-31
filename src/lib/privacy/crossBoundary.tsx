@@ -1,5 +1,5 @@
 import { modals } from "@mantine/modals";
-import { ConsentModal } from "@/components/Privacy/ConsentModal/ConsentModal";
+import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
 import { detectBias } from "@/lib/privacy/biasDetector";
 import { recordConsentDecision } from "@/lib/privacy/consentAuditLog";
 import { registerAck } from "@/lib/privacy/pendingAcks";
@@ -8,7 +8,7 @@ import { hashTextPayload, issueAckToken } from "@/lib/privacy/sessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
-} from "@/components/Privacy/ConsentModal/ConsentModal";
+} from "@/components/privacy/ConsentModal/ConsentModal";
 import type { BiasHit } from "@/lib/privacy/biasDetector";
 import type { PiiDetectionResult } from "@/lib/privacy/piiDetector";
 import type { Workspace } from "$/models/Workspace/Workspace";

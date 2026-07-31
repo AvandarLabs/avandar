@@ -1,4 +1,4 @@
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { FiltersByColumn } from "@utils/filters/filters.ts";

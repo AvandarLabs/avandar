@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/polar-public/polar-public.routes.ts";
+import { PolarPublicRoutes } from "@sbfn/polar-public/PolarPublicRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(PolarPublicRoutes).serve();

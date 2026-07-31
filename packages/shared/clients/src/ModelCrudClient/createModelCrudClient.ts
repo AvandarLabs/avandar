@@ -10,7 +10,7 @@ import { createServiceClient } from "@clients/ServiceClient/createServiceClient.
 import { withLogger } from "@logger/module-augmenters/withLogger.ts";
 import { FiltersByColumn } from "@utils/filters/filters.ts";
 import { omit } from "@utils/objects/omit/omit.ts";
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { EmptyObject } from "type-fest";
 

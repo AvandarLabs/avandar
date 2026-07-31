@@ -3,7 +3,7 @@ import { prettifyError } from "zod";
 import type {
   WebhookFailureResponse,
   WebhookSuccessResponse,
-} from "@sbfn/polar-public/polar-public.types.ts";
+} from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type { ZodError } from "zod";
 
 export const MAX_FREE_PLAN_SEATS = 2;

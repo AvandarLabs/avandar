@@ -97,8 +97,8 @@ msgid "Or {0} to be notified when our public launch is ready."
 msgstr "Au {0} ili kuarifiwa wakati uzinduzi wetu wa umma uko tayari."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {pickedGroupBy}"
-msgstr "Hesabu safu katika {datasetName} kwa {pickedGroupBy}"
+#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
+#~ msgstr "Hesabu safu katika {datasetName} kwa {pickedGroupBy}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -118,7 +118,7 @@ msgstr "Chagua mfano wa mazungumzo"
 msgid "most recent"
 msgstr "ya hivi karibuni zaidi"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
 
@@ -159,7 +159,7 @@ msgstr "Ruhusu usawazishaji mtandaoni"
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "Utafutaji haupatikani katika muktadha huu."
 
@@ -263,7 +263,8 @@ msgstr "Hapana"
 msgid "Select a field"
 msgstr "Chagua sehemu"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
 msgstr "Lini"
 
@@ -286,9 +287,9 @@ msgid "Unknown error"
 msgstr "Kosa lisilojulikana"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a line chart showing trends in {datasetName} over time"
-msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {datasetName} kwa "
-"muda"
+#~ msgid "Add a line chart showing trends in {datasetName} over time"
+#~ msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {datasetName} kwa "
+#~ "muda"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -314,11 +315,11 @@ msgstr "Pakia faili"
 msgid "Manage sharing"
 msgstr "Simamia kushiriki"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
 msgstr "Kumbukumbu ya faragha imeondolewa."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Sasisha CSV"
 
@@ -355,7 +356,7 @@ msgstr "Vichwa vya monospace"
 msgid "← Back"
 msgstr "← Nyuma"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
 "answer."
@@ -433,6 +434,7 @@ msgid "Get a count of how many values there are"
 msgstr "Pata idadi ya thamani zilizopo"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "Kitu kingine…"
 
@@ -440,7 +442,7 @@ msgstr "Kitu kingine…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Kubadilisha mpango kuwa {newPlanName} ({newPlanSubType})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
 msgstr "Tumia pendekezo"
 
@@ -511,7 +513,7 @@ msgstr "Inasasisha nenosiri kwa {0}"
 msgid "Column info"
 msgstr "Taarifa ya safu"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "Ninaelewa kuwa data hii itatumwa kwa mtoa huduma wa AI"
 
@@ -593,7 +595,7 @@ msgstr "Hakuna safu za nambari"
 msgid " permission"
 msgstr " ruhusa"
 
-#: src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
 msgstr "Swali la ugunduzi limefeli."
 
@@ -666,8 +668,8 @@ msgid "Preset"
 msgstr "Kuweka awali"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-msgstr "Ongeza chati ya nguzo ya {datasetName} iliyogawanywa na {groupByColumn}"
+#~ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
+#~ msgstr "Ongeza chati ya nguzo ya {datasetName} iliyogawanywa na {groupByColumn}"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -706,7 +708,7 @@ msgstr "Dashibodi yako imechapishwa kwenye:"
 msgid "Name"
 msgstr "Jina"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Swali lako lina lugha ambayo inaweza kuathiri jibu la AI."
 
@@ -726,7 +728,7 @@ msgstr "Futa kundi la jukumu"
 msgid "Enter your email to get a reset link"
 msgstr "Ingiza barua yako ya pepe kupata kiungo cha kurekebisha"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "Imeidhinishwa"
 
@@ -741,7 +743,7 @@ msgstr "Inapakia mipango..."
 msgid "User groups"
 msgstr "Makundi ya watumiaji"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Andika jibu lako..."
 
@@ -767,7 +769,7 @@ msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "Thibitisha"
@@ -834,8 +836,8 @@ msgid "Password"
 msgstr "Nenosiri"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Show the first 20 rows of {datasetName}"
-msgstr "Onyesha safu 20 za kwanza za {datasetName}"
+#~ msgid "Show the first 20 rows of {datasetName}"
+#~ msgstr "Onyesha safu 20 za kwanza za {datasetName}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -872,7 +874,9 @@ msgstr "Muhtasari wa Data"
 msgid "This {resource} is currently only accessible to its owner."
 msgstr "Hii {resource} kwa sasa inapatikana tu kwa mmiliki wake."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "Detected:"
 msgstr "Imegundulika:"
 
@@ -885,7 +889,7 @@ msgstr "/mwezi"
 msgid "Filters for this chart"
 msgstr "Vichujio vya chati hii"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Uchunguzi umeshindikana."
 
@@ -914,7 +918,7 @@ msgstr "Haiwezekani kukamata dashibodi kwa ajili ya maelezo."
 msgid "It may take a few minutes for your subscription to take effect."
 msgstr "Inaweza kuchukua dakika chache kwa usajili wako kuanza kutumika."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
 msgstr "Endelea kama ilivyo"
 
@@ -970,7 +974,8 @@ msgstr "Katalogi ya data za umma bado iko katika <0/><1/>Tunaongeza datasets "
 "wanazotaka katika Avandar. Ikiwa kuna dataset unayotaka kuiona hapa, "
 "<2>tuambie</2>!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
 msgstr "Taarifa za afya zimegunduliwa"
 
@@ -1124,7 +1129,7 @@ msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
 "tunashukuru uvumilivu wako. Utapokea msimbo wa kujiandikisha hivi "
 "karibuni. Tunahidi!"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
@@ -1132,7 +1137,7 @@ msgstr "Upendeleo umegunduliwa:"
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
 msgstr "Ilipendekezwa:"
 
@@ -1166,7 +1171,7 @@ msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from 
 "the import preview and have been overwritten with the actual values."
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "Hakuna thamani zilizorejeshwa kutoka {column}. Eleza unachohitaji "
 "badala yake."
@@ -1188,7 +1193,7 @@ msgid "Untitled dataset"
 msgstr "Dataset isiyo na jina"
 
 #. placeholder {0}: entry.turnNumber
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
 
@@ -1202,7 +1207,7 @@ msgstr "Kuunganisha na Google Sheets na vyanzo vingine vya data kuna katika "
 "huduma unayotumia ambayo unahitaji kuunganisha, <0>tafadhali tujulishe "
 "ili tuweze kuipa kipaumbele</0>."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
 "an AI provider in this workspace. Last 90 days, stored on this device "
 "only."
@@ -1227,7 +1232,7 @@ msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "Andika au bandika barua pepe hapa chini. Eneo lako la kazi litatozwa "
 "kwa kila mwanachama."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Pendekezo lililotumika"
 
@@ -1443,7 +1448,7 @@ msgstr "Ingiza maelezo ya dataset hii"
 msgid "Fields to be manually entered"
 msgstr "Sehemu za kuingizwa kwa mikono"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "seti yako ya data"
 
@@ -1454,7 +1459,7 @@ msgstr "seti yako ya data"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1468,7 +1473,7 @@ msgstr "seti yako ya data"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1642,7 +1647,7 @@ msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} "
 msgid "Delete Entity"
 msgstr "Futa Kitu"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "Data binafsi + upendeleo umebainishwa"
 
@@ -1688,7 +1693,7 @@ msgstr "maelezo"
 msgid "Min"
 msgstr "Min"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
 msgstr "Matokeo"
 
@@ -1794,7 +1799,7 @@ msgstr "Usajili unahitaji muunganisho wa intaneti."
 msgid "There are no values"
 msgstr "Hakuna thamani"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Ufafanuzi {turnNumber} wa 3"
 
@@ -1847,7 +1852,8 @@ msgstr "Jina la Uwanja"
 msgid "+ Add row filter"
 msgstr "+ Ongeza kichujio cha safu"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Consider rephrasing"
 msgstr "Fikiria kubadilisha maneno"
 
@@ -1956,7 +1962,7 @@ msgstr "Badilisha nenosiri"
 msgid "Checkout Successful!"
 msgstr "Malipo Yamefanikiwa!"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
 msgstr "Jibu"
 
@@ -1985,7 +1991,7 @@ msgstr "Unda makundi kwa wanachama wa ofisi yako. Seti za data na dashboards "
 "zinaweza kuwekewa mipangilio ya kushiriki tu na (au kuzuia) makundi "
 "fulani ya watumiaji."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/RowValueList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Preview:"
 msgstr "Muonekano:"
@@ -2035,7 +2041,8 @@ msgstr "Lipa kila mwezi"
 msgid "Choose a model"
 msgstr "Chagua mfano"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Personal data detected"
 msgstr "Data binafsi zimegunduliwa"
 
@@ -2047,7 +2054,7 @@ msgstr "Tumia kila kichujio cha kimataifa kwenye dashibodi."
 msgid "Collapse"
 msgstr "Punguza"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Kikomo kimefikiwa"
 
@@ -2055,7 +2062,7 @@ msgstr "Kikomo kimefikiwa"
 msgid "Go to billing portal"
 msgstr "Nenda kwenye lango la malipo"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear log"
 msgstr "Futa kumbukumbu"
 
@@ -2097,8 +2104,8 @@ msgid "Label type"
 msgstr "Aina ya lebo"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a bar chart of row counts in {datasetName}"
-msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
+#~ msgid "Add a bar chart of row counts in {datasetName}"
+#~ msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2199,7 +2206,7 @@ msgstr "Imepangwa mara nyingi: <0>{0}</0> inaonekana katika <1>{1}%</1> ya "
 msgid "Logo"
 msgstr "Nembo"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
 msgstr "Uamuzi"
 
@@ -2233,7 +2240,8 @@ msgstr "Lipa kila mwaka"
 msgid "coverage"
 msgstr "kufunika"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "Jibu la ufafanuzi"
 
@@ -2262,13 +2270,13 @@ msgstr "Imeshindwa kufuta seti ya data"
 msgid "License"
 msgstr "Leseni"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Describe your answer…"
 msgstr "Eleza jibu lako…"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What is the average {averageColumn} in {datasetName}?"
-msgstr "Ni nini wastani wa {averageColumn} katika {datasetName}?"
+#~ msgid "What is the average {averageColumn} in {datasetName}?"
+#~ msgstr "Ni nini wastani wa {averageColumn} katika {datasetName}?"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -2302,8 +2310,8 @@ msgid "Y column"
 msgstr "Safu ya Y"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count how many rows there are in {datasetName}"
-msgstr "Hesabu ni mistari mingapi katika {datasetName}"
+#~ msgid "Count how many rows there are in {datasetName}"
+#~ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2383,11 +2391,11 @@ msgstr "Fungua mazungumzo (⌘/)"
 msgid "Catalog ({0})"
 msgstr "Katalogi ({0})"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Send"
 msgstr "Tuma"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Generated SQL assumptions"
 msgstr "Kukadiria dhana za SQL"
 
@@ -2471,7 +2479,7 @@ msgstr "Imekamilisha kusawazisha data {0}"
 msgid "Select column"
 msgstr "Chagua safu"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "Chagua moja au zaidi"
 
@@ -2556,14 +2564,14 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 msgstr "{chartName} haiwezi kuonyeshwa kwa sababu kuna axes au series "
 "zinazokosekana."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
 "cannot be undone, and the log on other devices is not affected."
 msgstr "Futa maamuzi yote ya idhini kwenye kifaa hiki kwa kudumu? Kitendo hiki "
 "hakiwezi kubadilishwa, na kumbukumbu kwenye vifaa vingine "
 "hakitaathiriwa."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Let AI decide (legacy)"
 msgstr "Acha AI iamue (urithi)"
 
@@ -2576,6 +2584,7 @@ msgstr "Uwanja mpya"
 msgid "Workspace created successfully!"
 msgstr "Ofisi imeundwa kwa mafanikio!"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "Mwelekeo"
@@ -2605,7 +2614,7 @@ msgstr "Chagua dashibodi, au unda mpya."
 msgid "Get a sum of the values"
 msgstr "Pata jumla ya thamani"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "Andika jibu lako..."
 
@@ -2617,7 +2626,7 @@ msgstr "Ingiza"
 msgid "Yes"
 msgstr "Ndio"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear privacy log"
 msgstr "Futa kumbukumbu za faragha"
 
@@ -2707,7 +2716,7 @@ msgstr "Chagua safu ya longitudo"
 msgid "Dataset loaded successfully"
 msgstr "Dataset imepakiwa kwa mafanikio"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "Nina mamlaka ya kisheria ya kushiriki data hii na mtoa huduma wa AI"
 
@@ -2753,7 +2762,7 @@ msgstr "dakika"
 msgid "You don't have any dashboards yet."
 msgstr "Huna dashibodi zozote bado."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "Hakuna mwelekeo bado. Kumbukumbu inajaza kadri mazungumzo yanavyouliza "
@@ -2785,7 +2794,7 @@ msgstr "Kwa seti ya data <0>{0}</0>, chagua safu ya kutumia kama "
 msgid "Viewer"
 msgstr "Mtazamaji"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/SingleOptionList.tsx
 msgid "Pick one"
 msgstr "Chagua moja"
 
@@ -2799,7 +2808,7 @@ msgstr "Hakuna maeneo yaliyoongezwa"
 msgid "What is a series?"
 msgstr "Nini maana ya series?"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "Muktadha"
 
@@ -2849,7 +2858,7 @@ msgstr "Inatayarisha data kwa ajili ya uonyeshaji…"
 msgid "Received a non-string value for a select field"
 msgstr "Imepokea thamani isiyo ya maandiko kwa uwanja wa kuchagua"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "Wakati wa kujibu"
 
@@ -2865,7 +2874,7 @@ msgstr "Unda akaunti mpya"
 msgid "Direction"
 msgstr "Mwelekeo"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Edited"
 msgstr "Imehaririwa"
 
@@ -2894,7 +2903,7 @@ msgstr "Kila mwanachama wa eneo la kazi anayeweza kufungua programu ya {app} "
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "Tafadhali chagua chombo kutoka kwenye sidebar ya kushoto, au unda mpya."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "Imetambuliwa"
 
@@ -2929,7 +2938,7 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 "(kwa safu zilizochaguliwa)."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "Geuza"
 
@@ -2962,7 +2971,7 @@ msgstr "Lebo ya series"
 msgid "Edit {0}"
 msgstr "Hariri {0}"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha "
@@ -2979,7 +2988,7 @@ msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye "
 "orodha yetu ya kusubiri na umepokea msimbo wa kujiandikisha kwenye "
 "barua pepe yako."
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "Umeandika:"
 
@@ -3042,7 +3051,7 @@ msgid "Dataset \"{0}\" saved successfully"
 msgstr "Dataset \"{0}\" imehifadhiwa kwa mafanikio"
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
 msgstr "{0}s"
 
@@ -3134,7 +3143,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 "inaonyesha makadirio bora; SQL iliyo juu ndiyo inayoendesha."
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
 msgstr "Inatafuta thamani katika {column}…"
 
@@ -3213,7 +3222,7 @@ msgstr "Jina la eneo la kazi limeboreshwa"
 msgid "Add column as a field"
 msgstr "Ongeza safu kama uwanja"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
 "to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
 "etc.)."
@@ -3317,8 +3326,8 @@ msgid "Data Explorer"
 msgstr "Mchambuzi wa Data"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Count rows in {datasetName} by {secondGroupBy}"
-msgstr "Hesabu mistari katika {datasetName} kwa {secondGroupBy}"
+#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
+#~ msgstr "Hesabu mistari katika {datasetName} kwa {secondGroupBy}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3378,7 +3387,7 @@ msgstr "Ingiza karatasi za kazi, ungana na Google Sheets, au ongeza data kutoka 
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CleanPanel.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "Tuma <0>{0}</0> thamani{1} kwa AI?"
 
@@ -3427,7 +3436,7 @@ msgstr "Ondoa kichujio cha safu"
 msgid "Dataset deleted"
 msgstr "Seti ya data imefutwa"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
 msgstr "Ufafanuzi wa ugunduzi"
 
@@ -3467,10 +3476,10 @@ msgstr "Kila series ni wingu moja la mipira. Safu ya ukubwa inaamua radius ya "
 "mpira."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-msgid "Download an offline chat model (cloud icon) to ask questions while "
-"offline."
-msgstr "Pakua mfano wa mazungumzo ya mtandaoni (ikoni ya wingu) ili kuuliza "
-"maswali wakati wa kutokuwa mtandaoni."
+#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
+#~ "offline."
+#~ msgstr "Pakua mfano wa mazungumzo ya mtandaoni (ikoni ya wingu) ili kuuliza "
+#~ "maswali wakati wa kutokuwa mtandaoni."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -3494,7 +3503,7 @@ msgstr "Faili ilishindwa kupakia"
 msgid "There was an error on update: {0}"
 msgstr "Kulikuwa na hitilafu kwenye sasisho: {0}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "Kumbukumbu ya faragha"
@@ -3586,6 +3595,10 @@ msgstr "Vichujio vya kimataifa"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "Jukumu la {displayName}"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Review before sending"
+msgstr ""
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -3765,7 +3778,7 @@ msgstr "Mabadiliko yasiyohifadhiwa hayawezi kuonekana kwenye mapitio. Hifadhi "
 msgid "This workspace does not have a valid subscription."
 msgstr "Workspace hii haina usajili halali."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "Maamuzi yote"
 
@@ -3802,7 +3815,7 @@ msgstr "Hifadhi — {0}"
 msgid "Error"
 msgstr "Kosa"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
 msgstr "Tuma jibu"
 
@@ -3849,7 +3862,7 @@ msgstr "Kikundi cha mtumiaji kimehifadhiwa"
 msgid "Could not publish dashboard"
 msgstr "Haiwezekani kuchapisha dashibodi"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
 
@@ -3925,7 +3938,7 @@ msgstr "Hariri ruhusa"
 msgid "queried"
 msgstr "iliyoulizwa"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Ujumbe wa gumzo"
 
@@ -4069,7 +4082,7 @@ msgstr "Filita (Wapi)"
 msgid "Single-select"
 msgstr "Chaguo moja"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "(clean)"
 msgstr "(safi)"
 
@@ -4115,9 +4128,9 @@ msgid "Text contains"
 msgstr "Maandishi yana"
 
 #: src/components/Privacy/ConsentModal/ConsentModal.tsx
-msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-msgstr "Ili kuthibitisha, andika <0>{MEDICAL_CONFIRMATION_PHRASE}</0> hapa "
-"chini:"
+#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
+#~ msgstr "Ili kuthibitisha, andika <0>{MEDICAL_CONFIRMATION_PHRASE}</0> hapa "
+#~ "chini:"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
@@ -4126,6 +4139,10 @@ msgstr "Jukumu la kushiriki mpya"
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Expand panel"
 msgstr "Panua paneli"
+
+#: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
+msgid "Send to AI?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4154,10 +4171,11 @@ msgid "New user group"
 msgstr "Kikundi kipya cha mtumiaji"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-msgstr "Ni nini thamani tofauti za {pickedGroupBy} katika {datasetName}?"
+#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
+#~ msgstr "Ni nini thamani tofauti za {pickedGroupBy} katika {datasetName}?"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
+#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "Hakuna kati ya hapo juu"
 
@@ -4257,7 +4275,7 @@ msgstr "Haiwezekani kufanya dataset iwe ya mtandaoni pekee"
 msgid "Enter comment"
 msgstr "Ingiza maoni"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "Hakuna entries bado. Kumbukumbu inajaza kadri paneli ya mazungumzo "
 "inavyohitaji idhini."
@@ -4266,7 +4284,7 @@ msgstr "Hakuna entries bado. Kumbukumbu inajaza kadri paneli ya mazungumzo "
 msgid "Dataset name"
 msgstr "Jina la dataset"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Source column"
 msgstr "Safu ya chanzo"
 
@@ -4290,7 +4308,8 @@ msgstr "Sasisha & chapisha tena"
 msgid " · downloaded"
 msgstr " · imeshukuliwa"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
 msgstr "Imesitishwa"
 
@@ -4316,8 +4335,8 @@ msgid "Regenerate with the error"
 msgstr "Rejesha tena na kosa"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Add a table of the top 10 rows of {datasetName}"
-msgstr "Ongeza jedwali la safu 10 bora za {datasetName}"
+#~ msgid "Add a table of the top 10 rows of {datasetName}"
+#~ msgstr "Ongeza jedwali la safu 10 bora za {datasetName}"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
@@ -4352,7 +4371,7 @@ msgstr "nambari kamili"
 msgid "Symbol color"
 msgstr "Rangi ya alama"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "Jibu la ufafanuzi maalum"
 
@@ -4403,7 +4422,7 @@ msgstr "Makundi ya watumiaji kwa mgeni"
 msgid "Recommended"
 msgstr "Inapendekezwa"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx
+#: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Select all"
 msgstr "Chagua yote"
@@ -4425,7 +4444,7 @@ msgstr "Kuangalia dashibodi hii"
 msgid "No value"
 msgstr "Hakuna thamani"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
 msgstr "Umbo"
 
@@ -4616,7 +4635,7 @@ msgstr "Futa kikundi cha mtumiaji"
 msgid "Sync online?"
 msgstr "Sawa na mtandaoni?"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "Kushindwa kwa kawaida"
 
@@ -4655,7 +4674,7 @@ msgstr "Hifadhi mabadiliko"
 msgid "Google Sheet failed to load"
 msgstr "Google Sheet ilishindwa kupakia"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Andika kifungu cha uthibitisho"
 
@@ -4724,7 +4743,7 @@ msgstr "Mwaka"
 msgid "anyone with "
 msgstr "mtu yeyote mwenye "
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
@@ -4759,6 +4778,10 @@ msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
 msgid "Hello DateValueItem"
 msgstr "Habari DateValueItem"
+
+#: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
+msgid "To confirm, type <0>{confirmationTarget}</0> below:"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -4860,7 +4883,7 @@ msgstr "Hakuna mifano inayolingana na utafutaji wako"
 msgid "Recommended next steps"
 msgstr "Hatua zinazopendekezwa zifuatazo"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
+#: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "Kutoka safu: <0>{columnName}</0>"
 

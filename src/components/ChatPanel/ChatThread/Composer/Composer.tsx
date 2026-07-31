@@ -6,10 +6,8 @@ import clsx from "clsx";
 import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { OfflineChatDownloadControl } from "@/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus";
-import { useOfflineBlocksCloudChat } from "@/lib/offline/useOfflineBlocksCloudChat";
+import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
 import css from "./Composer.module.css";
 
 /**
@@ -17,7 +15,7 @@ import css from "./Composer.module.css";
  * picker, and the send button. Input and actions are disabled outside the Data
  * Explorer app, where chat actions are not yet available.
  */
-export function Composer(): JSX.Element {
+export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
   const panelRef = useRef<HTMLDivElement>(null);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
@@ -29,16 +27,12 @@ export function Composer(): JSX.Element {
 
   const context = useChatPageContext();
   const { t } = useLingui();
-  const offlineBlocksCloudChat = useOfflineBlocksCloudChat();
   const isChatEnabled =
     context.app === "data-explorer" || context.app === "dashboards";
-  const chatDisabled = !isChatEnabled || offlineBlocksCloudChat;
+  const chatDisabled = !isChatEnabled;
 
   const placeholder =
-    offlineBlocksCloudChat ?
-      t`Download an offline chat model (cloud icon) to ask questions while offline.`
-    : context.app === "dashboards" ?
-      t`Ask me to add a chart to this dashboard...`
+    context.app === "dashboards" ? t`Ask me to add a chart to this dashboard...`
     : context.app === "data-explorer" ? t`Ask about your data...`
     : t`Chat is enabled in Data Explorer and Dashboards`;
 
@@ -59,7 +53,6 @@ export function Composer(): JSX.Element {
           unstable_focusOnThreadSwitched={false}
         />
         <Group gap="xs">
-          <OfflineChatDownloadControl disabled={!isChatEnabled} />
           <ChatModelPicker disabled={chatDisabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon
