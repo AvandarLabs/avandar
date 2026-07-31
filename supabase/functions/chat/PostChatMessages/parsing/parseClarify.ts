@@ -1,4 +1,5 @@
 import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
+import { match } from "ts-pattern";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
@@ -61,65 +62,65 @@ export function parseClarify(
   }
 
   const turnNumber = (priorClarifications + 1) as 1 | 2 | 3;
-  if (shape.kind === "free_text") {
-    return {
-      question: parsed.question.trim(),
-      rationale,
-      responseShape: {
-        kind: "free_text",
-        ...(typeof shape.placeholder === "string" ?
-          { placeholder: shape.placeholder.slice(0, 80) }
-        : {}),
-      },
-      turnNumber,
-    };
-  }
-
-  if (shape.kind === "fixed_options") {
-    if (!Array.isArray(shape.options)) {
+  return match(shape.kind)
+    .with("free_text", () => {
+      return {
+        question: parsed.question.trim(),
+        rationale,
+        responseShape: {
+          kind: "free_text",
+          ...(typeof shape.placeholder === "string" ?
+            { placeholder: shape.placeholder.slice(0, 80) }
+          : {}),
+        },
+        turnNumber,
+      };
+    })
+    .with("fixed_options", () => {
+      if (!Array.isArray(shape.options)) {
+        return undefined;
+      }
+      const options = shape.options
+        .filter((option): option is string => {
+          return typeof option === "string";
+        })
+        .slice(0, 8);
+      if (options.length < 2) {
+        return undefined;
+      }
+      return {
+        question: parsed.question.trim(),
+        rationale,
+        responseShape: {
+          kind: "fixed_options",
+          options,
+          multi: shape.multi === true,
+        },
+        turnNumber,
+      };
+    })
+    .with("discovery", () => {
+      if (typeof shape.query !== "string" || typeof shape.column !== "string") {
+        return undefined;
+      }
+      const query = shape.query.trim();
+      const column = shape.column.trim();
+      if (!isReadOnlyDiscoveryQuery(query) || column.length === 0) {
+        return undefined;
+      }
+      return {
+        question: parsed.question.trim(),
+        rationale,
+        responseShape: {
+          kind: "discovery",
+          query,
+          column,
+          multi: shape.multi === true,
+        },
+        turnNumber,
+      };
+    })
+    .otherwise(() => {
       return undefined;
-    }
-    const options = shape.options
-      .filter((option): option is string => {
-        return typeof option === "string";
-      })
-      .slice(0, 8);
-    if (options.length < 2) {
-      return undefined;
-    }
-    return {
-      question: parsed.question.trim(),
-      rationale,
-      responseShape: {
-        kind: "fixed_options",
-        options,
-        multi: shape.multi === true,
-      },
-      turnNumber,
-    };
-  }
-
-  if (shape.kind === "discovery") {
-    if (typeof shape.query !== "string" || typeof shape.column !== "string") {
-      return undefined;
-    }
-    const query = shape.query.trim();
-    const column = shape.column.trim();
-    if (!isReadOnlyDiscoveryQuery(query) || column.length === 0) {
-      return undefined;
-    }
-    return {
-      question: parsed.question.trim(),
-      rationale,
-      responseShape: {
-        kind: "discovery",
-        query,
-        column,
-        multi: shape.multi === true,
-      },
-      turnNumber,
-    };
-  }
-
-  return undefined;
+    });
 }
