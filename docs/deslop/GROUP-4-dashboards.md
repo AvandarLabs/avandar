@@ -5,11 +5,14 @@
 - **Migration strategy:** one PR per group — the whole group lands as a single PR off `refactor-g4/dashboards`; the per-row order below is the in-branch build sequence.
 - **Source branch**: `feat/ict4d-demo`
 - **Target branch**: `develop`
-- **Base when authored**: `origin/develop` at `6ec98d45` (per the assignment).
-  **Drift note:** `origin/develop` had already advanced to `6ec98d45` by the
-  time this plan was written. Re-fetch and re-base off the current
-  `origin/develop` tip when the migration actually runs; the file paths below
-  are stable but the exact tip SHA is not.
+- **Base**: `origin/develop` at `c703e5c2` (refreshed 2026-07-31, after G1
+  `914bcbba` + G2 `59cdb59c` + G3 `c703e5c2` all merged). The
+  `refactor-g4/dashboards` branch + worktree are cut from this tip.
+  **Drift note:** originally authored against `6ec98d45`; this whole plan was
+  re-verified path-by-path against `origin/develop @ c703e5c2` and
+  `origin/feat/ict4d-demo @ b80b0418` on 2026-07-31. See "What the 2026-07-31
+  refresh changed" in Notes below. If you land this much later, re-fetch and
+  re-diff — the file paths below are current as of the refresh.
 - **Constituent rows** (from `ALL_FEATURES.md`):
   - `#064` dashboard-design-tokens
   - `#065` dashboard-chat-in-editor
@@ -58,38 +61,65 @@ code lives under `src/views/DashboardApp/`, not `src/components/AvaPage`,
 `supabase/functions/chat/tools`. The "Consolidated changes" section below has
 the verified real paths. Trust this file over the individual plans.
 
-### TOP RISK — AvaPage data-migration VERSION ordering
+### What the 2026-07-31 refresh changed (drift since `6ec98d45`)
 
-This is the single most dangerous part of the group. Get it wrong and existing
-saved dashboards silently corrupt or fail to load.
+This plan was re-verified path-by-path against the post-G3 develop
+(`c703e5c2`). The material deltas since it was authored:
+
+- **AvaPage V3 is now ON develop.** The TOP RISK below is largely retired: G2
+  `#009` landed V3, so develop is at `CURRENT_SCHEMA_VERSION = 3` with
+  `versionTransforms = [V1, V2, V3]`. G4 now registers **V4 only**.
+- **`AvaPageDataMigrationV2.types.ts` is now identical on both branches** (the
+  old "~116-line delta" landed with V3). Its surgical-edit entry was removed —
+  do not touch V2 types.
+- **Most deps already landed.** `html-to-image`, `roughjs`, `node-sql-parser`,
+  `react-querybuilder`, `@react-querybuilder/mantine` are all on develop
+  (via G2/G3). Only **`qrcode`, `@types/qrcode`, `jspdf`** still need installing.
+- **`#065` server wiring is mostly already on develop.** The chat routes file
+  was renamed `chat.routes.ts` → `ChatRoutes.ts` (G3 PascalCase) AND the
+  `addDashboardBlock` tool was refactored out of it into
+  `supabase/functions/chat/PostChatMessages/{parsing/parseDashboardBlock.ts,
+  prompt/buildChatToolConfig.ts, prompt/buildSystemPrompts.ts}` — which G3
+  already merged. Re-scope `#065`'s server side against those files; do not
+  expect to port a monolithic `chat.routes.ts` edit.
+- **Offline-chat surgical target does not exist on develop.**
+  `src/lib/offlineChat/buildOfflinePrompts.ts` (and the whole
+  `src/lib/offlineChat/` dir) is feat-only — the offline-chat subsystem is a
+  **G5** deliverable and has NOT landed. Drop it from G4's `#065` scope; the
+  offline `addDashboardBlock` prompt wiring rides with G5.
+- **`#069` per-viz-filter files sit one dir deeper on feat** (nested
+  `DataVizPBlock/DataVizPBlock/`). Corrected in the copy list.
+- Five files the old draft called "surgically edit" are actually **new**
+  (absent on develop) → moved to the copy-verbatim list.
+
+### TOP RISK (mostly retired) — AvaPage data-migration VERSION ordering
+
+Get this wrong and existing saved dashboards silently corrupt or fail to load.
+As of the 2026-07-31 refresh the dangerous prerequisite is **satisfied**: V3 is
+already on develop, so G4 only appends V4. Still verify before touching it.
 
 - The migration chain lives at
   `src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV{1,2,3,4}/`.
   Each migration declares a `downgradedVersion` → `upgradedVersion` pair and is
   registered, **in order**, in
   `src/views/DashboardApp/AvaPage/utils/upgradeAvaPageData.ts`.
-- **`develop` today has only V1 and V2.** `upgradeAvaPageData.ts` on develop
-  registers `[V1, V2]`, and
+- **`develop @ c703e5c2` has V1, V2, and V3.** `upgradeAvaPageData.ts`
+  registers `[V1, V2, V3]`, and
   `shared/models/Dashboard/DashboardConfig/constants.ts` has
-  `CURRENT_SCHEMA_VERSION = 2`.
+  `CURRENT_SCHEMA_VERSION = 3`. (Confirmed at refresh.)
 - **`feat/ict4d-demo` has V1–V4.** It registers `[V1, V2, V3, V4]` and sets
   `CURRENT_SCHEMA_VERSION = 4`.
-- Therefore the version bump must happen **incrementally and in lockstep with
-  the features that introduce each version:**
-  - **V3 ships with Group 2 `#009`** (viz multi-series/chart-types). It is a
-    Group 2 deliverable, NOT Group 4 — but Group 4 cannot land its V4 until V3
-    is on develop. When `#069` migrates, V3 must already be registered and
-    `CURRENT_SCHEMA_VERSION` already at 3. If it isn't, STOP and flag — do not
-    register V4 against a V2 base.
+- Therefore G4's only migration-chain work is the V3 → V4 step:
   - **V4 ships with Group 4 `#069`** (per-viz filters). Registering V4 means:
     copy the `AvaPageDataMigrationV4/` directory, add `AvaPageDataMigrationV4`
     to the `versionTransforms` array in `upgradeAvaPageData.ts` (after V3), and
     bump `CURRENT_SCHEMA_VERSION` 3 → 4 in
     `shared/models/Dashboard/DashboardConfig/constants.ts`.
-  - Note `AvaPageDataMigrationV2.types.ts` also has a real diff (~116 lines)
-    between branches. Verify whether that delta is part of the `#009` V3 work or
-    a standalone correction; do not blindly overwrite the develop copy of V2
-    types without confirming it round-trips with the V1→V2→V3 chain.
+  - Re-confirm at migration time that develop still shows V3 +
+    `CURRENT_SCHEMA_VERSION = 3` before appending V4. If someone has since
+    bumped it, reconcile — never register V4 twice or against a stale base.
+  - `AvaPageDataMigrationV2.types.ts` is now identical on both branches — leave
+    it alone (do not overwrite develop's V2 types).
 - **Acceptance gate:** after V4 lands, the migrator's own tests
   (`AvaPageDataMigrationV3.test.ts`, `AvaPageDataMigrationV4.test.ts`) must pass,
   and a V1/V2-era saved dashboard must upgrade cleanly all the way to V4. Run
@@ -154,14 +184,21 @@ this migration. Do not remove the gate.
 ### Cross-group dependency reminders
 
 - `#065` dashboard-chat-in-editor needs **Group 3**'s chat panel + tool
-  registration. The `addDashboardBlock` tool is wired server-side in
-  `supabase/functions/chat/chat.routes.ts` and consumed client-side in
+  registration — **which is already on develop (`c703e5c2`).** The
+  `addDashboardBlock` tool is wired server-side under
+  `supabase/functions/chat/PostChatMessages/` (`parsing/parseDashboardBlock.ts`,
+  `prompt/buildChatToolConfig.ts`, `prompt/buildSystemPrompts.ts`) — G3
+  refactored it OUT of the old monolithic routes file (now renamed
+  `chat.routes.ts` → `ChatRoutes.ts`). So the server side of `#065` is
+  **largely already done**; verify those files register `addDashboardBlock`
+  before assuming any server port is owed. `#065`'s remaining work is
+  client-side: unlock the composer on dashboards and consume pending blocks in
   `DashboardEditorView.tsx` via `DashboardEditorStateManager` +
   `DashboardChatPendingBlocksSync`. The per-feature plan's claim of a standalone
-  `supabase/functions/chat/tools/addDashboardBlock.ts` file is WRONG — there is
-  no such file; it is part of the chat routes. Do not migrate `#065` until
-  Group 3's chat plumbing is on develop. Also confirm `#015`
-  (chat-disabled-visual-feedback) per the row's stated dep.
+  `supabase/functions/chat/tools/addDashboardBlock.ts` file is WRONG — no such
+  file exists. **Do not** wire the offline `addDashboardBlock` prompt path here:
+  `src/lib/offlineChat/` is feat-only and lands with **G5**, not G4. Also
+  confirm `#015` (chat-disabled-visual-feedback) — it is `[x]` via G3.
 - `#048` sql-form-sync-dashboards needs **Group 2**'s SQL-form machinery
   (`#044` sql→structured, `#045` structured→sql, `#047` data-explorer hook
   shape). `useDashboardManualQueryState` is the per-block analogue of
@@ -221,13 +258,16 @@ file is shared.
 2. **`#066` dashboard-export-buttons-polish** — CSS-only. No deps. (Land early
    so modal/button chrome is final.)
 3. **`#067` dashboard-modal-styles** — CSS-only. No deps.
-4. **`#065` dashboard-chat-in-editor** — depends on **Group 3** chat plumbing +
-   `#015`. Unlocks the composer on dashboards and wires `addDashboardBlock`.
+4. **`#065` dashboard-chat-in-editor** — Group 3 chat plumbing + `#015` are
+   **already on develop**; the `addDashboardBlock` server tool already exists
+   under `PostChatMessages/`. Remaining work is client-side: unlock the composer
+   on dashboards and consume pending blocks. Skip the `src/lib/offlineChat/`
+   path (feat-only, G5). See cross-group reminders above.
 5. **`#068` dashboard-global-filters** — Filter P-block + state manager + SQL
    wrap. No intra-group dep, but must precede `#069`.
 6. **`#069` dashboard-per-viz-filters** — **ships `AvaPageDataMigrationV4`.**
-   Depends on `#068` and on **Group 2 `#009`** (V3 must be registered;
-   `CURRENT_SCHEMA_VERSION` already at 3). See TOP RISK.
+   Depends on `#068`. Group 2 `#009` V3 is **already registered on develop**
+   (`CURRENT_SCHEMA_VERSION = 3`); G4 appends V4 and bumps 3 → 4. See TOP RISK.
 7. **`#070` dashboard-view-before-publish** — preview route + `mode` prop on
    `DashboardViewerView`. Head of the publishing chain.
 8. **`#071` dashboard-publish-modal** — real Mantine modal replacing
@@ -284,10 +324,11 @@ src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGloba
 src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV4/AvaPageDataMigrationV4.ts
 src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV4/AvaPageDataMigrationV4.types.ts
 src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV4/AvaPageDataMigrationV4.test.ts
-src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizLocalFilters.tsx
-src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/dataVizFilters.ts
-src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/dataVizFilters.test.ts
-src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useLocalFilterState.ts
+# NOTE: these 4 sit in the NESTED DataVizPBlock/DataVizPBlock/ dir on feat (beside DataVizPBlock.tsx), not one level up.
+src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters.ts
+src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters.test.ts
+src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState.ts
 src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
 
@@ -324,6 +365,14 @@ src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateCo
 
 # --- #048 per-block SQL form sync ---
 src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState.ts
+
+# --- reclassified: NEW on develop (the 2026-07-31 audit found these are additive,
+#     not surgical edits — they do not exist on develop) ---
+src/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig.module.css                 # #064/#065/#068/#069/#048
+src/views/DashboardApp/DashboardEditorView/dashboardPuckDrawerLabel.ts                        # puck drawer label helper
+src/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize.ts                      # toolbar button sizing helper
+src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/resolveDataVizPBlockProps.ts  # #068/#069/#048 (nested dir)
+src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.module.css                     # #066 button polish
 ```
 
 > The `slug.ts`/`slug.test.ts` files are the real form of the plan's
@@ -336,17 +385,19 @@ src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryStat
 - `src/views/DashboardApp/AvaPage/AvaPage.types.ts` — add `theme`/`typography`
   root props (`#064`); add filter/opt-out/local-filter block field shapes
   (`#068`/`#069`).
-- `src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types.ts`
-  — ~116-line delta; confirm whether it belongs to V3 (Group 2) or is a
-  standalone V2-types correction before overwriting (`#069`/Group 2).
-- `src/views/DashboardApp/AvaPage/utils/upgradeAvaPageData.ts` — append `V3`
-  (Group 2) then `V4` (`#069`) to `versionTransforms`. **Ordering critical.**
+- ~~`AvaPageDataMigrationV2.types.ts`~~ — **no longer drifted.** As of the
+  2026-07-31 refresh this file is identical on both branches (the old ~116-line
+  delta landed with V3/Group 2). Do not touch it.
+- `src/views/DashboardApp/AvaPage/utils/upgradeAvaPageData.ts` — append `V4`
+  (`#069`) to `versionTransforms`. develop already has `[V1, V2, V3]`;
+  **append V4 after V3. Ordering critical.**
 - `shared/models/Dashboard/DashboardConfig/constants.ts` — bump
-  `CURRENT_SCHEMA_VERSION` 2 → 3 (Group 2) → 4 (`#069`).
+  `CURRENT_SCHEMA_VERSION` 3 → 4 (`#069`). develop is already at 3.
 - `src/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig.tsx`
-  (+`.module.css`, `dashboardPuckDrawerLabel.ts`, `dashboardToolbarButtonSize.ts`)
   — register Filter P-block (`#068`), local-filters/opt-out fields (`#069`),
   NLQueryPField tabs (`#048`), design-token fields (`#064`). Port cumulatively.
+  (Its siblings `getDashboardPuckConfig.module.css`, `dashboardPuckDrawerLabel.ts`,
+  `dashboardToolbarButtonSize.ts` are NEW → see the copy-verbatim list.)
 - `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx`
   (+`.test.tsx`) — chat composer unlock + pending-blocks sync (`#065`); publish
   modal trigger (`#071`); export button (`#075`); filter state manager wiring
@@ -357,20 +408,28 @@ src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryStat
   `mode: "public" | "preview"` (`#070`); render global filters at view time
   (`#068`); back the public `/d/$slug` route (`#072`).
 - `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx`
-  + `buildDataVizPBlockConfig.tsx` + `resolveDataVizPBlockProps.ts` — apply
-  global + local filters via the SQL wrapper (`#068`/`#069`); render 3-tab
-  NLQueryPField (`#048`); consume pending chat blocks (`#065`).
+  + `buildDataVizPBlockConfig.tsx` — apply global + local filters via the SQL
+  wrapper (`#068`/`#069`); render 3-tab NLQueryPField (`#048`); consume pending
+  chat blocks (`#065`). (Sibling `resolveDataVizPBlockProps.ts` is NEW → copy
+  list, same nested dir.)
 - `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx`
   + `buildNLQueryFieldConfig.tsx` — 3-tab Prompt/Manual/SQL UI (`#048`).
 - `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/*`,
   `ContainerMaxWidthPField/*` — minor field deltas riding along with the above.
-- `src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx`
-  (+`.module.css`), `ViewDashboardButton.tsx`, `DeleteDashboardButton.tsx`,
-  `DashboardListView/*` — button/styling polish (`#066`/`#067`).
-- `supabase/functions/chat/chat.routes.ts` — register/handle the
-  `addDashboardBlock` tool server-side (`#065`). (Group 3 plumbing must exist.)
-- `src/lib/offlineChat/buildOfflinePrompts.ts` — references `addDashboardBlock`
-  for the offline path (`#065`); verify Group 3 offline chat landed first.
+- `src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx`,
+  `ViewDashboardButton.tsx`, `DeleteDashboardButton.tsx`, `DashboardListView/*`
+  — button/styling polish (`#066`/`#067`). (`SaveDashboardButton.module.css` is
+  NEW → copy list.)
+- `supabase/functions/chat/PostChatMessages/{parsing/parseDashboardBlock.ts,
+  prompt/buildChatToolConfig.ts, prompt/buildSystemPrompts.ts}` — the
+  `addDashboardBlock` tool server-side (`#065`). **Likely already present on
+  develop** (G3 refactored it here out of the old `chat.routes.ts`, now
+  `ChatRoutes.ts`). Verify it registers `addDashboardBlock`; only edit if a gap
+  remains. There is NO server port of a monolithic `chat.routes.ts`.
+- ~~`src/lib/offlineChat/buildOfflinePrompts.ts`~~ — **NOT a G4 target.** The
+  whole `src/lib/offlineChat/` dir is feat-only and lands with **G5** (offline
+  chat). Do not add it here; the offline `addDashboardBlock` prompt wiring rides
+  with G5.
 - `src/clients/datasets/DatasetQueryClient.ts` — add `getDatasetMeta` /
   `getColumnSummary` methods (`#076`). Confirm the develop client shape first.
 - `src/components/ChatPanel/ChatEmptyState/getCachedDatasetColumnSummaries.ts`
@@ -388,26 +447,29 @@ likely nothing to delete.)
 
 ### Dependency changes
 
-Install on develop (all present on `feat/ict4d-demo`, absent on develop):
+**As of the 2026-07-31 refresh, only three packages still need installing** —
+the rest already landed on develop via G2/G3:
 
 ```sh
-pnpm add qrcode            # #073 client-side QR PNG (^1.5.4)  + @types/qrcode if needed
-pnpm add html-to-image     # #075 PDF capture via toCanvas (^1.11.13)  — NOT html2canvas
+pnpm add qrcode            # #073 client-side QR PNG (^1.5.4)
+pnpm add -D @types/qrcode  # #073 types (^1.5.6)
 pnpm add jspdf             # #075 PDF generation (^4.2.1)
-pnpm add roughjs           # #075 annotator strokes (^4.6.6)
-pnpm add node-sql-parser   # #074 columnList extraction (^5.4.0)  — likely already added by Group 2 #044
 ```
 
-`react-querybuilder` (^8.16.1) is also absent on develop and present on
-`feat/ict4d-demo`; it is the recursive filter-UI dep from Group 2 `#046`. If the
-Filter P-block (`#068`) or local-filters UI (`#069`) imports it, it must be
-installed — but it is primarily a Group 2 dependency. Verify the import graph of
-`FilterPBlock.tsx`/`LocalFiltersPField.tsx` before adding it here; prefer that
-Group 2 owns it.
+**Already on develop — do NOT re-add:**
 
-**Note on the plans' dependency lists:** `#075`'s plan says
+| Dep | On develop | Landed via |
+|---|---|---|
+| `html-to-image` (^1.11.13) | ✅ | G-series (PDF capture `toCanvas`, NOT html2canvas) |
+| `roughjs` (^4.6.6) | ✅ | G-series (`#075` annotator strokes) |
+| `node-sql-parser` (^5.4.0) | ✅ | Group 2 `#044` (`#074` columnList extraction) |
+| `react-querybuilder` (^8.16.1) | ✅ | Group 2 `#046` |
+| `@react-querybuilder/mantine` (^8.16.1) | ✅ | Group 2 `#046` |
+
+**Note on the plans' dependency lists:** `#075`'s per-feature plan says
 `pnpm add html2canvas jspdf roughjs`. **`html2canvas` is wrong** — the real code
-imports `toCanvas` from `html-to-image`. Use `html-to-image`.
+imports `toCanvas` from `html-to-image` (already installed). Only `jspdf` is
+owed from that line.
 
 ### AvaPage data-migration files + version sequence (explicit)
 
@@ -415,24 +477,25 @@ Directory: `src/views/DashboardApp/AvaPage/migrations/`
 
 ```
 AvaPageDataMigrationV1/   already on develop   (no-op for this group)
-AvaPageDataMigrationV2/   already on develop   (verify V2.types.ts delta)
-AvaPageDataMigrationV3/   NEW — ships with Group 2 #009 (prerequisite, not G4)
+AvaPageDataMigrationV2/   already on develop   (V2.types.ts now identical — leave alone)
+AvaPageDataMigrationV3/   already on develop    (landed with Group 2 #009)
 AvaPageDataMigrationV4/   NEW — ships with Group 4 #069
 AvaPageDataMigrator.ts        already on develop
 config.ts                     already on develop (re-exports CURRENT_SCHEMA_VERSION)
 getVersionFromAvaPageData.ts  already on develop
 ```
 
-Version sequence (applied in this exact order):
+Version sequence (develop already advanced to V3 as of the 2026-07-31 refresh):
 
 ```
-develop today:  CURRENT_SCHEMA_VERSION = 2 ; versionTransforms = [V1, V2]
-after Group 2:  CURRENT_SCHEMA_VERSION = 3 ; versionTransforms = [V1, V2, V3]
-after #069:     CURRENT_SCHEMA_VERSION = 4 ; versionTransforms = [V1, V2, V3, V4]
+develop @ c703e5c2:  CURRENT_SCHEMA_VERSION = 3 ; versionTransforms = [V1, V2, V3]
+after #069:          CURRENT_SCHEMA_VERSION = 4 ; versionTransforms = [V1, V2, V3, V4]
 ```
 
-Never register V4 without V3 present. Never bump the constant without
-registering the matching migration in the same change.
+G4's only migration-chain change is appending V4 and bumping 3 → 4. Re-confirm
+develop still shows V3 + `CURRENT_SCHEMA_VERSION = 3` at migration time; never
+register V4 without V3 present, and never bump the constant without registering
+the matching migration in the same change.
 
 ---
 
@@ -456,10 +519,14 @@ narrative (but trust THIS file's paths/deps over those).
    Publish/Export render into.
 
 4. **`#065` dashboard-chat-in-editor** → `065-dashboard-chat-in-editor.md`.
-   Unlock composer on dashboards; `addDashboardBlock` (server: `chat.routes.ts`);
+   Unlock composer on dashboards; the `addDashboardBlock` server tool is
+   **already on develop** under `supabase/functions/chat/PostChatMessages/`
+   (G3 refactored it out of the old `chat.routes.ts`, now `ChatRoutes.ts`) —
+   verify, don't re-port. Client side:
    `DashboardEditorStateManager` + `DashboardChatPendingBlocksSync` queue/apply
    blocks; `buildPendingDataVizBlock`/`buildPendingDashboardBlock` build drafts.
-   **Dep: Group 3 chat panel + `#015`.**
+   Skip the `src/lib/offlineChat/` path (feat-only, G5).
+   **Dep: Group 3 chat panel + `#015` — both already `[x]`.**
 
 5. **`#068` dashboard-global-filters** → `068-dashboard-global-filters.md`.
    `FilterPBlock` (single/multi/contains) + `DashboardFilterStateManager` +
@@ -529,6 +596,7 @@ pnpm tsc -b --noEmit          # or: pnpm type-check
 pnpm lint                     # eslint (neostandard / eslint9 config)
 
 # Migration chain — the hard gate for #069 / version ordering.
+# V3 already on develop; V4 is what G4 adds. Run both to prove the full chain upgrades.
 pnpm vitest run \
   src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.test.ts \
   src/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV4/AvaPageDataMigrationV4.test.ts
@@ -540,7 +608,7 @@ pnpm vitest run \
 # Filter SQL wrapping (#068) + per-viz filters (#069).
 pnpm vitest run \
   src/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql.test.ts \
-  src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/dataVizFilters.test.ts
+  src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters.test.ts
 
 # Chat pending blocks (#065).
 pnpm vitest run \

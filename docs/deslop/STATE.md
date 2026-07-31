@@ -84,8 +84,16 @@ by `/deslop complete`.
 
 GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26), and
 GROUP-3 (`c703e5c2`, 2026-07-31) are merged into `develop` and merged back
-into `feat/ict4d-demo`. No refactor branches are currently open; the next
-group to cut is GROUP-4 (dashboards).
+into `feat/ict4d-demo`.
+
+**GROUP-4 branch prepared (not yet in flight).** On 2026-07-31 the
+`refactor-g4/dashboards` branch + worktree were cut off `origin/develop`
+@ `c703e5c2` (worktree `~/src/worktrees/avandar/refactor-g4/dashboards`).
+Nothing is ported or pushed yet, so it is **not** an in-flight row above and
+the GROUP-4 `ALL_FEATURES.md` rows remain `[ ]`. When the port lands and the
+branch is pushed, flip rows `#064`–`#076` + `#048` to `[~]` and add the
+in-flight row per `/deslop migrate` steps 7–8. The refreshed plan is
+`docs/deslop/GROUP-4-dashboards.md` (re-verified against `c703e5c2`).
 
 ---
 
@@ -476,3 +484,27 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     `pnpm i18n:update-translations` to fill them. Working tree is **left
     dirty (uncommitted, not pushed)** for `dif`/difit review per the
     mergeback rule.
+- `2026-07-31` — **GROUP-4 plan refreshed + branch prepared (pre-port).**
+  Re-verified `docs/deslop/GROUP-4-dashboards.md` (rows `#064`–`#076` + `#048`)
+  path-by-path against `origin/develop @ c703e5c2` (post-G3) and
+  `origin/feat/ict4d-demo @ b80b0418`. Drift patched into the group plan:
+  - **AvaPage V3 is now on develop** (`CURRENT_SCHEMA_VERSION = 3`,
+    `versionTransforms = [V1, V2, V3]`) — the old TOP-RISK prerequisite is
+    satisfied; G4 appends **V4 only** and bumps 3 → 4.
+  - `AvaPageDataMigrationV2.types.ts` is now **identical** on both branches
+    (old ~116-line delta landed with V3) — surgical entry removed.
+  - Deps: only **`qrcode`, `@types/qrcode`, `jspdf`** still need installing;
+    `html-to-image`, `roughjs`, `node-sql-parser`, `react-querybuilder`,
+    `@react-querybuilder/mantine` already on develop (G2/G3).
+  - `#065` server side is **mostly already on develop** — G3 renamed
+    `chat.routes.ts` → `ChatRoutes.ts` and refactored `addDashboardBlock` into
+    `supabase/functions/chat/PostChatMessages/`. The `src/lib/offlineChat/`
+    target is feat-only (**G5**, not G4) and was dropped from scope.
+  - `#069` per-viz filter files are one dir deeper on feat
+    (`DataVizPBlock/DataVizPBlock/`); 5 files the draft called "surgical edit"
+    are actually new → moved to the copy-verbatim list. Base SHA in the plan
+    bumped `6ec98d45` → `c703e5c2`.
+  - **Branch prepared:** `refactor-g4/dashboards` cut off `origin/develop`
+    @ `c703e5c2` in worktree `~/src/worktrees/avandar/refactor-g4/dashboards`.
+    Nothing ported/pushed yet → not in the In-flight table; GROUP-4 rows stay
+    `[ ]`. These deslop-doc edits are left **uncommitted** for operator review.

@@ -154,9 +154,19 @@ planning is complete.
   (6 non-i18n, all feat-ahead / deferred to G4/G5); type-check, lint,
   and the chat/privacy/models vitest suites are green. Details in
   `STATE.md`'s 2026-07-31 log entry. (GROUP-2 had likewise merged on
-  2026-07-26, `59cdb59c`.) **Next step:** cut `refactor-g4/dashboards`
-  off the current `develop` tip and migrate GROUP-4 per
-  `docs/deslop/GROUP-4-dashboards.md`.
+  2026-07-26, `59cdb59c`.)
+- **2026-07-31 — GROUP-4 plan refreshed + branch prepared.**
+  `docs/deslop/GROUP-4-dashboards.md` was re-verified path-by-path against the
+  post-G3 develop (`c703e5c2`) and patched for drift (V3 now on develop so G4
+  appends V4 only; deps trimmed to `qrcode`/`@types/qrcode`/`jspdf`; `#065`
+  server tool already on develop; `#069` filter paths nested; offline-chat
+  deferred to G5). The `refactor-g4/dashboards` branch + worktree were cut off
+  `origin/develop @ c703e5c2` (`~/src/worktrees/avandar/refactor-g4/dashboards`).
+  Nothing ported/pushed yet — rows `#064`–`#076` + `#048` stay `[ ]`; not
+  in-flight. **Next step:** port GROUP-4 into the branch per the refreshed plan
+  (design tokens → CSS polish → chat-in-editor → filters+V4 → publishing chain
+  → summary view → `#048`), verify green, push, then flip rows to `[~]` and
+  register the in-flight row.
 
 ## Phase 2 ready
 
