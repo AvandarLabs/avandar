@@ -1,4 +1,3 @@
-import { createModule } from "@modules";
 import { makeSet, propIsDefined, sortObjList } from "@utils";
 import { AvaDataTypeModule } from "$/models/datasets/AvaDataType/AvaDataTypeModule";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
@@ -208,15 +207,10 @@ function _pickAverageColumn(
 }
 
 /** Selects columns suitable for generated chat suggestions. */
-export const ChatSuggestionColumnPicker = createModule(
-  "ChatSuggestionColumnPicker",
-  {
-    builder: {
-      isIdentifierColumnName: _isIdentifierColumnName,
-      isNonAverageableColumnName: _isNonAverageableColumnName,
-      isNonGroupableColumnName: _isNonGroupableColumnName,
-      pickAverageColumn: _pickAverageColumn,
-      pickGroupByColumn: _pickGroupByColumn,
-    },
-  },
-);
+export const ChatSuggestionColumnPicker = {
+  isIdentifierColumnName: _isIdentifierColumnName,
+  isNonAverageableColumnName: _isNonAverageableColumnName,
+  isNonGroupableColumnName: _isNonGroupableColumnName,
+  pickAverageColumn: _pickAverageColumn,
+  pickGroupByColumn: _pickGroupByColumn,
+};

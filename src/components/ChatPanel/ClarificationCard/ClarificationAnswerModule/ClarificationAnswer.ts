@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { createModule } from "@modules";
 import { match } from "ts-pattern";
 import type { ChatClarifyResponseShape } from "$/types/chat.types";
 
@@ -58,13 +57,11 @@ function _needsCrossBoundary(
 }
 
 /** Formats and classifies clarification answers for chat submission. */
-export const ClarificationAnswer = createModule("ClarificationAnswer", {
-  builder: {
-    noneOfAbove: CLARIFICATION_NONE_OF_ABOVE,
-    somethingElse: CLARIFICATION_SOMETHING_ELSE,
-    useNoneOfAboveLabel: useClarificationNoneOfAboveLabel,
-    useSomethingElseLabel: useClarificationSomethingElseLabel,
-    formatForThread: _formatForThread,
-    needsCrossBoundary: _needsCrossBoundary,
-  },
-});
+export const ClarificationAnswer = {
+  noneOfAbove: CLARIFICATION_NONE_OF_ABOVE,
+  somethingElse: CLARIFICATION_SOMETHING_ELSE,
+  useNoneOfAboveLabel: useClarificationNoneOfAboveLabel,
+  useSomethingElseLabel: useClarificationSomethingElseLabel,
+  formatForThread: _formatForThread,
+  needsCrossBoundary: _needsCrossBoundary,
+};
