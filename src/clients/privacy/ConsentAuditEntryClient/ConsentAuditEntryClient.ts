@@ -23,7 +23,7 @@ export type RecordConsentDecisionInput = {
   valueCount?: number;
   contentLengthChars?: number;
   isMedical: boolean;
-  typedConfirmationCorrect: boolean | null;
+  typedConfirmationCorrect?: boolean;
   ackTokenNonce?: string;
 };
 
@@ -108,7 +108,7 @@ const consentAuditEntryClient = createDexieCrudClient({
             patternLocale: "en",
             detectorVersion: "1.0.0",
             medicalTierTriggeredBy: input.isMedical ? "column" : null,
-            typedConfirmationCorrect: input.typedConfirmationCorrect,
+            typedConfirmationCorrect: input.typedConfirmationCorrect ?? null,
             ackTokenNonce: input.ackTokenNonce ?? null,
           };
           await dbTable.add(

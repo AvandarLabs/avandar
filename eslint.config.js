@@ -300,7 +300,8 @@ export default [
   },
   /**
    * Enforce that all data crossing the LLM boundary goes through
-   * `src/lib/privacy/crossBoundary.tsx`. The ack-token issuance and the
+   * `src/lib/privacy/decideIfDataCanCrossBoundary.tsx`. The ack-token issuance
+   * and the
    * pending-acks queue are the load-bearing pieces of the consent
    * pipeline — importing them anywhere else lets a caller forge a token
    * or drop the queue check. The spec calls this the "single chokepoint
@@ -308,12 +309,12 @@ export default [
    *
    * Adding a new caller for `issueAckToken` or `registerAck`? Don't. Add
    * a new context to `CrossBoundaryContext` and route through
-   * `crossBoundary` instead.
+   * `decideIfDataCanCrossBoundary` instead.
    */
   {
     files: ["src/**/*.{ts,tsx}"],
     ignores: [
-      "src/lib/privacy/crossBoundary.tsx",
+      "src/lib/privacy/decideIfDataCanCrossBoundary.tsx",
       "src/lib/privacy/sessionSecret.ts",
       "src/lib/privacy/pendingAcks.ts",
       "src/lib/privacy/**/*.test.ts",
@@ -327,13 +328,13 @@ export default [
               name: "@/lib/privacy/sessionSecret",
               importNames: ["issueAckToken"],
               message:
-                "Privacy chokepoint: ack tokens must only be minted inside crossBoundary.tsx. Route your call through crossBoundary() instead.",
+                "Privacy chokepoint: ack tokens must only be minted inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
             },
             {
               name: "@/lib/privacy/pendingAcks",
               importNames: ["registerAck"],
               message:
-                "Privacy chokepoint: pending acks must only be registered inside crossBoundary.tsx. Route your call through crossBoundary() instead.",
+                "Privacy chokepoint: pending acks must only be registered inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
             },
           ],
         },

@@ -70,7 +70,7 @@ const RULES: BiasRule[] = [
       /\b(primitive|backward|underdeveloped|third[-\s]?world|uncivilized)\b/i,
     suggest: () => {
       return (
-        'Replace loaded descriptors with neutral ones — "low-income", ' +
+        'Replace loaded descriptors with neutral ones: "low-income", ' +
         '"emerging", or the country/region name your data references.'
       );
     },

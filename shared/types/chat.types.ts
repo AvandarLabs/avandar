@@ -96,7 +96,7 @@ export type ChatClarifyResponseShape =
    * (typically a `SELECT DISTINCT col FROM ...`) whose result populates a
    * dropdown in the follow-up question. The query is run client-side in
    * DuckDB-WASM; its result is NOT rendered on the canvas. The user's
-   * selection routes through `crossBoundary` with context
+   * selection routes through `decideIfDataCanCrossBoundary` with context
    * `discovery_clarification` before crossing the LLM boundary again.
    */
   | {
@@ -138,7 +138,7 @@ export type ChatRetryContext = {
  * Response shape for `GET /chat/:workspaceId/session-secret`. The
  * returned secret is base64-encoded; the client stores it in memory
  * (never localStorage) and uses it to HMAC-sign `ackToken`s via
- * `crossBoundary`.
+ * `decideIfDataCanCrossBoundary`.
  */
 export type ChatSessionSecretResponse = {
   /** Base64-encoded HMAC key. Treat as sensitive material in memory. */

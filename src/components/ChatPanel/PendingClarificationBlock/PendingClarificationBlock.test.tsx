@@ -3,7 +3,9 @@ import { Model } from "@models";
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
-import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
+import {
+  decideIfDataCanCrossBoundary,
+} from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render } from "@/test-utils";
@@ -15,7 +17,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
   appendMock,
-  crossBoundaryMock,
+  decideIfDataCanCrossBoundaryMock,
   recordOutcomeMock,
   setPendingClarificationMock,
   useStateMock,
@@ -23,7 +25,7 @@ const {
 } = vi.hoisted(() => {
   return {
     appendMock: vi.fn(),
-    crossBoundaryMock: vi.fn(),
+    decideIfDataCanCrossBoundaryMock: vi.fn(),
     recordOutcomeMock: vi.fn().mockResolvedValue(undefined),
     setPendingClarificationMock: vi.fn(),
     useStateMock: vi.fn(),
@@ -81,11 +83,14 @@ vi.mock("@/components/ChatPanel/ClarificationCard/ClarificationCard", () => {
   };
 });
 
-vi.mock("@/components/privacy/privacy-helpers/crossBoundary", () => {
-  return {
-    crossBoundary: crossBoundaryMock,
-  };
-});
+vi.mock(
+  "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary",
+  () => {
+    return {
+      decideIfDataCanCrossBoundary: decideIfDataCanCrossBoundaryMock,
+    };
+  },
+);
 
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return {
@@ -160,7 +165,7 @@ describe("PendingClarificationBlock", () => {
   });
 
   it("records cancellation with the pending audit id when boundary consent is rejected", async () => {
-    crossBoundaryMock.mockResolvedValue({
+    decideIfDataCanCrossBoundaryMock.mockResolvedValue({
       approved: false,
       reason: "cancelled",
     });
@@ -179,7 +184,7 @@ describe("PendingClarificationBlock", () => {
       });
     });
 
-    expect(crossBoundary).toHaveBeenCalled();
+    expect(decideIfDataCanCrossBoundary).toHaveBeenCalled();
     expect(ClarificationAuditEntryClient.recordOutcome).toHaveBeenCalledWith({
       id: pendingClarification.auditId,
       outcome: "cancelled",

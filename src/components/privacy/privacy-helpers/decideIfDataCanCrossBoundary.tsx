@@ -69,8 +69,9 @@ export type CrossBoundaryResult =
 /**
  * The privacy chokepoint for anything leaving the browser for the LLM. Avandar
  * keeps row-level data in DuckDB on the client; the boundary is browser to
- * model/API, and `crossBoundary` is the only supported way to move user-typed
- * text or concrete cell values across it (chat messages, clarification answers,
+ * model/API, and `decideIfDataCanCrossBoundary` is the only supported way to
+ * move user-typed text or concrete cell values across it (chat messages,
+ * clarification answers,
  * discovery dropdown picks, assumed SQL literals). It runs the local PII + bias
  * detectors, opens `ConsentModal` when approval is needed, and on approval
  * mints
@@ -79,7 +80,7 @@ export type CrossBoundaryResult =
  * `UNAPPROVED_DATA_TRANSFER`). Resolves with an approved payload or a rejection
  * reason.
  */
-export async function crossBoundary(
+export async function decideIfDataCanCrossBoundary(
   req: CrossBoundaryRequest,
 ): Promise<CrossBoundaryResult> {
   const pii: PiiDetectionResult = detectPii({
@@ -90,7 +91,7 @@ export async function crossBoundary(
   const biasInput =
     typeof req.text === "string" && req.text.trim().length > 0 ?
       req.text
-    : null;
+    : undefined;
   const biasHits: BiasHit[] = biasInput ? detectBias(biasInput).hits : [];
 
   let mode = _chooseMode({ pii, biasHits });
@@ -99,12 +100,12 @@ export async function crossBoundary(
     (typeof req.text === "string" && req.text.trim().length > 0) ||
     (req.values !== undefined && req.values.length > 0);
 
-  if (mode === null && req.explicitConsentRequired && hasPayload) {
+  if (mode === undefined && req.explicitConsentRequired && hasPayload) {
     mode = "clean";
   }
 
   // Clean send when there is nothing to flag.
-  if (mode === null) {
+  if (mode === undefined) {
     const ackToken = await _mintAckFor(req, req.text ?? "");
     await ConsentAuditEntryClient.recordConsentDecision({
       workspaceId: req.workspaceId,
@@ -116,7 +117,7 @@ export async function crossBoundary(
       detectedBias: [],
       sourceColumn: req.sourceColumn,
       isMedical: false,
-      typedConfirmationCorrect: null,
+      typedConfirmationCorrect: undefined,
     });
     return {
       approved: true,
@@ -156,7 +157,8 @@ export async function crossBoundary(
       }),
       sourceColumn: req.sourceColumn,
       isMedical: pii.isMedical,
-      typedConfirmationCorrect: mode === "medical_strict" ? false : null,
+      typedConfirmationCorrect:
+        mode === "medical_strict" ? false : undefined,
     });
     return { approved: false, reason: "cancelled" };
   }
@@ -185,7 +187,7 @@ export async function crossBoundary(
     }),
     sourceColumn: req.sourceColumn,
     isMedical: pii.isMedical,
-    typedConfirmationCorrect: mode === "medical_strict" ? true : null,
+    typedConfirmationCorrect: mode === "medical_strict" ? true : undefined,
   });
 
   return {
@@ -233,7 +235,7 @@ async function _mintAckFor(
 function _chooseMode(args: {
   pii: PiiDetectionResult;
   biasHits: BiasHit[];
-}): ConsentModalMode | null {
+}): ConsentModalMode | undefined {
   const hasPii = args.pii.severity !== "clean";
   const hasBias = args.biasHits.length > 0;
 
@@ -254,7 +256,7 @@ function _chooseMode(args: {
   if (hasBias) {
     return "bias_nudge";
   }
-  return null;
+  return undefined;
 }
 
 function _openModal(args: {

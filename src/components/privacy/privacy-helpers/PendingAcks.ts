@@ -22,7 +22,8 @@ function _gc(): void {
 
 /**
  * Module-scope, single-use queue of consent ack tokens the user has approved
- * but that haven't yet been attached to a backend chat request. `crossBoundary`
+ * but that haven't yet been attached to a backend chat request.
+ * `decideIfDataCanCrossBoundary`
  * registers an ack keyed by the SHA-256 hex of the approved payload;
  * `useAvandarChatRuntime` looks up matching acks just before POSTing and
  * attaches them as `body.consentAcks`, deleting each on use. It lives at module

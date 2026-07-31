@@ -1,6 +1,8 @@
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
-import { crossBoundary } from "@/components/privacy/privacy-helpers/crossBoundary";
+import {
+  decideIfDataCanCrossBoundary,
+} from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
@@ -27,7 +29,7 @@ async function _resolveCustomAnswer(
   }>,
 ): Promise<ClarificationSubmitAnswer | undefined> {
   const { answer, request, userId, workspaceId } = parameters;
-  const result = await crossBoundary({
+  const result = await decideIfDataCanCrossBoundary({
     text: answer.text,
     context: "clarification_answer",
     workspaceId,
@@ -58,7 +60,7 @@ async function _resolveDiscoveryAnswer(
   const { answer, request, userId, workspaceId } = parameters;
   const answerValues =
     Array.isArray(answer.value) ? answer.value : [answer.value];
-  const result = await crossBoundary({
+  const result = await decideIfDataCanCrossBoundary({
     values: answerValues,
     sourceColumn: request.responseShape.column,
     sourceQuery: request.responseShape.query,

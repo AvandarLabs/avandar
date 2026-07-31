@@ -51,6 +51,15 @@ function _getSessionSecret(workspaceId: Workspace.Id): Promise<CachedSecret> {
   return promise;
 }
 
+function _base64Decode(input: string): Uint8Array {
+  const bin = atob(input);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) {
+    bytes[i] = bin.charCodeAt(i);
+  }
+  return bytes;
+}
+
 /**
  * Client side of the privacy consent ack-token protocol, and the browser
  * counterpart to `supabase/functions/_shared/privacy/verifyAckToken.ts` (the
@@ -107,12 +116,3 @@ export const SessionSecret = {
     return `${headerB64}.${sigHex}`;
   },
 };
-
-function _base64Decode(input: string): Uint8Array {
-  const bin = atob(input);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
-  }
-  return bytes;
-}
