@@ -38,11 +38,12 @@ let it drift.
   `6a1366e26660753f17b90bd36f6e17e3a10bdafd`
   (subject: _refactor(chat): remove planning feature_)
 - **Last update run on**: `2026-07-27`
-- **Active rows**: 30 remaining. On 2026-07-24 the 5
+- **Active rows**: 16 remaining (all GROUP-5). On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
   (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
   #049, #096, #097) merged (`59cdb59c`); on 2026-07-31 the 18 GROUP-3 rows
-  (#015–#032) merged (`c703e5c2`). All flipped to `[x]`; their
+  (#015–#032) merged (`c703e5c2`); on 2026-08-03 the 14 GROUP-4 rows
+  (#064–#076, #048) merged (`4f57526a`). All flipped to `[x]`; their
   `[x]` rows are kept in `ALL_FEATURES.md` (with merge SHA) and the group
   - per-feature plan files were deleted. On 2026-06-26 the 3 earlier completed rows
     (#061, #078, #083) were removed from `ALL_FEATURES.md` — their
@@ -58,13 +59,13 @@ let it drift.
     folded into #1, #14 into #9, #084..#089 into #083; #050..#055
     retired as voice-removed; #097 added 2026-06-25).
 - **Planning status**: **complete — Phase 2 batched into 5 group
-  PRs (2026-06-26).** GROUP-1 (2026-07-24), GROUP-2 (2026-07-26), and
-  GROUP-3 (2026-07-31) are now merged and merged back into
-  `feat/ict4d-demo`; GROUP-4 and GROUP-5 remain. The consolidated group
-  plans at `docs/deslop/GROUP-4..5-*.md` are the source of truth for the
-  rest and supersede the per-feature `NNN-<slug>.md` plans where they
-  disagree. Next step: cut GROUP-4 (dashboards) off the current
-  `develop` tip.
+  PRs (2026-06-26).** GROUP-1 (2026-07-24), GROUP-2 (2026-07-26),
+  GROUP-3 (2026-07-31), and GROUP-4 (2026-08-03) are now merged and
+  merged back into `feat/ict4d-demo`; **only GROUP-5 remains.** The
+  consolidated group plan at `docs/deslop/GROUP-5-*.md` is the source of
+  truth for the rest and supersedes the per-feature `NNN-<slug>.md` plans
+  where they disagree. Next step: cut GROUP-5 (platform / i18n /
+  standalone) off the current `develop` tip.
 
 `/deslop update` compares the analyzed-commit SHA above against
 `origin/feat/ict4d-demo` and walks any new commits. Bump the SHA
@@ -80,20 +81,20 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 | ------------- | ---- | --------------- | ------- | ----- |
-| 64–76, 48 | `dashboards` (GROUP-4) | `refactor-g4/dashboards` | 2026-07-31 | Ported + verified; committed `8d3052da`, **not pushed** (operator to push + open PR). |
+| _(none)_ | — | — | — | No refactor branches in flight. |
 
-GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26), and
-GROUP-3 (`c703e5c2`, 2026-07-31) are merged into `develop` and merged back
-into `feat/ict4d-demo`.
+GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26),
+GROUP-3 (`c703e5c2`, 2026-07-31), and GROUP-4 (`4f57526a`, 2026-08-03) are
+merged into `develop` and merged back into `feat/ict4d-demo`.
 
-**GROUP-4 in flight (ported, not pushed).** On 2026-07-31 `refactor-g4/dashboards`
-was cut off `origin/develop` @ `c703e5c2` (worktree
-`~/src/worktrees/avandar/refactor-g4/dashboards`) and the whole group was ported
-per `docs/deslop/GROUP-4-dashboards.md` (rows `#064`–`#076` + `#048`, now `[~]`).
-The port is committed locally as `8d3052da` but **not pushed** — so origin has no
-`refactor-g4/dashboards` branch yet and no PR is open. Operator: push the branch
-and open the single group PR. On merge, run `/deslop complete` to flip the rows to
-`[x]`, log the merge SHA, and drop the plan.
+**GROUP-4 complete.** `refactor-g4/dashboards` (rows `#064`–`#076` + `#048`)
+merged into `develop` at `4f57526a` on 2026-08-03. During code review the branch
+grew two follow-up commits on top of the original port `8d3052da` —
+`ffc07ef8` ("Added new dashboards features from ict4d and cleaned up code, fully
+deslopped") and `71dd2bbb` ("Fixed type and lint errors") — plus a develop-side
+`37a8627f` ("Format fixes"); all are captured by the 3-way mergeback below. Rows
+flipped `[x] (4f57526a)`; per-feature plans + `GROUP-4-dashboards.md` deleted; local
+branch + worktree removed. **Only GROUP-5 (platform / i18n / standalone) remains.**
 
 ---
 
@@ -143,6 +144,20 @@ the durable record once the per-feature markdown has been deleted.
 | 30           | `chat-clarification-card-and-bias-check` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
 | 31           | `chat-clarification-telemetry` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
 | 32           | `chat-discovery-clarifications` (GROUP-3) | `c703e5c2`             | 2026-07-31 |
+| 64           | `dashboard-design-tokens` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 65           | `dashboard-chat-in-editor` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 66           | `dashboard-export-buttons-polish` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 67           | `dashboard-modal-styles` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 68           | `dashboard-global-filters` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 69           | `dashboard-per-viz-filters` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 70           | `dashboard-view-before-publish` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 71           | `dashboard-publish-modal` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 72           | `dashboard-vanity-url` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 73           | `dashboard-share-url-row-qr` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 74           | `dashboard-slice-aware-publish` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 75           | `dashboard-pdf-export-annotate` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 76           | `summary-view-redesign` (GROUP-4) | `4f57526a`             | 2026-08-03 |
+| 48           | `sql-form-sync-dashboards` (GROUP-4) | `4f57526a`             | 2026-08-03 |
 
 ---
 
@@ -536,3 +551,20 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     left for the operator — can't drive prod state / LLM here.
   - **Not pushed** per operator instruction; feat-side deslop commits (this one
     + the plan refresh) are also local-only.
+- `2026-08-03` — **GROUP-4 completed.** `refactor-g4/dashboards` (rows
+  `#064`–`#076` + `#048`) merged into `develop` at `4f57526a`. The branch that
+  landed was the reviewed port: base `c703e5c2`, original migrate commit
+  `8d3052da`, plus two code-review follow-ups — `ffc07ef8` ("Added new dashboards
+  features from ict4d and cleaned up code, fully deslopped") and `71dd2bbb`
+  ("Fixed type and lint errors") — a develop-side `37a8627f` ("Format fixes"),
+  and the merge commit `4f57526a` ("Fixed merge conflicts").
+  - **Bookkeeping done:** flipped all 14 rows to `[x] (4f57526a)`; logged them in
+    the Completed migrations log; deleted the 14 per-feature plans (#048,
+    #064–#076) and `GROUP-4-dashboards.md`; deleted the local
+    `refactor-g4/dashboards` branch + its worktree
+    (`~/src/worktrees/avandar/refactor-g4/dashboards`); remote branch already gone.
+  - **Only GROUP-5 remains** (16 `[ ]` rows: desktop/offline #056–#060, #062–#063;
+    i18n #079–#082; profile/docs/share #090–#093, #095). Analyzed-commit marker
+    left at `6a1366e2`; the mergeback below advances the feat tip.
+  - **Next: the 3-way mergeback of the reviewed g4 cleanup back into
+    `feat/ict4d-demo`** (see the following entry).
