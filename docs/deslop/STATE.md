@@ -655,10 +655,16 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     **earlier-group residual + feat-ahead subsystems with no inventory row**,
     which `/deslop update` cannot surface (they are incomplete migrations of
     already-`[x]` features, not new commits). Buckets not covered by GROUP-5:
-    - **Privacy detectors** `src/lib/privacy/*` (~20 files, G3 deferred the
-      runtime wiring — develop has privacy clients/components but not these).
-    - **SQL display/mention** `src/lib/sql/*` + `shared/lib/sql/*` (~12,
-      buildSqlDisplaySegments/createSqlMentionExtension/formatSqlForDisplay/…).
+    - **Privacy** — **[corrected 2026-08-03]** the subsystem is ALREADY on
+      develop (G3 migrated it to `src/components/privacy/privacy-helpers/*` etc.);
+      feat's `src/lib/privacy/*` is a **stale pre-G3 duplicate**. The real
+      residual is only the **runtime wiring** (develop's slim
+      `useAvandarChatRuntime` never invokes the detectors; feat's does) + deleting
+      the stale dir → row #098.
+    - **SQL display/mention** — **[corrected 2026-08-03]** also already on develop
+      (`src/components/sql/sql-helpers/*`); feat's `src/lib/sql/*` +
+      `shared/lib/sql/*` are a **dead stale duplicate** (no live importers) →
+      cleanup row #099, not a migration.
     - **Session-expired infra** `ServerApiSessionRefresher`,
       `registerSessionExpiredHandler`, `AppErrorBoundary` recovery (~8).
     - **Chat runtime / clarification / `dataExplorerToolDefinitions`** (G3

@@ -164,36 +164,49 @@ categorization:
   → the offline group (feat is ahead of what `#061` landed; bring the deltas);
   `src/i18n/**` + language picker → `#079`–`#082`; `ShareResourceModal` → `#095`;
   profile → `#090`.
-- **The genuinely-uncovered residual → new rows `#098`–`#101`** (see §S in
-  `ALL_FEATURES.md`). These are feat-ahead subsystems / cleanup earlier groups'
-  mergebacks deferred, invisible to `/deslop update`:
-  - **`#098` chat-privacy-clarification-runtime** — `src/lib/privacy/**` (~20,
-    all feat-only), `supabase/functions/_shared/privacy/*`,
-    `supabase/functions/chat/dataExplorerToolDefinitions/*`, and the runtime
-    wiring in `ChatPanel/{useAvandarChatRuntime,ClarificationCard/clarificationAnswer,
-    ChatEmptyState/pickChatSuggestionColumns}`. G3 marked its privacy rows `[x]`
-    but its mergeback log explicitly deferred threading detectors into the live
-    turn lifecycle "in coordination with G4/G5" — this is that work.
-  - **`#099` sql-display-mention-rendering** — `shared/lib/sql/{buildSqlDisplaySegments,
-    sqlScope,sqlDisplay.types}` + `src/lib/sql/{formatSqlForDisplay,
-    buildSqlDisplayCatalog,createSqlDisplayExtension,createSqlMentionExtension,
-    getSqlMentionOptions}` (+tests) — 13 feat-only files.
-  - **`#100` session-expired-recovery** — `packages/shared/clients/src/ServerApiClient/*`,
-    `src/components/AppErrorBoundary/*`, `src/config/registerSessionExpiredHandler.ts`,
-    `src/clients/APIClient.ts`, `packages/web/ui/src/notifications/notifyExpiredSession.ts`,
-    `supabase/functions/_shared/MiniServer/*` (~17 files).
-  - **`#101` earlier-group-rename-and-schema-residuals** — mostly *final-parity
-    cleanup on feat*, not develop migration: adopt develop's `AnalyticsClient.ts`
-    (drop feat's lowercase `analyticsClient.ts`; repoint call sites),
-    `structuredQueryToSql`, `ChartStyle`; plus feat-only G1 leftovers
-    `datasetPreviewSQL.ts` / `useCanAddDataset.ts`; plus the **feat-only Phase-1
-    schema migration** `20260727210438_remove_chat_planning.sql` (+ its contract
-    test) to reconcile onto develop.
+- **The uncovered residual → rows `#098`–`#101`** (see §S in `ALL_FEATURES.md`).
+  **⚠ Correction (2026-08-03, after operator challenge):** the first pass
+  over-scoped these. A "feat-only by exact path" check mis-reads a
+  *rename-to-a-new-path* migration (the file IS on develop, under a new path) as
+  an unmigrated feature. Two of the four were exactly that:
+  - **`#098` chat-privacy-runtime-integration — NOT a subsystem migration.** G3
+    **already migrated the whole privacy subsystem** to develop
+    (`src/components/privacy/privacy-helpers/{detectPii,detectBias,
+    decideIfDataCanCrossBoundary,…}`, `ConsentModal/*`, `src/models/privacy/*`,
+    `src/clients/privacy/*`, `PrivacyLogTab/*`, `supabase/functions/_shared/privacy/*`).
+    Feat's `src/lib/privacy/**` is a **stale pre-G3 duplicate** (develop has zero
+    `src/lib/privacy`; feat has both the old dir AND develop's `privacy-helpers`).
+    The genuine residual is the **runtime wiring**: develop's
+    `useAvandarChatRuntime.ts` (102 lines) never invokes the detectors (they ship
+    as dead code), whereas feat's (498 lines) gates each turn via `crossBoundary`/
+    consent/`detectBias`. Work: port that turn wiring, repoint its imports to
+    develop's `privacy-helpers`, then delete feat's stale `src/lib/privacy/`.
+  - **`#099` sql-display-stale-duplicate-cleanup — NOT a migration.** The SQL
+    display/mention subsystem is already on develop at
+    `src/components/sql/sql-helpers/*` (via G2/G3). Feat's `src/lib/sql/*` (8) +
+    `shared/lib/sql/*` (5) are a **dead stale duplicate with no live importers**.
+    Work: delete both stale dirs on feat.
+  - **`#100` session-expired-recovery — genuinely feat-ahead** (verified absent on
+    develop, incl. under renamed paths): `packages/shared/clients/src/ServerApiClient/*`
+    (`ServerApiSessionRefresher` + client factories), `src/components/AppErrorBoundary/*`,
+    `src/config/registerSessionExpiredHandler.ts`, `src/clients/APIClient.ts`,
+    `supabase/functions/_shared/MiniServer/*` (~15 files). This one is a real
+    feat→develop migration.
+  - **`#101` earlier-group-rename-and-schema-residuals — mostly cleanup.** Same
+    stale-duplicate class as #099 (`analyticsClient`→`AnalyticsClient`,
+    `structuredQueryToSQL`→`structuredQueryToSql`, `ChartStyle`), plus two feat-only
+    G1 leftovers (`datasetPreviewSQL.ts`, `useCanAddDataset.ts`) and the feat-only
+    Phase-1 migration `20260727210438_remove_chat_planning.sql`.
 
-**Migration-order implication:** land `#098`–`#100` (real feat→develop
-subsystems) *before* `#081` (so their strings are in the extract), and do `#101`
-during the final-parity pass. `#098` depends on G3's privacy clients/components
-(already `[x]` on develop).
+**Net corrected picture:** the residual is far smaller than the raw 362-file count
+suggests. Only **`#100` (session-expiry)** and **`#098`'s runtime wiring** are real
+feat→develop work; **`#099` and most of `#101` are stale-duplicate deletions** the
+earlier mergebacks should have collapsed (the same class as the analytics rename).
+The bulk (~285 files) is `#081` i18n.
+
+**Migration-order implication:** land `#098` (runtime wiring) and `#100` before
+`#081` (so their strings are in the extract); do the stale-dup cleanups (`#099`,
+`#101` a/b) and the schema reconcile (`#101` c) during the final-parity pass.
 
 ### Internal split seam (fallback only — operator declined splitting for now)
 
