@@ -1,14 +1,21 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
+import { useLingui } from "@lingui/react/macro";
 import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 
+/**
+ * Opens the Polar customer portal for a user, redirecting the browser. Shows
+ * a localized error notification if the portal cannot be loaded.
+ */
 export async function goToBillingPortal({
   userId,
+  t,
 }: {
   userId: UserId;
+  t: ReturnType<typeof useLingui>["t"];
 }): Promise<void> {
   try {
     const customerPortalResponse = await APIClient.get({
@@ -31,13 +38,10 @@ export async function goToBillingPortal({
       navigateToExternalUrl(customerPortalResponse.customerPortalURL);
     } else {
       notifyError(
-        "Billing portal cannot be loaded because you do not" +
-          " have a subscription yet.",
+        t`Billing portal cannot be loaded because you do not have a subscription yet.`,
       );
     }
   } catch {
-    notifyError(
-      "Unable to open the billing portal. Please try" + " again later.",
-    );
+    notifyError(t`Unable to open the billing portal. Please try again later.`);
   }
 }

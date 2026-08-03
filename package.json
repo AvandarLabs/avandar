@@ -108,6 +108,7 @@
     "@mantine/notifications": "^9.2.0",
     "@mantine/spotlight": "^9.2.0",
     "@mantine/tiptap": "^9.2.0",
+    "@mlc-ai/web-llm": "^0.2.84",
     "@puckeditor/core": "^0.21.1",
     "@react-email/components": "^0.5.7",
     "@react-email/render": "^1.4.0",
@@ -144,6 +145,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
+    "exceljs": "^4.4.0",
     "fuse.js": "^7.1.0",
     "html-to-image": "^1.11.13",
     "idb-keyval": "^6.2.5",
@@ -163,6 +165,7 @@
     "roughjs": "^4.6.6",
     "ts-pattern": "^5.7.0",
     "uuid": "^11.1.0",
+    "workbox-window": "7.4.1",
     "xlsx": "^0.18.5",
     "zod": "^4.1.13"
   },

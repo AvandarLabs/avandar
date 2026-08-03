@@ -1,5 +1,5 @@
-import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const OpenDataCatalogEntryClient = createUsableServiceClient(

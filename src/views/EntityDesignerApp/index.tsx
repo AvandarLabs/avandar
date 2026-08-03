@@ -2,8 +2,8 @@ import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { EntityConfigNavbar } from "@/views/EntityDesignerApp/EntityConfigNavbar";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { EntityConfigNavbar } from "@/views/EntityDesignerApp/EntityConfigNavbar";
 
 export function EntityDesignerApp(): JSX.Element {
   const workspace = useCurrentWorkspace();

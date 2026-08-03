@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, Text } from "@mantine/core";
 import { pick } from "@utils";
 import { useMemo } from "react";
@@ -42,12 +43,14 @@ export function DescribableValueArrayBlock<
   data,
   rootData,
   onSubmitChange,
-  renderEmptyArray = "There are no values",
+  renderEmptyArray,
   renderArray,
   maxHeight,
   maxItemsCount,
   ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element {
+  const { t } = useLingui();
+  const resolvedRenderEmptyArray = renderEmptyArray ?? t`There are no values`;
   // Split between objects, arrays, and primitive values
   const [describableObjects, describableValueArrays, primitiveValues] =
     useMemo(() => {
@@ -74,14 +77,14 @@ export function DescribableValueArrayBlock<
     }, [data]);
 
   if (data.length === 0) {
-    if (isStringOrNumber(renderEmptyArray)) {
+    if (isStringOrNumber(resolvedRenderEmptyArray)) {
       return (
         <Text span fs="italic">
-          {renderEmptyArray}
+          {resolvedRenderEmptyArray}
         </Text>
       );
     }
-    return <>{renderEmptyArray}</>;
+    return <>{resolvedRenderEmptyArray}</>;
   }
 
   // compute the render options for each block

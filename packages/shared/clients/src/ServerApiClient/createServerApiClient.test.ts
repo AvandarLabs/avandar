@@ -1,3 +1,4 @@
+import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,9 +12,9 @@ const { fakeDbClient } = vi.hoisted(() => {
 });
 
 vi.mock("$/platform/isDesktop.ts", async () => {
-  const actual = await vi.importActual<typeof import("$/platform/isDesktop.ts")>(
-    "$/platform/isDesktop.ts",
-  );
+  const actual = await vi.importActual<
+    typeof import("$/platform/isDesktop.ts")
+  >("$/platform/isDesktop.ts");
   return {
     ...actual,
     isDesktop: vi.fn(() => {
@@ -32,8 +33,6 @@ vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   };
 });
 
-import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
-
 describe("createServerApiClient", () => {
   beforeEach(() => {
     (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(false);
@@ -49,14 +48,10 @@ describe("createServerApiClient", () => {
     expect(typeof client.invokeFunction).toBe("function");
   });
 
-  it(
-    "also returns the browser-backed adapter on desktop in Phase 1 " +
-      "(Option A — Phase 2 wires the IPC adapter here)",
-    () => {
-      (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      const client = createServerApiClient();
-      expect(typeof client.rpc).toBe("function");
-      expect(typeof client.invokeFunction).toBe("function");
-    },
-  );
+  it("also returns the browser-backed adapter on desktop", () => {
+    (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    const client = createServerApiClient();
+    expect(typeof client.rpc).toBe("function");
+    expect(typeof client.invokeFunction).toBe("function");
+  });
 });

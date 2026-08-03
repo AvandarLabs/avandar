@@ -1,7 +1,6 @@
-import { screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
-import { render } from "@/utils/testing-utils";
+import { render, screen, waitFor } from "@/test-utils";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
@@ -110,7 +109,7 @@ describe("ShareResourceModal", () => {
     const comboboxes = screen.getAllByRole("combobox");
     expect(
       comboboxes.some((el) => {
-        return el.getAttribute("aria-label") === "Add people, groups, or tags";
+        return el.getAttribute("aria-label") === "Add people or user groups";
       }),
     ).toBe(true);
     // Owner row shows as a non-removable badge.

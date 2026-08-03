@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, MultiSelect, Stack, Text } from "@mantine/core";
 import { notifyError, notifySuccess } from "@ui";
 import { Permissions } from "$/models/Permissions/Permissions";
@@ -41,6 +42,7 @@ export function WorkspaceMemberPermissionsEditor({
   workspaceId,
   onClose,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [matrix, setMatrix] = useState<UserAppRolesMatrix>(initialMatrix);
   const [builtinPresetType, setBuiltinPresetType] = useState<BuiltinPresetType>(
     () => {
@@ -62,12 +64,12 @@ export function WorkspaceMemberPermissionsEditor({
 
   const [saveMember, isSaving] = PermissionsClient.useSaveMemberWorkspaceRoles({
     onSuccess: () => {
-      notifySuccess({ title: "Permissions saved" });
+      notifySuccess({ title: t`Permissions saved` });
       onClose();
     },
     onError: (error: Error) => {
       notifyError({
-        title: "Save failed",
+        title: t`Save failed`,
         message: error.message,
       });
     },
@@ -88,8 +90,10 @@ export function WorkspaceMemberPermissionsEditor({
   return (
     <Stack gap="lg">
       <Text size="sm" c="dimmed">
-        Choose a workspace preset or customize per app. Tags control dataset and
-        dashboard access intersections.
+        <Trans>
+          Choose a workspace preset or customize per app. User groups control
+          dataset and dashboard access intersections.
+        </Trans>
       </Text>
       <WorkspaceAppRoleMatrixForm
         rolesMatrix={matrix}
@@ -106,8 +110,8 @@ export function WorkspaceMemberPermissionsEditor({
         disabled={isSaving}
       />
       <MultiSelect
-        label="Tags"
-        placeholder="Pick tags for this member"
+        label={t`User groups`}
+        placeholder={t`Pick user groups for this member`}
         data={userGroups.map((group: UserGroupRow) => {
           return { value: group.id, label: group.name };
         })}
@@ -116,7 +120,7 @@ export function WorkspaceMemberPermissionsEditor({
         disabled={userGroupsLoading || isSaving}
       />
       <Button loading={isSaving} onClick={onSave}>
-        Save changes
+        <Trans>Save changes</Trans>
       </Button>
     </Stack>
   );

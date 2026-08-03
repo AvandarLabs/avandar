@@ -1,16 +1,17 @@
+import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import {
   createFileRoute,
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
+import { Callout } from "@ui";
 import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
-import { Callout } from "@ui";
 import { Logger } from "@/utils/Logger";
+import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
@@ -42,6 +43,7 @@ function RouteComponent() {
 }
 
 function ErrorView({ error }: ErrorComponentProps) {
+  const { t } = useLingui();
   useEffect(() => {
     Logger.error(error);
   }, [error]);
@@ -49,8 +51,8 @@ function ErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%" pt="xxxl">
       <Callout
-        title="Entity failed to load"
-        message="The entity failed to load. Please try again later or reach out to support."
+        title={t`Entity failed to load`}
+        message={t`The entity failed to load. Please try again later or reach out to support.`}
       />
     </Center>
   );

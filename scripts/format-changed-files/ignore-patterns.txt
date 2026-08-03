@@ -14,10 +14,6 @@
 # Agent skill bundles
 (^|/)\.agents/
 
-# Agent skill sources (self-contained tools with their own tooling, e.g. the
-# `dif` Rust+JS diff-review tool) — not governed by the app formatter/linter.
-^agent-skills/
-
 # Generated Supabase types
 ^shared/types/database\.types\.ts$
 

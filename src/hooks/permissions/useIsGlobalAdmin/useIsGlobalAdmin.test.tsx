@@ -1,7 +1,7 @@
-import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
+import { renderHook } from "@/test-utils";
 
 vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return { useUserAppRoles: vi.fn() };

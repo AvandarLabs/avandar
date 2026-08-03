@@ -43,9 +43,13 @@ type TUserClient = WithSupabaseClient<
           resourceId: string;
           minRole: RoleLevel;
         }) => Promise<boolean>;
+        updateProfile: (params: {
+          profileId: UserProfileId;
+          data: { displayName?: string; fullName?: string };
+        }) => Promise<UserProfile.T>;
       },
       "getProfile" | "getUserAppRoles" | "canAccessResource",
-      never
+      "updateProfile"
     >
   >
 >;
@@ -226,10 +230,57 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
 
           return data ?? false;
         },
+
+        /**
+         * Update the editable fields on a user profile row.
+         *
+         * Only `display_name` and `full_name` are mutable; `user_id`,
+         * `workspace_id`, and `membership_id` are enforced immutable by
+         * a database trigger.
+         */
+        updateProfile: async ({
+          profileId,
+          data,
+        }: {
+          profileId: UserProfileId;
+          data: { displayName?: string; fullName?: string };
+        }): Promise<UserProfile.T> => {
+          const logger = baseLogger.appendName("updateProfile");
+          logger.log("Calling `updateProfile`", { profileId, data });
+
+          const session = await AuthClient.getCurrentSession();
+          if (!session?.user) {
+            throw new Error("User not found.");
+          }
+
+          const updatePayload: Partial<Tables<"user_profiles">> = {};
+          if (data.displayName !== undefined) {
+            updatePayload.display_name = data.displayName;
+          }
+          if (data.fullName !== undefined) {
+            updatePayload.full_name = data.fullName;
+          }
+
+          const { data: row } = await dbClient
+            .from("user_profiles")
+            .update(updatePayload)
+            .eq("id", profileId)
+            .select("*")
+            .single()
+            .throwOnError();
+
+          const userProfile = UserProfileDBReadToModelReadSchema.parse({
+            ...row,
+            email: session.user.email,
+          });
+
+          logger.log("User profile updated", { userProfile });
+          return userProfile;
+        },
       },
       {
         queryFns: ["getProfile", "getUserAppRoles", "canAccessResource"],
-        mutationFns: [],
+        mutationFns: ["updateProfile"],
       },
     );
   });

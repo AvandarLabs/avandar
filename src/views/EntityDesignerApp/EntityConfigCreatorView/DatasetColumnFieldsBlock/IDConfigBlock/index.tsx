@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
 import { isDefined, makeObject, prop, where } from "@utils";
@@ -14,6 +15,7 @@ export function IDConfigBlock({
   entityConfigForm,
   entityConfigName,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const { datasetColumnFields, sourceDatasets } = entityConfigForm.getValues();
 
   const datasetIdsToPullFrom = useMemo(() => {
@@ -56,16 +58,18 @@ export function IDConfigBlock({
     return (
       <Stack>
         <Text>
-          For dataset{" "}
-          <Text span fw="bold">
-            {sourcedDataset?.name}
-          </Text>
-          , choose the column to use as the {entityConfigName} ID
+          <Trans>
+            For dataset{" "}
+            <Text span fw="bold">
+              {sourcedDataset?.name}
+            </Text>
+            , choose the column to use as the {entityConfigName} ID
+          </Trans>
         </Text>
         <Select
           required
           data={fieldOptions}
-          placeholder="Select a field"
+          placeholder={t`Select a field`}
           radius="md"
           {...entityConfigForm.getInputProps(
             `sourceDatasets.0.primaryKeyColumnId`,
@@ -86,7 +90,9 @@ export function IDConfigBlock({
     return (
       <Stack gap="sm">
         <Text size="sm">
-          We should join data into the same {entityConfigName} when…
+          <Trans>
+            We should join data into the same {entityConfigName} when…
+          </Trans>
         </Text>
 
         <Group justify="center" gap="xl" wrap="nowrap">
@@ -95,7 +101,7 @@ export function IDConfigBlock({
               required
               label={left.name}
               data={leftOptions}
-              placeholder="Select column"
+              placeholder={t`Select column`}
               size="md"
               classNames={{
                 label: "text-dimmed text-sm text-neutral-500",
@@ -115,7 +121,7 @@ export function IDConfigBlock({
             <Select
               required
               data={rightOptions}
-              placeholder="Select column"
+              placeholder={t`Select column`}
               size="md"
               label={right.name}
               classNames={{
@@ -137,7 +143,9 @@ export function IDConfigBlock({
   return (
     <Stack gap="sm">
       <Text size="sm">
-        We should join data into the same {entityConfigName} when…
+        <Trans>
+          We should join data into the same {entityConfigName} when…
+        </Trans>
       </Text>
 
       {sourceDatasets.map(({ dataset }, idx) => {
@@ -148,7 +156,7 @@ export function IDConfigBlock({
               required
               label={dataset.name}
               data={fieldOptions}
-              placeholder="Select column"
+              placeholder={t`Select column`}
               size="md"
               classNames={{
                 label: "text-dimmed text-sm text-neutral-500",
@@ -160,7 +168,9 @@ export function IDConfigBlock({
             />
             {idx !== sourceDatasets.length - 1 ?
               <Text fw={500} size="lg" aria-hidden>
-                {idx > 0 ? "and is also" : "is"} equal to...
+                {idx > 0 ?
+                  <Trans>and is also equal to...</Trans>
+                : <Trans>is equal to...</Trans>}
               </Text>
             : null}
           </Stack>

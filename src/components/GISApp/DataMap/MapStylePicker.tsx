@@ -1,4 +1,5 @@
 import { useBoolean } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
@@ -32,6 +33,7 @@ export function MapStylePicker({
   value,
   onChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
 
   const { hovered, ref } = useHover();
@@ -60,7 +62,7 @@ export function MapStylePicker({
         shadow="md"
       >
         <Popover.Target>
-          <Tooltip label="Theme" position="right">
+          <Tooltip label={t`Theme`} position="right">
             <ActionIcon
               size="lg"
               variant="white"
@@ -76,7 +78,7 @@ export function MapStylePicker({
                     mantineVar("shadow-lg")
                   : mantineVar("shadow-md"),
               }}
-              aria-label="Theme picker"
+              aria-label={t`Theme picker`}
             >
               <IconPalette size={20} />
             </ActionIcon>
@@ -85,7 +87,7 @@ export function MapStylePicker({
         <Popover.Dropdown p="xs">
           <Stack gap="xs">
             <Text size="sm" fw={500}>
-              Theme
+              <Trans>Theme</Trans>
             </Text>
             <SegmentedControl data={items} value={value} onChange={onChange} />
           </Stack>

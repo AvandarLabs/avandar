@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
@@ -54,11 +55,11 @@ function WorkspaceBillingViewContent({
         <div>
           {!hideTitle ?
             <Title order={3} mb="xs">
-              Billing
+              <Trans>Billing</Trans>
             </Title>
           : null}
           <Text c="dimmed">
-            Choose a plan that works best for your workspace.
+            <Trans>Choose a plan that works best for your workspace.</Trans>
           </Text>
         </div>
       );
@@ -73,11 +74,13 @@ function WorkspaceBillingViewContent({
       if (currentFeaturePlanName) {
         return (
           <Text size="md" mt="xs" fw={500}>
-            You are currently on the{" "}
-            <Text span fw={700}>
-              {currentFeaturePlanName}
-            </Text>{" "}
-            plan.
+            <Trans>
+              You are currently on the{" "}
+              <Text span fw={700}>
+                {currentFeaturePlanName}
+              </Text>{" "}
+              plan.
+            </Trans>
           </Text>
         );
       }
@@ -90,7 +93,9 @@ function WorkspaceBillingViewContent({
       <Stack gap="lg">
         {elements.titleBlock()}
         <Stack>
-          <Text>Loading plans...</Text>
+          <Text>
+            <Trans>Loading plans...</Trans>
+          </Text>
           <Loader />
         </Stack>
       </Stack>
@@ -101,7 +106,9 @@ function WorkspaceBillingViewContent({
     return (
       <Stack gap="lg">
         {elements.titleBlock()}
-        <Text>No plans available.</Text>
+        <Text>
+          <Trans>No plans available.</Trans>
+        </Text>
       </Stack>
     );
   }
@@ -192,21 +199,29 @@ function WorkspaceBillingViewContent({
         <>
           <Group gap="xxxs" align="center">
             <Text c="dimmed">
-              For more control over your subscription, you can manage your
-              subscription in your
+              <Trans>
+                For more control over your subscription, you can manage your
+                subscription in your
+              </Trans>
             </Text>
-            <BillingPortalButton>billing portal.</BillingPortalButton>
+            <BillingPortalButton>
+              <Trans>billing portal.</Trans>
+            </BillingPortalButton>
           </Group>
 
           <div>
             <Title order={3} mb="xs">
-              Payment Methods
+              <Trans>Payment Methods</Trans>
             </Title>
             <Group gap="xxxs" align="center">
               <Text c="dimmed">
-                Changes to your payment method can be made in your
+                <Trans>
+                  Changes to your payment method can be made in your
+                </Trans>
               </Text>
-              <BillingPortalButton>billing portal.</BillingPortalButton>
+              <BillingPortalButton>
+                <Trans>billing portal.</Trans>
+              </BillingPortalButton>
             </Group>
           </div>
         </>

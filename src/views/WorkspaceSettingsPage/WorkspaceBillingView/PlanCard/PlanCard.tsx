@@ -1,4 +1,5 @@
 import { getCurrentUrl } from "@browser-utils";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
   Button,
@@ -104,6 +105,7 @@ export function PlanCard(props: Props): JSX.Element {
     workspaceId,
     workspaceSlug,
   } = props;
+  const { t } = useLingui();
   const router = useRouter();
   const [userProfile] = UserClient.useGetProfile({ workspaceId });
   const [selectedVariant, setSelectedVariant] = useState<
@@ -114,11 +116,11 @@ export function PlanCard(props: Props): JSX.Element {
     SubscriptionClient.useCreateFreeSubscription({
       onSuccess: () => {
         modals.closeAll();
-        notifySuccess("You're on the Free plan");
+        notifySuccess(t`You're on the Free plan`);
       },
       onError: () => {
         notifyError(
-          `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+          t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
         );
       },
       queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
@@ -161,7 +163,7 @@ export function PlanCard(props: Props): JSX.Element {
       await match(billingAction)
         .with({ type: "billing_error" }, () => {
           notifyError(
-            `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+            t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
           );
         })
         .with({ type: "create_native_free" }, () => {
@@ -202,7 +204,7 @@ export function PlanCard(props: Props): JSX.Element {
             });
           } else {
             notifyError(
-              `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+              t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
             );
           }
         })
@@ -254,7 +256,7 @@ export function PlanCard(props: Props): JSX.Element {
       if (selectedPlan.priceType === "free") {
         return (
           <Text size="xl" fw={600}>
-            Free
+            <Trans>Free</Trans>
           </Text>
         );
       }
@@ -289,13 +291,13 @@ export function PlanCard(props: Props): JSX.Element {
               </Text>
               {isRecommended ?
                 <Badge color="violet" variant="light" size="lg">
-                  Recommended
+                  <Trans>Recommended</Trans>
                 </Badge>
               : null}
               {isCurrentSubscribedPlan ?
                 <Tooltip
                   color="neutral.8"
-                  label="You are currently subscribed to this plan."
+                  label={t`You are currently subscribed to this plan.`}
                   className={css.currentPlanBadgeTooltip}
                 >
                   <Badge
@@ -306,7 +308,7 @@ export function PlanCard(props: Props): JSX.Element {
                       to: "primary.6",
                     }}
                   >
-                    Current Plan
+                    <Trans>Current Plan</Trans>
                   </Badge>
                 </Tooltip>
               : null}
@@ -327,7 +329,7 @@ export function PlanCard(props: Props): JSX.Element {
           onClick={onSelectPlan}
           loading={isLoadingCheckoutPage || isCreatingFreeSub}
         >
-          {isCurrentSubscribedPlan ? "Current Plan" : "Select Plan"}
+          {isCurrentSubscribedPlan ? t`Current Plan` : t`Select Plan`}
         </Button>
       </Stack>
     </Card>

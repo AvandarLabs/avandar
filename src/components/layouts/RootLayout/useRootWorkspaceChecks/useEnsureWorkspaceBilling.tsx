@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
@@ -48,7 +49,7 @@ export function useEnsureWorkspaceBilling(): void {
           modals.open({
             title: (
               <Text size="1.5rem" fw={700}>
-                Select your plan
+                <Trans>Select your plan</Trans>
               </Text>
             ),
             size: "100%",

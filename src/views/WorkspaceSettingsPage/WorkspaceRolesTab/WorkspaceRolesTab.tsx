@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Card,
@@ -17,9 +18,9 @@ import { Permissions } from "$/models/Permissions/Permissions";
 import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
-import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { partition } from "@/lib/utils/arrays/partition/partition";
+import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type {
   BuiltinPresetType,
@@ -30,6 +31,7 @@ import type {
  * Built-in presets (read-only) and CRUD for custom role groups.
  */
 export function WorkspaceRolesTab(): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<RoleGroupWithMatrix | null>(
@@ -58,32 +60,32 @@ export function WorkspaceRolesTab(): JSX.Element {
 
   const [createGroup, isCreating] = PermissionsClient.useCreateCustomRoleGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Role group created" });
+      notifySuccess({ title: t`Role group created` });
       setEditorOpen(false);
     },
     onError: (error: Error) => {
-      notifyError({ title: "Create failed", message: error.message });
+      notifyError({ title: t`Create failed`, message: error.message });
     },
     queriesToInvalidate: invalidate,
   });
 
   const [updateGroup, isUpdating] = PermissionsClient.useUpdateCustomRoleGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Role group updated" });
+      notifySuccess({ title: t`Role group updated` });
       setEditorOpen(false);
     },
     onError: (error: Error) => {
-      notifyError({ title: "Update failed", message: error.message });
+      notifyError({ title: t`Update failed`, message: error.message });
     },
     queriesToInvalidate: invalidate,
   });
 
   const [deleteGroup] = PermissionsClient.useDeleteCustomRoleGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Role group deleted" });
+      notifySuccess({ title: t`Role group deleted` });
     },
     onError: (error: Error) => {
-      notifyError({ title: "Delete failed", message: error.message });
+      notifyError({ title: t`Delete failed`, message: error.message });
     },
     queriesToInvalidate: invalidate,
   });
@@ -114,7 +116,7 @@ export function WorkspaceRolesTab(): JSX.Element {
 
   const onSaveEditor = (): void => {
     if (!nameDraft.trim()) {
-      notifyError({ title: "Name required" });
+      notifyError({ title: t`Name required` });
       return;
     }
     if (editingGroup) {
@@ -137,29 +139,38 @@ export function WorkspaceRolesTab(): JSX.Element {
     <Card withBorder p="lg" w="100%" maw="1000px">
       <LoadingOverlay visible={roleGroupsLoading} />
       <Stack gap="lg">
-        <Title order={4}>Built-in presets</Title>
+        <Title order={4}>
+          <Trans>Built-in presets</Trans>
+        </Title>
         <Text size="sm" c="dimmed">
-          {`${BUILTIN_ROLE_GROUP_NAMES.globalAdmin}, ${BUILTIN_ROLE_GROUP_NAMES.globalEditor}, and ${BUILTIN_ROLE_GROUP_NAMES.globalViewer} are fixed for every workspace.`}
+          <Trans>
+            {BUILTIN_ROLE_GROUP_NAMES.globalAdmin},{" "}
+            {BUILTIN_ROLE_GROUP_NAMES.globalEditor}, and{" "}
+            {BUILTIN_ROLE_GROUP_NAMES.globalViewer} are fixed for every
+            workspace.
+          </Trans>
         </Text>
         {builtins.map((roleGroup: RoleGroupWithMatrix) => {
           return (
             <Group key={roleGroup.id} justify="space-between">
               <Text fw={500}>{roleGroup.name}</Text>
               <Text size="sm" c="dimmed">
-                Preset
+                <Trans>Preset</Trans>
               </Text>
             </Group>
           );
         })}
         <Group justify="space-between">
-          <Title order={4}>Custom role groups</Title>
+          <Title order={4}>
+            <Trans>Custom role groups</Trans>
+          </Title>
           <Button size="xs" onClick={openCreate}>
-            New role group
+            <Trans>New role group</Trans>
           </Button>
         </Group>
         {customs.length === 0 ?
           <Text size="sm" c="dimmed">
-            No custom groups yet.
+            <Trans>No custom groups yet.</Trans>
           </Text>
         : null}
         {customs.map((g: RoleGroupWithMatrix) => {
@@ -170,7 +181,7 @@ export function WorkspaceRolesTab(): JSX.Element {
                 <IconEdit
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Edit role group"
+                  aria-label={t`Edit role group`}
                   onClick={() => {
                     openEdit(g);
                   }}
@@ -178,13 +189,12 @@ export function WorkspaceRolesTab(): JSX.Element {
                 <IconTrash
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Delete role group"
+                  aria-label={t`Delete role group`}
                   onClick={() => {
                     modals.openConfirmModal({
-                      title: "Delete role group",
-                      children:
-                        "Members still assigned to this group must be moved first.",
-                      labels: { confirm: "Delete", cancel: "Cancel" },
+                      title: t`Delete role group`,
+                      children: t`Members still assigned to this group must be moved first.`,
+                      labels: { confirm: t`Delete`, cancel: t`Cancel` },
                       confirmProps: { color: "red" },
                       onConfirm: () => {
                         deleteGroup({
@@ -205,11 +215,11 @@ export function WorkspaceRolesTab(): JSX.Element {
         onClose={() => {
           setEditorOpen(false);
         }}
-        title={editingGroup ? "Edit role group" : "New role group"}
+        title={editingGroup ? t`Edit role group` : t`New role group`}
       >
         <Stack gap="md">
           <TextInput
-            label="Name"
+            label={t`Name`}
             value={nameDraft}
             onChange={(e) => {
               setNameDraft(e.currentTarget.value);
@@ -230,7 +240,7 @@ export function WorkspaceRolesTab(): JSX.Element {
             disabled={isCreating || isUpdating}
           />
           <Button loading={isCreating || isUpdating} onClick={onSaveEditor}>
-            Save
+            <Trans>Save</Trans>
           </Button>
         </Stack>
       </Modal>

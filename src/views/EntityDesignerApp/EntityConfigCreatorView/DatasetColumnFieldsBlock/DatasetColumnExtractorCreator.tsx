@@ -1,9 +1,10 @@
+import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
 import { matchLiteral } from "@utils";
 import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors";
 import { EntityConfigCreatorStore } from "@/views/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
-import type { EntityConfigFormValues } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
+import type { EntityConfigFormValues } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigFormValues>;
@@ -11,28 +12,38 @@ type Props = {
   fieldName: string;
 };
 
-const valuePickerOptions = DatasetColumnValueExtractors.ValuePickerTypes.map(
-  (ruleType) => {
+/**
+ * Returns the localized value-picker rule options for dataset column
+ * extractors.
+ */
+function useValuePickerOptions(): ReadonlyArray<{
+  value: string;
+  label: string;
+}> {
+  const { t } = useLingui();
+  return DatasetColumnValueExtractors.ValuePickerTypes.map((ruleType) => {
     return {
       value: ruleType,
       label: matchLiteral(ruleType, {
-        most_frequent: "Choose the most frequent value",
-        first: "Choose the first value we see",
-        sum: "Get a sum of the values",
-        avg: "Get an average of the values",
-        count: "Get a count of how many values there are",
-        max: "Choose the maximum value",
-        min: "Choose the minimum value",
+        most_frequent: t`Choose the most frequent value`,
+        first: t`Choose the first value we see`,
+        sum: t`Get a sum of the values`,
+        avg: t`Get an average of the values`,
+        count: t`Get a count of how many values there are`,
+        max: t`Choose the maximum value`,
+        min: t`Choose the minimum value`,
       }),
     };
-  },
-);
+  });
+}
 
 export function DatasetColumnExtractorCreator({
   entityConfigForm,
   fieldIdx,
   fieldName,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const valuePickerOptions = useValuePickerOptions();
   const [state] = EntityConfigCreatorStore.useContext();
   const [fieldKeys, fieldInputProps] = entityConfigForm.keysAndProps(
     `datasetColumnFields.${fieldIdx}`,
@@ -54,16 +65,16 @@ export function DatasetColumnExtractorCreator({
       <Stack>
         <Checkbox
           key={fieldKeys.allowManualEdit}
-          label="Allow manual edit"
+          label={t`Allow manual edit`}
           {...fieldInputProps.allowManualEdit({ type: "checkbox" })}
         />
         <Tooltip
-          label={`If each ${state.singularEntityConfigName} can only have one ${fieldName} value, check this box.`}
+          label={t`If each ${state.singularEntityConfigName} can only have one ${fieldName} value, check this box.`}
           refProp="rootRef"
         >
           <Checkbox
             key={fieldKeys.isArray}
-            label="Only allow one value"
+            label={t`Only allow one value`}
             checked={onlyAllowOneValue}
             onChange={(e) => {
               const checked = e.currentTarget.checked;
@@ -80,8 +91,8 @@ export function DatasetColumnExtractorCreator({
           <Select
             key={extractorKeys.valuePickerRuleType}
             data={valuePickerOptions}
-            label={`If there are multiple ${fieldName} values for one ${state.singularEntityConfigName}, then...`}
-            placeholder="Select rule (e.g. most frequent)"
+            label={t`If there are multiple ${fieldName} values for one ${state.singularEntityConfigName}, then...`}
+            placeholder={t`Select rule (e.g. most frequent)`}
             {...extractorInputProps.valuePickerRuleType()}
           />
         )}

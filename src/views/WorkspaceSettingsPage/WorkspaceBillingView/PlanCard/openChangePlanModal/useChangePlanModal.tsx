@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
@@ -42,6 +43,7 @@ type OpenChangePlanModalOptions = {
 export function useChangePlanModal(): (
   options: OpenChangePlanModalOptions,
 ) => void {
+  const { t } = useLingui();
   const user = useCurrentUser();
   const [sendUpdateSubscriptionRequest] = useMutation({
     mutationFn: async ({
@@ -62,7 +64,7 @@ export function useChangePlanModal(): (
       });
     },
     onSuccess: () => {
-      notifySuccess("Subscription updated successfully");
+      notifySuccess(t`Subscription updated successfully`);
       modals.closeAll();
     },
     onError: (error) => {
@@ -70,7 +72,7 @@ export function useChangePlanModal(): (
         errorMessage: error.message,
       });
       notifyError(
-        `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+        t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
       );
     },
     queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
@@ -78,7 +80,7 @@ export function useChangePlanModal(): (
   const [convertToNativeFree, isConvertingToNativeFree] =
     SubscriptionClient.useCreateFreeSubscription({
       onSuccess: () => {
-        notifySuccess("You're on the Free plan");
+        notifySuccess(t`You're on the Free plan`);
         modals.closeAll();
       },
       onError: (error) => {
@@ -86,7 +88,7 @@ export function useChangePlanModal(): (
           errorMessage: error.message,
         });
         notifyError(
-          `We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
+          t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
         );
       },
       queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
@@ -106,32 +108,32 @@ export function useChangePlanModal(): (
     const newPlanSubType =
       newPlan.priceType === "seat_based" ?
         newPlan.planInterval === "month" ?
-          "Monthly"
-        : "Annual"
-      : newPlan.priceType === "custom" ? "Pay What You Want"
-      : "Free";
+          t`Monthly`
+        : t`Annual`
+      : newPlan.priceType === "custom" ? t`Pay What You Want`
+      : t`Free`;
 
     const modalId = modals.openConfirmModal({
       title: (
         <Text size="xl" fw={600} span>
           {isUpgradingPlan ?
-            `Upgrading plan to ${newPlanName} (${newPlanSubType})`
-          : `Changing plan to ${newPlanName} (${newPlanSubType})`}
+            t`Upgrading plan to ${newPlanName} (${newPlanSubType})`
+          : t`Changing plan to ${newPlanName} (${newPlanSubType})`}
         </Text>
       ),
       labels: {
         confirm:
-          newPlan.priceType === "custom" ? "Go to billing portal"
-          : isNativeFreeDowngrade ? "Switch to Free plan"
-          : "Update subscription",
-        cancel: "Cancel",
+          newPlan.priceType === "custom" ? t`Go to billing portal`
+          : isNativeFreeDowngrade ? t`Switch to Free plan`
+          : t`Update subscription`,
+        cancel: t`Cancel`,
       },
       closeOnConfirm: false,
       size: "xxl",
       children: <ChangePlanModalContents newPlan={newPlan} />,
       onConfirm: () => {
         if (newPlan.priceType === "custom" && user) {
-          goToBillingPortal({ userId: user.id });
+          goToBillingPortal({ userId: user.id, t });
         } else if (isNativeFreeDowngrade) {
           convertToNativeFree({ workspaceId });
         } else {

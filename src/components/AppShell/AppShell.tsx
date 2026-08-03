@@ -1,4 +1,5 @@
 import { useToggleBoolean } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import {
@@ -15,6 +16,8 @@ import { Navbar } from "@/components/AppShell/Navbar/Navbar";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
+import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { AppLink } from "@/config/AppLinks";
@@ -41,6 +44,19 @@ const NAVBAR_DEFAULT_WIDTH = 220;
 
 const ASIDE_DEFAULT_WIDTH = 380;
 
+/**
+ * DOM id on the AppShell's main content area. Components that need to scope
+ * an overlay (drawer, popover, etc.) to the main canvas, without covering
+ * the side navbar or the chat panel Aside, can target this element.
+ */
+export const APP_SHELL_MAIN_ID = "ava-app-shell-main";
+
+/**
+ * Mantine `useHotkeys` skips INPUT/TEXTAREA/SELECT by default. Omit TEXTAREA so
+ * app chrome shortcuts (chat toggle, navbar toggle) still work in the composer.
+ */
+const APP_SHELL_HOTKEY_TAGS_TO_IGNORE = ["INPUT", "SELECT"] as const;
+
 type Props = {
   /**
    * The main content of the app shell.
@@ -58,6 +74,8 @@ type Props = {
   /** Utility links go on the bottom of the navbar */
   utilityLinks?: readonly NavbarLink[];
   currentWorkspace?: Workspace.WithSubscription;
+  /** When false, the Aside slot stays empty (e.g. no-workspace routes). */
+  showChatPanel?: boolean;
 };
 
 /**
@@ -73,9 +91,10 @@ function AppShellComponent({
   navbarLinks,
   currentWorkspace,
   utilityLinks = [],
+  showChatPanel = true,
 }: Props): JSX.Element {
-  const { isNavbarSidebarCollapsed: isDesktopNavbarCollapsed } =
-    AppShellStateManager.useState();
+  const { t } = useLingui();
+  const { isNavbarSidebarCollapsed } = AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
   const { isOpen: isChatPanelOpen, isAvailable: isChatPanelAvailable } =
     ChatPanelStateManager.useState();
@@ -88,20 +107,23 @@ function AppShellComponent({
   // We use mod+/ instead of mod+J because Chrome and Firefox both bind
   // mod+J to the Downloads window at the browser/OS layer and the keydown
   // never reaches the page.
-  useHotkeys([
+  useHotkeys(
     [
-      "mod+/",
-      () => {
-        chatPanelDispatch.toggle();
-      },
+      [
+        "mod+/",
+        () => {
+          chatPanelDispatch.toggle();
+        },
+      ],
+      [
+        "mod+.",
+        () => {
+          appShellDispatch.toggleNavbarSidebar();
+        },
+      ],
     ],
-    [
-      "mod+.",
-      () => {
-        appShellDispatch.toggleNavbarSidebar();
-      },
-    ],
-  ]);
+    [...APP_SHELL_HOTKEY_TAGS_TO_IGNORE],
+  );
 
   const headerHeight =
     isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT
@@ -119,7 +141,7 @@ function AppShellComponent({
           breakpoint: "sm",
           collapsed: {
             mobile: !isMobileNavbarOpened,
-            desktop: isDesktopNavbarCollapsed,
+            desktop: isNavbarSidebarCollapsed,
           },
         }}
         aside={{
@@ -153,7 +175,7 @@ function AppShellComponent({
           withBorder={false}
           style={
             isMobileViewSize ?
-              { zIndex: 300, marginTop: -40, height: "100%" }
+              { zIndex: APP_CHROME_Z_INDEX, marginTop: -40, height: "100%" }
             : undefined
           }
         >
@@ -168,6 +190,7 @@ function AppShellComponent({
           />
         </MantineAppShell.Navbar>
         <MantineAppShell.Main
+          id={APP_SHELL_MAIN_ID}
           py="0"
           ml={-16}
           mr={-16}
@@ -176,7 +199,7 @@ function AppShellComponent({
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
-          {isChatPanelAvailable ?
+          {showChatPanel && isChatPanelAvailable ?
             <ChatPanel />
           : null}
         </MantineAppShell.Aside>
@@ -185,12 +208,14 @@ function AppShellComponent({
       <Spotlight
         highlightQuery
         actions={spotlightActions ?? []}
-        nothingFound="Nothing found..."
+        nothingFound={t`Nothing found...`}
         searchProps={{
           leftSection: <IconSearch size={20} stroke={1.5} />,
-          placeholder: "Search...",
+          placeholder: t`Search...`,
         }}
       />
+
+      <OfflineChatDownloadIndicator />
     </>
   );
 }

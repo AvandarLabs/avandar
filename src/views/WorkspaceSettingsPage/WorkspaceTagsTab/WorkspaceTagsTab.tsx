@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Card,
@@ -22,6 +23,7 @@ import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
  * CRUD for workspace user-group tags (names + colors).
  */
 export function WorkspaceTagsTab(): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<UserGroupRow | null>(null);
@@ -40,21 +42,21 @@ export function WorkspaceTagsTab(): JSX.Element {
 
   const [saveGroup, isSaving] = PermissionsClient.useSaveUserGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Tag saved" });
+      notifySuccess({ title: t`User group saved` });
       setEditorOpen(false);
     },
     onError: (error: Error) => {
-      notifyError({ title: "Save failed", message: error.message });
+      notifyError({ title: t`Save failed`, message: error.message });
     },
     queriesToInvalidate: invalidate,
   });
 
   const [deleteGroup] = PermissionsClient.useDeleteUserGroup({
     onSuccess: () => {
-      notifySuccess({ title: "Tag deleted" });
+      notifySuccess({ title: t`User group deleted` });
     },
     onError: (error: Error) => {
-      notifyError({ title: "Delete failed", message: error.message });
+      notifyError({ title: t`Delete failed`, message: error.message });
     },
     queriesToInvalidate: invalidate,
   });
@@ -75,7 +77,7 @@ export function WorkspaceTagsTab(): JSX.Element {
 
   const onSave = (): void => {
     if (!nameDraft.trim()) {
-      notifyError({ title: "Name required" });
+      notifyError({ title: t`Name required` });
       return;
     }
     saveGroup({
@@ -91,13 +93,19 @@ export function WorkspaceTagsTab(): JSX.Element {
       <LoadingOverlay visible={groupsLoading} />
       <Stack gap="md">
         <Group justify="space-between">
-          <Title order={4}>Tags</Title>
+          <Title order={4}>
+            <Trans>User groups</Trans>
+          </Title>
           <Button size="xs" onClick={openCreate}>
-            New tag
+            <Trans>New user group</Trans>
           </Button>
         </Group>
         <Text size="sm" c="dimmed">
-          Tags label members and resources for intersection-based access.
+          <Trans>
+            Create groups for your workspace members. Datasets and dashboards
+            can be configured to only share with (or restrict) certain user
+            groups.
+          </Trans>
         </Text>
         {groups.map((userGroupRow: UserGroupRow) => {
           return (
@@ -117,7 +125,7 @@ export function WorkspaceTagsTab(): JSX.Element {
                 <IconEdit
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Edit tag"
+                  aria-label={t`Edit user group`}
                   onClick={() => {
                     openEdit(userGroupRow);
                   }}
@@ -125,13 +133,12 @@ export function WorkspaceTagsTab(): JSX.Element {
                 <IconTrash
                   size={18}
                   style={{ cursor: "pointer" }}
-                  aria-label="Delete tag"
+                  aria-label={t`Delete user group`}
                   onClick={() => {
                     modals.openConfirmModal({
-                      title: "Delete tag",
-                      children:
-                        "This removes the tag from members and resources that use it.",
-                      labels: { confirm: "Delete", cancel: "Cancel" },
+                      title: t`Delete user group`,
+                      children: t`This removes the user group from members and resources that use it.`,
+                      labels: { confirm: t`Delete`, cancel: t`Cancel` },
                       confirmProps: { color: "red" },
                       onConfirm: () => {
                         deleteGroup({
@@ -152,23 +159,23 @@ export function WorkspaceTagsTab(): JSX.Element {
         onClose={() => {
           setEditorOpen(false);
         }}
-        title={editing ? "Edit tag" : "New tag"}
+        title={editing ? t`Edit user group` : t`New user group`}
       >
         <Stack gap="md">
           <TextInput
-            label="Name"
+            label={t`Name`}
             value={nameDraft}
             onChange={(e) => {
               setNameDraft(e.currentTarget.value);
             }}
           />
           <ColorInput
-            label="Color"
+            label={t`Color`}
             value={colorDraft}
             onChange={setColorDraft}
           />
           <Button loading={isSaving} onClick={onSave}>
-            Save
+            <Trans>Save</Trans>
           </Button>
         </Stack>
       </Modal>

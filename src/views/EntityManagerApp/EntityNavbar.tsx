@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   BoxProps,
   Flex,
@@ -8,12 +9,12 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { NavLinkList } from "@ui";
 import { constant, prop, where } from "@utils";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@ui";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {
@@ -25,6 +26,7 @@ export function EntityNavbar({
   entityConfig,
   ...boxProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
@@ -107,7 +109,8 @@ export function EntityNavbar({
       if (isLoaderRow) {
         return {
           style,
-          loadingText: hasNextPage ? "Loading more..." : "Nothing more to load",
+          loadingText:
+            hasNextPage ? t`Loading more...` : t`Nothing more to load`,
         };
       }
 
@@ -133,12 +136,13 @@ export function EntityNavbar({
     borderStyle,
     hasNextPage,
     workspace.slug,
+    t,
   ]);
 
   return (
     <Flex bg="neutral.1" pt="lg" direction="column" {...boxProps}>
       <Title pl="sm" order={3} pb="sm">
-        {entityConfig.name} Manager
+        <Trans>{entityConfig.name} Manager</Trans>
       </Title>
 
       <ScrollArea viewportRef={parentRef} flex={1} mih={0}>

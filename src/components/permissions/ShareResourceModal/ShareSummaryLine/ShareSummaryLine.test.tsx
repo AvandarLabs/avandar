@@ -1,7 +1,6 @@
-import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ShareSummaryLine } from "@/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine";
-import { render } from "@/utils/testing-utils";
+import { render, screen } from "@/test-utils";
 
 describe("ShareSummaryLine", () => {
   it("renders interleaved text segments and pill labels", () => {

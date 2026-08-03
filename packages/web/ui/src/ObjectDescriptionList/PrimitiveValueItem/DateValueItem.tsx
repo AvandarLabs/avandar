@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import {
   formatDate,
@@ -67,5 +68,9 @@ export function DateValueItem({
     );
   }
 
-  return <div>Hello DateValueItem</div>;
+  return (
+    <div>
+      <Trans>Hello DateValueItem</Trans>
+    </div>
+  );
 }

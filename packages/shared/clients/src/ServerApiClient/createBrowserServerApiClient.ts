@@ -1,8 +1,13 @@
+import {
+  ServerApiSessionRefresher,
+  SessionExpiredError,
+} from "@clients/ServerApiClient/ServerApiSessionRefresher.ts";
+import { FunctionsHttpError } from "@supabase/supabase-js";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,
 } from "$/platform/types/ServerApiClient.types.ts";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 
 /**
  * Build the relative URL `supabase.functions.invoke` is called with.
@@ -11,15 +16,12 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
  * centralize this builder; for now keeping it local keeps the
  * `packages/shared/` → `src/` boundary clean.
  */
-function buildRelativeFunctionUrl(
-  request: ServerApiFunctionRequest,
-): string {
+function buildRelativeFunctionUrl(request: ServerApiFunctionRequest): string {
   const { route, pathParams, queryParams } = request;
 
   const interpolated =
-    pathParams === undefined ?
-      route
-    : route.replace(/:([a-zA-Z0-9_]+)/g, (_, name: string) => {
+    pathParams === undefined ? route : (
+      route.replace(/:([a-zA-Z0-9_]+)/g, (_, name: string) => {
         const value = pathParams[name];
         if (value === undefined || value === null) {
           throw new Error(
@@ -27,7 +29,8 @@ function buildRelativeFunctionUrl(
           );
         }
         return encodeURIComponent(String(value));
-      });
+      })
+    );
 
   if (interpolated.includes(":")) {
     throw new Error(
@@ -52,6 +55,21 @@ function buildRelativeFunctionUrl(
     .join("&");
 
   return search.length === 0 ? interpolated : `${interpolated}?${search}`;
+}
+
+/**
+ * Whether a `supabase.functions.invoke` error is a `401 Unauthorized` from the
+ * edge function. Only these are worth a session refresh; relay/fetch errors and
+ * other status codes are not token problems.
+ *
+ * @param error - The error returned by `functions.invoke`.
+ * @returns `true` if the error is an HTTP 401.
+ */
+function _isUnauthorized(error: unknown): boolean {
+  return (
+    error instanceof FunctionsHttpError &&
+    (error.context as Response | undefined)?.status === 401
+  );
 }
 
 /**
@@ -92,10 +110,31 @@ export function createBrowserServerApiClient(): ServerApiClient {
     ): Promise<TResult> {
       const client = AvaSupabase.db();
       const relativeUrl = buildRelativeFunctionUrl(request);
-      const { data, error } = await client.functions.invoke(relativeUrl, {
-        method: request.method,
-        body: request.body as unknown as Record<string, unknown> | undefined,
-      });
+
+      const sendOnce = () => {
+        return client.functions.invoke(relativeUrl, {
+          method: request.method,
+          body: request.body as unknown as Record<string, unknown> | undefined,
+        });
+      };
+
+      let { data, error } = await sendOnce();
+
+      // A 401 (and only a 401) may be a stale access token: one signed by a
+      // retired JWT signing key. Refresh the session once (shared across all
+      // concurrent 401s) and retry exactly once. Any other error, or a second
+      // 401 after a fresh token, is not something a refresh can fix.
+      if (_isUnauthorized(error)) {
+        const session = await ServerApiSessionRefresher.refreshOnce();
+        if (session === undefined) {
+          throw new SessionExpiredError(request.route);
+        }
+        ({ data, error } = await sendOnce());
+        if (_isUnauthorized(error)) {
+          throw new SessionExpiredError(request.route);
+        }
+      }
+
       if (error) {
         throw new Error(
           `serverApi.invokeFunction('${request.route}') failed: ${error.message}`,

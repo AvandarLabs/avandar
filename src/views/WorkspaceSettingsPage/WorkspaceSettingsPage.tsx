@@ -1,4 +1,6 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
@@ -8,25 +10,60 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
+import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
 
-export function WorkspaceSettingsPage(): React.ReactNode {
+const OWNER_TAB_IDS = [
+  "general",
+  "users",
+  "roles",
+  "tags",
+  "language",
+  "privacy",
+  "billing",
+] as const;
+const NON_OWNER_TAB_IDS = [
+  "general",
+  "users",
+  "roles",
+  "tags",
+  "language",
+  "privacy",
+] as const;
+
+type OwnerTabId = (typeof OWNER_TAB_IDS)[number];
+type NonOwnerTabId = (typeof NON_OWNER_TAB_IDS)[number];
+
+function isOwnerTabId(value: string): value is OwnerTabId {
+  return (OWNER_TAB_IDS as readonly string[]).includes(value);
+}
+
+function isNonOwnerTabId(value: string): value is NonOwnerTabId {
+  return (NON_OWNER_TAB_IDS as readonly string[]).includes(value);
+}
+
+export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
   const isSettingsAdmin = useIsGlobalAdmin();
+  const { t } = useLingui();
+  const navigate = useNavigate();
+  const { tabName } = useParams({
+    from: "/_auth/$workspaceSlug/settings/$tabName",
+  });
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
       notifySuccess({
-        title: "Workspace name updated",
-        message: "The workspace name was saved successfully.",
+        title: t`Workspace name updated`,
+        message: t`The workspace name was saved successfully.`,
       });
     },
     onError: (error: Error) => {
       notifyError({
-        title: "Failed to update workspace name",
+        title: t`Failed to update workspace name`,
         message: error.message,
       });
     },
@@ -37,11 +74,16 @@ export function WorkspaceSettingsPage(): React.ReactNode {
 
   if (!isSettingsAdmin) {
     return (
-      <AppLayout title="Settings">
+      <AppLayout title={t`Settings`}>
         <Container py="xxxl" size="xl">
-          <Title order={3}>Access denied</Title>
+          <Title order={3}>
+            <Trans>Access denied</Trans>
+          </Title>
           <Text mt="md" c="dimmed">
-            Only workspace settings administrators can open workspace settings.
+            <Trans>
+              Only workspace settings administrators can open workspace
+              settings.
+            </Trans>
           </Text>
         </Container>
       </AppLayout>
@@ -56,7 +98,7 @@ export function WorkspaceSettingsPage(): React.ReactNode {
             key: "workspaceName",
             type: "text",
             initialValue: workspace.name,
-            label: "Workspace Name",
+            label: t`Workspace Name`,
           },
         }}
         formElements={["workspaceName"]}
@@ -75,28 +117,43 @@ export function WorkspaceSettingsPage(): React.ReactNode {
     );
   };
 
+  const tabHeaders = {
+    general: t`General`,
+    users: t`Members`,
+    roles: t`Roles & Permissions`,
+    tags: t`User groups`,
+    language: t`Language`,
+    privacy: t`Privacy log`,
+    billing: t`Billing`,
+  };
+
+  const navigateToTab = (next: string): void => {
+    navigate({
+      to: "/$workspaceSlug/settings/$tabName",
+      params: {
+        workspaceSlug: workspace.slug,
+        tabName: next,
+      },
+      replace: true,
+    });
+  };
+
   return (
-    <AppLayout title="Settings">
+    <AppLayout title={t`Settings`}>
       <Container py="xxxl" size="xl">
         {isCurrentUserTheWorkspaceOwner ?
           <Tabs
-            tabIds={
-              [
-                "general",
-                "users",
-                "roles",
-                "tags",
-                "privacy",
-                "billing",
-              ] as const
-            }
+            tabIds={OWNER_TAB_IDS}
+            value={isOwnerTabId(tabName) ? tabName : "general"}
+            onTabChange={navigateToTab}
             renderTabHeader={{
-              general: "General",
-              users: "Members",
-              roles: "Roles",
-              tags: "Tags",
-              privacy: "Privacy",
-              billing: "Billing",
+              general: tabHeaders.general,
+              users: tabHeaders.users,
+              roles: tabHeaders.roles,
+              tags: tabHeaders.tags,
+              language: tabHeaders.language,
+              privacy: tabHeaders.privacy,
+              billing: tabHeaders.billing,
             }}
             renderTabPanel={{
               general: generalTabPanel,
@@ -108,6 +165,9 @@ export function WorkspaceSettingsPage(): React.ReactNode {
               },
               tags: () => {
                 return <WorkspaceTagsTab />;
+              },
+              language: () => {
+                return <WorkspaceLanguageTab />;
               },
               privacy: () => {
                 return <PrivacyLogTab />;
@@ -118,13 +178,16 @@ export function WorkspaceSettingsPage(): React.ReactNode {
             }}
           />
         : <Tabs
-            tabIds={["general", "users", "roles", "tags", "privacy"] as const}
+            tabIds={NON_OWNER_TAB_IDS}
+            value={isNonOwnerTabId(tabName) ? tabName : "general"}
+            onTabChange={navigateToTab}
             renderTabHeader={{
-              general: "General",
-              users: "Members",
-              roles: "Roles",
-              tags: "Tags",
-              privacy: "Privacy",
+              general: tabHeaders.general,
+              users: tabHeaders.users,
+              roles: tabHeaders.roles,
+              tags: tabHeaders.tags,
+              language: tabHeaders.language,
+              privacy: tabHeaders.privacy,
             }}
             renderTabPanel={{
               general: generalTabPanel,
@@ -136,6 +199,9 @@ export function WorkspaceSettingsPage(): React.ReactNode {
               },
               tags: () => {
                 return <WorkspaceTagsTab />;
+              },
+              language: () => {
+                return <WorkspaceLanguageTab />;
               },
               privacy: () => {
                 return <PrivacyLogTab />;

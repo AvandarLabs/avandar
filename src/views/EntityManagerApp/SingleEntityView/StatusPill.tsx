@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Combobox, Group, Pill, useCombobox } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
@@ -29,7 +30,7 @@ export function StatusPill(): JSX.Element {
           }}
         >
           <Group wrap="nowrap" gap="xxs">
-            Active
+            <Trans>Active</Trans>
             {hovered || isEditing ?
               <IconPencil size={12} />
             : null}
@@ -39,8 +40,12 @@ export function StatusPill(): JSX.Element {
 
       <Combobox.Dropdown>
         <Combobox.Options>
-          <Combobox.Option value="active">Active</Combobox.Option>
-          <Combobox.Option value="inactive">Inactive</Combobox.Option>
+          <Combobox.Option value="active">
+            <Trans>Active</Trans>
+          </Combobox.Option>
+          <Combobox.Option value="inactive">
+            <Trans>Inactive</Trans>
+          </Combobox.Option>
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

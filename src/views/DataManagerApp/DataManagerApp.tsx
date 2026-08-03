@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
@@ -14,10 +15,11 @@ export function DataManagerApp(): JSX.Element {
     where("workspace_id", "eq", workspace.id),
   );
   const navigate = useNavigate();
+  const { t } = useLingui();
 
   return (
     <AppLayout
-      title="Data Sources"
+      title={t`Data Sources`}
       toolbarButtonSection={
         <Button
           leftSection={<IconPlus size={18} />}
@@ -27,7 +29,7 @@ export function DataManagerApp(): JSX.Element {
           size="compact-sm"
           variant="light"
         >
-          Add new dataset
+          {t`Add new dataset`}
         </Button>
       }
     >

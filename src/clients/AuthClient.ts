@@ -6,6 +6,21 @@ import {
   WeakPassword,
 } from "@supabase/supabase-js";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { isDesktop } from "$/platform/isDesktop";
+import { getPlatformImpls } from "@/config/platform/platformRegistry";
+import type { Session as PlatformSession } from "$/platform/types/AuthProvider.types";
+
+/**
+ * Phase 2.5: when running inside the Electrobun desktop shell, the
+ * Supabase-backed sign-in / sign-out / session-restore paths are
+ * routed through the platform layer's keychain-backed
+ * `AuthProvider`. Web behavior is unchanged — every method without a
+ * desktop branch hits Supabase JS the same way it did before.
+ *
+ * The wider `AuthClient` surface (password reset, email update, user
+ * registration) is not on the offline-demo path and stays on
+ * Supabase JS even on desktop. Those flows require network anyway.
+ */
 
 type AuthClient = {
   /**
@@ -96,10 +111,77 @@ type AuthClient = {
   resetManualSignOut: () => void;
 };
 
+/**
+ * Synthesises a Supabase-shaped `User` from the leaner platform
+ * `Session`. Real Supabase users carry `app_metadata`, `aud`, etc.;
+ * the codebase only reads `id` and `email` off the User today, so a
+ * minimal shim is enough for the offline-restore path. Add fields
+ * here if a consumer surfaces a missing property.
+ */
+function _platformSessionToSupabaseUser(session: PlatformSession): User {
+  return {
+    id: session.userId,
+    email: session.email,
+    aud: "authenticated",
+    app_metadata: {},
+    user_metadata: {},
+    created_at: "",
+  } as User;
+}
+
+/**
+ * Synthesises a Supabase-shaped `Session` from the leaner platform
+ * `Session`. The refresh token stays in the OS keychain on the bun-main
+ * side; only the short-lived access token crosses the boundary, so the
+ * Supabase-shaped `refresh_token` is left as the empty string. Consumers
+ * that compare token strings explicitly will need to migrate.
+ */
+function _platformSessionToSupabaseSession(session: PlatformSession): Session {
+  const user = _platformSessionToSupabaseUser(session);
+  return {
+    access_token: session.accessToken,
+    refresh_token: "",
+    expires_in: Math.max(
+      0,
+      Math.floor((session.accessTokenExpiresAt - Date.now()) / 1000),
+    ),
+    expires_at: Math.floor(session.accessTokenExpiresAt / 1000),
+    token_type: "bearer",
+    user,
+  };
+}
+
 function createAuthClient(): AuthClient {
   const _self = {
     isManuallySignedOut: false,
   };
+
+  const _desktopOnAuthChangeListeners = new Set<
+    (event: AuthChangeEvent, session: Session | null) => void
+  >();
+  let _desktopOnAuthChangeUnsub: (() => void) | null = null;
+
+  function _ensureDesktopAuthListenerWired(): void {
+    if (!isDesktop()) {
+      return;
+    }
+    if (_desktopOnAuthChangeUnsub !== null) {
+      return;
+    }
+    _desktopOnAuthChangeUnsub = getPlatformImpls().authProvider.onAuthChange(
+      (platformSession) => {
+        const supabaseSession =
+          platformSession === null ? null : (
+            _platformSessionToSupabaseSession(platformSession)
+          );
+        const event: AuthChangeEvent =
+          platformSession === null ? "SIGNED_OUT" : "SIGNED_IN";
+        _desktopOnAuthChangeListeners.forEach((cb) => {
+          cb(event, supabaseSession);
+        });
+      },
+    );
+  }
 
   return {
     requestPasswordResetEmail: async (email: string): Promise<void> => {
@@ -147,6 +229,19 @@ function createAuthClient(): AuthClient {
     },
 
     getCurrentSession: async (): Promise<Session | undefined> => {
+      if (isDesktop()) {
+        try {
+          const platformSession =
+            await getPlatformImpls().authProvider.getSession();
+          if (platformSession === null) {
+            return undefined;
+          }
+          return _platformSessionToSupabaseSession(platformSession);
+        } catch (err) {
+          console.error("Failed to get the current session (desktop)", err);
+          return undefined;
+        }
+      }
       const { data, error } = await AvaSupabase.db().auth.getSession();
       if (error) {
         console.error("Failed to get the current session", error);
@@ -164,6 +259,17 @@ function createAuthClient(): AuthClient {
       weakPassword?: WeakPassword;
     }> => {
       const { email, password } = signInParams;
+      if (isDesktop()) {
+        const platformSession = await getPlatformImpls().authProvider.signIn({
+          kind: "password",
+          email,
+          password,
+        });
+        return {
+          user: _platformSessionToSupabaseUser(platformSession),
+          session: _platformSessionToSupabaseSession(platformSession),
+        };
+      }
       const { data, error } = await AvaSupabase.db().auth.signInWithPassword({
         email,
         password,
@@ -171,6 +277,7 @@ function createAuthClient(): AuthClient {
       if (error) {
         throw error;
       }
+      _self.isManuallySignedOut = false;
       return data;
     },
 
@@ -199,7 +306,15 @@ function createAuthClient(): AuthClient {
 
     signOut: async (): Promise<void> => {
       _self.isManuallySignedOut = true;
-
+      if (isDesktop()) {
+        try {
+          await getPlatformImpls().authProvider.signOut();
+        } catch (err) {
+          _self.isManuallySignedOut = false;
+          throw err;
+        }
+        return;
+      }
       const { error } = await AvaSupabase.db().auth.signOut();
       if (error) {
         _self.isManuallySignedOut = false;
@@ -210,6 +325,17 @@ function createAuthClient(): AuthClient {
     onAuthStateChange: (
       callback: (event: AuthChangeEvent, session: Session | null) => void,
     ): Subscription => {
+      if (isDesktop()) {
+        _ensureDesktopAuthListenerWired();
+        _desktopOnAuthChangeListeners.add(callback);
+        return {
+          id: `desktop-${Date.now()}`,
+          callback: callback as unknown as Subscription["callback"],
+          unsubscribe: () => {
+            _desktopOnAuthChangeListeners.delete(callback);
+          },
+        };
+      }
       const {
         data: { subscription },
       } = AvaSupabase.db().auth.onAuthStateChange(callback);

@@ -11,10 +11,66 @@
   list-style: revert;
 }
 
+/*
+ * ag-grid v32+ Theming API injects its pagination panel CSS lazily into the
+ * parent document's <head> the first time a grid with pagination renders.
+ * Puck's editor iframe copies the parent's stylesheets at mount time and
+ * watches for new ones, but the lazy `component-PaginationComp` injection
+ * can land after Puck has lost track, leaving the iframe without the rule
+ * and the pagination items stack vertically (display: block).
+ *
+ * Replicating the essential layout rules here loads them eagerly via Tailwind
+ * so they're in the parent <head> before Puck mounts and are copied into the
+ * iframe with the rest of the boot-time styles. The visual styling continues
+ * to come from ag-grid; this only restores the flex layout.
+ */
+.ag-paging-panel {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+}
+
+.ag-paging-page-summary-panel,
+.ag-paging-row-summary-panel {
+  align-items: center;
+  display: flex;
+}
+
 button {
   &:disabled,
   &[data-disabled] {
     cursor: not-allowed;
+  }
+}
+
+/*
+ * Tablet responsiveness.
+ *
+ * Avandar's UI is designed for desktop. On tablet-sized viewports (iPad
+ * portrait/landscape, small laptops) everything appeared roughly 25%
+ * oversized. Overriding --mantine-scale shrinks all sizes built through
+ * Mantine's rem() helper - spacing, font sizes, heading sizes, radius,
+ * shadows, AppShell navbar/aside widths, etc. - in one place.
+ *
+ * !important is required because Mantine's MantineCssVariables renders a
+ * <style> tag at runtime that sets --mantine-scale on :root, and that
+ * style tag is appended to the DOM after this stylesheet.
+ *
+ * The breakpoints below are em-based to match Mantine's breakpoint
+ * convention (48em = sm = 768px, 88em = xl = 1408px). The two-tier scale
+ * lets iPad Pro 13" landscape (1366px) sit a bit closer to desktop than
+ * smaller iPads.
+ */
+@media (width >= 48em) and (width <= 74.99em) {
+  :root {
+    --mantine-scale: 0.8 !important;
+  }
+}
+
+@media (width >= 75em) and (width <= 87.99em) {
+  :root {
+    --mantine-scale: 0.9 !important;
   }
 }
 
@@ -35,10 +91,21 @@ button {
 
   /* z-indexes */
   --mantine-z-index-app-shell-main: ;
+  --mantine-z-index-app-chrome: ;
   --mantine-z-index-modal: ;
 
   /* other colors */
   --mantine-primary-color: ;
   --mantine-color-body: ;
   --mantine-color-text: ;
+
+  /* animation presets */
+  --ava-animation-duration-ooze-in: ;
+  --ava-animation-duration-swipe-out: ;
+  --ava-animation-duration-reduced: ;
+  --ava-animation-easing-spring: ;
+  --ava-animation-easing-swipe-out: ;
+  --ava-animate-swipe-translate-x: ;
+  --ava-animate-origin-x: ;
+  --ava-animate-origin-y: ;
 }

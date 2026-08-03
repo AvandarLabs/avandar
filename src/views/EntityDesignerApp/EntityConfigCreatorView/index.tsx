@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Button,
@@ -10,9 +11,13 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { makeSelectOptions, Select, Paper  } from "@ui";
+import { makeSelectOptions, Paper, Select } from "@ui";
 import { isDefined, prop, propEq, setValue } from "@utils";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DatasetColumnFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
 import { EntityConfigCreatorStore } from "@/views/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import {
@@ -25,14 +30,11 @@ import {
 } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock";
 import { useSubmitEntityCreatorForm } from "@/views/EntityDesignerApp/EntityConfigCreatorView/useSubmitEntityCreatorForm";
-import { AppLinks } from "@/config/AppLinks";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 
 export function EntityConfigCreatorView(): JSX.Element {
+  const { t } = useLingui();
   const [
     { entityConfigName, singularEntityConfigName, pluralEntityConfigName },
     dispatch,
@@ -47,9 +49,9 @@ export function EntityConfigCreatorView(): JSX.Element {
     initialValues: getDefaultEntityConfigFormValues(),
 
     validate: {
-      titleFieldId: isNotEmpty("Title field is required"),
+      titleFieldId: isNotEmpty(t`Title field is required`),
       sourceDatasets: {
-        primaryKeyColumnId: isNotEmpty("ID field is required"),
+        primaryKeyColumnId: isNotEmpty(t`ID field is required`),
       },
     },
 
@@ -191,29 +193,31 @@ export function EntityConfigCreatorView(): JSX.Element {
             <TextInput
               key={keys.name}
               required
-              label="Profile Name"
-              placeholder="Enter a name for this profile type"
+              label={t`Profile Name`}
+              placeholder={t`Enter a name for this profile type`}
               {...inputProps.name()}
             />
             <TextInput
               key={keys.description}
-              label="Profile Description"
-              placeholder="Enter a description for this profile type"
+              label={t`Profile Description`}
+              placeholder={t`Enter a description for this profile type`}
               {...inputProps.description()}
             />
             {IS_MANUAL_DATA_DISABLED ? null : (
               <Checkbox
                 key={keys.allowManualCreation}
-                label={`Allow new ${pluralEntityConfigName} to be created manually`}
+                label={t`Allow new ${pluralEntityConfigName} to be created manually`}
                 {...inputProps.allowManualCreation({ type: "checkbox" })}
               />
             )}
             <Text>
-              Tell us about where the {singularEntityConfigName} data should
-              come from...
+              <Trans>
+                Tell us about where the {singularEntityConfigName} data should
+                come from...
+              </Trans>
             </Text>
             <Switch
-              label={`Some data should come from existing datasets`}
+              label={t`Some data should come from existing datasets`}
               checked={allowDatasetFields}
               onChange={(e) => {
                 setAllowDatasetFields(e.currentTarget.checked);
@@ -228,7 +232,7 @@ export function EntityConfigCreatorView(): JSX.Element {
             : null}
             {IS_MANUAL_DATA_DISABLED ? null : (
               <Switch
-                label="Some data should be manually entered"
+                label={t`Some data should be manually entered`}
                 checked={allowManualEntryFields}
                 onChange={(e) => {
                   const displayManualEntryFields = e.currentTarget.checked;
@@ -248,7 +252,7 @@ export function EntityConfigCreatorView(): JSX.Element {
                       "manualEntryFields",
                       makeDefaultManualEntryField({
                         entityConfigId,
-                        name: "New field",
+                        name: t`New field`,
                       }),
                     );
                   }
@@ -268,16 +272,16 @@ export function EntityConfigCreatorView(): JSX.Element {
               data={possibleTitleFields}
               placeholder={
                 fields.length === 0 ?
-                  "No fields have been configured yet"
-                : "Select a field"
+                  t`No fields have been configured yet`
+                : t`Select a field`
               }
-              label={`What field should be used as a ${singularEntityConfigName}'s name?`}
+              label={t`What field should be used as a ${singularEntityConfigName}'s name?`}
               {...inputProps.titleFieldId()}
             />
 
             <Box>
               <Button type="submit" loading={isSendEntityConfigFormPending}>
-                Create
+                <Trans>Create</Trans>
               </Button>
             </Box>
           </Stack>

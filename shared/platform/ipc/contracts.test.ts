@@ -19,7 +19,7 @@ describe("defineIpcContract", () => {
     expect(typeof contract.parseResponse).toBe("function");
   });
 
-  it("parseRequest / parseResponse are identity casts at runtime (Phase 2)", () => {
+  it("parseRequest / parseResponse are identity casts at runtime", () => {
     const contract = defineIpcContract<{ a: number }, { b: number }>(
       "test.identity",
     );

@@ -1,3 +1,4 @@
+import { ModalsProvider } from "@mantine/modals";
 import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
@@ -9,9 +10,13 @@ import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootW
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
+import { WorkspaceI18nProvider } from "@/i18n/WorkspaceI18nProvider";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 
 type Props = {
@@ -23,9 +28,8 @@ type Props = {
 };
 
 export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
-  useRootWorkspaceChecks();
-
   const workspace = useCurrentWorkspace();
+  const { locale } = useWorkspaceLanguage(workspace.id);
   const canAccessDataSources = useHasPermission(
     "data_sources__can_list_sources",
   );
@@ -93,21 +97,59 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   }, [workspace.slug]);
 
   return (
-    <DataExplorerStateManager.Provider>
-      <ChatPanelProvider>
-        <AppDropzone>
-          <AppShell
-            title={workspace.name}
-            currentWorkspace={workspace}
-            profileLink={profileLink}
-            navbarLinks={mainNavBarLinks}
-            utilityLinks={utilityNavBarLinks}
-            spotlightActions={spotlightActions}
-          >
-            {children}
-          </AppShell>
-        </AppDropzone>
-      </ChatPanelProvider>
-    </DataExplorerStateManager.Provider>
+    <WorkspaceI18nProvider locale={locale}>
+      <WorkspaceLayoutContents
+        workspace={workspace}
+        profileLink={profileLink}
+        mainNavBarLinks={mainNavBarLinks}
+        utilityNavBarLinks={utilityNavBarLinks}
+        spotlightActions={spotlightActions}
+      >
+        {children}
+      </WorkspaceLayoutContents>
+    </WorkspaceI18nProvider>
+  );
+}
+
+type WorkspaceLayoutContentsProps = {
+  workspace: ReturnType<typeof useCurrentWorkspace>;
+  profileLink: ReturnType<typeof AppLinks.profile>;
+  mainNavBarLinks: NavbarLink[];
+  utilityNavBarLinks: NavbarLink[];
+  spotlightActions: ReturnType<typeof useSpotlightActions>;
+  children: ReactNode;
+};
+
+function WorkspaceLayoutContents({
+  workspace,
+  profileLink,
+  mainNavBarLinks,
+  utilityNavBarLinks,
+  spotlightActions,
+  children,
+}: WorkspaceLayoutContentsProps): JSX.Element {
+  useRootWorkspaceChecks();
+
+  return (
+    <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
+      <DataExplorerStateManager.Provider>
+        <DashboardEditorStateManager.Provider>
+          <ChatPanelProvider>
+            <AppDropzone>
+              <AppShell
+                title={workspace.name}
+                currentWorkspace={workspace}
+                profileLink={profileLink}
+                navbarLinks={mainNavBarLinks}
+                utilityLinks={utilityNavBarLinks}
+                spotlightActions={spotlightActions}
+              >
+                {children}
+              </AppShell>
+            </AppDropzone>
+          </ChatPanelProvider>
+        </DashboardEditorStateManager.Provider>
+      </DataExplorerStateManager.Provider>
+    </ModalsProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { useBoolean } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { Model } from "@models";
@@ -35,6 +36,7 @@ export function QueryFormContainer({
   symbolColor,
   onSymbolColorChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
   const { hovered, ref } = useHover();
 
@@ -55,7 +57,7 @@ export function QueryFormContainer({
         shadow="md"
       >
         <Popover.Target>
-          <Tooltip label="Filter" position="right">
+          <Tooltip label={t`Filter`} position="right">
             <ActionIcon
               size="lg"
               variant="white"
@@ -71,7 +73,7 @@ export function QueryFormContainer({
                     mantineVar("shadow-lg")
                   : mantineVar("shadow-md"),
               }}
-              aria-label="Query form"
+              aria-label={t`Query form`}
             >
               <IconFilter size={20} />
             </ActionIcon>
@@ -87,8 +89,8 @@ export function QueryFormContainer({
               comboboxProps={{ withinPortal: false }}
             />
             <QueryColumnSingleSelect
-              label="Latitude column"
-              placeholder="Select latitude column"
+              label={t`Latitude column`}
+              placeholder={t`Select latitude column`}
               dataSourceId={
                 selectedDataSource ?
                   Model.getTypedId(selectedDataSource)
@@ -101,8 +103,8 @@ export function QueryFormContainer({
               comboboxProps={{ withinPortal: false }}
             />
             <QueryColumnSingleSelect
-              label="Longitude column"
-              placeholder="Select longitude column"
+              label={t`Longitude column`}
+              placeholder={t`Select longitude column`}
               dataSourceId={
                 selectedDataSource ?
                   Model.getTypedId(selectedDataSource)
@@ -115,8 +117,8 @@ export function QueryFormContainer({
               comboboxProps={{ withinPortal: false }}
             />
             <QueryColumnSingleSelect
-              label="Symbol size"
-              placeholder="Select symbol size column"
+              label={t`Symbol size`}
+              placeholder={t`Select symbol size column`}
               dataSourceId={
                 selectedDataSource ?
                   Model.getTypedId(selectedDataSource)
@@ -126,8 +128,8 @@ export function QueryFormContainer({
               onChange={(value) => {
                 if (value && !QueryColumnFns.isNumeric(value)) {
                   notifyError({
-                    title: "Invalid column type",
-                    message: "Symbol size column must be numeric.",
+                    title: t`Invalid column type`,
+                    message: t`Symbol size column must be numeric.`,
                   });
                   return;
                 }
@@ -136,7 +138,7 @@ export function QueryFormContainer({
               comboboxProps={{ withinPortal: false }}
             />
             <ColorInput
-              label="Symbol color"
+              label={t`Symbol color`}
               value={symbolColor ?? "#3b82f6"}
               onChange={(value) => {
                 onSymbolColorChange(value || undefined);

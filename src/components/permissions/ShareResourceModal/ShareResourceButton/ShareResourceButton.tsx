@@ -1,15 +1,19 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { resourceTypeLabel } from "@/components/permissions/ShareResourceModal/shareCopy";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { ButtonProps } from "@mantine/core";
 
 type Props = {
   resourceName: string;
   resourceType: ResourceType;
   resourceId: string | undefined;
+  size?: ButtonProps["size"];
 };
 
 /**
@@ -19,7 +23,9 @@ export function ShareResourceButton({
   resourceName,
   resourceType,
   resourceId,
+  size,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [effectiveRole, isLoadingRole] = useResourceRole({
     resourceType,
     resourceId,
@@ -27,16 +33,18 @@ export function ShareResourceButton({
 
   const canManageShares = effectiveRole === "admin";
   const isDisabled = !resourceId || isLoadingRole || !canManageShares;
+  const resourceLabel = resourceTypeLabel(resourceType);
 
   return (
     <Tooltip
       label={
         canManageShares || isLoadingRole ?
-          "Share this resource"
-        : "You need admin access on this resource to manage sharing."
+          t`Share this ${resourceLabel}`
+        : t`You need admin access on this resource to manage sharing.`
       }
     >
       <Button
+        size={size}
         variant="default"
         leftSection={<IconShare size={16} />}
         data-disabled={isDisabled || undefined}
@@ -48,7 +56,7 @@ export function ShareResourceButton({
           }
 
           modals.open({
-            title: "Share",
+            title: t`Share`,
             size: "lg",
             children: (
               <ShareResourceModal
@@ -63,7 +71,7 @@ export function ShareResourceButton({
           });
         }}
       >
-        Share
+        <Trans>Share</Trans>
       </Button>
     </Tooltip>
   );

@@ -1,7 +1,6 @@
-import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShareGeneralAccess } from "@/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess";
-import { render } from "@/utils/testing-utils";
+import { render, screen } from "@/test-utils";
 
 function findComboboxByAriaLabel(label: string): HTMLElement | undefined {
   return screen.getAllByRole("combobox").find((el) => {

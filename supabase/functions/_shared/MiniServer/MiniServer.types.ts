@@ -13,19 +13,22 @@ import type { AnyZodType } from "@sbfn/_shared/MiniServer/createServerRouteHandl
 import type { ValidPathParamsSchema } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { User } from "npm:@supabase/supabase-js@2";
-import type { infer as ZodInfer, ZodObject, ZodType } from "npm:zod@4";
+import type { z } from "npm:zod@4";
 
 export type ValidBodySchema = AnyZodType | Record<string, AnyZodType>;
 export type InferBody<T extends ValidBodySchema> =
-  T extends AnyZodType ? ZodInfer<T>
-  : {
-      [K in keyof T]: ZodInfer<T[K]>;
-    };
+  T extends AnyZodType ? z.infer<T>
+  : MakeOptionalIfUndefined<{
+      [K in keyof T]: z.infer<T[K]>;
+    }>;
 /**
- * A valid query value schema must always be a string input (or null/undefined)
- * but it can be transformed to any type.
+ * A valid query param schema expects a string | null | undefined input.
+ * It allows any output type.
  */
-type QueryParamValueSchema<T> = ZodType<T, string | null | undefined>;
+export type ValidQueryParamValueSchema = z.ZodType<
+  unknown,
+  string | null | undefined
+>;
 
 export type MakeOptionalIfUndefined<T> = {
   [K in keyof T as undefined extends T[K] ? K : never]?: T[K];
@@ -34,21 +37,41 @@ export type MakeOptionalIfUndefined<T> = {
 };
 
 export type ValidQueryParams = UnknownRecord;
-
 export type URLPathWithoutParams<Path extends URLPathPattern> =
   Path extends `${string}:${string}` ? never : Path;
 
-export type QueryParamsSchemaShape<QueryParams extends ValidQueryParams> =
-  MakeOptionalIfUndefined<{
-    [K in keyof QueryParams]: QueryParamValueSchema<QueryParams[K]>;
-  }>;
+export type ValidQueryParamsSchemaShape<
+  QueryParams extends ValidQueryParams | undefined,
+> =
+  QueryParams extends ValidQueryParams ?
+    MakeOptionalIfUndefined<{
+      [K in keyof QueryParams]: ValidQueryParamValueSchema;
+    }>
+  : Record<string, ValidQueryParamValueSchema>;
 
 export type QueryParamsSchema<
   QueryParams extends ValidQueryParams | undefined,
 > =
   QueryParams extends ValidQueryParams ?
-    ZodObject<QueryParamsSchemaShape<QueryParams>>
+    z.ZodObject<ValidQueryParamsSchemaShape<QueryParams>>
   : undefined;
+
+/**
+ * Query params inferred from a route `.querySchema()` shape.
+ * Uses each schema's input type to detect optional query params (input allows
+ * undefined) and widen the handler param type accordingly.
+ */
+export type InferredRouteQueryParams<
+  SchemaShape extends Record<string, ValidQueryParamValueSchema>,
+> = MakeOptionalIfUndefined<{
+  [K in keyof SchemaShape]: SchemaShape[K] extends (
+    z.ZodType<infer Output, infer Input>
+  ) ?
+    undefined extends Input ?
+      Output | undefined
+    : Output
+  : never;
+}>;
 
 /**
  * These are the parameters that will get passed into an HTTP handler
@@ -160,7 +183,7 @@ export type ServerRouteHandler<
      * default to `z.record(z.string(), z.never())` (i.e. an empty record).
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    bodySchema: ZodType<Body, any>;
+    bodySchema: z.ZodType<Body, any>;
 
     /**
      * This should only be set to `true` if the edge function has JWT
@@ -184,7 +207,7 @@ export type ServerRouteHandler<
   >;
 
   querySchema: <
-    NewQueryParamsSchemaShape extends QueryParamsSchemaShape<ValidQueryParams>,
+    NewQueryParamsSchemaShape extends ValidQueryParamsSchemaShape<QueryParams>,
   >(
     queryParamsSchemaShape: NewQueryParamsSchemaShape,
   ) => ServerRouteHandler<
@@ -192,7 +215,7 @@ export type ServerRouteHandler<
     Path,
     ReturnType,
     PathParams,
-    MakeOptionalIfUndefined<ZodInfer<ZodObject<NewQueryParamsSchemaShape>>>,
+    InferredRouteQueryParams<NewQueryParamsSchemaShape>,
     Body,
     IsJWTVerificationDisabled
   >;

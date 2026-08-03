@@ -7,6 +7,7 @@
  */
 export {
   act,
+  cleanup,
   fireEvent,
   renderHook,
   screen,

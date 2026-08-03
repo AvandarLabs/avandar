@@ -1,4 +1,5 @@
 import { useAui } from "@assistant-ui/react";
+import { useLingui } from "@lingui/react/macro";
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
@@ -6,6 +7,8 @@ import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
+import { writeStoredLocalChatModelId } from "@/lib/offlineChat/localChatModelStore";
+import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
 import css from "./ChatModelPicker.module.css";
 
 type Props = {
@@ -20,9 +23,15 @@ type Props = {
 export function ChatModelPicker({
   disabled = false,
 }: Props): JSX.Element | null {
-  const { groups, models, isLoading, isError } = useChatModelCatalog();
-  const [selectedModelId, setSelectedModelId] = useState<string | undefined>();
+  const { groups, models, isLoading, isError, hasDownloadedOfflineModels } =
+    useChatModelCatalog();
+  const [selectedModelId, setSelectedModelId] = useState<string | undefined>(
+    () => {
+      return ChatModelStorage.readStoredChatModelId();
+    },
+  );
   const [search, setSearch] = useState("");
+  const { t } = useLingui();
   const assistantClient = useAui();
 
   const combobox = useCombobox({
@@ -36,24 +45,49 @@ export function ChatModelPicker({
     },
   });
 
-  const resolvedModelId =
-    models.length === 0 ?
-      selectedModelId
-    : ChatModelStorage.resolveChatModelId({
-        availableModels: models,
-        selectedModelId,
-      });
+  const resolvedModelId = useMemo(() => {
+    if (models.length === 0) {
+      return selectedModelId;
+    }
+    const storedMissingFromCatalog =
+      selectedModelId !== undefined &&
+      !models.some(propEq("id", selectedModelId));
+    return ChatModelStorage.resolveChatModelId({
+      availableModels: models,
+      selectedModelId,
+      honorStoredWhenMissing: isLoading && storedMissingFromCatalog,
+    });
+  }, [models, selectedModelId, isLoading]);
 
-  const selectedModel =
-    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
+  useEffect(() => {
+    if (!resolvedModelId) {
+      return;
+    }
+    const localModelId = parseOfflineChatPickerModelId(resolvedModelId);
+    if (localModelId) {
+      writeStoredLocalChatModelId(localModelId);
+    }
+  }, [resolvedModelId]);
 
   useEffect(
     function writeResolvedModelIdToStorage() {
-      if (resolvedModelId) {
-        ChatModelStorage.writeStoredChatModelId(resolvedModelId);
+      if (!resolvedModelId) {
+        return;
       }
+      const storedModelId = ChatModelStorage.readStoredChatModelId();
+      if (
+        isLoading &&
+        storedModelId &&
+        !models.some(propEq("id", storedModelId))
+      ) {
+        return;
+      }
+      if (storedModelId === resolvedModelId) {
+        return;
+      }
+      ChatModelStorage.writeStoredChatModelId(resolvedModelId);
     },
-    [resolvedModelId],
+    [resolvedModelId, models, isLoading],
   );
 
   // Register the resolved model id with assistant-ui's ModelContext so the
@@ -74,6 +108,9 @@ export function ChatModelPicker({
     },
     [assistantClient, resolvedModelId],
   );
+
+  const selectedModel =
+    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
 
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -100,13 +137,14 @@ export function ChatModelPicker({
   }, [groups, search]);
 
   const tooltipLabel =
-    isLoading ? "Loading models..."
-    : selectedModel ? `Using ${selectedModel.name}`
-    : "Choose a model";
+    isLoading ? t`Loading models...`
+    : selectedModel ? t`Using ${selectedModel.name}`
+    : t`Choose a model`;
 
-  const isTriggerDisabled = disabled || isLoading || !resolvedModelId;
+  const isTriggerDisabled =
+    disabled || (isLoading && !hasDownloadedOfflineModels) || !resolvedModelId;
 
-  if (isError) {
+  if (isError && !hasDownloadedOfflineModels) {
     return null;
   }
 
@@ -131,60 +169,62 @@ export function ChatModelPicker({
             size="compact-sm"
             className={css.trigger}
             disabled={isTriggerDisabled}
-            aria-label="Choose chat model"
+            aria-label={t`Choose chat model`}
             onClick={() => {
               combobox.toggleDropdown();
             }}
           >
-            {selectedModel?.nameWithoutProvider ?? "Model"}
+            {selectedModel?.nameWithoutProvider ?? t`Model`}
           </Button>
         </Combobox.Target>
       </Tooltip>
 
-      <Combobox.Dropdown className={css.dropdown}>
-        <Combobox.Search
-          value={search}
-          onChange={(event) => {
-            setSearch(event.currentTarget.value);
-            combobox.updateSelectedOptionIndex();
-          }}
-          placeholder="Search models"
-          aria-label="Search models"
-        />
-        <Combobox.Options className={css.options}>
-          {filteredGroups.length > 0 ?
-            filteredGroups.map((entry) => {
-              return (
-                <Combobox.Group label={entry.group} key={entry.group}>
-                  {entry.models.map((model) => {
-                    const isSelected = model.id === resolvedModelId;
-                    return (
-                      <Combobox.Option
-                        value={model.id}
-                        key={model.id}
-                        active={isSelected}
-                      >
-                        <Group gap="xs" wrap="nowrap" justify="space-between">
-                          <Text size="sm" className={css.optionLabel}>
-                            {model.name}
-                          </Text>
-                          {isSelected ?
-                            <IconCheck
-                              size={14}
-                              className={css.selectedIcon}
-                              aria-hidden
-                            />
-                          : null}
-                        </Group>
-                      </Combobox.Option>
-                    );
-                  })}
-                </Combobox.Group>
-              );
-            })
-          : <Combobox.Empty>No models match your search</Combobox.Empty>}
-        </Combobox.Options>
-      </Combobox.Dropdown>
+      {combobox.dropdownOpened ?
+        <Combobox.Dropdown className={css.dropdown}>
+          <Combobox.Search
+            value={search}
+            onChange={(event) => {
+              setSearch(event.currentTarget.value);
+              combobox.updateSelectedOptionIndex();
+            }}
+            placeholder={t`Search models`}
+            aria-label={t`Search models`}
+          />
+          <Combobox.Options className={css.options}>
+            {filteredGroups.length > 0 ?
+              filteredGroups.map((entry) => {
+                return (
+                  <Combobox.Group label={entry.group} key={entry.group}>
+                    {entry.models.map((model) => {
+                      const isSelected = model.id === resolvedModelId;
+                      return (
+                        <Combobox.Option
+                          value={model.id}
+                          key={model.id}
+                          active={isSelected}
+                        >
+                          <Group gap="xs" wrap="nowrap" justify="space-between">
+                            <Text size="sm" className={css.optionLabel}>
+                              {model.name}
+                            </Text>
+                            {isSelected ?
+                              <IconCheck
+                                size={14}
+                                className={css.selectedIcon}
+                                aria-hidden
+                              />
+                            : null}
+                          </Group>
+                        </Combobox.Option>
+                      );
+                    })}
+                  </Combobox.Group>
+                );
+              })
+            : <Combobox.Empty>{t`No models match your search`}</Combobox.Empty>}
+          </Combobox.Options>
+        </Combobox.Dropdown>
+      : null}
     </Combobox>
   );
 }

@@ -1,4 +1,5 @@
-import { notifyError, notifySuccess, InputTextForm  } from "@ui";
+import { useLingui } from "@lingui/react/macro";
+import { InputTextForm, notifyError, notifySuccess } from "@ui";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -7,13 +8,14 @@ type Props = {
 };
 
 export function EditDatasetView({ dataset }: Props): JSX.Element {
+  const { t } = useLingui();
   const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset updated successfully!");
+      notifySuccess(t`Dataset updated successfully!`);
     },
     onError: (err) => {
-      notifyError("There was an error on update: " + err.message);
+      notifyError(t`There was an error on update: ${err.message}`);
     },
   });
 
@@ -26,7 +28,7 @@ export function EditDatasetView({ dataset }: Props): JSX.Element {
       minLength={2}
       inputWidth={300}
       showSubmitButton
-      submitButtonLabel="Save"
+      submitButtonLabel={t`Save`}
       isSubmitting={isUpdatePending}
       onSubmit={(newName) => {
         return updateDataset({

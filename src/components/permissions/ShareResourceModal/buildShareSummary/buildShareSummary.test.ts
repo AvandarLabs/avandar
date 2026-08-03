@@ -4,6 +4,10 @@ import type { SummarySpan } from "./buildShareSummary";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
+// `buildShareSummary` uses the global `t` macro from `@lingui/core/macro`
+// internally, which reads from the active Lingui i18n singleton. The vitest
+// setup (`tests/vitest.setup.ts`) activates an empty English catalog, so
+// `t._({id, message})` calls return the source `message` here.
 const baseLookups = {
   workspaceName: "Avandar Labs",
   resourceType: "dataset" as const,

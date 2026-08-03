@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { Permissions } from "$/models/Permissions/Permissions";
@@ -8,10 +9,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import { AvaField } from "@/components/forms/AvaForm/AvaField";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
+import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type {
   BuiltinPresetType,
   UserAppRolesMatrix,
@@ -24,6 +25,7 @@ export type WorkspaceInviteModalFieldsRef = {
     tagIds: string[];
   };
   validate: () => boolean;
+  notifyModalOpened: () => void;
 };
 
 type Props = {
@@ -43,6 +45,7 @@ export const WorkspaceInviteModalFields = forwardRef<
   { featurePlanType, userGroups, userGroupsLoading, onPressEnter }: Props,
   ref: ForwardedRef<WorkspaceInviteModalFieldsRef>,
 ): JSX.Element {
+  const { t } = useLingui();
   const innerFormRef = useRef<AvaFormRef<{ email: string }>>(null);
   const [rolesMatrix, setROlesMatrix] = useState<UserAppRolesMatrix>(
     Permissions.RolesMatrix.roleMatrixFromPresetType("global_viewer"),
@@ -50,6 +53,7 @@ export const WorkspaceInviteModalFields = forwardRef<
   const [builtinPresetType, setBuiltinPresetType] =
     useState<BuiltinPresetType>("global_viewer");
   const [tagIds, setTagIds] = useState<string[]>([]);
+  const [segmentedControlKey, setSegmentedControlKey] = useState(0);
 
   useImperativeHandle(ref, (): WorkspaceInviteModalFieldsRef => {
     return {
@@ -63,16 +67,23 @@ export const WorkspaceInviteModalFields = forwardRef<
         }
         return !innerFormRef.current.getForm().validate().hasErrors;
       },
+      notifyModalOpened: () => {
+        setSegmentedControlKey((k) => {
+          return k + 1;
+        });
+      },
     };
   });
 
   return (
     <Stack>
       <Text size="sm" c="dimmed">
-        Type or paste an email below.
         {featurePlanType !== "free" ?
-          " Your workspace will be billed per member."
-        : null}
+          <Trans>
+            Type or paste an email below. Your workspace will be billed per
+            member.
+          </Trans>
+        : <Trans>Type or paste an email below.</Trans>}
       </Text>
       <AvaForm
         ref={innerFormRef}
@@ -81,7 +92,7 @@ export const WorkspaceInviteModalFields = forwardRef<
           email: AvaField.email({
             key: "email",
             initialValue: "",
-            label: "Email address",
+            label: t`Email address`,
           }),
         }}
         formElements={["email"]}
@@ -96,6 +107,7 @@ export const WorkspaceInviteModalFields = forwardRef<
         ])}
       />
       <WorkspaceAppRoleMatrixForm
+        key={segmentedControlKey}
         rolesMatrix={rolesMatrix}
         onRolesMatrixChange={(next) => {
           setROlesMatrix(next);
@@ -109,8 +121,8 @@ export const WorkspaceInviteModalFields = forwardRef<
         }}
       />
       <MultiSelect
-        label="Tags for invitee"
-        placeholder="Optional"
+        label={t`User groups for invitee`}
+        placeholder={t`Optional`}
         data={userGroups.map((g) => {
           return { value: g.id, label: g.name };
         })}

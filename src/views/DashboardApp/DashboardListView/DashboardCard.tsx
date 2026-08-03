@@ -1,16 +1,25 @@
-import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { mantineColorVar } from "@ui";
 import { useState } from "react";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
+type DashboardOfflineStatus = "full" | "partial" | "none";
+
 type Props = {
   dashboard: Dashboard.T;
+  offlineStatus?: DashboardOfflineStatus;
   onClick?: () => void;
 };
 
-export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
+export function DashboardCard({
+  dashboard,
+  offlineStatus = "none",
+  onClick,
+}: Props): JSX.Element {
+  const { t } = useLingui();
   const [isHovered, setIsHovered] = useState(false);
 
   const onMouseEnter = () => {
@@ -55,15 +64,29 @@ export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
                 {dashboard.name}
               </Text>
               <Text c="dimmed" size="sm" lineClamp={2}>
-                {dashboard.description ?? "No description has been added yet."}
+                {dashboard.description ?? (
+                  <Trans>No description has been added yet.</Trans>
+                )}
               </Text>
             </Stack>
           </Group>
         </Group>
 
-        <Text c="dimmed" size="xs">
-          Updated {formatDashboardDate(dashboard.updatedAt)}
-        </Text>
+        <Group gap="xs">
+          {offlineStatus === "full" ?
+            <Badge size="xs" color="teal" variant="light">
+              <Trans>Offline ready</Trans>
+            </Badge>
+          : null}
+          {offlineStatus === "partial" ?
+            <Badge size="xs" color="yellow" variant="light">
+              <Trans>Partially offline</Trans>
+            </Badge>
+          : null}
+          <Text c="dimmed" size="xs">
+            <Trans>Updated {formatDashboardDate(dashboard.updatedAt, t)}</Trans>
+          </Text>
+        </Group>
       </Stack>
     </Card>
   );

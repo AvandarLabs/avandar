@@ -102,19 +102,34 @@ if ! command -v concurrently &> /dev/null; then
   exit 1
 fi
 
-# Check if ngrok is available
+# Check if ngrok is available. Ngrok is only needed for webhooks
+# (Supabase edge functions called from third parties). The frontend and
+# Supabase functions run fine without it; print a warning and skip the
+# tunnel rather than blocking startup.
+NGROK_AVAILABLE=true
 if ! command -v ngrok &> /dev/null; then
-  echo -e "${RED}Error: ngrok is not installed${NC}"
-  echo -e "${YELLOW}Please install ngrok: https://ngrok.com/download${NC}"
-  exit 1
+  echo -e "${YELLOW}Warning: ngrok is not installed; skipping reverse-proxy tunnel.${NC}"
+  echo -e "${YELLOW}Webhook-driven flows (Supabase edge functions triggered by third parties) will not work locally.${NC}"
+  echo -e "${YELLOW}Install ngrok if you need them: https://ngrok.com/download${NC}"
+  NGROK_AVAILABLE=false
 fi
 
 # Run all processes concurrently with clean output
-concurrently \
-  --names "vite,functions,ngrok" \
-  --prefix-colors "blue,green,yellow" \
-  --prefix "{name}" \
-  --kill-others-on-fail \
-  "vite" \
-  "pnpm fns:serve" \
-  "$NGROK_COMMAND"
+if [ "$NGROK_AVAILABLE" = true ]; then
+  concurrently \
+    --names "vite,functions,ngrok" \
+    --prefix-colors "blue,green,yellow" \
+    --prefix "{name}" \
+    --kill-others-on-fail \
+    "vite --host 127.0.0.1 --port 5173" \
+    "pnpm fns:serve" \
+    "$NGROK_COMMAND"
+else
+  concurrently \
+    --names "vite,functions" \
+    --prefix-colors "blue,green" \
+    --prefix "{name}" \
+    --kill-others-on-fail \
+    "vite --host 127.0.0.1 --port 5173" \
+    "pnpm fns:serve"
+fi

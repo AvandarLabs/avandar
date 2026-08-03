@@ -1,5 +1,5 @@
+import { useLingui } from "@lingui/react/macro";
 import { SegmentedControlItem } from "@mantine/core";
-import { prop } from "@utils";
 import {
   BasicPlanConfig,
   FreePlanConfig,
@@ -22,26 +22,37 @@ import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.t
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];
 
-export const FREE_CHOICES = [
-  { value: "custom", label: "Pay what you want" },
-  { value: "free", label: "Free" },
-] as const satisfies SegmentedControlItem[];
+const FREE_CHOICE_VALUES = ["custom", "free"] as const;
+const PAID_CHOICE_VALUES = ["year", "month"] as const;
 
-export const PAID_CHOICES = [
-  { value: "year", label: "Pay yearly" },
-  { value: "month", label: "Pay monthly" },
-] as const satisfies SegmentedControlItem[];
+/** Localized free-plan variant choices for the segmented control. */
+export function useFreeChoices(): readonly SegmentedControlItem[] {
+  const { t } = useLingui();
+  return [
+    { value: "custom", label: t`Pay what you want` },
+    { value: "free", label: t`Free` },
+  ];
+}
+
+/** Localized paid-plan variant choices for the segmented control. */
+export function usePaidChoices(): readonly SegmentedControlItem[] {
+  const { t } = useLingui();
+  return [
+    { value: "year", label: t`Pay yearly` },
+    { value: "month", label: t`Pay monthly` },
+  ];
+}
 
 export function isValidFreePlanVariant(
   choice: string,
 ): choice is FreePlanVariants {
-  return isOneOf(choice, FREE_CHOICES.map(prop("value")));
+  return isOneOf(choice, FREE_CHOICE_VALUES);
 }
 
 export function isValidPaidPlanVariant(
   choice: string,
 ): choice is PaidPlanVariants {
-  return isOneOf(choice, PAID_CHOICES.map(prop("value")));
+  return isOneOf(choice, PAID_CHOICE_VALUES);
 }
 
 /**
@@ -153,8 +164,8 @@ export function makeSubscriptionPlanFromPolarProduct(
     return undefined;
   }
 
-  // Free plans are native (no Polar checkout) so we don't need a Polar price
-  // to render the Free card. Polar has deprecated
+  // Free plans are native (no Polar checkout) so we don't need a Polar
+  // price to render the Free card. Polar has deprecated
   // `LegacyRecurringProductPriceFree` and now ships some free recurring
   // products without any price object, which would otherwise cause the
   // product to be dropped below.

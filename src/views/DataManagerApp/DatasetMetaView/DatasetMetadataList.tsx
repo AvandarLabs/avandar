@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Model } from "@models";
 import { FloatingLoader, notifySuccess, ObjectDescriptionList } from "@ui";
 import { assertIsDefined, matchLiteral, where } from "@utils";
@@ -42,59 +43,65 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "dateOfLastSync",
 ] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
 
-const DATASET_METADATA_RENDER_OPTIONS = {
-  createdAt: {
-    renderAsType: "date",
-  },
-  updatedAt: {
-    renderAsType: "date",
-  },
-  sourceType: {
-    renderValue: (value) => {
-      return matchLiteral(value, {
-        csv_file: "CSV file",
-        google_sheets: "Google Sheets",
-        open_data: "Open Data",
-        virtual: "Derived Dataset",
-        xlsx_file: "Excel file",
-        _otherwise: value,
-      });
+// eslint-disable-next-line max-len
+function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
+  const { t } = useLingui();
+  return {
+    createdAt: {
+      renderAsType: "date",
     },
-  },
-  columns: {
-    renderAsTable: true,
-    maxHeight: 400,
-    editable: true,
-    itemRenderOptions: {
-      keyRenderOptions: {
-        description: {
-          renderAsType: "text",
-        },
-        createdAt: {
-          renderAsType: "date",
-        },
-        dataType: {
-          renderAsType: {
-            type: "text",
-            choices: AvaDataType.Types.map((type) => {
-              return {
-                value: type,
-                label: AvaDataType.toDisplayValue(type),
-              };
-            }),
-          },
-          renderValue: AvaDataType.toDisplayValue,
-        },
+    updatedAt: {
+      renderAsType: "date",
+    },
+    sourceType: {
+      renderValue: (value) => {
+        return matchLiteral(value, {
+          csv_file: t`CSV file`,
+          google_sheets: t`Google Sheets`,
+          open_data: t`Open Data`,
+          virtual: t`Derived Dataset`,
+          xlsx_file: t`Excel file`,
+          _otherwise: value,
+        });
       },
-      includeKeys: ["name", "dataType", "description"],
     },
-  },
-  source: {
-    excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
-  },
-} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
+    columns: {
+      renderAsTable: true,
+      maxHeight: 400,
+      editable: true,
+      itemRenderOptions: {
+        keyRenderOptions: {
+          description: {
+            renderAsType: "text",
+          },
+          createdAt: {
+            renderAsType: "date",
+          },
+          dataType: {
+            renderAsType: {
+              type: "text",
+              choices: AvaDataType.Types.map((type) => {
+                return {
+                  value: type,
+                  label: AvaDataType.toDisplayValue(type),
+                };
+              }),
+            },
+            renderValue: AvaDataType.toDisplayValue,
+          },
+        },
+        includeKeys: ["name", "dataType", "description"],
+      },
+    },
+    source: {
+      excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
+    },
+  } satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
+}
 
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
+  const { t } = useLingui();
+  const datasetMetadataRenderOptions = useDatasetMetadataRenderOptions();
   const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
@@ -108,7 +115,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         [DatasetQueryClient.getClientName()],
       ],
       onSuccess: () => {
-        notifySuccess("Column description updated successfully!");
+        notifySuccess(t`Column description updated successfully!`);
 
         // drop the local column data so it can be re-materialized when the
         // dataset is next loaded. No need to await this promise though.
@@ -123,7 +130,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         dateFormat="MMMM D, YYYY"
         includeKeys={["updatedAt", "sourceType", "..."]}
         excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-        keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
+        keyRenderOptions={datasetMetadataRenderOptions}
         onSubmitChange={async (value) => {
           if (Model.isOfModelType(value, "DatasetColumn")) {
             const datasetColumn = value as DatasetColumn.T;
@@ -169,7 +176,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
       />
       <FloatingLoader
         visible={isUpdatingDatasetColumn}
-        label="Updating dataset"
+        label={t`Updating dataset`}
       />
     </>
   );

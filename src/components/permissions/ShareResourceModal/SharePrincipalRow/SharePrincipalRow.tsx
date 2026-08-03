@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Badge,
@@ -8,18 +9,17 @@ import {
 } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { appForResource, appLabel, SHARE_COPY } from "../shareCopy";
+import {
+  appForResource,
+  appLabel,
+  resourceTypeLabel,
+  useShareCopy,
+} from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-
-const ROLE_OPTIONS: Array<{ value: RoleLevel; label: string }> = [
-  { value: "viewer", label: "Viewer" },
-  { value: "editor", label: "Editor" },
-  { value: "admin", label: "Admin" },
-];
 
 type Props = {
   share: ResourceShareRow;
@@ -45,9 +45,17 @@ export function SharePrincipalRow({
   onToggleRequiresAppAccess,
   onRemove,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const shareCopy = useShareCopy();
   const isGroup = share.principalType === "user_group";
   const app = appLabel(appForResource(resourceType));
-  const resource = resourceType === "dashboard" ? "dashboard" : "dataset";
+  const resource = resourceTypeLabel(resourceType);
+
+  const roleOptions: Array<{ value: RoleLevel; label: string }> = [
+    { value: "viewer", label: t`Viewer` },
+    { value: "editor", label: t`Editor` },
+    { value: "admin", label: t`Admin` },
+  ];
 
   return (
     <Group wrap="nowrap" align="center" gap="sm">
@@ -59,15 +67,15 @@ export function SharePrincipalRow({
       </Text>
 
       {isOwnerRow ?
-        <Tooltip label={SHARE_COPY.ownerBadgeTooltip(resource)}>
+        <Tooltip label={shareCopy.ownerBadgeTooltip(resource)}>
           <Badge variant="light" color="gray" tabIndex={0}>
-            Owner
+            <Trans>Owner</Trans>
           </Badge>
         </Tooltip>
-      : <Tooltip label={SHARE_COPY.roleSelectTooltip}>
+      : <Tooltip label={shareCopy.roleSelectTooltip}>
           <Select
             w={120}
-            data={ROLE_OPTIONS}
+            data={roleOptions}
             value={share.role}
             allowDeselect={false}
             onChange={(value) => {
@@ -75,14 +83,14 @@ export function SharePrincipalRow({
                 onRoleChange(value as RoleLevel);
               }
             }}
-            aria-label={`Role for ${displayName}`}
+            aria-label={t`Role for ${displayName}`}
           />
         </Tooltip>
       }
 
       {isGroup && !isOwnerRow && onToggleRequiresAppAccess ?
         <Tooltip
-          label={SHARE_COPY.limitToAppAccessTooltip(app)}
+          label={shareCopy.limitToAppAccessTooltip(app)}
           multiline
           w={320}
         >
@@ -91,20 +99,20 @@ export function SharePrincipalRow({
             onChange={(event) => {
               onToggleRequiresAppAccess(event.currentTarget.checked);
             }}
-            label="Limit to app access"
+            label={t`Limit to app access`}
             size="sm"
-            aria-label={`Limit ${displayName} to app access`}
+            aria-label={t`Limit ${displayName} to app access`}
           />
         </Tooltip>
       : null}
 
       {!isOwnerRow ?
-        <Tooltip label={SHARE_COPY.removeTooltip(displayName)}>
+        <Tooltip label={shareCopy.removeTooltip(displayName)}>
           <ActionIcon
             variant="subtle"
             color="gray"
             onClick={onRemove}
-            aria-label={`Remove access for ${displayName}`}
+            aria-label={t`Remove access for ${displayName}`}
           >
             <IconX size={16} />
           </ActionIcon>

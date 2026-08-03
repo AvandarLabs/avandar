@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Drawer, Flex, Stack, Text } from "@mantine/core";
 
 type Props = {
@@ -11,13 +12,14 @@ export function GeometryDrawer({
   onClose,
   feature,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const properties = feature?.properties ?? {};
 
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
-      title="Data Point"
+      title={t`Data Point`}
       position="right"
       withOverlay={false}
       closeOnClickOutside={false}
@@ -47,7 +49,7 @@ export function GeometryDrawer({
                 {key}:
               </Text>
               <Text size="sm" fw={500}>
-                {value != null ? String(value) : "N/A"}
+                {value != null ? String(value) : t`N/A`}
               </Text>
             </Flex>
           );

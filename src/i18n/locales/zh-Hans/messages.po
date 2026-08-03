@@ -14,12 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "Changes to your payment method can be made in your"
-#~ msgstr "您可以在您的支付方式中进行更改"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What is the average value in {name}?"
-#~ msgstr "{name} 的平均值是多少？"
+msgid "Changes to your payment method can be made in your"
+msgstr "您可以在您的支付方式中进行更改"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
@@ -27,8 +23,8 @@ msgid "Close chat panel"
 msgstr "关闭聊天面板"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "ID field is required"
-#~ msgstr "ID 字段是必填项"
+msgid "ID field is required"
+msgstr "ID 字段是必填项"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
@@ -37,7 +33,7 @@ msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法�
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
-msgstr ""
+msgstr "返回在线以查看或使页面可离线使用。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -48,17 +44,17 @@ msgid "Sort by"
 msgstr "排序方式"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Remove field"
-#~ msgstr "移除字段"
+msgid "Remove field"
+msgstr "移除字段"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Dashboard name"
 msgstr "仪表板名称"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "This will allow the dataset to be stored online so it can be accessed in "
-#~ "other devices."
-#~ msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
+msgid "This will allow the dataset to be stored online so it can be accessed in "
+"other devices."
+msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Run a query to see results."
@@ -77,47 +73,43 @@ msgstr "打开数据集"
 msgid "Value column"
 msgstr "值列"
 
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "There are no queried numeric fields"
-#~ msgstr "没有查询到数字字段"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Monthly"
-#~ msgstr "每月"
+msgid "Monthly"
+msgstr "每月"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Remove access for {name}."
-#~ msgstr "移除 {name} 的访问权限。"
+msgid "Remove access for {name}."
+msgstr "移除 {name} 的访问权限。"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Check your email for a password reset link"
-#~ msgstr "检查您的电子邮件以获取密码重置链接"
+msgid "Check your email for a password reset link"
+msgstr "检查您的电子邮件以获取密码重置链接"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Invite member"
-#~ msgstr "邀请成员"
+msgid "Invite member"
+msgstr "邀请成员"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
-#~ msgid "Or {0} to be notified when our public launch is ready."
-#~ msgstr "或 {0} 以在我们的公开发布准备好时收到通知。"
+msgid "Or {0} to be notified when our public launch is ready."
+msgstr "或 {0} 以在我们的公开发布准备好时收到通知。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
-#~ msgstr ""
+#~ msgstr "按 {pickedGroupBy} 统计 {datasetName} 中的行数"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "搜索数据集..."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
-#~ msgid "The dataset failed to load. Please try again later or reach out to "
-#~ "support."
-#~ msgstr "数据集加载失败。请稍后再试或联系支持。"
+msgid "The dataset failed to load. Please try again later or reach out to "
+"support."
+msgstr "数据集加载失败。请稍后再试或联系支持。"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Choose chat model"
-#~ msgstr "选择聊天模型"
+msgid "Choose chat model"
+msgstr "选择聊天模型"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
@@ -127,17 +119,13 @@ msgstr "最近的"
 msgid "PII detected:"
 msgstr "检测到个人身份信息："
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} downloaded. Tap the mic to start dictating."
-#~ msgstr "{0} 已下载。点击麦克风开始口述。"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Title field is required"
-#~ msgstr "标题字段是必填项"
+msgid "Title field is required"
+msgstr "标题字段是必填项"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Invite a member"
-#~ msgstr "邀请一位成员"
+msgid "Invite a member"
+msgstr "邀请一位成员"
 
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Ask Avandar"
@@ -151,22 +139,22 @@ msgstr "加载文件时发生错误"
 msgid "Source URL"
 msgstr "源 URL"
 
-#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#~ msgid "Type"
-#~ msgstr "类型"
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " access"
+msgstr "访问"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
-msgstr ""
+msgstr "无法显示 {chartName}。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Allow online syncing"
-#~ msgstr "允许在线同步"
+msgid "Allow online syncing"
+msgstr "允许在线同步"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
-msgstr ""
+msgstr "图表设置"
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
@@ -175,13 +163,6 @@ msgstr "在此上下文中无法使用发现功能。"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "输入一个问题，我将生成 SQL 并在画布上运行。"
-
-#. placeholder {0}: modelToDownload.displayName
-#. placeholder {1}: modelToDownload.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} needs {1} and is not available in the browser. Pick Tiny or Base "
-#~ "here, or use a smaller RAM tier."
-#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -206,8 +187,8 @@ msgid "Row filters"
 msgstr "行过滤器"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Profile Description"
-#~ msgstr "个人资料描述"
+msgid "Profile Description"
+msgstr "个人资料描述"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -222,8 +203,8 @@ msgid "Avandar"
 msgstr "Avandar"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Please check your email for a confirmation link."
-#~ msgstr "请检查您的电子邮件以获取确认链接。"
+msgid "Please check your email for a confirmation link."
+msgstr "请检查您的电子邮件以获取确认链接。"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Expand"
@@ -239,30 +220,26 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 "actual values."
 msgstr ""
 
-#: src/views/SharedWithMeView/SharedDatasetSection/SharedDatasetSection.tsx
-#~ msgid "Datasets"
-#~ msgstr "数据集"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Custom role"
-#~ msgstr "自定义角色"
+msgid "Custom role"
+msgstr "自定义角色"
 
 #: src/routes/signin.tsx
-#~ msgid "Create account"
-#~ msgstr "创建账户"
+msgid "Create account"
+msgstr "创建账户"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
 msgstr "无法添加数据集"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Members still assigned to this group must be moved first."
-#~ msgstr "仍然分配给此组的成员必须先被移动。"
+msgid "Members still assigned to this group must be moved first."
+msgstr "仍然分配给此组的成员必须先被移动。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "Delete failed"
-#~ msgstr "删除失败"
+msgid "Delete failed"
+msgstr "删除失败"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -273,13 +250,13 @@ msgid "Aggregations"
 msgstr "聚合"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
-#~ msgid "No"
-#~ msgstr "否"
+msgid "No"
+msgstr "否"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Select a field"
-#~ msgstr "选择一个字段"
+msgid "Select a field"
+msgstr "选择一个字段"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -292,22 +269,26 @@ msgstr "保存并重新运行查询"
 
 #. placeholder {0}: updated.displayName
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Saved as \"{0}\"."
-#~ msgstr "已保存为 \"{0}\"。"
+msgid "Saved as \"{0}\"."
+msgstr "已保存为 \"{0}\"。"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From Excel"
-#~ msgstr "来自 Excel"
+msgid "From Excel"
+msgstr "来自 Excel"
 
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Unknown error"
 msgstr "未知错误"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Add a line chart showing trends in {datasetName} over time"
-#~ msgstr ""
+#~ msgstr "添加一条显示 {datasetName} 随时间变化趋势的折线图"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/views/DataManagerApp/DataManagerApp.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "数据源"
 
@@ -316,8 +297,8 @@ msgid "Export annotated PDF"
 msgstr "导出带注释的 PDF"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Offline chat model"
-#~ msgstr ""
+msgid "Offline chat model"
+msgstr "离线聊天模型"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
@@ -338,27 +319,27 @@ msgstr "导出 CSV"
 
 #: src/components/AppDropzone/ImportConfirmBody.tsx
 msgid "Do you want to import \"{fileName}\" as a new dataset?"
-msgstr ""
+msgstr "您想将 \"{fileName}\" 导入为新数据集吗？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "For more control over your subscription, you can manage your "
-#~ "subscription in your"
-#~ msgstr "要更好地控制您的订阅，您可以在您的订阅中进行管理"
+msgid "For more control over your subscription, you can manage your "
+"subscription in your"
+msgstr "要更好地控制您的订阅，您可以在您的订阅中进行管理"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
-#~ msgid "Free"
-#~ msgstr "免费"
+msgid "Free"
+msgstr "免费"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "The table visualization has no extra settings."
 msgstr "表格可视化没有额外设置。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "About you"
-#~ msgstr "关于您"
+msgid "About you"
+msgstr "关于您"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -376,7 +357,7 @@ msgstr "在此工作区中，AI 所提出的每个澄清问题的本地记录。
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
-msgstr ""
+msgstr "无法显示 {chartName}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
@@ -387,18 +368,12 @@ msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} 行被拒绝"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Re-download"
-#~ msgstr ""
+msgid "Re-download"
+msgstr "重新下载"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Allow multiple values"
-#~ msgstr "允许多个值"
-
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. To increase the "
-#~ "number of datasets you can add to your workspace you can purchase more "
-#~ "seats. Each seat allows you to add 10 more datasets!"
-#~ msgstr ""
+msgid "Allow multiple values"
+msgstr "允许多个值"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -424,8 +399,8 @@ msgid "Add columns to the query above to start defining filters."
 msgstr "在上面的查询中添加列以开始定义过滤器。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Only allow one value"
-#~ msgstr "仅允许一个值"
+msgid "Only allow one value"
+msgstr "仅允许一个值"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
@@ -441,20 +416,17 @@ msgid "stddev"
 msgstr "标准差"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Get a count of how many values there are"
-#~ msgstr "获取值的数量"
+msgid "Get a count of how many values there are"
+msgstr "获取值的数量"
 
+#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "其他…"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Changing plan to {newPlanName} ({newPlanSubType})"
-#~ msgstr "正在更改计划为 {newPlanName} ({newPlanSubType})"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Waiting…"
-#~ msgstr "等待中…"
+msgid "Changing plan to {newPlanName} ({newPlanSubType})"
+msgstr "正在更改计划为 {newPlanName} ({newPlanSubType})"
 
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
@@ -462,8 +434,8 @@ msgstr "使用建议"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityManagerApp/EntityNavbar.tsx
-#~ msgid "{0} Manager"
-#~ msgstr "{0} 管理员"
+msgid "{0} Manager"
+msgstr "{0} 管理员"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -479,22 +451,23 @@ msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
 msgstr "数据浏览器和仪表板中已启用聊天。<0>打开数据浏览器</0>。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Role group updated"
-#~ msgstr "角色组已更新"
+msgid "Role group updated"
+msgstr "角色组已更新"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "No matches"
-#~ msgstr "没有匹配项"
+msgid "No matches"
+msgstr "没有匹配项"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Keep SQL as-is"
 msgstr "保持 SQL 不变"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Remove User"
-#~ msgstr "移除用户"
+msgid "Remove User"
+msgstr "移除用户"
 
-#. placeholder {0}: formatDashboardDate(dashboard.updatedAt)
+#. placeholder {0}: formatDashboardDate(dashboard.updatedAt, t)
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "已更新 {0}"
@@ -504,25 +477,25 @@ msgid "Request a data source connection via feedback"
 msgstr "通过反馈请求数据源连接"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "This dataset has no description."
-#~ msgstr "此数据集没有描述。"
+msgid "This dataset has no description."
+msgstr "此数据集没有描述。"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Password reset requires an internet connection."
-#~ msgstr ""
+msgid "Password reset requires an internet connection."
+msgstr "密码重置需要互联网连接。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Symbol size"
-#~ msgstr "符号大小"
+msgid "Symbol size"
+msgstr "符号大小"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
-#~ msgid "Updating password for {0}"
-#~ msgstr "正在更新 {0} 的密码"
+msgid "Updating password for {0}"
+msgstr "正在更新 {0} 的密码"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column info"
-#~ msgstr "列信息"
+msgid "Column info"
+msgstr "列信息"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
@@ -540,55 +513,43 @@ msgstr "我理解这些数据将发送给 AI 提供者"
 msgid "Saved datasets"
 msgstr "已保存的数据集"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Roles"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您无法在当前计划中添加更多数据集。升级以添加此目录数据集。"
 
 #: src/routes/register.tsx
-#~ msgid "Please check your email for a confirmation link. It may take a few "
-#~ "minutes to arrive."
-#~ msgstr "请检查您的电子邮件以获取确认链接。可能需要几分钟才能到达。"
+msgid "Please check your email for a confirmation link. It may take a few "
+"minutes to arrive."
+msgstr "请检查您的电子邮件以获取确认链接。可能需要几分钟才能到达。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Remove offline chat model?"
-#~ msgstr ""
+msgid "Remove offline chat model?"
+msgstr "删除离线聊天模型？"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Share “{resourceName}”"
-#~ msgstr "分享 “{resourceName}”"
+msgid "Share “{resourceName}”"
+msgstr "分享 “{resourceName}”"
 
 #: src/routes/signin.tsx
-#~ msgid "Sign in"
-#~ msgstr "登录"
+msgid "Sign in"
+msgstr "登录"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save as new dataset"
 msgstr "另存为新数据集"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From derived dataset"
-#~ msgstr "来自派生数据集"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model download failed"
-#~ msgstr "语音模型下载失败"
+msgid "From derived dataset"
+msgstr "来自派生数据集"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "单选"
 
-#: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
-#~ msgid "Processing — {eta} remaining"
-#~ msgstr "处理中 — 剩余 {eta}"
-
 #: src/routes/register.tsx
-#~ msgid "However, we are not allowing new registrations at the moment."
-#~ msgstr "但是，我们目前不允许新的注册。"
+msgid "However, we are not allowing new registrations at the moment."
+msgstr "但是，我们目前不允许新的注册。"
 
 #. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -601,16 +562,12 @@ msgstr "这是您数据集的前 {0} 行。检查数据是否正确。如果不�
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
-#~ msgid "This field cannot be empty"
-#~ msgstr "此字段不能为空"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Transcription language: {selectedLanguageLabel}"
-#~ msgstr ""
+msgid "This field cannot be empty"
+msgstr "此字段不能为空"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
-#~ msgid "Oops!"
-#~ msgstr "哎呀！"
+msgid "Oops!"
+msgstr "哎呀！"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Dataset saved."
@@ -620,6 +577,10 @@ msgstr "数据集已保存。"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "There are no numeric columns"
 msgstr "没有数字列"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " permission"
+msgstr "权限"
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
@@ -634,25 +595,26 @@ msgstr "发布仪表板"
 msgid "Container max width"
 msgstr "容器最大宽度"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
-#~ msgid "Close sidebar"
-#~ msgstr "关闭侧边栏"
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+msgid "Close sidebar"
+msgstr "关闭侧边栏"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Unable to delete the offline chat model from cache."
-#~ msgstr ""
+msgid "Unable to delete the offline chat model from cache."
+msgstr "无法从缓存中删除离线聊天模型。"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Unknown user"
-#~ msgstr "未知用户"
+msgid "Unknown user"
+msgstr "未知用户"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#~ msgid "Remove access for {displayName}"
-#~ msgstr "移除 {displayName} 的访问权限"
+msgid "Remove access for {displayName}"
+msgstr "移除 {displayName} 的访问权限"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Seat limit reached"
-#~ msgstr "达到座位限制"
+msgid "Seat limit reached"
+msgstr "达到座位限制"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
@@ -660,7 +622,7 @@ msgstr "管道"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
-msgstr ""
+msgstr "离线"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock.tsx
 msgid "These datasets are listed in your workspace, but their source data could "
@@ -669,24 +631,28 @@ msgid "These datasets are listed in your workspace, but their source data could 
 msgstr "这些数据集在您的工作区中列出，但其源数据在您的本地存储中找不到。要继续，您需要重新上传数据集或将其从工作区中删除。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Metadata"
-#~ msgstr "元数据"
+msgid "Metadata"
+msgstr "元数据"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
 msgstr "范围"
+
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+msgid "Enter email"
+msgstr "输入电子邮件"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Preset"
-#~ msgstr "预设"
+msgid "Preset"
+msgstr "预设"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-#~ msgstr ""
+#~ msgstr "添加按 {groupByColumn} 分组的 {datasetName} 的条形图"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -694,25 +660,25 @@ msgid "Permanently delete <0>{0}</0>?"
 msgstr "永久删除 <0>{0}</0> 吗？"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-#~ msgid "Welcome to your first workspace"
-#~ msgstr "欢迎来到您的第一个工作区"
+msgid "Welcome to your first workspace"
+msgstr "欢迎来到您的第一个工作区"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
-msgstr ""
+msgstr "已复制"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Add a member or a user group to grant access. Use General access below "
-#~ "to share more broadly."
-#~ msgstr "添加成员或用户组以授予访问权限。使用下面的通用访问以更广泛地分享。"
+msgid "Add a member or a user group to grant access. Use General access below "
+"to share more broadly."
+msgstr "添加成员或用户组以授予访问权限。使用下面的通用访问以更广泛地分享。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "添加到工作区"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Workspace Name"
-#~ msgstr "工作区名称"
+msgid "Workspace Name"
+msgstr "工作区名称"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard is published at:"
@@ -721,52 +687,43 @@ msgstr "您的仪表板已发布在："
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Name"
-#~ msgstr "名称"
+msgid "Name"
+msgstr "名称"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的问题包含可能会影响 AI 回答的语言。"
-
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. To "
-#~ "add more datasets, upgrade to a paid plan."
-#~ msgstr ""
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "关闭聊天 (⌘/)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Create failed"
-#~ msgstr "创建失败"
+msgid "Create failed"
+msgstr "创建失败"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Delete role group"
-#~ msgstr "删除角色组"
+msgid "Delete role group"
+msgstr "删除角色组"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Enter your email to get a reset link"
-#~ msgstr "输入您的电子邮件以获取重置链接"
+msgid "Enter your email to get a reset link"
+msgstr "输入您的电子邮件以获取重置链接"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "已批准"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model not available"
-#~ msgstr ""
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "Loading plans..."
-#~ msgstr "加载计划中..."
+msgid "Loading plans..."
+msgstr "加载计划中..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "User groups"
-#~ msgstr "用户组"
+msgid "User groups"
+msgstr "用户组"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
@@ -779,33 +736,30 @@ msgstr "输入您的答案…"
 #~ msgstr "发布使得任何拥有链接的人都可以查看此仪表板 — 无需 Avandar 账户。仪表板引用的数据集在发布时复制到公共存储。"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Password reset failed"
-#~ msgstr "密码重置失败"
+msgid "Password reset failed"
+msgstr "密码重置失败"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "New role group"
-#~ msgstr "新角色组"
+msgid "New role group"
+msgstr "新角色组"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Download & enable"
-#~ msgstr "下载并启用"
-
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "确认"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#~ msgid "is equal to..."
-#~ msgstr "等于..."
+msgid "is equal to..."
+msgstr "等于..."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Some data should come from existing datasets"
-#~ msgstr "某些数据应来自现有数据集"
+msgid "Some data should come from existing datasets"
+msgstr "某些数据应来自现有数据集"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -817,8 +771,8 @@ msgid "Label"
 msgstr "标签"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-#~ msgid "Create a dashboard"
-#~ msgstr "创建仪表板"
+msgid "Create a dashboard"
+msgstr "创建仪表板"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -836,13 +790,14 @@ msgstr "名称列"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
-msgstr ""
+msgstr "默认为 \"Y 对 X\""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
 msgstr "选择的名称列无效"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "自定义"
 
@@ -850,59 +805,55 @@ msgstr "自定义"
 msgid "Timestamp"
 msgstr ""
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} was deleted from this device."
-#~ msgstr "{0} 已从此设备删除。"
-
 #: src/routes/_auth/(no-workspace)/index.tsx
-#~ msgid "It's time to create your first workspace. Don't think for too long—you "
-#~ "can always change these later!"
-#~ msgstr "是时候创建您的第一个工作区了。不要想太久——您可以随时稍后更改这些！"
+msgid "It's time to create your first workspace. Don't think for too long—you "
+"can always change these later!"
+msgstr "是时候创建您的第一个工作区了。不要想太久——您可以随时稍后更改这些！"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
-#~ msgid "Password"
-#~ msgstr "密码"
+msgid "Password"
+msgstr "密码"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Show the first 20 rows of {datasetName}"
-#~ msgstr ""
+#~ msgstr "显示 {datasetName} 的前 20 行"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
-#~ msgid "The invitation you are trying to accept is not valid. Please contact the "
-#~ "workspace owner to get a new invitation."
-#~ msgstr "您尝试接受的邀请无效。请联系工作区所有者以获取新的邀请。"
+msgid "The invitation you are trying to accept is not valid. Please contact the "
+"workspace owner to get a new invitation."
+msgstr "您尝试接受的邀请无效。请联系工作区所有者以获取新的邀请。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Enter a description for this profile type"
-#~ msgstr "为此配置文件类型输入描述"
+msgid "Enter a description for this profile type"
+msgstr "为此配置文件类型输入描述"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "(Annual billing)"
-#~ msgstr "(年度计费)"
+msgid "(Annual billing)"
+msgstr "(年度计费)"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Remove member"
-#~ msgstr "移除成员"
+msgid "Remove member"
+msgstr "移除成员"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Welcome back"
-#~ msgstr "欢迎回来"
+msgid "Welcome back"
+msgstr "欢迎回来"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "所有列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Data Summary"
-#~ msgstr "数据摘要"
+msgid "Data Summary"
+msgstr "数据摘要"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "This {resource} is currently only accessible to its owner."
-#~ msgstr "此 {resource} 目前仅对其所有者可访问。"
+msgid "This {resource} is currently only accessible to its owner."
+msgstr "此 {resource} 目前仅对其所有者可访问。"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -912,8 +863,8 @@ msgstr "检测到："
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
-#~ msgid "/month"
-#~ msgstr "/月"
+msgid "/month"
+msgstr "/月"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 msgid "Filters for this chart"
@@ -933,25 +884,25 @@ msgid "Undo"
 msgstr "撤销"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "Permissions saved"
-#~ msgstr "权限已保存"
+msgid "Permissions saved"
+msgstr "权限已保存"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
-#~ msgid "Dataset updated successfully!"
-#~ msgstr "数据集更新成功！"
+msgid "Dataset updated successfully!"
+msgstr "数据集更新成功！"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Excel file"
-#~ msgstr "Excel 文件"
+msgid "Excel file"
+msgstr "Excel 文件"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture the dashboard for annotation."
 msgstr "无法捕获仪表板以进行注释。"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
-#~ msgid "It may take a few minutes for your subscription to take effect."
-#~ msgstr "您的订阅可能需要几分钟才能生效。"
+msgid "It may take a few minutes for your subscription to take effect."
+msgstr "您的订阅可能需要几分钟才能生效。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Continue as-is"
@@ -963,20 +914,20 @@ msgid "Contains…"
 msgstr "包含…"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Global Editor"
-#~ msgstr "全球编辑器"
+msgid "Global Editor"
+msgstr "全球编辑器"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Manage seats in billing portal →"
-#~ msgstr "在计费门户中管理席位 →"
+msgid "Manage seats in billing portal →"
+msgstr "在计费门户中管理席位 →"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
-#~ msgid "You save {discount}% compared to monthly billing"
-#~ msgstr "与按月计费相比，您节省了 {discount}%"
+msgid "You save {discount}% compared to monthly billing"
+msgstr "与按月计费相比，您节省了 {discount}%"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Built-in presets"
-#~ msgstr "内置预设"
+msgid "Built-in presets"
+msgstr "内置预设"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -984,8 +935,8 @@ msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 现在在您的工作区中。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Profile fields"
-#~ msgstr "配置文件字段"
+msgid "Profile fields"
+msgstr "配置文件字段"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -997,8 +948,8 @@ msgid "Select a dataset from the list to view its metadata."
 msgstr "从列表中选择一个数据集以查看其元数据。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "Choose a plan that works best for your workspace."
-#~ msgstr "选择最适合您工作区的计划。"
+msgid "Choose a plan that works best for your workspace."
+msgstr "选择最适合您工作区的计划。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
@@ -1028,24 +979,25 @@ msgid "Please select a file to import"
 msgstr "请选择一个文件进行导入"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#~ msgid "Role for everyone in the workspace"
-#~ msgstr "工作区中的每个人的角色"
+msgid "Role for everyone in the workspace"
+msgstr "工作区中的每个人的角色"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "选择数据源"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
 msgstr "开放数据"
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
-#~ msgid "Add new dataset"
-#~ msgstr "添加新数据集"
+msgid "Add new dataset"
+msgstr "添加新数据集"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Switch to Free plan"
-#~ msgstr ""
+msgid "Switch to Free plan"
+msgstr "切换到免费计划"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -1053,16 +1005,16 @@ msgid "Parsed {0} rows"
 msgstr "解析了 {0} 行"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
-#~ msgid "Email address"
-#~ msgstr "电子邮件地址"
+msgid "Email address"
+msgstr "电子邮件地址"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Enter a name for the field"
-#~ msgstr "为字段输入名称"
+msgid "Enter a name for the field"
+msgstr "为字段输入名称"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-#~ msgid "Select Plan"
-#~ msgstr "选择计划"
+msgid "Select Plan"
+msgstr "选择计划"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -1077,16 +1029,12 @@ msgid "Sum"
 msgstr "总和"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Sync data!"
-#~ msgstr "同步数据！"
+msgid "Sync data!"
+msgstr "同步数据！"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice settings"
-#~ msgstr "语音设置"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Used when transcribing; does not change the model download."
-#~ msgstr "用于转录时；不更改模型下载。"
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " who also have "
+msgstr " 也有 "
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1097,13 +1045,13 @@ msgid "Generating…"
 msgstr "生成中…"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#~ msgid "Are you sure you want to proceed with this action? This cannot be "
-#~ "undone."
-#~ msgstr "您确定要继续此操作吗？此操作无法撤销。"
+msgid "Are you sure you want to proceed with this action? This cannot be "
+"undone."
+msgstr "您确定要继续此操作吗？此操作无法撤销。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "This is the unique ID of your organization used in URLs."
-#~ msgstr "这是您组织在 URL 中使用的唯一 ID。"
+msgid "This is the unique ID of your organization used in URLs."
+msgstr "这是您组织在 URL 中使用的唯一 ID。"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -1111,16 +1059,16 @@ msgid "Previewing data for {0}"
 msgstr "预览 {0} 的数据"
 
 #: src/routes/update-password.tsx
-#~ msgid "You can start using your new password now"
-#~ msgstr "您现在可以开始使用新密码"
+msgid "You can start using your new password now"
+msgstr "您现在可以开始使用新密码"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
 msgstr "不支持的文件类型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Are you sure you want to remove this user from the workspace?"
-#~ msgstr "您确定要将此用户从工作区中移除吗？"
+msgid "Are you sure you want to remove this user from the workspace?"
+msgstr "您确定要将此用户从工作区中移除吗？"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -1134,8 +1082,8 @@ msgid "The current SQL contains parts that the form could not represent. "
 msgstr "当前 SQL 包含表单无法表示的部分。继续将用从表单生成的 SQL 覆盖该 SQL。这无法撤销（除非您重新运行之前的聊天提示）。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Select the columns you want in this {entityConfigName}"
-#~ msgstr "选择您想要在此 {entityConfigName} 中的列"
+msgid "Select the columns you want in this {entityConfigName}"
+msgstr "选择您想要在此 {entityConfigName} 中的列"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
@@ -1143,32 +1091,28 @@ msgstr "正式"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
-#~ msgid "This field"
-#~ msgstr "此字段"
+msgid "This field"
+msgstr "此字段"
 
 #. placeholder {0}: member.displayName
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
-#~ msgid "Edit access for {0}"
-#~ msgstr "编辑 {0} 的访问权限"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Complete"
-#~ msgstr "完成"
+msgid "Edit access for {0}"
+msgstr "编辑 {0} 的访问权限"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-#~ msgid "{0} to be notified when it's your turn to register! If you are already "
-#~ "on our waitlist and have not received a sign-up code, we appreciate your "
-#~ "patience. You will receive a sign-up code soon. We promise!"
-#~ msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的候补名单上并且尚未收到注册代码，我们感谢您的耐心。您将很快收到注册代码。我们保证！"
+msgid "{0} to be notified when it's your turn to register! If you are already "
+"on our waitlist and have not received a sign-up code, we appreciate your "
+"patience. You will receive a sign-up code soon. We promise!"
+msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的候补名单上并且尚未收到注册代码，我们感谢您的耐心。您将很快收到注册代码。我们保证！"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "检测到偏见："
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "The name other members see in {workspaceName}."
-#~ msgstr "{workspaceName} 中其他成员看到的名称。"
+msgid "The name other members see in {workspaceName}."
+msgstr "{workspaceName} 中其他成员看到的名称。"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
@@ -1182,35 +1126,27 @@ msgstr "用表单更改覆盖 SQL"
 msgid "Dataset did not match the expected schema"
 msgstr "数据集与预期模式不匹配"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} is on this device. Tap the mic to dictate."
-#~ msgstr ""
-
 #: src/components/AppShell/Navbar/Navbar.tsx
-#~ msgid "Sign Out"
-#~ msgstr "注销"
+msgid "Sign Out"
+msgstr "注销"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Unknown group"
-#~ msgstr "未知组"
+msgid "Unknown group"
+msgstr "未知组"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File was partially loaded"
 msgstr "文件部分加载"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "Payment Methods"
-#~ msgstr "支付方式"
+msgid "Payment Methods"
+msgstr "支付方式"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
 "the import preview and have been overwritten with the actual values."
 msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "{0} (~{1} MB)"
-#~ msgstr "{0} (~{1} MB)"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1228,8 +1164,8 @@ msgid "No columns are available"
 msgstr "没有可用的列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Untitled dataset"
-#~ msgstr "未命名数据集"
+msgid "Untitled dataset"
+msgstr "未命名数据集"
 
 #. placeholder {0}: entry.turnNumber
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -1258,12 +1194,12 @@ msgid "Ask me to add a chart to this dashboard..."
 msgstr "请让我为此仪表板添加图表..."
 
 #: packages/web/ui/src/notifications/notifyNotImplemented.ts
-#~ msgid "Not implemented yet"
-#~ msgstr "尚未实现"
+msgid "Not implemented yet"
+msgstr "尚未实现"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
-#~ msgid "Type or paste an email below. Your workspace will be billed per member."
-#~ msgstr "在下面输入或粘贴电子邮件。您的工作区将按成员收费。"
+msgid "Type or paste an email below. Your workspace will be billed per member."
+msgstr "在下面输入或粘贴电子邮件。您的工作区将按成员收费。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -1278,47 +1214,43 @@ msgid "Manual"
 msgstr "手动"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "or"
-#~ msgstr "或"
+msgid "or"
+msgstr "或"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Restriction update failed"
-#~ msgstr "限制更新失败"
+msgid "Restriction update failed"
+msgstr "限制更新失败"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
-#~ "and discover insights from your data."
-#~ msgstr "使用数据探索器分析您的数据集，创建可视化并发现数据中的洞察。"
+msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
+"and discover insights from your data."
+msgstr "使用数据探索器分析您的数据集，创建可视化并发现数据中的洞察。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Roles & Permissions"
-#~ msgstr "角色与权限"
+msgid "Roles & Permissions"
+msgstr "角色与权限"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
 msgstr "连接到 Google Sheets"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Stop and transcribe"
-#~ msgstr "停止并转录"
-
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
-msgstr "数据可视化"
+msgstr ""
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
-msgstr ""
+msgstr "选择一个已保存的数据集或将新数据导入到您的工作区。"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
-#~ msgid "Report a bug"
-#~ msgstr "报告错误"
+msgid "Report a bug"
+msgstr "报告错误"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
-#~ msgid "No entity selected"
-#~ msgstr "未选择实体"
+msgid "No entity selected"
+msgstr "未选择实体"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -1330,13 +1262,9 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "(RoughJS)."
 msgstr "将此仪表板导出为 PDF，或先进行草图绘制。注释支持文本、箭头和可调粗糙度的手绘（RoughJS）。"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "No speech detected"
-#~ msgstr "未检测到语音"
-
 #: src/routes/register.tsx
-#~ msgid "Please <0>email us</0> if you would like early access."
-#~ msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
+msgid "Please <0>email us</0> if you would like early access."
+msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -1357,17 +1285,21 @@ msgid "Category axis"
 msgstr "类别轴"
 
 #: src/components/AppShell/AppShell.tsx
-#~ msgid "Nothing found..."
-#~ msgstr "未找到任何内容..."
+msgid "Nothing found..."
+msgstr "未找到任何内容..."
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#~ msgid "{keyboardShortcut} to save"
-#~ msgstr "按 {keyboardShortcut} 保存"
+msgid "{keyboardShortcut} to save"
+msgstr "按 {keyboardShortcut} 保存"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
 msgstr "删除"
 
@@ -1377,16 +1309,16 @@ msgid "Failed to save dataset: {0}"
 msgstr "保存数据集失败：{0}"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Query form"
-#~ msgstr "查询表单"
+msgid "Query form"
+msgstr "查询表单"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
 msgstr "PDF 已下载。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "Workspace ID"
-#~ msgstr "工作区 ID"
+msgid "Workspace ID"
+msgstr "工作区 ID"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
@@ -1408,25 +1340,25 @@ msgstr "注释后导出"
 #. placeholder {1}: BUILTIN_ROLE_GROUP_NAMES.globalEditor
 #. placeholder {2}: BUILTIN_ROLE_GROUP_NAMES.globalViewer
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "{0}, {1}, and {2} are fixed for every workspace."
-#~ msgstr "{0}、{1} 和 {2} 对每个工作区都是固定的。"
+msgid "{0}, {1}, and {2} are fixed for every workspace."
+msgstr "{0}、{1} 和 {2} 对每个工作区都是固定的。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
-msgstr ""
+msgstr "每个系列是绘制在 Y 轴上的数值列。值按 X 轴（\"{axisKeyValue}\"）分组。"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "显示 SQL"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Search models"
-#~ msgstr "搜索模型"
+msgid "Search models"
+msgstr "搜索模型"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Cannot sync this entity"
-#~ msgstr "无法同步此实体"
+msgid "Cannot sync this entity"
+msgstr "无法同步此实体"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -1439,12 +1371,16 @@ msgid "Dataset name is required"
 msgstr "数据集名称是必需的"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Allow new {pluralEntityConfigName} to be created manually"
-#~ msgstr "允许手动创建新的 {pluralEntityConfigName}"
+msgid "Allow new {pluralEntityConfigName} to be created manually"
+msgstr "允许手动创建新的 {pluralEntityConfigName}"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid ", and "
+msgstr "，和 "
 
 #: src/routes/update-password.tsx
-#~ msgid "Password updated successfully"
-#~ msgstr "密码更新成功"
+msgid "Password updated successfully"
+msgstr "密码更新成功"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -1459,8 +1395,8 @@ msgid "not in"
 msgstr "不在"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
-#~ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
+msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
+msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -1475,14 +1411,20 @@ msgid "Enter a description for this dataset"
 msgstr "输入此数据集的描述"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Fields to be manually entered"
-#~ msgstr "需要手动输入的字段"
+msgid "Fields to be manually entered"
+msgstr "需要手动输入的字段"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "您的数据集"
 
+#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1494,7 +1436,16 @@ msgstr "您的数据集"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Cancel"
 msgstr "取消"
 
@@ -1512,24 +1463,28 @@ msgid "Data scope"
 msgstr "数据范围"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Data preview"
-#~ msgstr "数据预览"
+msgid "Data preview"
+msgstr "数据预览"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
 msgstr "到"
 
+#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
+msgid "Download offline chat model (WebLLM)"
+msgstr "下载离线聊天模型（WebLLM）"
+
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
-#~ msgid "Create new profile type"
-#~ msgstr "创建新的配置文件类型"
+msgid "Create new profile type"
+msgstr "创建新的配置文件类型"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Done"
-#~ msgstr "完成"
+msgid "Done"
+msgstr "完成"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Add Field"
-#~ msgstr "添加字段"
+msgid "Add Field"
+msgstr "添加字段"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
@@ -1540,16 +1495,16 @@ msgid "You haven't chosen an X axis"
 msgstr "您尚未选择 X 轴"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#~ msgid "and is also equal to..."
-#~ msgstr "并且也等于..."
+msgid "and is also equal to..."
+msgstr "并且也等于..."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
-#~ msgid "Profile failed to load"
-#~ msgstr "配置文件加载失败"
+msgid "Profile failed to load"
+msgstr "配置文件加载失败"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
-#~ msgstr "您当前处于 <0>{currentFeaturePlanName}</0> 计划中。"
+msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
+msgstr "您当前处于 <0>{currentFeaturePlanName}</0> 计划中。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Result size"
@@ -1560,25 +1515,25 @@ msgid "Search open data catalog"
 msgstr "搜索开放数据目录"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
-#~ "billing portal.<0/>The button below will take you there."
-#~ msgstr "升级到“您想支付多少”计划只能通过账单门户进行。<0/>下面的按钮将带您前往那里。"
+msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
+"billing portal.<0/>The button below will take you there."
+msgstr "升级到“您想支付多少”计划只能通过账单门户进行。<0/>下面的按钮将带您前往那里。"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Delete entity"
-#~ msgstr "删除实体"
+msgid "Delete entity"
+msgstr "删除实体"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
-#~ msgid "Empty text"
-#~ msgstr "文本为空"
+msgid "Empty text"
+msgstr "文本为空"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "海洋"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "You are about to change your subscription plan to:"
-#~ msgstr "您即将将您的订阅计划更改为："
+msgid "You are about to change your subscription plan to:"
+msgstr "您即将将您的订阅计划更改为："
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -1590,28 +1545,20 @@ msgid "Sheet name"
 msgstr "工作表名称"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "We will use those columns to merge datasets into a single "
-#~ "{entityConfigName}."
-#~ msgstr "我们将使用这些列将数据集合并为一个单一的 {entityConfigName}。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Browser unavailable"
-#~ msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Transcribing…"
-#~ msgstr "转录中…"
+msgid "We will use those columns to merge datasets into a single "
+"{entityConfigName}."
+msgstr "我们将使用这些列将数据集合并为一个单一的 {entityConfigName}。"
 
 #. placeholder {0}: model.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
-#~ "download it again later."
-#~ msgstr ""
+msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+"download it again later."
+msgstr "{0} (~{1} MB) 将从此浏览器中删除以释放空间。您可以稍后再次下载。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Go to Data Explorer"
-#~ msgstr "前往数据探索器"
+msgid "Go to Data Explorer"
+msgstr "前往数据探索器"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
@@ -1623,12 +1570,13 @@ msgstr "向上滚动到上面的字段，或使用下面的列表。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "None"
 msgstr "无"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "You'll be asked to confirm your current password."
-#~ msgstr "系统将要求您确认当前密码。"
+msgid "You'll be asked to confirm your current password."
+msgstr "系统将要求您确认当前密码。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
@@ -1637,8 +1585,8 @@ msgstr "发布"
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Using {0}"
-#~ msgstr "使用 {0}"
+msgid "Using {0}"
+msgstr "使用 {0}"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -1646,17 +1594,17 @@ msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to 
 msgstr "尚无 SQL。请向 Avandar 提问或在手动选项卡中构建查询以生成 SQL。"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
-#~ msgid "Received a non-string value for a text field"
-#~ msgstr "收到非字符串值的文本字段"
+msgid "Received a non-string value for a text field"
+msgstr "收到非字符串值的文本字段"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Tell us about where the {singularEntityConfigName} data should come "
-#~ "from..."
-#~ msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
+msgid "Tell us about where the {singularEntityConfigName} data should come "
+"from..."
+msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Delete Entity"
-#~ msgstr "删除实体"
+msgid "Delete Entity"
+msgstr "删除实体"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
@@ -1672,36 +1620,32 @@ msgid "Your dashboard will be published to:"
 msgstr "您的仪表板将发布到："
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
-#~ msgid "You do not have permission to open {appLabel} in this workspace."
-#~ msgstr "您没有权限在此工作区打开 {appLabel}。"
+msgid "You do not have permission to open {appLabel} in this workspace."
+msgstr "您没有权限在此工作区打开 {appLabel}。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Build a chart in chat"
 msgstr "在聊天中构建图表"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Additional seats required"
-#~ msgstr "需要额外的席位"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Finishing setup — almost ready."
-#~ msgstr "完成设置 — 准备就绪。"
+msgid "Additional seats required"
+msgstr "需要额外的席位"
 
 #: packages/web/ui/src/buttons/EditButton.tsx
-#~ msgid "Edit"
-#~ msgstr "编辑"
+msgid "Edit"
+msgstr "编辑"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
 msgstr "数据源"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-#~ msgid "No dataset selected"
-#~ msgstr "未选择数据集"
+msgid "No dataset selected"
+msgstr "未选择数据集"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "description"
-#~ msgstr "描述"
+msgid "description"
+msgstr "描述"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -1725,8 +1669,8 @@ msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#~ msgid "Collection {collectionNumber}"
-#~ msgstr "集合 {collectionNumber}"
+msgid "Collection {collectionNumber}"
+msgstr "集合 {collectionNumber}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
@@ -1743,33 +1687,29 @@ msgstr "派生的"
 
 #. placeholder {0}: columns.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "{0} columns were detected. Review the column info below to make sure "
-#~ "they are correct."
-#~ msgstr "{0} 列被检测到。请查看下面的列信息以确保它们正确。"
+msgid "{0} columns were detected. Review the column info below to make sure "
+"they are correct."
+msgstr "{0} 列被检测到。请查看下面的列信息以确保它们正确。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
 msgstr ""
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
-#~ msgid "Active"
-#~ msgstr "活动"
+msgid "Active"
+msgstr "活动"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "默认值，以逗号分隔或 JSON 数组"
 
 #: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#~ msgid "Confirm Action"
-#~ msgstr "确认操作"
+msgid "Confirm Action"
+msgstr "确认操作"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Data Preview"
-#~ msgstr "数据预览"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model saved"
-#~ msgstr ""
+msgid "Data Preview"
+msgstr "数据预览"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -1780,16 +1720,12 @@ msgid "Create dashboard & save"
 msgstr "创建仪表板并保存"
 
 #: src/components/GISApp/DataMap/MapStylePicker.tsx
-#~ msgid "Theme"
-#~ msgstr "主题"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
-#~ msgid "num"
-#~ msgstr ""
+msgid "Theme"
+msgstr "主题"
 
 #: src/routes/register.tsx
-#~ msgid "Register"
-#~ msgstr "注册"
+msgid "Register"
+msgstr "注册"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
@@ -1808,40 +1744,32 @@ msgid "Dashboard saved successfully!"
 msgstr "仪表板保存成功！"
 
 #: src/components/GISApp/DataMap/GeometryDrawer.tsx
-#~ msgid "N/A"
-#~ msgstr "不适用"
+msgid "N/A"
+msgstr "不适用"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Global Admin"
-#~ msgstr "全局管理员"
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a size column"
-#~ msgstr "您尚未选择大小列"
+msgid "Global Admin"
+msgstr "全局管理员"
 
 #: src/routes/register.tsx
-#~ msgid "Registration requires an internet connection."
-#~ msgstr ""
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid size column selected"
-#~ msgstr "选择了无效的大小列"
+msgid "Registration requires an internet connection."
+msgstr "注册需要互联网连接。"
 
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
-#~ msgid "There are no values"
-#~ msgstr "没有值"
+msgid "There are no values"
+msgstr "没有值"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "澄清 {turnNumber} / 3"
 
 #: src/components/GISApp/DataMap/GeometryDrawer.tsx
-#~ msgid "Data Point"
-#~ msgstr "数据点"
+msgid "Data Point"
+msgstr "数据点"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
@@ -1852,12 +1780,12 @@ msgid "about a minute"
 msgstr ""
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
-#~ msgid "You do not have permission to open this part of the workspace."
-#~ msgstr "您没有权限打开工作区的此部分。"
+msgid "You do not have permission to open this part of the workspace."
+msgstr "您没有权限打开工作区的此部分。"
 
 #: src/routes/register.tsx
-#~ msgid "Please check your email"
-#~ msgstr "请检查您的电子邮件"
+msgid "Please check your email"
+msgstr "请检查您的电子邮件"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -1872,16 +1800,16 @@ msgid "Processing dataset…"
 msgstr "正在处理数据集…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Offline chat model ready. Click to switch or re-download."
-#~ msgstr ""
+msgid "Offline chat model ready. Click to switch or re-download."
+msgstr "离线聊天模型已准备好。点击切换或重新下载。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "正在捕获仪表板…"
 
 #: src/routes/register.tsx
-#~ msgid "This is an invalid waitlist code"
-#~ msgstr "这是一个无效的候补名单代码"
+msgid "This is an invalid waitlist code"
+msgstr "这是一个无效的候补名单代码"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
@@ -1889,8 +1817,8 @@ msgid "Please try again."
 msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Field Name"
-#~ msgstr "字段名称"
+msgid "Field Name"
+msgstr "字段名称"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
@@ -1902,28 +1830,20 @@ msgid "Consider rephrasing"
 msgstr "考虑重新措辞"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#~ msgid "Add people or user groups"
-#~ msgstr "添加人员或用户组"
+msgid "Add people or user groups"
+msgstr "添加人员或用户组"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Size column"
-msgstr ""
+msgstr "大小列"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "值"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Unable to download the voice model."
-#~ msgstr "无法下载语音模型。"
-
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "About your workspace"
-#~ msgstr "关于您的工作区"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Could not remove voice model"
-#~ msgstr "无法移除语音模型"
+msgid "About your workspace"
+msgstr "关于您的工作区"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -1935,32 +1855,33 @@ msgid "CSVs"
 msgstr "CSV 文件"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "Plan Features:"
-#~ msgstr "计划功能："
+msgid "Plan Features:"
+msgstr "计划功能："
 
 #: src/routes/register.tsx
-#~ msgid "Start your journey with us"
-#~ msgstr "与我们一起开始您的旅程"
+msgid "Start your journey with us"
+msgstr "与我们一起开始您的旅程"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "二维码"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#~ msgid "Role"
-#~ msgstr "角色"
+msgid "Role"
+msgstr "角色"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "为空"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Invite sent"
-#~ msgstr "邀请已发送"
+msgid "Invite sent"
+msgstr "邀请已发送"
 
+#: src/components/offline/OfflineIndicator.tsx
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
-msgstr ""
+msgstr "您处于离线状态"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -1968,8 +1889,8 @@ msgid "Failed to save to dashboard: {0}"
 msgstr "保存到仪表板失败：{0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Custom role groups"
-#~ msgstr "自定义角色组"
+msgid "Custom role groups"
+msgstr "自定义角色组"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
@@ -1979,13 +1900,13 @@ msgstr "玫瑰"
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Are you sure you want to delete {0}?"
-#~ msgstr "您确定要删除 {0} 吗？"
+msgid "Are you sure you want to delete {0}?"
+msgstr "您确定要删除 {0} 吗？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "Save failed"
-#~ msgstr "保存失败"
+msgid "Save failed"
+msgstr "保存失败"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Chat is enabled in Data Explorer and Dashboards"
@@ -1993,8 +1914,8 @@ msgstr "数据探索器和仪表板中已启用聊天"
 
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
-#~ msgid "Forgot your password?"
-#~ msgstr "忘记密码？"
+msgid "Forgot your password?"
+msgstr "忘记密码？"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -2005,12 +1926,12 @@ msgid "Delete dashboard?"
 msgstr "删除仪表板？"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Change password"
-#~ msgstr "更改密码"
+msgid "Change password"
+msgstr "更改密码"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
-#~ msgid "Checkout Successful!"
-#~ msgstr "结账成功！"
+msgid "Checkout Successful!"
+msgstr "结账成功！"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
@@ -2027,17 +1948,17 @@ msgid "No fields"
 msgstr "没有字段"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Failed to update workspace name"
-#~ msgstr "更新工作区名称失败"
+msgid "Failed to update workspace name"
+msgstr "更新工作区名称失败"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Export"
 msgstr "导出"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "Create groups for your workspace members. Datasets and dashboards can be "
-#~ "configured to only share with (or restrict) certain user groups."
-#~ msgstr "为您的工作区成员创建组。数据集和仪表板可以配置为仅与某些用户组共享（或限制）。"
+msgid "Create groups for your workspace members. Datasets and dashboards can be "
+"configured to only share with (or restrict) certain user groups."
+msgstr "为您的工作区成员创建组。数据集和仪表板可以配置为仅与某些用户组共享（或限制）。"
 
 #: src/components/privacy/ConsentModal/RowValueList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
@@ -2045,8 +1966,8 @@ msgid "Preview:"
 msgstr "预览："
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
-#~ msgid "Select your plan"
-#~ msgstr "选择您的计划"
+msgid "Select your plan"
+msgstr "选择您的计划"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -2059,13 +1980,13 @@ msgid "Re-run query"
 msgstr "重新运行查询"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
-#~ msgid "Choose the language used across this workspace. Right-to-left languages "
-#~ "flip the layout automatically."
-#~ msgstr "选择此工作区中使用的语言。右到左语言会自动翻转布局。"
+msgid "Choose the language used across this workspace. Right-to-left languages "
+"flip the layout automatically."
+msgstr "选择此工作区中使用的语言。右到左语言会自动翻转布局。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "No plans available."
-#~ msgstr "没有可用的计划。"
+msgid "No plans available."
+msgstr "没有可用的计划。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -2076,16 +1997,16 @@ msgid "Dashboard not ready"
 msgstr "仪表板尚未准备好"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Downloaded on this browser"
-#~ msgstr ""
+msgid "Downloaded on this browser"
+msgstr "在此浏览器上下载"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
-#~ msgid "Pay monthly"
-#~ msgstr "按月支付"
+msgid "Pay monthly"
+msgstr "按月支付"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Choose a model"
-#~ msgstr "选择模型"
+msgid "Choose a model"
+msgstr "选择模型"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2105,8 +2026,8 @@ msgid "Cap reached"
 msgstr "达到上限"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Go to billing portal"
-#~ msgstr "前往账单门户"
+msgid "Go to billing portal"
+msgstr "前往账单门户"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear log"
@@ -2121,22 +2042,22 @@ msgid "Search by name, organization, pipeline…"
 msgstr "按名称、组织、管道搜索…"
 
 #: src/views/EntityManagerApp/SingleEntityView/index.tsx
-#~ msgid "Data"
-#~ msgstr "数据"
+msgid "Data"
+msgstr "数据"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
 msgid "Unavailable offline"
-msgstr ""
+msgstr "离线不可用"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
-#~ msgid "Back to the login page"
-#~ msgstr "返回登录页面"
+msgid "Back to the login page"
+msgstr "返回登录页面"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Controls the default for the rest of the workspace. People without app "
-#~ "access still need a direct share above."
-#~ msgstr "控制工作区其余部分的默认设置。没有应用访问权限的人仍然需要上面的直接共享。"
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share above."
+msgstr "控制工作区其余部分的默认设置。没有应用访问权限的人仍然需要上面的直接共享。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2144,18 +2065,13 @@ msgstr ""
 msgid "Save to dashboard"
 msgstr "保存到仪表板"
 
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our Impact "
-#~ "plan to increase the number of datasets you can add to your workspace."
-#~ msgstr ""
-
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "标签类型"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Add a bar chart of row counts in {datasetName}"
-#~ msgstr ""
+#~ msgstr "添加 {datasetName} 中行数的条形图"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
@@ -2165,18 +2081,17 @@ msgstr "未选择文件"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
-#~ msgid "Submit"
-#~ msgstr "提交"
+msgid "Submit"
+msgstr "提交"
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "See all shared items"
-#~ msgstr "查看所有共享项目"
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dashboard"
+msgstr "仪表板"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "{0} was deleted from this browser."
-#~ msgstr ""
+msgid "{0} was deleted from this browser."
+msgstr "{0} 已从此浏览器中删除。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
@@ -2187,38 +2102,38 @@ msgid "less than a minute"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Send invite"
-#~ msgstr "发送邀请"
+msgid "Send invite"
+msgstr "发送邀请"
 
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Open {0}"
-msgstr ""
+msgstr "打开 {0}"
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
 msgid "Manual Query"
 msgstr "手动查询"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Dataset is now offline-only"
-#~ msgstr "数据集现在仅限离线使用"
+msgid "Dataset is now offline-only"
+msgstr "数据集现在仅限离线使用"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Fields that come from datasets"
-#~ msgstr "来自数据集的字段"
+msgid "Fields that come from datasets"
+msgstr "来自数据集的字段"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "This is where you select which columns from which datasets should be "
-#~ "added into this {entityConfigName}."
-#~ msgstr "在这里选择应添加到此 {entityConfigName} 的数据集中的哪些列。"
+msgid "This is where you select which columns from which datasets should be "
+"added into this {entityConfigName}."
+msgstr "在这里选择应添加到此 {entityConfigName} 的数据集中的哪些列。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Create"
-#~ msgstr "创建"
+msgid "Create"
+msgstr "创建"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-#~ msgid "Create your first dashboard to track key metrics and insights."
-#~ msgstr "创建您的第一个仪表板以跟踪关键指标和洞察。"
+msgid "Create your first dashboard to track key metrics and insights."
+msgstr "创建您的第一个仪表板以跟踪关键指标和洞察。"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Are you sure you want to delete this dataset? This action cannot be "
@@ -2226,12 +2141,8 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "您确定要删除此数据集吗？此操作无法撤销。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Symbol size column must be numeric."
-#~ msgstr "符号大小列必须为数字。"
-
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Loading shared resources"
-#~ msgstr "加载共享资源"
+msgid "Symbol size column must be numeric."
+msgstr "符号大小列必须为数字。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -2243,12 +2154,8 @@ msgstr "Avandar（默认）"
 #~ msgstr "{numCols, plural, one {将发布 # 列：} other {将发布 # 列：}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
-#~ msgid "Type or paste an email below."
-#~ msgstr "在下面输入或粘贴电子邮件。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompting"
-#~ msgstr "语音提示"
+msgid "Type or paste an email below."
+msgstr "在下面输入或粘贴电子邮件。"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2257,16 +2164,16 @@ msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
 msgstr "重复出现：<0>{0}</0> 在 <1>{1}%</1> 的行中出现。"
 
 #: src/components/AppShell/Logo.tsx
-#~ msgid "Logo"
-#~ msgstr "徽标"
+msgid "Logo"
+msgstr "徽标"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
 msgstr "决策"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Update failed"
-#~ msgstr "更新失败"
+msgid "Update failed"
+msgstr "更新失败"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -2274,21 +2181,21 @@ msgid "Back"
 msgstr "返回"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
-#~ msgid "Continue to your workspace"
-#~ msgstr "继续进入您的工作区"
+msgid "Continue to your workspace"
+msgstr "继续进入您的工作区"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Choose the maximum value"
-#~ msgstr "选择最大值"
+msgid "Choose the maximum value"
+msgstr "选择最大值"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-#~ msgstr "您尝试访问的工作区不存在或您没有访问权限。"
+msgid "The workspace you are trying to access either does not exist or you do "
+"not have access to it."
+msgstr "您尝试访问的工作区不存在或您没有访问权限。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
-#~ msgid "Pay yearly"
-#~ msgstr "按年支付"
+msgid "Pay yearly"
+msgstr "按年支付"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "coverage"
@@ -2309,12 +2216,12 @@ msgid "Maximum rows to return"
 msgstr "最大返回行数"
 
 #: src/routes/update-password.tsx
-#~ msgid "Password update failed"
-#~ msgstr "密码更新失败"
+msgid "Password update failed"
+msgstr "密码更新失败"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#~ msgid "Anyone in {app}"
-#~ msgstr "在 {app} 中的任何人"
+msgid "Anyone in {app}"
+msgstr "在 {app} 中的任何人"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Failed to delete dataset"
@@ -2330,7 +2237,7 @@ msgstr "描述您的答案…"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "What is the average {averageColumn} in {datasetName}?"
-#~ msgstr ""
+#~ msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -2341,8 +2248,8 @@ msgid "Date range"
 msgstr "日期范围"
 
 #: src/routes/register.tsx
-#~ msgid "sign up for our waitlist"
-#~ msgstr "注册我们的候补名单"
+msgid "sign up for our waitlist"
+msgstr "注册我们的候补名单"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -2361,21 +2268,15 @@ msgstr "首先运行 AI 查询。"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
-msgstr ""
+msgstr "Y 列"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count how many rows there are in {datasetName}"
-#~ msgstr ""
-
-#: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
-#~ msgid "Your current plan only supports up to{0} datasets. Upgrade to our "
-#~ "Starter or Impact plan to increase the number of datasets you can add to "
-#~ "your workspace."
-#~ msgstr ""
+#~ msgstr "计算 {datasetName} 中有多少行"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Offline model download failed"
-#~ msgstr ""
+msgid "Offline model download failed"
+msgstr "离线模型下载失败"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Parsed {formattedNumRows} rows successfully"
@@ -2394,8 +2295,8 @@ msgid "Column name (must match SQL)"
 msgstr "列名（必须与 SQL 匹配）"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
-#~ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
+msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
+msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Generate Query"
@@ -2410,9 +2311,8 @@ msgid "We'll add this visualization to your new dashboard."
 msgstr "我们将把此可视化添加到您的新仪表板。"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Starting…"
-#~ msgstr "正在启动…"
+msgid "Starting…"
+msgstr "正在启动…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -2439,8 +2339,8 @@ msgid "Connectors"
 msgstr "连接器"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Seats purchased successfully"
-#~ msgstr "座位购买成功"
+msgid "Seats purchased successfully"
+msgstr "座位购买成功"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat (⌘/)"
@@ -2475,29 +2375,33 @@ msgstr "查看"
 msgid "Unavailable"
 msgstr ""
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "dataset"
+msgstr "数据集"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Remove failed"
-#~ msgstr "删除失败"
+msgid "Remove failed"
+msgstr "删除失败"
 
 #. placeholder {0}: dataset.name
 #. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "{0} deleted successfully"
-#~ msgstr "{0} 删除成功"
+msgid "{0} deleted successfully"
+msgstr "{0} 删除成功"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Open dashboard"
 msgstr "打开仪表板"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From dataset"
-#~ msgstr "来自数据集"
+msgid "From dataset"
+msgstr "来自数据集"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "A profile can consist of columns that come from different datasets."
-#~ msgstr "一个配置文件可以由来自不同数据集的列组成。"
+msgid "A profile can consist of columns that come from different datasets."
+msgstr "一个配置文件可以由来自不同数据集的列组成。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
@@ -2520,80 +2424,69 @@ msgid "There is only one sheet in this excel sheet."
 msgstr "此 Excel 表中只有一张工作表。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Make dataset offline-only?"
-#~ msgstr "将数据集设置为离线专用？"
+msgid "Make dataset offline-only?"
+msgstr "将数据集设置为离线专用？"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "颜色"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Finished syncing {0} data"
-#~ msgstr "完成同步 {0} 数据"
+msgid "Finished syncing {0} data"
+msgstr "完成同步 {0} 数据"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#~ msgid "Select column"
-#~ msgstr "选择列"
+msgid "Select column"
+msgstr "选择列"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "选择一个或多个"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column Name"
-#~ msgstr "列名称"
-
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Nothing has been shared with you here."
-#~ msgstr "这里没有与您共享的内容。"
+msgid "Column Name"
+msgstr "列名称"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Sent password reset email"
-#~ msgstr "已发送密码重置电子邮件"
+msgid "Sent password reset email"
+msgstr "已发送密码重置电子邮件"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select column to sort by"
 msgstr "选择排序列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "You can view this dataset because it was shared with you."
-#~ msgstr "您可以查看此数据集，因为它已与您共享。"
+msgid "You can view this dataset because it was shared with you."
+msgstr "您可以查看此数据集，因为它已与您共享。"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
 msgstr "创建新仪表板"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#~ msgid "Create Workspace"
-#~ msgstr "创建工作区"
+msgid "Create Workspace"
+msgstr "创建工作区"
 
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
-msgstr ""
+msgstr "再试一次"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#~ msgid "Do not refresh or close this tab or else the download will be canceled."
-#~ msgstr ""
+msgid "Do not refresh or close this tab or else the download will be canceled."
+msgstr "请勿刷新或关闭此标签页，否则下载将被取消。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
 msgstr "森林"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Choose the language you will speak when dictating."
-#~ msgstr ""
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "Allow manual edit"
-#~ msgstr "允许手动编辑"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Whisper supports many languages; auto-detect handles mixed input."
-#~ msgstr "Whisper 支持多种语言；自动检测处理混合输入。"
+msgid "Allow manual edit"
+msgstr "允许手动编辑"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2613,27 +2506,23 @@ msgstr "尚未发布。公众查看者将无法看到此内容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
-#~ msgid "The entity failed to load. Please try again later or reach out to "
-#~ "support."
-#~ msgstr "实体加载失败。请稍后再试或联系支持。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "We didn't catch anything — try again a bit closer to the mic."
-#~ msgstr "我们没有捕捉到任何内容 — 请稍微靠近麦克风再试一次。"
+msgid "The entity failed to load. Please try again later or reach out to "
+"support."
+msgstr "实体加载失败。请稍后再试或联系支持。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Purchase {seatsToAdd} seat"
-#~ msgstr "购买 {seatsToAdd} 个座位"
+msgid "Purchase {seatsToAdd} seat"
+msgstr "购买 {seatsToAdd} 个座位"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
-#~ msgid "The profile manager page failed to load. Please try again later or reach "
-#~ "out to support."
-#~ msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。"
+msgid "The profile manager page failed to load. Please try again later or reach "
+"out to support."
+msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
-msgstr ""
+msgstr "由于缺少轴或系列，无法显示 {chartName}。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -2646,12 +2535,12 @@ msgstr "让 AI 决定（遗留）"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "New field"
-#~ msgstr "新字段"
+msgid "New field"
+msgstr "新字段"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "Workspace created successfully!"
-#~ msgstr "工作区创建成功！"
+msgid "Workspace created successfully!"
+msgstr "工作区创建成功！"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -2659,8 +2548,8 @@ msgid "Clarifications"
 msgstr "澄清"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "Entity deleted"
-#~ msgstr "实体已删除"
+msgid "Entity deleted"
+msgstr "实体已删除"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns"
@@ -2671,16 +2560,16 @@ msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在存在未保存更改时无法发布。请先保存。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Latitude column"
-#~ msgstr "纬度列"
+msgid "Latitude column"
+msgstr "纬度列"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
 msgstr "选择一个仪表板，或创建一个新仪表板。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Get a sum of the values"
-#~ msgstr "获取值的总和"
+msgid "Get a sum of the values"
+msgstr "获取值的总和"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
@@ -2688,11 +2577,11 @@ msgstr "输入您的答案..."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
-msgstr ""
+msgstr "导入"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
-#~ msgid "Yes"
-#~ msgstr "是"
+msgid "Yes"
+msgstr "是"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clear privacy log"
@@ -2703,16 +2592,16 @@ msgid "Consent"
 msgstr "同意"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "Edit user group"
-#~ msgstr "编辑用户组"
+msgid "Edit user group"
+msgstr "编辑用户组"
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
-#~ msgid "Privacy Policy"
-#~ msgstr "隐私政策"
+msgid "Privacy Policy"
+msgstr "隐私政策"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#~ msgid "Sign out failed"
-#~ msgstr "注销失败"
+msgid "Sign out failed"
+msgstr "注销失败"
 
 #. placeholder {0}: selectedGoogleAccount.google_email
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -2722,11 +2611,11 @@ msgstr "您已成功连接到 {0}"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
-msgstr ""
+msgstr "X 列"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Choose the most frequent value"
-#~ msgstr "选择最常见的值"
+msgid "Choose the most frequent value"
+msgstr "选择最常见的值"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -2738,8 +2627,8 @@ msgid "Date format"
 msgstr "日期格式"
 
 #: src/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine.tsx
-#~ msgid "Share summary"
-#~ msgstr "分享摘要"
+msgid "Share summary"
+msgstr "分享摘要"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
@@ -2750,17 +2639,17 @@ msgid "Dataset added"
 msgstr "数据集已添加"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
-#~ msgid "Optional"
-#~ msgstr "可选"
+msgid "Optional"
+msgstr "可选"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "App"
-#~ msgstr "应用"
+msgid "App"
+msgstr "应用"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
-#~ msgid "/month (paid yearly)"
-#~ msgstr "/月（按年支付）"
+msgid "/month (paid yearly)"
+msgstr "/月（按年支付）"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Close {title}"
@@ -2776,17 +2665,17 @@ msgstr "最常见"
 
 #: src/routes/register.tsx
 #: src/routes/update-password.tsx
-#~ msgid "Passwords do not match"
-#~ msgstr "密码不匹配"
+msgid "Passwords do not match"
+msgstr "密码不匹配"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
-msgstr ""
+msgstr "每个系列是一个绘制在径向值上的数值列。值按类别轴（\"{axisKeyValue}\"）分组。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Select longitude column"
-#~ msgstr "选择经度列"
+msgid "Select longitude column"
+msgstr "选择经度列"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -2797,13 +2686,13 @@ msgid "I have legal authority to share this data with the AI provider"
 msgstr "我有法律权力与AI提供者共享此数据"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "No custom groups yet."
-#~ msgstr "尚无自定义组。"
+msgid "No custom groups yet."
+msgstr "尚无自定义组。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
-#~ msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
-#~ "invite more team members, upgrade to a paid plan for unlimited seats."
-#~ msgstr "您的工作区处于免费计划，支持最多 2 个席位。要邀请更多团队成员，请升级到付费计划以获得无限席位。"
+msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
+"invite more team members, upgrade to a paid plan for unlimited seats."
+msgstr "您的工作区处于免费计划，支持最多 2 个席位。要邀请更多团队成员，请升级到付费计划以获得无限席位。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
@@ -2811,8 +2700,8 @@ msgstr "选项（逗号分隔，用于选择模式）"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Owner"
-#~ msgstr "所有者"
+msgid "Owner"
+msgstr "所有者"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the "
@@ -2824,8 +2713,8 @@ msgid "Number of rows to skip"
 msgstr "要跳过的行数"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From CSV"
-#~ msgstr "从 CSV"
+msgid "From CSV"
+msgstr "从 CSV"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
@@ -2841,47 +2730,43 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "尚无澄清。日志会随着聊天提出澄清问题而填充。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Offline chat model removed"
-#~ msgstr ""
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Preparing download…"
-#~ msgstr "准备下载中…"
+msgid "Offline chat model removed"
+msgstr "离线聊天模型已移除"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "工具"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
-#~ msgid "Ask a workspace settings administrator to update your roles."
-#~ msgstr "请向工作区设置管理员请求更新您的角色。"
+msgid "Ask a workspace settings administrator to update your roles."
+msgstr "请向工作区设置管理员请求更新您的角色。"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#~ msgid "For dataset <0>{0}</0>, choose the column to use as the "
-#~ "{entityConfigName} ID"
-#~ msgstr "对于数据集 <0>{0}</0>，选择用作 {entityConfigName} ID 的列"
+msgid "For dataset <0>{0}</0>, choose the column to use as the "
+"{entityConfigName} ID"
+msgstr "对于数据集 <0>{0}</0>，选择用作 {entityConfigName} ID 的列"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Viewer"
-#~ msgstr "查看者"
+msgid "Viewer"
+msgstr "查看者"
 
 #: src/components/ChatPanel/ClarificationCard/SingleOptionList.tsx
 msgid "Pick one"
 msgstr "选择一个"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
-#~ msgid "No fields have been added"
-#~ msgstr "尚未添加任何字段"
+msgid "No fields have been added"
+msgstr "尚未添加任何字段"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "What is a series?"
-msgstr ""
+msgstr "什么是系列？"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
@@ -2898,20 +2783,20 @@ msgstr "原始元数据（JSON）"
 
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "These are the first {0} rows of your dataset."
-#~ msgstr "这是您数据集的前 {0} 行。"
+msgid "These are the first {0} rows of your dataset."
+msgstr "这是您数据集的前 {0} 行。"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Select symbol size column"
-#~ msgstr "选择符号大小列"
+msgid "Select symbol size column"
+msgstr "选择符号大小列"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
 msgstr "仪表板删除成功！"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
-#~ msgid "The name you want other team members to see."
-#~ msgstr "您希望其他团队成员看到的名称。"
+msgid "The name you want other team members to see."
+msgstr "您希望其他团队成员看到的名称。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Custom URL"
@@ -2922,36 +2807,28 @@ msgid "Ask about your data..."
 msgstr "询问有关您的数据..."
 
 #: src/components/GISApp/DataMap/MapStylePicker.tsx
-#~ msgid "Theme picker"
-#~ msgstr "主题选择器"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Do not refresh or close this tab — the download will be canceled."
-#~ msgstr "请勿刷新或关闭此标签页 — 下载将被取消。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Desktop only"
-#~ msgstr "仅限桌面"
+msgid "Theme picker"
+msgstr "主题选择器"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "正在为可视化准备数据…"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
-#~ msgid "Received a non-string value for a select field"
-#~ msgstr "接收到非字符串值的选择字段"
+msgid "Received a non-string value for a select field"
+msgstr "接收到非字符串值的选择字段"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "回答时间"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Could not remove offline chat model"
-#~ msgstr ""
+msgid "Could not remove offline chat model"
+msgstr "无法移除离线聊天模型"
 
 #: src/routes/register.tsx
-#~ msgid "Create a new account"
-#~ msgstr "创建新账户"
+msgid "Create a new account"
+msgstr "创建新账户"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Direction"
@@ -2974,20 +2851,21 @@ msgid "No saved datasets found."
 msgstr "未找到已保存的数据集。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Every workspace member who can open the {app} app gets this role on this "
-#~ "{resource}, in addition to whatever's listed above."
-#~ msgstr "每个可以打开 {app} 应用的工作区成员在此 {resource} 上获得此角色，此外还有上述列出的内容。"
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed above."
+msgstr "每个可以打开 {app} 应用的工作区成员在此 {resource} 上获得此角色，此外还有上述列出的内容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
-#~ msgid "Please select an entity from the left sidebar, or create a new one."
-#~ msgstr "请从左侧边栏选择一个实体，或创建一个新实体。"
+msgid "Please select an entity from the left sidebar, or create a new one."
+msgstr "请从左侧边栏选择一个实体，或创建一个新实体。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "已检测到"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "删除数据集"
@@ -3003,14 +2881,13 @@ msgid "Date"
 msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Download"
-#~ msgstr "下载"
+msgid "Download"
+msgstr "下载"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "No members or user groups yet. Invite members or create user groups in "
-#~ "Workspace settings."
-#~ msgstr "尚无成员或用户组。请在工作区设置中邀请成员或创建用户组。"
+msgid "No members or user groups yet. Invite members or create user groups in "
+"Workspace settings."
+msgstr "尚无成员或用户组。请在工作区设置中邀请成员或创建用户组。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "SQL"
@@ -3025,13 +2902,9 @@ msgstr "没有行过滤器。切片将包括数据集中每一行（针对所选
 msgid "Turn"
 msgstr "转动"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a table of the top 10 rows of {target}"
-#~ msgstr "添加 {target} 的前 10 行表格"
-
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#~ msgid "Empty"
-#~ msgstr "空"
+msgid "Empty"
+msgstr "空"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
@@ -3041,8 +2914,8 @@ msgstr "全部"
 
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
-#~ msgid "{fieldName} must be at least {minLength} characters long"
-#~ msgstr "{fieldName} 必须至少包含 {minLength} 个字符"
+msgid "{fieldName} must be at least {minLength} characters long"
+msgstr "{fieldName} 必须至少包含 {minLength} 个字符"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "System sans"
@@ -3051,12 +2924,12 @@ msgstr "系统无"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
-msgstr ""
+msgstr "系列标签"
 
 #. placeholder {0}: props.name
 #: packages/web/ui/src/buttons/EditButton.tsx
-#~ msgid "Edit {0}"
-#~ msgstr "编辑 {0}"
+msgid "Edit {0}"
+msgstr "编辑 {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3068,9 +2941,9 @@ msgid "Select aggregation"
 msgstr "选择聚合"
 
 #: src/routes/register.tsx
-#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
-#~ "on our waitlist and have received a sign-up code in your email."
-#~ msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
+msgid "While Avandar is in beta, we are only allowing registration if you are "
+"on our waitlist and have received a sign-up code in your email."
+msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -3085,24 +2958,24 @@ msgid "Multi select"
 msgstr "多选"
 
 #: src/routes/register.tsx
-#~ msgid "Sign up for our waitlist"
-#~ msgstr "注册我们的候补名单"
+msgid "Sign up for our waitlist"
+msgstr "注册我们的候补名单"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
 msgstr "无法加载仪表板数据集"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
-#~ msgid "No description has been added yet."
-#~ msgstr "尚未添加描述。"
+msgid "No description has been added yet."
+msgstr "尚未添加描述。"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Share failed"
-#~ msgstr "分享失败"
+msgid "Share failed"
+msgstr "分享失败"
 
 #: src/routes/register.tsx
-#~ msgid "Your waitlist code has been verified"
-#~ msgstr "您的候补名单代码已被验证"
+msgid "Your waitlist code has been verified"
+msgstr "您的候补名单代码已被验证"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -3129,13 +3002,9 @@ msgstr "仪表板共享设置已更新。"
 msgid "Sketch"
 msgstr "草图"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model ready"
-#~ msgstr "语音模型已准备好"
-
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
-msgstr ""
+msgstr "复制代码"
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
@@ -3156,25 +3025,29 @@ msgid "between"
 msgstr "之间"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
-#~ msgid "Inactive"
-#~ msgstr "非活动"
+msgid "Inactive"
+msgstr "非活动"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "all members of "
+msgstr "所有成员的 "
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Some data should be manually entered"
-#~ msgstr "某些数据应手动输入"
+msgid "Some data should be manually entered"
+msgstr "某些数据应手动输入"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
-msgstr ""
+msgstr "每个系列是一个绘制在 Y 轴上的数值列。请在下面选择 X 轴。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Pick a model to download. You can switch models or re-download later."
-#~ msgstr ""
+msgid "Pick a model to download. You can switch models or re-download later."
+msgstr "选择要下载的模型。您可以稍后切换模型或重新下载。"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
-#~ msgid "Request a feature"
-#~ msgstr "请求功能"
+msgid "Request a feature"
+msgstr "请求功能"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -3182,8 +3055,8 @@ msgid "Description"
 msgstr "描述"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Loading models..."
-#~ msgstr "加载模型中..."
+msgid "Loading models..."
+msgstr "加载模型中..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -3194,8 +3067,8 @@ msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Allow syncing"
-#~ msgstr "允许同步"
+msgid "Allow syncing"
+msgstr "允许同步"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Ascending"
@@ -3215,12 +3088,12 @@ msgstr "您尚未添加任何系列"
 
 #. placeholder {0}: userProfile.displayName
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Welcome back, {0}"
-#~ msgstr "欢迎回来，{0}"
+msgid "Welcome back, {0}"
+msgstr "欢迎回来，{0}"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Change"
-#~ msgstr "更改"
+msgid "Change"
+msgstr "更改"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -3240,8 +3113,8 @@ msgstr "正在查找 {column} 中的值…"
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
-#~ msgid "Email"
-#~ msgstr "电子邮件"
+msgid "Email"
+msgstr "电子邮件"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
@@ -3261,6 +3134,7 @@ msgstr "导出为 PDF"
 msgid "Collapse panel"
 msgstr "折叠面板"
 
+#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter"
 msgstr "过滤"
@@ -3269,25 +3143,17 @@ msgstr "过滤"
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Show the first 20 rows of {name}"
-#~ msgstr "显示 {name} 的前 20 行"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Could not access the microphone."
-#~ msgstr "无法访问麦克风。"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Dataset name must be at least 2 characters."
-#~ msgstr "数据集名称必须至少包含 2 个字符。"
+msgid "Dataset name must be at least 2 characters."
+msgstr "数据集名称必须至少包含 2 个字符。"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle.tsx
-#~ msgid "Open sidebar"
-#~ msgstr "打开侧边栏"
+#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+msgid "Open sidebar"
+msgstr "打开侧边栏"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Upload dataset"
-#~ msgstr "上传数据集"
+msgid "Upload dataset"
+msgstr "上传数据集"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -3295,28 +3161,28 @@ msgid "Reset"
 msgstr "重置"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Enter a name for this profile type"
-#~ msgstr "输入此配置文件类型的名称"
+msgid "Enter a name for this profile type"
+msgstr "输入此配置文件类型的名称"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "区域"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "No fields have been configured yet"
-#~ msgstr "尚未配置任何字段"
+msgid "No fields have been configured yet"
+msgstr "尚未配置任何字段"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "does not contain"
 msgstr "不包含"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Workspace name updated"
-#~ msgstr "工作区名称已更新"
+msgid "Workspace name updated"
+msgstr "工作区名称已更新"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Add column as a field"
-#~ msgstr "将列添加为字段"
+msgid "Add column as a field"
+msgstr "将列添加为字段"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
@@ -3325,24 +3191,25 @@ msgid "This data appears to contain health or patient information. Sending it "
 msgstr "此数据似乎包含健康或患者信息。将其发送给 AI 提供商可能会有法律和伦理影响（HIPAA、GDPR 等）。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Get started by exploring your workspace or uploading your first dataset."
-#~ msgstr "通过探索您的工作区或上传您的第一个数据集开始。"
+msgid "Get started by exploring your workspace or uploading your first dataset."
+msgstr "通过探索您的工作区或上传您的第一个数据集开始。"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#~ msgid "Share this {resourceLabel}"
-#~ msgstr "分享此 {resourceLabel}"
+msgid "Share this {resourceLabel}"
+msgstr "分享此 {resourceLabel}"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Select latitude column"
-#~ msgstr "选择纬度列"
+msgid "Select latitude column"
+msgstr "选择纬度列"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is shared with: "
+msgstr "此 {resource} 与以下人员共享："
+
+#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上传"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#~ msgid "Bubble size (numeric)"
-#~ msgstr "气泡大小（数值）"
 
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -3362,12 +3229,12 @@ msgid " over 1000 rows were rejected"
 msgstr "超过 1000 行被拒绝"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Update subscription"
-#~ msgstr "更新订阅"
+msgid "Update subscription"
+msgstr "更新订阅"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Get an average of the values"
-#~ msgstr "获取值的平均值"
+msgid "Get an average of the values"
+msgstr "获取值的平均值"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -3385,25 +3252,25 @@ msgid "{0} columns · {1} rows"
 msgstr "{0} 列 · {1} 行"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "User removed"
-#~ msgstr "用户已移除"
+msgid "User removed"
+msgstr "用户已移除"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#~ msgid "Limit {displayName} to app access"
-#~ msgstr "限制 {displayName} 的应用访问"
+msgid "Limit {displayName} to app access"
+msgstr "限制 {displayName} 的应用访问"
 
 #: src/routes/register.tsx
 #: src/routes/update-password.tsx
-#~ msgid "Confirm Password"
-#~ msgstr "确认密码"
+msgid "Confirm Password"
+msgstr "确认密码"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
 msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
-#~ msgid "Partially offline"
-#~ msgstr ""
+msgid "Partially offline"
+msgstr "部分离线"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -3411,34 +3278,36 @@ msgid "Edit query"
 msgstr "编辑查询"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "数据探索器"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count rows in {datasetName} by {secondGroupBy}"
-#~ msgstr ""
+#~ msgstr "按 {secondGroupBy} 计算 {datasetName} 中的行数"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
-msgstr ""
+msgstr "每个系列是一个绘制在径向值上的数值列。请在下面选择类别轴。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "{formattedPrice}/seat"
-#~ msgstr "{formattedPrice}/座位"
+msgid "{formattedPrice}/seat"
+msgstr "{formattedPrice}/座位"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Display name"
-#~ msgstr "显示名称"
+msgid "Display name"
+msgstr "显示名称"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Dataset is now synced online"
-#~ msgstr "数据集现已在线同步"
+msgid "Dataset is now synced online"
+msgstr "数据集现已在线同步"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
-#~ msgid "Your session has expired"
-#~ msgstr "您的会话已过期"
+msgid "Your session has expired"
+msgstr "您的会话已过期"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
@@ -3457,29 +3326,29 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr ""
 
 #: src/routes/register.tsx
-#~ msgid "A confirmation email has been sent to your email address."
-#~ msgstr "确认邮件已发送到您的电子邮件地址。"
+msgid "A confirmation email has been sent to your email address."
+msgstr "确认邮件已发送到您的电子邮件地址。"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
 msgstr "保留数据集"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Global Viewer"
-#~ msgstr "全球查看者"
+msgid "Global Viewer"
+msgstr "全球查看者"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#~ msgid "Create a new workspace. You can always edit it later."
-#~ msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
+msgid "Create a new workspace. You can always edit it later."
+msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
-#~ msgid "Your checkout was successful!"
-#~ msgstr "您的结账成功！"
+msgid "Your checkout was successful!"
+msgstr "您的结账成功！"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
-#~ "sources to start analyzing your information."
-#~ msgstr "导入电子表格，连接到 Google 表格，或从其他来源添加数据以开始分析您的信息。"
+msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
+"sources to start analyzing your information."
+msgstr "导入电子表格，连接到 Google 表格，或从其他来源添加数据以开始分析您的信息。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Please try again later."
@@ -3496,16 +3365,16 @@ msgid "Custom URL path"
 msgstr "自定义 URL 路径"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
-#~ msgid "Please log in again to continue."
-#~ msgstr "请重新登录以继续。"
+msgid "Please log in again to continue."
+msgstr "请重新登录以继续。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
 msgstr "均值"
 
 #: src/routes/update-password.tsx
-#~ msgid "Update password"
-#~ msgstr "更新密码"
+msgid "Update password"
+msgstr "更新密码"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
@@ -3516,13 +3385,13 @@ msgid "Query Details"
 msgstr "查询详情"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Your name"
-#~ msgstr "您的姓名"
+msgid "Your name"
+msgstr "您的姓名"
 
 #. placeholder {0}: model.displayName
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-#~ msgid "Downloading {0} for offline chat"
-#~ msgstr ""
+msgid "Downloading {0} for offline chat"
+msgstr "正在下载 {0} 以进行离线聊天"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Open chat panel"
@@ -3533,8 +3402,8 @@ msgid "Remove row filter"
 msgstr "移除行过滤器"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "Dataset deleted"
-#~ msgstr "数据集已删除"
+msgid "Dataset deleted"
+msgstr "数据集已删除"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
@@ -3561,8 +3430,8 @@ msgid "Pick google sheet"
 msgstr "选择 Google 表格"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Only workspace settings administrators can open workspace settings."
-#~ msgstr "只有工作区设置管理员可以打开工作区设置。"
+msgid "Only workspace settings administrators can open workspace settings."
+msgstr "只有工作区设置管理员可以打开工作区设置。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
@@ -3571,24 +3440,24 @@ msgstr "选择适用于此可视化的全局过滤器。"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
-msgstr ""
+msgstr "每个系列是一个气泡云。大小列决定气泡半径。"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 #~ msgid "Download an offline chat model (cloud icon) to ask questions while "
 #~ "offline."
-#~ msgstr ""
+#~ msgstr "下载离线聊天模型（云图标），以便在离线时提问。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "此目录条目没有列元数据。尚无法导入。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Offline chat model ready"
-#~ msgstr ""
+msgid "Offline chat model ready"
+msgstr "离线聊天模型已准备好"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "列描述更新成功！"
+msgid "Column description updated successfully!"
+msgstr "列描述更新成功！"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -3601,10 +3470,11 @@ msgstr "文件加载失败"
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
-#~ msgid "There was an error on update: {0}"
-#~ msgstr "更新时发生错误：{0}"
+msgid "There was an error on update: {0}"
+msgstr "更新时发生错误：{0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "隐私日志"
 
@@ -3618,8 +3488,8 @@ msgid "Data processing failed"
 msgstr "数据处理失败"
 
 #: packages/web/ui/src/notifications/notifyNotImplemented.ts
-#~ msgid "This feature is not implemented yet."
-#~ msgstr "此功能尚未实现。"
+msgid "This feature is not implemented yet."
+msgstr "此功能尚未实现。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -3636,12 +3506,12 @@ msgstr "此数据集可以存储在云中。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Billing"
-#~ msgstr "账单"
+msgid "Billing"
+msgstr "账单"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "Profile Name"
-#~ msgstr "配置文件名称"
+msgid "Profile Name"
+msgstr "配置文件名称"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -3650,19 +3520,20 @@ msgstr "可视化类型"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "删除数据集"
 
 #: packages/web/ui/src/notifications/notify.ts
-#~ msgid "Warning"
-#~ msgstr "警告"
+msgid "Warning"
+msgstr "警告"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "When on, members of this group only get access if they already have "
-#~ "{app} access in the workspace. When off, every member of the group gets "
-#~ "access here, even if they normally can't open {app}."
-#~ msgstr "开启时，只有在工作区中已拥有 {app} 访问权限的组成员才能访问。关闭时，组中的每个成员都可以在此访问，即使他们通常无法打开 {app}。"
+msgid "When on, members of this group only get access if they already have "
+"{app} access in the workspace. When off, every member of the group gets "
+"access here, even if they normally can't open {app}."
+msgstr "开启时，只有在工作区中已拥有 {app} 访问权限的组成员才能访问。关闭时，组中的每个成员都可以在此访问，即使他们通常无法打开 {app}。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -3676,16 +3547,16 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的 Impact 计划以增加您可以添加到工作区的数据集数量。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "This dataset is offline-only. Click to allow online syncing."
-#~ msgstr "此数据集仅限离线使用。点击以允许在线同步。"
+msgid "This dataset is offline-only. Click to allow online syncing."
+msgstr "此数据集仅限离线使用。点击以允许在线同步。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "全局过滤器"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#~ msgid "Role for {displayName}"
-#~ msgstr "{displayName} 的角色"
+msgid "Role for {displayName}"
+msgstr "{displayName} 的角色"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
@@ -3697,16 +3568,16 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 msgstr "结构化查询不支持公共查询。请改用原始 SQL。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "CSV file"
-#~ msgstr "CSV 文件"
+msgid "CSV file"
+msgstr "CSV 文件"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Updating dataset"
-#~ msgstr "正在更新数据集"
+msgid "Updating dataset"
+msgstr "正在更新数据集"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Reset password"
-#~ msgstr "重置密码"
+msgid "Reset password"
+msgstr "重置密码"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -3729,38 +3600,34 @@ msgstr "渲染为"
 msgid "Line"
 msgstr "行"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Unable to delete the voice model from cache."
-#~ msgstr "无法从缓存中删除语音模型。"
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Make offline-only"
-#~ msgstr "设为仅离线使用"
+msgid "Make offline-only"
+msgstr "设为仅离线使用"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "{0} is available when you are offline."
-#~ msgstr ""
+msgid "{0} is available when you are offline."
+msgstr "{0} 在您离线时可用。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "自定义 URL 可用"
 
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
-#~ msgid "Number of rows"
-#~ msgstr "行数"
+msgid "Number of rows"
+msgstr "行数"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#~ msgid "Restricted"
-#~ msgstr "受限"
+msgid "Restricted"
+msgstr "受限"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Contains (free-text)"
 msgstr "包含（自由文本）"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
-#~ msgid "Send feedback"
-#~ msgstr "发送反馈"
+msgid "Send feedback"
+msgstr "发送反馈"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Loading dashboard datasets"
@@ -3777,55 +3644,37 @@ msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 msgstr ""
 
 #: src/routes/register.tsx
-#~ msgid "Please choose a password to complete your registration"
-#~ msgstr "请选一个密码以完成注册"
-
-#: src/views/SharedWithMeView/SharedWithMeView.tsx
-#~ msgid "Shared with me"
-#~ msgstr "与我共享"
+msgid "Please choose a password to complete your registration"
+msgstr "请选一个密码以完成注册"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "仪表板已发布！"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of {target} grouped by category"
-#~ msgstr "添加按类别分组的 {target} 条形图"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Dictation runs locally with whisper.cpp. We download a ggml model into "
-#~ "device storage first (without freezing the tab). The model loads when "
-#~ "you dictate. Progress appears bottom-left."
-#~ msgstr ""
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "已添加到 \"{dashboardName}\""
 
 #: src/routes/signin.tsx
-#~ msgid "Welcome back!"
-#~ msgstr "欢迎回来！"
+msgid "Welcome back!"
+msgstr "欢迎回来！"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "尝试与 Google 表格进行身份验证时发生错误。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "The owner always has admin access. To change owner, use the {resource} "
-#~ "settings."
-#~ msgstr "所有者始终具有管理员访问权限。要更改所有者，请使用 {resource} 设置。"
+msgid "The owner always has admin access. To change owner, use the {resource} "
+"settings."
+msgstr "所有者始终具有管理员访问权限。要更改所有者，请使用 {resource} 设置。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
 msgstr "正在加载数据集…"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Choose the first value we see"
-#~ msgstr "选择我们看到的第一个值"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Download offline chat model (WebLLM, not voice)"
-#~ msgstr ""
+msgid "Choose the first value we see"
+msgstr "选择我们看到的第一个值"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processed successfully"
@@ -3833,8 +3682,8 @@ msgstr "数据处理成功"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Access denied"
-#~ msgstr "访问被拒绝"
+msgid "Access denied"
+msgstr "访问被拒绝"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
@@ -3842,8 +3691,8 @@ msgstr "创建了 \"{dashboardName}\""
 
 #. placeholder {0}: state.singularEntityConfigName
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "If each {0} can only have one {fieldName} value, check this box."
-#~ msgstr "如果每个 {0} 只能有一个 {fieldName} 值，请勾选此框。"
+msgid "If each {0} can only have one {fieldName} value, check this box."
+msgstr "如果每个 {0} 只能有一个 {fieldName} 值，请勾选此框。"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -3852,57 +3701,47 @@ msgid "Description must be under {maxDatasetDescriptionLength} characters "
 msgstr "描述必须少于 {maxDatasetDescriptionLength} 个字符（当前：{0}）。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Number of seats to add"
-#~ msgstr "要添加的座位数量"
+msgid "Number of seats to add"
+msgstr "要添加的座位数量"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Pay What You Want"
-#~ msgstr "随意支付"
+msgid "Pay What You Want"
+msgstr "随意支付"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-#~ msgid "Please select a dataset from the left sidebar, or create a new one."
-#~ msgstr "请从左侧边栏选择一个数据集，或创建一个新数据集。"
+msgid "Please select a dataset from the left sidebar, or create a new one."
+msgstr "请从左侧边栏选择一个数据集，或创建一个新数据集。"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#~ msgid "Limit to app access"
-#~ msgstr "限制应用访问"
+msgid "Limit to app access"
+msgstr "限制应用访问"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "输入数据集名称"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
-#~ "their own."
-#~ msgstr "此名称仅适用于 {workspaceName}。您的其他工作区保持各自的名称。"
-
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelDownloadIndicator.tsx
-#~ msgid "Downloading {0} for voice prompting"
-#~ msgstr "正在下载 {0} 以进行语音提示"
+msgid "This name only applies in {workspaceName}. Your other workspaces keep "
+"their own."
+msgstr "此名称仅适用于 {workspaceName}。您的其他工作区保持各自的名称。"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Model"
-#~ msgstr "模型"
+msgid "Model"
+msgstr "模型"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
 msgstr "未保存的更改将不会出现在预览中。请先保存。"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "This workspace does not have a valid subscription."
-#~ msgstr "此工作区没有有效的订阅。"
+msgid "This workspace does not have a valid subscription."
+msgstr "此工作区没有有效的订阅。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
 msgstr "所有决策"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Speak (local voice-to-text)"
-#~ msgstr "说话（本地语音转文本）"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Show labels"
@@ -3913,20 +3752,20 @@ msgid "X axis"
 msgstr "X 轴"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "User group deleted"
-#~ msgstr "用户组已删除"
+msgid "User group deleted"
+msgstr "用户组已删除"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "(Monthly billing)"
-#~ msgstr "（按月计费）"
+msgid "(Monthly billing)"
+msgstr "（按月计费）"
 
 #: src/routes/signin.tsx
-#~ msgid "Don't have an account yet?"
-#~ msgstr "还没有账户？"
+msgid "Don't have an account yet?"
+msgstr "还没有账户？"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
-#~ msgid "Dataset failed to load"
-#~ msgstr "数据集加载失败"
+msgid "Dataset failed to load"
+msgstr "数据集加载失败"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -3938,8 +3777,8 @@ msgid "Decimal"
 msgstr ""
 
 #: packages/web/ui/src/notifications/notify.ts
-#~ msgid "Error"
-#~ msgstr "错误"
+msgid "Error"
+msgstr "错误"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -3948,8 +3787,8 @@ msgstr "发送答案"
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
-#~ msgid "... and {remainingCount} more"
-#~ msgstr "... 还有 {remainingCount} 个"
+msgid "... and {remainingCount} more"
+msgstr "... 还有 {remainingCount} 个"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Just what's queried"
@@ -3960,8 +3799,8 @@ msgid "Could not generate QR code"
 msgstr "无法生成二维码"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
-#~ msgid "No fields or dataset are configured."
-#~ msgstr "未配置任何字段或数据集。"
+msgid "No fields or dataset are configured."
+msgstr "未配置任何字段或数据集。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
@@ -3972,25 +3811,21 @@ msgid "bar chart"
 msgstr "条形图"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From Open Data"
-#~ msgstr "来自开放数据"
+msgid "From Open Data"
+msgstr "来自开放数据"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "Name required"
-#~ msgstr "名称是必需的"
+msgid "Name required"
+msgstr "名称是必需的"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "User group saved"
-#~ msgstr "用户组已保存"
+msgid "User group saved"
+msgstr "用户组已保存"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Could not publish dashboard"
 msgstr "无法发布仪表板"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice model removed"
-#~ msgstr "语音模型已移除"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
@@ -4001,9 +3836,10 @@ msgid "Upload a spreadsheet"
 msgstr "上传电子表格"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "We were unable to update your subscription. Please contact "
-#~ "{SUPPORT_EMAIL}"
-#~ msgstr "我们无法更新您的订阅。请联系 {SUPPORT_EMAIL}"
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "We were unable to update your subscription. Please contact "
+"{SUPPORT_EMAIL}"
+msgstr "我们无法更新您的订阅。请联系 {SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google sheets connector is disabled while this feature is under "
@@ -4012,37 +3848,39 @@ msgstr "在此功能维护期间，Google Sheets 连接器已被禁用。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Remove"
-#~ msgstr "移除"
+msgid "Remove"
+msgstr "移除"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
-msgstr ""
+msgstr "没有数值列"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "服务"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
-#~ msgid "Nothing more to load"
-#~ msgstr "没有更多内容可加载"
+msgid "Nothing more to load"
+msgstr "没有更多内容可加载"
 
 #. placeholder {0}: workspace.name
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Manage how you appear in {0} and the account you use to sign in."
-#~ msgstr "管理您在 {0} 中的显示方式以及您用于登录的帐户。"
+msgid "Manage how you appear in {0} and the account you use to sign in."
+msgstr "管理您在 {0} 中的显示方式以及您用于登录的帐户。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "People with access"
-#~ msgstr "有访问权限的人"
+msgid "People with access"
+msgstr "有访问权限的人"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
 "able to access this data. This is recommended only for very sensitive "
@@ -4050,19 +3888,12 @@ msgid "This dataset will no longer be stored online and can only be accessed as 
 msgstr "此数据集将不再在线存储，仅在您的个人计算机上可以访问。您团队中的其他人将无法访问此数据。仅建议用于非常敏感的数据。"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Download a different offline chat model"
-#~ msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Voice prompts run entirely on your device. To dictate, we need to "
-#~ "download a Whisper model from Hugging Face once. The download runs in "
-#~ "the background; progress appears in the bottom-left corner."
-#~ msgstr "语音提示完全在您的设备上运行。为了进行口述，我们需要从 Hugging Face 下载一次 Whisper "
-#~ "模型。下载在后台进行；进度会显示在左下角。"
+msgid "Download a different offline chat model"
+msgstr "下载不同的离线聊天模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Edit permissions"
-#~ msgstr "编辑权限"
+msgid "Edit permissions"
+msgstr "编辑权限"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "queried"
@@ -4076,19 +3907,25 @@ msgstr "聊天消息"
 msgid "Error saving dataset"
 msgstr "保存数据集时出错"
 
+#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/routes/_auth/$workspaceSlug/profile.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
 msgstr "保存"
 
 #: src/components/badges/SourceBadge.tsx
-#~ msgid "From Google Sheets"
-#~ msgstr "来自 Google Sheets"
+msgid "From Google Sheets"
+msgstr "来自 Google Sheets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Subscription updated successfully"
-#~ msgstr "订阅已成功更新"
+msgid "Subscription updated successfully"
+msgstr "订阅已成功更新"
 
 #. placeholder {0}: columns.length
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
@@ -4109,17 +3946,17 @@ msgid "You haven't chosen a name column"
 msgstr "您尚未选择名称列"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#~ msgid "You need admin access on this resource to manage sharing."
-#~ msgstr "您需要对该资源具有管理员访问权限才能管理共享。"
+msgid "You need admin access on this resource to manage sharing."
+msgstr "您需要对该资源具有管理员访问权限才能管理共享。"
 
 #. placeholder {0}: state.singularEntityConfigName
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "If there are multiple {fieldName} values for one {0}, then..."
-#~ msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
+msgid "If there are multiple {fieldName} values for one {0}, then..."
+msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Select rule (e.g. most frequent)"
-#~ msgstr "选择规则（例如，最频繁）"
+msgid "Select rule (e.g. most frequent)"
+msgstr "选择规则（例如，最频繁）"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Multi-select"
@@ -4128,7 +3965,7 @@ msgstr "多选"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
-msgstr ""
+msgstr "每个系列是一个 (X, Y) 点云。添加更多以在同一图表上比较多个指标对。"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
@@ -4142,28 +3979,24 @@ msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "覆盖 <0>{0}</0>，从 <1>{1}</1> 到 <2>{2}</2>。"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
-#~ msgid "Loading more..."
-#~ msgstr "加载更多..."
+msgid "Loading more..."
+msgstr "加载更多..."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "自定义 URL（可选）"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "The workspace name was saved successfully."
-#~ msgstr "工作区名称已成功保存。"
+msgid "The workspace name was saved successfully."
+msgstr "工作区名称已成功保存。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#~ msgid "dataset name"
-#~ msgstr "数据集名称"
+msgid "dataset name"
+msgstr "数据集名称"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Email address updated"
-#~ msgstr "电子邮件地址已更新"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "These are too big for web and are only available on Avandar Desktop"
-#~ msgstr "这些文件太大，无法在网页上使用，仅在 Avandar Desktop 上可用"
+msgid "Email address updated"
+msgstr "电子邮件地址已更新"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
@@ -4173,34 +4006,34 @@ msgstr "手绘"
 msgid "Permanent link (use for QR codes)"
 msgstr "永久链接（用于二维码）"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Settings"
-#~ msgstr "设置"
+msgid "Settings"
+msgstr "设置"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualizations"
-msgstr ""
+msgstr "可视化"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#~ msgid "Switch Workspace"
-#~ msgstr "切换工作区"
+msgid "Switch Workspace"
+msgstr "切换工作区"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "您可以查看此仪表板，因为它已与您共享。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "Pick user groups for this member"
-#~ msgstr "为此成员选择用户组"
+msgid "Pick user groups for this member"
+msgstr "为此成员选择用户组"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Admin"
-#~ msgstr "管理员"
+msgid "Admin"
+msgstr "管理员"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "Published"
@@ -4219,8 +4052,8 @@ msgid "(clean)"
 msgstr "(清理)"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#~ msgid "Loading sharing settings…"
-#~ msgstr "加载共享设置中…"
+msgid "Loading sharing settings…"
+msgstr "加载共享设置中…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your workspace is on the Free plan, which supports up to 5 datasets. "
@@ -4232,20 +4065,20 @@ msgstr "您的工作区处于免费计划，支持最多 5 个数据集。升级
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
-#~ msgid "Editor"
-#~ msgstr "编辑者"
+msgid "Editor"
+msgstr "编辑者"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Only the people and groups listed above can access this {resource}."
-#~ msgstr "只有上述列出的人和组可以访问此 {resource}。"
+msgid "Only the people and groups listed above can access this {resource}."
+msgstr "只有上述列出的人和组可以访问此 {resource}。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "组织"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
-#~ msgid "billing portal."
-#~ msgstr "账单门户。"
+msgid "billing portal."
+msgstr "账单门户。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -4255,13 +4088,13 @@ msgstr "您尚未选择值列"
 msgid "Text contains"
 msgstr "文本包含"
 
-#: src/components/privacy/ConsentModal/ConsentModal.tsx
+#: src/components/Privacy/ConsentModal/ConsentModal.tsx
 #~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
 #~ msgstr "确认请在下面输入 <0>{MEDICAL_CONFIRMATION_PHRASE}</0>："
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#~ msgid "Role for new share"
-#~ msgstr "新共享的角色"
+msgid "Role for new share"
+msgstr "新共享的角色"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
 msgid "Expand panel"
@@ -4272,16 +4105,16 @@ msgid "Send to AI?"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Purchase {seatsToAdd} seats"
-#~ msgstr "购买 {seatsToAdd} 个座位"
+msgid "Purchase {seatsToAdd} seats"
+msgstr "购买 {seatsToAdd} 个座位"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share link"
 msgstr "分享链接"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-#~ msgid "Current Plan"
-#~ msgstr "当前计划"
+msgid "Current Plan"
+msgstr "当前计划"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
@@ -4293,50 +4126,42 @@ msgid "No rows were read successfully"
 msgstr "没有成功读取任何行"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "New user group"
-#~ msgstr "新用户组"
+msgid "New user group"
+msgstr "新用户组"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-#~ msgstr ""
+#~ msgstr "{datasetName} 中 {pickedGroupBy} 的不同值是什么？"
 
+#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "以上均不适用"
+
+#. placeholder {0}: capitalize(role)
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "This {resource} is accessible to anyone with {app} {0} permission."
+msgstr "此 {resource} 对拥有 {app} {0} 权限的任何人可访问。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "琥珀色"
 
-#. placeholder {0}: props.strokeWidth
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#~ msgid "Stroke ({0}px)"
-#~ msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Enable voice prompting"
-#~ msgstr "启用语音提示"
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Configure how to join datasets"
-#~ msgstr "配置如何连接数据集"
+msgid "Configure how to join datasets"
+msgstr "配置如何连接数据集"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Excel"
 msgstr "Excel"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "Dataset columns"
-#~ msgstr "数据集列"
+msgid "Dataset columns"
+msgstr "数据集列"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Could not prepare the offline chat model."
-#~ msgstr ""
-
-#. placeholder {0}: model.displayName
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-#~ msgid "Starting {0}…"
-#~ msgstr ""
+msgid "Could not prepare the offline chat model."
+msgstr "无法准备离线聊天模型。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
@@ -4344,24 +4169,19 @@ msgstr "此数据集将仅离线使用"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y / Size series"
-msgstr ""
+msgstr "添加至少一个 X / Y / 尺寸系列"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "This dataset is synced online. Click to make offline-only."
-#~ msgstr "此数据集已在线同步。点击以仅离线使用。"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "X Axis (numeric)"
-#~ msgstr "X 轴（数值）"
+msgid "This dataset is synced online. Click to make offline-only."
+msgstr "此数据集已在线同步。点击以仅离线使用。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
 msgstr "请再试一次。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#~ msgid "We should join data into the same {entityConfigName} when…"
-#~ msgstr "当…时，我们应该将数据连接到同一个 {entityConfigName}"
+msgid "We should join data into the same {entityConfigName} when…"
+msgstr "当…时，我们应该将数据连接到同一个 {entityConfigName}"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
@@ -4373,8 +4193,8 @@ msgstr "添加过滤器"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Profile"
-#~ msgstr "个人资料"
+msgid "Profile"
+msgstr "个人资料"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -4387,9 +4207,9 @@ msgid "Column outline"
 msgstr "列大纲"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "What this person or group can do. Viewer = read only, Editor = edit "
-#~ "content, Admin = full control including sharing."
-#~ msgstr "此人或组可以执行的操作。查看者 = 只读，编辑者 = 编辑内容，管理员 = 完全控制，包括共享。"
+msgid "What this person or group can do. Viewer = read only, Editor = edit "
+"content, Admin = full control including sharing."
+msgstr "此人或组可以执行的操作。查看者 = 只读，编辑者 = 编辑内容，管理员 = 完全控制，包括共享。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
@@ -4404,12 +4224,12 @@ msgid "Dataset ready"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Unable to make dataset offline-only"
-#~ msgstr "无法将数据集设置为仅离线使用"
+msgid "Unable to make dataset offline-only"
+msgstr "无法将数据集设置为仅离线使用"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
-#~ msgid "Enter comment"
-#~ msgstr "输入评论"
+msgid "Enter comment"
+msgstr "输入评论"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
@@ -4424,12 +4244,12 @@ msgid "Source column"
 msgstr "源列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
-#~ msgid "Number of columns"
-#~ msgstr "列数"
+msgid "Number of columns"
+msgstr "列数"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Edit role group"
-#~ msgstr "编辑角色组"
+msgid "Edit role group"
+msgstr "编辑角色组"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
@@ -4440,12 +4260,8 @@ msgid "Update & republish"
 msgstr "更新并重新发布"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid " · downloaded"
-#~ msgstr ""
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {name} by category"
-#~ msgstr "按类别计算 {name} 中的行数"
+msgid " · downloaded"
+msgstr " · 已下载"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -4457,27 +4273,21 @@ msgid "number"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Role group created"
-#~ msgstr "角色组已创建"
+msgid "Role group created"
+msgstr "角色组已创建"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Failed to update display name"
-#~ msgstr "更新显示名称失败"
+msgid "Failed to update display name"
+msgstr "更新显示名称失败"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Language"
-#~ msgstr "语言"
+msgid "Language"
+msgstr "语言"
 
 #: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
 msgid "Close panel (⌘/)"
 msgstr "关闭面板 (⌘/)"
-
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/ScatterChartForm.tsx
-#~ msgid "Y Axis (numeric)"
-#~ msgstr "Y 轴（数值）"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -4485,28 +4295,30 @@ msgstr "使用错误重新生成"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Add a table of the top 10 rows of {datasetName}"
-#~ msgstr ""
+#~ msgstr "添加 {datasetName} 的前 10 行表格"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
-msgstr ""
+msgstr "此数据集可完全离线使用"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
 msgstr "无法读取文件"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
-#~ msgid "Pay what you want"
-#~ msgstr "随意支付"
+msgid "Pay what you want"
+msgstr "随意支付"
 
 #. placeholder {0}: model.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Remove {0}"
-#~ msgstr "移除 {0}"
+msgid "Remove {0}"
+msgstr "移除 {0}"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "仪表板"
 
@@ -4514,13 +4326,9 @@ msgstr "仪表板"
 msgid "integer"
 msgstr "整数"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Transcription failed"
-#~ msgstr "转录失败"
-
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Symbol color"
-#~ msgstr "符号颜色"
+msgid "Symbol color"
+msgstr "符号颜色"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
@@ -4539,35 +4347,36 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的�
 msgid "Prompt"
 msgstr "提示"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
+msgid "You're on the Free plan"
+msgstr "您正在使用免费计划"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Count"
 msgstr "计数"
 
-#: src/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets.tsx
-#~ msgid "Some datasets are missing data"
-#~ msgstr "某些数据集缺少数据"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
-#~ msgid "Avandar is still in beta. Some features may not work as expected and "
-#~ "some may still be under construction. We appreciate your patience and "
-#~ "feedback as we work to improve the product."
-#~ msgstr "Avandar 仍在测试阶段。某些功能可能无法按预期工作，某些功能可能仍在建设中。感谢您的耐心和反馈，我们将努力改进产品。"
+msgid "Avandar is still in beta. Some features may not work as expected and "
+"some may still be under construction. We appreciate your patience and "
+"feedback as we work to improve the product."
+msgstr "Avandar 仍在测试阶段。某些功能可能无法按预期工作，某些功能可能仍在建设中。感谢您的耐心和反馈，我们将努力改进产品。"
 
 #: src/routes/register.tsx
-#~ msgid "Thank you for your interest!"
-#~ msgstr "感谢您的关注！"
+msgid "Thank you for your interest!"
+msgstr "感谢您的关注！"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "General"
-#~ msgstr "常规"
+msgid "General"
+msgstr "常规"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
-#~ msgid "User groups for invitee"
-#~ msgstr "邀请者的用户组"
+msgid "User groups for invitee"
+msgstr "邀请者的用户组"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-#~ msgid "Recommended"
-#~ msgstr "推荐"
+msgid "Recommended"
+msgstr "推荐"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
@@ -4579,16 +4388,16 @@ msgid "Only what's queried (recommended)"
 msgstr "仅查询的内容（推荐）"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#~ msgid "What field should be used as a {singularEntityConfigName}'s name?"
-#~ msgstr "应使用哪个字段作为 {singularEntityConfigName} 的名称？"
+msgid "What field should be used as a {singularEntityConfigName}'s name?"
+msgstr "应使用哪个字段作为 {singularEntityConfigName} 的名称？"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
 msgstr "正在预览此仪表板"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
-#~ msgid "No value"
-#~ msgstr "没有值"
+msgid "No value"
+msgstr "没有值"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Shape"
@@ -4596,8 +4405,8 @@ msgstr "形状"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
-#~ msgid "Members"
-#~ msgstr "成员"
+msgid "Members"
+msgstr "成员"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
@@ -4609,24 +4418,24 @@ msgid "Value"
 msgstr "值"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
-#~ msgid "You are currently subscribed to this plan."
-#~ msgstr "您当前已订阅此计划。"
+msgid "You are currently subscribed to this plan."
+msgstr "您当前已订阅此计划。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Upload a dataset"
-#~ msgstr "上传数据集"
+msgid "Upload a dataset"
+msgstr "上传数据集"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Invalid column type"
-#~ msgstr "无效的列类型"
+msgid "Invalid column type"
+msgstr "无效的列类型"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Syncing dataset online..."
-#~ msgstr "正在在线同步数据集..."
+msgid "Syncing dataset online..."
+msgstr "正在在线同步数据集..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
-msgstr ""
+msgstr "添加一个系列以选择哪个数值列驱动图表。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
@@ -4638,12 +4447,8 @@ msgid "Remove local filter"
 msgstr "移除本地过滤器"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "This removes the user group from members and resources that use it."
-#~ msgstr "这将从使用该用户组的成员和资源中移除该用户组。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Microphone access denied"
-#~ msgstr "麦克风访问被拒绝"
+msgid "This removes the user group from members and resources that use it."
+msgstr "这将从使用该用户组的成员和资源中移除该用户组。"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
@@ -4670,30 +4475,26 @@ msgid "Invalid value column selected"
 msgstr "选择的值列无效"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "No columns have been added yet."
-#~ msgstr "尚未添加任何列。"
+msgid "No columns have been added yet."
+msgstr "尚未添加任何列。"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Display name updated"
-#~ msgstr "显示名称已更新"
-
-#: src/components/VoiceModelDownloadIndicator/VoiceModelLoadingNotification.tsx
-#~ msgid "Loading voice model"
-#~ msgstr ""
+msgid "Display name updated"
+msgstr "显示名称已更新"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "Choose a workspace preset or customize per app. User groups control "
-#~ "dataset and dashboard access intersections."
-#~ msgstr "选择一个工作区预设或按应用自定义。用户组控制数据集和仪表板访问交集。"
+msgid "Choose a workspace preset or customize per app. User groups control "
+"dataset and dashboard access intersections."
+msgstr "选择一个工作区预设或按应用自定义。用户组控制数据集和仪表板访问交集。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "数据集已保存"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-#~ msgid "For each dataset you've added, please specify which columns should be "
-#~ "used to uniquely identify a {entityConfigName}."
-#~ msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {entityConfigName}。"
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {entityConfigName}."
+msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {entityConfigName}。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
@@ -4701,8 +4502,8 @@ msgid "Text"
 msgstr "文本"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#~ msgid "Role group deleted"
-#~ msgstr "角色组已删除"
+msgid "Role group deleted"
+msgstr "角色组已删除"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select sort order"
@@ -4710,7 +4511,7 @@ msgstr "选择排序顺序"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import this file?"
-msgstr ""
+msgstr "导入此文件？"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
@@ -4720,15 +4521,12 @@ msgstr "保存数据集"
 msgid "Search dashboards"
 msgstr "搜索仪表板"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "Invalid Y axis selected"
-#~ msgstr "选择的 Y 轴无效"
-
 #: packages/web/ui/src/singleton-forms/InputTextForm.tsx
+#: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
-#~ msgid "Invalid email address"
-#~ msgstr "无效的电子邮件地址"
+msgid "Invalid email address"
+msgstr "无效的电子邮件地址"
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -4736,12 +4534,12 @@ msgid "Selected document: {0}"
 msgstr "选定文档：{0}"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
-#~ msgid "Activity"
-#~ msgstr "活动"
+msgid "Activity"
+msgstr "活动"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "No workspace was found"
-#~ msgstr "未找到工作区"
+msgid "No workspace was found"
+msgstr "未找到工作区"
 
 #. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -4751,67 +4549,51 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 msgstr "{0} 列已被检测到。请查看下面的列信息以确保其正确。如果不正确，请更改上面的导入选项并再次点击上传。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
-#~ "seats."
-#~ msgstr "您的工作区已使用全部 {currentSeatUsage} 个 {totalSeats} 座位。"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
-#~ msgid "txt"
-#~ msgstr ""
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
+"seats."
+msgstr "您的工作区已使用全部 {currentSeatUsage} 个 {totalSeats} 座位。"
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "
 "to your workspace."
-msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Could not transcribe your audio."
-#~ msgstr "无法转录您的音频。"
+msgstr "上传文件、连接外部来源或浏览开放数据集以添加到您的工作区。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
-#~ msgid "{formattedPriceToDisplay}/seat"
-#~ msgstr "{formattedPriceToDisplay}/座位"
+msgid "{formattedPriceToDisplay}/seat"
+msgstr "{formattedPriceToDisplay}/座位"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed"
 msgstr "该查询失败"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Explore your data"
-#~ msgstr "探索您的数据"
+msgid "Explore your data"
+msgstr "探索您的数据"
 
 #: src/routes/forgot-password.tsx
-#~ msgid "Enter your email address"
-#~ msgstr "输入您的电子邮件地址"
+msgid "Enter your email address"
+msgstr "输入您的电子邮件地址"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
-#~ msgid "Delete user group"
-#~ msgstr "删除用户组"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a line chart showing trends in {target} over time"
-#~ msgstr "添加一条显示 {target} 随时间变化的趋势的折线图"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Downloaded on this device"
-#~ msgstr "在此设备上下载"
+msgid "Delete user group"
+msgstr "删除用户组"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#~ msgid "Sync online?"
-#~ msgstr "在线同步？"
+msgid "Sync online?"
+msgstr "在线同步？"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "中性失败"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Please try again or reach out to support."
-#~ msgstr "请重试或联系支持。"
+msgid "Please try again or reach out to support."
+msgstr "请重试或联系支持。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#~ msgid "General access"
-#~ msgstr "一般访问"
+msgid "General access"
+msgstr "一般访问"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -4832,8 +4614,8 @@ msgid "Slice colors"
 msgstr "切片颜色"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
-#~ msgid "Save changes"
-#~ msgstr "保存更改"
+msgid "Save changes"
+msgstr "保存更改"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
@@ -4844,20 +4626,20 @@ msgid "Type the confirmation phrase"
 msgstr "输入确认短语"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-#~ msgid "You have not created any dashboards"
-#~ msgstr "您尚未创建任何仪表板"
+msgid "You have not created any dashboards"
+msgstr "您尚未创建任何仪表板"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
-#~ msgid "Beta"
-#~ msgstr "测试版"
+msgid "Beta"
+msgstr "测试版"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Search by name or user group"
-#~ msgstr "按名称或用户组搜索"
+msgid "Search by name or user group"
+msgstr "按名称或用户组搜索"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Failed to update email"
-#~ msgstr "更新电子邮件失败"
+msgid "Failed to update email"
+msgstr "更新电子邮件失败"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -4876,21 +4658,18 @@ msgid "Distinct values"
 msgstr "唯一值"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
-#~ msgid "Please confirm that you would like to proceed with this plan change. "
-#~ "Your subscription will be updated accordingly."
-#~ msgstr "请确认您是否希望继续进行此计划更改。您的订阅将相应更新。"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Speak"
-#~ msgstr ""
+msgid "Please confirm that you would like to proceed with this plan change. "
+"Your subscription will be updated accordingly."
+msgstr "请确认您是否希望继续进行此计划更改。您的订阅将相应更新。"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
 msgstr "派生数据集"
 
 #: src/components/AppShell/AppShell.tsx
-#~ msgid "Search..."
-#~ msgstr "搜索..."
+msgid "Search..."
+msgstr "搜索..."
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Please take a look at the data and make sure it is correct. Once you "
@@ -4906,25 +4685,21 @@ msgid "Whole number"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Annual"
-#~ msgstr "年度"
+msgid "Annual"
+msgstr "年度"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "anyone with "
+msgstr "任何拥有 "
 
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信息并可能记录请求。"
 
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Selected"
-#~ msgstr "已选择"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "CSV 或 Excel 文件"
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "End transcription"
-#~ msgstr "结束转录"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
@@ -4954,8 +4729,8 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "最适合口碑分享。访问下面的永久链接也会重定向到此处。"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-#~ msgid "Hello DateValueItem"
-#~ msgstr "你好 DateValueItem"
+msgid "Hello DateValueItem"
+msgstr "你好 DateValueItem"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -4963,16 +4738,16 @@ msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
-#~ msgid "Entity failed to load"
-#~ msgstr "实体加载失败"
+msgid "Entity failed to load"
+msgstr "实体加载失败"
 
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#~ msgid "Used to sign in to your account."
-#~ msgstr "用于登录您的账户。"
+msgid "Used to sign in to your account."
+msgstr "用于登录您的账户。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
-#~ msgid "Role & user groups"
-#~ msgstr "角色和用户组"
+msgid "Role & user groups"
+msgstr "角色和用户组"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Clear all"
@@ -4984,29 +4759,32 @@ msgid "Close"
 msgstr "关闭"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
-#~ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
-#~ msgstr "您的工作区已使用 {currentSeatUsage} 个座位中的全部 {totalSeats} 个座位。"
+msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
+msgstr "您的工作区已使用 {currentSeatUsage} 个座位中的全部 {totalSeats} 个座位。"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "与您共享"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#~ msgid "Longitude column"
-#~ msgstr "经度列"
+msgid "Longitude column"
+msgstr "经度列"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
-msgstr ""
+msgstr "不离线"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
 msgstr "此仪表板已公开发布。"
 
 #: src/views/EntityManagerApp/SingleEntityView/index.tsx
-#~ msgid "Loading..."
-#~ msgstr "加载中..."
+msgid "Loading..."
+msgstr "加载中..."
 
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "分享"
@@ -5016,8 +4794,8 @@ msgid "Whole dataset"
 msgstr "整个数据集"
 
 #: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
-#~ msgid "Invalid date"
-#~ msgstr "无效日期"
+msgid "Invalid date"
+msgstr "无效日期"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
@@ -5030,10 +4808,6 @@ msgstr "箭头"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "值，逗号分隔"
-
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
-#~ msgid "You haven't chosen a Y axis"
-#~ msgstr "您尚未选择 Y 轴"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
@@ -5050,33 +4824,24 @@ msgid "Loose"
 msgstr "松散"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
-#~ msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
-#~ msgstr "升级计划至 {newPlanName} ({newPlanSubType})"
+msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
+msgstr "升级计划至 {newPlanName} ({newPlanSubType})"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "No models match your search"
-#~ msgstr "没有模型匹配您的搜索"
+msgid "No models match your search"
+msgstr "没有模型匹配您的搜索"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
-#~ msgid "Recommended next steps"
-#~ msgstr "推荐的下一步"
+msgid "Recommended next steps"
+msgstr "推荐的下一步"
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "来自列：<0>{columnName}</0>"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
-#~ msgid "Offline ready"
-#~ msgstr ""
-
-#. placeholder {0}: model.systemRequirements
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Not available in the browser ({0}, ~{sizeMb} MB download)."
-#~ msgstr ""
-
-#: src/components/ChatPanel/VoiceInputButton/VoiceInputButton.tsx
-#~ msgid "Set up voice prompting"
-#~ msgstr "设置语音提示"
+msgid "Offline ready"
+msgstr "离线准备就绪"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Download PNG"
@@ -5084,7 +4849,7 @@ msgstr "下载 PNG"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Add at least one X / Y series"
-msgstr ""
+msgstr "添加至少一个 X / Y 系列"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Show QR code"
@@ -5096,16 +4861,16 @@ msgid "By default we use a permanent UUID-based link. Add a custom path below "
 msgstr "默认情况下，我们使用基于永久 UUID 的链接。请在下面添加自定义路径以获得更好的 URL。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#~ msgid "Choose the minimum value"
-#~ msgstr "选择最小值"
+msgid "Choose the minimum value"
+msgstr "选择最小值"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Mode"
 msgstr "模式"
 
 #: packages/web/ui/src/notifications/notify.ts
-#~ msgid "Success"
-#~ msgstr "成功"
+msgid "Success"
+msgstr "成功"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerApp.tsx

@@ -119,7 +119,7 @@ export function SaveToDashboardListMode({
                 </Text>
                 <Text className={css.rowMeta}>
                   <Trans>
-                    Updated {formatDashboardDate(dashboard.updatedAt)}
+                    Updated {formatDashboardDate(dashboard.updatedAt, t)}
                   </Trans>
                 </Text>
                 {isSelected ?

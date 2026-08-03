@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   Divider,
@@ -33,6 +34,7 @@ export function PurchaseSeatsModalContents({
   userId,
   onSeatsAdded,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [seatsToAdd, setSeatsToAdd] = useState(1);
 
   const [purchaseSeats, isPurchasing] = useMutation({
@@ -52,25 +54,32 @@ export function PurchaseSeatsModalContents({
       });
     },
     onSuccess: () => {
-      notifySuccess({ title: "Seats purchased successfully" });
+      notifySuccess({ title: t`Seats purchased successfully` });
       modals.closeAll();
       onSeatsAdded();
     },
     queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
   });
 
-  const seatLabel = seatsToAdd === 1 ? "seat" : "seats";
   const totalSeats = subscription.maxSeatsAllowed;
 
   return (
     <Stack>
       <Text size="sm">
-        Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
-        {totalSeats === 1 ? "seat" : "seats"}.
+        {totalSeats === 1 ?
+          <Trans>
+            Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
+            seat.
+          </Trans>
+        : <Trans>
+            Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
+            seats.
+          </Trans>
+        }
       </Text>
 
       <NumberInput
-        label="Number of seats to add"
+        label={t`Number of seats to add`}
         min={1}
         value={seatsToAdd}
         onChange={(value) => {
@@ -85,7 +94,7 @@ export function PurchaseSeatsModalContents({
             modals.closeAll();
           }}
         >
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
         <Button
           loading={isPurchasing}
@@ -93,11 +102,13 @@ export function PurchaseSeatsModalContents({
             purchaseSeats({ seatsToAdd });
           }}
         >
-          Purchase {seatsToAdd} {seatLabel}
+          {seatsToAdd === 1 ?
+            <Trans>Purchase {seatsToAdd} seat</Trans>
+          : <Trans>Purchase {seatsToAdd} seats</Trans>}
         </Button>
       </Group>
 
-      <Divider label="or" labelPosition="center" />
+      <Divider label={t`or`} labelPosition="center" />
 
       <Text
         size="sm"
@@ -105,10 +116,10 @@ export function PurchaseSeatsModalContents({
         style={{ cursor: "pointer" }}
         onClick={() => {
           modals.closeAll();
-          goToBillingPortal({ userId });
+          goToBillingPortal({ userId, t });
         }}
       >
-        Manage seats in billing portal →
+        <Trans>Manage seats in billing portal →</Trans>
       </Text>
     </Stack>
   );

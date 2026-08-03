@@ -1,15 +1,16 @@
+import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import {
   createFileRoute,
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
+import { Callout } from "@ui";
 import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { EntityConfigMetaView } from "@/views/EntityDesignerApp/EntityConfigMetaView";
-import { Callout } from "@ui";
 import { Logger } from "@/utils/Logger";
+import { EntityConfigMetaView } from "@/views/EntityDesignerApp/EntityConfigMetaView";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 export const Route = createFileRoute(
@@ -34,6 +35,7 @@ function RouteComponent() {
 }
 
 function EntityMetaErrorView({ error }: ErrorComponentProps) {
+  const { t } = useLingui();
   useEffect(() => {
     Logger.error(error);
   }, [error]);
@@ -41,8 +43,8 @@ function EntityMetaErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%">
       <Callout
-        title="Profile failed to load"
-        message="The profile manager page failed to load. Please try again later or reach out to support."
+        title={t`Profile failed to load`}
+        message={t`The profile manager page failed to load. Please try again later or reach out to support.`}
       />
     </Center>
   );

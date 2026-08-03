@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Anchor, Text } from "@mantine/core";
 
 const PRIVACY_POLICY_URL = "https://www.avandarlabs.com/privacy-policy";
@@ -10,7 +11,7 @@ export function AuthFooter(): JSX.Element {
         target="_blank"
         rel="noopener noreferrer"
       >
-        Privacy Policy
+        <Trans>Privacy Policy</Trans>
       </Anchor>
     </Text>
   );

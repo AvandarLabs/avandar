@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Box,
@@ -44,6 +45,7 @@ export function DatasetColumnFieldsBlock({
   entityConfigId,
   entityConfigName,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const [selectedDatasetColumnId, setSelectedDatasetColumnId] = useState<
     DatasetColumnId | undefined
   >();
@@ -174,24 +176,29 @@ export function DatasetColumnFieldsBlock({
   const { sourceDatasets } = entityConfigForm.getValues();
 
   return (
-    <Fieldset legend="Fields that come from datasets">
+    <Fieldset legend={t`Fields that come from datasets`}>
       <Stack>
         <Callout.Info
-          title={`Select the columns you want in this ${entityConfigName}`}
+          title={t`Select the columns you want in this ${entityConfigName}`}
           icon={<IconCircleNumber1Filled />}
         >
           <Text>
-            A profile can consist of columns that come from different datasets.
+            <Trans>
+              A profile can consist of columns that come from different
+              datasets.
+            </Trans>
           </Text>
           <Text>
-            This is where you select which columns from which datasets should be
-            added into this {entityConfigName}.
+            <Trans>
+              This is where you select which columns from which datasets should
+              be added into this {entityConfigName}.
+            </Trans>
           </Text>
         </Callout.Info>
         <Group align="flex-start">
           <Stack gap="xs">
             <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
-              Dataset columns
+              <Trans>Dataset columns</Trans>
             </Text>
             <Divider />
             <DatasetColumnPickerList
@@ -206,7 +213,7 @@ export function DatasetColumnFieldsBlock({
             <ActionIcon
               variant="subtle"
               color="neutral"
-              aria-label="Add column as a field"
+              aria-label={t`Add column as a field`}
               className={`data-[disabled]:bg-transparent`}
               disabled={!selectedDatasetColumnId}
               onClick={addDatasetColumnAsField}
@@ -216,7 +223,7 @@ export function DatasetColumnFieldsBlock({
             <ActionIcon
               variant="subtle"
               color="neutral"
-              aria-label="Remove field"
+              aria-label={t`Remove field`}
               className={`data-[disabled]:bg-transparent`}
               disabled={addedFields.length === 0}
               onClick={removeField}
@@ -226,11 +233,13 @@ export function DatasetColumnFieldsBlock({
           </Stack>
           <Stack gap="xs">
             <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
-              Profile fields
+              <Trans>Profile fields</Trans>
             </Text>
             <Divider />
             {addedFields.length === 0 ?
-              <Text>No columns have been added yet.</Text>
+              <Text>
+                <Trans>No columns have been added yet.</Trans>
+              </Text>
             : <ScrollArea h={300}>
                 <SegmentedControl
                   orientation="vertical"
@@ -257,16 +266,20 @@ export function DatasetColumnFieldsBlock({
         <Divider my="xs" />
         {sourceDatasets.length > 1 ?
           <Callout.Info
-            title="Configure how to join datasets"
+            title={t`Configure how to join datasets`}
             icon={<IconCircleNumber2Filled />}
           >
             <Text>
-              For each dataset you've added, please specify which columns should
-              be used to uniquely identify a {entityConfigName}.
+              <Trans>
+                For each dataset you've added, please specify which columns
+                should be used to uniquely identify a {entityConfigName}.
+              </Trans>
             </Text>
             <Text>
-              We will use those columns to merge datasets into a single{" "}
-              {entityConfigName}.
+              <Trans>
+                We will use those columns to merge datasets into a single{" "}
+                {entityConfigName}.
+              </Trans>
             </Text>
           </Callout.Info>
         : null}
@@ -275,7 +288,10 @@ export function DatasetColumnFieldsBlock({
             entityConfigForm={entityConfigForm}
             entityConfigName={entityConfigName}
           />
-        : <Text>No columns have been added yet.</Text>}
+        : <Text>
+            <Trans>No columns have been added yet.</Trans>
+          </Text>
+        }
       </Stack>
     </Fieldset>
   );

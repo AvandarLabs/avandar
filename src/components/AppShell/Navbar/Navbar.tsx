@@ -1,4 +1,5 @@
 import { useBoolean, useMutation } from "@hooks";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   Burger,
@@ -21,6 +22,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
+import { Link } from "@ui";
 import { APP_NAME } from "$/config/AppConfig";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -28,9 +30,11 @@ import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
+import { OfflineGated } from "@/components/offline/OfflineGated";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { Link } from "@ui";
+import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -58,6 +62,8 @@ export function Navbar({
   utilityLinks,
   currentWorkspace,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const isOnline = useIsOnline();
   const router = useRouter();
   const navigate = useNavigate();
   const user = useCurrentUser();
@@ -81,7 +87,7 @@ export function Navbar({
     },
     onError: (error) => {
       notifications.show({
-        title: "Sign out failed",
+        title: t`Sign out failed`,
         message: error.message,
         color: "danger",
       });
@@ -165,24 +171,34 @@ export function Navbar({
               {profileLink ?
                 <>
                   <Menu.Item
-                    leftSection={<IconUser size={16} />}
+                    leftSection={
+                      <IconUser size={16} stroke={1.5} aria-hidden />
+                    }
                     onClick={() => {
                       router.navigate({ to: profileLink.to });
                     }}
                   >
-                    <Text span>Profile</Text>
+                    <Trans>Profile</Trans>
                   </Menu.Item>
-                  <Menu.Item
-                    leftSection={<IconPlus size={16} />}
-                    onClick={openCreateWorkspaceModal}
-                  >
-                    <Text span>Create Workspace</Text>
-                  </Menu.Item>
+                  <OfflineGated isBlocked={!isOnline}>
+                    <Menu.Item
+                      leftSection={
+                        <IconPlus size={16} stroke={1.5} aria-hidden />
+                      }
+                      onClick={openCreateWorkspaceModal}
+                    >
+                      <Trans>Create Workspace</Trans>
+                    </Menu.Item>
+                  </OfflineGated>
                   {userWorkspaces && userWorkspaces?.length > 1 ?
                     <Menu.Sub>
                       <Menu.Sub.Target>
-                        <Menu.Sub.Item leftSection={<IconSwitch2 size={14} />}>
-                          <Text>Switch Workspace</Text>
+                        <Menu.Sub.Item
+                          leftSection={
+                            <IconSwitch2 size={16} stroke={1.5} aria-hidden />
+                          }
+                        >
+                          <Trans>Switch Workspace</Trans>
                         </Menu.Sub.Item>
                       </Menu.Sub.Target>
 
@@ -210,17 +226,13 @@ export function Navbar({
               : null}
 
               <Menu.Item
-                leftSection={<IconLogout size={16} />}
+                leftSection={<IconLogout size={16} stroke={1.5} aria-hidden />}
+                rightSection={isSignOutPending ? <Loader size={14} /> : null}
                 onClick={() => {
                   sendSignOutRequest();
                 }}
               >
-                <Group>
-                  <Text span>Sign Out</Text>
-                  {isSignOutPending ?
-                    <Loader />
-                  : null}
-                </Group>
+                <Trans>Sign Out</Trans>
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -237,6 +249,33 @@ export function Navbar({
               return null;
             }
 
+            const isOfflineBlocked =
+              !isOnline && !isAppLinkAvailableOffline(link);
+            const linkContent = (
+              <Flex
+                px="xs"
+                py="xs"
+                bdrs="md"
+                align="center"
+                className={css.navbarLinkPill}
+              >
+                <Box mr="xs">{icon}</Box>
+                <Text span fw={500} className={css.collapsibleText}>
+                  {link.label}
+                </Text>
+              </Flex>
+            );
+
+            if (isOfflineBlocked) {
+              return (
+                <OfflineGated key={link.key} isBlocked>
+                  <Box component="span" display="block" w="100%">
+                    {linkContent}
+                  </Box>
+                </OfflineGated>
+              );
+            }
+
             return (
               <Link
                 key={link.key}
@@ -249,18 +288,7 @@ export function Navbar({
                   link.to === "/$workspaceSlug" ? { exact: true } : undefined
                 }
               >
-                <Flex
-                  px="xs"
-                  py="xs"
-                  bdrs="md"
-                  align="center"
-                  className={css.navbarLinkPill}
-                >
-                  <Box mr="xs">{icon}</Box>
-                  <Text span fw={500} className={css.collapsibleText}>
-                    {link.label}
-                  </Text>
-                </Flex>
+                {linkContent}
               </Link>
             );
           })}
@@ -269,6 +297,35 @@ export function Navbar({
         <Divider />
         <Stack gap={0} pb="xs" pos="relative">
           {utilityLinks.map(({ link, icon }) => {
+            const isOfflineBlocked =
+              !isOnline && !isAppLinkAvailableOffline(link);
+            const linkContent = (
+              <Flex
+                px="sm"
+                py="xs"
+                bdrs="md"
+                align="center"
+                className={css.navbarLinkPill}
+              >
+                <Group gap={0} wrap="nowrap">
+                  <Box mr="xs">{icon}</Box>
+                  <Text span fw={500} className={css.collapsibleText}>
+                    {link.label}
+                  </Text>
+                </Group>
+              </Flex>
+            );
+
+            if (isOfflineBlocked) {
+              return (
+                <OfflineGated key={link.key} isBlocked>
+                  <Box component="span" display="block" w="100%">
+                    {linkContent}
+                  </Box>
+                </OfflineGated>
+              );
+            }
+
             return (
               <Link
                 key={link.key}
@@ -284,20 +341,7 @@ export function Navbar({
                   link.to === "/$workspaceSlug" ? { exact: true } : undefined
                 }
               >
-                <Flex
-                  px="sm"
-                  py="xs"
-                  bdrs="md"
-                  align="center"
-                  className={css.navbarLinkPill}
-                >
-                  <Group gap={0} wrap="nowrap">
-                    <Box mr="xs">{icon}</Box>
-                    <Text span fw={500} className={css.collapsibleText}>
-                      {link.label}
-                    </Text>
-                  </Group>
-                </Flex>
+                {linkContent}
               </Link>
             );
           })}
@@ -308,7 +352,7 @@ export function Navbar({
         onClose={closeCreateWorkspaceModal}
       >
         <CreateWorkspaceForm
-          introText="Create a new workspace. You can always edit it later."
+          introText={t`Create a new workspace. You can always edit it later.`}
           onWorkspaceCreated={closeCreateWorkspaceModal}
         />
       </Modal>

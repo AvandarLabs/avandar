@@ -2,24 +2,22 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { makeSelectOptions, Select, Tooltip } from "@ui";
-import { makeBucketMap, prop, where } from "@utils";
+import { makeBucketMap, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   QueryDataSource,
   QueryDataSourceId,
 } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { UserId } from "$/models/User/User.types";
 
 type Props = {
   value?: QueryDataSource | null;
@@ -53,22 +51,7 @@ export function QueryDataSourceSelect({
 
   const workspace = useCurrentWorkspace();
   const isOnline = useIsOnline();
-  const user = useCurrentUser();
-
-  // Dataset ids with parquet cached locally for the current user/workspace.
-  const [localDatasets] = LocalDatasetClient.useGetAll({
-    where: {
-      userId: { eq: user?.id as UserId },
-      workspaceId: { eq: workspace.id },
-    },
-    useQueryOptions: {
-      enabled: !!user,
-      staleTime: 30_000,
-    },
-  });
-  const localDatasetIds = useMemo(() => {
-    return new Set((localDatasets ?? []).map(prop("datasetId")));
-  }, [localDatasets]);
+  const localDatasetIds = useLocalDatasetIds();
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -100,15 +83,13 @@ export function QueryDataSourceSelect({
     if (isOnline) {
       return new Set<QueryDataSourceId>();
     }
-    return new Set(
-      (datasets ?? [])
-        .filter((d) => {
-          return !localDatasetIds.has(d.id as DatasetId);
-        })
-        .map((d) => {
-          return d.id as QueryDataSourceId;
-        }),
-    );
+    const ids = new Set<QueryDataSourceId>();
+    for (const dataset of datasets ?? []) {
+      if (!localDatasetIds.has(dataset.id as DatasetId)) {
+        ids.add(dataset.id as QueryDataSourceId);
+      }
+    }
+    return ids;
   }, [datasets, isOnline, localDatasetIds]);
 
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {

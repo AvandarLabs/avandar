@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   Button,
   Container,
@@ -14,6 +15,7 @@ import { mantineColorVar, Paper } from "@ui";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
@@ -23,6 +25,8 @@ type Props = {
 export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
   const navigate = useNavigate();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+  const isTabletSize = useIsTabletSize() ?? false;
+  const featureIconSize = isTabletSize ? 24 : 32;
 
   const onGoToUploadDataset = () => {
     navigate(AppLinks.dataImport(workspace.slug));
@@ -34,44 +38,50 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
 
   return (
     <AppLayout title={workspace.name}>
-      <Container ta="left" py="xxxl" size="lg">
+      <Container ta="left" py={{ base: "xl", md: "xxl", xl: "xxxl" }} size="lg">
         <Stack gap="xl">
           <Stack gap="xs">
             <Title order={1}>
-              Welcome back
               {isLoadingUserProfile ?
-                <Loader ml="sm" size="sm" />
+                <>
+                  <Trans>Welcome back</Trans>
+                  <Loader ml="sm" size="sm" />
+                </>
               : userProfile ?
-                `, ${userProfile.displayName}`
-              : null}
+                <Trans>Welcome back, {userProfile.displayName}</Trans>
+              : <Trans>Welcome back</Trans>}
             </Title>
             <Text size="lg" c="dimmed">
-              Get started by exploring your workspace or uploading your first
-              dataset.
+              <Trans>
+                Get started by exploring your workspace or uploading your first
+                dataset.
+              </Trans>
             </Text>
           </Stack>
 
           <Stack gap="md">
             <Title order={2} size="h3" fw={600}>
-              Recommended next steps
+              <Trans>Recommended next steps</Trans>
             </Title>
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
               <Paper p="lg" h="100%">
                 <Stack gap="md" h="100%">
                   <Group gap="md">
                     <IconDatabase
-                      size={32}
+                      size={featureIconSize}
                       stroke={1.5}
                       color={mantineColorVar("primary.6")}
                     />
                     <Stack gap={4} style={{ flex: 1 }}>
                       <Title order={3} size="h4" fw={600}>
-                        Upload a dataset
+                        <Trans>Upload a dataset</Trans>
                       </Title>
                       <Text size="sm" c="dimmed">
-                        Import spreadsheets, connect to Google Sheets, or add
-                        data from other sources to start analyzing your
-                        information.
+                        <Trans>
+                          Import spreadsheets, connect to Google Sheets, or add
+                          data from other sources to start analyzing your
+                          information.
+                        </Trans>
                       </Text>
                     </Stack>
                   </Group>
@@ -82,7 +92,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                     mt="auto"
                     leftSection={<IconDatabase size={18} />}
                   >
-                    Upload dataset
+                    <Trans>Upload dataset</Trans>
                   </Button>
                 </Stack>
               </Paper>
@@ -91,17 +101,19 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                 <Stack gap="md" h="100%">
                   <Group gap="md">
                     <IconTable
-                      size={32}
+                      size={featureIconSize}
                       stroke={1.5}
                       color={mantineColorVar("primary.6")}
                     />
                     <Stack gap={4} style={{ flex: 1 }}>
                       <Title order={3} size="h4" fw={600}>
-                        Explore your data
+                        <Trans>Explore your data</Trans>
                       </Title>
                       <Text size="sm" c="dimmed">
-                        Use the Data Explorer to analyze your datasets, create
-                        visualizations, and discover insights from your data.
+                        <Trans>
+                          Use the Data Explorer to analyze your datasets, create
+                          visualizations, and discover insights from your data.
+                        </Trans>
                       </Text>
                     </Stack>
                   </Group>
@@ -112,7 +124,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                     mt="auto"
                     leftSection={<IconTable size={18} />}
                   >
-                    Go to Data Explorer
+                    <Trans>Go to Data Explorer</Trans>
                   </Button>
                 </Stack>
               </Paper>

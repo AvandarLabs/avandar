@@ -1,7 +1,6 @@
-import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ShareAddPrincipalRow } from "@/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow";
-import { render } from "@/utils/testing-utils";
+import { render, screen } from "@/test-utils";
 
 describe("ShareAddPrincipalRow", () => {
   it("disables the Share button until a target is selected", () => {
@@ -32,7 +31,7 @@ describe("ShareAddPrincipalRow", () => {
     const comboboxes = screen.getAllByRole("combobox");
     expect(
       comboboxes.some((el) => {
-        return el.getAttribute("aria-label") === "Add people, groups, or tags";
+        return el.getAttribute("aria-label") === "Add people or user groups";
       }),
     ).toBe(true);
 

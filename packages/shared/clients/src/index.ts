@@ -33,3 +33,7 @@ export type {
   ServerApiClient,
   ServerApiFunctionRequest,
 } from "@clients/ServerApiClient/ServerApiClient.types.ts";
+export {
+  ServerApiSessionRefresher,
+  SessionExpiredError,
+} from "@clients/ServerApiClient/ServerApiSessionRefresher.ts";

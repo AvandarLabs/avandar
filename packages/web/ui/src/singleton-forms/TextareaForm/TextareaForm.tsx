@@ -1,4 +1,5 @@
 import { getIsMacPlatform } from "@browser-utils";
+import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { useId, useRef } from "react";
@@ -86,11 +87,14 @@ export function TextareaForm({
   onCancel,
   showSubmitButton = true,
   showCancelButton = false,
-  submitButtonLabel = "Submit",
-  cancelButtonLabel = "Cancel",
+  submitButtonLabel,
+  cancelButtonLabel,
   disabledUntilDirty = false,
   ...moreTextareaProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedSubmitLabel = submitButtonLabel ?? t`Submit`;
+  const resolvedCancelLabel = cancelButtonLabel ?? t`Cancel`;
   const formId = useId();
   const form = useForm<SingleInputForm>({
     mode: "uncontrolled",
@@ -103,11 +107,12 @@ export function TextareaForm({
       value: (value) => {
         if (required && value.trim().length === 0) {
           // prevent a value that is only empty spaces
-          return "This field cannot be empty";
+          return t`This field cannot be empty`;
         }
 
         if (minLength && value.length < minLength) {
-          return `${hideLabel || !label ? "This field" : label} must be at least ${minLength} characters long`;
+          const fieldName = hideLabel || !label ? t`This field` : label;
+          return t`${fieldName} must be at least ${minLength} characters long`;
         }
         return null;
       },
@@ -166,7 +171,7 @@ export function TextareaForm({
             (disabledUntilDirty && !form.isDirty())
           }
         >
-          {submitButtonLabel}
+          {resolvedSubmitLabel}
           <Text ml="xxs" span size="xs" c="white">
             {shortcutText}
           </Text>
@@ -174,7 +179,7 @@ export function TextareaForm({
       : null}
       {showCancelButton ?
         <Button variant="default" onClick={onCancel}>
-          {cancelButtonLabel}
+          {resolvedCancelLabel}
         </Button>
       : null}
     </Group>

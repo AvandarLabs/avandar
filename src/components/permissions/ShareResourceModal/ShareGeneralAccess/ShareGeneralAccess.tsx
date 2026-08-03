@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
@@ -5,7 +6,7 @@ import {
   appForResource,
   appLabel,
   resourceTypeLabel,
-  SHARE_COPY,
+  useShareCopy,
 } from "../shareCopy";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -29,6 +30,8 @@ export function ShareGeneralAccess({
   workspaceShareRole,
   onChange,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const shareCopy = useShareCopy();
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
@@ -36,21 +39,21 @@ export function ShareGeneralAccess({
     isRestricted ? "restricted" : "workspace";
 
   const generalOptions = [
-    { value: "restricted", label: "Restricted" },
-    { value: "workspace", label: `Anyone in ${app}` },
+    { value: "restricted", label: t`Restricted` },
+    { value: "workspace", label: t`Anyone in ${app}` },
   ];
 
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {SHARE_COPY.generalAccessHeading}
+        {shareCopy.generalAccessHeading}
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
         <Tooltip
           label={
             generalValue === "restricted" ?
-              SHARE_COPY.restrictedOptionTooltip(resource)
-            : SHARE_COPY.workspaceOptionTooltip(resource, app)
+              shareCopy.restrictedOptionTooltip(resource)
+            : shareCopy.workspaceOptionTooltip(resource, app)
           }
           multiline
           w={320}
@@ -71,17 +74,17 @@ export function ShareGeneralAccess({
                 });
               }
             }}
-            aria-label="General access"
+            aria-label={t`General access`}
           />
         </Tooltip>
         {generalValue === "workspace" ?
-          <Tooltip label={SHARE_COPY.roleSelectTooltip}>
+          <Tooltip label={shareCopy.roleSelectTooltip}>
             <Select
               w={120}
               data={[
-                { value: "viewer", label: "Viewer" },
-                { value: "editor", label: "Editor" },
-                { value: "admin", label: "Admin" },
+                { value: "viewer", label: t`Viewer` },
+                { value: "editor", label: t`Editor` },
+                { value: "admin", label: t`Admin` },
               ]}
               value={workspaceShareRole ?? "viewer"}
               allowDeselect={false}
@@ -93,13 +96,13 @@ export function ShareGeneralAccess({
                   });
                 }
               }}
-              aria-label="Role for everyone in the workspace"
+              aria-label={t`Role for everyone in the workspace`}
             />
           </Tooltip>
         : null}
       </Group>
       <Text size="xs" c="dimmed">
-        {SHARE_COPY.generalAccessHelper}
+        {shareCopy.generalAccessHelper}
       </Text>
     </Stack>
   );

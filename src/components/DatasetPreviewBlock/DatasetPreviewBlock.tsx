@@ -1,5 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { ObjectDescriptionList, Callout  } from "@ui";
+import { Callout, ObjectDescriptionList } from "@ui";
 import { prop } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -34,28 +35,29 @@ export function DatasetPreviewBlock({
   dataColumnsCalloutMessage,
   ...stackProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const dataPreviewMsg =
     dataPreviewCalloutMessage ??
-    `These are the first ${previewRows.length} rows of your dataset.`;
+    t`These are the first ${previewRows.length} rows of your dataset.`;
   const dataColumnsMsg =
     dataColumnsCalloutMessage ??
-    `${columns.length} columns were detected. Review the column info below to make sure they are correct.`;
+    t`${columns.length} columns were detected. Review the column info below to make sure they are correct.`;
 
   const columnNames = columns.map(prop("name"));
 
   return (
     <Stack gap="md" {...stackProps}>
-      <Callout title="Data Preview" color="info" message={dataPreviewMsg}>
+      <Callout title={t`Data Preview`} color="info" message={dataPreviewMsg}>
         {dataPreviewCalloutContents}
       </Callout>
       <DataGrid columnNames={columnNames} data={previewRows} />
-      <Callout title="Column info" color="info" message={dataColumnsMsg} />
+      <Callout title={t`Column info`} color="info" message={dataColumnsMsg} />
       <ScrollArea h={500} type="auto">
         <ObjectDescriptionList
           data={columns}
           renderAsTable
           renderTableHeader={(key: keyof DatasetColumn.T) => {
-            return key === "name" ? "Column Name" : undefined;
+            return key === "name" ? t`Column Name` : undefined;
           }}
           itemRenderOptions={{
             includeKeys: ["name", "dataType"],

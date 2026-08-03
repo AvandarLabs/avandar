@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
   SimpleGrid,
@@ -9,12 +10,18 @@ import {
 import { Model } from "@models";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert, Paper  } from "@ui";
+import { notifyDevAlert, Paper } from "@ui";
+import { prop, where } from "@utils";
+import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
+import { useMemo } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
+import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -27,9 +34,37 @@ export function DashboardListView({
   dashboards,
   workspaceSlug,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const localDatasetIds = useLocalDatasetIds();
+  const [workspaceDatasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+  const workspaceDatasetIds = useMemo(() => {
+    return (workspaceDatasets ?? []).map(prop("id"));
+  }, [workspaceDatasets]);
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+
+  const getDashboardOfflineStatus = (
+    dashboard: Dashboard.T,
+  ): "full" | "partial" | "none" => {
+    const referencedIds = collectDatasetIds(dashboard, workspaceDatasetIds);
+    if (referencedIds.length === 0) {
+      return "full";
+    }
+    const cachedCount = referencedIds.filter((datasetId) => {
+      return localDatasetIds.has(datasetId);
+    }).length;
+    if (cachedCount === referencedIds.length) {
+      return "full";
+    }
+    if (cachedCount === 0) {
+      return "none";
+    }
+    return "partial";
+  };
+  const isTabletSize = useIsTabletSize() ?? false;
   const [insertDashboard, isInsertDashboardPending] = DashboardClient.useInsert(
     {
       queryToInvalidate: DashboardClient.QueryKeys.getAll(),
@@ -77,16 +112,22 @@ export function DashboardListView({
       return (
         <Paper p="xxl" maw={720} mx="auto">
           <Stack gap="lg" align="center" ta="center">
-            <ThemeIcon size={64} radius="xl" variant="light">
-              <IconLayoutDashboard size={32} stroke={1.5} />
+            <ThemeIcon
+              size={isTabletSize ? 48 : 64}
+              radius="xl"
+              variant="light"
+            >
+              <IconLayoutDashboard size={isTabletSize ? 24 : 32} stroke={1.5} />
             </ThemeIcon>
 
             <Stack gap="xs">
               <Title order={2} fw={650}>
-                You have not created any dashboards
+                <Trans>You have not created any dashboards</Trans>
               </Title>
               <Text c="dimmed">
-                Create your first dashboard to track key metrics and insights.
+                <Trans>
+                  Create your first dashboard to track key metrics and insights.
+                </Trans>
               </Text>
             </Stack>
 
@@ -97,7 +138,7 @@ export function DashboardListView({
               loading={isInsertDashboardPending}
               disabled={isLoadingUserProfile}
             >
-              Create a dashboard
+              <Trans>Create a dashboard</Trans>
             </Button>
           </Stack>
         </Paper>
@@ -123,6 +164,7 @@ export function DashboardListView({
                 <DashboardCard
                   key={dashboard.id}
                   dashboard={dashboard}
+                  offlineStatus={getDashboardOfflineStatus(dashboard)}
                   onClick={onCardClick}
                 />
               );
@@ -135,7 +177,7 @@ export function DashboardListView({
 
   return (
     <AppLayout
-      title="Dashboards"
+      title={t`Dashboards`}
       toolbarButtonSection={
         <Button
           leftSection={<IconPlus size={18} />}
@@ -145,7 +187,7 @@ export function DashboardListView({
           loading={isInsertDashboardPending}
           disabled={isLoadingUserProfile}
         >
-          Create a dashboard
+          <Trans>Create a dashboard</Trans>
         </Button>
       }
       containerProps={{

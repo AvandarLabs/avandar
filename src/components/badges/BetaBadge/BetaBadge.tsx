@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Badge, BadgeProps } from "@mantine/core";
 import { mantineVar, Tooltip } from "@ui";
 
@@ -8,9 +9,6 @@ type Props = BadgeProps & {
   withTooltip?: boolean;
 };
 
-const _BETA_TOOLTIP_LABEL =
-  "Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.";
-
 /**
  * Small “Beta” badge; optional tooltip explains the product beta state.
  */
@@ -19,9 +17,10 @@ export function BetaBadge({
   withTooltip = true,
   ...props
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const badge = (
     <Badge
-      aria-label="Beta"
+      aria-label={t`Beta`}
       color="warning.5"
       c="dark.9"
       fw={700}
@@ -36,11 +35,15 @@ export function BetaBadge({
       }}
       {...props}
     >
-      <span aria-hidden="true">Beta</span>
+      <span aria-hidden="true">{t`Beta`}</span>
     </Badge>
   );
 
   return withTooltip ?
-      <Tooltip label={_BETA_TOOLTIP_LABEL}>{badge}</Tooltip>
+      <Tooltip
+        label={t`Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.`}
+      >
+        {badge}
+      </Tooltip>
     : badge;
 }

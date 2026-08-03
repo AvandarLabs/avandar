@@ -1,4 +1,9 @@
+import { I18nProvider } from "@lingui/react";
+import { ModalsProvider } from "@mantine/modals";
 import { describe, expect, it, vi } from "vitest";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
+import { i18n } from "@/i18n/i18n";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { openFileImportFlow } from "./openFileImportFlow";
 import type { ReactElement } from "react";
@@ -52,11 +57,13 @@ function TriggerButton({ file }: { file: File }): ReactElement {
 }
 
 function renderImportFlowUi(ui: ReactElement): void {
-  // `render` from `@/test-utils` wraps in `TestProviders`
-  // (`I18nProvider` > `AvandarUiProvider`, which owns the single
-  // `ModalsProvider`), so the imperatively-opened dropzone confirm modal
-  // renders inside the Lingui context and its `<Trans>` content resolves.
-  render(ui);
+  render(
+    <AvandarUiProvider>
+      <I18nProvider i18n={i18n}>
+        <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>{ui}</ModalsProvider>
+      </I18nProvider>
+    </AvandarUiProvider>,
+  );
 }
 
 function _createCsvFile(name = "data.csv"): File {

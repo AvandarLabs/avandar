@@ -1,10 +1,6 @@
+import { t } from "@lingui/core/macro";
 import { capitalize, propEq } from "@utils";
-import {
-  appForResource,
-  appLabel,
-  resourceTypeLabel,
-  SHARE_COPY,
-} from "../shareCopy";
+import { appForResource, appLabel, resourceTypeLabel } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -73,13 +69,13 @@ export function buildShareSummary(
     return [
       {
         kind: "text",
-        text: SHARE_COPY.emptyState.noShares(resource),
+        text: t`This ${resource} is currently only accessible to its owner.`,
       },
     ];
   }
 
   const spans: SummarySpan[] = [
-    { kind: "text", text: `This ${resource} is shared with: ` },
+    { kind: "text", text: t`This ${resource} is shared with: ` },
   ];
 
   const fragments: SummarySpan[][] = [];
@@ -89,7 +85,7 @@ export function buildShareSummary(
   if (userShares.length > 0) {
     const userFragment: SummarySpan[] = [];
     userShares.forEach((share, idx) => {
-      const name = opts.userById[share.principalId] ?? "Unknown user";
+      const name = opts.userById[share.principalId] ?? t`Unknown user`;
       if (idx > 0) {
         userFragment.push({ kind: "text", text: ", " });
       }
@@ -99,15 +95,15 @@ export function buildShareSummary(
   }
 
   groupShares.forEach((share) => {
-    const groupName = opts.groupById[share.principalId] ?? "Unknown group";
+    const groupName = opts.groupById[share.principalId] ?? t`Unknown group`;
     const fragment: SummarySpan[] = [
-      { kind: "text", text: "all members of " },
+      { kind: "text", text: t`all members of ` },
       { kind: "pill", label: groupName, variant: "group" },
     ];
     if (share.requiresAppAccess) {
-      fragment.push({ kind: "text", text: " who also have " });
+      fragment.push({ kind: "text", text: t` who also have ` });
       fragment.push({ kind: "pill", label: app, variant: "app" });
-      fragment.push({ kind: "text", text: " access" });
+      fragment.push({ kind: "text", text: t` access` });
     }
     fragments.push(fragment);
   });
@@ -120,7 +116,7 @@ export function buildShareSummary(
   // separator becomes ", and " (Oxford-style for readability).
   fragments.forEach((fragment, idx) => {
     if (idx > 0) {
-      const separator = idx === fragments.length - 1 ? ", and " : ", ";
+      const separator = idx === fragments.length - 1 ? t`, and ` : ", ";
       spans.push({ kind: "text", text: separator });
     }
     spans.push(...fragment);
@@ -138,7 +134,7 @@ function buildGeneralAccessOnlySummary(
   return [
     {
       kind: "text",
-      text: `This ${resource} is accessible to anyone with ${app} ${capitalize(role)} permission.`,
+      text: t`This ${resource} is accessible to anyone with ${app} ${capitalize(role)} permission.`,
     },
   ];
 }
@@ -148,10 +144,10 @@ function buildGeneralAccessFragment(
   role: RoleLevel,
 ): SummarySpan[] {
   return [
-    { kind: "text", text: "anyone with " },
+    { kind: "text", text: t`anyone with ` },
     { kind: "pill", label: app, variant: "app" },
     { kind: "text", text: " " },
     { kind: "pill", label: capitalize(role), variant: "role" },
-    { kind: "text", text: " permission" },
+    { kind: "text", text: t` permission` },
   ];
 }
