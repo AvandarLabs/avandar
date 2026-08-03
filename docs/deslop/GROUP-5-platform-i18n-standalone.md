@@ -47,6 +47,14 @@
 | 092 | `docs-superpowers-specs-plans` | docs |
 | 093 | `docs-demo-features` | docs |
 
+**Parity absorption (§S — added 2026-08-03; see "Residual parity audit" below)**
+| # | Slug | Size |
+|---|------|------|
+| 098 | `chat-privacy-clarification-runtime` | large (G3-deferred runtime wiring) |
+| 099 | `sql-display-mention-rendering` | medium |
+| 100 | `session-expired-recovery` | medium |
+| 101 | `earlier-group-rename-and-schema-residuals` | small (mostly final-parity cleanup) |
+
 ---
 
 ## Notes for future you
@@ -132,6 +140,60 @@ reconcile them, or the final-parity gate below will fail.
    `AvaPageDataMigrationV3.ts`/`.types.ts`. It is cosmetic; either adopt feat's
    version during the final-parity pass or explicitly accept it (develop's V3 is
    correct and tested). Not a feature gap.
+
+### Residual parity audit (2026-08-03) — what GROUP-5 must ALSO absorb
+
+The original GROUP-5 scope (desktop/offline/i18n/profile/share/docs) did **not**
+cover the full `develop..feat` residual. After the G4 mergeback merged, a
+final-parity audit of `git diff origin/develop..origin/feat/ict4d-demo -- src
+shared packages supabase scripts` found **362 files (158 feat-only)**. Full
+categorization:
+
+- **~285 files → `#081 frontend-lingui-wiring` (already in scope).** 193 are
+  i18n-only string wrapping; ~92 more are i18n-*driven* refactors that a naive
+  "non-i18n" filter mis-flags — static label functions/constants converted to
+  localized hooks (`appTypeToLabel` → `useAppTypeLabel`, `FREE_CHOICES` labels →
+  localized choices), `<Combobox.Option>` text wrapping, etc. These are exactly
+  what `#081` does across every surface. **No new row needed**; they validate
+  that `#081` is genuinely repo-wide and must run dead last.
+- **Existing GROUP-5 rows absorb their own areas** — `apps/desktop/**` +
+  `src/config/platform/**` → `#056`–`#060` (`AuthClient.ts` platform-branch is
+  `#058`); `src/lib/offlineChat/**` + download controls + `src/lib/localModels/**`
+  → `#062`/`#063`; `src/lib/offline/**` + `src/components/offline/**` +
+  `useLocalDatasetIds`/`useIsOnline`/`collectDatasetIds`/`isAppLinkAvailableOffline`
+  → the offline group (feat is ahead of what `#061` landed; bring the deltas);
+  `src/i18n/**` + language picker → `#079`–`#082`; `ShareResourceModal` → `#095`;
+  profile → `#090`.
+- **The genuinely-uncovered residual → new rows `#098`–`#101`** (see §S in
+  `ALL_FEATURES.md`). These are feat-ahead subsystems / cleanup earlier groups'
+  mergebacks deferred, invisible to `/deslop update`:
+  - **`#098` chat-privacy-clarification-runtime** — `src/lib/privacy/**` (~20,
+    all feat-only), `supabase/functions/_shared/privacy/*`,
+    `supabase/functions/chat/dataExplorerToolDefinitions/*`, and the runtime
+    wiring in `ChatPanel/{useAvandarChatRuntime,ClarificationCard/clarificationAnswer,
+    ChatEmptyState/pickChatSuggestionColumns}`. G3 marked its privacy rows `[x]`
+    but its mergeback log explicitly deferred threading detectors into the live
+    turn lifecycle "in coordination with G4/G5" — this is that work.
+  - **`#099` sql-display-mention-rendering** — `shared/lib/sql/{buildSqlDisplaySegments,
+    sqlScope,sqlDisplay.types}` + `src/lib/sql/{formatSqlForDisplay,
+    buildSqlDisplayCatalog,createSqlDisplayExtension,createSqlMentionExtension,
+    getSqlMentionOptions}` (+tests) — 13 feat-only files.
+  - **`#100` session-expired-recovery** — `packages/shared/clients/src/ServerApiClient/*`,
+    `src/components/AppErrorBoundary/*`, `src/config/registerSessionExpiredHandler.ts`,
+    `src/clients/APIClient.ts`, `packages/web/ui/src/notifications/notifyExpiredSession.ts`,
+    `supabase/functions/_shared/MiniServer/*` (~17 files).
+  - **`#101` earlier-group-rename-and-schema-residuals** — mostly *final-parity
+    cleanup on feat*, not develop migration: adopt develop's `AnalyticsClient.ts`
+    (drop feat's lowercase `analyticsClient.ts`; repoint call sites),
+    `structuredQueryToSql`, `ChartStyle`; plus feat-only G1 leftovers
+    `datasetPreviewSQL.ts` / `useCanAddDataset.ts`; plus the **feat-only Phase-1
+    schema migration** `20260727210438_remove_chat_planning.sql` (+ its contract
+    test) to reconcile onto develop.
+
+**Migration-order implication:** land `#098`–`#100` (real feat→develop
+subsystems) *before* `#081` (so their strings are in the extract), and do `#101`
+during the final-parity pass. `#098` depends on G3's privacy clients/components
+(already `[x]` on develop).
 
 ### Internal split seam (fallback only — operator declined splitting for now)
 
@@ -571,9 +633,10 @@ The operator opens exactly one PR for the group against `develop`. On merge:
 
 1. Verify the refactor branch merged into `develop`
    (`git merge-base --is-ancestor refactor-g5/platform-i18n-standalone origin/develop`).
-2. Flip **all 16 constituent rows** (`#056`-`#060`, `#062`,
-   `#063`, `#079`-`#082`, `#090`, `#091`, `#092`, `#093`, `#095`) in
-   `ALL_FEATURES.md` from `[ ]` to `[x] (<merge-sha>)` (the same merge SHA for all).
+2. Flip **all 20 constituent rows** (`#056`-`#060`, `#062`,
+   `#063`, `#079`-`#082`, `#090`, `#091`, `#092`, `#093`, `#095`, **plus the
+   parity-absorption rows `#098`-`#101`**) in `ALL_FEATURES.md` from `[ ]` to
+   `[x] (<merge-sha>)` (the same merge SHA for all).
 3. Log the group completion in `STATE.md` (move the rows from `In-flight
    migrations` to the `Completed migrations log` with date + SHA).
 4. Delete all of the group's per-feature plan files:

@@ -41,7 +41,10 @@ let it drift.
   real commit is `6a1366e20054cc4e9c87055ebb6fca6119270282`)
   (subject: _refactor(chat): remove planning feature_)
 - **Last update run on**: `2026-08-03`
-- **Active rows**: 16 remaining (all GROUP-5). On 2026-07-24 the 5
+- **Active rows**: 20 remaining (all GROUP-5): the original 16
+  (#056–#063, #079–#082, #090–#093, #095) plus the 2026-08-03 parity-absorption
+  rows #098–#101 (see §S in `ALL_FEATURES.md` and the "Residual parity audit" in
+  `GROUP-5-*.md`). On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
   (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
   #049, #096, #097) merged (`59cdb59c`); on 2026-07-31 the 18 GROUP-3 rows
