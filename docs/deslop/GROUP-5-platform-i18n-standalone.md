@@ -3,7 +3,11 @@
 - **Group**: 5 of 5 (the **final** group; when this merges, deslop is DONE)
 - **Refactor branch**: `refactor-g5/platform-i18n-standalone`
 - **Migration strategy:** one PR per group — the whole group lands as a single PR off `refactor-g5/platform-i18n-standalone`; the per-row order below is the in-branch build sequence.
-- **Base**: `origin/develop` (was `6ec98d45` at group-planning time; **drifted to `6ec98d45`** — see drift note below)
+- **Base**: `origin/develop` at `4f57526a` (refreshed 2026-08-03 via
+  `/deslop undrift`, after G1 `914bcbba` + G2 `59cdb59c` + G3 `c703e5c2` + G4
+  `4f57526a` all merged). Originally planned against `6ec98d45`; re-verify and
+  re-cut the branch from the `4f57526a` tip. See the 2026-08-03 undrift note at
+  the top of "GROUP-4 residual drift to absorb" below.
 - **Depends on**: **Groups 1–4** (all of them). This is the last group.
   `#081 frontend-lingui-wiring` populates translation catalogs across **all**
   surfaces, so every other surface must exist before it runs.
@@ -70,26 +74,40 @@ over source must be empty (or every remaining line explicitly accepted).
 
 ### GROUP-4 residual drift to absorb here (deferred on 2026-07-31)
 
-GROUP-4 (`refactor-g4/dashboards`, committed `8d3052da`) deliberately deferred a
-few file-level deltas that belong to G5-owned features. After G4 merges, these
-files will still show in `git diff origin/develop..origin/feat/ict4d-demo`
-**by design** — G5 must reconcile them, or the final-parity gate below will fail.
+> **2026-08-03 `/deslop undrift` update (after G4 merged `4f57526a` + its
+> mergeback into `feat/ict4d-demo`).** Re-verified all four items below against
+> the post-mergeback `feat/ict4d-demo` and `origin/develop @ 4f57526a`:
+> - **Item 1 (ShareResourceButton `size` prop): RESOLVED / was stale.** feat
+>   HEAD's `DashboardEditorView.tsx` does **not** pass a `size` prop to
+>   `<ShareResourceButton>` (verified — it passes only `resourceName`/
+>   `resourceType`/`resourceId`), and develop's button has none either. There is
+>   no residual to re-add; drop this from `#095`'s scope.
+> - **Item 4 (`AvaPageDataMigrationV3` `match`→`switch`): RESOLVED.** The g4
+>   mergeback adopted develop's V3 onto feat, so
+>   `git diff origin/develop -- .../AvaPageDataMigrationV3/` is now empty. No
+>   cosmetic residual remains.
+> - **Items 2 & 3 still stand** (offline-status + i18n on the dashboard-list
+>   files; offline `addDashboardBlock` prompt path) — the g4 mergeback preserved
+>   feat's offline versions of `DashboardListView.tsx`/`DashboardCard.tsx` and
+>   the `collectDatasetIds`/`useLocalDatasetIds`/`useIsTabletSize` helpers on
+>   feat, so they remain feat-ahead deltas for the offline + `#081` rows to
+>   migrate. The g4 mergeback also re-ran `lingui extract`, so `#081`'s final
+>   catalog pass rebases on the post-mergeback catalogs.
 
-1. **`ShareResourceButton` `size` prop (row `#095`).** feat's
-   `ShareResourceButton` takes a `size` prop and feat's
-   `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx` passes
-   `size={DASHBOARD_TOOLBAR_BUTTON_SIZE}` so the dashboard toolbar's Share
-   button matches the other toolbar buttons. G4 shipped `DashboardEditorView`
-   **without** that prop (develop's `ShareResourceButton` had no `size`). When
-   `#095` migrates `ShareResourceButton`, also **re-add the `size` prop to the
-   `<ShareResourceButton>` call in `DashboardEditorView.tsx`** (re-import
-   `DASHBOARD_TOOLBAR_BUTTON_SIZE` from
-   `@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize`). This
-   is the one residual on a G4-owned file that no other row would otherwise touch.
+GROUP-4 (`refactor-g4/dashboards`) merged into `develop` at `4f57526a`. A couple
+of the deltas it deferred to G5-owned features are now resolved (see the
+2026-08-03 undrift note above); the rest still show in
+`git diff origin/develop..origin/feat/ict4d-demo` **by design** — G5 must
+reconcile them, or the final-parity gate below will fail.
+
+1. ~~**`ShareResourceButton` `size` prop (row `#095`).**~~ **RESOLVED / stale —
+   see the 2026-08-03 undrift note above.** feat's `DashboardEditorView.tsx`
+   does not pass a `size` prop; nothing to re-add.
 
 2. **`DashboardListView.tsx` / `DashboardCard.tsx` / `formatDashboardDate.ts`
-   (rows `#081` i18n + the offline group `#056`-`#063`).** G4 restored develop's
-   versions of these three files, deferring feat's two entangled deltas:
+   (rows `#081` i18n + the offline group `#056`-`#063`).** develop carries its
+   own (un-i18n'd, no-offline) versions of these three files; feat is ahead with
+   two entangled deltas that the g4 mergeback preserved on feat:
    - **i18n:** feat wraps their strings in `<Trans>`/`t` and `formatDashboardDate`
      takes a `t` arg. `#081 frontend-lingui-wiring` must wrap these three files
      (and update `SaveToDashboardListMode.tsx`'s `formatDashboardDate` call to
@@ -190,7 +208,7 @@ no such question — copy verbatim.
 - Desktop **registry/impls (`#056`/`#057`) before** anything desktop that uses
   them (`#058`, `#059`, `#060`).
 - **`#062` webllm / `#063` SQL-hardening** ride on `#061 web-offline-mode`
-  (already merged, `6ec98d45`) — but see the offline-infra drift note: the
+  (already merged, `50fb7884`) — but see the offline-infra drift note: the
   hooks they import are NOT where the plans claim.
 - i18n order: `#079` → `#080` → (everything else) → **`#081` last** → `#082`.
 - Standalone (`#090`, `#095`, docs `#091`-`#093`) can slot anywhere late;
@@ -372,13 +390,21 @@ profile are rewrites-in-place; docs are copies.)
 
 ### Dependency changes
 
-Root `package.json` (web) — source-only deps to add:
+Root `package.json` (web) — source-only deps to add. **As of the 2026-08-03
+undrift, only two still need installing** — the rest already landed on develop:
 ```
-pnpm add @mlc-ai/web-llm@^0.2.81        # #062 webllm offline chat
-pnpm add node-sql-parser@^5.4.0         # #063 offline-chat SQL parse/validate (verify not already present via cloud chat)
-pnpm add qrcode@^1.5.4                  # share URL row QR (#095, and shared with dashboard share row)
-pnpm add -D @types/qrcode@^1.5.6        # #095
+pnpm add @mlc-ai/web-llm@^0.2.81        # #062 webllm offline chat — still needed
+pnpm add openai                          # #080 translateWithLLM — still needed (see below)
 ```
+
+**Already on develop — do NOT re-add:**
+
+| Dep | On develop | Landed via |
+|---|---|---|
+| `node-sql-parser` (^5.4.0) | ✅ | Group 2 `#044` (`#063` offline SQL parse/validate rides on it) |
+| `qrcode` (^1.5.4) | ✅ | **Group 4 `#073`** (`#095` share URL row QR reuses it) |
+| `@types/qrcode` (^1.5.6) | ✅ | **Group 4 `#073`** (`#095`) |
+| `jspdf` (^4.2.1) | ✅ | Group 4 `#075` (not a G5 dep; noted for completeness) |
 `apps/desktop/package.json` (Bun-main): no new source-only deps.
 ```
 # electrobun is "latest" in the desktop pkg — confirm parity with develop's desktop pkg
