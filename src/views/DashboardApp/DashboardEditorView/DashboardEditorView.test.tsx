@@ -3,9 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, RenderOptions, screen } from "@/test-utils";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type { UserId } from "$/models/User/User.types";
-import type { UserProfileId } from "$/models/User/UserProfile.types";
+import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
 
@@ -122,7 +121,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig",
+  "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig",
   () => {
     return {
       useDashboardPuckConfig: (): Record<string, unknown> => {
@@ -243,14 +242,14 @@ function renderWithProviders(
 function _makeDashboard(): Dashboard.T {
   return {
     __type: "Dashboard",
-    id: "00000000-0000-4000-8000-000000000001" as DashboardId,
+    id: "00000000-0000-4000-8000-000000000001" as Dashboard.Id,
     name: "Test Dashboard",
     slug: "test-dashboard",
     description: undefined,
     isPublic: false,
     isRestricted: false,
-    ownerId: "00000000-0000-4000-8000-000000000002" as UserId,
-    ownerProfileId: "00000000-0000-4000-8000-000000000003" as UserProfileId,
+    ownerId: "00000000-0000-4000-8000-000000000002" as User.Id,
+    ownerProfileId: "00000000-0000-4000-8000-000000000003" as UserProfile.Id,
     workspaceId: "00000000-0000-4000-8000-000000000004" as Workspace.Id,
     config: {
       root: {

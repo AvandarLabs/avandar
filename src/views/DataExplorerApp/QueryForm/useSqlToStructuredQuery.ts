@@ -11,8 +11,8 @@ import type { SqlMappingResult } from "$/models/queries/StructuredQuery/sqlToStr
  * Provides a memoised `parseSql` callback that uses the current workspace's
  * datasets and columns to resolve table/column references in arbitrary SQL.
  *
- * Loading happens lazily through React Query in the underlying clients; the
- * callback should be invoked from event handlers, not render bodies.
+ * Loading happens lazily through React Query in the underlying clients. The
+ * memoized callback is pure and may be used to derive render state.
  */
 export function useSqlToStructuredQuery(): {
   parseSql: (sql: string) => SqlMappingResult;

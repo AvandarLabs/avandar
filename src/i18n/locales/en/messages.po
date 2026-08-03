@@ -26,7 +26,7 @@ msgstr "Close chat panel"
 msgid "ID field is required"
 msgstr "ID field is required"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
@@ -36,7 +36,7 @@ msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 msgid "Return online to view or make the page available offline."
 msgstr "Return online to view or make the page available offline."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "No columns detected for this dataset. Falling back to all columns."
 
@@ -62,7 +62,7 @@ msgstr "This will allow the dataset to be stored online so it can be accessed "
 msgid "Run a query to see results."
 msgstr "Run a query to see results."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Start (e.g. 2024-01-01)"
 
@@ -177,7 +177,7 @@ msgstr "No filters yet. Add one to let viewers refine this chart without "
 msgid "Excel files"
 msgstr "Excel files"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
 msgstr "Enter your question or instructions in natural language to generate a "
@@ -187,7 +187,7 @@ msgstr "Enter your question or instructions in natural language to generate a "
 msgid "Query"
 msgstr "Query"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Row filters"
 msgstr "Row filters"
 
@@ -270,7 +270,7 @@ msgstr "Select a field"
 msgid "When"
 msgstr "When"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "Save and re-run query"
 
@@ -349,7 +349,7 @@ msgstr "The table visualization has no extra settings."
 msgid "About you"
 msgstr "About you"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "Monospace headlines"
 
@@ -390,14 +390,14 @@ msgid "No datasets added yet"
 msgstr "No datasets added yet"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-"queried\" — uploads just the columns your visualizations read. Widen the "
-"scope if you've added viewer-editable filters and want viewers to be "
-"able to filter beyond your defaults."
-msgstr "Choose how much of each dataset to publish. The default — \"Only what's "
-"queried\" — uploads just the columns your visualizations read. Widen "
-"the scope if you've added viewer-editable filters and want viewers to "
-"be able to filter beyond your defaults."
+#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
+#~ "queried\" — uploads just the columns your visualizations read. Widen the "
+#~ "scope if you've added viewer-editable filters and want viewers to be "
+#~ "able to filter beyond your defaults."
+#~ msgstr "Choose how much of each dataset to publish. The default — \"Only what's "
+#~ "queried\" — uploads just the columns your visualizations read. Widen "
+#~ "the scope if you've added viewer-editable filters and want viewers to "
+#~ "be able to filter beyond your defaults."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -512,6 +512,16 @@ msgstr "Updating password for {0}"
 msgid "Column info"
 msgstr "Column info"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Choose how much of each dataset to publish. The default: \"Only what's "
+"queried\": uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+msgstr "Choose how much of each dataset to publish. The default: \"Only what's "
+"queried\": uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "I understand this data will be sent to the AI provider"
@@ -553,7 +563,7 @@ msgstr "Save as new dataset"
 msgid "From derived dataset"
 msgstr "From derived dataset"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Single select"
 
@@ -602,8 +612,8 @@ msgstr "Discovery query failed."
 msgid "Publish dashboard"
 msgstr "Publish dashboard"
 
-#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
 msgid "Container max width"
 msgstr "Container max width"
 
@@ -695,7 +705,7 @@ msgstr "Add to workspace"
 msgid "Workspace Name"
 msgstr "Workspace Name"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard is published at:"
 msgstr "Your dashboard is published at:"
 
@@ -745,12 +755,12 @@ msgid "Type your answer…"
 msgstr "Type your answer…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-"Avandar account required. Datasets referenced by the dashboard are "
-"copied to public storage at publish time."
-msgstr "Publishing makes this dashboard viewable by anyone with the link — no "
-"Avandar account required. Datasets referenced by the dashboard are "
-"copied to public storage at publish time."
+#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
+#~ "Avandar account required. Datasets referenced by the dashboard are "
+#~ "copied to public storage at publish time."
+#~ msgstr "Publishing makes this dashboard viewable by anyone with the link — no "
+#~ "Avandar account required. Datasets referenced by the dashboard are "
+#~ "copied to public storage at publish time."
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -760,7 +770,7 @@ msgstr "Password reset failed"
 msgid "New role group"
 msgstr "New role group"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "Column name in SQL"
 
@@ -779,11 +789,11 @@ msgid "Some data should come from existing datasets"
 msgstr "Some data should come from existing datasets"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Couldn't export PDF"
 msgstr "Couldn't export PDF"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
 msgstr "Label"
 
@@ -817,6 +827,10 @@ msgstr "Invalid name column selected"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "Custom"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Timestamp"
+msgstr "Timestamp"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -881,15 +895,21 @@ msgstr "Detected:"
 msgid "/month"
 msgstr "/month"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 msgid "Filters for this chart"
 msgstr "Filters for this chart"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
+"exposure."
+msgstr "Publish every column, all rows. Maximum flexibility for viewers, "
+"maximum exposure."
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Query failed."
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
 msgstr "Undo"
 
@@ -918,7 +938,7 @@ msgstr "It may take a few minutes for your subscription to take effect."
 msgid "Continue as-is"
 msgstr "Continue as-is"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Contains…"
 msgstr "Contains…"
@@ -1028,7 +1048,7 @@ msgstr "Enter a name for the field"
 msgid "Select Plan"
 msgstr "Select Plan"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "Default value (optional)"
 
@@ -1101,7 +1121,7 @@ msgstr "The current SQL contains parts that the form could not represent. "
 msgid "Select the columns you want in this {entityConfigName}"
 msgstr "Select the columns you want in this {entityConfigName}"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
 msgstr "Formal"
 
@@ -1172,7 +1192,7 @@ msgstr "Detected column types for 1 column in \"{sourceFileName}\" differed "
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No values were returned from {column}. Describe what you need instead."
 
-#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
+#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
@@ -1261,6 +1281,10 @@ msgstr "Roles & Permissions"
 msgid "Connect to Google Sheets"
 msgstr "Connect to Google Sheets"
 
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
+msgid "Data Visualization"
+msgstr "Data Visualization"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "Choose a saved dataset or import new data into your workspace."
@@ -1291,7 +1315,7 @@ msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "Please <0>email us</0> if you would like early access."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "Max"
@@ -1412,7 +1436,7 @@ msgstr "Password updated successfully"
 msgid "Narrowest"
 msgstr "Narrowest"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Graphite"
 msgstr "Graphite"
 
@@ -1428,7 +1452,7 @@ msgstr "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgid "Enter a name for this dataset"
 msgstr "Enter a name for this dataset"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "Custom selection"
 
@@ -1452,11 +1476,11 @@ msgstr "your dataset"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
@@ -1493,7 +1517,7 @@ msgstr "Data scope"
 msgid "Data preview"
 msgstr "Data preview"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
 msgstr "to"
 
@@ -1555,7 +1579,7 @@ msgstr "Delete entity"
 msgid "Empty text"
 msgstr "Empty text"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "Ocean"
 
@@ -1590,7 +1614,7 @@ msgstr "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 msgid "Go to Data Explorer"
 msgstr "Go to Data Explorer"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "This dashboard is <0>public</0>. Anyone with the link below can view "
 "it."
@@ -1610,7 +1634,7 @@ msgid "You'll be asked to confirm your current password."
 msgstr "You'll be asked to confirm your current password."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
 msgstr "Publish"
 
@@ -1643,12 +1667,12 @@ msgstr "Delete Entity"
 msgid "Personal data + biased framing detected"
 msgstr "Personal data + biased framing detected"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Manual form shows an approximation"
 msgstr "Manual form shows an approximation"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
 msgstr "Your dashboard will be published to:"
 
@@ -1680,7 +1704,7 @@ msgstr "No dataset selected"
 msgid "description"
 msgstr "description"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "Min"
@@ -1689,7 +1713,7 @@ msgstr "Min"
 msgid "Outcome"
 msgstr "Outcome"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "Local filters (viewer-editable, this chart only)"
 
@@ -1697,7 +1721,7 @@ msgstr "Local filters (viewer-editable, this chart only)"
 msgid "Invalid X axis selected"
 msgstr "Invalid X axis selected"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "e.g. cholera-outbreak-2024"
 
@@ -1726,11 +1750,15 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 msgstr "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "text"
+msgstr "text"
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "Active"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "Default values, comma-separated or JSON array"
 
@@ -1779,6 +1807,10 @@ msgstr "Dashboard saved successfully!"
 msgid "N/A"
 msgstr "N/A"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Publish only the columns your dashboard reads. Narrowest, most private."
+msgstr "Publish only the columns your dashboard reads. Narrowest, most private."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "Global Admin"
@@ -1815,7 +1847,11 @@ msgstr "You do not have permission to open this part of the workspace."
 msgid "Please check your email"
 msgstr "Please check your email"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Pick columns and add row constraints (enum, number range, date range)."
+msgstr "Pick columns and add row constraints (enum, number range, date range)."
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
 msgstr "Couldn't capture dashboard"
 
@@ -1835,11 +1871,16 @@ msgstr "Capturing dashboard…"
 msgid "This is an invalid waitlist code"
 msgstr "This is an invalid waitlist code"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Please try again."
+msgstr "Please try again."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Field Name"
 msgstr "Field Name"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ Add row filter"
 
@@ -1856,7 +1897,7 @@ msgstr "Add people or user groups"
 msgid "Size column"
 msgstr "Size column"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "Values"
 
@@ -1912,7 +1953,7 @@ msgstr "Failed to save to dashboard: {0}"
 msgid "Custom role groups"
 msgstr "Custom role groups"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
 msgstr "Rose"
 
@@ -1982,7 +2023,7 @@ msgstr "Create groups for your workspace members. Datasets and dashboards can "
 "be configured to only share with (or restrict) certain user groups."
 
 #: src/components/privacy/ConsentModal/RowValueList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Preview:"
 msgstr "Preview:"
 
@@ -2170,15 +2211,15 @@ msgstr "Are you sure you want to delete this dataset? This action cannot be "
 msgid "Symbol size column must be numeric."
 msgstr "Symbol size column must be numeric."
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (default)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-"columns:}}"
-msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # "
-"columns:}}"
+#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
+#~ "columns:}}"
+#~ msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # "
+#~ "columns:}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2234,7 +2275,7 @@ msgstr "coverage"
 msgid "Clarification answer"
 msgstr "Clarification answer"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
 msgstr "Generated SQL"
@@ -2271,7 +2312,7 @@ msgstr "Describe your answer…"
 msgid "Drop to import"
 msgstr "Drop to import"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Date range"
 
@@ -2310,7 +2351,7 @@ msgstr "Offline model download failed"
 msgid "Parsed {formattedNumRows} rows successfully"
 msgstr "Parsed {formattedNumRows} rows successfully"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "Label, e.g. Region"
 
@@ -2318,7 +2359,7 @@ msgstr "Label, e.g. Region"
 msgid "Select file"
 msgstr "Select file"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
 msgstr "Column name (must match SQL)"
 
@@ -2326,7 +2367,7 @@ msgstr "Column name (must match SQL)"
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Generate Query"
 msgstr "Generate Query"
 
@@ -2342,11 +2383,11 @@ msgstr "We'll add this visualization to your new dashboard."
 msgid "Starting…"
 msgstr "Starting…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Number range"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "Columns"
 
@@ -2399,6 +2440,10 @@ msgstr "Timestamp format"
 msgid "View"
 msgstr "View"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "Unavailable"
+msgstr "Unavailable"
+
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dataset"
 msgstr "dataset"
@@ -2427,7 +2472,7 @@ msgstr "From dataset"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "A profile can consist of columns that come from different datasets."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "End (e.g. 2024-12-31)"
 
@@ -2453,7 +2498,7 @@ msgstr "Make dataset offline-only?"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "Color"
@@ -2503,7 +2548,7 @@ msgstr "Try again"
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "Do not refresh or close this tab or else the download will be canceled."
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
 msgstr "Forest"
 
@@ -2521,8 +2566,8 @@ msgid "Series"
 msgstr "Series"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-msgid "Save your changes first — the PDF reflects the saved dashboard."
-msgstr "Save your changes first — the PDF reflects the saved dashboard."
+#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
+#~ msgstr "Save your changes first — the PDF reflects the saved dashboard."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
@@ -2645,6 +2690,11 @@ msgstr "X column"
 msgid "Choose the most frequent value"
 msgstr "Choose the most frequent value"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
+msgid "Please try again. The PDF was not created."
+msgstr "Please try again. The PDF was not created."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
 msgstr "Date format"
@@ -2652,6 +2702,10 @@ msgstr "Date format"
 #: src/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine.tsx
 msgid "Share summary"
 msgstr "Share summary"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Time"
+msgstr "Time"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -2715,7 +2769,7 @@ msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
 msgstr "Your workspace is on the Free plan, which supports up to 2 seats. To "
 "invite more team members, upgrade to a paid plan for unlimited seats."
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "Options (comma-separated, for select modes)"
 
@@ -2724,7 +2778,7 @@ msgstr "Options (comma-separated, for select modes)"
 msgid "Owner"
 msgstr "Owner"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the "
 "custom URL changes."
 msgstr "Never changes, so QR codes printed from here keep working even if the "
@@ -2756,7 +2810,7 @@ msgstr "No clarifications yet. The log fills in as the chat asks clarifying "
 msgid "Offline chat model removed"
 msgstr "Offline chat model removed"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "Tool"
 
@@ -2822,7 +2876,7 @@ msgstr "Dashboard deleted successfully!"
 msgid "The name you want other team members to see."
 msgstr "The name you want other team members to see."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Custom URL"
 msgstr "Custom URL"
 
@@ -2901,6 +2955,10 @@ msgstr "Delete Dataset"
 msgid "Add series"
 msgstr "Add series"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Date"
+msgstr "Date"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "Download"
@@ -2915,7 +2973,7 @@ msgstr "No members or user groups yet. Invite members or create user groups in "
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "No row filters. The slice will include every row in the dataset (for "
@@ -2929,7 +2987,7 @@ msgstr "Turn"
 msgid "Empty"
 msgstr "Empty"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
@@ -2940,7 +2998,7 @@ msgstr "All"
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} must be at least {minLength} characters long"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "System sans"
 msgstr "System sans"
 
@@ -2970,11 +3028,15 @@ msgid "While Avandar is in beta, we are only allowing registration if you are "
 msgstr "While Avandar is in beta, we are only allowing registration if you are "
 "on our waitlist and have received a sign-up code in your email."
 
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Ignore all global filters: this visualization is unfiltered."
+msgstr "Ignore all global filters: this visualization is unfiltered."
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "You wrote:"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Multi select"
 
@@ -3016,10 +3078,10 @@ msgid "Dashboard share settings updated."
 msgstr "Dashboard share settings updated."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-msgid "Ignore all global filters — this visualization is unfiltered."
-msgstr "Ignore all global filters — this visualization is unfiltered."
+#~ msgid "Ignore all global filters — this visualization is unfiltered."
+#~ msgstr "Ignore all global filters — this visualization is unfiltered."
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
 msgstr "Sketch"
 
@@ -3100,7 +3162,7 @@ msgstr "Ascending"
 msgid "Ask about your data"
 msgstr "Ask about your data"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "Enter values; press Enter after each"
 
@@ -3117,12 +3179,16 @@ msgstr "Welcome back, {0}"
 msgid "Change"
 msgstr "Change"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Please try again. Your dashboard has not been published."
+msgstr "Please try again. Your dashboard has not been published."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
@@ -3154,7 +3220,7 @@ msgid "Collapse panel"
 msgstr "Collapse panel"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter"
 msgstr "Filter"
 
@@ -3174,7 +3240,7 @@ msgstr "Open sidebar"
 msgid "Upload dataset"
 msgstr "Upload dataset"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
 msgstr "Reset"
@@ -3263,7 +3329,7 @@ msgid "No dashboards match “{searchQuery}”."
 msgstr "No dashboards match “{searchQuery}”."
 
 #. placeholder {0}: roughness.toFixed(1)
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Roughness ({0})"
 msgstr "Roughness ({0})"
 
@@ -3294,7 +3360,7 @@ msgstr "Column types updated"
 msgid "Partially offline"
 msgstr "Partially offline"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Edit query"
 msgstr "Edit query"
@@ -3340,6 +3406,14 @@ msgstr "Send message"
 msgid "Copied!"
 msgstr "Copied!"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "date"
+msgstr "date"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "This dashboard doesn't reference any datasets: nothing to publish."
+msgstr "This dashboard doesn't reference any datasets: nothing to publish."
+
 #: src/routes/register.tsx
 msgid "A confirmation email has been sent to your email address."
 msgstr "A confirmation email has been sent to your email address."
@@ -3366,13 +3440,17 @@ msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
 msgstr "Import spreadsheets, connect to Google Sheets, or add data from other "
 "sources to start analyzing your information."
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Please try again later."
+msgstr "Please try again later."
+
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
 #: src/components/privacy/ConsentModal/CleanPanel.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "Send <0>{0}</0> value{1} to the AI?"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL path"
 msgstr "Custom URL path"
 
@@ -3388,7 +3466,7 @@ msgstr "Mean"
 msgid "Update password"
 msgstr "Update password"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
 msgstr "Dashboard snapshot"
 
@@ -3409,7 +3487,7 @@ msgstr "Downloading {0} for offline chat"
 msgid "Open chat panel"
 msgstr "Open chat panel"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Remove row filter"
 
@@ -3473,6 +3551,10 @@ msgstr "Offline chat model ready"
 msgid "Column description updated successfully!"
 msgstr "Column description updated successfully!"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Save your changes first: the PDF reflects the saved dashboard."
+msgstr "Save your changes first: the PDF reflects the saved dashboard."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
 msgstr "File failed to load"
@@ -3488,7 +3570,7 @@ msgstr "There was an error on update: {0}"
 msgid "Privacy log"
 msgstr "Privacy log"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "Visualization Settings"
@@ -3508,8 +3590,8 @@ msgstr "This dataset is large, so we applied a 100-row limit. You can change it 
 "anytime."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "This dashboard doesn't reference any datasets — nothing to publish."
-msgstr "This dashboard doesn't reference any datasets — nothing to publish."
+#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
+#~ msgstr "This dashboard doesn't reference any datasets — nothing to publish."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -3525,7 +3607,7 @@ msgid "Profile Name"
 msgstr "Profile Name"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "Visualization Type"
 
@@ -3565,7 +3647,7 @@ msgstr "Your current plan only supports up to {0} datasets. Upgrade to our "
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "This dataset is offline-only. Click to allow online syncing."
 
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Global filters"
 
@@ -3625,7 +3707,7 @@ msgstr "Make offline-only"
 msgid "{0} is available when you are offline."
 msgstr "{0} is available when you are offline."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "Custom URL is available"
 
@@ -3637,7 +3719,7 @@ msgstr "Number of rows"
 msgid "Restricted"
 msgstr "Restricted"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Contains (free-text)"
 msgstr "Contains (free-text)"
 
@@ -3652,6 +3734,14 @@ msgstr "Loading dashboard datasets"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Select an Excel or CSV file from your computer to import"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Publishing makes this dashboard viewable by anyone with the link, no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
+msgstr "Publishing makes this dashboard viewable by anyone with the link, no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
 
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
@@ -3785,6 +3875,10 @@ msgstr "Dataset failed to load"
 msgid "Save — {0}"
 msgstr "Save — {0}"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Decimal"
+msgstr "Decimal"
+
 #: packages/web/ui/src/notifications/notify.ts
 msgid "Error"
 msgstr "Error"
@@ -3799,7 +3893,7 @@ msgstr "Send answer"
 msgid "... and {remainingCount} more"
 msgstr "... and {remainingCount} more"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Just what's queried"
 msgstr "Just what's queried"
 
@@ -3909,7 +4003,7 @@ msgstr "Download a different offline chat model"
 msgid "Edit permissions"
 msgstr "Edit permissions"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "queried"
 msgstr "queried"
 
@@ -3924,7 +4018,7 @@ msgstr "Error saving dataset"
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx
+#: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -3941,7 +4035,14 @@ msgstr "From Google Sheets"
 msgid "Subscription updated successfully"
 msgstr "Subscription updated successfully"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#. placeholder {0}: columns.length
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+msgid "{0, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
+msgstr "{0, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "Default value"
 
@@ -3966,7 +4067,7 @@ msgstr "If there are multiple {fieldName} values for one {0}, then..."
 msgid "Select rule (e.g. most frequent)"
 msgstr "Select rule (e.g. most frequent)"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Multi-select"
 msgstr "Multi-select"
 
@@ -3991,7 +4092,7 @@ msgstr "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgid "Loading more..."
 msgstr "Loading more..."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "Custom URL (optional)"
 
@@ -4007,11 +4108,11 @@ msgstr "dataset name"
 msgid "Email address updated"
 msgstr "Email address updated"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
 msgstr "Freehand"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Permanent link (use for QR codes)"
 msgstr "Permanent link (use for QR codes)"
 
@@ -4052,7 +4153,7 @@ msgstr "Published"
 msgid "Filters (Where)"
 msgstr "Filters (Where)"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
 msgstr "Single-select"
 
@@ -4095,7 +4196,7 @@ msgstr "billing portal."
 msgid "You haven't chosen a value column"
 msgstr "You haven't chosen a value column"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Text contains"
 msgstr "Text contains"
 
@@ -4119,7 +4220,7 @@ msgstr "Send to AI?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Purchase {seatsToAdd} seats"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share link"
 msgstr "Share link"
 
@@ -4127,7 +4228,7 @@ msgstr "Share link"
 msgid "Current Plan"
 msgstr "Current Plan"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
 msgstr "Using your custom URL. The permanent UUID link below also still works."
 
@@ -4154,7 +4255,7 @@ msgstr "None of the above"
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "This {resource} is accessible to anyone with {app} {0} permission."
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "Amber"
 
@@ -4224,7 +4325,7 @@ msgid "What this person or group can do. Viewer = read only, Editor = edit "
 msgstr "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
 msgstr "Filter id (stable)"
 
@@ -4268,7 +4369,7 @@ msgstr "Edit role group"
 msgid "Profiles"
 msgstr "Profiles"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Update & republish"
 msgstr "Update & republish"
 
@@ -4280,6 +4381,10 @@ msgstr " · downloaded"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
 msgstr "Cancelled"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "number"
+msgstr "number"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -4352,8 +4457,9 @@ msgstr "Your current plan only supports up to {0} datasets. Upgrade to our "
 "Starter or Impact plan to increase the number of datasets you can add "
 "to your workspace."
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "Prompt"
 
@@ -4391,11 +4497,11 @@ msgid "Recommended"
 msgstr "Recommended"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Select all"
 msgstr "Select all"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "Only what's queried (recommended)"
 
@@ -4420,7 +4526,7 @@ msgstr "Shape"
 msgid "Members"
 msgstr "Members"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
 "type is kebab-cased automatically."
 msgstr "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
@@ -4455,7 +4561,7 @@ msgstr "Add a series to choose which numeric column drives the chart."
 msgid "Column"
 msgstr "Column"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Remove local filter"
 msgstr "Remove local filter"
 
@@ -4467,7 +4573,7 @@ msgstr "This removes the user group from members and resources that use it."
 msgid "From your prompt:"
 msgstr "From your prompt:"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Anyone with this link can view the dashboard."
 msgstr "Anyone with this link can view the dashboard."
 
@@ -4511,7 +4617,8 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "Text"
 
@@ -4696,9 +4803,13 @@ msgid "Please take a look at the data and make sure it is correct. Once you "
 msgstr "Please take a look at the data and make sure it is correct. Once you "
 "confirm, the dataset will be synced with this data."
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Stroke ({strokeWidth}px)"
 msgstr "Stroke ({strokeWidth}px)"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Whole number"
+msgstr "Whole number"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -4718,10 +4829,16 @@ msgstr "The values you selected may contain personal information. The AI "
 msgid "CSV or Excel file"
 msgstr "CSV or Excel file"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Dashboard is not loaded yet."
+msgstr "Dashboard is not loaded yet."
+
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Editorial serif"
 msgstr "Editorial serif"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Untitled dashboard"
 msgstr "Untitled dashboard"
@@ -4734,7 +4851,7 @@ msgstr "Limit"
 msgid "Fix these issues before saving"
 msgstr "Fix these issues before saving"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
@@ -4761,12 +4878,12 @@ msgstr "Used to sign in to your account."
 msgid "Role & user groups"
 msgstr "Role & user groups"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Clear all"
 msgstr "Clear all"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Close"
 msgstr "Close"
 
@@ -4798,11 +4915,11 @@ msgstr "Loading..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "Share"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "Whole dataset"
 
@@ -4814,11 +4931,11 @@ msgstr "Invalid date"
 msgid "Some"
 msgstr "Some"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Arrow"
 msgstr "Arrow"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "Values, comma-separated"
 
@@ -4832,7 +4949,7 @@ msgstr "+{0} more values tied at {1} rows"
 msgid "Processing, {remainingLabel} remaining"
 msgstr "Processing, {remainingLabel} remaining"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Loose"
 msgstr "Loose"
 
@@ -4868,7 +4985,7 @@ msgstr "Add at least one X / Y series"
 msgid "Show QR code"
 msgstr "Show QR code"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a permanent UUID-based link. Add a custom path below "
 "for a nicer URL."
 msgstr "By default we use a permanent UUID-based link. Add a custom path below "
@@ -4878,7 +4995,7 @@ msgstr "By default we use a permanent UUID-based link. Add a custom path below "
 msgid "Choose the minimum value"
 msgstr "Choose the minimum value"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Mode"
 msgstr "Mode"
 

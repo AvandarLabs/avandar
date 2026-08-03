@@ -1,5 +1,5 @@
+import { navigateToExternalUrl } from "@browser-utils";
 import { APIClient } from "@/clients/APIClient";
-import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -66,5 +66,5 @@ export async function goToPolarCheckout({
       currentCustomerId: currentCustomerId ?? undefined,
     },
   });
-  navigateToExternalURL(checkoutURL);
+  navigateToExternalUrl(checkoutURL);
 }

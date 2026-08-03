@@ -3,24 +3,23 @@ import {
   Anchor,
   Box,
   Group,
-  RingProgress,
   ScrollArea,
   Skeleton,
   Stack,
   Text,
-  Title,
 } from "@mantine/core";
-import { useIntersection } from "@mantine/hooks";
-import { IconChevronRight, IconHash } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { useState } from "react";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ColumnSummaryBody } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody";
+import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
+import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection";
+import { buildShortDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
 import css from "./DatasetSummaryView.module.css";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { ReactNode } from "react";
 
 type Props = {
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
 };
 
 /**
@@ -42,8 +41,8 @@ type Props = {
  * observer the lazy-loaders use, which works incrementally and avoids a
  * second observer pass.
  */
-export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
-  const { t } = useLingui();
+export function DatasetSummaryView({ datasetId }: Props): ReactNode {
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const [meta, isLoadingMeta] = DatasetQueryClient.useGetDatasetMeta({
     datasetId,
@@ -56,7 +55,9 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
     },
   });
 
-  const [activeColumn, setActiveColumn] = useState<string | null>(null);
+  const [activeColumn, setActiveColumn] = useState<string | undefined>(
+    undefined,
+  );
 
   if (isLoadingMeta || !meta) {
     return (
@@ -70,8 +71,12 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
   }
 
   return (
-    <Box className={css.layout}>
-      <Box className={css.nav} component="nav" aria-label={t`Column outline`}>
+    <Box className={css.datasetSummaryViewLayout}>
+      <Box
+        className={css.datasetSummaryViewNav}
+        component="nav"
+        aria-label={t`Column outline`}
+      >
         <Stack gap={2}>
           <Text size="xs" tt="uppercase" c="dimmed" fw={600} mb="xs">
             <Trans>
@@ -93,7 +98,7 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
                     el.scrollIntoView({ behavior: "smooth", block: "start" });
                   }
                 }}
-                className={`${css.navLink} ${isActive ? css.navLinkActive : ""}`}
+                className={`${css.datasetSummaryViewNavLink} ${isActive ? css.datasetSummaryViewNavLinkActive : ""}`}
               >
                 <Group gap={6} wrap="nowrap" align="center">
                   <Box
@@ -118,7 +123,7 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
                     {col.name}
                   </Text>
                   <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-                    {_typeShortLabel(col.dataType, t)}
+                    {buildShortDataTypeLabel(col.dataType, i18n)}
                   </Text>
                 </Group>
               </Anchor>
@@ -127,160 +132,23 @@ export function DatasetSummaryView({ datasetId }: Props): JSX.Element {
         </Stack>
       </Box>
 
-      <ScrollArea className={css.content}>
-        <Stack gap="xxl" pb="xxl">
-          {meta.columns.map((col) => {
-            return (
-              <ColumnSection
-                key={col.name}
-                datasetId={datasetId}
-                columnName={col.name}
-                dataType={col.dataType}
-                totalRows={meta.rows}
-                onEnterView={() => {
-                  return setActiveColumn(col.name);
-                }}
-              />
-            );
-          })}
-        </Stack>
-      </ScrollArea>
+      <ActiveColumnContext.Provider value={setActiveColumn}>
+        <ScrollArea className={css.datasetSummaryViewContent}>
+          <Stack gap="xxl" pb="xxl">
+            {meta.columns.map((col) => {
+              return (
+                <ColumnSection
+                  key={col.name}
+                  datasetId={datasetId}
+                  columnName={col.name}
+                  dataType={col.dataType}
+                  totalRows={meta.rows}
+                />
+              );
+            })}
+          </Stack>
+        </ScrollArea>
+      </ActiveColumnContext.Provider>
     </Box>
   );
 }
-
-type ColumnSectionProps = {
-  datasetId: DatasetId;
-  columnName: string;
-  dataType: string;
-  totalRows: number;
-  onEnterView: () => void;
-};
-
-/**
- * One column's section in the outline. Wraps the actual summary body
- * with:
- *
- *   - an `IntersectionObserver` (via `useIntersection`) that triggers the
- *     per-column SQL fetch the first time the section is near the
- *     viewport (50% rootMargin so the body starts loading just before
- *     the user reaches it; near-zero perceived lag).
- *   - the active-section tracking that drives the sticky nav highlight.
- */
-function ColumnSection({
-  datasetId,
-  columnName,
-  dataType,
-  totalRows,
-  onEnterView,
-}: ColumnSectionProps): JSX.Element {
-  const { t } = useLingui();
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { ref: intersectionRef, entry } = useIntersection({
-    root: null,
-    threshold: 0,
-    rootMargin: "200px 0px 200px 0px",
-  });
-  const hasIntersectedRef = useRef(false);
-
-  // Stitch the two refs onto the same element.
-  const setRefs = (el: HTMLDivElement | null): void => {
-    containerRef.current = el;
-    intersectionRef(el);
-  };
-
-  // Trigger the lazy-load the first time the section is anywhere near
-  // the viewport. The flag prevents the per-column query from being
-  // re-issued on subsequent visibility flips.
-  const isReadyToLoad =
-    hasIntersectedRef.current || entry?.isIntersecting === true;
-  if (entry?.isIntersecting && !hasIntersectedRef.current) {
-    hasIntersectedRef.current = true;
-  }
-
-  // Drive the sticky-nav highlight: when the section's heading is in
-  // the upper portion of the viewport, mark it active. We use the same
-  // entry to avoid an extra observer pass.
-  useEffect(() => {
-    if (!entry) {
-      return;
-    }
-    if (entry.isIntersecting && entry.boundingClientRect.top < 200) {
-      onEnterView();
-    }
-  }, [entry, onEnterView]);
-
-  return (
-    <Box
-      ref={setRefs}
-      id={`col-${encodeURIComponent(columnName)}`}
-      style={{ scrollMarginTop: 24 }}
-    >
-      <Stack gap="sm">
-        <Group gap="sm" align="baseline">
-          <Title order={3} fw={650} style={{ letterSpacing: "-0.01em" }}>
-            {columnName}
-          </Title>
-          <Text
-            size="xs"
-            c="dimmed"
-            tt="uppercase"
-            ff="monospace"
-            style={{ letterSpacing: "0.04em" }}
-          >
-            {_typeFullLabel(dataType, t)}
-          </Text>
-        </Group>
-
-        {isReadyToLoad ?
-          <ColumnSummaryBody
-            datasetId={datasetId}
-            columnName={columnName}
-            dataType={dataType}
-            totalRows={totalRows}
-          />
-        : <Skeleton height={120} />}
-      </Stack>
-    </Box>
-  );
-}
-
-type TranslateFn = ReturnType<typeof useLingui>["t"];
-
-function _typeShortLabel(dataType: string, t: TranslateFn): string {
-  if (dataType === "varchar") {
-    return t`txt`;
-  }
-  if (dataType === "bigint" || dataType === "double") {
-    return t`num`;
-  }
-  if (dataType === "date" || dataType === "time" || dataType === "timestamp") {
-    return t`date`;
-  }
-  return dataType;
-}
-
-function _typeFullLabel(dataType: string, t: TranslateFn): string {
-  if (dataType === "varchar") {
-    return t`Text`;
-  }
-  if (dataType === "bigint") {
-    return t`Whole number`;
-  }
-  if (dataType === "double") {
-    return t`Decimal`;
-  }
-  if (dataType === "date") {
-    return t`Date`;
-  }
-  if (dataType === "time") {
-    return t`Time`;
-  }
-  if (dataType === "timestamp") {
-    return t`Timestamp`;
-  }
-  return dataType;
-}
-
-// Exports for the other component, lint-friendly.
-export { IconChevronRight, IconHash, RingProgress };

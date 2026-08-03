@@ -1,4 +1,5 @@
 import { Group, Title } from "@mantine/core";
+import { mantineColorVar } from "@ui";
 import { ReactNode } from "react";
 import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
@@ -7,7 +8,6 @@ import { NavbarSidebarToggle } from "@/components/layouts/AppLayout/AppToolbar/N
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
-import { mantineColorVar } from "@/lib/utils/browser/css";
 
 type Props = {
   children?: ReactNode;

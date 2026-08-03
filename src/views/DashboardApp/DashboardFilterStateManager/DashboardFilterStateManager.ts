@@ -9,7 +9,6 @@ export type DashboardFilterValue =
   | string
   | number
   | boolean
-  | null
   | ReadonlyArray<string | number>
   | undefined;
 

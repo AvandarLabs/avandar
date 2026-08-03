@@ -1,84 +1,61 @@
+import { objectValues } from "@utils";
 import { useMemo } from "react";
-import {
-  localFilterToRecord,
-  resolveSubscribedFilterIds,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
-import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql";
+import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type {
   DataVizFilterProps,
   LocalFilter,
-  LocalFilterStateApi,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { LocalFilterStateApi } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
-/**
- * Returns `rawSql` amended with the viewer-selected dashboard filters that
- * this viz subscribes to, plus any local viz-only filters layered on top.
- *
- * Resolution order (applied as nested subselects, so SQL inside an inner
- * WHERE / GROUP BY composes correctly):
- *
- *   1. Global filters in the dashboard's filter state manager — filtered by
- *      `globalFilterSubscriptionMode`:
- *        - `"all"` (default): every active filter applies.
- *        - `"none"`: skip global filters entirely.
- *        - `"selected"`: only the listed `subscribedFilterIds` apply.
- *   2. Local filters owned by this viz. Each local filter is converted into
- *      the same `DashboardFilterRecord` shape used by global filters so the
- *      WHERE-clause logic stays in one place.
- *
- * Safe to call from inside a Puck `<Render>` tree because
- * `DashboardFilterStateManager.Provider` wraps both the editor and viewer.
- *
- * `filterProps` and `localFilterState` are both optional; passing neither
- * preserves the original "subscribe to all global filters, no local
- * filters" behaviour for callers that haven't been migrated yet.
- */
+type Options = {
+  rawSql: string;
+  filterProps?: DataVizFilterProps;
+  localFilters?: readonly LocalFilter[];
+  localFilterState?: LocalFilterStateApi;
+};
+
+function _buildLocalFilterRecords(
+  options: Readonly<Options>,
+): DashboardFilterRecord[] {
+  if (!options.localFilterState) {
+    return [];
+  }
+  return (options.localFilters ?? []).map((localFilter) => {
+    return DataVizFilters.localFilterToRecord({
+      filter: localFilter,
+      value: options.localFilterState?.valuesById[localFilter.id],
+    });
+  });
+}
+
+/** Returns SQL amended with active global and visualization-local filters. */
 export function useApplyDashboardFiltersToSql(
-  rawSql: string,
-  options?: {
-    filterProps?: DataVizFilterProps;
-    localFilters?: readonly LocalFilter[];
-    localFilterState?: LocalFilterStateApi;
-  },
+  options: Readonly<Options>,
 ): string {
   const { filtersById } = DashboardFilterStateManager.useState();
   return useMemo(() => {
-    const globalFilters = Object.values(filtersById);
-    const subscribedIds =
-      options?.filterProps ?
-        resolveSubscribedFilterIds(
-          options.filterProps.globalFilterSubscription,
-          globalFilters,
-        )
+    const globalFilters = objectValues(filtersById);
+    const subscribedFilterIds =
+      options.filterProps ?
+        DataVizFilters.resolveSubscribedFilterIds({
+          subscription: options.filterProps.globalFilterSubscription,
+          registeredFilters: globalFilters,
+        })
       : undefined;
-
-    const afterGlobal = applyDashboardFiltersToSql({
-      sql: rawSql,
+    const globallyFilteredSql = applyDashboardFiltersToSql({
+      sql: options.rawSql,
       filters: globalFilters,
-      ...(subscribedIds !== undefined ?
-        { subscribedFilterIds: subscribedIds }
-      : {}),
+      ...(subscribedFilterIds !== undefined ? { subscribedFilterIds } : {}),
     });
-
-    const localFilters = options?.localFilters ?? [];
-    if (localFilters.length === 0 || !options?.localFilterState) {
-      return afterGlobal;
-    }
-
-    const localRecords = localFilters.map((f) => {
-      return localFilterToRecord(f, options.localFilterState!.valuesById[f.id]);
-    });
-
-    return applyDashboardFiltersToSql({
-      sql: afterGlobal,
-      filters: localRecords,
-    });
-  }, [
-    rawSql,
-    filtersById,
-    options?.filterProps,
-    options?.localFilters,
-    options?.localFilterState,
-  ]);
+    const localFilterRecords = _buildLocalFilterRecords(options);
+    return localFilterRecords.length > 0 ?
+        applyDashboardFiltersToSql({
+          sql: globallyFilteredSql,
+          filters: localFilterRecords,
+        })
+      : globallyFilteredSql;
+  }, [filtersById, options]);
 }

@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Badge, BadgeProps } from "@mantine/core";
-import { Tooltip } from "@ui";
-import { mantineVar } from "@/lib/utils/browser/css";
+import { mantineVar, Tooltip } from "@ui";
 
 type Props = BadgeProps & {
   /**

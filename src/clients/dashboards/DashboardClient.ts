@@ -1,17 +1,17 @@
 import { notifyError } from "@ui";
-import { assertIsDefined, promiseMap, prop, where } from "@utils";
+import {
+  assertIsDefined,
+  makeBucketRecord,
+  promiseMap,
+  prop,
+  where,
+} from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
-import { DEFAULT_PUBLISH_SLICE } from "$/models/Dashboard/PublishSliceConfig";
-import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { APIClient } from "@/clients/APIClient";
+import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
-import {
-  buildSliceSql,
-  extractReferencedColumns,
-  readDashboardPublishConfig,
-  writeDashboardPublishConfig,
-} from "@/clients/dashboards/sliceBuilder";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -21,9 +21,10 @@ import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
+import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardPublishConfig } from "$/models/Dashboard/PublishSliceConfig";
 
 export const DashboardClient = createUsableServiceClient(
   createRdbCrudClient({
@@ -46,12 +47,10 @@ export const DashboardClient = createUsableServiceClient(
            * sanitising; the server-side uniqueness constraint catches
            * collisions.
            *
-           * - `undefined` — leave the existing slug alone.
-           * - `string`    — set the slug (and register the vanity URL).
-           * - `null`      — explicitly clear any existing slug, so the
-           *                 dashboard is reachable only by its dashboardId URL.
+           * Omit the option to preserve the current slug. Use `set` to
+           * register a vanity URL or `clear` to remove the existing slug.
            */
-          slug?: string | null;
+          slug?: { action: "set"; value: string } | { action: "clear" };
           /**
            * Per-dataset slice configuration. When provided, replaces any
            * previously-persisted slice config and is also persisted into the
@@ -59,7 +58,7 @@ export const DashboardClient = createUsableServiceClient(
            * to the same selection. When omitted, falls back to whatever is
            * already persisted (or the narrowest default per dataset).
            */
-          publishConfig?: DashboardPublishConfig;
+          publishConfig?: PublishSliceConfig.Dashboard;
         }): Promise<Dashboard.T> => {
           const {
             dashboardId,
@@ -73,9 +72,9 @@ export const DashboardClient = createUsableServiceClient(
           });
           assertIsDefined(dashboard, { name: "dashboard" });
 
-          const publishConfig: DashboardPublishConfig =
+          const publishConfig: PublishSliceConfig.Dashboard =
             incomingPublishConfig ??
-            readDashboardPublishConfig(dashboard.config);
+            DashboardSliceBuilder.readDashboardPublishConfig(dashboard.config);
 
           const datasetIdCandidates = extractDatasetIdsFromDashboardConfig(
             dashboard.config,
@@ -90,12 +89,12 @@ export const DashboardClient = createUsableServiceClient(
                 []
               : await DatasetClient.getAll({
                   where: {
-                    id: { in: datasetIdCandidates as DatasetId[] },
+                    id: { in: datasetIdCandidates as Dataset.Id[] },
                     workspace_id: { eq: dashboard.workspaceId },
                   },
                 });
 
-            const dependentDatasetIds: DatasetId[] = datasetsInDashboard.map(
+            const dependentDatasetIds: Dataset.Id[] = datasetsInDashboard.map(
               prop("id"),
             );
 
@@ -107,10 +106,10 @@ export const DashboardClient = createUsableServiceClient(
             // Resolve "what columns does the dashboard actually read" once,
             // so the per-dataset materialization step can apply a narrowest
             // projection by default.
-            const referenced = extractReferencedColumns(
-              dashboard.config,
-              dependentDatasetIds,
-            );
+            const referenced = DashboardSliceBuilder.extractReferencedColumns({
+              dashboardConfig: dashboard.config,
+              allDatasetIds: dependentDatasetIds,
+            });
 
             // Fetch dataset columns for every dependent dataset so we can
             // (a) honour custom slice column allow-lists, and (b) skip
@@ -122,14 +121,14 @@ export const DashboardClient = createUsableServiceClient(
                 workspace_id: { eq: dashboard.workspaceId },
               },
             });
-            const columnsByDataset: Record<DatasetId, string[]> = {};
-            for (const c of allColumns) {
-              (columnsByDataset[c.datasetId] ??= []).push(c.name);
-            }
+            const columnsByDataset = makeBucketRecord(allColumns, {
+              key: "datasetId",
+              valueKey: "name",
+            });
 
             await promiseMap(datasetsInDashboard, async (dataset) => {
               const slice =
-                publishConfig.slices[dataset.id] ?? DEFAULT_PUBLISH_SLICE;
+                publishConfig.slices[dataset.id] ?? PublishSliceConfig.DEFAULT;
               const availableColumns = columnsByDataset[dataset.id] ?? [];
               const queriedColumns = Array.from(
                 referenced.perDataset[dataset.id] ?? new Set<string>(),
@@ -146,7 +145,7 @@ export const DashboardClient = createUsableServiceClient(
                     name: "virtualDataset",
                   });
 
-                  const materializedSql = buildSliceSql({
+                  const materializedSql = DashboardSliceBuilder.buildSliceSql({
                     baseSelectExpr: virtualDataset.rawSql,
                     sliceConfig: slice,
                     availableColumns,
@@ -182,7 +181,7 @@ export const DashboardClient = createUsableServiceClient(
 
                 if (needsMaterialization) {
                   const baseSelectExpr = `SELECT * FROM "${dataset.id}"`;
-                  const materializedSql = buildSliceSql({
+                  const materializedSql = DashboardSliceBuilder.buildSliceSql({
                     baseSelectExpr,
                     sliceConfig: slice,
                     availableColumns,
@@ -215,7 +214,8 @@ export const DashboardClient = createUsableServiceClient(
                   let parquetBlob: Blob;
 
                   if (
-                    localDataset?.parseStatus === "ready" &&
+                    localDataset !== undefined &&
+                    localDataset.parseStatus === "ready" &&
                     localDataset.parquetData
                   ) {
                     parquetBlob = localDataset.parquetData;
@@ -261,9 +261,7 @@ export const DashboardClient = createUsableServiceClient(
 
                 notifyError({
                   title: "Unable to publish dashboard",
-                  message:
-                    "Some datasets are not synced online yet or failed to publish. " +
-                    errorMessage,
+                  message: `Some datasets are not synced online yet or failed to publish. ${errorMessage}`,
                 });
                 throw error;
               }
@@ -274,13 +272,17 @@ export const DashboardClient = createUsableServiceClient(
           // JSON blob so future re-publishes default to the same selection.
           const nextConfig =
             incomingPublishConfig ?
-              writeDashboardPublishConfig(dashboard.config, publishConfig)
+              DashboardSliceBuilder.writeDashboardPublishConfig({
+                dashboardConfig: dashboard.config,
+                publishConfig,
+              })
             : undefined;
 
           const updateModel: Partial<Dashboard.T> = {
             isPublic: true,
-            // `undefined` means "leave alone"; `null` means "clear it".
-            ...(slug !== undefined ? { slug: slug ?? undefined } : {}),
+            ...(slug ?
+              { slug: slug.action === "set" ? slug.value : undefined }
+            : {}),
             ...(nextConfig ?
               {
                 config: nextConfig as unknown as Dashboard.T["config"],
@@ -317,7 +319,7 @@ export const DashboardClient = createUsableServiceClient(
            * its existing slug still validates as available.
            */
           dashboardId?: Dashboard.Id;
-        }): Promise<{ isValid: true } | { isValid: false; reason: string }> => {
+        }): Promise<{ isValid: true } | DashboardSlugValidationFailure> => {
           const logger = config.clientLogger.appendName(
             "validateDashboardSlug",
           );
@@ -326,9 +328,7 @@ export const DashboardClient = createUsableServiceClient(
             route: "dashboards/validate-slug",
             body: {
               slug: options.slug,
-              ...(options.dashboardId ?
-                { dashboardId: options.dashboardId }
-              : {}),
+              dashboardId: options.dashboardId,
             },
           });
         },

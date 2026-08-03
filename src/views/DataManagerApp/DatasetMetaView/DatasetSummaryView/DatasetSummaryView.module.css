@@ -1,4 +1,4 @@
-.layout {
+.datasetSummaryViewLayout {
   align-items: start;
   display: grid;
   gap: var(--mantine-spacing-xxl);
@@ -7,16 +7,16 @@
 }
 
 @media (width <= 900px) {
-  .layout {
+  .datasetSummaryViewLayout {
     grid-template-columns: 1fr;
   }
 
-  .nav {
+  .datasetSummaryViewNav {
     display: none;
   }
 }
 
-.nav {
+.datasetSummaryViewNav {
   align-self: flex-start;
   max-height: calc(100vh - 120px);
   overflow-y: auto;
@@ -26,12 +26,12 @@
   top: var(--mantine-spacing-md);
 }
 
-.content {
+.datasetSummaryViewContent {
   max-width: 760px;
   min-width: 0;
 }
 
-.navLink {
+.datasetSummaryViewNavLink {
   border-radius: var(--mantine-radius-sm);
   display: block;
   padding: 4px 6px;
@@ -39,10 +39,10 @@
   transition: background-color 120ms ease-out;
 }
 
-.navLink:hover {
+.datasetSummaryViewNavLink:hover {
   background-color: var(--mantine-color-neutral-0);
 }
 
-.navLinkActive {
+.datasetSummaryViewNavLinkActive {
   background-color: var(--mantine-color-primary-0);
 }

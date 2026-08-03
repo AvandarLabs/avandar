@@ -12,13 +12,14 @@ import { Render as PuckPageRender } from "@puckeditor/core";
 import { IconArrowLeft, IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
+import type { ReactNode } from "react";
 import "@puckeditor/core/puck.css";
 import { notifyError, Paper } from "@ui";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -26,9 +27,9 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 type Props = {
   dashboard: Dashboard.T;
   /**
-   * "public" (default) — render at the public route; enforce
+   * "public" (default): render at the public route; enforce
    *   `dashboard.isPublic` before showing anything.
-   * "preview" — auth-gated owner preview; skip the public gate and
+   * "preview": auth-gated owner preview; skip the public gate and
    *   show a "Back to editor" banner. The viewer route at
    *   `/public/dashboards/...` never passes this; it's set only by
    *   the auth-gated `/dashboards/preview/...` route.
@@ -37,18 +38,19 @@ type Props = {
   workspaceSlug?: string;
 };
 
+/** Renders a published dashboard or authenticated publication preview. */
 export function DashboardViewerView({
   dashboard,
   mode = "public",
   workspaceSlug,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const [isLoadingDatasets, loadingDatasetsError] =
     useEnsurePublishedDashboardDatasets(dashboard);
 
   const config = useDashboardPuckConfig({
-    dashboardTitle: dashboard?.name ?? "Untitled dashboard",
+    dashboardTitle: dashboard.name || t`Untitled dashboard`,
     workspaceId: dashboard?.workspaceId,
     dashboardId: dashboard.id,
     t,
@@ -63,24 +65,28 @@ export function DashboardViewerView({
         ...dashboardConfigData.root,
         props: {
           ...dashboardConfigData.root.props,
-          title: dashboard.name || "Untitled dashboard",
+          title: dashboard.name || t`Untitled dashboard`,
           schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
         },
       },
     };
     return upgradeAvaPageData(puckData);
-  }, [dashboard]);
+  }, [dashboard, t]);
 
-  useEffect(() => {
-    if (!loadingDatasetsError) {
-      return;
-    }
+  useEffect(
+    function notifyDatasetLoadFailure() {
+      if (!loadingDatasetsError) {
+        return;
+      }
 
-    notifyError({
-      title: t`Unable to load dashboard datasets`,
-      message: loadingDatasetsError.message,
-    });
-  }, [loadingDatasetsError, t]);
+      console.error(loadingDatasetsError);
+      notifyError({
+        title: t`Unable to load dashboard datasets`,
+        message: t`Please try again later.`,
+      });
+    },
+    [loadingDatasetsError, t],
+  );
 
   const avaPageMetadata = useMemo(() => {
     return getAvaPageMetadataFromDashboard(dashboard);

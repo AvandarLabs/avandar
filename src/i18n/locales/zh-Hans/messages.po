@@ -26,7 +26,7 @@ msgstr "关闭聊天面板"
 msgid "ID field is required"
 msgstr "ID 字段是必填项"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法安全解析，因此所有列将被发布。"
@@ -35,7 +35,7 @@ msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法�
 msgid "Return online to view or make the page available offline."
 msgstr "返回在线以查看或使页面可离线使用。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "未检测到该数据集的列。回退到所有列。"
 
@@ -60,7 +60,7 @@ msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
 msgid "Run a query to see results."
 msgstr "运行查询以查看结果。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "开始时间（例如：2024-01-01）"
 
@@ -173,7 +173,7 @@ msgstr "尚未添加过滤器。添加一个以便查看者在不影响其他图
 msgid "Excel files"
 msgstr "Excel 文件"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
 msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
@@ -182,7 +182,7 @@ msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
 msgid "Query"
 msgstr "查询"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Row filters"
 msgstr "行过滤器"
 
@@ -263,7 +263,7 @@ msgstr "选择一个字段"
 msgid "When"
 msgstr "何时"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "保存并重新运行查询"
 
@@ -341,7 +341,7 @@ msgstr "表格可视化没有额外设置。"
 msgid "About you"
 msgstr "关于您"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "等宽标题"
 
@@ -380,12 +380,12 @@ msgid "No datasets added yet"
 msgstr "尚未添加数据集"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-"queried\" — uploads just the columns your visualizations read. Widen the "
-"scope if you've added viewer-editable filters and want viewers to be "
-"able to filter beyond your defaults."
-msgstr "选择要发布的每个数据集的数量。默认设置为“仅查询的内容”，仅上传您的可视化读取的列。如果您添加了可由查看者编辑的过滤器并希望查看者能够超出默认"
-"设置进行过滤，请扩大范围。"
+#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
+#~ "queried\" — uploads just the columns your visualizations read. Widen the "
+#~ "scope if you've added viewer-editable filters and want viewers to be "
+#~ "able to filter beyond your defaults."
+#~ msgstr "选择要发布的每个数据集的数量。默认设置为“仅查询的内容”，仅上传您的可视化读取的列。如果您添加了可由查看者编辑的过滤器并希望查看者能够超出默认"
+#~ "设置进行过滤，请扩大范围。"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -497,6 +497,13 @@ msgstr "正在更新 {0} 的密码"
 msgid "Column info"
 msgstr "列信息"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "Choose how much of each dataset to publish. The default: \"Only what's "
+"queried\": uploads just the columns your visualizations read. Widen the "
+"scope if you've added viewer-editable filters and want viewers to be "
+"able to filter beyond your defaults."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我理解这些数据将发送给 AI 提供者"
@@ -536,7 +543,7 @@ msgstr "另存为新数据集"
 msgid "From derived dataset"
 msgstr "来自派生数据集"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "单选"
 
@@ -583,8 +590,8 @@ msgstr "发现查询失败。"
 msgid "Publish dashboard"
 msgstr "发布仪表板"
 
-#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
 msgid "Container max width"
 msgstr "容器最大宽度"
 
@@ -673,7 +680,7 @@ msgstr "添加到工作区"
 msgid "Workspace Name"
 msgstr "工作区名称"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard is published at:"
 msgstr "您的仪表板已发布在："
 
@@ -723,10 +730,10 @@ msgid "Type your answer…"
 msgstr "输入您的答案…"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-"Avandar account required. Datasets referenced by the dashboard are "
-"copied to public storage at publish time."
-msgstr "发布使得任何拥有链接的人都可以查看此仪表板 — 无需 Avandar 账户。仪表板引用的数据集在发布时复制到公共存储。"
+#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
+#~ "Avandar account required. Datasets referenced by the dashboard are "
+#~ "copied to public storage at publish time."
+#~ msgstr "发布使得任何拥有链接的人都可以查看此仪表板 — 无需 Avandar 账户。仪表板引用的数据集在发布时复制到公共存储。"
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -736,7 +743,7 @@ msgstr "密码重置失败"
 msgid "New role group"
 msgstr "新角色组"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
@@ -755,11 +762,11 @@ msgid "Some data should come from existing datasets"
 msgstr "某些数据应来自现有数据集"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Couldn't export PDF"
 msgstr "无法导出 PDF"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
 msgstr "标签"
 
@@ -793,6 +800,10 @@ msgstr "选择的名称列无效"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "自定义"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Timestamp"
+msgstr ""
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -855,15 +866,20 @@ msgstr "检测到："
 msgid "/month"
 msgstr "/月"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 msgid "Filters for this chart"
 msgstr "此图表的过滤器"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
+"exposure."
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "查询失败。"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
 msgstr "撤销"
 
@@ -892,7 +908,7 @@ msgstr "您的订阅可能需要几分钟才能生效。"
 msgid "Continue as-is"
 msgstr "继续保持现状"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Contains…"
 msgstr "包含…"
@@ -1000,7 +1016,7 @@ msgstr "为字段输入名称"
 msgid "Select Plan"
 msgstr "选择计划"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "默认值（可选）"
 
@@ -1069,7 +1085,7 @@ msgstr "当前 SQL 包含表单无法表示的部分。继续将用从表单生�
 msgid "Select the columns you want in this {entityConfigName}"
 msgstr "选择您想要在此 {entityConfigName} 中的列"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
 msgstr "正式"
 
@@ -1136,7 +1152,7 @@ msgstr ""
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "从 {column} 返回的值为空。请描述您需要的内容。"
 
-#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>. </> : "."
+#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> : "."
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
@@ -1218,6 +1234,10 @@ msgstr "角色与权限"
 msgid "Connect to Google Sheets"
 msgstr "连接到 Google Sheets"
 
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
+msgid "Data Visualization"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "选择一个已保存的数据集或将新数据导入到您的工作区。"
@@ -1246,7 +1266,7 @@ msgstr "将此仪表板导出为 PDF，或先进行草图绘制。注释支持�
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "最大"
@@ -1366,7 +1386,7 @@ msgstr "密码更新成功"
 msgid "Narrowest"
 msgstr "最窄"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Graphite"
 msgstr "石墨"
 
@@ -1382,7 +1402,7 @@ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩�
 msgid "Enter a name for this dataset"
 msgstr "输入此数据集的名称"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "自定义选择"
 
@@ -1406,11 +1426,11 @@ msgstr "您的数据集"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
@@ -1446,7 +1466,7 @@ msgstr "数据范围"
 msgid "Data preview"
 msgstr "数据预览"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
 msgstr "到"
 
@@ -1507,7 +1527,7 @@ msgstr "删除实体"
 msgid "Empty text"
 msgstr "文本为空"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "海洋"
 
@@ -1540,7 +1560,7 @@ msgstr "{0} (~{1} MB) 将从此浏览器中删除以释放空间。您可以稍�
 msgid "Go to Data Explorer"
 msgstr "前往数据探索器"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "此仪表板是 <0>公开</0> 的。任何拥有以下链接的人都可以查看。"
 
@@ -1559,7 +1579,7 @@ msgid "You'll be asked to confirm your current password."
 msgstr "系统将要求您确认当前密码。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
 msgstr "发布"
 
@@ -1590,12 +1610,12 @@ msgstr "删除实体"
 msgid "Personal data + biased framing detected"
 msgstr "检测到个人数据 + 偏见框架"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Manual form shows an approximation"
 msgstr "手动表单显示近似值"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
 msgstr "您的仪表板将发布到："
 
@@ -1627,7 +1647,7 @@ msgstr "未选择数据集"
 msgid "description"
 msgstr "描述"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "最小"
@@ -1636,7 +1656,7 @@ msgstr "最小"
 msgid "Outcome"
 msgstr "结果"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/buildLocalFiltersPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "本地过滤器（可由查看者编辑，仅此图表）"
 
@@ -1644,7 +1664,7 @@ msgstr "本地过滤器（可由查看者编辑，仅此图表）"
 msgid "Invalid X axis selected"
 msgstr "选择了无效的 X 轴"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
@@ -1671,11 +1691,15 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 msgstr "{0} 列被检测到。请查看下面的列信息以确保它们正确。"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "text"
+msgstr ""
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "活动"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "默认值，以逗号分隔或 JSON 数组"
 
@@ -1723,6 +1747,10 @@ msgstr "仪表板保存成功！"
 msgid "N/A"
 msgstr "不适用"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Publish only the columns your dashboard reads. Narrowest, most private."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "全局管理员"
@@ -1759,7 +1787,11 @@ msgstr "您没有权限打开工作区的此部分。"
 msgid "Please check your email"
 msgstr "请检查您的电子邮件"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+msgid "Pick columns and add row constraints (enum, number range, date range)."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
 msgstr "无法捕获仪表板"
 
@@ -1779,11 +1811,16 @@ msgstr "正在捕获仪表板…"
 msgid "This is an invalid waitlist code"
 msgstr "这是一个无效的候补名单代码"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+msgid "Please try again."
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Field Name"
 msgstr "字段名称"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ 添加行过滤器"
 
@@ -1800,7 +1837,7 @@ msgstr "添加人员或用户组"
 msgid "Size column"
 msgstr "大小列"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "值"
 
@@ -1855,7 +1892,7 @@ msgstr "保存到仪表板失败：{0}"
 msgid "Custom role groups"
 msgstr "自定义角色组"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
 msgstr "玫瑰"
 
@@ -1924,7 +1961,7 @@ msgid "Create groups for your workspace members. Datasets and dashboards can be 
 msgstr "为您的工作区成员创建组。数据集和仪表板可以配置为仅与某些用户组共享（或限制）。"
 
 #: src/components/privacy/ConsentModal/RowValueList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Preview:"
 msgstr "预览："
 
@@ -2107,14 +2144,14 @@ msgstr "您确定要删除此数据集吗？此操作无法撤销。"
 msgid "Symbol size column must be numeric."
 msgstr "符号大小列必须为数字。"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar（默认）"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-"columns:}}"
-msgstr "{numCols, plural, one {将发布 # 列：} other {将发布 # 列：}}"
+#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
+#~ "columns:}}"
+#~ msgstr "{numCols, plural, one {将发布 # 列：} other {将发布 # 列：}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2169,7 +2206,7 @@ msgstr "覆盖率"
 msgid "Clarification answer"
 msgstr "澄清答案"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
 msgstr "生成的 SQL"
@@ -2206,7 +2243,7 @@ msgstr "描述您的答案…"
 msgid "Drop to import"
 msgstr "拖放以导入"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "日期范围"
 
@@ -2245,7 +2282,7 @@ msgstr "离线模型下载失败"
 msgid "Parsed {formattedNumRows} rows successfully"
 msgstr "成功解析 {formattedNumRows} 行"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "标签，例如：区域"
 
@@ -2253,7 +2290,7 @@ msgstr "标签，例如：区域"
 msgid "Select file"
 msgstr "选择文件"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
 msgstr "列名（必须与 SQL 匹配）"
 
@@ -2261,7 +2298,7 @@ msgstr "列名（必须与 SQL 匹配）"
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩余"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Generate Query"
 msgstr "生成查询"
 
@@ -2277,11 +2314,11 @@ msgstr "我们将把此可视化添加到您的新仪表板。"
 msgid "Starting…"
 msgstr "正在启动…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "数字范围"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "列"
 
@@ -2334,6 +2371,10 @@ msgstr "时间戳格式"
 msgid "View"
 msgstr "查看"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
+msgid "Unavailable"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dataset"
 msgstr "数据集"
@@ -2362,7 +2403,7 @@ msgstr "来自数据集"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "一个配置文件可以由来自不同数据集的列组成。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "结束（例如：2024-12-31）"
 
@@ -2388,7 +2429,7 @@ msgstr "将数据集设置为离线专用？"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "颜色"
@@ -2438,7 +2479,7 @@ msgstr "再试一次"
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "请勿刷新或关闭此标签页，否则下载将被取消。"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
 msgstr "森林"
 
@@ -2456,8 +2497,8 @@ msgid "Series"
 msgstr "系列"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-msgid "Save your changes first — the PDF reflects the saved dashboard."
-msgstr "请先保存更改 — PDF 反映已保存的仪表板。"
+#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
+#~ msgstr "请先保存更改 — PDF 反映已保存的仪表板。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
@@ -2576,6 +2617,11 @@ msgstr "X 列"
 msgid "Choose the most frequent value"
 msgstr "选择最常见的值"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
+msgid "Please try again. The PDF was not created."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
 msgstr "日期格式"
@@ -2583,6 +2629,10 @@ msgstr "日期格式"
 #: src/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine.tsx
 msgid "Share summary"
 msgstr "分享摘要"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Time"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -2644,7 +2694,7 @@ msgid "Your workspace is on the Free plan, which supports up to 2 seats. To "
 "invite more team members, upgrade to a paid plan for unlimited seats."
 msgstr "您的工作区处于免费计划，支持最多 2 个席位。要邀请更多团队成员，请升级到付费计划以获得无限席位。"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "选项（逗号分隔，用于选择模式）"
 
@@ -2653,7 +2703,7 @@ msgstr "选项（逗号分隔，用于选择模式）"
 msgid "Owner"
 msgstr "所有者"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the "
 "custom URL changes."
 msgstr "永不更改，因此从这里打印的二维码即使自定义 URL 更改也能继续使用。"
@@ -2683,7 +2733,7 @@ msgstr "尚无澄清。日志会随着聊天提出澄清问题而填充。"
 msgid "Offline chat model removed"
 msgstr "离线聊天模型已移除"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
 msgstr "工具"
 
@@ -2748,7 +2798,7 @@ msgstr "仪表板删除成功！"
 msgid "The name you want other team members to see."
 msgstr "您希望其他团队成员看到的名称。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Custom URL"
 msgstr "自定义 URL"
 
@@ -2826,6 +2876,10 @@ msgstr "删除数据集"
 msgid "Add series"
 msgstr "添加系列"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Date"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "下载"
@@ -2839,7 +2893,7 @@ msgstr "尚无成员或用户组。请在工作区设置中邀请成员或创建
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "没有行过滤器。切片将包括数据集中每一行（针对所选列）。"
@@ -2852,7 +2906,7 @@ msgstr "转动"
 msgid "Empty"
 msgstr "空"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
@@ -2863,7 +2917,7 @@ msgstr "全部"
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} 必须至少包含 {minLength} 个字符"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "System sans"
 msgstr "系统无"
 
@@ -2891,11 +2945,15 @@ msgid "While Avandar is in beta, we are only allowing registration if you are "
 "on our waitlist and have received a sign-up code in your email."
 msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
 
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
+msgid "Ignore all global filters: this visualization is unfiltered."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "您写道："
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "多选"
 
@@ -2937,10 +2995,10 @@ msgid "Dashboard share settings updated."
 msgstr "仪表板共享设置已更新。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-msgid "Ignore all global filters — this visualization is unfiltered."
-msgstr "忽略所有全局过滤器——此可视化未经过滤。"
+#~ msgid "Ignore all global filters — this visualization is unfiltered."
+#~ msgstr "忽略所有全局过滤器——此可视化未经过滤。"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
 msgstr "草图"
 
@@ -3020,7 +3078,7 @@ msgstr "升序"
 msgid "Ask about your data"
 msgstr "询问您的数据"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "输入值；每个值后按 Enter"
 
@@ -3037,11 +3095,15 @@ msgstr "欢迎回来，{0}"
 msgid "Change"
 msgstr "更改"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分内容无法以手动形式表示。该表单显示了最佳努力的近似值；上面的 SQL 是实际运行的内容。"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "Please try again. Your dashboard has not been published."
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
@@ -3073,7 +3135,7 @@ msgid "Collapse panel"
 msgstr "折叠面板"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter"
 msgstr "过滤"
 
@@ -3093,7 +3155,7 @@ msgstr "打开侧边栏"
 msgid "Upload dataset"
 msgstr "上传数据集"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
 msgstr "重置"
@@ -3179,7 +3241,7 @@ msgid "No dashboards match “{searchQuery}”."
 msgstr "没有仪表板匹配 “{searchQuery}”。"
 
 #. placeholder {0}: roughness.toFixed(1)
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Roughness ({0})"
 msgstr "粗糙度 ({0})"
 
@@ -3210,7 +3272,7 @@ msgstr ""
 msgid "Partially offline"
 msgstr "部分离线"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Edit query"
 msgstr "编辑查询"
@@ -3255,6 +3317,14 @@ msgstr "发送消息"
 msgid "Copied!"
 msgstr "已复制！"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "date"
+msgstr ""
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+msgid "This dashboard doesn't reference any datasets: nothing to publish."
+msgstr ""
+
 #: src/routes/register.tsx
 msgid "A confirmation email has been sent to your email address."
 msgstr "确认邮件已发送到您的电子邮件地址。"
@@ -3280,13 +3350,17 @@ msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
 "sources to start analyzing your information."
 msgstr "导入电子表格，连接到 Google 表格，或从其他来源添加数据以开始分析您的信息。"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+msgid "Please try again later."
+msgstr ""
+
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
 #: src/components/privacy/ConsentModal/CleanPanel.tsx
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "将 <0>{0}</0> 值{1} 发送给 AI 吗？"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL path"
 msgstr "自定义 URL 路径"
 
@@ -3302,7 +3376,7 @@ msgstr "均值"
 msgid "Update password"
 msgstr "更新密码"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
 msgstr "仪表板快照"
 
@@ -3323,7 +3397,7 @@ msgstr "正在下载 {0} 以进行离线聊天"
 msgid "Open chat panel"
 msgstr "打开聊天面板"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "移除行过滤器"
 
@@ -3385,6 +3459,10 @@ msgstr "离线聊天模型已准备好"
 msgid "Column description updated successfully!"
 msgstr "列描述更新成功！"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Save your changes first: the PDF reflects the saved dashboard."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
 msgstr "文件加载失败"
@@ -3400,7 +3478,7 @@ msgstr "更新时发生错误：{0}"
 msgid "Privacy log"
 msgstr "隐私日志"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/buildVizConfigPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "可视化设置"
@@ -3419,8 +3497,8 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 msgstr "此数据集较大，因此我们应用了 100 行限制。您可以随时更改此限制。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-msgid "This dashboard doesn't reference any datasets — nothing to publish."
-msgstr "此仪表板未引用任何数据集——没有内容可发布。"
+#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
+#~ msgstr "此仪表板未引用任何数据集——没有内容可发布。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -3436,7 +3514,7 @@ msgid "Profile Name"
 msgstr "配置文件名称"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "可视化类型"
 
@@ -3472,7 +3550,7 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的 
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "此数据集仅限离线使用。点击以允许在线同步。"
 
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/buildGlobalFilterSubscriptionPFieldConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "全局过滤器"
 
@@ -3531,7 +3609,7 @@ msgstr "设为仅离线使用"
 msgid "{0} is available when you are offline."
 msgstr "{0} 在您离线时可用。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "自定义 URL 可用"
 
@@ -3543,7 +3621,7 @@ msgstr "行数"
 msgid "Restricted"
 msgstr "受限"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Contains (free-text)"
 msgstr "包含（自由文本）"
 
@@ -3558,6 +3636,12 @@ msgstr "加载仪表板数据集"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "从您的计算机选择一个 Excel 或 CSV 文件进行导入"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Publishing makes this dashboard viewable by anyone with the link, no "
+"Avandar account required. Datasets referenced by the dashboard are "
+"copied to public storage at publish time."
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
@@ -3688,6 +3772,10 @@ msgstr "数据集加载失败"
 msgid "Save — {0}"
 msgstr "保存 — {0}"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Decimal"
+msgstr ""
+
 #: packages/web/ui/src/notifications/notify.ts
 msgid "Error"
 msgstr "错误"
@@ -3702,7 +3790,7 @@ msgstr "发送答案"
 msgid "... and {remainingCount} more"
 msgstr "... 还有 {remainingCount} 个"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Just what's queried"
 msgstr "仅查询的内容"
 
@@ -3807,7 +3895,7 @@ msgstr "下载不同的离线聊天模型"
 msgid "Edit permissions"
 msgstr "编辑权限"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "queried"
 msgstr "查询的"
 
@@ -3822,7 +3910,7 @@ msgstr "保存数据集时出错"
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
 #: src/routes/_auth/$workspaceSlug/profile.tsx
-#: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton.tsx
+#: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -3839,7 +3927,13 @@ msgstr "来自 Google Sheets"
 msgid "Subscription updated successfully"
 msgstr "订阅已成功更新"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#. placeholder {0}: columns.length
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+msgid "{0, plural, one {Will publish # column:} other {Will publish # "
+"columns:}}"
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "默认值"
 
@@ -3864,7 +3958,7 @@ msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Multi-select"
 msgstr "多选"
 
@@ -3888,7 +3982,7 @@ msgstr "覆盖 <0>{0}</0>，从 <1>{1}</1> 到 <2>{2}</2>。"
 msgid "Loading more..."
 msgstr "加载更多..."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "自定义 URL（可选）"
 
@@ -3904,11 +3998,11 @@ msgstr "数据集名称"
 msgid "Email address updated"
 msgstr "电子邮件地址已更新"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
 msgstr "手绘"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Permanent link (use for QR codes)"
 msgstr "永久链接（用于二维码）"
 
@@ -3949,7 +4043,7 @@ msgstr "已发布"
 msgid "Filters (Where)"
 msgstr "过滤器（位置）"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
 msgstr "单选"
 
@@ -3990,7 +4084,7 @@ msgstr "账单门户。"
 msgid "You haven't chosen a value column"
 msgstr "您尚未选择值列"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Text contains"
 msgstr "文本包含"
 
@@ -4014,7 +4108,7 @@ msgstr ""
 msgid "Purchase {seatsToAdd} seats"
 msgstr "购买 {seatsToAdd} 个座位"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share link"
 msgstr "分享链接"
 
@@ -4022,7 +4116,7 @@ msgstr "分享链接"
 msgid "Current Plan"
 msgstr "当前计划"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
 msgstr "使用您的自定义 URL。下面的永久 UUID 链接仍然有效。"
 
@@ -4049,7 +4143,7 @@ msgstr "以上均不适用"
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "此 {resource} 对拥有 {app} {0} 权限的任何人可访问。"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "琥珀色"
 
@@ -4117,7 +4211,7 @@ msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "此人或组可以执行的操作。查看者 = 只读，编辑者 = 编辑内容，管理员 = 完全控制，包括共享。"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
 msgstr "过滤器 ID（稳定）"
 
@@ -4161,7 +4255,7 @@ msgstr "编辑角色组"
 msgid "Profiles"
 msgstr "配置文件"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Update & republish"
 msgstr "更新并重新发布"
 
@@ -4173,6 +4267,10 @@ msgstr " · 已下载"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
 msgstr "已取消"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "number"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -4243,8 +4341,9 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 "your workspace."
 msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的入门或影响计划以增加您可以添加到工作区的数据集数量。"
 
-#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
+#: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "提示"
 
@@ -4280,11 +4379,11 @@ msgid "Recommended"
 msgstr "推荐"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Select all"
 msgstr "全选"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "仅查询的内容（推荐）"
 
@@ -4309,7 +4408,7 @@ msgstr "形状"
 msgid "Members"
 msgstr "成员"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
 "type is kebab-cased automatically."
 msgstr "用于传单、报告和二维码的简短、易记的 URL。您输入的内容会自动转换为 kebab-case。"
@@ -4343,7 +4442,7 @@ msgstr "添加一个系列以选择哪个数值列驱动图表。"
 msgid "Column"
 msgstr "列"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Remove local filter"
 msgstr "移除本地过滤器"
 
@@ -4355,7 +4454,7 @@ msgstr "这将从使用该用户组的成员和资源中移除该用户组。"
 msgid "From your prompt:"
 msgstr "来自您的提示："
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Anyone with this link can view the dashboard."
 msgstr "任何拥有此链接的人都可以查看仪表板。"
 
@@ -4397,7 +4496,8 @@ msgid "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {entityConfigName}。"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "文本"
 
@@ -4576,9 +4676,13 @@ msgid "Please take a look at the data and make sure it is correct. Once you "
 "confirm, the dataset will be synced with this data."
 msgstr "请查看数据并确保其正确。一旦确认，数据集将与此数据同步。"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Stroke ({strokeWidth}px)"
 msgstr "描边 ({strokeWidth}px)"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "Whole number"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -4597,10 +4701,16 @@ msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信
 msgid "CSV or Excel file"
 msgstr "CSV 或 Excel 文件"
 
-#: src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
+msgid "Dashboard is not loaded yet."
+msgstr ""
+
+#: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Editorial serif"
 msgstr "编辑 serif"
 
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Untitled dashboard"
 msgstr "未命名仪表板"
@@ -4613,7 +4723,7 @@ msgstr "限制"
 msgid "Fix these issues before saving"
 msgstr "在保存之前修复这些问题"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "最适合口碑分享。访问下面的永久链接也会重定向到此处。"
@@ -4639,12 +4749,12 @@ msgstr "用于登录您的账户。"
 msgid "Role & user groups"
 msgstr "角色和用户组"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Clear all"
 msgstr "清除所有"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Close"
 msgstr "关闭"
 
@@ -4675,11 +4785,11 @@ msgstr "加载中..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "分享"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "整个数据集"
 
@@ -4691,11 +4801,11 @@ msgstr "无效日期"
 msgid "Some"
 msgstr "一些"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Arrow"
 msgstr "箭头"
 
-#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "值，逗号分隔"
 
@@ -4709,7 +4819,7 @@ msgstr "+{0} 个值与 {1} 行相关联"
 msgid "Processing, {remainingLabel} remaining"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Loose"
 msgstr "松散"
 
@@ -4745,7 +4855,7 @@ msgstr "添加至少一个 X / Y 系列"
 msgid "Show QR code"
 msgstr "显示二维码"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a permanent UUID-based link. Add a custom path below "
 "for a nicer URL."
 msgstr "默认情况下，我们使用基于永久 UUID 的链接。请在下面添加自定义路径以获得更好的 URL。"
@@ -4754,7 +4864,7 @@ msgstr "默认情况下，我们使用基于永久 UUID 的链接。请在下面
 msgid "Choose the minimum value"
 msgstr "选择最小值"
 
-#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Mode"
 msgstr "模式"
 

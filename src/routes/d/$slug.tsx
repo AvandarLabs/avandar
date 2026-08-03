@@ -1,8 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { DashboardRead } from "$/models/Dashboard/Dashboard.types";
 
 /**
  * Public vanity URL for a published dashboard:
@@ -13,14 +13,14 @@ import type { DashboardRead } from "$/models/Dashboard/Dashboard.types";
  * `supabase/schemas/10.dashboards.sql`),
  * so the slug alone resolves to at most one dashboard. The dashboardId
  * URL at `/public/dashboards/<workspaceSlug>/<dashboardId>` stays valid
- * and is what QR codes encode — it redirects here when a slug is set.
+ * and is what QR codes encode. It redirects here when a slug is set.
  *
  * Anon SELECT on `dashboards` is gated to `is_public = true` rows (see
  * `supabase/schemas/17.rls.dashboards.sql`), so no workspace lookup is
  * required.
  */
 export const Route = createFileRoute("/d/$slug")({
-  loader: async ({ params }): Promise<{ dashboard: DashboardRead }> => {
+  loader: async ({ params }): Promise<{ dashboard: Dashboard.T }> => {
     const dashboards = await DashboardClient.getAll({
       where: {
         slug: { eq: params.slug },
@@ -36,8 +36,8 @@ export const Route = createFileRoute("/d/$slug")({
   component: DashboardVanityPage,
 });
 
-function DashboardVanityPage(): JSX.Element {
-  const { dashboard } = Route.useLoaderData() as { dashboard: DashboardRead };
+function DashboardVanityPage() {
+  const { dashboard } = Route.useLoaderData() as { dashboard: Dashboard.T };
   return (
     <DataExplorerStateManager.Provider>
       <DashboardViewerView dashboard={dashboard} mode="public" />

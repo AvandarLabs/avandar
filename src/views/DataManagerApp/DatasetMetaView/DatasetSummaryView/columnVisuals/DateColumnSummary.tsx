@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
+import { TimelineEndpoint } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TimelineEndpoint";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "date" };
@@ -10,10 +12,10 @@ type Props = {
 /**
  * Visual block for date / time / timestamp columns. Horizontal timeline
  * with oldest on the left, most recent on the right, and the coverage
- * span labelled in the middle. Skips a chart on purpose — for a single
+ * span labelled in the middle. Skips a chart on purpose: for a single
  * column the timeline is the clearest read.
  */
-export function DateColumnSummary({ summary }: Props): JSX.Element {
+export function DateColumnSummary({ summary }: Props): ReactNode {
   const { oldestDate, mostRecentDate, datasetCoverage } = summary;
 
   return (
@@ -25,17 +27,17 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
       <Box pos="relative" px={6}>
         <Box h={4} bg="neutral.1" style={{ borderRadius: 2 }} />
         <Box pos="absolute" top={-3} left={0}>
-          <Endpoint position="start" />
+          <TimelineEndpoint />
         </Box>
         <Box pos="absolute" top={-3} right={0}>
-          <Endpoint position="end" />
+          <TimelineEndpoint />
         </Box>
       </Box>
 
       <Group justify="space-between" gap="xs">
         <Stack gap={0} align="flex-start">
           <Text size="sm" fw={600} ff="monospace">
-            {oldestDate || "—"}
+            {oldestDate || <Trans>Unavailable</Trans>}
           </Text>
           <Text size="xs" c="dimmed">
             <Trans>earliest</Trans>
@@ -51,7 +53,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
         </Stack>
         <Stack gap={0} align="flex-end">
           <Text size="sm" fw={600} ff="monospace">
-            {mostRecentDate || "—"}
+            {mostRecentDate || <Trans>Unavailable</Trans>}
           </Text>
           <Text size="xs" c="dimmed">
             <Trans>most recent</Trans>
@@ -59,22 +61,5 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
         </Stack>
       </Group>
     </Stack>
-  );
-}
-
-function Endpoint({ position }: { position: "start" | "end" }): JSX.Element {
-  return (
-    <Box
-      h={10}
-      w={10}
-      bg="primary.6"
-      style={{
-        borderRadius: "50%",
-        boxShadow:
-          position === "start" ?
-            "0 0 0 3px var(--mantine-color-primary-0)"
-          : "0 0 0 3px var(--mantine-color-primary-0)",
-      }}
-    />
   );
 }

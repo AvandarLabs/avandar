@@ -1,7 +1,8 @@
+import { getIsMacPlatform } from "@browser-utils";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { useId, useMemo, useRef } from "react";
+import { useId, useRef } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import type { TextareaProps } from "@mantine/core";
 
@@ -119,22 +120,7 @@ export function TextareaForm({
   });
 
   const formRef = useRef<HTMLFormElement>(null);
-  const isMac = useMemo(() => {
-    if (typeof navigator === "undefined") {
-      return false;
-    }
-    // Use modern User-Agent Client Hints API if available
-    const userAgentData = (
-      navigator as Navigator & {
-        userAgentData?: { platform: string };
-      }
-    ).userAgentData;
-    if (userAgentData?.platform) {
-      return /Mac|iPhone|iPod|iPad/i.test(userAgentData.platform);
-    }
-    // Fallback to userAgent string (widely supported and reliable)
-    return /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
-  }, []);
+  const isMac = getIsMacPlatform();
 
   const shortcutText = isMac ? "⌘↵" : "Ctrl↵";
 

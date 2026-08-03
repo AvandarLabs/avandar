@@ -1,3 +1,4 @@
+import { getCurrentUrl } from "@browser-utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -18,7 +19,6 @@ import { match } from "ts-pattern";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
@@ -170,7 +170,7 @@ export function PlanCard(props: Props): JSX.Element {
           createFreeSub({ workspaceId });
         })
         .with({ type: "polar_checkout" }, async () => {
-          const currentURL = getCurrentURL();
+          const currentURL = getCurrentUrl();
           const successURL = router.buildLocation({
             to: "/$workspaceSlug/checkout",
             params: { workspaceSlug },

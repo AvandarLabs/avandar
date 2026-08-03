@@ -1,3 +1,4 @@
+import { clearOpfs } from "@browser-utils";
 import { modals } from "@mantine/modals";
 import {
   SpotlightActionData,
@@ -10,7 +11,6 @@ import { useMemo } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import { Logger } from "@/utils/Logger";
 
 export function useSpotlightActions(
@@ -65,7 +65,7 @@ export function useSpotlightActions(
                 await AvaDexie.deleteDatabase();
 
                 // delete any local OPFS data
-                await clearOPFS();
+                await clearOpfs();
                 notifySuccess({
                   title: "Local data deleted",
                   message:

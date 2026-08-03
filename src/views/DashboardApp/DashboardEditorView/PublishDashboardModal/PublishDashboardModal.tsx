@@ -1,37 +1,39 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Alert,
-  Anchor,
-  Button,
-  Code,
-  Divider,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
-import { IconCheck, IconInfoCircle, IconWorld } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
-import { useEffect, useMemo, useState } from "react";
+import { matchLiteral } from "@utils";
+import { useEffect, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { readDashboardPublishConfig } from "@/clients/dashboards/sliceBuilder";
+import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
+import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
-import { PublishSliceSection } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection";
-import { ShareUrlRow } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow";
-import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/slug";
+import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
+import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/toVanitySlug/toVanitySlug";
+import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardPublishConfig } from "$/models/Dashboard/PublishSliceConfig";
+import type { ReactNode } from "react";
 
 const SLUG_VALIDATION_DEBOUNCE_MS = 500;
 
-type SlugValidationResult =
-  | { isValid: true }
-  | { isValid: false; reason: string };
+type SlugValidationResult = { isValid: true } | DashboardSlugValidationFailure;
+
+type TranslateFn = ReturnType<typeof useLingui>["t"];
+
+function _slugFailureToMessage(
+  failure: DashboardSlugValidationFailure,
+  t: TranslateFn,
+): string {
+  return matchLiteral(failure.reason, {
+    empty: t`The custom URL cannot be empty`,
+    spaces: t`The custom URL cannot contain spaces`,
+    invalid_characters: t`The custom URL can only contain lowercase letters, numbers, and hyphens`,
+    too_short: t`The custom URL must be at least ${failure.limit ?? 3} characters`,
+    too_long: t`The custom URL cannot exceed ${failure.limit ?? 64} characters`,
+    taken: t`This custom URL is already taken`,
+  });
+}
 
 type Props = {
   dashboard: Dashboard.T;
@@ -64,7 +66,7 @@ export function PublishDashboardModal({
   dashboard,
   onClose,
   modalId,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   // Track the live dashboard locally so a successful publish flips the
@@ -101,18 +103,17 @@ export function PublishDashboardModal({
         });
       }
     },
-    onError: (e: Error) => {
+    onError: (error: Error) => {
+      console.error(error);
       notifyError({
         title: t`Could not publish dashboard`,
-        message: e.message,
+        message: t`Please try again. Your dashboard has not been published.`,
       });
     },
   });
 
   const [slugInput, setSlugInput] = useState(currentDashboard.slug ?? "");
-  const normalisedSlug = useMemo(() => {
-    return toVanitySlug(slugInput);
-  }, [slugInput]);
+  const normalisedSlug = toVanitySlug(slugInput);
 
   // Slug availability check. Debounced; tracks the last slug we got a
   // result for so a slow response for an older slug can't overwrite a
@@ -132,24 +133,27 @@ export function PublishDashboardModal({
     string | undefined
   >(undefined);
 
-  useEffect(() => {
-    if (!normalisedSlug) {
-      // Clear any prior result so the row doesn't render a stale state
-      // when the user empties the input.
-      setSlugValidationResult(undefined);
-      setLastValidatedSlug(undefined);
-      return;
-    }
-    const handle = window.setTimeout(() => {
-      validateSlug({
-        slug: normalisedSlug,
-        dashboardId: currentDashboard.id,
-      });
-    }, SLUG_VALIDATION_DEBOUNCE_MS);
-    return () => {
-      window.clearTimeout(handle);
-    };
-  }, [normalisedSlug, currentDashboard.id, validateSlug]);
+  useEffect(
+    function validateNormalisedSlug() {
+      if (!normalisedSlug) {
+        // Clear any prior result so the row doesn't render a stale state
+        // when the user empties the input.
+        setSlugValidationResult(undefined);
+        setLastValidatedSlug(undefined);
+        return;
+      }
+      const timeoutId = window.setTimeout(() => {
+        validateSlug({
+          slug: normalisedSlug,
+          dashboardId: currentDashboard.id,
+        });
+      }, SLUG_VALIDATION_DEBOUNCE_MS);
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    },
+    [normalisedSlug, currentDashboard.id, validateSlug],
+  );
 
   const hasPendingSlugCheck =
     !!normalisedSlug &&
@@ -164,14 +168,15 @@ export function PublishDashboardModal({
     slugValidationResult?.isValid === true;
   const slugErrorMessage =
     isSlugRejected && slugValidationResult?.isValid === false ?
-      slugValidationResult.reason
+      _slugFailureToMessage(slugValidationResult, t)
     : undefined;
 
-  const [publishConfig, setPublishConfig] = useState<DashboardPublishConfig>(
-    () => {
-      return readDashboardPublishConfig(currentDashboard.config);
-    },
-  );
+  const [publishConfig, setPublishConfig] =
+    useState<PublishSliceConfig.Dashboard>(() => {
+      return DashboardSliceBuilder.readDashboardPublishConfig(
+        currentDashboard.config,
+      );
+    });
 
   // The URL the dashboard will be (or has been) published to. Prefers
   // the live vanity preview when the user has typed something; falls
@@ -182,187 +187,42 @@ export function PublishDashboardModal({
     slug: normalisedSlug || currentDashboard.slug,
   });
   const targetUrl = livePreviewUrls.vanity ?? livePreviewUrls.canonical;
-  const isUsingVanity = Boolean(livePreviewUrls.vanity);
-
-  const isAlreadyPublished = currentDashboard.isPublic;
-
   const submit = (): void => {
     // Don't let a stale debounced check or pending request leak through.
     if (normalisedSlug && (hasPendingSlugCheck || isSlugRejected)) {
       return;
     }
-    // `normalisedSlug` non-empty: set/update the slug.
-    // `normalisedSlug` empty + dashboard previously had one: clear it.
-    // `normalisedSlug` empty + dashboard had none: omit (no-op for the field).
-    const slugParam: string | null | undefined =
-      normalisedSlug ? normalisedSlug
-      : currentDashboard.slug ? null
+    const slugUpdate:
+      | { action: "set"; value: string }
+      | { action: "clear" }
+      | undefined =
+      normalisedSlug ? { action: "set", value: normalisedSlug }
+      : currentDashboard.slug ? { action: "clear" }
       : undefined;
     publishDashboard({
       dashboardId: currentDashboard.id,
-      ...(slugParam !== undefined ? { slug: slugParam } : {}),
+      ...(slugUpdate ? { slug: slugUpdate } : {}),
       publishConfig,
     });
   };
 
   return (
-    <Stack gap="md">
-      {isAlreadyPublished ?
-        <Alert color="teal" icon={<IconWorld size={18} />} variant="light">
-          <Text size="sm">
-            <Trans>
-              This dashboard is <strong>public</strong>. Anyone with the link
-              below can view it.
-            </Trans>
-          </Text>
-        </Alert>
-      : <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
-          <Text size="sm">
-            <Trans>
-              Publishing makes this dashboard viewable by anyone with the link —
-              no Avandar account required. Datasets referenced by the dashboard
-              are copied to public storage at publish time.
-            </Trans>
-          </Text>
-        </Alert>
-      }
-
-      <Stack gap={6}>
-        <Text size="sm" fw={500}>
-          {isAlreadyPublished ?
-            <Trans>Your dashboard is published at:</Trans>
-          : <Trans>Your dashboard will be published to:</Trans>}
-        </Text>
-        <Code
-          block
-          style={{
-            wordBreak: "break-all",
-            fontSize: "0.9em",
-            padding: "8px 12px",
-          }}
-        >
-          {targetUrl}
-        </Code>
-        <Text size="xs" c="dimmed">
-          {isUsingVanity ?
-            <Trans>
-              Using your custom URL. The permanent UUID link below also still
-              works.
-            </Trans>
-          : <Trans>
-              By default we use a permanent UUID-based link. Add a custom path
-              below for a nicer URL.
-            </Trans>
-          }
-        </Text>
-      </Stack>
-
-      <Divider />
-
-      <Stack gap={4}>
-        <Title order={5} fw={600}>
-          <Trans>Custom URL (optional)</Trans>
-        </Title>
-        <Text size="xs" c="dimmed">
-          <Trans>
-            A short, memorable URL for flyers, reports, and QR codes. Whatever
-            you type is kebab-cased automatically.
-          </Trans>
-        </Text>
-        <TextInput
-          aria-label={t`Custom URL path`}
-          placeholder={t`e.g. cholera-outbreak-2024`}
-          value={slugInput}
-          onChange={(e) => {
-            return setSlugInput(e.currentTarget.value);
-          }}
-          error={slugErrorMessage}
-          rightSection={
-            !normalisedSlug ? null
-            : hasPendingSlugCheck ?
-              <Loader size="xs" />
-            : isSlugAccepted ?
-              <IconCheck
-                size={18}
-                color="var(--mantine-color-teal-6)"
-                aria-label={t`Custom URL is available`}
-              />
-            : null
-          }
-          rightSectionWidth={36}
-        />
-        {normalisedSlug ?
-          <Group gap={6} mt={2} wrap="nowrap">
-            <Text size="xs" c="dimmed">
-              <Trans>Preview:</Trans>
-            </Text>
-            <Code style={{ fontSize: "0.78em", padding: "1px 6px" }}>
-              /d/{normalisedSlug}
-            </Code>
-          </Group>
-        : null}
-      </Stack>
-
-      <Divider />
-
-      <PublishSliceSection
-        dashboard={currentDashboard}
-        publishConfig={publishConfig}
-        onChange={setPublishConfig}
-      />
-
-      {isAlreadyPublished ?
-        <>
-          <Divider />
-          <Stack gap="md">
-            <Title order={5} fw={600}>
-              <Trans>Share</Trans>
-            </Title>
-            {livePreviewUrls.vanity ?
-              <ShareUrlRow
-                label={t`Custom URL`}
-                url={livePreviewUrls.vanity}
-                hint={t`Best for word-of-mouth sharing. Visiting the permanent link below also redirects here.`}
-                showQr={false}
-              />
-            : null}
-            <ShareUrlRow
-              label={
-                livePreviewUrls.vanity ?
-                  t`Permanent link (use for QR codes)`
-                : t`Share link`
-              }
-              url={livePreviewUrls.canonical}
-              hint={
-                livePreviewUrls.vanity ?
-                  t`Never changes, so QR codes printed from here keep working even if the custom URL changes.`
-                : t`Anyone with this link can view the dashboard.`
-              }
-            />
-          </Stack>
-        </>
-      : null}
-
-      <Group justify="space-between" mt="md">
-        <Anchor size="xs" c="dimmed" onClick={onClose} component="button">
-          <Trans>Close</Trans>
-        </Anchor>
-        <Group gap="xs">
-          <Button variant="subtle" color="neutral" onClick={onClose}>
-            <Trans>Cancel</Trans>
-          </Button>
-          <Button
-            loading={isPublishing}
-            disabled={hasPendingSlugCheck || isSlugRejected}
-            onClick={submit}
-            leftSection={<IconWorld size={16} />}
-          >
-            {isAlreadyPublished ?
-              <Trans>Update &amp; republish</Trans>
-            : <Trans>Publish</Trans>}
-          </Button>
-        </Group>
-      </Group>
-    </Stack>
+    <PublishDashboardModalContent
+      dashboard={currentDashboard}
+      publishConfig={publishConfig}
+      shareUrls={livePreviewUrls}
+      targetUrl={targetUrl}
+      slugInput={slugInput}
+      normalisedSlug={normalisedSlug}
+      slugErrorMessage={slugErrorMessage}
+      hasPendingSlugCheck={hasPendingSlugCheck}
+      isSlugAccepted={isSlugAccepted}
+      isSlugRejected={isSlugRejected}
+      isPublishing={isPublishing}
+      onSlugInputChange={setSlugInput}
+      onPublishConfigChange={setPublishConfig}
+      onSubmit={submit}
+      onClose={onClose}
+    />
   );
 }

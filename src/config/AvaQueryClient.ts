@@ -1,6 +1,6 @@
+import { getIsOnline } from "@browser-utils";
 import { SessionExpiredError } from "@clients";
 import { QueryClient } from "@tanstack/react-query";
-import { getIsOnline } from "@/lib/utils/browser/getIsOnline/getIsOnline";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;

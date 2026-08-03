@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/dashboards/dashboards.routes.ts";
+import { DashboardsRoutes } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(DashboardsRoutes).serve();

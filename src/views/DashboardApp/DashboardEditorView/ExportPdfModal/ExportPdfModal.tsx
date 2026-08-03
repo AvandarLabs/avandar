@@ -13,10 +13,11 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
-import { captureAndDownloadPdf } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
-import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
+import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -25,13 +26,21 @@ type Props = {
 
 type Step = "choose" | "snapshot" | "annotate";
 
+function buildPdfFilenameFromDashboardName(dashboardName: string): string {
+  const filenameBase = (dashboardName || "dashboard")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/gu, "-")
+    .replace(/^-+|-+$/gu, "");
+  return `${filenameBase || "dashboard"}.pdf`;
+}
+
 /**
  * Two-step PDF export flow:
  *
- *   1. "choose" — pick between immediate export or annotation-then-export.
- *   2a. "snapshot" — capture the rendered dashboard once and let the user
+ *   1. "choose": pick between immediate export or annotation-then-export.
+ *   2a. "snapshot": capture the rendered dashboard once and let the user
  *       download it as a PDF directly.
- *   2b. "annotate" — same snapshot but mounted into PdfAnnotator so the
+ *   2b. "annotate": same snapshot but mounted into PdfAnnotator so the
  *       user can layer text, arrows, and freehand strokes (with adjustable
  *       roughness) before exporting.
  *
@@ -39,7 +48,7 @@ type Step = "choose" | "snapshot" | "annotate";
  * using `<PuckPageRender>` directly (not the Puck editor frame), so the
  * editor chrome doesn't show up in the snapshot.
  */
-export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
+export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
   const { t } = useLingui();
   const [step, setStep] = useState<Step>("choose");
   const renderContainerRef = useRef<HTMLDivElement | null>(null);
@@ -60,44 +69,39 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         ...cfg.root,
         props: {
           ...cfg.root.props,
-          title: dashboard.name || "Untitled dashboard",
+          title: dashboard.name || t`Untitled dashboard`,
           schemaVersion: getVersionFromAvaPageData(cfg),
         },
       },
     };
     return upgradeAvaPageData(data);
-  }, [dashboard]);
+  }, [dashboard, t]);
 
   const avaPageMetadata = useMemo(() => {
     return getAvaPageMetadataFromDashboard(dashboard);
   }, [dashboard]);
 
-  const filename = useMemo(() => {
-    const base = (dashboard.name || "dashboard")
-      .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-    return `${base || "dashboard"}.pdf`;
-  }, [dashboard.name]);
+  const filename = buildPdfFilenameFromDashboardName(dashboard.name);
 
-  const handleDirectExport = useCallback(async (): Promise<void> => {
+  const onDirectExport = useCallback(async (): Promise<void> => {
     if (!renderContainerRef.current) {
       notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
       return;
     }
     setIsExporting(true);
     try {
-      await captureAndDownloadPdf({
+      await PdfExport.captureAndDownloadPdf({
         element: renderContainerRef.current,
         filename,
-        title: dashboard.name || "Untitled dashboard",
+        title: dashboard.name || t`Untitled dashboard`,
       });
       notifySuccess(t`PDF downloaded.`);
       onClose();
-    } catch (e: unknown) {
+    } catch (error: unknown) {
+      console.error(error);
       notifyError({
         title: t`Couldn't export PDF`,
-        message: e instanceof Error ? e.message : String(e),
+        message: t`Please try again. The PDF was not created.`,
       });
     } finally {
       setIsExporting(false);
@@ -151,7 +155,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
             leftSection={<IconFileExport size={18} />}
             rightSection={<IconArrowRight size={16} />}
             loading={isExporting}
-            onClick={handleDirectExport}
+            onClick={onDirectExport}
             justify="space-between"
           >
             <Trans>Export as PDF</Trans>
@@ -183,9 +187,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
     <Stack gap="sm">
       {hiddenRender}
       <PdfAnnotator
-        sourceElement={renderContainerRef.current}
+        sourceElement={renderContainerRef.current ?? undefined}
         filename={filename}
-        title={dashboard.name || "Untitled dashboard"}
+        title={dashboard.name || t`Untitled dashboard`}
         onClose={onClose}
         onBack={() => {
           return setStep("choose");

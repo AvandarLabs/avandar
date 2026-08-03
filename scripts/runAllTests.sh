@@ -53,6 +53,7 @@ pnpm test:clients
 pnpm test:models
 pnpm test:hooks
 pnpm test:ui
+pnpm test:browser-utils
 pnpm test:db
 
 if [ "$QUICK" = true ]; then

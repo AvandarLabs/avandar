@@ -2,6 +2,7 @@
 export { splitArray } from "@utils/arrays/splitArray/splitArray.ts";
 export { append } from "@utils/arrays/hofs/append/append.ts";
 export { getRandomItem } from "@utils/arrays/getRandomItem/getRandomItem.ts";
+export { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength.ts";
 export { removeAtIndex } from "@utils/arrays/removeAtIndex/removeAtIndex.ts";
 
 // asserts

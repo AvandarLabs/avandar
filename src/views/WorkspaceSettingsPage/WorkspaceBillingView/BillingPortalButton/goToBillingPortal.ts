@@ -1,11 +1,10 @@
+import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
 import { useLingui } from "@lingui/react/macro";
 import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 
 /**
  * Opens the Polar customer portal for a user, redirecting the browser. Shows
@@ -25,7 +24,7 @@ export async function goToBillingPortal({
         userId: userId,
       },
       queryParams: {
-        returnURL: getCurrentURL(),
+        returnURL: getCurrentUrl(),
       },
     });
 
@@ -36,7 +35,7 @@ export async function goToBillingPortal({
       AvaQueryClient.invalidateQueries({
         queryKey: [WorkspaceClient.getClientName()],
       });
-      navigateToExternalURL(customerPortalResponse.customerPortalURL);
+      navigateToExternalUrl(customerPortalResponse.customerPortalURL);
     } else {
       notifyError(
         t`Billing portal cannot be loaded because you do not have a subscription yet.`,

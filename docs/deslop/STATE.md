@@ -568,3 +568,65 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     left at `6a1366e2`; the mergeback below advances the feat tip.
   - **Next: the 3-way mergeback of the reviewed g4 cleanup back into
     `feat/ict4d-demo`** (see the following entry).
+- `2026-08-03` — **GROUP-4 mergeback into `feat/ict4d-demo`.** 3-way merge of the
+  reviewed g4 cleanup: base `c703e5c2`, ours `feat/ict4d-demo`, theirs
+  `origin/develop @ 4f57526a`. Path set (base..develop over
+  `src packages shared scripts supabase`): 198 entries (116 A, 67 M, 8 R, 7 D),
+  plus root config not in that scope (`tsconfig.base.json`, `vite.config.ts`,
+  `tests/vitestAliases.ts`, `package.json`).
+  - **The g4 review bundled far more than dashboards.** Beyond the dashboard
+    surface it (a) extracted `src/lib/utils/browser/` into a new
+    `@avandar/browser-utils` package (alias `@browser-utils`), (b) moved `css.ts`
+    into `packages/web/ui` as `cssVar`, and (c) restructured the entire dashboard
+    module tree to develop's PascalCase-dir conventions (`build*Config.tsx` →
+    `use*Config` hooks/dirs; `dashboardDesignTokens.ts` →
+    `DashboardDesignTokens/`; `shared/models/Dashboard/PublishSliceConfig.ts` →
+    `src/models/Dashboard/PublishSliceConfig/`; `dashboards.routes*` →
+    `DashboardsRoutes*`; etc.). Feat carried the pre-restructure "before".
+  - **Strategy:** wholesale-adopted develop for the g4-owned surface
+    (`src/views/DashboardApp`, `src/clients/dashboards`, `src/models/Dashboard`,
+    `src/routes/d`, `supabase/functions/dashboards`, `packages/web/browser-utils`,
+    `DatasetSummaryView`) because mapping ~150 renames path-by-path was
+    infeasible; 3-way-merged the cross-cutting shared importers favouring develop;
+    regenerated `routeTree.gen.ts` (feat already carried the routes) and the i18n
+    catalogs; deferred nothing else.
+  - **Feat-ahead PRESERVED** (develop lacks these; verified via an offline-marker
+    audit): `DashboardListView.tsx` (offline dataset-cache status, kept whole —
+    not in path set), `DashboardCard.tsx` (offline delta, 3-way), and
+    `shared/models/Dashboard/collectDatasetIds.ts`/`.test.ts` (offline helper, no
+    develop equivalent).
+  - **Entanglements resolved:**
+    - **Analytics case-rename EXCLUDED** (G1 residual). develop's g4 code imports
+      PascalCase `@/lib/analytics/AnalyticsClient` (`AnalyticsClient.logEvent`),
+      but feat still has lowercase `analyticsClient.ts` (`logAnalyticsEvent`).
+      Reverted the 3 coupled g4 files (`FilterPBlock`, `ExportPdfButton`,
+      `PublishDashboardModal`) to feat's lowercase API — the rename belongs to the
+      analytics feature's own migration, not this cleanup.
+    - **`--theirs` dropped feat-only imports** adjacent to conflicting lines in 7
+      shared files — re-added: lingui (`EditableDisplayText`, `TextareaForm`,
+      `PlanCard`, `goToBillingPortal`), `useIsTabletSize` (`WorkspaceHomeView`),
+      `APP_CHROME_Z_INDEX` (`AppToolbar`), `SessionExpiredError` (`AvaQueryClient`).
+    - Removed the now-orphaned `src/lib/utils/browser/` dir (superseded by the
+      package); deduped a spurious `@types/qrcode` the `package.json` 3-way added
+      to `dependencies` (develop keeps it in `devDependencies` only); pulled the
+      `@browser-utils` alias into `tsconfig.base.json`, `vite.config.ts`, and
+      `tests/vitestAliases.ts` (root files outside the scoped path set, so the
+      package's own tests couldn't resolve until added); restored
+      `runAllTests.sh`'s exec bit (a `mv` artifact); repointed
+      `useAvandarChatRuntime.ts` at the restructured `buildPendingDashboardBlock/`
+      dir.
+  - **Drift:** g4 path set fell from 193 files to **17** (non-i18n), all
+    legitimate feat-ahead (offline on DashboardCard; i18n on EditableDisplayText/
+    TextareaForm/`@ui` Drawer export/GIS/billing; re-added feat-only imports;
+    feat-ahead `vite.config.ts` PWA config; generated `routeTree.gen.ts`) or the
+    named analytics-rename exclusion (3 files).
+  - **Verification green:** `pnpm type-check` 0 errors; `pnpm format` applied;
+    eslint clean on 153 changed TS files; stylelint clean on changed CSS; vitest
+    green — `@avandar/browser-utils` 23, AvaPage V3/V4 migration chain +
+    PublishDashboardModal + DataVizPBlock + `clients/dashboards` 62, and a wider
+    DashboardApp/DatasetSummaryView/`@ui`/ChatPanel sweep 148.
+  - **Left for the operator:** i18n `lingui extract` surfaced ~38 new dashboard
+    strings per non-en locale still untranslated — run
+    `pnpm i18n:update-translations` to fill. Working tree is **left dirty
+    (uncommitted, not pushed)** for `dif`/difit review per the mergeback rule; the
+    analyzed-commit marker stays at `6a1366e2`.

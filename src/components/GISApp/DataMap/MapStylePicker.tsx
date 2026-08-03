@@ -3,12 +3,17 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import { SegmentedControl, SegmentedControlItem, Tooltip } from "@ui";
+import {
+  mantineColorVar,
+  mantineVar,
+  SegmentedControl,
+  SegmentedControlItem,
+  Tooltip,
+} from "@ui";
 import {
   MapStyleKey,
   MapStyleKeys,
 } from "@/components/GISApp/DataMap/mapStyles";
-import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 
 type MapStyle = {
   url: string;

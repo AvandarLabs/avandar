@@ -4,13 +4,14 @@ import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const TEST_WORKSPACE_ID =
   "00000000-0000-4000-8000-000000000001" as Workspace.Id;
-const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000002" as DashboardId;
+const TEST_DASHBOARD_ID =
+  "00000000-0000-4000-8000-000000000002" as Dashboard.Id;
 
 vi.mock("@puckeditor/core", () => {
   return {
@@ -55,7 +56,7 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
   };
 });
 
-function renderField(props: { value: VizConfig }): {
+function renderField(props: { value: VizConfig.T }): {
   onChange: ReturnType<typeof vi.fn>;
 } {
   const onChange = vi.fn();

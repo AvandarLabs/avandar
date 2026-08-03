@@ -1,11 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type {
-  DashboardId,
-  DashboardRead,
-} from "$/models/Dashboard/Dashboard.types";
 
 /**
  * Auth-gated preview of a dashboard, rendered with the same viewer
@@ -18,9 +15,9 @@ import type {
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/dashboards/preview/$dashboardId",
 )({
-  loader: async ({ params }): Promise<{ dashboard: DashboardRead }> => {
+  loader: async ({ params }): Promise<{ dashboard: Dashboard.T }> => {
     const dashboard = await DashboardClient.getById({
-      id: params.dashboardId as DashboardId,
+      id: params.dashboardId as Dashboard.Id,
     });
     if (!dashboard) {
       throw notFound();
@@ -30,10 +27,10 @@ export const Route = createFileRoute(
   component: DashboardPreviewPage,
 });
 
-function DashboardPreviewPage(): JSX.Element {
+function DashboardPreviewPage() {
   const { workspaceSlug } = Route.useParams();
   const { dashboard } = Route.useLoaderData() as {
-    dashboard: DashboardRead;
+    dashboard: Dashboard.T;
   };
   return (
     <DataExplorerStateManager.Provider>

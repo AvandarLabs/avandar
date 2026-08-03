@@ -1,24 +1,17 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Badge,
-  Box,
-  Code,
-  Group,
-  RingProgress,
-  Skeleton,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Group, RingProgress, Skeleton, Stack, Text } from "@mantine/core";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DateColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary";
 import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary";
 import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
+import { SummaryTag } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/SummaryTag";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { ReactNode } from "react";
 
 type Props = {
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   columnName: string;
   dataType: string;
   totalRows: number;
@@ -39,7 +32,7 @@ export function ColumnSummaryBody({
   columnName,
   dataType,
   totalRows,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [summary, isLoading, query] = DatasetQueryClient.useGetColumnSummary({
@@ -78,6 +71,19 @@ export function ColumnSummaryBody({
   const sentence = _buildHeadlineSentence({ summary, totalRows });
   const missingPct = totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
 
+  const typeSummary =
+    summary.type === "text" ?
+      <TextColumnSummary summary={summary} totalRows={totalRows} />
+    : summary.type === "number" ?
+      <NumberColumnSummary
+        summary={summary}
+        totalRows={totalRows}
+        dataType={dataType}
+      />
+    : summary.type === "date" ?
+      <DateColumnSummary summary={summary} totalRows={totalRows} />
+    : null;
+
   return (
     <Stack gap="md">
       <Text size="sm" c="neutral.7" lh={1.6}>
@@ -85,11 +91,14 @@ export function ColumnSummaryBody({
       </Text>
 
       <Group gap="lg" align="center" wrap="wrap">
-        <Stat label={t`Distinct values`}>
+        <Stack gap={0}>
           <Text fw={650} size="xl" lh={1}>
             {summary.distinctValuesCount.toLocaleString()}
           </Text>
-        </Stat>
+          <Text size="xs" c="dimmed">
+            {t`Distinct values`}
+          </Text>
+        </Stack>
         {missingPct > 0 ?
           <Group gap="xs" align="center">
             <RingProgress
@@ -115,55 +124,7 @@ export function ColumnSummaryBody({
         : null}
       </Group>
 
-      <_TypeSwitch
-        summary={summary}
-        totalRows={totalRows}
-        dataType={dataType}
-      />
-    </Stack>
-  );
-}
-
-function _TypeSwitch({
-  summary,
-  totalRows,
-  dataType,
-}: {
-  summary: ColumnSummary;
-  totalRows: number;
-  dataType: string;
-}): JSX.Element | null {
-  if (summary.type === "text") {
-    return <TextColumnSummary summary={summary} totalRows={totalRows} />;
-  }
-  if (summary.type === "number") {
-    return (
-      <NumberColumnSummary
-        summary={summary}
-        totalRows={totalRows}
-        dataType={dataType}
-      />
-    );
-  }
-  if (summary.type === "date") {
-    return <DateColumnSummary summary={summary} totalRows={totalRows} />;
-  }
-  return null;
-}
-
-function Stat({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}): JSX.Element {
-  return (
-    <Stack gap={0}>
-      {children}
-      <Text size="xs" c="dimmed">
-        {label}
-      </Text>
+      {typeSummary}
     </Stack>
   );
 }
@@ -174,8 +135,8 @@ function Stat({
  * cares about, then show the chart-y bits below as supporting evidence.
  *
  * Examples (intentionally varied):
- *   - "Mostly unique — 4,200 distinct values across 4,205 rows."
- *   - "Heavily repeated — `Lagos` shows up in 87% of rows."
+ *   - "Mostly unique: 4,200 distinct values across 4,205 rows."
+ *   - "Heavily repeated: `Lagos` shows up in 87% of rows."
  *   - "Ranges from 0 to 412, averaging 38 with a stddev of 64."
  *   - "Covers 412 days, from 2023-01-04 through 2024-02-19."
  */
@@ -191,12 +152,14 @@ function _buildHeadlineSentence(args: {
     const avg = _fmtNum(summary.averageValue);
     return (
       <Trans>
-        Ranges from <Tag>{numericLow}</Tag> to <Tag>{numericHigh}</Tag>,
-        averaging <Tag>{avg}</Tag>
+        Ranges from <SummaryTag>{numericLow}</SummaryTag> to{" "}
+        <SummaryTag>{numericHigh}</SummaryTag>, averaging{" "}
+        <SummaryTag>{avg}</SummaryTag>
         {Number.isFinite(summary.stdDev) ?
           <>
             {" "}
-            with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>.
+            with a standard deviation of{" "}
+            <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>.
           </>
         : "."}
       </Trans>
@@ -206,9 +169,9 @@ function _buildHeadlineSentence(args: {
   if (summary.type === "date") {
     return (
       <Trans>
-        Covers <Tag>{summary.datasetCoverage}</Tag>, from{" "}
-        <Tag>{summary.oldestDate || "earliest"}</Tag> through{" "}
-        <Tag>{summary.mostRecentDate || "latest"}</Tag>.
+        Covers <SummaryTag>{summary.datasetCoverage}</SummaryTag>, from{" "}
+        <SummaryTag>{summary.oldestDate || "earliest"}</SummaryTag> through{" "}
+        <SummaryTag>{summary.mostRecentDate || "latest"}</SummaryTag>.
       </Trans>
     );
   }
@@ -220,8 +183,9 @@ function _buildHeadlineSentence(args: {
     if (share >= 0.5) {
       return (
         <Trans>
-          Heavily repeated: <Tag>{top.value.slice(0, 1).join(", ")}</Tag>{" "}
-          appears in <Tag>{(share * 100).toFixed(0)}%</Tag> of rows.
+          Heavily repeated:{" "}
+          <SummaryTag>{top.value.slice(0, 1).join(", ")}</SummaryTag> appears in{" "}
+          <SummaryTag>{(share * 100).toFixed(0)}%</SummaryTag> of rows.
         </Trans>
       );
     }
@@ -229,14 +193,18 @@ function _buildHeadlineSentence(args: {
       return (
         <Trans>
           Mostly unique:{" "}
-          <Tag>{summary.distinctValuesCount.toLocaleString()}</Tag> distinct
-          values across <Tag>{totalRows.toLocaleString()}</Tag> rows.
+          <SummaryTag>
+            {summary.distinctValuesCount.toLocaleString()}
+          </SummaryTag>{" "}
+          distinct values across{" "}
+          <SummaryTag>{totalRows.toLocaleString()}</SummaryTag> rows.
         </Trans>
       );
     }
     return (
       <Trans>
-        Most common value: <Tag>{top.value.slice(0, 2).join(", ")}</Tag> (
+        Most common value:{" "}
+        <SummaryTag>{top.value.slice(0, 2).join(", ")}</SummaryTag> (
         {top.count.toLocaleString()} rows, {(share * 100).toFixed(0)}%).
       </Trans>
     );
@@ -246,23 +214,6 @@ function _buildHeadlineSentence(args: {
     <Text size="sm" c="dimmed" fs="italic">
       <Trans>No values to summarize.</Trans>
     </Text>
-  );
-}
-
-function Tag({ children }: { children: React.ReactNode }): JSX.Element {
-  return (
-    <Box
-      component="span"
-      bg="neutral.0"
-      style={{
-        padding: "1px 6px",
-        borderRadius: 4,
-        fontFamily: "var(--mantine-font-family-monospace)",
-        fontSize: "0.92em",
-      }}
-    >
-      {children}
-    </Box>
   );
 }
 
@@ -280,4 +231,3 @@ function _fmtNum(n: number): string {
 }
 
 export type { ColumnSummary };
-export { Badge, Code };

@@ -8,8 +8,8 @@ import type {
   V3_AvaPageData,
   V3_AvaPageRootProps,
   V3_PBlockPropsRegistry,
+  V3_VizConfig,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 const SCHEMA_VERSION = 3;
 
@@ -89,7 +89,7 @@ export const AvaPageDataMigrationV3 = {
       },
       // Cast through `unknown` because the V2 viz config shape (the
       // return value) is narrower than the V3 viz config the function
-      // signature expects — puck's transform-prop typing is invariant
+      // signature expects: puck's transform-prop typing is invariant
       // on the registry argument.
       DataViz: ((props: V3_PBlockPropsRegistry["DataViz"]) => {
         return {
@@ -104,9 +104,9 @@ export const AvaPageDataMigrationV3 = {
   },
 } satisfies AvaPageDataMigration<V2_AvaPageData, V3_AvaPageData>;
 
-function _upgradeVizConfig(v2: V2_VizConfig): VizConfig {
+function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
   return match(v2)
-    .returnType<VizConfig>()
+    .returnType<V3_VizConfig>()
     .with({ vizType: "table" }, () => {
       return { vizType: "table" };
     })
@@ -217,7 +217,7 @@ function _upgradeVizConfig(v2: V2_VizConfig): VizConfig {
     .exhaustive();
 }
 
-function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
+function _downgradeVizConfig(curr: V3_VizConfig): V2_VizConfig {
   return match(curr)
     .returnType<V2_VizConfig>()
     .with({ vizType: "table" }, () => {

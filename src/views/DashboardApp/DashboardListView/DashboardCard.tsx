@@ -1,8 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
+import { mantineColorVar } from "@ui";
 import { useState } from "react";
-import { mantineColorVar } from "@/lib/utils/browser/css";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 

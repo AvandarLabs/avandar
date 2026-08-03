@@ -1,21 +1,17 @@
 import { makeObject, prop } from "@utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { useCallback, useMemo } from "react";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type {
-  OrderByDirection,
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 export type DashboardManualQueryState = {
-  query: PartialStructuredQuery;
+  query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
   sqlSyncWarnings: readonly string[];
   /** Whether the SQL parser is ready (dataset metadata loaded). */
@@ -23,74 +19,47 @@ export type DashboardManualQueryState = {
   handlers: ManualQueryFormHandlers;
 };
 
+type Options = {
+  rawSql: string;
+  onRawSqlChange: (nextSql: string) => void;
+};
+
 /**
  * Backs the dashboard DataViz block's manual query form. Mirrors the slice of
  * `DataExplorerStateManager` that the form depends on, but keeps the
- * structured query in local React state and writes the regenerated SQL back
- * to the block's `nlQuery.rawSql` via `onRawSqlChange`. The structured query
- * itself is *not* persisted — it is re-derived from `rawSql` whenever the
- * incoming SQL changes (e.g. when the user pastes new SQL or runs an AI
- * generation).
+ * structured query derived from the block's `nlQuery.rawSql` and writes
+ * regenerated SQL back through `onRawSqlChange`.
  */
-export function useDashboardManualQueryState(opts: {
-  rawSql: string;
-  onRawSqlChange: (nextSql: string) => void;
-}): DashboardManualQueryState {
-  const { rawSql, onRawSqlChange } = opts;
+export function useDashboardManualQueryState(
+  options: Readonly<Options>,
+): DashboardManualQueryState {
+  const { rawSql, onRawSqlChange } = options;
   const { parseSql, isReady } = useSqlToStructuredQuery();
-
-  const [query, setQuery] = useState<PartialStructuredQuery>(
-    StructuredQuery.makeEmpty(),
-  );
-  const [isStructuredQueryInSync, setIsStructuredQueryInSync] = useState(true);
-  const [sqlSyncWarnings, setSqlSyncWarnings] = useState<readonly string[]>([]);
-
-  /**
-   * Track the most recent SQL we mirrored into the structured query so we
-   * don't fight our own writes. When the user edits the form, we regenerate
-   * SQL and call `onRawSqlChange`; the parent then re-renders with the new
-   * `rawSql`, which we want to ignore here.
-   */
-  const lastSyncedSqlRef = useRef<string>("");
-
-  // When external `rawSql` changes (e.g. an AI generation arrived) and the
-  // parser is ready, re-derive the structured query.
-  useEffect(() => {
-    if (!isReady) {
-      return;
+  const sqlMapping = useMemo(() => {
+    if (!isReady || rawSql.trim() === "") {
+      return {
+        query: StructuredQuery.makeEmpty(),
+        isFullyMapped: true,
+        unmappedReasons: [] as readonly string[],
+      };
     }
-    if (rawSql === lastSyncedSqlRef.current) {
-      return;
-    }
-    if (rawSql.trim() === "") {
-      setQuery(StructuredQuery.makeEmpty());
-      setIsStructuredQueryInSync(true);
-      setSqlSyncWarnings([]);
-      lastSyncedSqlRef.current = rawSql;
-      return;
-    }
-    const mapping = parseSql(rawSql);
-    setQuery(mapping.query);
-    setIsStructuredQueryInSync(mapping.isFullyMapped);
-    setSqlSyncWarnings(mapping.unmappedReasons);
-    lastSyncedSqlRef.current = rawSql;
-  }, [rawSql, isReady, parseSql]);
+    return parseSql(rawSql);
+  }, [isReady, parseSql, rawSql]);
+  const query = sqlMapping.query;
 
   // Regenerate SQL from a new structured query and push it up.
   const applyQueryChange = useCallback(
-    (nextQuery: PartialStructuredQuery): void => {
-      setQuery(nextQuery);
-      setIsStructuredQueryInSync(true);
-      setSqlSyncWarnings([]);
-      let nextSql = "";
-      if (nextQuery.dataSource !== undefined) {
-        try {
-          nextSql = structuredQueryToSQL(nextQuery);
-        } catch {
-          nextSql = "";
+    (nextQuery: StructuredQuery.Partial): void => {
+      const nextSql = (() => {
+        if (nextQuery.dataSource === undefined) {
+          return "";
         }
-      }
-      lastSyncedSqlRef.current = nextSql;
+        try {
+          return structuredQueryToSql(nextQuery);
+        } catch {
+          return "";
+        }
+      })();
       onRawSqlChange(nextSql);
     },
     [onRawSqlChange],
@@ -98,14 +67,16 @@ export function useDashboardManualQueryState(opts: {
 
   const handlers: ManualQueryFormHandlers = {
     onSetDataSource: (
-      dataSource: QueryDataSource | undefined,
-      options?: { limit?: number },
+      dataSource: QueryDataSource.T | undefined,
+      changeOptions?: { limit?: number },
     ) => {
       applyQueryChange({
         ...query,
         dataSource,
-        ...(options?.limit !== undefined ? { limit: options.limit } : {}),
-      } as PartialStructuredQuery);
+        ...(changeOptions?.limit !== undefined ?
+          { limit: changeOptions.limit }
+        : {}),
+      } as StructuredQuery.Partial);
     },
     onSetColumns: (columns: readonly QueryColumn.T[]) => {
       const newColumnIds = columns.map(prop("id"));
@@ -118,7 +89,7 @@ export function useDashboardManualQueryState(opts: {
         ...query,
         queryColumns: columns,
         aggregations: newAggregations,
-      } as PartialStructuredQuery);
+      } as StructuredQuery.Partial);
     },
     onSetColumnAggregation: (payload: {
       columnId: QueryColumn.Id;
@@ -135,32 +106,32 @@ export function useDashboardManualQueryState(opts: {
         ...query,
         queryColumns: newQueryColumns,
         aggregations: { ...query.aggregations, [columnId]: aggregation },
-      } as PartialStructuredQuery);
+      } as StructuredQuery.Partial);
     },
-    onSetOrderByColumn: (columnId: QueryColumnId | undefined) => {
+    onSetOrderByColumn: (columnId: QueryColumn.Id | undefined) => {
       applyQueryChange({
         ...query,
         orderByColumn: columnId,
-      } as PartialStructuredQuery);
+      } as StructuredQuery.Partial);
     },
     onSetOrderByDirection: (direction: OrderByDirection | undefined) => {
       applyQueryChange({
         ...query,
         orderByDirection: direction,
-      } as PartialStructuredQuery);
+      } as StructuredQuery.Partial);
     },
     onSetFilters: (filters: QueryFilterGroup) => {
-      applyQueryChange({ ...query, filters } as PartialStructuredQuery);
+      applyQueryChange({ ...query, filters } as StructuredQuery.Partial);
     },
     onSetLimit: (limit: number | undefined) => {
-      applyQueryChange({ ...query, limit } as PartialStructuredQuery);
+      applyQueryChange({ ...query, limit } as StructuredQuery.Partial);
     },
   };
 
   return {
     query,
-    isStructuredQueryInSync,
-    sqlSyncWarnings,
+    isStructuredQueryInSync: sqlMapping.isFullyMapped,
+    sqlSyncWarnings: sqlMapping.unmappedReasons,
     isParserReady: isReady,
     handlers,
   };

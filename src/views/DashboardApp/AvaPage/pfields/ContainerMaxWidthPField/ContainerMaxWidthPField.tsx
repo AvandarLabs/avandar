@@ -4,6 +4,7 @@ import { FieldLabel } from "@puckeditor/core";
 import { SegmentedControl } from "@ui";
 import { isPlainObject } from "@utils";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 
@@ -70,7 +71,7 @@ export function ContainerMaxWidthPField({
   value,
   onChange,
   readOnly,
-}: Props): JSX.Element {
+}: Props): ReactElement {
   const { t } = useLingui();
   const normalized = _normalizeContainerMaxWidth(value);
 
