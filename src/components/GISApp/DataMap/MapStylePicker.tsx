@@ -4,12 +4,11 @@ import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
 import { Tooltip,
   SegmentedControl,
-  SegmentedControlItem } from "@ui";
+  SegmentedControlItem, mantineColorVar, mantineVar  } from "@ui";
 import {
   MapStyleKey,
   MapStyleKeys,
 } from "@/components/GISApp/DataMap/mapStyles";
-import { mantineColorVar, mantineVar } from "@ui";
 
 type MapStyle = {
   url: string;
