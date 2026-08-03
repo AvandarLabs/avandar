@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUrl } from "@browser-utils/getCurrentUrl/getCurrentUrl";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("getCurrentUrl", () => {
   afterEach(() => {

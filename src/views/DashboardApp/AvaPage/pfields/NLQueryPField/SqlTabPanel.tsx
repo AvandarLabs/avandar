@@ -10,10 +10,10 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { mantineColorVar } from "@ui";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
-import { mantineColorVar } from "@ui";
 import type { ReactElement } from "react";
 
 type Props = {

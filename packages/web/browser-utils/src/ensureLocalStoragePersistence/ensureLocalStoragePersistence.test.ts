@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { ensureLocalStoragePersistence } from "@browser-utils/ensureLocalStoragePersistence/ensureLocalStoragePersistence";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("ensureLocalStoragePersistence", () => {
   afterEach(() => {

@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { ensureOpfsWritePermission } from "@browser-utils/ensureOpfsWritePermission/ensureOpfsWritePermission";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("ensureOpfsWritePermission", () => {
   afterEach(() => {

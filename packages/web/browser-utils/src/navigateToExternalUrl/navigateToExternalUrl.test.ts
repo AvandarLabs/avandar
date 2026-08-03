@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { navigateToExternalUrl } from "@browser-utils/navigateToExternalUrl/navigateToExternalUrl";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("navigateToExternalUrl", () => {
   afterEach(() => {

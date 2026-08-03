@@ -169,6 +169,7 @@ export default defineConfig(({ mode }) => {
         "@utils": "/packages/shared/utils/src",
         "@ui": "/packages/web/ui/src",
         "@hooks": "/packages/web/hooks/src",
+        "@browser-utils": "/packages/web/browser-utils/src",
         "@sbfn": "/supabase/functions",
       },
     },

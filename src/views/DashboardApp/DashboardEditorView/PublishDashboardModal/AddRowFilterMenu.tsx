@@ -18,7 +18,8 @@ function _columnToRowFilter(
   const id = crypto.randomUUID();
   const columnName = column.name;
   return (
-    AvaDataType.isNumeric(column.type) ? { id, kind: "range_number", columnName }
+    AvaDataType.isNumeric(column.type) ?
+      { id, kind: "range_number", columnName }
     : AvaDataType.isTemporal(column.type) ?
       { id, kind: "range_date", columnName }
     : { id, kind: "enum", columnName, values: [] }

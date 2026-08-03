@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { removeOpfsFile } from "@browser-utils/removeOpfsFile/removeOpfsFile";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 function stubOpfsRoot(): {
   removeEntry: ReturnType<typeof vi.fn>;

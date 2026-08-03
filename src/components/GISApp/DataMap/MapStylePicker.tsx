@@ -2,9 +2,13 @@ import { useBoolean } from "@hooks";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import { Tooltip,
+import {
+  mantineColorVar,
+  mantineVar,
   SegmentedControl,
-  SegmentedControlItem, mantineColorVar, mantineVar  } from "@ui";
+  SegmentedControlItem,
+  Tooltip,
+} from "@ui";
 import {
   MapStyleKey,
   MapStyleKeys,

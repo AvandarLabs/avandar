@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { getIsMacPlatform } from "@browser-utils/getIsMacPlatform/getIsMacPlatform";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("getIsMacPlatform", () => {
   afterEach(() => {

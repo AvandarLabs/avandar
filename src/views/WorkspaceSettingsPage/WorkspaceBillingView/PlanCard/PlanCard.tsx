@@ -1,3 +1,4 @@
+import { getCurrentUrl } from "@browser-utils";
 import {
   Badge,
   Button,
@@ -17,7 +18,6 @@ import { match } from "ts-pattern";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { getCurrentUrl } from "@browser-utils";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";

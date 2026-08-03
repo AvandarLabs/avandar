@@ -1,6 +1,6 @@
+import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import { renderHook } from "@/test-utils";
 

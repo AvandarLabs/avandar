@@ -2,7 +2,7 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
-import { Tooltip, mantineColorVar } from "@ui";
+import { mantineColorVar, Tooltip } from "@ui";
 import clsx from "clsx";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";

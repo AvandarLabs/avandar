@@ -3,7 +3,7 @@ import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { Model } from "@models";
 import { IconFilter } from "@tabler/icons-react";
-import { notifyError, Tooltip, mantineColorVar, mantineVar } from "@ui";
+import { mantineColorVar, mantineVar, notifyError, Tooltip } from "@ui";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";

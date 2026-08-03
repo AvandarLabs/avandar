@@ -108,11 +108,24 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
       </Box>
 
       <Group gap="lg" mt="xs">
-        <NumberColumnStat label={t`min`} value={_formatCompactNumber(minValue)} />
-        <NumberColumnStat label={t`avg`} value={_formatCompactNumber(averageValue)} accent />
-        <NumberColumnStat label={t`max`} value={_formatCompactNumber(maxValue)} />
+        <NumberColumnStat
+          label={t`min`}
+          value={_formatCompactNumber(minValue)}
+        />
+        <NumberColumnStat
+          label={t`avg`}
+          value={_formatCompactNumber(averageValue)}
+          accent
+        />
+        <NumberColumnStat
+          label={t`max`}
+          value={_formatCompactNumber(maxValue)}
+        />
         {Number.isFinite(stdDev) ?
-          <NumberColumnStat label={t`stddev`} value={_formatCompactNumber(stdDev)} />
+          <NumberColumnStat
+            label={t`stddev`}
+            value={_formatCompactNumber(stdDev)}
+          />
         : null}
         <NumberColumnStat
           label={t`kind`}
