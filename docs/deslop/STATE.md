@@ -35,9 +35,12 @@ let it drift.
 
 - **Header status**: `Ready for Phase 2 — Session 3 (2026-06-05)`
 - **Last analyzed commit on `feat/ict4d-demo`**:
-  `6a1366e26660753f17b90bd36f6e17e3a10bdafd`
+  `337b79cf1aaba2cedac6fdae028efeee55d03562`
+  (subject: _docs(deslop): refresh GROUP-5 plan against current develop_;
+  bumped 2026-08-03 — the prior value `6a1366e2…` had a wrong SHA tail, the
+  real commit is `6a1366e20054cc4e9c87055ebb6fca6119270282`)
   (subject: _refactor(chat): remove planning feature_)
-- **Last update run on**: `2026-07-27`
+- **Last update run on**: `2026-08-03`
 - **Active rows**: 16 remaining (all GROUP-5). On 2026-07-24 the 5
   GROUP-1 rows (#077, #094, #001, #002, #003) merged into `develop`
   (`914bcbba`); on 2026-07-26 the 13 GROUP-2 rows (#008–#013, #044–#047,
@@ -630,3 +633,40 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     `pnpm i18n:update-translations` to fill. Working tree is **left dirty
     (uncommitted, not pushed)** for `dif`/difit review per the mergeback rule; the
     analyzed-commit marker stays at `6a1366e2`.
+- `2026-08-03` — **`/deslop update` run — 0 new features.** Marker bumped
+  `6a1366e2` → `337b79cf` (feat tip). All 8 non-merge commits since the marker
+  are deslop-infrastructure and mergeback, none a new product feature:
+  `9c0310dc`/`41bc4c97`/`1c53b9d6`/`bd2714d3`/`910a7a85`/`337b79cf` are
+  `docs(deslop)`/`chore(deslop)` housekeeping (GROUP-4 lifecycle + GROUP-5 plan);
+  `f3bced66` and `4235de73` are the two `merged back g4 refactor` commits — they
+  forward-port develop's already-on-develop g4 cleanup while preserving
+  already-inventoried feat features. `git cherry` shows all 8 as `+` (unique to
+  feat), which is expected for docs/mergeback commits and does **not** indicate
+  new features. Also corrected the stored marker SHA (the prior tail was wrong;
+  real `6a1366e2` = `6a1366e20054cc4e9c87055ebb6fca6119270282`).
+  - **⚠ Parity is NOT achieved — and `/deslop update` does not fix it.** A
+    separate final-parity audit on 2026-08-03 (post-g4-mergeback) found
+    `git diff origin/develop..origin/feat/ict4d-demo` over `src shared packages
+    supabase scripts` is still **362 files, 158 of them feat-only (absent on
+    develop)**. Only a fraction maps to GROUP-5's 16 rows. The remainder is
+    **earlier-group residual + feat-ahead subsystems with no inventory row**,
+    which `/deslop update` cannot surface (they are incomplete migrations of
+    already-`[x]` features, not new commits). Buckets not covered by GROUP-5:
+    - **Privacy detectors** `src/lib/privacy/*` (~20 files, G3 deferred the
+      runtime wiring — develop has privacy clients/components but not these).
+    - **SQL display/mention** `src/lib/sql/*` + `shared/lib/sql/*` (~12,
+      buildSqlDisplaySegments/createSqlMentionExtension/formatSqlForDisplay/…).
+    - **Session-expired infra** `ServerApiSessionRefresher`,
+      `registerSessionExpiredHandler`, `AppErrorBoundary` recovery (~8).
+    - **Chat runtime / clarification / `dataExplorerToolDefinitions`** (G3
+      residual, ~10).
+    - **G1/G2 residuals**: `structuredQueryToSQL`, `ChartStyle`,
+      `useCanAddDataset`, `datasetPreviewSQL`; the **analytics case-rename**
+      (`analyticsClient.ts` vs develop's `AnalyticsClient.ts`).
+    - **Schema**: feat-only migration
+      `supabase/migrations/20260727210438_remove_chat_planning.sql` (+ a datasets
+      contract test) — Phase 1 was meant to be schema-complete.
+    **Implication:** GROUP-5 as scoped is NOT the last thing; merging it would not
+    bring develop to parity. Before cutting GROUP-5, expand its plan (or add a
+    residual-cleanup group) to absorb the above per the final-parity gate. This
+    audit was surfaced but NOT yet actioned in the inventory.
