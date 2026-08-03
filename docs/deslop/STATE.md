@@ -87,11 +87,20 @@ by `/deslop complete`.
 
 | Feature index | Slug | Refactor branch | Started | Notes |
 | ------------- | ---- | --------------- | ------- | ----- |
-| _(none)_ | — | — | — | No refactor branches in flight. |
+| 56–63, 79–82, 90–93, 95, 98–101 | `platform-i18n-standalone` (GROUP-5) | `refactor-g5/platform-i18n-standalone` | 2026-08-03 | Ported + verified; committed `e84ab3a2`, **pushed** to origin (operator to open the single group PR). The **final** group — on merge, deslop is complete. |
 
 GROUP-1 (`914bcbba`, 2026-07-24), GROUP-2 (`59cdb59c`, 2026-07-26),
 GROUP-3 (`c703e5c2`, 2026-07-31), and GROUP-4 (`4f57526a`, 2026-08-03) are
 merged into `develop` and merged back into `feat/ict4d-demo`.
+
+**GROUP-5 in flight (ported, pushed).** On 2026-08-03 `refactor-g5/platform-i18n-standalone`
+was cut off `origin/develop` @ `4f57526a` (worktree
+`~/src/worktrees/avandar/refactor-g5/platform-i18n-standalone`) and the whole
+final group + parity residuals were ported (rows `#056`–`#063`, `#079`–`#082`,
+`#090`–`#093`, `#095`, `#098`–`#101`, now `[~]`). Committed `e84ab3a2` and pushed.
+On merge, run `/deslop complete` to flip the rows to `[x]`, then the final-parity
+gate (in `GROUP-5-*.md`) + a cleanup pass on `feat/ict4d-demo` to delete its dead
+stale-dups, after which `develop → main` cutover can begin.
 
 **GROUP-4 complete.** `refactor-g4/dashboards` (rows `#064`–`#076` + `#048`)
 merged into `develop` at `4f57526a` on 2026-08-03. During code review the branch
@@ -679,3 +688,43 @@ mode`) squash-merged at `50fb7884`. Row flipped `[~]` → `[x]`;
     bring develop to parity. Before cutting GROUP-5, expand its plan (or add a
     residual-cleanup group) to absorb the above per the final-parity gate. This
     audit was surfaced but NOT yet actioned in the inventory.
+- `2026-08-03` — **GROUP-5 (the FINAL group) cut + migrated (in flight).** Cut
+  `refactor-g5/platform-i18n-standalone` off `origin/develop` @ `4f57526a` in a
+  worktree and ported the whole final group + the parity-absorption rows (rows
+  `#056`–`#063`, `#079`–`#082`, `#090`–`#093`, `#095`, `#098`–`#101`). Committed
+  `e84ab3a2`, **pushed** to origin. All 20 rows flipped `[ ]` → `[~]`; in-flight
+  row added. Active `[ ]` rows: 0.
+  - **Method (parity-driven, not per-feature re-impl).** feat's tree already
+    carries develop's clean G1–G4 structure (from the mergebacks) plus feat's
+    extra features plus a few stale duplicates. So on the branch off develop I
+    adopted feat's version of every feat-ahead file (307 files), **skipped the 35
+    stale duplicates** (`src/lib/privacy/**`, `src/lib/sql/**`, `shared/lib/sql/**`,
+    lowercase `analyticsClient`, `structuredQueryToSQL`, `ChartStyle`) so develop
+    keeps its clean renames, protected develop's ahead-files (`AnalyticsClient.ts`
+    and 2 superseded test utils, which I then deleted as feat had), and added deps
+    `@mlc-ai/web-llm` + `workbox-window` + `exceljs` (NOT `openai` — absent on
+    both branches; the plan was stale on that).
+  - **#098 privacy runtime integration done for real:** repointed feat's
+    `useAvandarChatRuntime` privacy imports from the stale `src/lib/privacy` to
+    develop's `src/components/privacy/privacy-helpers` (`crossBoundary` →
+    `decideIfDataCanCrossBoundary`, `recordShown` →
+    `ClarificationAuditEntryClient.recordShown`, `consumeAckForText` →
+    `PendingAcks.consumeAckForText`), threading the already-migrated detectors
+    into the live turn. Repointed 4 analytics importers to `AnalyticsClient.logEvent`.
+  - **Parity proven:** `git diff <branch>..origin/feat/ict4d-demo` over
+    `src shared packages supabase scripts` is **43 files, all the deliberately-
+    excluded stale duplicates + the 5 repointed importers** — i.e. on merge,
+    develop has every feat feature and LESS dead code than feat. The remaining
+    feat-side cleanup (delete its stale `src/lib/privacy`/`src/lib/sql`/lowercase
+    analytics dups) is a trivial post-merge pass, not a feature gap.
+  - **Verification green:** `pnpm type-check` 0 errors; eslint clean on 287
+    changed TS files; stylelint clean; vitest 953 passing. The only 3 failing
+    suites (`AvaSqlBlock`, `DashboardEditorView`, `useSyncLargeDatasetAutoLimit`)
+    fail **identically on clean develop @ `4f57526a`** — a pre-existing
+    `VITE_SUPABASE_API_URL` env requirement under plain `vitest run`, not a
+    regression.
+  - **Operator TODO before merge:** the `#091` docs-history copy-vs-leave decision
+    (surfaced in `GROUP-5-*.md`); i18n catalogs were regenerated via `lingui
+    extract`/`compile` — run `pnpm i18n:update-translations` to fill any new
+    untranslated strings. On merge: `/deslop complete`, run the final-parity gate,
+    then `develop → main` cutover.
