@@ -20,12 +20,12 @@
  * was lost and we should clear the IndexedDB database and try to seed it as
  * much as possible with defaults or data we can get from the backend.
  */
+import { clearOpfs } from "@browser-utils";
 import { prop } from "@utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";
-import { clearOpfs } from "@browser-utils";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";

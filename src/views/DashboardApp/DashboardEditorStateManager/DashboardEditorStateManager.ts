@@ -77,10 +77,10 @@ export const DashboardEditorStateManager = createAppStateManager({
     /**
      * Append a generated block to the active editor's Puck data and bump
      * `editorRevision`. Puck seeds its internal store from the `data` prop only
-     * on mount, so appending to `editorData` alone would not reach the canvas or
-     * Save (both read Puck's store). Bumping the revision remounts Puck with the
-     * appended block, keeping the two in agreement: an appended block is both
-     * visible on the canvas and persisted by Save.
+     * on mount, so appending to `editorData` alone would not reach the canvas
+     * or Save (both read Puck's store). Bumping the revision remounts Puck
+     * with the appended block, keeping the two in agreement: an appended block
+     * is both visible on the canvas and persisted by Save.
      */
     queuePendingBlock: (
       state: DashboardEditorAppState,

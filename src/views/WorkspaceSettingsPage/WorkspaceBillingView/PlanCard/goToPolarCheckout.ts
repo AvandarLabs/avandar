@@ -1,5 +1,5 @@
-import { APIClient } from "@/clients/APIClient";
 import { navigateToExternalUrl } from "@browser-utils";
+import { APIClient } from "@/clients/APIClient";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

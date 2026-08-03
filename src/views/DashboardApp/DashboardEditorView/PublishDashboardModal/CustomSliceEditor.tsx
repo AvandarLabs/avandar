@@ -13,8 +13,8 @@ import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardEditorView/Publi
 import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type {
-  PublishSliceDataset,
   FilterableColumn,
+  PublishSliceDataset,
 } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";
 import type { ReactNode } from "react";
 

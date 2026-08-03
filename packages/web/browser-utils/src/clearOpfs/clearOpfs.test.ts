@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { clearOpfs } from "@browser-utils/clearOpfs/clearOpfs";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("clearOpfs", () => {
   afterEach(() => {

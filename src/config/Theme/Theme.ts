@@ -22,12 +22,15 @@ import {
   TagsInput,
   Tooltip,
 } from "@mantine/core";
+// Imported by direct path (not the `@ui` alias) because tailwind.config.js
+// loads this module through jiti, which does not resolve the Vite-only `@ui`
+// alias. Using `@ui` here breaks tailwind's CSS build.
+import { cssAvaVar } from "../../../packages/web/ui/src/cssVar/cssVar";
 import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
-import { cssAvaVar } from "@ui";
 import { AnimationTheme } from "./AnimationTheme/AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";

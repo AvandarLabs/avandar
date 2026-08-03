@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import {
   cssAvaVar,
   cssVar,
   mantineColorVar,
   mantineVar,
 } from "@ui/cssVar/cssVar";
+import { describe, expect, it } from "vitest";
 
 describe("cssVar", () => {
   it("wraps a raw custom property name in var()", () => {
@@ -20,9 +20,7 @@ describe("mantineColorVar", () => {
   });
 
   it("uses the shade after a dot separator", () => {
-    expect(mantineColorVar("primary.8")).toBe(
-      "var(--mantine-color-primary-8)",
-    );
+    expect(mantineColorVar("primary.8")).toBe("var(--mantine-color-primary-8)");
   });
 });
 

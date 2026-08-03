@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { getIsOnline } from "@browser-utils/getIsOnline/getIsOnline";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("getIsOnline", () => {
   afterEach(() => {

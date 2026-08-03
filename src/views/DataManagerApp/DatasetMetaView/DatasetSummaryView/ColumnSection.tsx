@@ -26,10 +26,11 @@ export function ColumnSection({
   const setActiveColumn = useContext(ActiveColumnContext);
   const containerRef = useRef<HTMLDivElement | null>(null);
   // A single IntersectionObserver (against the viewport) drives two things for
-  // this section: lazy-loading (render the SQL-backed body only once the section
-  // scrolls near the viewport, with the 200px rootMargin prefetching just before
-  // it appears) and scroll-spy (highlight this column in the outline once its top
-  // reaches the viewport top; see the updateActiveColumn effect below).
+  // this section: lazy-loading (render the SQL-backed body only once the
+  // section scrolls near the viewport, with the 200px rootMargin prefetching
+  // just before it appears) and scroll-spy (highlight this column in the
+  // outline once its top reaches the viewport top; see the updateActiveColumn
+  // effect below).
   const { ref: intersectionRef, entry } = useIntersection({
     root: null,
     threshold: 0,

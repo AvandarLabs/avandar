@@ -1,6 +1,6 @@
+import { makeArrayWithLength } from "@utils";
 import { toCanvas } from "html-to-image";
 import jsPDF from "jspdf";
-import { makeArrayWithLength } from "@utils";
 
 const PDF_WIDTH_PT = 612;
 const PDF_HEIGHT_PT = 792;

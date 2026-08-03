@@ -1,5 +1,5 @@
-import { QueryClient } from "@tanstack/react-query";
 import { getIsOnline } from "@browser-utils";
+import { QueryClient } from "@tanstack/react-query";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
