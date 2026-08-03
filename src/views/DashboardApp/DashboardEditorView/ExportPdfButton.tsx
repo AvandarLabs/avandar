@@ -2,11 +2,12 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
-import { notifyDevAlert, Tooltip } from "@ui";
+import { notifyError, Tooltip } from "@ui";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
 
 const HIDE_EXPORT_AS_PDF = true;
 
@@ -20,14 +21,14 @@ type Props = {
  * directly or annotate the rendered dashboard (text, arrows, freehand with
  * adjustable roughness via RoughJS) before exporting.
  *
- * Disabled while the dashboard isn't loaded or has unsaved edits — the
+ * Disabled while the dashboard isn't loaded or has unsaved edits: the
  * snapshot reads from the persisted dashboard config so unsaved tweaks
  * won't show up. The tooltip explains both states.
  */
 export function ExportPdfButton({
   dashboard,
   hasUnsavedChanges,
-}: Props): JSX.Element | null {
+}: Props): ReactNode {
   const { t } = useLingui();
   if (HIDE_EXPORT_AS_PDF) {
     return null;
@@ -36,7 +37,7 @@ export function ExportPdfButton({
 
   return (
     <Tooltip
-      label={t`Save your changes first — the PDF reflects the saved dashboard.`}
+      label={t`Save your changes first: the PDF reflects the saved dashboard.`}
       disabled={!hasUnsavedChanges}
     >
       <Button
@@ -48,7 +49,7 @@ export function ExportPdfButton({
         onClick={(event) => {
           if (!dashboard) {
             event.preventDefault();
-            notifyDevAlert("Dashboard is not loaded yet.");
+            notifyError({ message: t`Dashboard is not loaded yet.` });
             return;
           }
           if (hasUnsavedChanges) {

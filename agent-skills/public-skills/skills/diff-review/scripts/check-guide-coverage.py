@@ -12,8 +12,8 @@ Usage:
     check-guide-coverage.py <path-to-guide.json> [comparison-key]
 
 comparison-key mirrors `dif` (defaults to develop if it exists, else main):
-    .        uncommitted worktree changes (staged + unstaged), vs HEAD
-    working  unstaged changes only
+    .        uncommitted worktree changes (staged + unstaged + untracked)
+    working  unstaged + untracked changes
     staged   staged changes only
     <branch> git diff <branch>...HEAD (three-dot: merge-base)
 
@@ -53,25 +53,33 @@ def _default_base():
 def diff_files(comparison):
     """Repo-relative paths changed under the given comparison key."""
     if comparison == "working":
-        return _run(["git", "diff", "--name-only"])
+        return _run(["git", "diff", "--name-only"]) + untracked_files()
     if comparison == ".":
-        return _run(["git", "diff", "--name-only", "HEAD"])
+        return _run(["git", "diff", "--name-only", "HEAD"]) + untracked_files()
     if comparison == "staged":
         return _run(["git", "diff", "--name-only", "--staged"])
     return _run(["git", "diff", "--name-only", f"{comparison}...HEAD"])
 
 
+def untracked_files():
+    """Untracked paths included by difit's --include-untracked option."""
+    return _run(["git", "ls-files", "--others", "--exclude-standard"])
+
+
 def guide_files(guide_path):
-    """Union of every file path across all groups in the guide.json."""
+    """File paths and duplicates across all groups in the guide.json."""
     with open(guide_path) as fh:
         groups = json.load(fh)
     paths = set()
+    duplicates = set()
     for group in groups:
         for entry in group.get("files", []):
             path = entry.get("path")
             if path:
+                if path in paths:
+                    duplicates.add(path)
                 paths.add(path)
-    return paths
+    return paths, duplicates
 
 
 def main(argv):
@@ -82,7 +90,7 @@ def main(argv):
     comparison = argv[2] if len(argv) > 2 else _default_base()
 
     try:
-        guide = guide_files(guide_path)
+        guide, duplicates = guide_files(guide_path)
     except (OSError, json.JSONDecodeError) as err:
         print(f"ERROR: cannot read guide.json ({guide_path}): {err}")
         return 2
@@ -94,7 +102,7 @@ def main(argv):
 
     missing = sorted(diff - guide)
     extra = sorted(guide - diff)
-    if not missing and not extra:
+    if not missing and not extra and not duplicates:
         print(
             f"OK: guide covers all {len(diff)} files in the diff "
             f"(comparison: {comparison})."
@@ -116,6 +124,10 @@ def main(argv):
               "(remove them):")
         for path in extra:
             print(f"  - {path}")
+    if duplicates:
+        print(f"\n{len(duplicates)} file(s) listed in MORE THAN ONE guide group:")
+        for path in sorted(duplicates):
+            print(f"  ! {path}")
     return 1
 
 

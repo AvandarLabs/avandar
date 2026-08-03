@@ -72,3 +72,11 @@ export { useCheckTruncatedText } from "./hooks/useCheckTruncatedText/useCheckTru
 // loaders
 export { FloatingLoader } from "./FloatingLoader/FloatingLoader";
 export { LoadingOverlay } from "./LoadingOverlay/LoadingOverlay";
+
+// css variable helpers
+export {
+  cssVar,
+  cssAvaVar,
+  mantineColorVar,
+  mantineVar,
+} from "./cssVar/cssVar";

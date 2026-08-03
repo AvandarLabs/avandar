@@ -1,23 +1,24 @@
 import { Trans } from "@lingui/react/macro";
 import { Box, Text } from "@mantine/core";
 import { createUsePuck } from "@puckeditor/core";
-import { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { ReactElement } from "react";
 
 const usePuckSelector = createUsePuck();
 
 type Props = {
   /** Current viz config. */
-  value: VizConfig;
+  value: VizConfig.T;
 
   /** Called when the user edits any control inside the per-type subform. */
-  onChange: (value: VizConfig) => void;
+  onChange: (value: VizConfig.T) => void;
 
   /**
    * Workspace id used to authorize the SQL data query. When undefined the
@@ -26,7 +27,7 @@ type Props = {
   workspaceId: Workspace.Id | undefined;
 
   /** Dashboard id used for public-page queries when `workspaceId` is unset. */
-  dashboardId: DashboardId;
+  dashboardId: Dashboard.Id;
 };
 
 /**
@@ -44,7 +45,7 @@ export function VizConfigPField({
   onChange,
   workspaceId,
   dashboardId,
-}: Props): JSX.Element {
+}: Props): ReactElement {
   const selectedItem = usePuckSelector((state) => {
     return state.selectedItem;
   });

@@ -1,25 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Alert,
-  Button,
-  Fieldset,
-  Group,
-  List,
-  Paper,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { IconAlertTriangle } from "@tabler/icons-react";
-import { Tabs, TextareaForm } from "@ui";
-import { useState } from "react";
-import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
-import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
+import { Text } from "@mantine/core";
+import { Tabs } from "@ui";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { mantineColorVar } from "@/lib/utils/browser/css";
+import { PromptTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel";
+import { SqlTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel";
 import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 export type NLQuery = {
   /**
@@ -55,7 +44,8 @@ export type NLQuery = {
 
 type Props = AvaPageFieldProps<NLQuery>;
 
-export function NLQueryPField({ value, onChange }: Props): JSX.Element {
+/** Edits a visualization query through prompt, structured, and SQL tabs. */
+export function NLQueryPField({ value, onChange }: Props): ReactElement {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
@@ -140,128 +130,5 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
         },
       }}
     />
-  );
-}
-
-function PromptTabPanel({
-  prompt,
-  isRunningQuery,
-  onSubmitPrompt,
-}: {
-  prompt: string;
-  isRunningQuery: boolean;
-  onSubmitPrompt: (prompt: string) => void;
-}): JSX.Element {
-  const { t } = useLingui();
-  return (
-    <Stack gap="sm" px="sm">
-      <TextareaForm
-        asField
-        defaultValue={prompt}
-        description={t`Enter your question or instructions in natural language to generate a SQL query`}
-        label={t`Prompt`}
-        minRows={4}
-        autosize
-        isSubmitting={isRunningQuery}
-        submitButtonLabel={t`Generate Query`}
-        styles={{
-          input: {
-            fontFamily: "monospace",
-          },
-        }}
-        onSubmit={(promptStr) => {
-          onSubmitPrompt(promptStr.trim());
-        }}
-      />
-    </Stack>
-  );
-}
-
-function SqlTabPanel({
-  rawSql,
-  isStructuredQueryInSync,
-  sqlSyncWarnings,
-  onSubmitSql,
-}: {
-  rawSql: string;
-  isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly string[];
-  onSubmitSql: (nextSql: string) => void;
-}): JSX.Element {
-  const { t } = useLingui();
-  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
-
-  return (
-    <Stack gap="sm" px="sm">
-      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
-        <Alert
-          icon={<IconAlertTriangle size={16} />}
-          color="yellow"
-          variant="light"
-          title={t`Manual form shows an approximation`}
-          data-testid="sql-sync-warning"
-        >
-          <Text size="xs" mb="xs">
-            <Trans>
-              Parts of this SQL could not be represented in the Manual form. The
-              form shows a best-effort approximation; the SQL above is what
-              actually runs.
-            </Trans>
-          </Text>
-          <List size="xs" spacing={2}>
-            {sqlSyncWarnings.map((reason) => {
-              return <List.Item key={reason}>{reason}</List.Item>;
-            })}
-          </List>
-        </Alert>
-      : null}
-      <Fieldset
-        legend={
-          <Group justify="space-between" style={{ width: "100%" }}>
-            <span>
-              <Trans>Generated SQL</Trans>
-            </span>
-            {!isEditSQLMode && (
-              <Button
-                size="xs"
-                variant="subtle"
-                onClick={() => {
-                  setIsEditSQLMode(true);
-                }}
-              >
-                <Trans>Edit query</Trans>
-              </Button>
-            )}
-          </Group>
-        }
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
-      >
-        <Stack gap="sm">
-          {isEditSQLMode ?
-            <SqlQueryEditPanel
-              initialSql={rawSql}
-              submitButtonLabel={t`Save and re-run query`}
-              cancelButtonLabel={t`Cancel`}
-              onSubmit={(newRawSQL) => {
-                setIsEditSQLMode(false);
-                onSubmitSql(newRawSQL);
-              }}
-              onCancel={() => {
-                setIsEditSQLMode(false);
-              }}
-            />
-          : <Paper
-              p="sm"
-              style={{
-                backgroundColor: mantineColorVar("gray.0"),
-                border: `1px solid ${mantineColorVar("gray.3")}`,
-              }}
-            >
-              <AvaSqlBlock value={rawSql} readOnly minRows={6} />
-            </Paper>
-          }
-        </Stack>
-      </Fieldset>
-    </Stack>
   );
 }

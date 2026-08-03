@@ -1,10 +1,11 @@
+import { isDefined, makeMap } from "@utils";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import type {
   ColumnSummary,
   DatasetSummary,
 } from "@/clients/datasets/DatasetQueryClient";
 import type { QueryClient } from "@tanstack/react-query";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type ColumnRef = { name: string; dataType: string };
@@ -14,38 +15,35 @@ type ColumnRef = { name: string; dataType: string };
  * fetches. Uses the full dataset summary when present; otherwise checks
  * per-column summary entries for the given columns only.
  */
-export function getCachedDatasetColumnSummaries(params: {
-  queryClient: QueryClient;
-  datasetId: DatasetId;
-  workspaceId: Workspace.Id;
-  columns: readonly ColumnRef[];
-}): Map<string, ColumnSummary> {
-  const { queryClient, datasetId, workspaceId, columns } = params;
-  const byName = new Map<string, ColumnSummary>();
-
-  const fullSummary = queryClient.getQueryData<DatasetSummary>(
-    DatasetQueryClient.QueryKeys.getSummary({ datasetId, workspaceId }),
+export function getCachedDatasetColumnSummaries(
+  options: Readonly<{
+    queryClient: QueryClient;
+    datasetId: Dataset.Id;
+    workspaceId: Workspace.Id;
+    columns: readonly ColumnRef[];
+  }>,
+): Map<string, ColumnSummary> {
+  const fullSummary = options.queryClient.getQueryData<DatasetSummary>(
+    DatasetQueryClient.QueryKeys.getSummary({
+      datasetId: options.datasetId,
+      workspaceId: options.workspaceId,
+    }),
   );
   if (fullSummary?.columnSummaries) {
-    for (const summary of fullSummary.columnSummaries) {
-      byName.set(summary.name, summary);
-    }
-    return byName;
+    return makeMap(fullSummary.columnSummaries, { key: "name" });
   }
 
-  for (const column of columns) {
-    const cached = queryClient.getQueryData<ColumnSummary>(
-      DatasetQueryClient.QueryKeys.getColumnSummary({
-        datasetId,
-        workspaceId,
-        columnName: column.name,
-        dataType: column.dataType,
-      }),
-    );
-    if (cached) {
-      byName.set(column.name, cached);
-    }
-  }
-
-  return byName;
+  const cachedSummaries = options.columns
+    .map((column) => {
+      return options.queryClient.getQueryData<ColumnSummary>(
+        DatasetQueryClient.QueryKeys.getColumnSummary({
+          datasetId: options.datasetId,
+          workspaceId: options.workspaceId,
+          columnName: column.name,
+          dataType: column.dataType,
+        }),
+      );
+    })
+    .filter(isDefined);
+  return makeMap(cachedSummaries, { key: "name" });
 }

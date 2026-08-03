@@ -1,4 +1,4 @@
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * The dashboardId-based URL is always valid for any published dashboard.
@@ -18,11 +18,14 @@ function _origin(): string {
   return "";
 }
 
-export function buildShareUrls(args: {
+type Options = {
   workspaceSlug: string;
-  dashboardId: DashboardId;
+  dashboardId: Dashboard.Id;
   slug: string | undefined;
-}): ShareUrls {
+};
+
+/** Builds canonical and optional vanity URLs for a published dashboard. */
+export function buildShareUrls(args: Readonly<Options>): ShareUrls {
   const base = _origin().replace(/\/$/, "");
   return {
     canonical: `${base}/public/dashboards/${args.workspaceSlug}/${args.dashboardId}`,

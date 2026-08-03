@@ -2,13 +2,12 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
+import { Tooltip, mantineColorVar } from "@ui";
 import clsx from "clsx";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { mantineColorVar } from "@/lib/utils/browser/css";
 import css from "./ChatPanel.module.css";
 
 /**

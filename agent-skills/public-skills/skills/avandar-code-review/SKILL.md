@@ -691,8 +691,10 @@ sub-checklist file.
   absent, skip this phase even if the diff calls `createModule`.
 - **Reference:**
   [`docs/code-reviews/libraries/avandar-modules-checklist.md`](docs/code-reviews/libraries/avandar-modules-checklist.md)
-- **Covers:** grouping related free functions into a `createModule(...)`
-  module when they share a domain or storage backend.
+- **Covers:** grouping related helpers that share a domain, storage, or
+  purpose into a single named module (a plain object by default; only use
+  `createModule(...)` when the module needs state or mixins, and flag a
+  stateless `createModule(...)` as something that should be a plain object).
 
 ## Repo-Local Phase
 

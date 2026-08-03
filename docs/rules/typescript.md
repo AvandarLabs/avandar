@@ -271,6 +271,26 @@
   export only that module object or `@modules` module. Do not export the
   individual helper functions. Name the file exactly after the exported module
   object.
+- In this codebase a **module** simply means an object that groups related
+  functions (and any supporting constants) under a single named export, called
+  as `MyModule.member(...)`. A module can be either a plain object literal or an
+  `@avandar/modules` module created with `createModule(...)`. Which one to use
+  depends **solely on whether the module needs state or mixins**, never on how
+  many functions it groups:
+  - Use a **plain object literal** for a stateless collection of related
+    functions and constants. This is the default.
+
+    ```ts
+    export const DataVizFilters = {
+      parseLocalFilterOptions: _parseLocalFilterOptions,
+      localFilterToRecord: _localFilterToRecord,
+    };
+    ```
+
+  - Use **`createModule(...)`** (from `@avandar/modules`) only when the module
+    tracks state (and needs its generated getters/setters) or composes behavior
+    via mixins. Do not reach for `createModule` merely to group stateless
+    functions: a plain object is sufficient and lighter.
 - When a module can not be encapsulated in a single file, create a directory
   to represent the module. Some examples of when a module should be a directory
   are: when a module has a `.test` file, has tightly-coupled helper functions,

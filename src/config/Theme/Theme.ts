@@ -27,7 +27,7 @@ import {
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
-import { cssAvaVar } from "../../lib/utils/browser/css";
+import { cssAvaVar } from "@ui";
 import { AnimationTheme } from "./AnimationTheme/AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";

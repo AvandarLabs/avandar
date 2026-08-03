@@ -1,41 +1,16 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { Trans } from "@lingui/react/macro";
+import { Button, Stack, Text } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
+import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactElement } from "react";
 
 type Props = AvaPageFieldProps<readonly LocalFilter[]>;
 
-function useModeOptions(): ReadonlyArray<{
-  value: LocalFilter["mode"];
-  label: string;
-}> {
-  const { t } = useLingui();
-  return [
-    { value: "select_single", label: t`Single-select` },
-    { value: "select_multi", label: t`Multi-select` },
-    { value: "contains", label: t`Text contains` },
-  ];
-}
-
-function _generateLocalFilterId(): string {
-  // Stable enough for client-side keying; collisions across vizzes don't
-  // matter since values are scoped per viz.
-  return `lf_${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function _makeEmptyLocalFilter(): LocalFilter {
+function createLocalFilter(): LocalFilter {
   return {
-    id: _generateLocalFilterId(),
+    id: crypto.randomUUID(),
     label: "",
     columnName: "",
     mode: "select_single",
@@ -53,23 +28,27 @@ function _makeEmptyLocalFilter(): LocalFilter {
  * applied as a second subselect wrap on top of any subscribed global
  * filters at SQL-compose time.
  */
-export function LocalFiltersPField({ value, onChange }: Props): JSX.Element {
+export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
   const filters = value ?? [];
 
-  const _updateFilter = (idx: number, next: LocalFilter): void => {
-    const arr = filters.slice();
-    arr[idx] = next;
-    onChange(arr);
+  const updateFilter = (filterIndex: number, filter: LocalFilter): void => {
+    onChange(
+      filters.map((currentFilter, currentFilterIndex) => {
+        return currentFilterIndex === filterIndex ? filter : currentFilter;
+      }),
+    );
   };
 
-  const _removeFilter = (idx: number): void => {
-    const arr = filters.slice();
-    arr.splice(idx, 1);
-    onChange(arr);
+  const removeFilter = (filterIndex: number): void => {
+    onChange(
+      filters.filter((_, currentFilterIndex) => {
+        return currentFilterIndex !== filterIndex;
+      }),
+    );
   };
 
-  const _addFilter = (): void => {
-    onChange([...filters, _makeEmptyLocalFilter()]);
+  const addFilter = (): void => {
+    onChange([...filters, createLocalFilter()]);
   };
 
   return (
@@ -82,16 +61,16 @@ export function LocalFiltersPField({ value, onChange }: Props): JSX.Element {
           </Trans>
         </Text>
       : <Stack gap="xs">
-          {filters.map((f, idx) => {
+          {filters.map((filter, filterIndex) => {
             return (
               <LocalFilterEditor
-                key={f.id}
-                filter={f}
-                onChange={(next) => {
-                  _updateFilter(idx, next);
+                key={filter.id}
+                filter={filter}
+                onChange={(updatedFilter) => {
+                  updateFilter(filterIndex, updatedFilter);
                 }}
                 onRemove={() => {
-                  _removeFilter(idx);
+                  removeFilter(filterIndex);
                 }}
               />
             );
@@ -101,99 +80,11 @@ export function LocalFiltersPField({ value, onChange }: Props): JSX.Element {
       <Button
         size="compact-xs"
         leftSection={<IconPlus size={12} />}
-        onClick={_addFilter}
+        onClick={addFilter}
         variant="light"
       >
         <Trans>Add filter</Trans>
       </Button>
     </Stack>
-  );
-}
-
-function LocalFilterEditor({
-  filter,
-  onChange,
-  onRemove,
-}: {
-  filter: LocalFilter;
-  onChange: (next: LocalFilter) => void;
-  onRemove: () => void;
-}): JSX.Element {
-  const { t } = useLingui();
-  const modeOptions = useModeOptions();
-  return (
-    <Box
-      p="xs"
-      style={{
-        borderRadius: 6,
-        border: "1px solid var(--mantine-color-gray-3)",
-        background: "var(--mantine-color-gray-0)",
-      }}
-    >
-      <Stack gap={6}>
-        <Group justify="space-between">
-          <TextInput
-            size="xs"
-            placeholder={t`Label, e.g. Region`}
-            value={filter.label}
-            onChange={(e) => {
-              onChange({ ...filter, label: e.currentTarget.value });
-            }}
-            style={{ flex: 1 }}
-          />
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            size="sm"
-            onClick={onRemove}
-            aria-label={t`Remove local filter`}
-          >
-            <IconTrash size={14} />
-          </ActionIcon>
-        </Group>
-        <TextInput
-          size="xs"
-          placeholder={t`Column name (must match SQL)`}
-          value={filter.columnName}
-          onChange={(e) => {
-            onChange({ ...filter, columnName: e.currentTarget.value });
-          }}
-        />
-        <Select
-          size="xs"
-          allowDeselect={false}
-          data={modeOptions.map((o) => {
-            return { value: o.value, label: o.label };
-          })}
-          value={filter.mode}
-          onChange={(v) => {
-            if (!v) return;
-            onChange({ ...filter, mode: v as LocalFilter["mode"] });
-          }}
-        />
-        {filter.mode !== "contains" ?
-          <TextInput
-            size="xs"
-            placeholder={t`Values, comma-separated`}
-            value={filter.optionsRaw}
-            onChange={(e) => {
-              onChange({ ...filter, optionsRaw: e.currentTarget.value });
-            }}
-          />
-        : null}
-        <TextInput
-          size="xs"
-          placeholder={
-            filter.mode === "select_multi" ?
-              t`Default values, comma-separated or JSON array`
-            : t`Default value (optional)`
-          }
-          value={filter.defaultValue}
-          onChange={(e) => {
-            onChange({ ...filter, defaultValue: e.currentTarget.value });
-          }}
-        />
-      </Stack>
-    </Box>
   );
 }

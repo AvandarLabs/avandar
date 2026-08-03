@@ -2,12 +2,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
-import { notifyDevAlert, Tooltip } from "@ui";
+import { notifyError, Tooltip } from "@ui";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
 
 type Props = {
   dashboard: Dashboard.T | undefined;
@@ -29,7 +30,7 @@ type Props = {
 export function PublishDashboardButton({
   dashboard,
   hasUnsavedChanges,
-}: Props): JSX.Element {
+}: Props): ReactElement {
   const { t } = useLingui();
   const offline = useOfflineGate();
   const isDisabled: boolean =
@@ -55,7 +56,7 @@ export function PublishDashboardButton({
             }
             if (!dashboard) {
               event.preventDefault();
-              notifyDevAlert("Dashboard is not loaded yet.");
+              notifyError({ message: "Dashboard is not loaded yet." });
               return;
             }
             if (hasUnsavedChanges) {

@@ -6,7 +6,7 @@
  */
 
 import { isPlainObject, isString, traverse } from "@utils";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type DataVizLikeProps = {
   nlQuery: {
@@ -90,14 +90,14 @@ function _extractDatasetIdsFromSQL(sql: string): string[] {
  * NOTE: these are **candidates** because we are only looking for UUID-like
  * strings, which means we may be extracting some IDs that are not actual
  * dataset ids. That is why the return type of this function is
- * is Array<DatasetId | string> rather than just `DatasetId[]`.
+ * is Array<Dataset.Id | string> rather than just `Dataset.Id[]`.
  *
  * @param dashConfig - The dashboard config to extract dataset IDs from.
  * @returns The dataset ID candidates found in the dashboard config.
  */
 export function extractDatasetIdsFromDashboardConfig(
   dashConfig: unknown,
-): Array<DatasetId | string> {
+): Array<Dataset.Id | string> {
   const sqlStrings: string[] = _extractDataVizSQLStrings(dashConfig);
   const candidates = Array.from(
     new Set(sqlStrings.flatMap(_extractDatasetIdsFromSQL)),

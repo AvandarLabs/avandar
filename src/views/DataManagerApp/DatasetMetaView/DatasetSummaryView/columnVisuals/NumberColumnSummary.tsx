@@ -1,6 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
+import { formatNumber } from "@utils";
+import { NumberColumnStat } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnStat";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "number" };
@@ -8,13 +11,26 @@ type Props = {
   dataType: string;
 };
 
+function _formatCompactNumber(n: number): string {
+  if (!Number.isFinite(n)) {
+    return "–";
+  }
+  if (Math.abs(n) >= 10_000) {
+    return formatNumber(n, { maximumFractionDigits: 0 });
+  }
+  if (Number.isInteger(n)) {
+    return formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
+  }
+  return formatNumber(n, { maximumFractionDigits: 2 });
+}
+
 /**
  * Visual block for numeric columns. A min→max range bar with the
  * average plotted as a marker tick. Communicates "where does the
- * average sit inside the range" — the question analysts most often
+ * average sit inside the range": the question analysts most often
  * have looking at a fresh numeric column.
  */
-export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
+export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
   const { t } = useLingui();
   const { minValue, maxValue, averageValue, stdDev } = summary;
   const range = maxValue - minValue;
@@ -83,65 +99,26 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
           gap={0}
         >
           <Text size="xs" c="dimmed" ff="monospace">
-            {_fmt(minValue)}
+            {_formatCompactNumber(minValue)}
           </Text>
           <Text size="xs" c="dimmed" ff="monospace">
-            {_fmt(maxValue)}
+            {_formatCompactNumber(maxValue)}
           </Text>
         </Group>
       </Box>
 
       <Group gap="lg" mt="xs">
-        <Stat label={t`min`} value={_fmt(minValue)} />
-        <Stat label={t`avg`} value={_fmt(averageValue)} accent />
-        <Stat label={t`max`} value={_fmt(maxValue)} />
+        <NumberColumnStat label={t`min`} value={_formatCompactNumber(minValue)} />
+        <NumberColumnStat label={t`avg`} value={_formatCompactNumber(averageValue)} accent />
+        <NumberColumnStat label={t`max`} value={_formatCompactNumber(maxValue)} />
         {Number.isFinite(stdDev) ?
-          <Stat label={t`stddev`} value={_fmt(stdDev)} />
+          <NumberColumnStat label={t`stddev`} value={_formatCompactNumber(stdDev)} />
         : null}
-        <Stat
+        <NumberColumnStat
           label={t`kind`}
           value={dataType === "bigint" ? t`integer` : t`decimal`}
         />
       </Group>
     </Stack>
   );
-}
-
-function Stat({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}): JSX.Element {
-  return (
-    <Stack gap={0}>
-      <Text
-        size="sm"
-        fw={accent ? 700 : 600}
-        c={accent ? "primary.7" : "neutral.9"}
-        ff="monospace"
-      >
-        {value}
-      </Text>
-      <Text size="xs" c="dimmed">
-        {label}
-      </Text>
-    </Stack>
-  );
-}
-
-function _fmt(n: number): string {
-  if (!Number.isFinite(n)) {
-    return "–";
-  }
-  if (Math.abs(n) >= 10_000) {
-    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  }
-  if (Number.isInteger(n)) {
-    return n.toString();
-  }
-  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }

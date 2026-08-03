@@ -7,23 +7,18 @@ import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQ
 import { useMemo } from "react";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
-import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters";
-import {
-  DEFAULT_DATA_VIZ_FILTER_PROPS,
-  DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
-  useLocalFilterState,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
+import { useLocalFilterState } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
-import type {
-  VizConfig,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { ReactElement } from "react";
 
-type Props = {
+export type Props = {
   /** Natural-language prompt + generated SQL configured by the editor. */
   nlQuery: NLQuery;
 
@@ -32,16 +27,14 @@ type Props = {
    * the Puck `resolveData` hook so it can drive the type-picker control
    * separately from the per-type sub-config.
    */
-  vizType: VizType;
+  vizType: VizConfig.Type;
 
   /**
    * The full per-type viz config (axis selections, legend toggle, colors,
    * etc.) that gets passed straight to `VisualizationContainer`.
    */
-  vizConfig: VizConfig;
+  vizConfig: VizConfig.T;
 } & DataVizFilterProps;
-
-export { type Props as DataVizPBlockProps };
 
 /**
  * Dashboard Puck block that renders any visualization supported by the shared
@@ -58,21 +51,24 @@ export function DataVizPBlock({
   globalFilterSubscription,
   localFilters,
   puck,
-}: WithPuckProps<Props>): JSX.Element {
+}: WithPuckProps<Props>): ReactElement {
   const { prompt, rawSql } = nlQuery;
   const metadata = useAvaPageMetadata(puck);
 
   const filterProps: DataVizFilterProps = useMemo(() => {
     return {
       globalFilterSubscription:
-        globalFilterSubscription ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
-      localFilters: localFilters ?? DEFAULT_DATA_VIZ_FILTER_PROPS.localFilters,
+        globalFilterSubscription ??
+        DataVizFilters.defaultGlobalFilterSubscription,
+      localFilters:
+        localFilters ?? DataVizFilters.defaultDataVizFilterProps.localFilters,
     };
   }, [globalFilterSubscription, localFilters]);
 
   const localFilterState = useLocalFilterState(filterProps.localFilters);
 
-  const filteredSql = useApplyDashboardFiltersToSql(rawSql, {
+  const filteredSql = useApplyDashboardFiltersToSql({
+    rawSql,
     filterProps,
     localFilters: filterProps.localFilters,
     localFilterState,

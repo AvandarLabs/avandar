@@ -458,10 +458,31 @@ when the gate matches.
   `i18n._(msg\`…\`)` (`i18n` from `@lingui/core`, `msg` from
   `@lingui/core/macro`). Never the deprecated `t(i18n)\`…\`` binding.
 
+- **Never pass the translation function as a parameter (extraction bug).**
+  `lingui extract` only sees a macro (`` t`…` ``, `` msg`…` ``, `<Trans>`) when
+  the macro identifier is bound in the same lexical scope. A `t` (or any
+  tagged-template translate fn) passed into another function and called there is
+  a runtime value the extractor cannot follow, so those strings never reach the
+  catalogs and stay untranslated in every non-English locale (English still
+  renders, which hides it). Flag:
+  - a parameter typed `ReturnType<typeof useLingui>["t"]`, a local
+    `type TranslateFn = …`, or a parameter named `t` / `translate` /
+    `translateFn` that is called as a tagged template inside the function;
+  - a call site that threads the macro `t` into a helper: `buildX(…, t)`.
+
+  Correct instead: call `` t`…` `` directly in the component/hook where `t` came
+  from `useLingui()`, or thread `i18n` (not `t`) and resolve `` msg`…` `` with
+  `i18n._(…)`. See [`docs/rules/i18n.md`](../rules/i18n.md). Confirm a suspected
+  miss by running `pnpm i18n:extract` and checking the file is referenced in
+  `src/i18n/locales/en/messages.po`.
+
   **Find candidates:**
 
   ```bash
   grep -rEn '(label|placeholder|title|aria-label|description)=("[A-Z]|\{"[A-Z])' \
     --include="*.tsx" src
   grep -rEn 'notify(Success|Error|Warning)\(\s*"' src
+  # translation function passed as a parameter (the extraction bug):
+  grep -rEn 'TranslateFn|ReturnType<typeof useLingui>\["t"\]' \
+    --include="*.ts" --include="*.tsx" src
   ```

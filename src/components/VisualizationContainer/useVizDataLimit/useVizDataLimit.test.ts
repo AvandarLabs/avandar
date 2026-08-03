@@ -1,5 +1,6 @@
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import { renderHook } from "@/test-utils";
 
@@ -31,7 +32,7 @@ describe("useVizDataLimit", () => {
 
   it("slices data when over the cap", () => {
     const max = VIZ_RENDER_LIMITS.bar!.max;
-    const data = Array.from({ length: max + 10 }, (_, index) => {
+    const data = makeArrayWithLength(max + 10).map((_, index) => {
       return { category: `row-${index}`, value: index };
     });
     const { result } = renderHook(() => {
@@ -44,7 +45,7 @@ describe("useVizDataLimit", () => {
 
   it("shows a warning toast once when data first exceeds the cap", () => {
     const max = VIZ_RENDER_LIMITS.pie!.max;
-    const overLimitData = Array.from({ length: max + 1 }, (_, index) => {
+    const overLimitData = makeArrayWithLength(max + 1).map((_, index) => {
       return { name: `slice-${index}`, value: index };
     });
 
@@ -66,7 +67,7 @@ describe("useVizDataLimit", () => {
   });
 
   it("does not limit table data", () => {
-    const data = Array.from({ length: 10_000 }, (_, index) => {
+    const data = makeArrayWithLength(10_000).map((_, index) => {
       return { col: index };
     });
     const { result } = renderHook(() => {

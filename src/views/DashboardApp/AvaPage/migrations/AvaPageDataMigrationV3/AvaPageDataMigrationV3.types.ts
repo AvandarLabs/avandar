@@ -16,7 +16,6 @@ import type {
   V2_VizConfig,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types";
 import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { Simplify } from "type-fest";
 
 export type {
@@ -63,14 +62,122 @@ export type V3_AvaPageRootProps = {
   schemaVersion: 3;
 };
 
-/**
- * V3 viz config shape. Structurally identical to the current `VizConfig`
- * shipped from `shared/models/vizs/VizConfig`. No v3-to-v4 changes
- * touched the viz config tree. If a future version reshapes vizs, snapshot
- * those types into this module the same way V2 snapshotted its own
- * `V2_VizConfig`.
- */
-export type V3_VizConfig = VizConfig;
+type V3_CurveType = "linear" | "natural" | "monotone" | "step";
+
+type V3_AxisStyle = {
+  label?: string;
+  labelColor?: string;
+  tickColor?: string;
+  hide?: boolean;
+};
+
+type V3_ChartStyle = {
+  xAxis?: V3_AxisStyle;
+  yAxis?: V3_AxisStyle;
+  grid?: {
+    color?: string;
+    horizontal?: boolean;
+    vertical?: boolean;
+  };
+  legend?: { position?: "top" | "bottom" | "left" | "right" };
+};
+
+type V3_XYSeries =
+  | {
+      renderAs: "bar";
+      key: string;
+      label?: string;
+      color?: string;
+      fillOpacity?: number;
+      stackId?: string;
+    }
+  | {
+      renderAs: "line";
+      key: string;
+      label?: string;
+      color?: string;
+      curveType?: V3_CurveType;
+      strokeWidth?: number;
+      withDots?: boolean;
+    }
+  | {
+      renderAs: "area";
+      key: string;
+      label?: string;
+      color?: string;
+      curveType?: V3_CurveType;
+      strokeWidth?: number;
+      fillOpacity?: number;
+      withDots?: boolean;
+    };
+
+type V3_ScatterSeries = {
+  key: string;
+  xKey: string;
+  label?: string;
+  color?: string;
+};
+
+type V3_RadarSeries = {
+  key: string;
+  label?: string;
+  color?: string;
+  strokeWidth?: number;
+  fillOpacity?: number;
+};
+
+export type V3_VizConfig =
+  | { vizType: "table" }
+  | {
+      vizType: "bar";
+      xAxisKey: string | undefined;
+      series: V3_XYSeries[];
+      layout: "group" | "stack" | "percent";
+      withLegend: boolean;
+      chartStyle?: V3_ChartStyle;
+    }
+  | {
+      vizType: "line";
+      xAxisKey: string | undefined;
+      series: V3_XYSeries[];
+      withLegend: boolean;
+      chartStyle?: V3_ChartStyle;
+    }
+  | {
+      vizType: "area";
+      xAxisKey: string | undefined;
+      series: V3_XYSeries[];
+      layout: "default" | "stacked" | "percent" | "split";
+      withLegend: boolean;
+      chartStyle?: V3_ChartStyle;
+    }
+  | { vizType: "scatter"; series: V3_ScatterSeries[] }
+  | {
+      vizType: "pie";
+      nameKey: string | undefined;
+      valueKey: string | undefined;
+      isDonut: boolean;
+      withLabels: boolean;
+      labelsType: "value" | "percent";
+      seriesColors?: Record<string, string>;
+    }
+  | {
+      vizType: "funnel";
+      nameKey: string | undefined;
+      valueKey: string | undefined;
+      seriesColors?: Record<string, string>;
+    }
+  | {
+      vizType: "radar";
+      nameKey: string | undefined;
+      series: V3_RadarSeries[];
+      withLegend?: boolean;
+      chartStyle?: V3_ChartStyle;
+    }
+  | {
+      vizType: "bubble";
+      series: Array<V3_ScatterSeries & { sizeKey: string }>;
+    };
 
 type V3_NLQuery = {
   prompt: string;

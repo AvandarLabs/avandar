@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { LocalPublicDatasetRawDataClient } from "@/clients/datasets/LocalPublicDatasetRawDataClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /**
  * Ensures all published dataset dependencies for a dashboard are loaded into
@@ -17,7 +17,7 @@ export function useEnsurePublishedDashboardDatasets(
     if (dashboard?.isPublic) {
       return extractDatasetIdsFromDashboardConfig(
         dashboard.config,
-      ) as readonly DatasetId[];
+      ) as readonly Dataset.Id[];
     }
     return [];
   }, [dashboard?.config, dashboard?.isPublic]);

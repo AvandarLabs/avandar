@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ensureLocalStoragePersistence } from "@/lib/utils/browser/ensureLocalStoragePersistence";
+import { ensureLocalStoragePersistence } from "@browser-utils";
 
 /**
  * On mount, requests persistent local storage in the background.

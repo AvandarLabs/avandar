@@ -4,10 +4,11 @@ import { Paper } from "@ui";
 import { useEffect, useMemo } from "react";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { ReactElement } from "react";
 
 export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
 
-export type FilterPBlockProps = {
+export type Props = {
   /** Stable id used by the filter state manager. */
   filterId: string;
   /** Display label shown above the input. */
@@ -51,8 +52,15 @@ function _parseDefaultMulti(raw: string): readonly string[] {
   return _parseOptions(raw);
 }
 
-export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
-  const { filterId, label, columnName, mode, optionsRaw, defaultValue } = props;
+/** Renders an interactive dashboard filter block. */
+export function FilterPBlock({
+  filterId,
+  label,
+  columnName,
+  mode,
+  optionsRaw,
+  defaultValue,
+}: Props): ReactElement {
   const { t } = useLingui();
 
   const dispatch = DashboardFilterStateManager.useDispatch();
@@ -72,21 +80,24 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
 
   // Register the filter on mount / config change so the rest of the page
   // knows it exists. Unregister on unmount.
-  useEffect(() => {
-    if (!filterId || !columnName || !label) {
-      return;
-    }
-    dispatch.registerFilter({
-      filterId,
-      columnName,
-      label,
-      operator,
-      value: initialValue,
-    });
-    return () => {
-      dispatch.unregisterFilter(filterId);
-    };
-  }, [filterId, columnName, label, operator, initialValue, dispatch]);
+  useEffect(
+    function registerDashboardFilter() {
+      if (!filterId || !columnName || !label) {
+        return;
+      }
+      dispatch.registerFilter({
+        filterId,
+        columnName,
+        label,
+        operator,
+        value: initialValue,
+      });
+      return () => {
+        dispatch.unregisterFilter(filterId);
+      };
+    },
+    [filterId, columnName, label, operator, initialValue, dispatch],
+  );
 
   const filterState = filterId ? filtersById[filterId] : undefined;
   const options = useMemo(() => {

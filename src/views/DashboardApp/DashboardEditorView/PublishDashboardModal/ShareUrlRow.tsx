@@ -21,6 +21,7 @@ import {
 import { notifyError } from "@ui";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   label: string;
@@ -34,7 +35,7 @@ type Props = {
   /**
    * Whether to show the "Show QR code" button. Defaults to true. We hide
    * the QR affordance on the vanity row so all QR codes encode the stable
-   * dashboardId URL — even if the user later changes the vanity slug, any
+   * dashboardId URL: even if the user later changes the vanity slug, any
    * printed QR keeps resolving.
    */
   showQr?: boolean;
@@ -53,46 +54,50 @@ export function ShareUrlRow({
   url,
   hint,
   showQr = true,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const [qrOpen, setQrOpen] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (!qrOpen) {
-      return;
-    }
-    let cancelled = false;
-    QRCode.toDataURL(url, {
-      errorCorrectionLevel: "M",
-      margin: 2,
-      width: 256,
-      color: { dark: "#0f172a", light: "#ffffff" },
-    })
-      .then((data) => {
-        if (!cancelled) {
-          setQrDataUrl(data);
-        }
+  useEffect(
+    function generateQrCode() {
+      if (!qrOpen) {
+        return;
+      }
+      let isCancelled = false;
+      QRCode.toDataURL(url, {
+        errorCorrectionLevel: "M",
+        margin: 2,
+        width: 256,
+        color: { dark: "#0f172a", light: "#ffffff" },
       })
-      .catch((e) => {
-        notifyError({
-          title: t`Could not generate QR code`,
-          message: e instanceof Error ? e.message : String(e),
+        .then((dataUrl) => {
+          if (!isCancelled) {
+            setQrDataUrl(dataUrl);
+          }
+        })
+        .catch((error: unknown) => {
+          console.error(error);
+          notifyError({
+            title: t`Could not generate QR code`,
+            message: t`Please try again.`,
+          });
         });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [qrOpen, url, t]);
+      return () => {
+        isCancelled = true;
+      };
+    },
+    [qrOpen, url, t],
+  );
 
   const downloadQr = (): void => {
     if (!qrDataUrl) {
       return;
     }
-    const a = document.createElement("a");
-    a.href = qrDataUrl;
-    a.download = `dashboard-qr-${Date.now()}.png`;
-    a.click();
+    const downloadLink = document.createElement("a");
+    downloadLink.href = qrDataUrl;
+    downloadLink.download = `dashboard-qr-${Date.now()}.png`;
+    downloadLink.click();
   };
 
   return (

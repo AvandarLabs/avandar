@@ -1,3 +1,4 @@
+import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
 import { useMutation } from "@hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -34,8 +35,6 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { Logger } from "@/utils/Logger";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
@@ -377,12 +376,12 @@ export function GoogleSheetsImportView({
                 try {
                   const { authorizeURL } = await APIClient.get({
                     queryParams: {
-                      redirectURL: getCurrentURL(),
+                      redirectURL: getCurrentUrl(),
                     },
                     route: "google-auth/auth-url",
                   });
 
-                  navigateToExternalURL(authorizeURL);
+                  navigateToExternalUrl(authorizeURL);
                 } catch (error) {
                   Logger.error(error, {
                     devMsg: "Error while fetching Google auth URL",

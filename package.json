@@ -19,6 +19,7 @@
     "test": "./scripts/runAllTests.sh",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
     "test:ava-etl": "pnpm --filter @avandar/ava-etl test",
+    "test:browser-utils": "pnpm --filter @avandar/browser-utils test",
     "test:clients": "pnpm --filter @avandar/clients test",
     "test:desktop": "pnpm --filter @avandar/desktop test",
     "test:dev-fanout-server": "pnpm --filter @avandar/dev-fanout-server test",

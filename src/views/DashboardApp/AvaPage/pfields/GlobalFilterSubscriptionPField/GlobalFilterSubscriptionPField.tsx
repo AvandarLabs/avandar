@@ -8,13 +8,14 @@ import {
   Text,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
-import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type {
   GlobalFilterSubscription,
   GlobalFilterSubscriptionMode,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactElement } from "react";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 
@@ -23,7 +24,7 @@ function useModeDescriptions(): Record<GlobalFilterSubscriptionMode, string> {
   return {
     all: t`Apply every global filter on the dashboard.`,
     selected: t`Pick which global filters apply to this visualization.`,
-    none: t`Ignore all global filters — this visualization is unfiltered.`,
+    none: t`Ignore all global filters: this visualization is unfiltered.`,
   };
 }
 
@@ -38,13 +39,14 @@ function useModeDescriptions(): Record<GlobalFilterSubscriptionMode, string> {
 export function GlobalFilterSubscriptionPField({
   value,
   onChange,
-}: Props): JSX.Element {
+}: Props): ReactElement {
   const { t } = useLingui();
   const modeDescriptions = useModeDescriptions();
   const { filtersById } = DashboardFilterStateManager.useState();
   const registeredFilters = Object.values(filtersById);
 
-  const subscription = value ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION;
+  const subscription = value ?? DataVizFilters.defaultGlobalFilterSubscription;
+  const subscribedFilterIds = new Set(subscription.subscribedFilterIds);
 
   const _setMode = (mode: GlobalFilterSubscriptionMode): void => {
     onChange({
@@ -58,8 +60,11 @@ export function GlobalFilterSubscriptionPField({
 
   const _toggleFilter = (filterId: string, checked: boolean): void => {
     const next = new Set(subscription.subscribedFilterIds);
-    if (checked) next.add(filterId);
-    else next.delete(filterId);
+    if (checked) {
+      next.add(filterId);
+    } else {
+      next.delete(filterId);
+    }
     onChange({
       mode: "selected",
       subscribedFilterIds: Array.from(next),
@@ -114,9 +119,7 @@ export function GlobalFilterSubscriptionPField({
                         </Text>
                       </Text>
                     }
-                    checked={subscription.subscribedFilterIds.includes(
-                      f.filterId,
-                    )}
+                    checked={subscribedFilterIds.has(f.filterId)}
                     onChange={(e) => {
                       _toggleFilter(f.filterId, e.currentTarget.checked);
                     }}

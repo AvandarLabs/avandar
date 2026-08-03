@@ -3,20 +3,21 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@ui";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
 
 type Props = {
   workspaceSlug: string;
-  dashboardId: DashboardId | undefined;
+  dashboardId: Dashboard.Id | undefined;
 };
 
 export function DeleteDashboardButton({
   workspaceSlug,
   dashboardId,
-}: Props): JSX.Element {
+}: Props): ReactElement {
   const { t } = useLingui();
   const navigate = useNavigate();
   const [deleteDashboard, isDeleting] = DashboardClient.useDelete({
@@ -46,7 +47,7 @@ export function DeleteDashboardButton({
       disabled={!dashboardId}
       onClick={() => {
         if (!dashboardId) {
-          notifyDevAlert("Dashboard is not loaded yet.");
+          notifyError({ message: "Dashboard is not loaded yet." });
           return;
         }
 

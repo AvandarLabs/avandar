@@ -25,7 +25,7 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";
-import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
+import { clearOpfs } from "@browser-utils";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
@@ -85,7 +85,7 @@ const DBDefinitions = [
     upgrader: async (tx) => {
       // clear the local dataset entry table
       await tx.table("LocalDatasetEntry").clear();
-      await clearOPFS();
+      await clearOpfs();
 
       // delete all datasets from the backend. We should try to never do backend
       // operations in a local database upgrade (because it is not idempotent.

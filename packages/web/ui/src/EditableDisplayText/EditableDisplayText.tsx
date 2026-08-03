@@ -1,8 +1,9 @@
+import { getIsMacPlatform } from "@browser-utils";
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditButton } from "../buttons/EditButton";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
@@ -106,22 +107,7 @@ export function EditableDisplayText({
     (isPlainObject(passThroughProps.style) &&
       hasDefinedProps(passThroughProps.style, "width"));
 
-  const isMac = useMemo(() => {
-    if (typeof navigator === "undefined") {
-      return false;
-    }
-    const userAgentData = (
-      navigator as Navigator & {
-        userAgentData?: { platform: string };
-      }
-    ).userAgentData;
-
-    if (userAgentData?.platform) {
-      return /Mac|iPhone|iPod|iPad/i.test(userAgentData.platform);
-    }
-
-    return /Mac|iPhone|iPod|iPad/i.test(navigator.userAgent);
-  }, []);
+  const isMac = getIsMacPlatform();
   const keyboardShortcut =
     passThroughProps.textarea ?
       isMac ? "⌘↵"

@@ -11,14 +11,13 @@ If `@avandar/modules` is not present in the repo, **skip this entire
 checklist**, even if the repo has unrelated functions named
 `createModule`.
 
-## Group related helpers into `createModule(...)`
+## Group related helpers into a module
 
 - Group multiple related helpers that share storage, configuration, or
-  purpose into a `createModule(...)` module instead of leaving them as
-  loose free functions. Once a group of functions has a shared purpose
-  (for example, a "PreferenceStorage" wrapping `readPreference`,
-  `writePreference`, and `resolvePreference`), use the module
-  pattern so callers reach for `PreferenceStorage.resolvePreference(...)`
+  purpose into a single named **module** instead of leaving them as loose
+  free functions. In this codebase a "module" simply means an object that
+  groups related functions (and any supporting constants) under one named
+  export, so callers reach for `PreferenceStorage.resolvePreference(...)`
   rather than a flat namespace of unrelated imports.
 
   This is bad:
@@ -41,16 +40,37 @@ checklist**, even if the repo has unrelated functions named
 
   ```ts
   // PreferenceStorage.ts
-  export const PreferenceStorage = createModule("PreferenceStorage", {
-    builder: () => {
-      return {
-        writePreference: (value: string) => { ... },
-        resolvePreference: (args: { ... }) => { ... },
-      };
-    },
-  });
+  export const PreferenceStorage = {
+    readPreference: _readPreference,
+    writePreference: _writePreference,
+    resolvePreference: _resolvePreference,
+  };
 
   // call site
   import { PreferenceStorage } from "./PreferenceStorage/PreferenceStorage";
   PreferenceStorage.resolvePreference({ ... });
+  ```
+
+## Plain object vs `createModule(...)`
+
+- A module does **not** have to use `createModule`. Whether a module should
+  be a plain object literal or an `@avandar/modules` `createModule(...)`
+  module depends entirely on whether it needs state or mixins, never on how
+  many functions it groups:
+  - **Stateless collection of functions/constants: plain object literal.**
+    This is the default. Flag any stateless `createModule(...)` (a `builder`
+    that only returns functions/constants, with no `state` and no mixins) and
+    ask for it to be a plain object instead.
+  - **Tracks state (needs `createModule`'s generated getters/setters) or uses
+    mixins: `createModule(...)`.**
+
+  Stateful case where `createModule` is warranted:
+
+  ```ts
+  export const Counter = createModule("Counter", {
+    state: { count: 0 },
+    builder: () => {
+      return { ... };
+    },
+  });
   ```

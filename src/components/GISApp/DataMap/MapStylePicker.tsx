@@ -9,7 +9,7 @@ import {
   MapStyleKey,
   MapStyleKeys,
 } from "@/components/GISApp/DataMap/mapStyles";
-import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
+import { mantineColorVar, mantineVar } from "@ui";
 
 type MapStyle = {
   url: string;

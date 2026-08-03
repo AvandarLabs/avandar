@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
 import { act, renderHook } from "@/test-utils";
 import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";
 import type { RefObject } from "react";
@@ -86,7 +87,7 @@ describe("useFloatingPanelMorphTransition — runEnter convergence when Mantine 
     // Flush 5 frames: 1 for runEnter to pass the position check, then
     // 2 nested rAFs to commit state (setIsEnterPending + setAnimationPhase).
     // Extra frames provide headroom for any additional React scheduling.
-    Array.from({ length: 5 }).forEach(() => {
+    makeArrayWithLength(5).forEach(() => {
       act(() => {
         flushOneFrame();
       });

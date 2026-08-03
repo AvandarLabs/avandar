@@ -5,7 +5,7 @@ import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsid
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { NavbarSidebarToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { mantineColorVar } from "@/lib/utils/browser/css";
+import { mantineColorVar } from "@ui";
 
 type Props = {
   children?: ReactNode;

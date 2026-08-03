@@ -1,12 +1,12 @@
 import { uuidType } from "$/lib/zodHelpers";
-import { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
 import z from "zod";
 import type { PuckContext } from "@puckeditor/core";
 
 export type AvaPageMetadata = {
-  dashboardId: DashboardId;
+  dashboardId: Dashboard.Id;
 } & (
   | {
       auth: "public";
@@ -20,7 +20,7 @@ export type AvaPageMetadata = {
 
 const AvaPageMetadataSchema = z
   .object({
-    dashboardId: uuidType<DashboardId>(),
+    dashboardId: uuidType<Dashboard.Id>(),
   })
   .and(
     z.discriminatedUnion("auth", [

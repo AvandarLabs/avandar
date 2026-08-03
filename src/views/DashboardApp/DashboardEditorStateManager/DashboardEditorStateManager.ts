@@ -20,17 +20,25 @@ export type DashboardEditorAppState = {
    */
   activeDashboardId: string | undefined;
 
-  /**
-   * Pending blocks queued by the chat panel that the editor view should
-   * append to its in-memory Puck data on the next render and then clear via
-   * `consumePendingBlock`.
-   */
-  pendingBlocks: readonly DashboardEditorPendingBlock[];
+  /** Current in-memory Puck data for the active editor. */
+  editorData: AvaPageData | undefined;
+
+  /** Changes not yet persisted to the dashboard record. */
+  hasUnsavedChanges: boolean;
+
+  /** Revision used to remount Puck when a different dashboard is loaded. */
+  editorRevision: number;
+
+  /** Generated block ids already appended to the active dashboard. */
+  appendedBlockIds: readonly string[];
 };
 
 const INITIAL_STATE: DashboardEditorAppState = {
   activeDashboardId: undefined,
-  pendingBlocks: [],
+  editorData: undefined,
+  hasUnsavedChanges: false,
+  editorRevision: 0,
+  appendedBlockIds: [],
 };
 
 /**
@@ -49,42 +57,64 @@ export const DashboardEditorStateManager = createAppStateManager({
      */
     setActiveDashboard: (
       state: DashboardEditorAppState,
-      dashboardId: string | undefined,
+      activeDashboard:
+        | { dashboardId: string; editorData: AvaPageData }
+        | undefined,
     ): DashboardEditorAppState => {
-      if (state.activeDashboardId === dashboardId) {
+      if (state.activeDashboardId === activeDashboard?.dashboardId) {
         return state;
       }
-      return { ...state, activeDashboardId: dashboardId, pendingBlocks: [] };
+      return {
+        ...state,
+        activeDashboardId: activeDashboard?.dashboardId,
+        editorData: activeDashboard?.editorData,
+        hasUnsavedChanges: false,
+        editorRevision: state.editorRevision + 1,
+        appendedBlockIds: [],
+      };
     },
 
-    /** Queue a new block for the editor to append to its Puck data. */
+    /**
+     * Append a generated block to the active editor's Puck data and bump
+     * `editorRevision`. Puck seeds its internal store from the `data` prop only
+     * on mount, so appending to `editorData` alone would not reach the canvas or
+     * Save (both read Puck's store). Bumping the revision remounts Puck with the
+     * appended block, keeping the two in agreement: an appended block is both
+     * visible on the canvas and persisted by Save.
+     */
     queuePendingBlock: (
       state: DashboardEditorAppState,
       block: DashboardEditorPendingBlock,
     ): DashboardEditorAppState => {
-      const alreadyQueued = state.pendingBlocks.some((b) => {
-        return b.pendingId === block.pendingId;
-      });
-      if (alreadyQueued) {
+      if (
+        !state.editorData ||
+        state.appendedBlockIds.includes(block.pendingId)
+      ) {
         return state;
       }
-      return { ...state, pendingBlocks: [...state.pendingBlocks, block] };
+      return {
+        ...state,
+        editorData: {
+          ...state.editorData,
+          content: [...(state.editorData.content ?? []), block.block],
+        },
+        hasUnsavedChanges: true,
+        editorRevision: state.editorRevision + 1,
+        appendedBlockIds: [...state.appendedBlockIds, block.pendingId],
+      };
     },
 
-    /**
-     * Drain the queue; the editor calls this after it appends the blocks.
-     *
-     * TODO(jpsyx): this is an antipattern and this should be removed once
-     * we lift the puck data state from DashboardEditorView into the
-     * DashboardEditorStateManager.
-     */
-    clearPendingBlocks: (
+    /** Replace the active Puck data after an editor interaction. */
+    updateEditorData: (
       state: DashboardEditorAppState,
+      editorData: AvaPageData,
     ): DashboardEditorAppState => {
-      if (state.pendingBlocks.length === 0) {
-        return state;
-      }
-      return { ...state, pendingBlocks: [] };
+      return { ...state, editorData, hasUnsavedChanges: true };
+    },
+
+    /** Mark the current editor data as persisted. */
+    markSaved: (state: DashboardEditorAppState): DashboardEditorAppState => {
+      return { ...state, hasUnsavedChanges: false };
     },
   },
 });

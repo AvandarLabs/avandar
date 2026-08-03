@@ -1,64 +1,21 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  ActionIcon,
-  Box,
-  Button,
-  ColorInput,
-  Divider,
-  Group,
-  Loader,
-  Paper,
-  SegmentedControl,
-  Slider,
-  Stack,
-  Text,
-} from "@mantine/core";
-import {
-  IconArrowBack,
-  IconArrowRight,
-  IconClearAll,
-  IconFileExport,
-  IconPencil,
-  IconTypography,
-} from "@tabler/icons-react";
-import { notifyError } from "@ui";
+import { Button, Group, Loader, Stack, Text } from "@mantine/core";
+import { IconFileExport } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import rough from "roughjs";
-import {
-  captureAndDownloadPdf,
-  snapshotElement,
-} from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
-
-type Tool = "freehand" | "arrow" | "text";
-
-type Stroke =
-  | {
-      kind: "freehand";
-      points: Array<[number, number]>;
-      color: string;
-      roughness: number;
-      strokeWidth: number;
-      seed: number;
-    }
-  | {
-      kind: "arrow";
-      from: [number, number];
-      to: [number, number];
-      color: string;
-      roughness: number;
-      strokeWidth: number;
-      seed: number;
-    }
-  | {
-      kind: "text";
-      at: [number, number];
-      text: string;
-      color: string;
-      fontSize: number;
-    };
+import { drawPdfAnnotationStroke } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/drawPdfAnnotationStroke";
+import { PdfAnnotationCanvas } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas";
+import { PdfAnnotationToolbar } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar";
+import { useAnnotatedPdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport";
+import { usePdfDashboardCapture } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture";
+import type {
+  PdfAnnotationStroke,
+  PdfAnnotationTool,
+} from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotation";
+import type { ReactNode } from "react";
 
 type Props = {
-  sourceElement: HTMLElement | null;
+  sourceElement: HTMLElement | undefined;
   filename: string;
   title: string;
   onClose: () => void;
@@ -67,53 +24,33 @@ type Props = {
 
 const MAX_DISPLAY_WIDTH = 900;
 
+/** Provides drawing and text annotations over a captured dashboard image. */
 export function PdfAnnotator({
   sourceElement,
   filename,
   title,
   onClose,
   onBack,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
-  const [baseCanvas, setBaseCanvas] = useState<HTMLCanvasElement | null>(null);
-  const [isCapturing, setIsCapturing] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
-  const [tool, setTool] = useState<Tool>("freehand");
+  const { baseCanvas, isCapturing } = usePdfDashboardCapture(sourceElement);
+  const [tool, setTool] = useState<PdfAnnotationTool>("freehand");
   const [color, setColor] = useState("#1e3a8a");
   const [roughness, setRoughness] = useState(1.5);
   const [strokeWidth, setStrokeWidth] = useState(2);
-  const [strokes, setStrokes] = useState<readonly Stroke[]>([]);
+  const [strokes, setStrokes] = useState<readonly PdfAnnotationStroke[]>([]);
 
   const overlayRef = useRef<HTMLCanvasElement | null>(null);
-  const baseImgRef = useRef<HTMLCanvasElement | null>(null);
   // Current in-progress stroke (during a drag).
-  const draftRef = useRef<Stroke | null>(null);
+  const draftRef = useRef<PdfAnnotationStroke | null>(null);
 
-  // Capture the dashboard once on mount.
-  useEffect(() => {
-    let isMounted = true;
-    if (!sourceElement) {
-      setIsCapturing(false);
-      return;
-    }
-    void snapshotElement(sourceElement)
-      .then((canvas) => {
-        if (!isMounted) return;
-        setBaseCanvas(canvas);
-        setIsCapturing(false);
-      })
-      .catch((e: unknown) => {
-        if (!isMounted) return;
-        notifyError({
-          title: t`Couldn't capture dashboard`,
-          message: e instanceof Error ? e.message : String(e),
-        });
-        setIsCapturing(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [sourceElement, t]);
+  const { isExporting, exportPdf } = useAnnotatedPdfExport({
+    sourceElement,
+    overlayRef,
+    filename,
+    title,
+    onClose,
+  });
 
   // Derive display dimensions from the captured canvas.
   const displayWidth =
@@ -122,22 +59,29 @@ export function PdfAnnotator({
   const displayHeight = baseCanvas ? baseCanvas.height * displayScale : 600;
 
   // Render overlay strokes every time something changes.
-  useEffect(() => {
-    if (!baseCanvas || !overlayRef.current) return;
-    const overlay = overlayRef.current;
-    overlay.width = baseCanvas.width;
-    overlay.height = baseCanvas.height;
-    const ctx = overlay.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, overlay.width, overlay.height);
-    const rc = rough.canvas(overlay);
-    for (const s of strokes) {
-      drawStroke(ctx, rc, s);
-    }
-    if (draftRef.current) {
-      drawStroke(ctx, rc, draftRef.current);
-    }
-  }, [baseCanvas, strokes]);
+  useEffect(
+    function renderAnnotationStrokes() {
+      if (!baseCanvas || !overlayRef.current) {
+        return;
+      }
+      const overlay = overlayRef.current;
+      overlay.width = baseCanvas.width;
+      overlay.height = baseCanvas.height;
+      const context = overlay.getContext("2d");
+      if (!context) {
+        return;
+      }
+      context.clearRect(0, 0, overlay.width, overlay.height);
+      const roughCanvas = rough.canvas(overlay);
+      strokes.forEach((stroke) => {
+        drawPdfAnnotationStroke(context, roughCanvas, stroke);
+      });
+      if (draftRef.current) {
+        drawPdfAnnotationStroke(context, roughCanvas, draftRef.current);
+      }
+    },
+    [baseCanvas, strokes],
+  );
 
   const _toCanvasCoord = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>): [number, number] => {
@@ -152,18 +96,33 @@ export function PdfAnnotator({
   );
 
   const _redrawDraft = useCallback((): void => {
-    if (!overlayRef.current || !baseCanvas) return;
-    const ctx = overlayRef.current.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, overlayRef.current.width, overlayRef.current.height);
-    const rc = rough.canvas(overlayRef.current);
-    for (const s of strokes) drawStroke(ctx, rc, s);
-    if (draftRef.current) drawStroke(ctx, rc, draftRef.current);
+    if (!overlayRef.current || !baseCanvas) {
+      return;
+    }
+    const context = overlayRef.current.getContext("2d");
+    if (!context) {
+      return;
+    }
+    context.clearRect(
+      0,
+      0,
+      overlayRef.current.width,
+      overlayRef.current.height,
+    );
+    const roughCanvas = rough.canvas(overlayRef.current);
+    strokes.forEach((stroke) => {
+      drawPdfAnnotationStroke(context, roughCanvas, stroke);
+    });
+    if (draftRef.current) {
+      drawPdfAnnotationStroke(context, roughCanvas, draftRef.current);
+    }
   }, [baseCanvas, strokes]);
 
   const _handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>): void => {
-      if (!baseCanvas) return;
+      if (!baseCanvas) {
+        return;
+      }
       const pt = _toCanvasCoord(e);
       const seed = Math.floor(Math.random() * 100000);
       if (tool === "freehand") {
@@ -191,7 +150,9 @@ export function PdfAnnotator({
         _redrawDraft();
       } else if (tool === "text") {
         const text = window.prompt(t`Annotation text:`);
-        if (!text) return;
+        if (!text) {
+          return;
+        }
         setStrokes((s) => {
           return [
             ...s,
@@ -222,7 +183,9 @@ export function PdfAnnotator({
 
   const _handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>): void => {
-      if (!draftRef.current) return;
+      if (!draftRef.current) {
+        return;
+      }
       const pt = _toCanvasCoord(e);
       if (draftRef.current.kind === "freehand") {
         draftRef.current.points.push(pt);
@@ -236,7 +199,9 @@ export function PdfAnnotator({
 
   const _handlePointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>): void => {
-      if (!draftRef.current) return;
+      if (!draftRef.current) {
+        return;
+      }
       const finished = draftRef.current;
       draftRef.current = null;
       try {
@@ -260,27 +225,6 @@ export function PdfAnnotator({
   const _clear = useCallback((): void => {
     setStrokes([]);
   }, []);
-
-  const _export = useCallback(async (): Promise<void> => {
-    if (!sourceElement || !overlayRef.current) return;
-    setIsExporting(true);
-    try {
-      await captureAndDownloadPdf({
-        element: sourceElement,
-        annotationCanvas: overlayRef.current,
-        filename,
-        title,
-      });
-      onClose();
-    } catch (e: unknown) {
-      notifyError({
-        title: t`Couldn't export PDF`,
-        message: e instanceof Error ? e.message : String(e),
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  }, [filename, onClose, sourceElement, title, t]);
 
   if (isCapturing) {
     return (
@@ -308,187 +252,30 @@ export function PdfAnnotator({
 
   return (
     <Stack gap="sm">
-      <Group gap="md" wrap="wrap" align="end">
-        <Stack gap={2}>
-          <Text size="xs" c="dimmed">
-            <Trans>Tool</Trans>
-          </Text>
-          <SegmentedControl
-            size="xs"
-            value={tool}
-            onChange={(nextTool) => {
-              return setTool(nextTool as Tool);
-            }}
-            data={[
-              {
-                value: "freehand",
-                label: (
-                  <Group gap={4}>
-                    <IconPencil size={14} />
-                    <span>
-                      <Trans>Freehand</Trans>
-                    </span>
-                  </Group>
-                ),
-              },
-              {
-                value: "arrow",
-                label: (
-                  <Group gap={4}>
-                    <IconArrowRight size={14} />
-                    <span>
-                      <Trans>Arrow</Trans>
-                    </span>
-                  </Group>
-                ),
-              },
-              {
-                value: "text",
-                label: (
-                  <Group gap={4}>
-                    <IconTypography size={14} />
-                    <span>
-                      <Trans>Text</Trans>
-                    </span>
-                  </Group>
-                ),
-              },
-            ]}
-          />
-        </Stack>
+      <PdfAnnotationToolbar
+        tool={tool}
+        color={color}
+        roughness={roughness}
+        strokeWidth={strokeWidth}
+        hasStrokes={strokes.length > 0}
+        onToolChange={setTool}
+        onColorChange={setColor}
+        onRoughnessChange={setRoughness}
+        onStrokeWidthChange={setStrokeWidth}
+        onUndo={_undo}
+        onClear={_clear}
+      />
 
-        <Stack gap={2} miw={180}>
-          <Text size="xs" c="dimmed">
-            <Trans>Roughness ({roughness.toFixed(1)})</Trans>
-          </Text>
-          <Slider
-            size="xs"
-            min={0}
-            max={4}
-            step={0.1}
-            value={roughness}
-            onChange={setRoughness}
-            marks={[
-              { value: 0, label: t`Formal` },
-              { value: 2, label: t`Sketch` },
-              { value: 4, label: t`Loose` },
-            ]}
-          />
-        </Stack>
-
-        <Stack gap={2} miw={140}>
-          <Text size="xs" c="dimmed">
-            <Trans>Stroke ({strokeWidth}px)</Trans>
-          </Text>
-          <Slider
-            size="xs"
-            min={1}
-            max={8}
-            step={1}
-            value={strokeWidth}
-            onChange={setStrokeWidth}
-          />
-        </Stack>
-
-        <Stack gap={2}>
-          <Text size="xs" c="dimmed">
-            <Trans>Color</Trans>
-          </Text>
-          <ColorInput
-            size="xs"
-            value={color}
-            onChange={setColor}
-            withEyeDropper={false}
-            format="hex"
-            swatches={[
-              "#1e3a8a",
-              "#dc2626",
-              "#16a34a",
-              "#f59e0b",
-              "#0ea5e9",
-              "#000000",
-            ]}
-            style={{ width: 140 }}
-          />
-        </Stack>
-
-        <Divider orientation="vertical" />
-
-        <Group gap={4}>
-          <ActionIcon
-            variant="subtle"
-            onClick={_undo}
-            disabled={strokes.length === 0}
-            aria-label={t`Undo`}
-          >
-            <IconArrowBack size={16} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            onClick={_clear}
-            disabled={strokes.length === 0}
-            aria-label={t`Clear all`}
-          >
-            <IconClearAll size={16} />
-          </ActionIcon>
-        </Group>
-      </Group>
-
-      <Paper
-        withBorder
-        radius="sm"
-        style={{ overflow: "hidden", background: "#fff" }}
-      >
-        <Box
-          pos="relative"
-          style={{
-            width: displayWidth,
-            height: displayHeight,
-            margin: "0 auto",
-          }}
-        >
-          <img
-            src={baseCanvas.toDataURL()}
-            alt={t`Dashboard snapshot`}
-            ref={(el) => {
-              // Keep the same width as the overlay so coords line up.
-              if (el) {
-                el.style.width = "100%";
-                el.style.height = "100%";
-                el.style.display = "block";
-              }
-            }}
-            draggable={false}
-          />
-          <canvas
-            ref={overlayRef}
-            onPointerDown={_handlePointerDown}
-            onPointerMove={_handlePointerMove}
-            onPointerUp={_handlePointerUp}
-            onPointerCancel={_handlePointerUp}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              cursor:
-                tool === "text" ? "text"
-                : tool === "arrow" ? "crosshair"
-                : "crosshair",
-              touchAction: "none",
-            }}
-          />
-          {/* Stash the base for compositing in export. Off-screen. */}
-          <canvas
-            ref={baseImgRef}
-            style={{ display: "none" }}
-            width={baseCanvas.width}
-            height={baseCanvas.height}
-          />
-        </Box>
-      </Paper>
+      <PdfAnnotationCanvas
+        baseCanvas={baseCanvas}
+        displayWidth={displayWidth}
+        displayHeight={displayHeight}
+        tool={tool}
+        overlayRef={overlayRef}
+        onPointerDown={_handlePointerDown}
+        onPointerMove={_handlePointerMove}
+        onPointerUp={_handlePointerUp}
+      />
 
       <Group justify="space-between" mt="xs">
         <Button variant="subtle" color="neutral" onClick={onBack}>
@@ -501,7 +288,7 @@ export function PdfAnnotator({
           <Button
             loading={isExporting}
             leftSection={<IconFileExport size={16} />}
-            onClick={_export}
+            onClick={exportPdf}
           >
             <Trans>Export annotated PDF</Trans>
           </Button>
@@ -509,62 +296,4 @@ export function PdfAnnotator({
       </Group>
     </Stack>
   );
-}
-
-function drawStroke(
-  ctx: CanvasRenderingContext2D,
-  rc: ReturnType<typeof rough.canvas>,
-  s: Stroke,
-): void {
-  if (s.kind === "text") {
-    ctx.save();
-    ctx.fillStyle = s.color;
-    ctx.font = `${s.fontSize}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    ctx.textBaseline = "top";
-    ctx.fillText(s.text, s.at[0], s.at[1]);
-    ctx.restore();
-    return;
-  }
-  if (s.kind === "freehand") {
-    if (s.points.length < 2) return;
-    rc.curve(s.points as Array<[number, number]>, {
-      stroke: s.color,
-      strokeWidth: s.strokeWidth,
-      roughness: s.roughness,
-      seed: s.seed,
-      bowing: s.roughness === 0 ? 0 : 1,
-    });
-    return;
-  }
-  // arrow
-  rc.line(s.from[0], s.from[1], s.to[0], s.to[1], {
-    stroke: s.color,
-    strokeWidth: s.strokeWidth,
-    roughness: s.roughness,
-    seed: s.seed,
-  });
-  // arrowhead
-  const angle = Math.atan2(s.to[1] - s.from[1], s.to[0] - s.from[0]);
-  const headLen = 14 + s.strokeWidth * 2;
-  const headAngle = Math.PI / 6;
-  const a1: [number, number] = [
-    s.to[0] - headLen * Math.cos(angle - headAngle),
-    s.to[1] - headLen * Math.sin(angle - headAngle),
-  ];
-  const a2: [number, number] = [
-    s.to[0] - headLen * Math.cos(angle + headAngle),
-    s.to[1] - headLen * Math.sin(angle + headAngle),
-  ];
-  rc.line(s.to[0], s.to[1], a1[0], a1[1], {
-    stroke: s.color,
-    strokeWidth: s.strokeWidth,
-    roughness: s.roughness,
-    seed: s.seed + 1,
-  });
-  rc.line(s.to[0], s.to[1], a2[0], a2[1], {
-    stroke: s.color,
-    strokeWidth: s.strokeWidth,
-    roughness: s.roughness,
-    seed: s.seed + 2,
-  });
 }

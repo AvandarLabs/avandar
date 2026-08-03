@@ -1,10 +1,9 @@
+import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
 import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 
 export async function goToBillingPortal({
   userId,
@@ -18,7 +17,7 @@ export async function goToBillingPortal({
         userId: userId,
       },
       queryParams: {
-        returnURL: getCurrentURL(),
+        returnURL: getCurrentUrl(),
       },
     });
 
@@ -29,7 +28,7 @@ export async function goToBillingPortal({
       AvaQueryClient.invalidateQueries({
         queryKey: [WorkspaceClient.getClientName()],
       });
-      navigateToExternalURL(customerPortalResponse.customerPortalURL);
+      navigateToExternalUrl(customerPortalResponse.customerPortalURL);
     } else {
       notifyError(
         "Billing portal cannot be loaded because you do not" +
