@@ -14,7 +14,7 @@ const isCI = !!process.env.CI;
  * Ensures e2e runs with flags required by share-modal and shared-with-me specs.
  * Merges with any flags already present in `.env.development`.
  */
-function mergeE2eFeatureFlags(): string {
+function mergeE2EFeatureFlags(): string {
   const existing = (process.env.VITE_FEATURE_FLAGS ?? "")
     .split(",")
     .map((part) => {
@@ -24,7 +24,7 @@ function mergeE2eFeatureFlags(): string {
   return [...new Set([...existing, "enable-shared-with-me"])].join(",");
 }
 
-const e2eFeatureFlags = mergeE2eFeatureFlags();
+const e2eFeatureFlags = mergeE2EFeatureFlags();
 
 /**
  * Per-test ceiling:
