@@ -1,12 +1,12 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { propEq } from "@utils";
-import { ensureOfflineChatSchema } from "@/components/ChatPanel/offline-chat-helpers/ensureOfflineChatSchema/ensureOfflineChatSchema";
+import { ensureOfflineChatSchema } from "@/components/ChatPanel/offlineChatHelpers/ensureOfflineChatSchema/ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "./logOfflineChat";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
-import { runOfflineChatPipeline } from "@/components/ChatPanel/offline-chat-helpers/runOfflineChatPipeline/runOfflineChatPipeline";
+import { runOfflineChatPipeline } from "@/components/ChatPanel/offlineChatHelpers/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
   OfflineChatPipelineCopy,
   OfflineChatTurnResult,

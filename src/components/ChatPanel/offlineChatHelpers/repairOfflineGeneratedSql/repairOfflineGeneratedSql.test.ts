@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offline-chat-helpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
+import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
 
 const DEATHS_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 const CASES_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901";

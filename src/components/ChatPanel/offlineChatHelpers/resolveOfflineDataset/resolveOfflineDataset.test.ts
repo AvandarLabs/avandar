@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveOfflineDataset } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineDataset/resolveOfflineDataset";
+import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
 
 const SCHEMA = {
   datasets: [

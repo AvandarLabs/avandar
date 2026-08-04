@@ -1,12 +1,12 @@
 import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
-import { forceFromTableToDatasetId } from "@/components/ChatPanel/offline-chat-helpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
-import { logOfflineChat } from "@/components/ChatPanel/offline-chat-helpers/logOfflineChat";
-import { matchOfflineDatasetTable } from "@/components/ChatPanel/offline-chat-helpers/matchOfflineDatasetTable";
-import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offline-chat-helpers/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
-import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offline-chat-helpers/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
-import { repairOfflineColumnFromError } from "@/components/ChatPanel/offline-chat-helpers/repairOfflineColumnFromError";
-import { resolveOfflineDataset } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineDataset/resolveOfflineDataset";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
+import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
+import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
+import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
+import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
+import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineColumnFromError";
+import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
 import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";

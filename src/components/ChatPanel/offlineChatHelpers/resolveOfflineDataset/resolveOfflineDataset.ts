@@ -1,7 +1,7 @@
 import { propEq } from "@utils";
-import { fuseMatchOfflineDatasetByName } from "@/components/ChatPanel/offline-chat-helpers/fuseMatchOfflineDatasetByName";
-import { matchOfflineDatasetTable } from "@/components/ChatPanel/offline-chat-helpers/matchOfflineDatasetTable";
-import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offline-chat-helpers/OfflineDatasetLabelMatch";
+import { fuseMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuseMatchOfflineDatasetByName";
+import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
+import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offlineChatHelpers/OfflineDatasetLabelMatch";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
