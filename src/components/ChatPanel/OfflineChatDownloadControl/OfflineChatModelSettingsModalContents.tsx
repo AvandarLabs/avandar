@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select, Stack, Text } from "@mantine/core";
+import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useCallback, useEffect, useState } from "react";
@@ -77,7 +78,9 @@ export function OfflineChatModelSettingsModalContents({
       return LocalChatModelStore.readSelectedId();
     },
   );
-  const [downloadedRevision, setDownloadedRevision] = useState(0);
+  // The store reads below are non-reactive snapshots; forceUpdate re-runs them
+  // when the manager becomes ready.
+  const forceUpdate = useForceUpdate();
   const onModelDeleted = useCallback(() => {
     onDownloadedListChange?.();
     refreshSettingsModal({ settingsModalId, onDownloadedListChange });
@@ -88,7 +91,6 @@ export function OfflineChatModelSettingsModalContents({
 
   const isBusy = managerStatus.kind === "downloading";
 
-  void downloadedRevision;
   const isSelectedDownloaded =
     LocalChatModelStore.isDownloaded(selectedModelId);
   const downloadedModelIds = LocalChatModelStore.listDownloadedIds();
@@ -96,12 +98,10 @@ export function OfflineChatModelSettingsModalContents({
   useEffect(
     function refreshDownloadedModelsWhenReady() {
       if (managerStatus.kind === "ready") {
-        setDownloadedRevision((revision) => {
-          return revision + 1;
-        });
+        forceUpdate();
       }
     },
-    [managerStatus.kind],
+    [managerStatus.kind, forceUpdate],
   );
 
   useEffect(
@@ -126,9 +126,7 @@ export function OfflineChatModelSettingsModalContents({
         message: t`${modelCopy.displayName} is available when you are offline.`,
         color: "success",
       });
-      setDownloadedRevision((revision) => {
-        return revision + 1;
-      });
+      forceUpdate();
     } catch {
       notifications.show({
         title: t`Offline model download failed`,
@@ -136,7 +134,7 @@ export function OfflineChatModelSettingsModalContents({
         color: "danger",
       });
     }
-  }, [getLocalChatModelCopy, onClose, selectedModelId, t]);
+  }, [forceUpdate, getLocalChatModelCopy, onClose, selectedModelId, t]);
 
   const selectedModel = LocalChatModelCatalog.find(selectedModelId);
   const selectedModelCopy = getLocalChatModelCopy(selectedModel);

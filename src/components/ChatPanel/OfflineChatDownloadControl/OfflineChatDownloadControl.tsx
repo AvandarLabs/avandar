@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
+import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconCloudDownload } from "@tabler/icons-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
 import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
 import { createOfflineChatModelSettingsModalChildren } from "./OfflineChatModelSettingsModalContents";
@@ -21,11 +22,12 @@ export function OfflineChatDownloadControl({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const managerStatus = useOfflineChatManagerStatus();
-  const [downloadedRevision, setDownloadedRevision] = useState(0);
+  // The store reads below are non-reactive snapshots; forceUpdate re-runs them
+  // when the manager becomes ready or the downloaded list changes.
+  const forceUpdate = useForceUpdate();
 
   const isBusy = managerStatus.kind === "downloading";
 
-  void downloadedRevision;
   const selectedModelId = LocalChatModelStore.readSelectedId();
   const isSelectedDownloaded =
     LocalChatModelStore.isDownloaded(selectedModelId);
@@ -34,19 +36,15 @@ export function OfflineChatDownloadControl({
   useEffect(
     function refreshDownloadStateWhenReady() {
       if (managerStatus.kind === "ready") {
-        setDownloadedRevision((revision) => {
-          return revision + 1;
-        });
+        forceUpdate();
       }
     },
-    [managerStatus.kind],
+    [managerStatus.kind, forceUpdate],
   );
 
   const openSettingsModal = useCallback(() => {
     const onDownloadedListChange = (): void => {
-      setDownloadedRevision((revision) => {
-        return revision + 1;
-      });
+      forceUpdate();
     };
     const modalId = modals.open({
       title: t`Offline chat model`,
@@ -60,7 +58,7 @@ export function OfflineChatDownloadControl({
         onDownloadedListChange,
       }),
     });
-  }, [t]);
+  }, [t, forceUpdate]);
 
   const tooltipLabel =
     !hasAnyDownloaded ? t`Download offline chat model (WebLLM)`
