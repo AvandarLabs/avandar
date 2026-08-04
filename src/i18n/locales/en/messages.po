@@ -2283,6 +2283,10 @@ msgstr "dashboard"
 msgid "{0} was deleted from this browser."
 msgstr "{0} was deleted from this browser."
 
+#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
+msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Some published datasets could not be loaded. Please try again later."

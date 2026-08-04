@@ -2,6 +2,8 @@
  * Shared copy helpers for offline chat model pickers.
  */
 
+import { t } from "@lingui/core/macro";
+
 /** Option label: name, RAM tier, and optional download size. */
 function _formatLabel(args: {
   displayName: string;
@@ -20,7 +22,8 @@ function _formatDescription(args: {
   recommendedIf: string;
   approxSizeMb: number;
 }): string {
-  return `${args.description} ${args.recommendedIf} (~${args.approxSizeMb} MB download).`;
+  const { description, recommendedIf, approxSizeMb } = args;
+  return t`${description} ${recommendedIf} (~${approxSizeMb} MB download).`;
 }
 
 /** Copy formatting for local-model picker labels and descriptions. */

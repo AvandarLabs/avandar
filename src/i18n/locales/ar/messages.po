@@ -2260,6 +2260,10 @@ msgstr "لوحة التحكم"
 msgid "{0} was deleted from this browser."
 msgstr "{0} تم حذفه من هذا المتصفح."
 
+#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
+msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة "

@@ -2308,6 +2308,10 @@ msgstr "tableau de bord"
 msgid "{0} was deleted from this browser."
 msgstr "{0} a été supprimé de ce navigateur."
 
+#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
+msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Certains jeux de données publiés n'ont pas pu être chargés. Veuillez "

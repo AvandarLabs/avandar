@@ -2293,6 +2293,10 @@ msgstr "tablero"
 msgid "{0} was deleted from this browser."
 msgstr "{0} fue eliminado de este navegador."
 
+#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
+msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "No se pudieron cargar algunos conjuntos de datos publicados. Por favor, "

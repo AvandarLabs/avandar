@@ -2212,6 +2212,10 @@ msgstr "儀表板"
 msgid "{0} was deleted from this browser."
 msgstr "{0} 已從此瀏覽器中刪除。"
 
+#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
+msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "某些已發佈的數據集無法加載。請稍後再試。"
