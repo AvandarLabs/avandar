@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { isDefined } from "@utils";
 import { useMemo } from "react";
@@ -5,6 +6,7 @@ import { match } from "ts-pattern";
 import { ChatSuggestionColumnPicker } from "./ChatSuggestionColumnPicker/ChatSuggestionColumnPicker";
 import { getCachedDatasetColumnSummaries } from "./getCachedDatasetColumnSummaries";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { I18n } from "@lingui/core";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -15,27 +17,25 @@ type SuggestionTarget = Pick<Dataset.T, "name"> & {
   datasetId: Dataset.Id;
 };
 
-type TranslationFunction = ReturnType<typeof useLingui>["t"];
-
 function _buildDashboardSuggestions(
   parameters: Readonly<{
     cachedSummaries: ReadonlyMap<string, ColumnSummary>;
     columns: readonly DatasetColumn.T[];
     datasetName: string;
-    t: TranslationFunction;
+    i18n: I18n;
   }>,
 ): string[] {
-  const { cachedSummaries, columns, datasetName, t } = parameters;
+  const { cachedSummaries, columns, datasetName, i18n } = parameters;
   const groupByColumn = ChatSuggestionColumnPicker.pickGroupByColumn(
     columns,
     cachedSummaries,
   );
   return [
     groupByColumn ?
-      t`Add a bar chart of ${datasetName} grouped by ${groupByColumn}`
-    : t`Add a bar chart of row counts in ${datasetName}`,
-    t`Add a line chart showing trends in ${datasetName} over time`,
-    t`Add a table of the top 10 rows of ${datasetName}`,
+      i18n._(msg`Add a bar chart of ${datasetName} grouped by ${groupByColumn}`)
+    : i18n._(msg`Add a bar chart of row counts in ${datasetName}`),
+    i18n._(msg`Add a line chart showing trends in ${datasetName} over time`),
+    i18n._(msg`Add a table of the top 10 rows of ${datasetName}`),
   ];
 }
 
@@ -44,10 +44,10 @@ function _buildDataExplorerSuggestions(
     cachedSummaries: ReadonlyMap<string, ColumnSummary>;
     columns: readonly DatasetColumn.T[];
     datasetName: string;
-    t: TranslationFunction;
+    i18n: I18n;
   }>,
 ): string[] {
-  const { cachedSummaries, columns, datasetName, t } = parameters;
+  const { cachedSummaries, columns, datasetName, i18n } = parameters;
   const groupByColumn = ChatSuggestionColumnPicker.pickGroupByColumn(
     columns,
     cachedSummaries,
@@ -61,15 +61,16 @@ function _buildDataExplorerSuggestions(
     : undefined;
 
   return [
-    t`Show the first 20 rows of ${datasetName}`,
+    i18n._(msg`Show the first 20 rows of ${datasetName}`),
     groupByColumn ?
-      t`Count rows in ${datasetName} by ${groupByColumn}`
-    : t`Count how many rows there are in ${datasetName}`,
-    averageColumn ? t`What is the average ${averageColumn} in ${datasetName}?`
+      i18n._(msg`Count rows in ${datasetName} by ${groupByColumn}`)
+    : i18n._(msg`Count how many rows there are in ${datasetName}`),
+    averageColumn ?
+      i18n._(msg`What is the average ${averageColumn} in ${datasetName}?`)
     : secondGroupByColumn ?
-      t`Count rows in ${datasetName} by ${secondGroupByColumn}`
+      i18n._(msg`Count rows in ${datasetName} by ${secondGroupByColumn}`)
     : groupByColumn ?
-      t`What are the distinct values of ${groupByColumn} in ${datasetName}?`
+      i18n._(msg`What are the distinct values of ${groupByColumn} in ${datasetName}?`)
     : undefined,
   ].filter(isDefined);
 }
@@ -91,7 +92,7 @@ export function useChatSuggestions(
     suggestionTarget,
     workspaceId,
   } = parameters;
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
 
   return useMemo(
     function buildChatSuggestions() {
@@ -105,7 +106,7 @@ export function useChatSuggestions(
             columns,
           })
         : new Map<string, ColumnSummary>();
-      const sharedParameters = { cachedSummaries, columns, datasetName, t };
+      const sharedParameters = { cachedSummaries, columns, datasetName, i18n };
 
       return match(app)
         .with("dashboards", () => {
@@ -119,6 +120,6 @@ export function useChatSuggestions(
         })
         .exhaustive();
     },
-    [app, columns, queryClient, suggestionTarget, t, workspaceId],
+    [app, columns, i18n, queryClient, suggestionTarget, t, workspaceId],
   );
 }

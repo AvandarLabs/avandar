@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
@@ -11,6 +12,7 @@ import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/Publis
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
 import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/toVanitySlug/toVanitySlug";
+import type { I18n } from "@lingui/core";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
@@ -19,19 +21,23 @@ const SLUG_VALIDATION_DEBOUNCE_MS = 500;
 
 type SlugValidationResult = { isValid: true } | DashboardSlugValidationFailure;
 
-type TranslateFn = ReturnType<typeof useLingui>["t"];
-
 function _slugFailureToMessage(
   failure: DashboardSlugValidationFailure,
-  t: TranslateFn,
+  i18n: I18n,
 ): string {
   return matchLiteral(failure.reason, {
-    empty: t`The custom URL cannot be empty`,
-    spaces: t`The custom URL cannot contain spaces`,
-    invalid_characters: t`The custom URL can only contain lowercase letters, numbers, and hyphens`,
-    too_short: t`The custom URL must be at least ${failure.limit ?? 3} characters`,
-    too_long: t`The custom URL cannot exceed ${failure.limit ?? 64} characters`,
-    taken: t`This custom URL is already taken`,
+    empty: i18n._(msg`The custom URL cannot be empty`),
+    spaces: i18n._(msg`The custom URL cannot contain spaces`),
+    invalid_characters: i18n._(
+      msg`The custom URL can only contain lowercase letters, numbers, and hyphens`,
+    ),
+    too_short: i18n._(
+      msg`The custom URL must be at least ${failure.limit ?? 3} characters`,
+    ),
+    too_long: i18n._(
+      msg`The custom URL cannot exceed ${failure.limit ?? 64} characters`,
+    ),
+    taken: i18n._(msg`This custom URL is already taken`),
   });
 }
 
@@ -67,7 +73,7 @@ export function PublishDashboardModal({
   onClose,
   modalId,
 }: Props): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   // Track the live dashboard locally so a successful publish flips the
   // UI to the "already published" branch (with share URLs and QR) without
@@ -168,7 +174,7 @@ export function PublishDashboardModal({
     slugValidationResult?.isValid === true;
   const slugErrorMessage =
     isSlugRejected && slugValidationResult?.isValid === false ?
-      _slugFailureToMessage(slugValidationResult, t)
+      _slugFailureToMessage(slugValidationResult, i18n)
     : undefined;
 
   const [publishConfig, setPublishConfig] =

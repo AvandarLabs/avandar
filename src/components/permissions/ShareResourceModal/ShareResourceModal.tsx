@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifyError } from "@ui";
@@ -16,6 +17,7 @@ import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
 import type { DisplayShare } from "./SharePrincipalList";
+import type { I18n } from "@lingui/core";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
@@ -38,14 +40,14 @@ function resolveOwnerDisplayName(
   ownerId: string,
   members: WorkspaceMemberProfile[] | undefined,
   userById: Readonly<Record<string, string>>,
-  t: ReturnType<typeof useLingui>["t"],
+  i18n: I18n,
 ): string {
   return (
     userById[ownerId] ??
     members?.find((member) => {
       return member.userId === ownerId;
     })?.email ??
-    t`Owner`
+    i18n._(msg`Owner`)
   );
 }
 
@@ -59,7 +61,7 @@ export function ShareResourceModal({
   resourceId,
   onClose,
 }: Props): JSX.Element {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const workspaceId = workspace.id as WorkspaceId;
 
@@ -143,7 +145,7 @@ export function ShareResourceModal({
     sharingState.ownerId,
     members,
     userById,
-    t,
+    i18n,
   );
 
   const ownerShare: DisplayShare = {

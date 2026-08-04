@@ -34,7 +34,7 @@ export function DashboardEditorView({
   dashboard,
   workspaceSlug,
 }: Props): ReactElement {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const [appRoles] = useUserAppRoles();
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const { editorData, editorRevision, hasUnsavedChanges } =
@@ -81,7 +81,7 @@ export function DashboardEditorView({
     dashboardTitle,
     workspaceId: dashboard.workspaceId,
     dashboardId: dashboard.id,
-    t,
+    i18n,
   });
 
   const [saveDashboard] = DashboardClient.useUpdate({

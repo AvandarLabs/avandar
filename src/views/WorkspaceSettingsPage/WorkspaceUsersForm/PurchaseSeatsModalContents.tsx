@@ -116,7 +116,7 @@ export function PurchaseSeatsModalContents({
         style={{ cursor: "pointer" }}
         onClick={() => {
           modals.closeAll();
-          goToBillingPortal({ userId, t });
+          goToBillingPortal({ userId });
         }}
       >
         <Trans>Manage seats in billing portal →</Trans>

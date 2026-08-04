@@ -49,7 +49,7 @@ function buildPdfFilenameFromDashboardName(dashboardName: string): string {
  * editor chrome doesn't show up in the snapshot.
  */
 export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const [step, setStep] = useState<Step>("choose");
   const renderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -58,7 +58,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
     dashboardTitle: dashboard.name,
     workspaceId: dashboard.workspaceId,
     dashboardId: dashboard.id,
-    t,
+    i18n,
   });
 
   const puckData = useMemo(() => {

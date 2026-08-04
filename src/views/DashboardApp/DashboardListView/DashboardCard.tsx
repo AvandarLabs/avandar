@@ -19,7 +19,7 @@ export function DashboardCard({
   offlineStatus = "none",
   onClick,
 }: Props): JSX.Element {
-  const { t } = useLingui();
+  const { i18n } = useLingui();
   const [isHovered, setIsHovered] = useState(false);
 
   const onMouseEnter = () => {
@@ -84,7 +84,9 @@ export function DashboardCard({
             </Badge>
           : null}
           <Text c="dimmed" size="xs">
-            <Trans>Updated {formatDashboardDate(dashboard.updatedAt, t)}</Trans>
+            <Trans>
+              Updated {formatDashboardDate(dashboard.updatedAt, i18n)}
+            </Trans>
           </Text>
         </Group>
       </Stack>

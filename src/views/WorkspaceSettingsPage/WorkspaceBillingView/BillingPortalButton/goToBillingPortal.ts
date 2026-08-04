@@ -1,5 +1,6 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
-import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
@@ -12,10 +13,8 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
  */
 export async function goToBillingPortal({
   userId,
-  t,
 }: {
   userId: UserId;
-  t: ReturnType<typeof useLingui>["t"];
 }): Promise<void> {
   try {
     const customerPortalResponse = await APIClient.get({
@@ -38,10 +37,14 @@ export async function goToBillingPortal({
       navigateToExternalUrl(customerPortalResponse.customerPortalURL);
     } else {
       notifyError(
-        t`Billing portal cannot be loaded because you do not have a subscription yet.`,
+        i18n._(
+          msg`Billing portal cannot be loaded because you do not have a subscription yet.`,
+        ),
       );
     }
   } catch {
-    notifyError(t`Unable to open the billing portal. Please try again later.`);
+    notifyError(
+      i18n._(msg`Unable to open the billing portal. Please try again later.`),
+    );
   }
 }

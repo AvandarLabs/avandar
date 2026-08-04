@@ -44,7 +44,7 @@ export function DashboardViewerView({
   mode = "public",
   workspaceSlug,
 }: Props): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const navigate = useNavigate();
   const [isLoadingDatasets, loadingDatasetsError] =
     useEnsurePublishedDashboardDatasets(dashboard);
@@ -53,7 +53,7 @@ export function DashboardViewerView({
     dashboardTitle: dashboard.name || t`Untitled dashboard`,
     workspaceId: dashboard?.workspaceId,
     dashboardId: dashboard.id,
-    t,
+    i18n,
   });
 
   const data = useMemo(() => {

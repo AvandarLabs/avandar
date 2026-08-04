@@ -47,7 +47,7 @@ export function SaveToDashboardListMode({
   onCancel,
   onSelectAndSave,
 }: Props): JSX.Element {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDashboardId, setSelectedDashboardId] =
     useState<DashboardId | null>(null);
@@ -119,7 +119,7 @@ export function SaveToDashboardListMode({
                 </Text>
                 <Text className={css.rowMeta}>
                   <Trans>
-                    Updated {formatDashboardDate(dashboard.updatedAt, t)}
+                    Updated {formatDashboardDate(dashboard.updatedAt, i18n)}
                   </Trans>
                 </Text>
                 {isSelected ?

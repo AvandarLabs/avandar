@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
@@ -7,6 +8,7 @@ import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLinks } from "@/config/AppLinks";
+import type { I18n } from "@lingui/core";
 
 type Props = {
   onSubmit?: (values: {
@@ -25,23 +27,29 @@ const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
 
 function _makeSlugValidator(
-  t: ReturnType<typeof useLingui>["t"],
+  i18n: I18n,
 ): (value: string) => string | undefined {
   return (value: string): string | undefined => {
     if (!value) {
-      return t`The workspace ID cannot be empty`;
+      return i18n._(msg`The workspace ID cannot be empty`);
     }
     if (value.length < SLUG_MIN_LENGTH) {
-      return t`The workspace ID must be at least ${SLUG_MIN_LENGTH} characters long`;
+      return i18n._(
+        msg`The workspace ID must be at least ${SLUG_MIN_LENGTH} characters long`,
+      );
     }
     if (value.length > SLUG_MAX_LENGTH) {
-      return t`The workspace ID must be less than ${SLUG_MAX_LENGTH} characters long`;
+      return i18n._(
+        msg`The workspace ID must be less than ${SLUG_MAX_LENGTH} characters long`,
+      );
     }
     if (value.includes(" ")) {
-      return t`The workspace ID cannot contain spaces`;
+      return i18n._(msg`The workspace ID cannot contain spaces`);
     }
     if (!value.match(/^[a-zA-Z0-9-]+$/)) {
-      return t`The workspace ID can only contain letters, numbers, and hyphens`;
+      return i18n._(
+        msg`The workspace ID can only contain letters, numbers, and hyphens`,
+      );
     }
     return undefined;
   };
@@ -52,8 +60,8 @@ export function CreateWorkspaceForm({
   introText,
   onWorkspaceCreated,
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const validateSlugString = _makeSlugValidator(t);
+  const { t, i18n } = useLingui();
+  const validateSlugString = _makeSlugValidator(i18n);
   const navigate = useNavigate();
   const [submittedOnwerInfo, setSubmittedOnwerInfo] = useState<
     | {

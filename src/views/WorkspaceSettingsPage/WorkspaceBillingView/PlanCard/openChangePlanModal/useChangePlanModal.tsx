@@ -133,7 +133,7 @@ export function useChangePlanModal(): (
       children: <ChangePlanModalContents newPlan={newPlan} />,
       onConfirm: () => {
         if (newPlan.priceType === "custom" && user) {
-          goToBillingPortal({ userId: user.id, t });
+          goToBillingPortal({ userId: user.id });
         } else if (isNativeFreeDowngrade) {
           convertToNativeFree({ workspaceId });
         } else {

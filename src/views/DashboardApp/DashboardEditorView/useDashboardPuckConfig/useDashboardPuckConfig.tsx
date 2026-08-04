@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
 import {
   Blockquote,
   Box,
@@ -40,6 +40,7 @@ import type {
   SlotRenderer,
   TableBlockProps,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
@@ -265,7 +266,7 @@ function _getGridCellKey(options: {
 }
 
 function _createGridCellSlotFields(
-  t: TranslateFn,
+  i18n: I18n,
 ): Record<`r${number}c${number}`, { label: string; type: "slot" }> {
   return Object.fromEntries(
     makeArrayWithLength(12).flatMap((unusedRow, rowIdx) => {
@@ -279,7 +280,7 @@ function _createGridCellSlotFields(
 
         return [
           key,
-          { label: t`Row ${rowNum} / Col ${colNum}`, type: "slot" },
+          { label: i18n._(msg`Row ${rowNum} / Col ${colNum}`), type: "slot" },
         ] as const;
       });
     }),
@@ -366,8 +367,6 @@ function _parseTableRows(options: {
     });
 }
 
-type TranslateFn = ReturnType<typeof useLingui>["t"];
-
 /**
  * Builds the Puck `AvaPageConfig` for a dashboard. Calls hooks for theme /
  * typography options and pblock/pfield configs, then memoizes the resulting
@@ -377,9 +376,9 @@ export function useDashboardPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: Workspace.Id | undefined;
   dashboardId: Dashboard.Id;
-  t: TranslateFn;
+  i18n: I18n;
 }): AvaPageConfig {
-  const { dashboardTitle, workspaceId, dashboardId, t } = options;
+  const { dashboardTitle, workspaceId, dashboardId, i18n } = options;
   const themeOptions = DashboardDesignTokens.useThemeOptions();
   const typographyOptions = DashboardDesignTokens.useTypographyOptions();
   const dataVizFieldConfig = useDataVizPBlockConfig({
@@ -397,24 +396,24 @@ export function useDashboardPuckConfig(options: {
             // leave this as `false`. Set to `true` only for debugging
             visible: false,
             type: "custom",
-            label: t`Schema version`,
+            label: i18n._(msg`Schema version`),
             render: ({ value }) => {
               return <>Version: {value}</>;
             },
           },
           title: {
-            label: t`Page title`,
+            label: i18n._(msg`Page title`),
             type: "text",
           },
           theme: {
-            label: t`Theme`,
+            label: i18n._(msg`Theme`),
             type: "select",
             options: themeOptions.map((o) => {
               return { label: o.label, value: o.value };
             }),
           },
           typography: {
-            label: t`Typography`,
+            label: i18n._(msg`Typography`),
             type: "select",
             options: typographyOptions.map((o) => {
               return { label: o.label, value: o.value };
@@ -422,71 +421,71 @@ export function useDashboardPuckConfig(options: {
           },
           containerMaxWidth: containerMaxWidthFieldConfig,
           isTitleHidden: {
-            label: t`Hide title`,
+            label: i18n._(msg`Hide title`),
             type: "radio",
             options: [
-              { label: t`No`, value: false },
-              { label: t`Yes`, value: true },
+              { label: i18n._(msg`No`), value: false },
+              { label: i18n._(msg`Yes`), value: true },
             ],
           },
           subtitle: {
-            label: t`Subtitle`,
+            label: i18n._(msg`Subtitle`),
             type: "text",
           },
           isSubtitleHidden: {
-            label: t`Hide subtitle`,
+            label: i18n._(msg`Hide subtitle`),
             type: "radio",
             options: [
-              { label: t`No`, value: false },
-              { label: t`Yes`, value: true },
+              { label: i18n._(msg`No`), value: false },
+              { label: i18n._(msg`Yes`), value: true },
             ],
           },
           author: {
-            label: t`Author`,
+            label: i18n._(msg`Author`),
             type: "text",
           },
           isAuthorHidden: {
-            label: t`Hide author`,
+            label: i18n._(msg`Hide author`),
             type: "radio",
             options: [
-              { label: t`No`, value: false },
-              { label: t`Yes`, value: true },
+              { label: i18n._(msg`No`), value: false },
+              { label: i18n._(msg`Yes`), value: true },
             ],
           },
           publishedAt: {
-            label: t`Published Date`,
+            label: i18n._(msg`Published Date`),
             type: "text",
           },
           isPublishedAtHidden: {
-            label: t`Hide published date`,
+            label: i18n._(msg`Hide published date`),
             type: "radio",
             options: [
-              { label: t`No`, value: false },
-              { label: t`Yes`, value: true },
+              { label: i18n._(msg`No`), value: false },
+              { label: i18n._(msg`Yes`), value: true },
             ],
           },
           verticalPadding: {
-            label: t`Vertical padding`,
+            label: i18n._(msg`Vertical padding`),
             type: "select",
             options: [
-              { label: t`None`, value: "none" },
-              { label: t`Extra small`, value: "xs" },
-              { label: t`Small`, value: "sm" },
-              { label: t`Medium`, value: "md" },
-              { label: t`Large`, value: "lg" },
-              { label: t`Extra large`, value: "xl" },
+              { label: i18n._(msg`None`), value: "none" },
+              { label: i18n._(msg`Extra small`), value: "xs" },
+              { label: i18n._(msg`Small`), value: "sm" },
+              { label: i18n._(msg`Medium`), value: "md" },
+              { label: i18n._(msg`Large`), value: "lg" },
+              { label: i18n._(msg`Extra large`), value: "xl" },
             ],
           },
           horizontalPadding: {
-            label: t`Horizontal padding`,
+            label: i18n._(msg`Horizontal padding`),
             type: "select",
             options: [
-              { label: t`None`, value: "none" },
-              { label: t`Extra small`, value: "xs" },
-              { label: t`Small`, value: "sm" },
-              { label: t`Medium`, value: "md" },
-              { label: t`Large`, value: "lg" },
-              { label: t`Extra large`, value: "xl" },
+              { label: i18n._(msg`None`), value: "none" },
+              { label: i18n._(msg`Extra small`), value: "xs" },
+              { label: i18n._(msg`Small`), value: "sm" },
+              { label: i18n._(msg`Medium`), value: "md" },
+              { label: i18n._(msg`Large`), value: "lg" },
+              { label: i18n._(msg`Extra large`), value: "xl" },
             ],
           },
         },
@@ -549,7 +548,7 @@ export function useDashboardPuckConfig(options: {
             _getRootPaddingProp({ props, key: "horizontalPadding" }) ?? "md";
 
           const title: string =
-            _getStringProp({ props, key: "title" }) ?? t`Untitled`;
+            _getStringProp({ props, key: "title" }) ?? i18n._(msg`Untitled`);
           const subtitle: string | undefined = _getStringProp({
             props,
             key: "subtitle",
@@ -683,12 +682,12 @@ export function useDashboardPuckConfig(options: {
       // but we'll use the term "pblocks" to mean "Page Blocks")
       categories: {
         layout: {
-          title: t`Layout`,
+          title: i18n._(msg`Layout`),
           defaultExpanded: true,
           components: ["Section", "Columns", "Grid", "SidebarLayout"],
         },
         content: {
-          title: t`Content`,
+          title: i18n._(msg`Content`),
           defaultExpanded: true,
           components: [
             "DataViz",
@@ -705,44 +704,44 @@ export function useDashboardPuckConfig(options: {
           ],
         },
         media: {
-          title: t`Media`,
+          title: i18n._(msg`Media`),
           components: ["FigureBlock", "EmbedBlock"],
         },
       },
 
       components: {
         Section: {
-          label: t`Section`,
+          label: i18n._(msg`Section`),
           fields: {
             maxWidth: {
-              label: t`Max width`,
+              label: i18n._(msg`Max width`),
               type: "select",
               options: [
-                { label: t`Narrow`, value: "narrow" },
-                { label: t`Normal`, value: "normal" },
-                { label: t`Wide`, value: "wide" },
-                { label: t`Full`, value: "full" },
+                { label: i18n._(msg`Narrow`), value: "narrow" },
+                { label: i18n._(msg`Normal`), value: "normal" },
+                { label: i18n._(msg`Wide`), value: "wide" },
+                { label: i18n._(msg`Full`), value: "full" },
               ],
             },
             padding: {
-              label: t`Padding`,
+              label: i18n._(msg`Padding`),
               type: "select",
               options: [
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
             background: {
-              label: t`Background`,
+              label: i18n._(msg`Background`),
               type: "select",
               options: [
-                { label: t`None`, value: "none" },
-                { label: t`Subtle`, value: "subtle" },
+                { label: i18n._(msg`None`), value: "none" },
+                { label: i18n._(msg`Subtle`), value: "subtle" },
               ],
             },
             content: {
-              label: t`Content`,
+              label: i18n._(msg`Content`),
               type: "slot",
             },
           },
@@ -768,94 +767,94 @@ export function useDashboardPuckConfig(options: {
           },
         },
         Columns: {
-          label: t`Columns`,
+          label: i18n._(msg`Columns`),
           fields: {
             numColumns: {
-              label: t`Number of columns`,
+              label: i18n._(msg`Number of columns`),
               type: "number",
               min: 1,
               max: 12,
               step: 1,
             },
             leftSpan: {
-              label: t`Left span`,
+              label: i18n._(msg`Left span`),
               type: "number",
               min: 1,
               max: 12,
               step: 1,
             },
             rightSpan: {
-              label: t`Right span`,
+              label: i18n._(msg`Right span`),
               type: "number",
               min: 1,
               max: 12,
               step: 1,
             },
             gap: {
-              label: t`Gap`,
+              label: i18n._(msg`Gap`),
               type: "select",
               options: [
-                { label: t`Extra small`, value: "xs" },
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Extra small`), value: "xs" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
             collapseAt: {
-              label: t`Collapse at`,
+              label: i18n._(msg`Collapse at`),
               type: "select",
               options: [
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
             col1: {
-              label: t`Column 1`,
+              label: i18n._(msg`Column 1`),
               type: "slot",
             },
             col2: {
-              label: t`Column 2`,
+              label: i18n._(msg`Column 2`),
               type: "slot",
             },
             col3: {
-              label: t`Column 3`,
+              label: i18n._(msg`Column 3`),
               type: "slot",
             },
             col4: {
-              label: t`Column 4`,
+              label: i18n._(msg`Column 4`),
               type: "slot",
             },
             col5: {
-              label: t`Column 5`,
+              label: i18n._(msg`Column 5`),
               type: "slot",
             },
             col6: {
-              label: t`Column 6`,
+              label: i18n._(msg`Column 6`),
               type: "slot",
             },
             col7: {
-              label: t`Column 7`,
+              label: i18n._(msg`Column 7`),
               type: "slot",
             },
             col8: {
-              label: t`Column 8`,
+              label: i18n._(msg`Column 8`),
               type: "slot",
             },
             col9: {
-              label: t`Column 9`,
+              label: i18n._(msg`Column 9`),
               type: "slot",
             },
             col10: {
-              label: t`Column 10`,
+              label: i18n._(msg`Column 10`),
               type: "slot",
             },
             col11: {
-              label: t`Column 11`,
+              label: i18n._(msg`Column 11`),
               type: "slot",
             },
             col12: {
-              label: t`Column 12`,
+              label: i18n._(msg`Column 12`),
               type: "slot",
             },
           },
@@ -943,48 +942,48 @@ export function useDashboardPuckConfig(options: {
           },
         },
         SidebarLayout: {
-          label: t`Sidebar layout`,
+          label: i18n._(msg`Sidebar layout`),
           fields: {
             sidebarPosition: {
-              label: t`Sidebar position`,
+              label: i18n._(msg`Sidebar position`),
               type: "radio",
               options: [
-                { label: t`Left`, value: "left" },
-                { label: t`Right`, value: "right" },
+                { label: i18n._(msg`Left`), value: "left" },
+                { label: i18n._(msg`Right`), value: "right" },
               ],
             },
             sidebarSpan: {
-              label: t`Sidebar span`,
+              label: i18n._(msg`Sidebar span`),
               type: "number",
               min: 2,
               max: 10,
               step: 1,
             },
             gap: {
-              label: t`Gap`,
+              label: i18n._(msg`Gap`),
               type: "select",
               options: [
-                { label: t`Extra small`, value: "xs" },
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Extra small`), value: "xs" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
             collapseAt: {
-              label: t`Collapse at`,
+              label: i18n._(msg`Collapse at`),
               type: "select",
               options: [
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
             sidebar: {
-              label: t`Sidebar`,
+              label: i18n._(msg`Sidebar`),
               type: "slot",
             },
             main: {
-              label: t`Main`,
+              label: i18n._(msg`Main`),
               type: "slot",
             },
           },
@@ -1047,33 +1046,33 @@ export function useDashboardPuckConfig(options: {
           },
         },
         Grid: {
-          label: t`Grid`,
+          label: i18n._(msg`Grid`),
           fields: {
             numColumns: {
-              label: t`Number of columns`,
+              label: i18n._(msg`Number of columns`),
               type: "number",
               min: 1,
               max: 12,
               step: 1,
             },
             numRows: {
-              label: t`Number of rows`,
+              label: i18n._(msg`Number of rows`),
               type: "number",
               min: 1,
               max: 12,
               step: 1,
             },
             gap: {
-              label: t`Gap`,
+              label: i18n._(msg`Gap`),
               type: "select",
               options: [
-                { label: t`Extra small`, value: "xs" },
-                { label: t`Small`, value: "sm" },
-                { label: t`Medium`, value: "md" },
-                { label: t`Large`, value: "lg" },
+                { label: i18n._(msg`Extra small`), value: "xs" },
+                { label: i18n._(msg`Small`), value: "sm" },
+                { label: i18n._(msg`Medium`), value: "md" },
+                { label: i18n._(msg`Large`), value: "lg" },
               ],
             },
-            ..._createGridCellSlotFields(t),
+            ..._createGridCellSlotFields(i18n),
           },
           defaultProps: {
             gap: "md",
@@ -1125,21 +1124,21 @@ export function useDashboardPuckConfig(options: {
           },
         },
         Card: {
-          label: t`Card`,
+          label: i18n._(msg`Card`),
           fields: {
             title: {
-              label: t`Title`,
+              label: i18n._(msg`Title`),
               type: "text",
             },
             content: {
-              label: t`Content`,
+              label: i18n._(msg`Content`),
               type: "slot",
               disallow: ["Card"],
             },
           },
           defaultProps: {
             content: [],
-            title: t`Card`,
+            title: i18n._(msg`Card`),
           },
           render: (props) => {
             return (
@@ -1157,36 +1156,36 @@ export function useDashboardPuckConfig(options: {
         DataViz: dataVizFieldConfig,
         Filter: filterFieldConfig,
         HeadingBlock: {
-          label: t`Heading`,
+          label: i18n._(msg`Heading`),
           fields: {
             text: {
-              label: t`Text`,
+              label: i18n._(msg`Text`),
               type: "text",
             },
             level: {
-              label: t`Level`,
+              label: i18n._(msg`Level`),
               type: "select",
               options: [
-                { label: t`H1`, value: 1 },
-                { label: t`H2`, value: 2 },
-                { label: t`H3`, value: 3 },
-                { label: t`H4`, value: 4 },
+                { label: i18n._(msg`H1`), value: 1 },
+                { label: i18n._(msg`H2`), value: 2 },
+                { label: i18n._(msg`H3`), value: 3 },
+                { label: i18n._(msg`H4`), value: 4 },
               ],
             },
             align: {
-              label: t`Align`,
+              label: i18n._(msg`Align`),
               type: "radio",
               options: [
-                { label: t`Left`, value: "left" },
-                { label: t`Center`, value: "center" },
-                { label: t`Right`, value: "right" },
+                { label: i18n._(msg`Left`), value: "left" },
+                { label: i18n._(msg`Center`), value: "center" },
+                { label: i18n._(msg`Right`), value: "right" },
               ],
             },
           },
           defaultProps: {
             align: "left",
             level: 2,
-            text: t`Heading`,
+            text: i18n._(msg`Heading`),
           },
           render: (props: HeadingBlockProps) => {
             return (
@@ -1197,25 +1196,25 @@ export function useDashboardPuckConfig(options: {
           },
         },
         ParagraphBlock: {
-          label: t`Paragraph`,
+          label: i18n._(msg`Paragraph`),
           fields: {
             text: {
-              label: t`Text`,
+              label: i18n._(msg`Text`),
               type: "textarea",
             },
             align: {
-              label: t`Align`,
+              label: i18n._(msg`Align`),
               type: "radio",
               options: [
-                { label: t`Left`, value: "left" },
-                { label: t`Center`, value: "center" },
-                { label: t`Right`, value: "right" },
+                { label: i18n._(msg`Left`), value: "left" },
+                { label: i18n._(msg`Center`), value: "center" },
+                { label: i18n._(msg`Right`), value: "right" },
               ],
             },
           },
           defaultProps: {
             align: "left",
-            text: t`Write your paragraph here...`,
+            text: i18n._(msg`Write your paragraph here...`),
           },
           render: (props: ParagraphBlockProps) => {
             return (
@@ -1226,20 +1225,20 @@ export function useDashboardPuckConfig(options: {
           },
         },
         QuoteBlock: {
-          label: t`Quote`,
+          label: i18n._(msg`Quote`),
           fields: {
             quote: {
-              label: t`Quote`,
+              label: i18n._(msg`Quote`),
               type: "textarea",
             },
             cite: {
-              label: t`Attribution`,
+              label: i18n._(msg`Attribution`),
               type: "text",
             },
           },
           defaultProps: {
             cite: "",
-            quote: t`Add a pull quote...`,
+            quote: i18n._(msg`Add a pull quote...`),
           },
           render: (props: QuoteBlockProps) => {
             return (
@@ -1250,25 +1249,25 @@ export function useDashboardPuckConfig(options: {
           },
         },
         DividerBlock: {
-          label: t`Divider`,
+          label: i18n._(msg`Divider`),
           fields: {},
           render: () => {
             return <Divider />;
           },
         },
         FigureBlock: {
-          label: t`Image`,
+          label: i18n._(msg`Image`),
           fields: {
             src: {
-              label: t`Image URL`,
+              label: i18n._(msg`Image URL`),
               type: "text",
             },
             alt: {
-              label: t`Alt text`,
+              label: i18n._(msg`Alt text`),
               type: "text",
             },
             caption: {
-              label: t`Caption`,
+              label: i18n._(msg`Caption`),
               type: "textarea",
             },
           },
@@ -1283,7 +1282,7 @@ export function useDashboardPuckConfig(options: {
                 {props.src.trim().length > 0 ?
                   <Image src={props.src} alt={props.alt} radius="sm" />
                 : <Text c="dimmed" fz="sm">
-                    {t`Add an image URL to render a figure.`}
+                    {i18n._(msg`Add an image URL to render a figure.`)}
                   </Text>
                 }
                 {props.caption.trim().length > 0 ?
@@ -1296,29 +1295,29 @@ export function useDashboardPuckConfig(options: {
           },
         },
         CalloutBlock: {
-          label: t`Callout`,
+          label: i18n._(msg`Callout`),
           fields: {
             tone: {
-              label: t`Tone`,
+              label: i18n._(msg`Tone`),
               type: "select",
               options: [
-                { label: t`Info`, value: "info" },
-                { label: t`Warning`, value: "warning" },
-                { label: t`Neutral`, value: "neutral" },
+                { label: i18n._(msg`Info`), value: "info" },
+                { label: i18n._(msg`Warning`), value: "warning" },
+                { label: i18n._(msg`Neutral`), value: "neutral" },
               ],
             },
             title: {
-              label: t`Title`,
+              label: i18n._(msg`Title`),
               type: "text",
             },
             body: {
-              label: t`Body`,
+              label: i18n._(msg`Body`),
               type: "textarea",
             },
           },
           defaultProps: {
-            body: t`Add context, methodology, or a key takeaway.`,
-            title: t`Callout`,
+            body: i18n._(msg`Add context, methodology, or a key takeaway.`),
+            title: i18n._(msg`Callout`),
             tone: "neutral",
           },
           render: (props: CalloutBlockProps) => {
@@ -1340,22 +1339,22 @@ export function useDashboardPuckConfig(options: {
           },
         },
         ListBlock: {
-          label: t`List`,
+          label: i18n._(msg`List`),
           fields: {
             type: {
-              label: t`Type`,
+              label: i18n._(msg`Type`),
               type: "radio",
               options: [
-                { label: t`Unordered`, value: "unordered" },
-                { label: t`Ordered`, value: "ordered" },
+                { label: i18n._(msg`Unordered`), value: "unordered" },
+                { label: i18n._(msg`Ordered`), value: "ordered" },
               ],
             },
             items: {
-              label: t`Items`,
+              label: i18n._(msg`Items`),
               type: "array",
               arrayFields: {
                 text: {
-                  label: t`Text`,
+                  label: i18n._(msg`Text`),
                   type: "text",
                 },
               },
@@ -1364,12 +1363,12 @@ export function useDashboardPuckConfig(options: {
 
                 return typeof text === "string" && text.trim().length > 0 ?
                     text
-                  : t`List item`;
+                  : i18n._(msg`List item`);
               },
             },
           },
           defaultProps: {
-            items: [{ text: t`First point` }, { text: t`Second point` }],
+            items: [{ text: i18n._(msg`First point`) }, { text: i18n._(msg`Second point`) }],
             type: "unordered",
           },
           render: (props: ListBlockProps) => {
@@ -1383,14 +1382,14 @@ export function useDashboardPuckConfig(options: {
           },
         },
         CodeBlock: {
-          label: t`Code`,
+          label: i18n._(msg`Code`),
           fields: {
             language: {
-              label: t`Language`,
+              label: i18n._(msg`Language`),
               type: "text",
             },
             code: {
-              label: t`Code`,
+              label: i18n._(msg`Code`),
               type: "textarea",
             },
           },
@@ -1425,18 +1424,18 @@ export function useDashboardPuckConfig(options: {
           },
         },
         EmbedBlock: {
-          label: t`Embed`,
+          label: i18n._(msg`Embed`),
           fields: {
             title: {
-              label: t`Title`,
+              label: i18n._(msg`Title`),
               type: "text",
             },
             url: {
-              label: t`URL`,
+              label: i18n._(msg`URL`),
               type: "text",
             },
             height: {
-              label: t`Height`,
+              label: i18n._(msg`Height`),
               type: "number",
               min: 200,
               max: 1200,
@@ -1454,7 +1453,7 @@ export function useDashboardPuckConfig(options: {
             if (!url) {
               return (
                 <Text c="dimmed" fz="sm">
-                  {t`Add a URL to embed a visualization or external content.`}
+                  {i18n._(msg`Add a URL to embed a visualization or external content.`)}
                 </Text>
               );
             }
@@ -1463,7 +1462,7 @@ export function useDashboardPuckConfig(options: {
               <Paper withBorder p={0} radius="sm">
                 <iframe
                   src={url}
-                  title={props.title.trim().length > 0 ? props.title : t`Embed`}
+                  title={props.title.trim().length > 0 ? props.title : i18n._(msg`Embed`)}
                   loading="lazy"
                   sandbox="allow-scripts allow-presentation"
                   style={{
@@ -1478,27 +1477,27 @@ export function useDashboardPuckConfig(options: {
           },
         },
         TableBlock: {
-          label: t`Table`,
+          label: i18n._(msg`Table`),
           fields: {
             delimiter: {
-              label: t`Delimiter`,
+              label: i18n._(msg`Delimiter`),
               type: "select",
               options: [
-                { label: t`Comma (,)`, value: "comma" },
-                { label: t`Tab`, value: "tab" },
-                { label: t`Pipe (|)`, value: "pipe" },
+                { label: i18n._(msg`Comma (,)`), value: "comma" },
+                { label: i18n._(msg`Tab`), value: "tab" },
+                { label: i18n._(msg`Pipe (|)`), value: "pipe" },
               ],
             },
             hasHeader: {
-              label: t`Header row`,
+              label: i18n._(msg`Header row`),
               type: "radio",
               options: [
-                { label: t`Yes`, value: true },
-                { label: t`No`, value: false },
+                { label: i18n._(msg`Yes`), value: true },
+                { label: i18n._(msg`No`), value: false },
               ],
             },
             data: {
-              label: t`Data`,
+              label: i18n._(msg`Data`),
               type: "textarea",
             },
           },
@@ -1516,7 +1515,7 @@ export function useDashboardPuckConfig(options: {
             if (rows.length === 0) {
               return (
                 <Text c="dimmed" fz="sm">
-                  {t`Add tabular data to render a simple table.`}
+                  {i18n._(msg`Add tabular data to render a simple table.`)}
                 </Text>
               );
             }
@@ -1562,7 +1561,7 @@ export function useDashboardPuckConfig(options: {
     };
   }, [
     dashboardTitle,
-    t,
+    i18n,
     themeOptions,
     typographyOptions,
     dataVizFieldConfig,
