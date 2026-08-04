@@ -217,7 +217,7 @@ msgstr "无法加载数据集的 SQL 查询。"
 msgid "Avandar"
 msgstr "Avandar"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "请检查您的电子邮件以获取确认链接。"
 
@@ -287,7 +287,7 @@ msgid "Save and re-run query"
 msgstr "保存并重新运行查询"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "已保存为 \"{0}\"。"
 
@@ -862,10 +862,10 @@ msgstr ""
 #~ "can always change these later!"
 #~ msgstr "是时候创建您的第一个工作区了。不要想太久——您可以随时稍后更改这些！"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Password"
 msgstr "密码"
 
@@ -1174,7 +1174,7 @@ msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的�
 msgid "Bias detected:"
 msgstr "检测到偏见："
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成员看到的名称。"
 
@@ -1665,7 +1665,7 @@ msgstr "向上滚动到上面的字段，或使用下面的列表。"
 msgid "None"
 msgstr "无"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "系统将要求您确认当前密码。"
 
@@ -2034,7 +2034,7 @@ msgstr "条形图"
 msgid "Delete dashboard?"
 msgstr "删除仪表板？"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
 msgstr "更改密码"
 
@@ -3163,7 +3163,7 @@ msgstr "创建仪表板失败：{0}"
 msgid "kind"
 msgstr "类型"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
 msgstr ""
 
@@ -3276,7 +3276,7 @@ msgstr "您尚未添加任何系列"
 msgid "Welcome back, {0}"
 msgstr "欢迎回来，{0}"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Change"
 msgstr "更改"
 
@@ -3294,10 +3294,10 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email"
 msgstr "电子邮件"
 
@@ -3486,7 +3486,7 @@ msgstr "每个系列是一个绘制在径向值上的数值列。请在下面选
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/座位"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "显示名称"
 
@@ -3582,7 +3582,7 @@ msgstr ""
 msgid "Query Details"
 msgstr "查询详情"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "您的姓名"
 
@@ -3928,7 +3928,7 @@ msgstr "限制应用访问"
 msgid "Enter dataset name"
 msgstr "输入数据集名称"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "此名称仅适用于 {workspaceName}。您的其他工作区保持各自的名称。"
@@ -4080,7 +4080,7 @@ msgid "Reset app"
 msgstr ""
 
 #. placeholder {0}: workspace.name
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "管理您在 {0} 中的显示方式以及您用于登录的帐户。"
 
@@ -4128,11 +4128,11 @@ msgstr "保存数据集时出错"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
@@ -4213,7 +4213,7 @@ msgstr "工作区名称已成功保存。"
 msgid "dataset name"
 msgstr "数据集名称"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "电子邮件地址已更新"
 
@@ -4419,7 +4419,7 @@ msgid "Offline models"
 msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "个人资料"
 
@@ -4507,7 +4507,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "角色组已创建"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "更新显示名称失败"
 
@@ -4709,7 +4709,7 @@ msgstr "选择的值列无效"
 msgid "No columns have been added yet."
 msgstr "尚未添加任何列。"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "显示名称已更新"
 
@@ -4826,7 +4826,7 @@ msgstr "在线同步？"
 msgid "Neutral failure"
 msgstr "中性失败"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "请重试或联系支持。"
 
@@ -4877,7 +4877,7 @@ msgstr "测试版"
 msgid "Search by name or user group"
 msgstr "按名称或用户组搜索"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "更新电子邮件失败"
 
@@ -4982,7 +4982,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "实体加载失败"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "用于登录您的账户。"
 

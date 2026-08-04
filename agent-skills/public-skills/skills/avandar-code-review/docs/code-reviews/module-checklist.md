@@ -85,6 +85,20 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   primary file name both match the module or component name.
 - Keep directory and file casing aligned with the module naming rules. For
   example, React components should stay in `PascalCase`.
+- **No `-`-prefixed route components under `src/routes/`.** TanStack Router
+  drops any file or directory whose name starts with `-` from the route tree
+  (`routeFileIgnorePrefix: "-"`), so a `-DisplayNameSection.tsx` colocated next
+  to a route file is a hidden, non-route component and is not allowed. Route
+  files stay thin (`createFileRoute` wiring a `component`); the view and its
+  sub-components belong in `src/views/<Name>View/`, named without any `-`
+  prefix, and the route file imports and renders that view.
+
+  **Find candidates** (route-tree-ignored components colocated under
+  `src/routes/`):
+
+  ```bash
+  git diff --name-only <base> | grep -E '/routes/.*/-[^/]+\.tsx?$'
+  ```
 - Never allow a file named just `constants.ts` or `types.ts`. These must be
   qualified with what they represent: the module/component name
   (`MyModule.constants.ts`, `MyComponent.types.ts`), or, when broader than a

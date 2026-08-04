@@ -222,7 +222,7 @@ msgstr "لم يتمكن من تحميل استعلام SQL لمجموعة الب
 msgid "Avandar"
 msgstr "أفاندار"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
 
@@ -292,7 +292,7 @@ msgid "Save and re-run query"
 msgstr "احفظ وأعد تشغيل الاستعلام"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "تم الحفظ كـ \"{0}\"."
 
@@ -884,10 +884,10 @@ msgstr ""
 #~ msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك "
 #~ "دائمًا تغيير هذه لاحقًا!"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Password"
 msgstr "كلمة المرور"
 
@@ -1205,7 +1205,7 @@ msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! �
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
 
@@ -1709,7 +1709,7 @@ msgstr "قم بالتمرير لأعلى إلى الحقول أعلاه، أو �
 msgid "None"
 msgstr "لا شيء"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
 
@@ -2080,7 +2080,7 @@ msgstr "شريط"
 msgid "Delete dashboard?"
 msgstr "حذف اللوحة؟"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
 msgstr "تغيير كلمة المرور"
 
@@ -3228,7 +3228,7 @@ msgstr "فشل إنشاء لوحة التحكم: {0}"
 msgid "kind"
 msgstr "نوع"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
 msgstr ""
 
@@ -3341,7 +3341,7 @@ msgstr "لم تقم بإضافة أي سلاسل"
 msgid "Welcome back, {0}"
 msgstr "مرحبًا بعودتك، {0}"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Change"
 msgstr "تغيير"
 
@@ -3360,10 +3360,10 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "جارٍ البحث عن القيم في {column}…"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
@@ -3554,7 +3554,7 @@ msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة ا
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/مقعد"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "اسم العرض"
 
@@ -3651,7 +3651,7 @@ msgstr ""
 msgid "Query Details"
 msgstr "تفاصيل الاستعلام"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "اسمك"
 
@@ -4010,7 +4010,7 @@ msgstr "تحديد وصول التطبيق"
 msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى "
@@ -4163,7 +4163,7 @@ msgid "Reset app"
 msgstr ""
 
 #. placeholder {0}: workspace.name
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "إدارة كيفية ظهورك في {0} والحساب الذي تستخدمه لتسجيل الدخول."
 
@@ -4213,11 +4213,11 @@ msgstr "خطأ في حفظ مجموعة البيانات"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
@@ -4299,7 +4299,7 @@ msgstr "تم حفظ اسم مساحة العمل بنجاح."
 msgid "dataset name"
 msgstr "اسم مجموعة البيانات"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
 
@@ -4509,7 +4509,7 @@ msgid "Offline models"
 msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "الملف الشخصي"
 
@@ -4598,7 +4598,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "تم إنشاء مجموعة الأدوار"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "فشل في تحديث اسم العرض"
 
@@ -4805,7 +4805,7 @@ msgstr "تم اختيار عمود قيمة غير صالح"
 msgid "No columns have been added yet."
 msgstr "لم يتم إضافة أي أعمدة بعد."
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "تم تحديث اسم العرض"
 
@@ -4927,7 +4927,7 @@ msgstr "مزامنة عبر الإنترنت؟"
 msgid "Neutral failure"
 msgstr "فشل محايد"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
 
@@ -4978,7 +4978,7 @@ msgstr "بيتا"
 msgid "Search by name or user group"
 msgstr "ابحث بالاسم أو مجموعة المستخدمين"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "فشل في تحديث البريد الإلكتروني"
 
@@ -5087,7 +5087,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "فشل تحميل الكيان"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "يستخدم لتسجيل الدخول إلى حسابك."
 

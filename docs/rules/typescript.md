@@ -305,6 +305,25 @@
     | SubComponent.tsx
   ```
 
+- **Never colocate route components with a `-` prefix under `src/routes/`.**
+  TanStack Router drops any file or directory whose name starts with `-` from
+  the route tree (`routeFileIgnorePrefix: "-"`), so a `-DisplayNameSection.tsx`
+  sitting next to a route file is a hidden, non-route component. Do not use the
+  ignore prefix to colocate a route's pieces. Keep the route file thin (only
+  `createFileRoute` wiring a `component`) and move the view and its
+  sub-components into `src/views/<Name>View/`, named without any `-` prefix.
+  The route file imports and renders the view:
+
+  ```ts
+  // src/routes/_auth/$workspaceSlug/profile.tsx
+  import { createFileRoute } from "@tanstack/react-router";
+  import { ProfileView } from "@/views/ProfileView/ProfileView";
+
+  export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({
+    component: ProfileView,
+  });
+  ```
+
 - **Never name a file just `constants.ts` or `types.ts`.** Always qualify the
   file with what it represents:
   - Name it after the module or component it belongs to:

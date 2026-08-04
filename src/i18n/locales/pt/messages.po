@@ -225,7 +225,7 @@ msgstr "Não foi possível carregar a consulta SQL do conjunto de dados."
 msgid "Avandar"
 msgstr "Avandar"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "Por favor, verifique seu e-mail para um link de confirmação."
 
@@ -295,7 +295,7 @@ msgid "Save and re-run query"
 msgstr "Salvar e reexecutar consulta"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "Salvo como \"{0}\"."
 
@@ -895,10 +895,10 @@ msgstr ""
 #~ msgstr "É hora de criar seu primeiro espaço de trabalho. Não pense muito—você "
 #~ "pode sempre mudar isso depois!"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Password"
 msgstr "Senha"
 
@@ -1221,7 +1221,7 @@ msgstr "{0} para ser notificado quando for sua vez de se registrar! Se você já
 msgid "Bias detected:"
 msgstr "Viés detectado:"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "O nome que outros membros veem em {workspaceName}."
 
@@ -1732,7 +1732,7 @@ msgstr "Role para cima até os campos acima ou use a lista abaixo."
 msgid "None"
 msgstr "Nenhum"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "Você será solicitado a confirmar sua senha atual."
 
@@ -2105,7 +2105,7 @@ msgstr "Barra"
 msgid "Delete dashboard?"
 msgstr "Excluir painel?"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
 msgstr "Alterar senha"
 
@@ -3269,7 +3269,7 @@ msgstr "Falha ao criar o painel: {0}"
 msgid "kind"
 msgstr "tipo"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
 msgstr ""
 
@@ -3384,7 +3384,7 @@ msgstr "Você não adicionou nenhuma série"
 msgid "Welcome back, {0}"
 msgstr "Bem-vindo de volta, {0}"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Change"
 msgstr "Alterar"
 
@@ -3404,10 +3404,10 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "Buscando valores em {column}…"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email"
 msgstr "E-mail"
 
@@ -3600,7 +3600,7 @@ msgstr "Cada série é uma coluna numérica plotada no valor radial. Escolha o "
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/assento"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "Nome de exibição"
 
@@ -3698,7 +3698,7 @@ msgstr ""
 msgid "Query Details"
 msgstr "Detalhes da Consulta"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Seu nome"
 
@@ -4060,7 +4060,7 @@ msgstr "Limitar ao acesso do aplicativo"
 msgid "Enter dataset name"
 msgstr "Digite o nome do conjunto de dados"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "Este nome se aplica apenas em {workspaceName}. Seus outros espaços de "
@@ -4215,7 +4215,7 @@ msgid "Reset app"
 msgstr ""
 
 #. placeholder {0}: workspace.name
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "Gerencie como você aparece em {0} e a conta que você usa para entrar."
 
@@ -4266,11 +4266,11 @@ msgstr "Erro ao salvar o conjunto de dados"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
@@ -4353,7 +4353,7 @@ msgstr "O nome do espaço de trabalho foi salvo com sucesso."
 msgid "dataset name"
 msgstr "nome do conjunto de dados"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "Endereço de e-mail atualizado"
 
@@ -4565,7 +4565,7 @@ msgid "Offline models"
 msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "Perfil"
 
@@ -4657,7 +4657,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "Grupo de funções criado"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "Falha ao atualizar o nome exibido"
 
@@ -4865,7 +4865,7 @@ msgstr "Coluna de valor inválido selecionada"
 msgid "No columns have been added yet."
 msgstr "Nenhuma coluna foi adicionada ainda."
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "Nome de exibição atualizado"
 
@@ -4990,7 +4990,7 @@ msgstr "Sincronizar online?"
 msgid "Neutral failure"
 msgstr "Falha neutra"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "Por favor, tente novamente ou entre em contato com o suporte."
 
@@ -5041,7 +5041,7 @@ msgstr "Beta"
 msgid "Search by name or user group"
 msgstr "Pesquisar por nome ou grupo de usuários"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "Falha ao atualizar o e-mail"
 
@@ -5151,7 +5151,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "Entidade falhou ao carregar"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "Usado para fazer login na sua conta."
 

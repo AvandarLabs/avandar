@@ -222,7 +222,7 @@ msgstr "Haiwezekani kupakia swali la SQL la dataset."
 msgid "Avandar"
 msgstr "Avandar"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho."
 
@@ -292,7 +292,7 @@ msgid "Save and re-run query"
 msgstr "Hifadhi na rudia swali"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "Imehifadhiwa kama \"{0}\"."
 
@@ -891,10 +891,10 @@ msgstr ""
 #~ msgstr "Ni wakati wa kuunda eneo lako la kazi la kwanza. Usifikirie kwa muda "
 #~ "mrefu—unaweza kila wakati kubadilisha haya baadaye!"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Password"
 msgstr "Nenosiri"
 
@@ -1213,7 +1213,7 @@ msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 
@@ -1724,7 +1724,7 @@ msgstr "Panda juu kwa maeneo yaliyo juu, au tumia orodha hapa chini."
 msgid "None"
 msgstr "Hakuna"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "Utatazamiwa kuthibitisha nenosiri lako la sasa."
 
@@ -2100,7 +2100,7 @@ msgstr "Bar"
 msgid "Delete dashboard?"
 msgstr "Futa dashibodi?"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
 msgstr "Badilisha nenosiri"
 
@@ -3260,7 +3260,7 @@ msgstr "Imeshindikana kuunda dashibodi: {0}"
 msgid "kind"
 msgstr "aina"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
 msgstr ""
 
@@ -3375,7 +3375,7 @@ msgstr "Hujongeza mfululizo wowote"
 msgid "Welcome back, {0}"
 msgstr "Karibu tena, {0}"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Change"
 msgstr "Badilisha"
 
@@ -3394,10 +3394,10 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "Inatafuta thamani katika {column}…"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email"
 msgstr "Barua pepe"
 
@@ -3590,7 +3590,7 @@ msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/kiti"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "Jina la kuonyesha"
 
@@ -3687,7 +3687,7 @@ msgstr ""
 msgid "Query Details"
 msgstr "Maelezo ya Kuuliza"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Jina lako"
 
@@ -4049,7 +4049,7 @@ msgstr "Punguza ufikiaji wa programu"
 msgid "Enter dataset name"
 msgstr "Ingiza jina la seti ya data"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "Jina hili linatumika tu katika {workspaceName}. Workspace zako nyingine "
@@ -4205,7 +4205,7 @@ msgid "Reset app"
 msgstr ""
 
 #. placeholder {0}: workspace.name
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "Simamisha jinsi unavyoonekana katika {0} na akaunti unayotumia kuingia."
 
@@ -4255,11 +4255,11 @@ msgstr "Hitilafu katika kuhifadhi seti ya data"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
@@ -4342,7 +4342,7 @@ msgstr "Jina la eneo la kazi limehifadhiwa kwa mafanikio."
 msgid "dataset name"
 msgstr "jina la seti ya data"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "Anwani ya barua pepe imeboreshwa"
 
@@ -4555,7 +4555,7 @@ msgid "Offline models"
 msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "Profaili"
 
@@ -4646,7 +4646,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "Kundi la jukumu limeundwa"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "Imeshindwa kuboresha jina la kuonyesha"
 
@@ -4855,7 +4855,7 @@ msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 msgid "No columns have been added yet."
 msgstr "Hakuna safu zilizoongezwa bado."
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "Jina la kuonyesha limeboreshwa"
 
@@ -4979,7 +4979,7 @@ msgstr "Sawa na mtandaoni?"
 msgid "Neutral failure"
 msgstr "Kushindwa kwa kawaida"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "Tafadhali jaribu tena au wasiliana na msaada."
 
@@ -5030,7 +5030,7 @@ msgstr "Beta"
 msgid "Search by name or user group"
 msgstr "Tafuta kwa jina au kikundi cha mtumiaji"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "Imeshindwa kuboresha barua pepe"
 
@@ -5139,7 +5139,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "Kitu hakikupata kupakia"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "Inatumika kuingia kwenye akaunti yako."
 

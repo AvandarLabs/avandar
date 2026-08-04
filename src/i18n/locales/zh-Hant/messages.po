@@ -217,7 +217,7 @@ msgstr "無法載入資料集的 SQL 查詢。"
 msgid "Avandar"
 msgstr "Avandar"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "請檢查您的電子郵件以獲取確認連結。"
 
@@ -287,7 +287,7 @@ msgid "Save and re-run query"
 msgstr "保存並重新執行查詢"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "已保存為 \"{0}\"。"
 
@@ -862,10 +862,10 @@ msgstr ""
 #~ "can always change these later!"
 #~ msgstr "是時候創建您的第一個工作區了。不要想太久—您隨時可以稍後更改這些！"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Password"
 msgstr "密碼"
 
@@ -1175,7 +1175,7 @@ msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候�
 msgid "Bias detected:"
 msgstr "檢測到偏見："
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成員看到的名稱。"
 
@@ -1667,7 +1667,7 @@ msgstr "向上滾動至上方的字段，或使用下面的列表。"
 msgid "None"
 msgstr "無"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "系統將要求您確認當前密碼。"
 
@@ -2036,7 +2036,7 @@ msgstr "條"
 msgid "Delete dashboard?"
 msgstr "刪除儀表板？"
 
-#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
+#: src/views/ProfileView/PasswordSection.tsx
 msgid "Change password"
 msgstr "更改密碼"
 
@@ -3165,7 +3165,7 @@ msgstr "無法創建儀表板：{0}"
 msgid "kind"
 msgstr "類型"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
 msgstr ""
 
@@ -3278,7 +3278,7 @@ msgstr "您尚未添加任何系列"
 msgid "Welcome back, {0}"
 msgstr "歡迎回來，{0}"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Change"
 msgstr "更改"
 
@@ -3296,10 +3296,10 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email"
 msgstr "電子郵件"
 
@@ -3488,7 +3488,7 @@ msgstr "每個系列都是一個繪製在徑向值上的數值欄。請選擇下
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/席位"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "顯示名稱"
 
@@ -3584,7 +3584,7 @@ msgstr ""
 msgid "Query Details"
 msgstr "查詢詳情"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "您的名字"
 
@@ -3931,7 +3931,7 @@ msgstr "限制應用訪問"
 msgid "Enter dataset name"
 msgstr "輸入數據集名稱"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "此名稱僅適用於 {workspaceName}。您的其他工作區保持自己的名稱。"
@@ -4083,7 +4083,7 @@ msgid "Reset app"
 msgstr ""
 
 #. placeholder {0}: workspace.name
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "管理您在 {0} 的顯示方式及用於登入的帳戶。"
 
@@ -4131,11 +4131,11 @@ msgstr "保存數據集時出錯"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
@@ -4216,7 +4216,7 @@ msgstr "工作區名稱已成功保存。"
 msgid "dataset name"
 msgstr "數據集名稱"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "電子郵件地址已更新"
 
@@ -4422,7 +4422,7 @@ msgid "Offline models"
 msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "個人資料"
 
@@ -4510,7 +4510,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "角色群組已創建"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "更新顯示名稱失敗"
 
@@ -4712,7 +4712,7 @@ msgstr "選擇的值欄位無效"
 msgid "No columns have been added yet."
 msgstr "尚未添加任何欄位。"
 
-#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
+#: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "顯示名稱已更新"
 
@@ -4829,7 +4829,7 @@ msgstr "同步到線上？"
 msgid "Neutral failure"
 msgstr "中立失敗"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "請重試或聯繫支持。"
 
@@ -4880,7 +4880,7 @@ msgstr "測試版"
 msgid "Search by name or user group"
 msgstr "按名稱或用戶群組搜索"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "更新電子郵件失敗"
 
@@ -4985,7 +4985,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "實體加載失敗"
 
-#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+#: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "用於登錄您的帳戶。"
 
