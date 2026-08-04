@@ -16,7 +16,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 
 // Local `.env.development` may enable product feature flags that change which
 // components mount in tests (for example FeedbackButton). E2E injects flags
-// via `ensureE2eViteFeatureFlags` instead.
+// via `ensureE2EViteFeatureFlags` instead.
 delete process.env.VITE_FEATURE_FLAGS;
 
 const noop = (): void => {

@@ -21,7 +21,7 @@ test.describe("account registration", () => {
 
     const uniqueSuffix = Date.now();
     const email = `e2e-register-${uniqueSuffix}@avandarlabs.com`;
-    const password = `E2e-register-pass-${uniqueSuffix}!`;
+    const password = `E2E-register-pass-${uniqueSuffix}!`;
 
     try {
       await page.goto("/register");

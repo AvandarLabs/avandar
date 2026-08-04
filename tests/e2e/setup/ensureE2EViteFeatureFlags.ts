@@ -27,7 +27,7 @@ const E2E_REQUIRED_VITE_FEATURE_FLAGS = [
  * Ensures feature flags required by Playwright specs are enabled for the test
  * runner and the Vite dev server.
  */
-export function ensureE2eViteFeatureFlags(): void {
+export function ensureE2EViteFeatureFlags(): void {
   E2E_REQUIRED_VITE_FEATURE_FLAGS.forEach((flag) => {
     process.env.VITE_FEATURE_FLAGS = appendViteFeatureFlag(
       process.env.VITE_FEATURE_FLAGS,

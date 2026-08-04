@@ -15,7 +15,7 @@ import { ensureAuthUserExists } from "../setup/ensureAuthUser";
 
 export { expect } from "@playwright/test";
 
-export type E2eWorkerCredentials = Readonly<{
+export type E2EWorkerCredentials = Readonly<{
   email: string;
   password: string;
 }>;
@@ -23,14 +23,14 @@ export type E2eWorkerCredentials = Readonly<{
 /**
  * Shared worker database state: two auth users and one owned workspace slug.
  */
-export type E2eWorkerDb = Readonly<{
+export type E2EWorkerDb = Readonly<{
   workspaceSlug: string;
-  primaryUser: E2eWorkerCredentials;
-  secondaryUser: E2eWorkerCredentials;
+  primaryUser: E2EWorkerCredentials;
+  secondaryUser: E2EWorkerCredentials;
 }>;
 
-type E2eWorkerFixtures = {
-  e2eWorkerDb: E2eWorkerDb;
+type E2EWorkerFixtures = {
+  e2eWorkerDb: E2EWorkerDb;
 };
 
 /**
@@ -38,19 +38,19 @@ type E2eWorkerFixtures = {
  * users, provisions the shared workspace once per worker, and purges
  * workspace data plus auth users when the worker shuts down.
  */
-export const test = base.extend<Record<never, never>, E2eWorkerFixtures>({
+export const test = base.extend<Record<never, never>, E2EWorkerFixtures>({
   e2eWorkerDb: [
     async ({}, use, workerInfo) => {
       const workspaceSlug = `${E2E_WORKSPACE_SLUG_BASE}-w${workerInfo.workerIndex}`;
-      const primaryUser: E2eWorkerCredentials = {
+      const primaryUser: E2EWorkerCredentials = {
         email: E2E_PRIMARY_USER_EMAIL,
         password: E2E_TEST_USER_PASSWORD,
       };
-      const secondaryUser: E2eWorkerCredentials = {
+      const secondaryUser: E2EWorkerCredentials = {
         email: E2E_SECONDARY_USER_EMAIL,
         password: E2E_TEST_USER_PASSWORD,
       };
-      const state: E2eWorkerDb = {
+      const state: E2EWorkerDb = {
         workspaceSlug,
         primaryUser,
         secondaryUser,

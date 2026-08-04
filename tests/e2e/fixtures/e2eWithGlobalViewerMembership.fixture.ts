@@ -20,7 +20,7 @@ export type E2EGlobalViewerMembership = ViewerMembershipSetup & {
   workspaceId: string;
 };
 
-type E2eGlobalViewerFixtures = {
+type E2EGlobalViewerFixtures = {
   /**
    * Test-scoped: ensures the secondary E2E user is a Global Viewer member,
    * then removes that membership when this fixture inserted or replaced it.
@@ -155,7 +155,7 @@ async function _ensureUserIsMemberAndViewer(options: {
  * Global Viewer member (inserting or replacing a non-viewer membership), and
  * removes that membership on teardown when this fixture inserted it.
  */
-export const test = base.extend<E2eGlobalViewerFixtures>({
+export const test = base.extend<E2EGlobalViewerFixtures>({
   e2eViewerMembership: async ({ e2eWorkerDb }, use) => {
     const supabaseAdminClient = createSupabaseAdminClient();
     const workspaceId = await getWorkspaceIdBySlug({
