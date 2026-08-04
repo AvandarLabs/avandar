@@ -6,6 +6,6 @@ import { quoteSqlIdentifier } from "@utils";
  * open data). Quotes the identifier so dataset UUIDs with dashes and
  * non-identifier characters work as DuckDB table names.
  */
-export function buildSelectAllPreviewSQL(datasetId: string): string {
+export function buildSelectAllPreviewSql(datasetId: string): string {
   return `SELECT * FROM ${quoteSqlIdentifier(datasetId)} LIMIT 100`;
 }
