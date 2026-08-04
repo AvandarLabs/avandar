@@ -15,7 +15,7 @@ export const PROJECT_ROOT = path.resolve(
 );
 export const LOCALES_DIR = path.join(PROJECT_ROOT, "src", "i18n", "locales");
 export const SOURCE_LOCALE = "en";
-export const DEFAULT_MODEL = "gpt-4o-mini";
+export const DEFAULT_MODEL = "gpt-5.6-luna";
 export const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 /**
