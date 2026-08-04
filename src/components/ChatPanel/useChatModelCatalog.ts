@@ -4,8 +4,8 @@ import { prop } from "@utils";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/offlineChatPickerModels";
-import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/offline-chat-helpers/useDownloadedLocalChatModelIds";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
+import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/offline-chat-helpers/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type UseChatModelCatalogResult = {

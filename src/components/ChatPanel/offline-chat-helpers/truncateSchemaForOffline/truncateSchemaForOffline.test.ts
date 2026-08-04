@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { truncateSchemaForOffline } from "./truncateSchemaForOffline";
+import { truncateSchemaForOffline } from "@/components/ChatPanel/offline-chat-helpers/truncateSchemaForOffline/truncateSchemaForOffline";
 
 describe("truncateSchemaForOffline", () => {
   it("keeps dataset labels when there are no columns yet", () => {

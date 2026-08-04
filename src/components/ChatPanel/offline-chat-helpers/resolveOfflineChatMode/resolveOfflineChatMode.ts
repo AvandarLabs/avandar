@@ -1,5 +1,5 @@
 import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
-import { OfflineChatPickerModels } from "./offlineChatPickerModels";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import type { OfflineChatMode } from "@/clients/LocalChatModel/offlineChat.types";
 
 export function resolveOfflineChatMode(args: {

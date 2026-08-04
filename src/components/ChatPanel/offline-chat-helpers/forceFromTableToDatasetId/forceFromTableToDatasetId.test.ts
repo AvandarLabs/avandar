@@ -1,7 +1,7 @@
 import { Parser } from "node-sql-parser";
 import { describe, expect, it } from "vitest";
-import { forceFromTableToDatasetId } from "./forceFromTableToDatasetId";
-import { repairOfflineGeneratedSql } from "./repairOfflineGeneratedSql";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offline-chat-helpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
+import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offline-chat-helpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
 
 describe("node-sql-parser sqlify after remap", () => {
   it("may emit unquoted FROM so force must handle it", () => {

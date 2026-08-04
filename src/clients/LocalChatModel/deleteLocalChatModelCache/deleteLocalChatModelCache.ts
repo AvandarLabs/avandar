@@ -1,5 +1,5 @@
-import { LocalChatModelCatalog } from "./LocalChatModelCatalog/LocalChatModelCatalog";
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 /**
  * Deletes WebLLM weight/config cache for a model from the browser cache.

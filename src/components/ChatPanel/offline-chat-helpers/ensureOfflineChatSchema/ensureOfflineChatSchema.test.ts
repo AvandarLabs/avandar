@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ensureOfflineChatSchema } from "./ensureOfflineChatSchema";
+import { ensureOfflineChatSchema } from "@/components/ChatPanel/offline-chat-helpers/ensureOfflineChatSchema/ensureOfflineChatSchema";
 
 describe("ensureOfflineChatSchema", () => {
   it("adds open dataset when cache has no datasets", () => {

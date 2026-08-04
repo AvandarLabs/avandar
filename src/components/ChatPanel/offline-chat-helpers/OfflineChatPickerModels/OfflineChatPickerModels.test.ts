@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OfflineChatPickerModels } from "./offlineChatPickerModels";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import type { LocalChatModelCopy } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 const TRANSLATED_GROUP_LABEL = "Modelos sin conexión";

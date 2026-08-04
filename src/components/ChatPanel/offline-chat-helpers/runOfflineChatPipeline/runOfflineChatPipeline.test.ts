@@ -1,7 +1,7 @@
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { describe, expect, it } from "vitest";
 import { createMockOfflineChatEngine } from "@/clients/LocalChatModel/createMockOfflineChatEngine";
-import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
+import { runOfflineChatPipeline } from "@/components/ChatPanel/offline-chat-helpers/runOfflineChatPipeline/runOfflineChatPipeline";
 
 const SCHEMA = {
   datasets: [{ id: "ds-1", name: "Sales" }],

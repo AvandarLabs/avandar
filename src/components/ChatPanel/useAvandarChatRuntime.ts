@@ -22,8 +22,8 @@ import { isNetworkChatFailure } from "@/components/ChatPanel/offline-chat-helper
 import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "@/components/ChatPanel/offline-chat-helpers/logOfflineChat";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/offline-chat-helpers/offerOfflineChatFallback";
-import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/offlineChatPickerModels";
-import { resolveOfflineChatMode } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineChatMode";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
+import { resolveOfflineChatMode } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineChatMode/resolveOfflineChatMode";
 import { runOfflineChatTurn } from "@/components/ChatPanel/offline-chat-helpers/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/offline-chat-helpers/tryExecuteOfflineSql";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";

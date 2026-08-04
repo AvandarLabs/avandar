@@ -2,12 +2,12 @@ import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,
   buildOfflineSqlPrompt,
-} from "./buildOfflinePrompts/buildOfflinePrompts";
-import { logOfflineChat } from "./logOfflineChat";
-import { narrowOfflineSchema } from "./narrowOfflineSchema";
-import { OfflineLlmOutput } from "./OfflineLlmOutput/OfflineLlmOutput";
-import { repairOfflineGeneratedSql } from "./repairOfflineGeneratedSql";
-import { resolveOfflineDataset } from "./resolveOfflineDataset";
+} from "@/components/ChatPanel/offline-chat-helpers/buildOfflinePrompts/buildOfflinePrompts";
+import { logOfflineChat } from "@/components/ChatPanel/offline-chat-helpers/logOfflineChat";
+import { narrowOfflineSchema } from "@/components/ChatPanel/offline-chat-helpers/narrowOfflineSchema";
+import { OfflineLlmOutput } from "@/components/ChatPanel/offline-chat-helpers/OfflineLlmOutput/OfflineLlmOutput";
+import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offline-chat-helpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
+import { resolveOfflineDataset } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineDataset/resolveOfflineDataset";
 import type {
   OfflineChatPipelineArgs,
   OfflineChatPipelineResult,

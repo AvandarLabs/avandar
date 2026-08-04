@@ -1,12 +1,12 @@
 import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
-import { forceFromTableToDatasetId } from "./forceFromTableToDatasetId";
-import { logOfflineChat } from "./logOfflineChat";
-import { matchOfflineDatasetTable } from "./matchOfflineDatasetTable";
-import { OfflineSqlHallucinationSubstitutions } from "./OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
-import { OfflineSqlTableNamespaces } from "./OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
-import { repairOfflineColumnFromError } from "./repairOfflineColumnFromError";
-import { resolveOfflineDataset } from "./resolveOfflineDataset";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offline-chat-helpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
+import { logOfflineChat } from "@/components/ChatPanel/offline-chat-helpers/logOfflineChat";
+import { matchOfflineDatasetTable } from "@/components/ChatPanel/offline-chat-helpers/matchOfflineDatasetTable";
+import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offline-chat-helpers/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
+import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offline-chat-helpers/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
+import { repairOfflineColumnFromError } from "@/components/ChatPanel/offline-chat-helpers/repairOfflineColumnFromError";
+import { resolveOfflineDataset } from "@/components/ChatPanel/offline-chat-helpers/resolveOfflineDataset/resolveOfflineDataset";
 import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
