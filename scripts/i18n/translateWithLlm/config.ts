@@ -18,12 +18,16 @@ export const SOURCE_LOCALE = "en";
 export const DEFAULT_MODEL = "gpt-5.6-luna";
 
 /**
- * Reasoning effort for the translation calls. Translation is a transduction
- * task that does not benefit from reasoning, so we pin the lowest level
- * (`"none"`) to avoid burning reasoning tokens and latency. Without this the
- * gpt-5.x series defaults to `"medium"`.
+ * Reasoning effort for the translation calls. `"low"` is a deliberate middle
+ * ground: `"medium"` (the gpt-5.x default) over-reasons for short-string
+ * translation, but `"none"` is a bit too aggressive here because these prompts
+ * are not pure transduction. Each batched call must preserve ICU placeholders
+ * (`{name}`, `{count}`) verbatim, avoid translating variable names, pick the
+ * right per-locale register, and return well-formed JSON for every key. `"low"`
+ * keeps it cheap and fast while leaving a small safety margin for those
+ * constraints on the trickier locales.
  */
-export const DEFAULT_REASONING_EFFORT = "none";
+export const DEFAULT_REASONING_EFFORT = "low";
 export const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 /**
