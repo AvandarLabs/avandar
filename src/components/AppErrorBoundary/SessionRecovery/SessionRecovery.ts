@@ -12,13 +12,6 @@ const RECOVERY_TIMESTAMP_KEY = "ava:auth-recovery-ts";
  */
 const RECOVERY_LOOP_WINDOW_MS = 15_000;
 
-/**
- * Whether an auto-recovery was attempted within the last few seconds. If so,
- * the redirect did not clear the failure and we are looping, so the caller
- * should show a manual recovery screen instead of silently redirecting again.
- *
- * @returns `true` if a recovery attempt is still within the loop window.
- */
 function _isLooping(): boolean {
   try {
     const storedTimestamp = sessionStorage.getItem(RECOVERY_TIMESTAMP_KEY);
@@ -51,13 +44,6 @@ function _buildSignInUrl(): string {
   return `/signin?redirect=${encodeURIComponent(current)}`;
 }
 
-/**
- * Clear the local Supabase session and send the user to sign-in. Self-contained
- * and dependency-free: it does not call any authenticated endpoint, so it
- * cannot re-trigger the failure it is recovering from. Records a timestamp so a
- * repeated crash right after the redirect can be detected as a loop (see
- * {@link isSessionRecoveryLooping}) and fall back to a manual screen.
- */
 async function _recover(): Promise<void> {
   try {
     sessionStorage.setItem(RECOVERY_TIMESTAMP_KEY, String(Date.now()));
@@ -91,13 +77,6 @@ async function _recover(): Promise<void> {
   window.location.assign(_buildSignInUrl());
 }
 
-/**
- * Harder reset for a client wedged on stale cached assets (e.g. a service
- * worker still serving an old bundle that ships a revoked key): unregister all
- * service workers and delete all Cache Storage, then run the standard session
- * recovery. Used by the manual "Reset app" action when a plain sign-in redirect
- * keeps looping.
- */
 async function _resetAndRecover(): Promise<void> {
   try {
     if ("serviceWorker" in navigator) {
@@ -130,7 +109,29 @@ async function _resetAndRecover(): Promise<void> {
 
 /** Recovery operations for invalid or expired browser sessions. */
 export const SessionRecovery = {
+  /**
+   * Whether an auto-recovery was attempted within the last few seconds. If so,
+   * the redirect did not clear the failure and we are looping, so the caller
+   * should show a manual recovery screen instead of silently redirecting again.
+   *
+   * @returns `true` if a recovery attempt is still within the loop window.
+   */
   isLooping: _isLooping,
+  /**
+   * Clear the local Supabase session and send the user to sign-in.
+   * Self-contained and dependency-free: it does not call any authenticated
+   * endpoint, so it cannot re-trigger the failure it is recovering from.
+   * Records a timestamp so a repeated crash right after the redirect can be
+   * detected as a loop (see {@link SessionRecovery.isLooping}) and fall back to
+   * a manual screen.
+   */
   recover: _recover,
+  /**
+   * Harder reset for a client wedged on stale cached assets (e.g. a service
+   * worker still serving an old bundle that ships a revoked key): unregister
+   * all service workers and delete all Cache Storage, then run the standard
+   * session recovery. Used by the manual "Reset app" action when a plain
+   * sign-in redirect keeps looping.
+   */
   resetAndRecover: _resetAndRecover,
 };

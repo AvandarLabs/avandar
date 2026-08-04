@@ -347,8 +347,6 @@
    * Docstring describing `MyObject`.
    */
   export const MyObject = {
-    foo, // docstring already attached to its declaration, no need to duplciate
-
     /**
      * Docstring describing the `hello` method.
      */
@@ -357,6 +355,44 @@
     },
   };
   ```
+
+- Put the docstring on the module's exported key, not on the underlying
+  function, when a non-exported function is defined in the same file as the
+  module that exports it. TypeScript intellisense does not carry a function's
+  docstring across the assignment into a module object: it can see the type of
+  `MyModule.myFunc` but does not know it is the same function as `_myFunc`, so a
+  docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
+
+  This is bad (the docstring on `_myFunc` is invisible at the call site):
+
+  ```ts
+  /** What myFunc does. */
+  function _myFunc() {
+    implementation();
+  }
+
+  export const MyModule = {
+    myFunc: _myFunc,
+  };
+  ```
+
+  This is good (hovering `MyModule.myFunc` shows the docstring):
+
+  ```ts
+  function _myFunc() {
+    implementation();
+  }
+
+  export const MyModule = {
+    /** What myFunc does. */
+    myFunc: _myFunc,
+  };
+  ```
+
+  Exception: when the object is annotated with an interface or type that already
+  documents its members (`const Store: BlobStore = { ... }`), the docstrings
+  belong on that interface, which is the intellisense source for every
+  implementation. Do not duplicate them on the object keys or the functions.
 
 ## Immutability
 

@@ -114,6 +114,39 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export function isReadOnlyDiscoveryQuery(query: string): boolean {}
   ```
 
+- Put a method's docstring on the module's exported key, not on the underlying
+  function, when a non-exported function is defined in the same file as the
+  module that exports it. TypeScript intellisense does not carry a function's
+  docstring across the assignment into a module object: hovering
+  `MyModule.myFunc` shows the type but not the docstring that sits on `_myFunc`.
+  Flag a docstring that sits on the `_impl` function while its exported object
+  key has none.
+
+  This is bad (the docstring is invisible when a caller hovers `MyModule.myFunc`):
+
+  ```ts
+  /** What myFunc does. */
+  function _myFunc() {}
+
+  export const MyModule = { myFunc: _myFunc };
+  ```
+
+  This is good:
+
+  ```ts
+  function _myFunc() {}
+
+  export const MyModule = {
+    /** What myFunc does. */
+    myFunc: _myFunc,
+  };
+  ```
+
+  Exception: when the object is annotated by an interface or type that already
+  documents its members (`const Store: BlobStore = { ... }`), that interface is
+  the intellisense source; the docstrings belong there, not on the object keys
+  or the functions. Do not flag missing key docstrings in that case.
+
 - Comments must describe the code as it exists today, not the external plan
   that produced it. Flag any comment that references planning artifacts a
   reader cannot resolve from the codebase: roadmap phase numbers ("Phase 3"),
