@@ -1,4 +1,4 @@
-import { MAX_DISCOVERY_QUERY_CHARS } from "@sbfn/_shared/privacy/isReadOnlyDiscoveryQuery.ts";
+import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
 type DataExplorerToolDefinition = {
   type: "function";
