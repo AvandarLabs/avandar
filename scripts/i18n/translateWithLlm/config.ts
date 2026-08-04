@@ -16,6 +16,14 @@ export const PROJECT_ROOT = path.resolve(
 export const LOCALES_DIR = path.join(PROJECT_ROOT, "src", "i18n", "locales");
 export const SOURCE_LOCALE = "en";
 export const DEFAULT_MODEL = "gpt-5.6-luna";
+
+/**
+ * Reasoning effort for the translation calls. Translation is a transduction
+ * task that does not benefit from reasoning, so we pin the lowest level
+ * (`"none"`) to avoid burning reasoning tokens and latency. Without this the
+ * gpt-5.x series defaults to `"medium"`.
+ */
+export const DEFAULT_REASONING_EFFORT = "none";
 export const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 /**

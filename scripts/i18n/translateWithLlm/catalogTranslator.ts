@@ -6,7 +6,12 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { makeObjectFromEntries } from "@utils";
-import { LOCALES_DIR, OPENAI_URL, TARGET_LOCALE_NAMES } from "./config";
+import {
+  DEFAULT_REASONING_EFFORT,
+  LOCALES_DIR,
+  OPENAI_URL,
+  TARGET_LOCALE_NAMES,
+} from "./config";
 import { PoCatalog } from "./poCatalog";
 
 type TranslationBatch = Record<string, string>;
@@ -49,7 +54,10 @@ async function _translateBatch(args: {
     },
     body: JSON.stringify({
       model,
-      temperature: 0.2,
+      // gpt-5.x reasoning models reject a custom `temperature` on Chat
+      // Completions (only the default 1 is allowed), so we omit it and pin
+      // the reasoning effort low instead.
+      reasoning_effort: DEFAULT_REASONING_EFFORT,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
