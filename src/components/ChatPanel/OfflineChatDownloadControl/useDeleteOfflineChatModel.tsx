@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
+import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useState } from "react";
 import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
@@ -28,17 +28,15 @@ export function useDeleteOfflineChatModel({ onDeleted }: Props): {
         await OfflineChatResourceManager.deleteModel(modelId);
         const model = LocalChatModelCatalog.find(modelId);
         const modelCopy = getLocalChatModelCopy(model);
-        notifications.show({
+        notifySuccess({
           title: t`Offline chat model removed`,
           message: t`${modelCopy.displayName} was deleted from this browser.`,
-          color: "success",
         });
         onDeleted();
       } catch {
-        notifications.show({
+        notifyError({
           title: t`Could not remove offline chat model`,
           message: t`Unable to delete the offline chat model from cache.`,
-          color: "danger",
         });
       } finally {
         setDeletingModelId(undefined);

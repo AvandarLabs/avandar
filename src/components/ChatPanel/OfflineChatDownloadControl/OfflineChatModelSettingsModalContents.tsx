@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select, Stack, Text } from "@mantine/core";
 import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
+import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useEffect, useState } from "react";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
 import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
@@ -121,17 +121,15 @@ export function OfflineChatModelSettingsModalContents({
     const modelCopy = getLocalChatModelCopy(model);
     try {
       await OfflineChatResourceManager.ensureEngine(selectedModelId);
-      notifications.show({
+      notifySuccess({
         title: t`Offline chat model ready`,
         message: t`${modelCopy.displayName} is available when you are offline.`,
-        color: "success",
       });
       forceUpdate();
     } catch {
-      notifications.show({
+      notifyError({
         title: t`Offline model download failed`,
         message: t`Could not prepare the offline chat model.`,
-        color: "danger",
       });
     }
   }, [forceUpdate, getLocalChatModelCopy, onClose, selectedModelId, t]);
