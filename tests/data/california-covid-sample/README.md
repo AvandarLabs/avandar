@@ -13,8 +13,6 @@ behavior (import → parquet, previews, Data Explorer queries, visualizations)
 rather than a parsing edge case.
 
 The `.csv` and `.xlsx` are the same rows, so tests can assert that both import
-paths yield equivalent results. This dataset is also the seed the
-`scripts/generate-large-test-files.ts` benchmark duplicates to build large
-files.
+paths yield equivalent results.
 
 For a fast, size-agnostic variant, use `small-california-covid-sample`.
