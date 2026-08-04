@@ -1,5 +1,5 @@
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 
 /**
  * Whether cloud chat is blocked by being offline with no local fallback: true

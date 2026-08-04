@@ -3,10 +3,10 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useState } from "react";
-import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
-import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
-import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
-import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   onDeleted: () => void;

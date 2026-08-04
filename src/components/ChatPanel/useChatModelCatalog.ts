@@ -4,9 +4,9 @@ import { prop } from "@utils";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { OfflineChatPickerModels } from "@/lib/offlineChat/offlineChatPickerModels";
-import { useDownloadedLocalChatModelIds } from "@/lib/offlineChat/useDownloadedLocalChatModelIds";
-import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/offlineChatPickerModels";
+import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/offline-chat-helpers/useDownloadedLocalChatModelIds";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type UseChatModelCatalogResult = {
   groups: ChatModelOption.OptionGroup[];

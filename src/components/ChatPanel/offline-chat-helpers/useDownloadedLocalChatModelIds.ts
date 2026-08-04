@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 const EMPTY_DOWNLOADED_IDS: readonly LocalChatModelId[] = [];
 
@@ -12,7 +12,7 @@ let cachedDownloadedKey = "";
  * each call; returning it directly causes infinite re-renders because React
  * compares snapshots with `Object.is`.
  */
-function _getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
+function _getDownloadedIdsSnapshot(): readonly LocalChatModelId[] {
   const downloadedIds = LocalChatModelStore.listDownloadedIds();
   const downloadedKey = downloadedIds.join("\0");
   if (downloadedKey === cachedDownloadedKey) {
@@ -30,7 +30,7 @@ function _getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] 
 export function useDownloadedLocalChatModelIds(): readonly LocalChatModelId[] {
   return useSyncExternalStore(
     LocalChatModelStore.subscribeDownloadedModels,
-    _getDownloadedLocalChatModelIdsSnapshot,
+    _getDownloadedIdsSnapshot,
     () => {
       return EMPTY_DOWNLOADED_IDS;
     },

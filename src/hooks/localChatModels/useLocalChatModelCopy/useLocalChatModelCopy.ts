@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import type {
   LocalChatModel,
   LocalChatModelCopy,
-} from "../LocalChatModelCatalog/LocalChatModelCatalog";
+} from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 /** Returns translated display copy for an offline chat model. */
 export function useLocalChatModelCopy(): (

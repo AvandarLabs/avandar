@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatPickerModels } from "./offlineChatPickerModels";
 import { resolveOfflineChatMode } from "./resolveOfflineChatMode";
 

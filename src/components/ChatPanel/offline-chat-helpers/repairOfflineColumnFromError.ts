@@ -3,7 +3,7 @@ import Fuse from "fuse.js";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaColumn,
-} from "./offlineChat.types";
+} from "@/clients/LocalChatModel/offlineChat.types";
 
 const COLUMN_ERROR_RE = /(?:Referenced column|column)\s+"([^"]+)"\s+not found/i;
 

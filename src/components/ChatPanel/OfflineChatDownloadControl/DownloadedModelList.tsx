@@ -1,9 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
-import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
-import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   downloadedModelIds: readonly LocalChatModelId[];

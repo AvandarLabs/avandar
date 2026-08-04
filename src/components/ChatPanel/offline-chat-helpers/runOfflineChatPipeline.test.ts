@@ -1,6 +1,6 @@
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { describe, expect, it } from "vitest";
-import { createMockOfflineChatEngine } from "./createMockOfflineChatEngine";
+import { createMockOfflineChatEngine } from "@/clients/LocalChatModel/createMockOfflineChatEngine";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
 
 const SCHEMA = {

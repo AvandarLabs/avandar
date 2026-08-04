@@ -162,7 +162,7 @@ msgid " access"
 msgstr "訪問"
 
 #. placeholder {0}: model.minRamGb
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "{0} GB RAM"
 msgstr ""
 
@@ -251,7 +251,7 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 "actual values."
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
 msgstr ""
 
@@ -407,7 +407,7 @@ msgstr "關於您"
 msgid "Monospace headlines"
 msgstr "等寬標題"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr ""
 
@@ -445,7 +445,7 @@ msgstr "重新下載"
 msgid "Allow multiple values"
 msgstr "允許多個值"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
 msgstr ""
 
@@ -764,7 +764,7 @@ msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
 msgid "Permanently delete <0>{0}</0>?"
 msgstr "永久刪除 <0>{0}</0>？"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr ""
 
@@ -976,7 +976,7 @@ msgstr "移除成員"
 msgid "Welcome back"
 msgstr "歡迎回來"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
 msgstr ""
 
@@ -1029,7 +1029,7 @@ msgstr "查詢失敗。"
 msgid "Undo"
 msgstr "撤銷"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr ""
 
@@ -1500,7 +1500,7 @@ msgstr "降序"
 msgid "Category axis"
 msgstr "類別軸"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Balanced offline model for everyday SQL questions on typical laptops."
 msgstr ""
 
@@ -1630,7 +1630,7 @@ msgstr "不在"
 msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgstr "{usedSeats} / {maxSeats} 個座位已使用 · {remainingSeats} 個剩餘"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
 "size are not constraints."
 msgstr ""
@@ -1896,7 +1896,7 @@ msgstr ""
 msgid "Column 7"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
 msgstr ""
@@ -2158,7 +2158,7 @@ msgstr "計劃功能："
 msgid "Start your journey with us"
 msgstr "與我們一起開始您的旅程"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B (offline)"
 msgstr ""
 
@@ -2166,7 +2166,7 @@ msgstr ""
 msgid "QR code"
 msgstr "QR 碼"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
 msgstr ""
@@ -2295,7 +2295,7 @@ msgstr ""
 msgid "Re-run query"
 msgstr "重新執行查詢"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
 msgstr ""
 
@@ -2675,7 +2675,7 @@ msgstr "我們將把這個視覺化添加到您的新儀表板。"
 msgid "Repairing query…"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
 "the 8 GB tier."
 msgstr ""
@@ -2742,7 +2742,7 @@ msgstr "導入失敗：{reason}"
 msgid "Timestamp format"
 msgstr "時間戳格式"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
 msgstr ""
@@ -2881,7 +2881,7 @@ msgstr "允許手動編輯"
 msgid "Embed"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
 msgstr ""
 
@@ -3013,12 +3013,12 @@ msgstr "同意"
 msgid "Edit user group"
 msgstr "編輯用戶群組"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
 "device."
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B"
 msgstr ""
 
@@ -3161,7 +3161,7 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "尚無澄清。當聊天提出澄清問題時，日誌會填寫。"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B"
 msgstr ""
 
@@ -3429,7 +3429,7 @@ msgstr "無法加載儀表板資料集"
 msgid "No description has been added yet."
 msgstr "尚未添加描述。"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B"
 msgstr ""
 
@@ -3858,7 +3858,7 @@ msgstr "全球查看者"
 msgid "Create a new workspace. You can always edit it later."
 msgstr "創建一個新的工作區。您可以隨時稍後編輯它。"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
 msgstr ""
 
@@ -4020,7 +4020,7 @@ msgstr "隱私日誌"
 msgid "Visualization Settings"
 msgstr "視覺化設定"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini (offline)"
 msgstr ""
 
@@ -4304,7 +4304,7 @@ msgstr "所有決策"
 msgid "Show labels"
 msgstr "顯示標籤"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr ""
 
@@ -4468,7 +4468,7 @@ msgstr "編輯權限"
 msgid "queried"
 msgstr "查詢的"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
 msgstr ""
 
@@ -4624,7 +4624,7 @@ msgstr "已發布"
 msgid "Filters (Where)"
 msgstr "篩選器（位置）"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
 msgstr ""

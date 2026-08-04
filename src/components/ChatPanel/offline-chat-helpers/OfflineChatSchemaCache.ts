@@ -1,4 +1,4 @@
-import type { OfflineChatSchema } from "./offlineChat.types";
+import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 
 const CACHE_KEY_PREFIX = "avandar.offlineChat.schemaCache.";
 

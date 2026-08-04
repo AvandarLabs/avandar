@@ -4,7 +4,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
-import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { OfflineChatDownloadControl } from "./OfflineChatDownloadControl";
 
@@ -14,7 +14,7 @@ const { deleteModelMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/lib/offlineChat/useOfflineChatManagerStatus", () => {
+vi.mock("@/hooks/localChatModels/useOfflineChatManagerStatus", () => {
   return {
     useOfflineChatManagerStatus: () => {
       return { kind: "idle" as const };
@@ -22,7 +22,7 @@ vi.mock("@/lib/offlineChat/useOfflineChatManagerStatus", () => {
   };
 });
 
-vi.mock("@/lib/offlineChat/OfflineChatResourceManager", () => {
+vi.mock("@/clients/LocalChatModel/OfflineChatResourceManager", () => {
   return {
     OfflineChatResourceManager: {
       ensureEngine: vi.fn(),

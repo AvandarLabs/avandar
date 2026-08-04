@@ -5,7 +5,7 @@ import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
-} from "./offlineChat.types";
+} from "@/clients/LocalChatModel/offlineChat.types";
 
 /** Minimum score to prefer label match over fuzzy or open-dataset fallbacks. */
 const MIN_LABEL_MATCH_SCORE = 2;

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
-import type { OfflineChatManagerStatus } from "./OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
+import type { OfflineChatManagerStatus } from "@/clients/LocalChatModel/OfflineChatResourceManager";
 
 /**
  * Subscribes to offline chat engine load/download status for UI indicators.

@@ -2,15 +2,15 @@ import { propEq } from "@utils";
 import { ensureOfflineChatSchema } from "./ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
-import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "./logOfflineChat";
-import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type {
   OfflineChatPipelineCopy,
   OfflineChatTurnResult,
-} from "./offlineChat.types";
+} from "@/clients/LocalChatModel/offlineChat.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Workspace } from "$/models/Workspace/Workspace";

@@ -1,10 +1,10 @@
 import { Model } from "@models";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
-import { LocalChatModelCatalog } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type {
   LocalChatModelCopy,
   LocalChatModelId,
-} from "./LocalChatModelCatalog/LocalChatModelCatalog";
+} from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 /** Prefix for offline model ids in the shared chat model picker. */

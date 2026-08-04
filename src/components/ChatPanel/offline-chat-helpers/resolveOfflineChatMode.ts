@@ -1,6 +1,6 @@
-import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatPickerModels } from "./offlineChatPickerModels";
-import type { OfflineChatMode } from "./offlineChat.types";
+import type { OfflineChatMode } from "@/clients/LocalChatModel/offlineChat.types";
 
 export function resolveOfflineChatMode(args: {
   navigatorOnLine: boolean;

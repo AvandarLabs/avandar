@@ -1,7 +1,7 @@
 import { propEq } from "@utils";
 import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName";
 import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
-import type { OfflineChatSchemaDataset } from "./offlineChat.types";
+import type { OfflineChatSchemaDataset } from "@/clients/LocalChatModel/offlineChat.types";
 
 /** DuckDB/Postgres catalog names small models hallucinate on errors. */
 export const FORBIDDEN_TABLE_NAMES = new Set([

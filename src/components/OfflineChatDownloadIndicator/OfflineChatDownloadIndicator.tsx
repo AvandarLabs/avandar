@@ -1,8 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Progress, Text } from "@mantine/core";
-import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
-import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
-import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import css from "./OfflineChatDownloadIndicator.module.css";
 
 /**

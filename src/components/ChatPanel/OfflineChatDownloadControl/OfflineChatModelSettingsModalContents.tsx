@@ -5,14 +5,14 @@ import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useEffect, useState } from "react";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
-import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
-import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
-import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
-import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
-import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
+import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import { DownloadedModelList } from "./DownloadedModelList";
 import { useDeleteOfflineChatModel } from "./useDeleteOfflineChatModel";
-import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   settingsModalId: string;

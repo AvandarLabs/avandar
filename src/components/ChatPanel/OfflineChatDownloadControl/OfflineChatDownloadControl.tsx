@@ -4,8 +4,8 @@ import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
-import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
-import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
+import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import { createOfflineChatModelSettingsModalChildren } from "./OfflineChatModelSettingsModalContents";
 
 type Props = {

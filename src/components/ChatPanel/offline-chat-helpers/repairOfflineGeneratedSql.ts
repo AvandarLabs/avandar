@@ -7,7 +7,7 @@ import { OfflineSqlHallucinationSubstitutions } from "./OfflineSqlHallucinationS
 import { OfflineSqlTableNamespaces } from "./OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "./repairOfflineColumnFromError";
 import { resolveOfflineDataset } from "./resolveOfflineDataset";
-import type { OfflineChatSchema } from "./offlineChat.types";
+import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
 const MAX_REPAIR_ROUNDS = 4;

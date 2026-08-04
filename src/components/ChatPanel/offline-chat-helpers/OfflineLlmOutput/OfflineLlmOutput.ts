@@ -1,4 +1,4 @@
-import type { OfflineAnalyzeResult } from "../offlineChat.types";
+import type { OfflineAnalyzeResult } from "@/clients/LocalChatModel/offlineChat.types";
 
 function _parseAnalyzeJson(raw: string): OfflineAnalyzeResult | undefined {
   const trimmed = raw.trim();

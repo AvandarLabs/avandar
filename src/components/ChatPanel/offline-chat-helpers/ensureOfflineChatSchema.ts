@@ -1,5 +1,5 @@
 import { propEq } from "@utils";
-import type { OfflineChatSchema } from "./offlineChat.types";
+import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 
 /**
  * When the session schema cache is empty offline, still allow repair if the

@@ -168,7 +168,7 @@ msgid " access"
 msgstr " acesso"
 
 #. placeholder {0}: model.minRamGb
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "{0} GB RAM"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 "actual values."
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
 msgstr ""
 
@@ -417,7 +417,7 @@ msgstr "Sobre você"
 msgid "Monospace headlines"
 msgstr "Títulos em monoespaço"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr ""
 
@@ -457,7 +457,7 @@ msgstr "Baixar novamente"
 msgid "Allow multiple values"
 msgstr "Permitir múltiplos valores"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
 msgstr ""
 
@@ -792,7 +792,7 @@ msgstr "Adicione um gráfico de barras de {datasetName} agrupado por "
 msgid "Permanently delete <0>{0}</0>?"
 msgstr "Excluir permanentemente <0>{0}</0>?"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr ""
 
@@ -1010,7 +1010,7 @@ msgstr "Remover membro"
 msgid "Welcome back"
 msgstr "Bem-vindo de volta"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
 msgstr ""
 
@@ -1063,7 +1063,7 @@ msgstr "Consulta falhou."
 msgid "Undo"
 msgstr "Desfazer"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr ""
 
@@ -1558,7 +1558,7 @@ msgstr "Decrescente"
 msgid "Category axis"
 msgstr "Eixo de categoria"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Balanced offline model for everyday SQL questions on typical laptops."
 msgstr ""
 
@@ -1690,7 +1690,7 @@ msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgstr "{usedSeats} de {maxSeats} assentos utilizados · {remainingSeats} "
 "restantes"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
 "size are not constraints."
 msgstr ""
@@ -1962,7 +1962,7 @@ msgstr ""
 msgid "Column 7"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
 msgstr ""
@@ -2227,7 +2227,7 @@ msgstr "Recursos do Plano:"
 msgid "Start your journey with us"
 msgstr "Comece sua jornada conosco"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B (offline)"
 msgstr ""
 
@@ -2235,7 +2235,7 @@ msgstr ""
 msgid "QR code"
 msgstr "Código QR"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
 msgstr ""
@@ -2367,7 +2367,7 @@ msgstr ""
 msgid "Re-run query"
 msgstr "Reexecutar consulta"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
 msgstr ""
 
@@ -2756,7 +2756,7 @@ msgstr "Adicionaremos esta visualização ao seu novo painel."
 msgid "Repairing query…"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
 "the 8 GB tier."
 msgstr ""
@@ -2823,7 +2823,7 @@ msgstr "Importação falhou: {reason}"
 msgid "Timestamp format"
 msgstr "Formato de timestamp"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
 msgstr ""
@@ -2965,7 +2965,7 @@ msgstr "Permitir edição manual"
 msgid "Embed"
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
 msgstr ""
 
@@ -3102,12 +3102,12 @@ msgstr "Consentimento"
 msgid "Edit user group"
 msgstr "Editar grupo de usuários"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
 "device."
 msgstr ""
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B"
 msgstr ""
 
@@ -3256,7 +3256,7 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "Ainda não há esclarecimentos. O registro se preenche à medida que o "
 "chat faz perguntas esclarecedoras."
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B"
 msgstr ""
 
@@ -3533,7 +3533,7 @@ msgstr "Não foi possível carregar os conjuntos de dados do painel"
 msgid "No description has been added yet."
 msgstr "Nenhuma descrição foi adicionada ainda."
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B"
 msgstr ""
 
@@ -3971,7 +3971,7 @@ msgid "Create a new workspace. You can always edit it later."
 msgstr "Criar um novo espaço de trabalho. Você pode editá-lo a qualquer "
 "momento."
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
 msgstr ""
 
@@ -4138,7 +4138,7 @@ msgstr "Registro de privacidade"
 msgid "Visualization Settings"
 msgstr "Configurações de Visualização"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini (offline)"
 msgstr ""
 
@@ -4434,7 +4434,7 @@ msgstr "Todas as decisões"
 msgid "Show labels"
 msgstr "Mostrar rótulos"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr ""
 
@@ -4603,7 +4603,7 @@ msgstr "Editar permissões"
 msgid "queried"
 msgstr "consultado"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
 msgstr ""
 
@@ -4761,7 +4761,7 @@ msgstr "Publicado"
 msgid "Filters (Where)"
 msgstr "Filtros (Onde)"
 
-#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
 msgstr ""
