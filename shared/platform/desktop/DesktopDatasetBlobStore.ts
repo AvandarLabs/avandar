@@ -1,3 +1,4 @@
+import { base64ToUint8, uint8ToBase64 } from "@utils/encoding/index.ts";
 import { callIpc } from "$/platform/ipc/client.ts";
 import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 import type {
@@ -32,29 +33,6 @@ async function _readStreamToUint8Array(
   return out;
 }
 
-/** Encodes bytes as a standard base64 string for transit over the IPC JSON. */
-function _uint8ToBase64(bytes: Uint8Array): string {
-  // Chunked encoding avoids the `String.fromCharCode(...)` call-stack limit.
-  // `btoa` accepts the byte-sized character codes produced here.
-  const chunkSize = 0x8000;
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i += chunkSize) {
-    const slice = bytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode(...slice);
-  }
-  return btoa(binary);
-}
-
-/** Decodes a standard base64 string back into its raw bytes. */
-function _base64ToUint8(b64: string): Uint8Array {
-  const binary = atob(b64);
-  const out = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    out[i] = binary.charCodeAt(i);
-  }
-  return out;
-}
-
 /** Wraps a byte array in a single-chunk readable stream. */
 function _bytesToStream(bytes: Uint8Array): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
@@ -73,13 +51,13 @@ async function put(
     bytes instanceof Uint8Array ? bytes : await _readStreamToUint8Array(bytes);
   await callIpc(DatasetBlobContracts.put, {
     key,
-    bytesBase64: _uint8ToBase64(buffer),
+    bytesBase64: uint8ToBase64(buffer),
   });
 }
 
 async function get(key: DatasetBlobKey): Promise<ReadableStream<Uint8Array>> {
   const reply = await callIpc(DatasetBlobContracts.get, { key });
-  return _bytesToStream(_base64ToUint8(reply.bytesBase64));
+  return _bytesToStream(base64ToUint8(reply.bytesBase64));
 }
 
 async function deleteKey(key: DatasetBlobKey): Promise<void> {

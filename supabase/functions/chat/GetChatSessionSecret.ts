@@ -1,6 +1,6 @@
+import { uint8ToBase64 } from "@utils/encoding/index.ts";
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
-import { base64Encode } from "$/utils/privacy/sessionSecretUtils.ts";
 import { z } from "zod";
 import type { ChatSessionSecretResponse } from "$/types/chat.types.ts";
 
@@ -18,7 +18,7 @@ export const GetChatSessionSecret = GET({
     userId: user.id,
   });
   return {
-    sessionSecret: base64Encode(new Uint8Array(secret)),
+    sessionSecret: uint8ToBase64(new Uint8Array(secret)),
     issuedAt: Date.now(),
   };
 });

@@ -1,5 +1,4 @@
 import {
-  base64Encode,
   base64UrlDecode,
   base64UrlEncode,
   hashTextPayload,
@@ -10,12 +9,6 @@ import { describe, expect, it } from "vitest";
 describe("toHex", () => {
   it("encodes every byte as two lowercase hexadecimal characters", () => {
     expect(toHex(new Uint8Array([0, 15, 255]))).toBe("000fff");
-  });
-});
-
-describe("base64Encode", () => {
-  it("encodes bytes as standard padded base64", () => {
-    expect(base64Encode(new Uint8Array([0, 255, 16]))).toBe("AP8Q");
   });
 });
 

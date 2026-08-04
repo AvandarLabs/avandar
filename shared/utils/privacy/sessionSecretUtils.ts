@@ -1,3 +1,5 @@
+import { base64ToUint8, uint8ToBase64 } from "@utils/encoding/index.ts";
+
 const TEXT_ENCODER = new TextEncoder();
 
 /** Lowercase hex encoding of a byte array (two chars per byte). */
@@ -9,21 +11,12 @@ export function toHex(bytes: Uint8Array): string {
   return out;
 }
 
-/** Encodes bytes as standard padded base64. */
-export function base64Encode(bytes: Uint8Array): string {
-  let binary = "";
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary);
-}
-
 /**
  * Encodes bytes as unpadded base64url (`+`/`/` become `-`/`_`, trailing `=`
  * stripped). Used to encode the ack-token header on the issuing (client) side.
  */
 export function base64UrlEncode(bytes: Uint8Array): string {
-  return base64Encode(bytes)
+  return uint8ToBase64(bytes)
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
@@ -37,12 +30,7 @@ export function base64UrlEncode(bytes: Uint8Array): string {
 export function base64UrlDecode(input: string): Uint8Array {
   const pad = input.length % 4 === 0 ? 0 : 4 - (input.length % 4);
   const b64 = input.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad);
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
-  }
-  return bytes;
+  return base64ToUint8(b64);
 }
 
 /**

@@ -1,3 +1,4 @@
+import { base64ToUint8 } from "@utils/encoding";
 import {
   base64UrlEncode,
   hashTextPayload,
@@ -23,7 +24,7 @@ async function _fetchAndImport(
     route: "chat/:workspaceId/session-secret",
     pathParams: { workspaceId },
   });
-  const bytes = _base64Decode(response.sessionSecret);
+  const bytes = base64ToUint8(response.sessionSecret);
   // Re-pack into a fresh ArrayBuffer (not SharedArrayBuffer-backed) so
   // strict-mode TS recognises it as `BufferSource` for `importKey`.
   const bytesBuf = new ArrayBuffer(bytes.byteLength);
@@ -49,15 +50,6 @@ function _getSessionSecret(workspaceId: Workspace.Id): Promise<CachedSecret> {
   });
   CACHE.set(workspaceId, promise);
   return promise;
-}
-
-function _base64Decode(input: string): Uint8Array {
-  const bin = atob(input);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
-  }
-  return bytes;
 }
 
 /**
