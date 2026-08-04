@@ -835,6 +835,10 @@ msgstr "均值周围的一个标准差"
 msgid "Name column"
 msgstr "名称列"
 
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Your session has expired. Redirecting you to sign in."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -1155,6 +1159,10 @@ msgstr "此字段"
 msgid "Edit access for {0}"
 msgstr "编辑 {0} 的访问权限"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "An unexpected error occurred. You can try again, or return home."
+msgstr ""
+
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1227,6 +1235,10 @@ msgstr "未命名数据集"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Show details"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -2375,6 +2387,10 @@ msgstr "首先运行 AI 查询。"
 msgid "Y column"
 msgstr "Y 列"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Go home"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count how many rows there are in {datasetName}"
 #~ msgstr "计算 {datasetName} 中有多少行"
@@ -2598,6 +2614,7 @@ msgstr "创建新仪表板"
 msgid "Create Workspace"
 msgstr "创建工作区"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "再试一次"
@@ -3226,6 +3243,10 @@ msgstr "更新频率"
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr ""
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Something went wrong"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "允许同步"
@@ -3548,6 +3569,10 @@ msgstr "更新密码"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
 msgstr "仪表板快照"
+
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Signing you back in…"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
@@ -4424,6 +4449,10 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
 msgstr "无法将数据集设置为仅离线使用"
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Hide details"
+msgstr ""
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Enter comment"

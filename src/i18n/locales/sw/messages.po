@@ -863,6 +863,10 @@ msgstr "Kiwango kimoja cha kawaida karibu na wastani"
 msgid "Name column"
 msgstr "Safu ya jina"
 
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Your session has expired. Redirecting you to sign in."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -1191,6 +1195,10 @@ msgstr "Uwanja huu"
 msgid "Edit access for {0}"
 msgstr "Hariri ufikiaji kwa {0}"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "An unexpected error occurred. You can try again, or return home."
+msgstr ""
+
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1268,6 +1276,10 @@ msgstr "Dataset isiyo na jina"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Show details"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -2451,6 +2463,10 @@ msgstr "Kimbia swali la AI kwanza."
 msgid "Y column"
 msgstr "Safu ya Y"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Go home"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count how many rows there are in {datasetName}"
 #~ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
@@ -2675,6 +2691,7 @@ msgstr "Unda dashibodi mpya"
 msgid "Create Workspace"
 msgstr "Unda Mahali pa Kazi"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "Jaribu tena"
@@ -3325,6 +3342,10 @@ msgstr "Mara kwa mara ya sasisho"
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr ""
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Something went wrong"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "Ruhusu usawazishaji"
@@ -3653,6 +3674,10 @@ msgstr "Sasisha neno la siri"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
 msgstr "Picha ya dashibodi"
+
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Signing you back in…"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
@@ -4562,6 +4587,10 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
 msgstr "Haiwezekani kufanya dataset iwe ya mtandaoni pekee"
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Hide details"
+msgstr ""
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Enter comment"

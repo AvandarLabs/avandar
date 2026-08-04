@@ -867,6 +867,10 @@ msgstr "Um desvio padrão em torno da média"
 msgid "Name column"
 msgstr "Coluna de nome"
 
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Your session has expired. Redirecting you to sign in."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -1199,6 +1203,10 @@ msgstr "Este campo"
 msgid "Edit access for {0}"
 msgstr "Editar acesso para {0}"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "An unexpected error occurred. You can try again, or return home."
+msgstr ""
+
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "{0} to be notified when it's your turn to register! If you are already "
@@ -1276,6 +1284,10 @@ msgstr "Conjunto de dados sem título"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0} / 3"
 msgstr "{0} / 3"
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Show details"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -2458,6 +2470,10 @@ msgstr "Execute uma consulta de IA primeiro."
 msgid "Y column"
 msgstr "Coluna Y"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Go home"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #~ msgid "Count how many rows there are in {datasetName}"
 #~ msgstr "Conte quantas linhas existem em {datasetName}"
@@ -2683,6 +2699,7 @@ msgstr "Criar novo painel"
 msgid "Create Workspace"
 msgstr "Criar Espaço de Trabalho"
 
+#: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "Tente novamente"
@@ -3334,6 +3351,10 @@ msgstr "Frequência de atualização"
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
 msgstr ""
 
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Something went wrong"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "Permitir sincronização"
@@ -3664,6 +3685,10 @@ msgstr "Atualizar senha"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas.tsx
 msgid "Dashboard snapshot"
 msgstr "Captura de tela do painel"
+
+#: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
+msgid "Signing you back in…"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
@@ -4573,6 +4598,10 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
 msgstr "Não foi possível tornar o conjunto de dados apenas offline."
+
+#: src/components/AppErrorBoundary/GenericError.tsx
+msgid "Hide details"
+msgstr ""
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Enter comment"

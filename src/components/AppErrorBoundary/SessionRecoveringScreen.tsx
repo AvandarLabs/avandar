@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Center, Stack, Text, Title } from "@mantine/core";
 
 /**
@@ -10,9 +11,11 @@ export function SessionRecoveringScreen(): React.ReactNode {
   return (
     <Center h="100vh" p="lg">
       <Stack align="center" gap="xs">
-        <Title order={3}>Signing you back in…</Title>
+        <Title order={3}>
+          <Trans>Signing you back in…</Trans>
+        </Title>
         <Text c="dimmed" size="sm" ta="center">
-          Your session has expired. Redirecting you to sign in.
+          <Trans>Your session has expired. Redirecting you to sign in.</Trans>
         </Text>
       </Stack>
     </Center>

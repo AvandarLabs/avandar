@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Button, Center, Code, Group, Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
 
@@ -22,19 +23,25 @@ export function GenericError({ error, reset }: Props): React.ReactNode {
   return (
     <Center h="100vh" p="lg">
       <Stack align="center" gap="md" maw={480}>
-        <Title order={3}>Something went wrong</Title>
+        <Title order={3}>
+          <Trans>Something went wrong</Trans>
+        </Title>
         <Text c="dimmed" size="sm" ta="center">
-          An unexpected error occurred. You can try again, or return home.
+          <Trans>
+            An unexpected error occurred. You can try again, or return home.
+          </Trans>
         </Text>
         <Group>
-          <Button onClick={reset}>Try again</Button>
+          <Button onClick={reset}>
+            <Trans>Try again</Trans>
+          </Button>
           <Button
             variant="default"
             onClick={() => {
               window.location.assign("/");
             }}
           >
-            Go home
+            <Trans>Go home</Trans>
           </Button>
         </Group>
         {import.meta.env.DEV ?
@@ -48,7 +55,9 @@ export function GenericError({ error, reset }: Props): React.ReactNode {
                 });
               }}
             >
-              {showDetails ? "Hide details" : "Show details"}
+              {showDetails ?
+                <Trans>Hide details</Trans>
+              : <Trans>Show details</Trans>}
             </Button>
             {showDetails ?
               <Code block>{message}</Code>
