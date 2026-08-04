@@ -43,6 +43,7 @@ export const PlatformRegistry = {
    * @param next - The {@link PlatformImpls} to register.
    */
   setImpls: _setImpls,
+
   /**
    * Reads the registered platform implementations. Throws when called
    * before `setImpls` has run, which means before the React tree's
@@ -53,6 +54,7 @@ export const PlatformRegistry = {
    * @returns The {@link PlatformImpls} registered by `PlatformProvider`.
    */
   getImpls: _getImpls,
+
   /**
    * Test-only seam. Clears the registered impls so the next test can
    * register its own. Do not call from app code.

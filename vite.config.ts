@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
   const escapeRegExp = (s: string) => {
     return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   };
-  const supabaseRestPattern =
+  const supabaseRestUrlPattern =
     supabaseApiUrl ?
       new RegExp(`^${escapeRegExp(supabaseApiUrl)}/rest/`)
     : undefined;
@@ -74,10 +74,10 @@ export default defineConfig(({ mode }) => {
               navigateFallback: "/index.html",
               navigateFallbackDenylist: [/^\/functions\//, /^\/auth\//],
               runtimeCaching: [
-                ...(supabaseRestPattern ?
+                ...(supabaseRestUrlPattern ?
                   [
                     {
-                      urlPattern: supabaseRestPattern,
+                      urlPattern: supabaseRestUrlPattern,
                       handler: "NetworkFirst" as const,
                       options: {
                         cacheName: "supabase-rest",
