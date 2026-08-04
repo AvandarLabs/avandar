@@ -11,12 +11,6 @@ import { PoCatalog } from "./poCatalog";
 
 type TranslationBatch = Record<string, string>;
 
-/**
- * Call OpenAI Chat Completions and return a `msgid -> translation` map.
- *
- * Exported so tests can stub it out via dependency injection without
- * needing to monkey-patch `globalThis.fetch`.
- */
 async function _translateBatch(args: {
   locale: string;
   localeLabel: string;
@@ -97,13 +91,6 @@ async function _translateBatch(args: {
   return makeObjectFromEntries(translations);
 }
 
-/**
- * Translate a single locale: read its .po file, find empty msgstr entries
- * matching the scope filter, hit OpenAI, and write the catalog back.
- *
- * @returns `translated` (count actually filled) and `remaining` (count
- *   still empty within the scope).
- */
 async function _processLocale(args: {
   locale: string;
   apiKey: string;
@@ -193,6 +180,19 @@ async function _processLocale(args: {
 /** Translates missing catalog entries through the configured LLM. */
 export const CatalogTranslator = {
   localeNames: TARGET_LOCALE_NAMES,
+  /**
+   * Call OpenAI Chat Completions and return a `msgid -> translation` map.
+   *
+   * Exported so tests can stub it out via dependency injection without
+   * needing to monkey-patch `globalThis.fetch`.
+   */
   translateBatch: _translateBatch,
+  /**
+   * Translate a single locale: read its .po file, find empty msgstr entries
+   * matching the scope filter, hit OpenAI, and write the catalog back.
+   *
+   * @returns `translated` (count actually filled) and `remaining` (count
+   *   still empty within the scope).
+   */
   processLocale: _processLocale,
 };

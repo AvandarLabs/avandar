@@ -14,26 +14,10 @@ import type { PlatformImpls } from "../PlatformProvider/PlatformProvider";
 
 let impls: PlatformImpls | undefined;
 
-/**
- * Registers the platform implementations resolved by `PlatformProvider`.
- * Called once at provider mount. Calling again replaces the prior value,
- * which supports test isolation and development remounts.
- *
- * @param next - The {@link PlatformImpls} to register.
- */
 function _setImpls(platformImpls: PlatformImpls): void {
   impls = platformImpls;
 }
 
-/**
- * Reads the registered platform implementations. Throws when called
- * before `setImpls` has run, which means before the React tree's
- * `PlatformProvider` has mounted. Non-React modules calling this from
- * module top-level should defer the read until they're actually
- * invoked.
- *
- * @returns The {@link PlatformImpls} registered by `PlatformProvider`.
- */
 function _getImpls(): PlatformImpls {
   if (impls === undefined) {
     throw new Error(
@@ -45,17 +29,33 @@ function _getImpls(): PlatformImpls {
   return impls;
 }
 
-/**
- * Test-only seam. Clears the registered impls so the next test can
- * register its own. Do not call from app code.
- */
 function _resetForTests(): void {
   impls = undefined;
 }
 
 /** Registry for platform implementations used outside React components. */
 export const PlatformRegistry = {
+  /**
+   * Registers the platform implementations resolved by `PlatformProvider`.
+   * Called once at provider mount. Calling again replaces the prior value,
+   * which supports test isolation and development remounts.
+   *
+   * @param next - The {@link PlatformImpls} to register.
+   */
   setImpls: _setImpls,
+  /**
+   * Reads the registered platform implementations. Throws when called
+   * before `setImpls` has run, which means before the React tree's
+   * `PlatformProvider` has mounted. Non-React modules calling this from
+   * module top-level should defer the read until they're actually
+   * invoked.
+   *
+   * @returns The {@link PlatformImpls} registered by `PlatformProvider`.
+   */
   getImpls: _getImpls,
+  /**
+   * Test-only seam. Clears the registered impls so the next test can
+   * register its own. Do not call from app code.
+   */
   resetForTests: _resetForTests,
 };

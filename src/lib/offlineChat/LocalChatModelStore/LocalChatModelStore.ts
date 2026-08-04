@@ -8,7 +8,6 @@ type DownloadedRecord = Partial<Record<LocalChatModelId, true>>;
 
 const downloadedListeners = new Set<() => void>();
 
-/** Subscribes to changes in the downloaded-models list (mark/clear). */
 function _subscribeDownloadedModels(listener: () => void): () => void {
   downloadedListeners.add(listener);
   return () => {
@@ -75,7 +74,6 @@ function _hasAnyDownloaded(): boolean {
   });
 }
 
-/** Downloaded models in catalog order (for UI lists). */
 function _listDownloadedIds(): LocalChatModelId[] {
   const record = readDownloaded();
   return LocalChatModelCatalog.values.flatMap((model) => {
@@ -85,6 +83,7 @@ function _listDownloadedIds(): LocalChatModelId[] {
 
 /** Persistent selection and download metadata for local chat models. */
 export const LocalChatModelStore = {
+  /** Subscribes to changes in the downloaded-models list (mark/clear). */
   subscribeDownloadedModels: _subscribeDownloadedModels,
   readSelectedId: _readSelectedId,
   writeSelectedId: _writeSelectedId,
@@ -92,5 +91,6 @@ export const LocalChatModelStore = {
   markDownloaded: _markDownloaded,
   clearDownloaded: _clearDownloaded,
   hasAnyDownloaded: _hasAnyDownloaded,
+  /** Downloaded models in catalog order (for UI lists). */
   listDownloadedIds: _listDownloadedIds,
 };

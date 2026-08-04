@@ -21,10 +21,6 @@ export type ParseArgsResult =
   | { ok: true; options: CliOptions }
   | { ok: false; error: string };
 
-/**
- * Returns the human-readable help text for the CLI. Exported so tests
- * can assert on it without invoking the script.
- */
 function _buildHelpText(): string {
   return [
     "Usage: pnpm vite-script scripts/i18n/translateWithLlm/translateWithLlm.ts [options]",
@@ -74,13 +70,6 @@ function _buildHelpText(): string {
   ].join("\n");
 }
 
-/**
- * Parse the script's CLI arguments. This pure function does not read env or
- * touch the filesystem, so it can be tested directly.
- *
- * @param argv The argv slice (i.e. without `node` / script path). Pass
- *   `process.argv.slice(2)` from the entrypoint.
- */
 function _parseArgs(argv: string[]): ParseArgsResult {
   const options: CliOptions = {
     help: false,
@@ -155,12 +144,6 @@ function _parseArgs(argv: string[]): ParseArgsResult {
   return { ok: true, options };
 }
 
-/**
- * Load env vars from .env.development and .env.development.edge (the
- * latter holds the OpenAI key in our Supabase edge-function convention).
- * Already-set vars on `process.env` win over file values so callers can
- * still override on the command line.
- */
 function _loadEnvFiles(): void {
   [".env.development", ".env.development.edge"].forEach((file) => {
     dotenv.config({ path: path.join(PROJECT_ROOT, file), override: false });
@@ -169,7 +152,24 @@ function _loadEnvFiles(): void {
 
 /** Parses translation CLI options and builds its help output. */
 export const TranslationCli = {
+  /**
+   * Parse the script's CLI arguments. This pure function does not read env or
+   * touch the filesystem, so it can be tested directly.
+   *
+   * @param argv The argv slice (i.e. without `node` / script path). Pass
+   *   `process.argv.slice(2)` from the entrypoint.
+   */
   parseArgs: _parseArgs,
+  /**
+   * Returns the human-readable help text for the CLI. Exported so tests
+   * can assert on it without invoking the script.
+   */
   buildHelpText: _buildHelpText,
+  /**
+   * Load env vars from .env.development and .env.development.edge (the
+   * latter holds the OpenAI key in our Supabase edge-function convention).
+   * Already-set vars on `process.env` win over file values so callers can
+   * still override on the command line.
+   */
   loadEnvFiles: _loadEnvFiles,
 };

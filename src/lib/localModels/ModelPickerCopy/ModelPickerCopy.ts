@@ -4,7 +4,6 @@
 
 import { t } from "@lingui/core/macro";
 
-/** Option label: name, RAM tier, and optional download size. */
 function _formatLabel(args: {
   displayName: string;
   systemRequirements: string;
@@ -16,7 +15,6 @@ function _formatLabel(args: {
   return args.downloadedSuffix ? `${base}${args.downloadedSuffix}` : base;
 }
 
-/** Select `description`: capability blurb plus recommendation. */
 function _formatDescription(args: {
   description: string;
   recommendedIf: string;
@@ -28,6 +26,8 @@ function _formatDescription(args: {
 
 /** Copy formatting for local-model picker labels and descriptions. */
 export const ModelPickerCopy = {
+  /** Option label: name, RAM tier, and optional download size. */
   formatLabel: _formatLabel,
+  /** Select `description`: capability blurb plus recommendation. */
   formatDescription: _formatDescription,
 };

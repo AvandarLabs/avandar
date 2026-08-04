@@ -2,9 +2,6 @@
  * Token and heuristic scoring helpers for offline dataset name resolution.
  */
 
-/**
- * Tokenizes user text for loose label matching (filenames, topic words).
- */
 function _tokenize(text: string): string[] {
   return text
     .toLowerCase()
@@ -25,9 +22,6 @@ function shareStem(a: string, b: string): boolean {
   return a.slice(0, stemLen) === b.slice(0, stemLen);
 }
 
-/**
- * Scores how well a dataset label matches the user prompt or table reference.
- */
 function _score(args: {
   datasetName: string;
   promptTokens: readonly string[];
@@ -57,6 +51,12 @@ function _score(args: {
 
 /** Tokenization and scoring for loose offline dataset-name matching. */
 export const OfflineDatasetLabelMatch = {
+  /**
+   * Tokenizes user text for loose label matching (filenames, topic words).
+   */
   tokenize: _tokenize,
+  /**
+   * Scores how well a dataset label matches the user prompt or table reference.
+   */
   score: _score,
 };

@@ -1,9 +1,5 @@
 type FromEntry = Record<string, unknown>;
 
-/**
- * Removes `schema.table` (and deeper) qualifiers from FROM/JOIN in raw SQL so
- * offline repair can match Avandar dataset names.
- */
 function _stripInSql(sql: string): string {
   const qualifierSegment =
     "(?:\"[^\"]+\"|'[^']+'|`[^`]+`|\\[[^\\]]+\\]|[a-zA-Z_][a-zA-Z0-9_]*)";
@@ -46,10 +42,6 @@ function _stripInSql(sql: string): string {
   );
 }
 
-/**
- * Clears `db` (and similar namespace fields) on node-sql-parser FROM entries so
- * `table` holds only the dataset name segment.
- */
 function _stripInFromList(fromList: unknown): boolean {
   if (!Array.isArray(fromList)) {
     return false;
@@ -69,9 +61,6 @@ function _stripInFromList(fromList: unknown): boolean {
   return changed;
 }
 
-/**
- * Strips namespace fields from a parsed SELECT AST (call before dataset remap).
- */
 function _stripInSelectAst(ast: Record<string, unknown>): boolean {
   if (ast.type !== "select") {
     return false;
@@ -81,7 +70,19 @@ function _stripInSelectAst(ast: Record<string, unknown>): boolean {
 
 /** Namespace stripping for raw and parsed offline SQL. */
 export const OfflineSqlTableNamespaces = {
+  /**
+   * Removes `schema.table` (and deeper) qualifiers from FROM/JOIN in raw SQL so
+   * offline repair can match Avandar dataset names.
+   */
   stripInSql: _stripInSql,
+  /**
+   * Clears `db` and similar namespace fields on node-sql-parser FROM
+   * entries so `table` holds only the dataset-name segment.
+   */
   stripInFromList: _stripInFromList,
+  /**
+   * Strips namespace fields from a parsed SELECT AST. Call before the
+   * dataset remap.
+   */
   stripInSelectAst: _stripInSelectAst,
 };

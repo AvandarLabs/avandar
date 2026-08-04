@@ -26,16 +26,10 @@ function buildForbiddenTablePattern(): RegExp {
   );
 }
 
-/**
- * Avandar SQL uses double-quoted identifiers; models often emit backticks.
- */
 function _normalizeBacktickIdentifiers(sql: string): string {
   return sql.replace(/`([^`]+)`/g, '"$1"');
 }
 
-/**
- * Converts T-SQL `SELECT TOP n` into DuckDB `LIMIT n` (parser + runtime).
- */
 function _normalizeSelectTopToLimit(sql: string): string {
   const topMatch = /\bSELECT\s+TOP\s+(\d+)\b/i.exec(sql);
   if (!topMatch?.[1]) {
@@ -48,9 +42,6 @@ function _normalizeSelectTopToLimit(sql: string): string {
   return out.trim();
 }
 
-/**
- * Quotes a bare identifier after FROM/JOIN so node-sql-parser can read it.
- */
 function _quoteUnquotedFromTable(sql: string): string {
   return sql.replace(
     /\b(FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_.-]*)\b(?!\s*\()/gi,
@@ -93,9 +84,6 @@ const SUBSTITUTION_RULES: readonly OfflineSqlSubstitutionRule[] = [
   },
 ];
 
-/**
- * Applies the hallucination substitution dictionary in a stable order.
- */
 function _apply(sql: string): {
   sql: string;
   appliedRuleIds: string[];
@@ -116,8 +104,20 @@ function _apply(sql: string): {
 
 /** Deterministic substitutions for common offline-model SQL mistakes. */
 export const OfflineSqlHallucinationSubstitutions = {
+  /**
+   * Avandar SQL uses double-quoted identifiers; models often emit backticks.
+   */
   normalizeBacktickIdentifiers: _normalizeBacktickIdentifiers,
+  /**
+   * Converts T-SQL `SELECT TOP n` into DuckDB `LIMIT n` (parser + runtime).
+   */
   normalizeSelectTopToLimit: _normalizeSelectTopToLimit,
+  /**
+   * Quotes a bare identifier after FROM/JOIN so node-sql-parser can read it.
+   */
   quoteUnquotedFromTable: _quoteUnquotedFromTable,
+  /**
+   * Applies the hallucination substitution dictionary in a stable order.
+   */
   apply: _apply,
 };

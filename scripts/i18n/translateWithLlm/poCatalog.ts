@@ -70,14 +70,6 @@ function _skipBlankLines(lines: string[], startIndex: number): number {
   return nonBlankOffset === -1 ? lines.length : startIndex + nonBlankOffset;
 }
 
-/**
- * Minimal PO parser sufficient for Lingui-generated catalogs.
- *
- * @param text Raw text of the .po file.
- * @returns Parsed structure with `preamble` (metadata block kept as-is)
- *   and `entries` (each `header` retains the original comments + msgid
- *   lines so we can filter by `#: source/path` references).
- */
 function _parsePo(text: string): ParsedPo {
   const lines = text.split("\n");
   const firstMessageIndex = lines.findIndex((line) => {
@@ -130,9 +122,6 @@ function _parsePo(text: string): ParsedPo {
   return { preamble, entries };
 }
 
-/**
- * Serialize a parsed PO structure back to text.
- */
 function _serializePo(parsed: ParsedPo): string {
   const entryBlocks = parsed.entries.map((entry) => {
     const msgstrSerialized = `msgstr "${_escapePoString(entry.msgstr)}"`;
@@ -141,17 +130,6 @@ function _serializePo(parsed: ParsedPo): string {
   return `${[parsed.preamble, ...entryBlocks].join("\n\n")}\n`;
 }
 
-/**
- * Returns true if the entry's `#: ...` source-file reference comments
- * contain any of the given scope substrings. An empty `scopes` array
- * matches everything (no filtering).
- *
- * @param entry The PO entry whose header carries `#:` reference comments
- *   pointing at the source file(s) the msgid was extracted from.
- * @param scopes Substrings to match against those reference paths. Match
- *   is case-sensitive and substring-based, e.g. `WorkspaceSettingsPage`
- *   matches `src/views/WorkspaceSettingsPage/...`.
- */
 function _entryMatchesScope(entry: PoEntry, scopes: string[]): boolean {
   if (scopes.length === 0) {
     return true;
@@ -170,7 +148,29 @@ function _entryMatchesScope(entry: PoEntry, scopes: string[]): boolean {
 
 /** Parses, matches, and serializes Lingui PO catalogs. */
 export const PoCatalog = {
+  /**
+   * Minimal PO parser sufficient for Lingui-generated catalogs.
+   *
+   * @param text Raw text of the .po file.
+   * @returns Parsed structure with `preamble` (metadata block kept as-is)
+   *   and `entries` (each `header` retains the original comments + msgid
+   *   lines so we can filter by `#: source/path` references).
+   */
   parse: _parsePo,
+  /**
+   * Serialize a parsed PO structure back to text.
+   */
   serialize: _serializePo,
+  /**
+   * Returns true if the entry's `#: ...` source-file reference comments
+   * contain any of the given scope substrings. An empty `scopes` array
+   * matches everything (no filtering).
+   *
+   * @param entry The PO entry whose header carries `#:` reference comments
+   *   pointing at the source file(s) the msgid was extracted from.
+   * @param scopes Substrings to match against those reference paths. Match
+   *   is case-sensitive and substring-based, e.g. `WorkspaceSettingsPage`
+   *   matches `src/views/WorkspaceSettingsPage/...`.
+   */
   entryMatchesScope: _entryMatchesScope,
 };
