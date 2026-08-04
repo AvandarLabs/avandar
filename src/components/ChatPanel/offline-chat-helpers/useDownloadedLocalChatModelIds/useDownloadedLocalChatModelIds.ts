@@ -1,10 +1,10 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useSyncExternalStore } from "react";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 
-const EMPTY_DOWNLOADED_IDS: readonly LocalChatModelId[] = [];
+const EMPTY_DOWNLOADED_IDS: readonly LocalChatModel.Id[] = [];
 
-let cachedDownloadedIds: readonly LocalChatModelId[] = EMPTY_DOWNLOADED_IDS;
+let cachedDownloadedIds: readonly LocalChatModel.Id[] = EMPTY_DOWNLOADED_IDS;
 let cachedDownloadedKey = "";
 
 /**
@@ -12,7 +12,7 @@ let cachedDownloadedKey = "";
  * each call; returning it directly causes infinite re-renders because React
  * compares snapshots with `Object.is`.
  */
-function _getDownloadedIdsSnapshot(): readonly LocalChatModelId[] {
+function _getDownloadedIdsSnapshot(): readonly LocalChatModel.Id[] {
   const downloadedIds = LocalChatModelStore.listDownloadedIds();
   const downloadedKey = downloadedIds.join("\0");
   if (downloadedKey === cachedDownloadedKey) {
@@ -27,7 +27,7 @@ function _getDownloadedIdsSnapshot(): readonly LocalChatModelId[] {
 /**
  * Reactive list of offline chat models marked downloaded in this browser.
  */
-export function useDownloadedLocalChatModelIds(): readonly LocalChatModelId[] {
+export function useDownloadedLocalChatModelIds(): readonly LocalChatModel.Id[] {
   return useSyncExternalStore(
     LocalChatModelStore.subscribeDownloadedModels,
     _getDownloadedIdsSnapshot,

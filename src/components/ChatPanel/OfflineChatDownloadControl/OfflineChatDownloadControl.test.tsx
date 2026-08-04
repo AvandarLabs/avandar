@@ -4,7 +4,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { OfflineChatDownloadControl } from "./OfflineChatDownloadControl";
 

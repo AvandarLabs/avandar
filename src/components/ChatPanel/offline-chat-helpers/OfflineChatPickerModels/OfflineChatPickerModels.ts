@@ -1,10 +1,6 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Model } from "@models";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
-import type {
-  LocalChatModelCopy,
-  LocalChatModelId,
-} from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 /** Prefix for offline model ids in the shared chat model picker. */
@@ -14,17 +10,17 @@ const ID_PREFIX = "offline:" as const;
  * Builds the picker id stored in chat model local storage and assistant-ui
  * model context.
  */
-function buildModelId(localModelId: LocalChatModelId): string {
+function buildModelId(localModelId: LocalChatModel.Id): string {
   return `${ID_PREFIX}${localModelId}`;
 }
 
 /** Parses a picker id back to a local catalog id, if it is an offline model. */
-function parseModelId(modelId: string): LocalChatModelId | undefined {
+function parseModelId(modelId: string): LocalChatModel.Id | undefined {
   if (!modelId.startsWith(ID_PREFIX)) {
     return undefined;
   }
   const localId = modelId.slice(ID_PREFIX.length);
-  if (LocalChatModelCatalog.isValidId(localId)) {
+  if (LocalChatModel.Catalog.isValidId(localId)) {
     return localId;
   }
   return undefined;
@@ -32,13 +28,13 @@ function parseModelId(modelId: string): LocalChatModelId | undefined {
 
 /** Maps downloaded local models to chat picker options. */
 function buildOptions(
-  downloadedIds: readonly LocalChatModelId[],
+  downloadedIds: readonly LocalChatModel.Id[],
   getCopy: (
-    model: ReturnType<typeof LocalChatModelCatalog.find>,
-  ) => LocalChatModelCopy,
+    model: ReturnType<typeof LocalChatModel.Catalog.find>,
+  ) => LocalChatModel.Copy,
 ): ChatModelOption.T[] {
   return downloadedIds.map((localModelId) => {
-    const model = LocalChatModelCatalog.find(localModelId);
+    const model = LocalChatModel.Catalog.find(localModelId);
     const copy = getCopy(model);
     return Model.make("ChatModelOption", {
       id: buildModelId(localModelId),
@@ -58,10 +54,10 @@ function buildOptions(
 
 /** Offline models group for the chat picker (empty when none downloaded). */
 function buildGroup(
-  downloadedIds: readonly LocalChatModelId[],
+  downloadedIds: readonly LocalChatModel.Id[],
   getCopy: (
-    model: ReturnType<typeof LocalChatModelCatalog.find>,
-  ) => LocalChatModelCopy,
+    model: ReturnType<typeof LocalChatModel.Catalog.find>,
+  ) => LocalChatModel.Copy,
   groupLabel: string,
 ): ChatModelOption.OptionGroup | undefined {
   const models = buildOptions(downloadedIds, getCopy);

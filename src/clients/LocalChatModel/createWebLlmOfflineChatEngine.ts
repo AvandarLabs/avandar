@@ -1,5 +1,4 @@
-import { LocalChatModelCatalog } from "./LocalChatModelCatalog/LocalChatModelCatalog";
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
@@ -30,11 +29,11 @@ export type WebLLMEngineFactory = (
  * real package import.
  */
 export function createWebLlmOfflineChatEngine(args: {
-  modelId: LocalChatModelId;
+  modelId: LocalChatModel.Id;
   onDownloadProgress?: (report: { text: string; progress: number }) => void;
   factory?: WebLLMEngineFactory;
 }): OfflineChatEngine {
-  const catalog = LocalChatModelCatalog.find(args.modelId);
+  const catalog = LocalChatModel.Catalog.find(args.modelId);
   let enginePromise: Promise<MlcEngine> | undefined;
 
   const loadEngine = async (): Promise<MlcEngine> => {

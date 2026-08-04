@@ -1,12 +1,12 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { propEq } from "@utils";
 import { ensureOfflineChatSchema } from "@/components/ChatPanel/offline-chat-helpers/ensureOfflineChatSchema/ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "./logOfflineChat";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/offline-chat-helpers/runOfflineChatPipeline/runOfflineChatPipeline";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type {
   OfflineChatPipelineCopy,
   OfflineChatTurnResult,
@@ -21,7 +21,7 @@ export type RunOfflineChatTurnArgs = {
   messages: readonly ChatClientMessage.T[];
   navigatorOnLine: boolean;
   copy: OfflineChatPipelineCopy;
-  localChatModelId?: LocalChatModelId;
+  localChatModelId?: LocalChatModel.Id;
   executeSql?: (
     sql: string,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;

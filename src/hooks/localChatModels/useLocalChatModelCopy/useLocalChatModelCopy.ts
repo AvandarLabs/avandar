@@ -1,18 +1,15 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
-import type {
-  LocalChatModel,
-  LocalChatModelCopy,
-} from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 /** Returns translated display copy for an offline chat model. */
 export function useLocalChatModelCopy(): (
-  model: LocalChatModel,
-) => LocalChatModelCopy {
+  model: LocalChatModel.T,
+) => LocalChatModel.Copy {
   const { t } = useLingui();
 
   return useCallback(
-    (model: LocalChatModel): LocalChatModelCopy => {
+    (model: LocalChatModel.T): LocalChatModel.Copy => {
       const systemRequirements = t`${model.minRamGb} GB RAM`;
       switch (model.id) {
         case "llama-1b":

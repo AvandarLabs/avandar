@@ -1,13 +1,12 @@
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 
 /**
  * Deletes WebLLM weight/config cache for a model from the browser cache.
  */
 export async function deleteLocalChatModelCache(
-  modelId: LocalChatModelId,
+  modelId: LocalChatModel.Id,
 ): Promise<void> {
-  const { mlcModelId } = LocalChatModelCatalog.find(modelId);
+  const { mlcModelId } = LocalChatModel.Catalog.find(modelId);
   const { deleteModelAllInfoInCache } = await import("@mlc-ai/web-llm");
   await deleteModelAllInfoInCache(mlcModelId);
 }

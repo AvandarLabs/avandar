@@ -1,3 +1,4 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Model } from "@models";
@@ -19,7 +20,7 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isNetworkChatFailure } from "@/components/ChatPanel/offline-chat-helpers/isNetworkChatFailure";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "@/components/ChatPanel/offline-chat-helpers/logOfflineChat";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/offline-chat-helpers/offerOfflineChatFallback";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
@@ -30,7 +31,6 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
@@ -420,7 +420,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         };
 
         const runOfflineTurn = async (
-          localChatModelId?: LocalChatModelId,
+          localChatModelId?: LocalChatModel.Id,
         ): Promise<ChatModelRunResult> => {
           if (!LocalChatModelStore.hasAnyDownloaded()) {
             return {

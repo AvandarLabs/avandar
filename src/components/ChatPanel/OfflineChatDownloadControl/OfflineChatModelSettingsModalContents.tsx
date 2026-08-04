@@ -1,3 +1,4 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select, Stack, Text } from "@mantine/core";
 import { useForceUpdate } from "@mantine/hooks";
@@ -5,14 +6,12 @@ import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useEffect, useState } from "react";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import { DownloadedModelList } from "./DownloadedModelList";
 import { useDeleteOfflineChatModel } from "./useDeleteOfflineChatModel";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   settingsModalId: string;
@@ -73,7 +72,7 @@ export function OfflineChatModelSettingsModalContents({
   const { t } = useLingui();
   const getLocalChatModelCopy = useLocalChatModelCopy();
   const managerStatus = useOfflineChatManagerStatus();
-  const [selectedModelId, setSelectedModelId] = useState<LocalChatModelId>(
+  const [selectedModelId, setSelectedModelId] = useState<LocalChatModel.Id>(
     () => {
       return LocalChatModelStore.readSelectedId();
     },
@@ -117,7 +116,7 @@ export function OfflineChatModelSettingsModalContents({
 
   const onConfirmDownload = useCallback(async () => {
     onClose();
-    const model = LocalChatModelCatalog.find(selectedModelId);
+    const model = LocalChatModel.Catalog.find(selectedModelId);
     const modelCopy = getLocalChatModelCopy(model);
     try {
       await OfflineChatResourceManager.ensureEngine(selectedModelId);
@@ -134,9 +133,9 @@ export function OfflineChatModelSettingsModalContents({
     }
   }, [forceUpdate, getLocalChatModelCopy, onClose, selectedModelId, t]);
 
-  const selectedModel = LocalChatModelCatalog.find(selectedModelId);
+  const selectedModel = LocalChatModel.Catalog.find(selectedModelId);
   const selectedModelCopy = getLocalChatModelCopy(selectedModel);
-  const modelSelectData = LocalChatModelCatalog.values.map((model) => {
+  const modelSelectData = LocalChatModel.Catalog.values.map((model) => {
     const modelCopy = getLocalChatModelCopy(model);
     const downloadedSuffix =
       LocalChatModelStore.isDownloaded(model.id) ? t` · downloaded` : "";
@@ -174,7 +173,7 @@ export function OfflineChatModelSettingsModalContents({
         value={selectedModelId}
         onChange={(value) => {
           if (value) {
-            setSelectedModelId(value as LocalChatModelId);
+            setSelectedModelId(value as LocalChatModel.Id);
           }
         }}
         data={modelSelectData}

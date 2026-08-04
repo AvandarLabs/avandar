@@ -1,10 +1,9 @@
-import { LocalChatModelCatalog } from "../LocalChatModelCatalog/LocalChatModelCatalog";
-import type { LocalChatModelId } from "../LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 
 const SELECTED_MODEL_KEY = "avandar.offlineChat.selectedModelId";
 const DOWNLOADED_MODELS_KEY = "avandar.offlineChat.downloadedModels";
 
-type DownloadedRecord = Partial<Record<LocalChatModelId, true>>;
+type DownloadedRecord = Partial<Record<LocalChatModel.Id, true>>;
 
 const downloadedListeners = new Set<() => void>();
 
@@ -37,30 +36,30 @@ function writeDownloaded(record: DownloadedRecord): void {
   window.localStorage.setItem(DOWNLOADED_MODELS_KEY, JSON.stringify(record));
 }
 
-function _readSelectedId(): LocalChatModelId {
+function _readSelectedId(): LocalChatModel.Id {
   const raw = window.localStorage.getItem(SELECTED_MODEL_KEY);
-  if (raw && LocalChatModelCatalog.isValidId(raw)) {
+  if (raw && LocalChatModel.Catalog.isValidId(raw)) {
     return raw;
   }
-  return LocalChatModelCatalog.defaultId;
+  return LocalChatModel.Catalog.defaultId;
 }
 
-function _writeSelectedId(id: LocalChatModelId): void {
+function _writeSelectedId(id: LocalChatModel.Id): void {
   window.localStorage.setItem(SELECTED_MODEL_KEY, id);
 }
 
-function _isDownloaded(id: LocalChatModelId): boolean {
+function _isDownloaded(id: LocalChatModel.Id): boolean {
   return readDownloaded()[id] === true;
 }
 
-function _markDownloaded(id: LocalChatModelId): void {
+function _markDownloaded(id: LocalChatModel.Id): void {
   const record = readDownloaded();
   record[id] = true;
   writeDownloaded(record);
   _notifyDownloadedModelsChanged();
 }
 
-function _clearDownloaded(id: LocalChatModelId): void {
+function _clearDownloaded(id: LocalChatModel.Id): void {
   const record = readDownloaded();
   delete record[id];
   writeDownloaded(record);
@@ -74,9 +73,9 @@ function _hasAnyDownloaded(): boolean {
   });
 }
 
-function _listDownloadedIds(): LocalChatModelId[] {
+function _listDownloadedIds(): LocalChatModel.Id[] {
   const record = readDownloaded();
-  return LocalChatModelCatalog.values.flatMap((model) => {
+  return LocalChatModel.Catalog.values.flatMap((model) => {
     return record[model.id] === true ? [model.id] : [];
   });
 }

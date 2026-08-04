@@ -7,7 +7,7 @@ import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import css from "./ChatModelPicker.module.css";
 

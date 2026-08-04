@@ -1,18 +1,18 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "@/clients/LocalChatModel/deleteLocalChatModelCache/deleteLocalChatModelCache";
-import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import type { OfflineChatEngine } from "./offlineChat.types";
 
 export type OfflineChatManagerStatus =
   | { kind: "idle" }
   | {
       kind: "downloading";
-      modelId: LocalChatModelId;
+      modelId: LocalChatModel.Id;
       progress: number;
     }
-  | { kind: "ready"; modelId: LocalChatModelId }
-  | { kind: "error"; modelId: LocalChatModelId; message: string };
+  | { kind: "ready"; modelId: LocalChatModel.Id }
+  | { kind: "error"; modelId: LocalChatModel.Id; message: string };
 
 type Listener = (status: OfflineChatManagerStatus) => void;
 
@@ -23,7 +23,7 @@ class OfflineChatResourceManagerImpl {
   private status: OfflineChatManagerStatus = { kind: "idle" };
   private listeners = new Set<Listener>();
   private engine: OfflineChatEngine | undefined;
-  private loadedModelId: LocalChatModelId | undefined;
+  private loadedModelId: LocalChatModel.Id | undefined;
 
   /** Subscribes to status changes and immediately emits the current status. */
   subscribe(listener: Listener): () => void {
@@ -47,7 +47,7 @@ class OfflineChatResourceManagerImpl {
   }
 
   /** Loads the selected model and returns its reusable chat engine. */
-  async ensureEngine(modelId: LocalChatModelId): Promise<OfflineChatEngine> {
+  async ensureEngine(modelId: LocalChatModel.Id): Promise<OfflineChatEngine> {
     if (this.engine && this.loadedModelId === modelId) {
       return this.engine;
     }
@@ -88,7 +88,7 @@ class OfflineChatResourceManagerImpl {
    * Removes cached WebLLM artifacts and the downloaded marker for `modelId`.
    * Unloads first when that model is resident in memory.
    */
-  async deleteModel(modelId: LocalChatModelId): Promise<void> {
+  async deleteModel(modelId: LocalChatModel.Id): Promise<void> {
     if (this.loadedModelId === modelId) {
       await this.unload();
     }

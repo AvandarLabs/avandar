@@ -1,6 +1,6 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Progress, Text } from "@mantine/core";
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import css from "./OfflineChatDownloadIndicator.module.css";
@@ -18,7 +18,7 @@ export function OfflineChatDownloadIndicator(): JSX.Element | null {
     return null;
   }
 
-  const model = LocalChatModelCatalog.find(status.modelId);
+  const model = LocalChatModel.Catalog.find(status.modelId);
   const modelCopy = getLocalChatModelCopy(model);
   const message = t`Downloading ${modelCopy.displayName} for offline chat`;
   const progressPercent = Math.round(

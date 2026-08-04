@@ -1,15 +1,14 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
-  downloadedModelIds: readonly LocalChatModelId[];
-  deletingModelId?: LocalChatModelId;
+  downloadedModelIds: readonly LocalChatModel.Id[];
+  deletingModelId?: LocalChatModel.Id;
   areControlsDisabled: boolean;
-  onRequestDelete: (modelId: LocalChatModelId) => void;
+  onRequestDelete: (modelId: LocalChatModel.Id) => void;
 };
 
 /** Lists downloaded offline models with controls for removing each one. */
@@ -31,7 +30,7 @@ export function DownloadedModelList({
         <Trans>Downloaded on this browser</Trans>
       </Text>
       {downloadedModelIds.map((modelId) => {
-        const model = LocalChatModelCatalog.find(modelId);
+        const model = LocalChatModel.Catalog.find(modelId);
         const modelCopy = getLocalChatModelCopy(model);
         return (
           <Group key={modelId} justify="space-between" wrap="nowrap">

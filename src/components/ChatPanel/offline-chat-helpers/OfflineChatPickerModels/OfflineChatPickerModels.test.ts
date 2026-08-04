@@ -1,10 +1,10 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { describe, expect, it } from "vitest";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offline-chat-helpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import type { LocalChatModelCopy } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 const TRANSLATED_GROUP_LABEL = "Modelos sin conexión";
 
-function getTranslatedCopy(): LocalChatModelCopy {
+function getTranslatedCopy(): LocalChatModel.Copy {
   return {
     displayName: "Qwen 2.5 1.5B (sin conexión)",
     pickerName: "Qwen 2.5 1.5B",

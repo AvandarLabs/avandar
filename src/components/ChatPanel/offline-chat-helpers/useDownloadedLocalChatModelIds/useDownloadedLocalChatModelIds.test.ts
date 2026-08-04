@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
-import { LocalChatModelStore } from "@/clients/LocalChatModel/LocalChatModelStore/LocalChatModelStore";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/offline-chat-helpers/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
 
 describe("useDownloadedLocalChatModelIds", () => {

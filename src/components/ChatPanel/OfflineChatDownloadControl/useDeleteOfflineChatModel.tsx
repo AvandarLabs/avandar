@@ -1,12 +1,11 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useState } from "react";
-import { LocalChatModelCatalog } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
-import type { LocalChatModelId } from "@/clients/LocalChatModel/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   onDeleted: () => void;
@@ -14,19 +13,19 @@ type Props = {
 
 /** Owns confirmation, progress, and notifications for local-model deletion. */
 export function useDeleteOfflineChatModel({ onDeleted }: Props): {
-  deletingModelId: LocalChatModelId | undefined;
-  onRequestDelete: (modelId: LocalChatModelId) => void;
+  deletingModelId: LocalChatModel.Id | undefined;
+  onRequestDelete: (modelId: LocalChatModel.Id) => void;
 } {
   const { t } = useLingui();
   const getLocalChatModelCopy = useLocalChatModelCopy();
-  const [deletingModelId, setDeletingModelId] = useState<LocalChatModelId>();
+  const [deletingModelId, setDeletingModelId] = useState<LocalChatModel.Id>();
 
   const onDelete = useCallback(
-    async (modelId: LocalChatModelId) => {
+    async (modelId: LocalChatModel.Id) => {
       setDeletingModelId(modelId);
       try {
         await OfflineChatResourceManager.deleteModel(modelId);
-        const model = LocalChatModelCatalog.find(modelId);
+        const model = LocalChatModel.Catalog.find(modelId);
         const modelCopy = getLocalChatModelCopy(model);
         notifySuccess({
           title: t`Offline chat model removed`,
@@ -46,8 +45,8 @@ export function useDeleteOfflineChatModel({ onDeleted }: Props): {
   );
 
   const onRequestDelete = useCallback(
-    (modelId: LocalChatModelId) => {
-      const model = LocalChatModelCatalog.find(modelId);
+    (modelId: LocalChatModel.Id) => {
+      const model = LocalChatModel.Catalog.find(modelId);
       const modelCopy = getLocalChatModelCopy(model);
       modals.openConfirmModal({
         title: t`Remove offline chat model?`,

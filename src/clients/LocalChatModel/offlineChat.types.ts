@@ -1,4 +1,4 @@
-import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { ChatClarifyRequest } from "$/types/chat.types";
@@ -92,6 +92,6 @@ export type OfflineChatMode =
   | {
       kind: "local";
       /** When set, overrides the offline settings modal selection. */
-      localChatModelId?: LocalChatModelId;
+      localChatModelId?: LocalChatModel.Id;
     }
   | { kind: "offer_local_fallback" };

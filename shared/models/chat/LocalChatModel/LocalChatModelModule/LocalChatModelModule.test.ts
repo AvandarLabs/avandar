@@ -1,9 +1,9 @@
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 import { describe, expect, it } from "vitest";
-import { LocalChatModelCatalog } from "./LocalChatModelCatalog";
 
-describe("LocalChatModelCatalog/LocalChatModelCatalog", () => {
+describe("LocalChatModel.Catalog", () => {
   it("lists models in ascending RAM tier", () => {
-    const tiers = LocalChatModelCatalog.values.map((model) => {
+    const tiers = LocalChatModel.Catalog.values.map((model) => {
       return model.minRamGb;
     });
     const sortedTiers = [...tiers].sort((leftTier, rightTier) => {
@@ -14,7 +14,7 @@ describe("LocalChatModelCatalog/LocalChatModelCatalog", () => {
 
   it("caps RAM guidance at 32 GB", () => {
     const maxTier = Math.max(
-      ...LocalChatModelCatalog.values.map((model) => {
+      ...LocalChatModel.Catalog.values.map((model) => {
         return model.minRamGb;
       }),
     );
@@ -22,20 +22,20 @@ describe("LocalChatModelCatalog/LocalChatModelCatalog", () => {
   });
 
   it("uses unique catalog and MLC ids", () => {
-    const catalogIds = LocalChatModelCatalog.values.map((model) => {
+    const catalogIds = LocalChatModel.Catalog.values.map((model) => {
       return model.id;
     });
-    const mlcIds = LocalChatModelCatalog.values.map((model) => {
+    const mlcIds = LocalChatModel.Catalog.values.map((model) => {
       return model.mlcModelId;
     });
     expect(new Set(catalogIds).size).toBe(catalogIds.length);
     expect(new Set(mlcIds).size).toBe(mlcIds.length);
   });
 
-  it("LocalChatModelCatalog.isValidId accepts every catalog id", () => {
-    LocalChatModelCatalog.values.forEach((model) => {
-      expect(LocalChatModelCatalog.isValidId(model.id)).toBe(true);
+  it("isValidId accepts every catalog id and rejects unknown ids", () => {
+    LocalChatModel.Catalog.values.forEach((model) => {
+      expect(LocalChatModel.Catalog.isValidId(model.id)).toBe(true);
     });
-    expect(LocalChatModelCatalog.isValidId("not-a-model")).toBe(false);
+    expect(LocalChatModel.Catalog.isValidId("not-a-model")).toBe(false);
   });
 });
