@@ -4,7 +4,7 @@
  * sample dataset until each file is at least the target size in MB.
  *
  * Usage:
- *   node scripts/generate-large-test-files.mjs \
+ *   node scripts/generate-large-test-files.ts \
  *     [--target-mb=420] [--out-dir=tests/data/large]
  *
  * The output files are gitignored so they are never committed.
@@ -13,17 +13,24 @@ import { createWriteStream, mkdirSync, statSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { CellValue } from "exceljs";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..");
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(scriptDir, "..");
 
-const args = Object.fromEntries(
+// Parse `--key=value` and bare `--flag` args into a string record; bare flags
+// map to "true". Kept inline (rather than a shared helper) because Node's
+// direct TS execution needs a `.ts` import extension that the repo lint rules
+// reject for relative imports.
+const args: Record<string, string> = Object.fromEntries(
   process.argv
     .slice(2)
-    .filter((arg) => arg.startsWith("--"))
+    .filter((arg) => {
+      return arg.startsWith("--");
+    })
     .map((arg) => {
-      const [k, v] = arg.replace(/^--/, "").split("=");
-      return [k, v ?? "true"];
+      const [flagName, flagValue] = arg.replace(/^--/, "").split("=");
+      return [flagName, flagValue ?? "true"];
     }),
 );
 
@@ -43,8 +50,11 @@ console.log(
 );
 console.log(`Output dir:  ${OUT_DIR}`);
 
-// === CSV: stream the header once, then repeat the body until target. ===
-async function generateCsv() {
+/**
+ * Streams the CSV header once, then repeats the source body until the file
+ * reaches the target size. Writes are back-pressure aware so memory stays flat.
+ */
+async function generateCsv(): Promise<void> {
   console.log(`\n[CSV] Reading source: ${SRC_CSV}`);
   const text = await readFile(SRC_CSV, "utf8");
   const newlineIdx = text.indexOf("\n");
@@ -69,49 +79,56 @@ async function generateCsv() {
   out.write(header);
 
   // Write the body in chunks of N repeats at a time to avoid one massive
-  // string allocation; back-pressure aware.
+  // string allocation; back-pressure aware. Each write is awaited in
+  // sequence, so this stays an imperative loop rather than a functional map.
   const CHUNK_REPEATS = 32;
   const chunk = body.repeat(CHUNK_REPEATS);
   let written = 0;
   while (written < repeats) {
     const remaining = repeats - written;
-    if (remaining < CHUNK_REPEATS) {
-      const drain = !out.write(body.repeat(remaining));
-      if (drain) await new Promise((r) => out.once("drain", r));
-      written += remaining;
-    } else {
-      const drain = !out.write(chunk);
-      if (drain) await new Promise((r) => out.once("drain", r));
-      written += CHUNK_REPEATS;
+    const batch = remaining < CHUNK_REPEATS ? body.repeat(remaining) : chunk;
+    const needsDrain = !out.write(batch);
+    if (needsDrain) {
+      await new Promise<void>((resolve) => {
+        out.once("drain", resolve);
+      });
     }
+    written += remaining < CHUNK_REPEATS ? remaining : CHUNK_REPEATS;
   }
-  await new Promise((r) => out.end(r));
-  const stat = statSync(outCsv);
+  await new Promise<void>((resolve) => {
+    out.end(resolve);
+  });
+  const outStat = statSync(outCsv);
   console.log(
-    `[CSV] Wrote ${outCsv}: ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
+    `[CSV] Wrote ${outCsv}: ${(outStat.size / 1024 / 1024).toFixed(1)} MB`,
   );
 }
 
-// === XLSX: stream rows via exceljs WorkbookWriter so the workbook is never
-// fully materialized in memory. Rows flush into the on-disk zip as they
-// commit. ===
-async function generateXlsx() {
+/**
+ * Streams rows into an XLSX file via exceljs's WorkbookWriter so the workbook
+ * is never fully materialized in memory. Rows flush into the on-disk zip as
+ * they commit.
+ */
+async function generateXlsx(): Promise<void> {
   console.log(`\n[XLSX] Reading source: ${SRC_XLSX}`);
-  const ExcelJS =
-    (await import("exceljs")).default ?? (await import("exceljs"));
+  const exceljsModule = await import("exceljs");
+  const ExcelJS = exceljsModule.default ?? exceljsModule;
 
   // Pull the header + body rows out of the source workbook (small file,
   // fine to load whole).
   const srcWb = new ExcelJS.Workbook();
   await srcWb.xlsx.readFile(SRC_XLSX);
   const srcWs = srcWb.worksheets[0];
-  const sheetName = srcWs.name;
-  // exceljs `.values` is 1-based; index 0 is always empty.
-  const header = srcWs.getRow(1).values.slice(1);
-  const body = [];
-  for (let r = 2; r <= srcWs.rowCount; r++) {
-    body.push(srcWs.getRow(r).values.slice(1));
+  if (!srcWs) {
+    throw new Error(`Source workbook has no worksheets: ${SRC_XLSX}`);
   }
+  const sheetName = srcWs.name;
+  // exceljs `.values` is a 1-based array for these sheets; index 0 is empty.
+  const header = (srcWs.getRow(1).values as CellValue[]).slice(1);
+  const bodyRowCount = srcWs.rowCount - 1;
+  const body = Array.from({ length: bodyRowCount }, (_unused, idx) => {
+    return (srcWs.getRow(idx + 2).values as CellValue[]).slice(1);
+  });
   console.log(`[XLSX] header cols=${header.length}, body rows=${body.length}`);
 
   // XLSX is zip-compressed. With sharedStrings disabled and the streaming
@@ -132,27 +149,33 @@ async function generateXlsx() {
   });
   const outWs = outWb.addWorksheet(sheetName);
   outWs.addRow(header).commit();
-  for (let i = 0; i < repeats; i++) {
-    for (let j = 0; j < body.length; j++) {
-      outWs.addRow(body[j]).commit();
-    }
-    if ((i + 1) % 10 === 0) {
-      const pct = (((i + 1) / repeats) * 100).toFixed(0);
-      console.log(
-        `[XLSX] ${pct}% (${((i + 1) * body.length).toLocaleString()} rows)`,
-      );
+  // This writes millions of rows for large targets, so the imperative repeat
+  // loop stays: each addRow(...).commit() flushes to the on-disk zip and the
+  // row volume is far past the point where an extra functional pass matters.
+  for (let repeatIdx = 0; repeatIdx < repeats; repeatIdx++) {
+    body.forEach((row) => {
+      outWs.addRow(row).commit();
+    });
+    if ((repeatIdx + 1) % 10 === 0) {
+      const percentDone = (((repeatIdx + 1) / repeats) * 100).toFixed(0);
+      const rowsDone = ((repeatIdx + 1) * body.length).toLocaleString();
+      console.log(`[XLSX] ${percentDone}% (${rowsDone} rows)`);
     }
   }
   outWs.commit();
   await outWb.commit();
 
-  const stat = statSync(outXlsx);
+  const outStat = statSync(outXlsx);
   console.log(
-    `[XLSX] Wrote ${outXlsx}: ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
+    `[XLSX] Wrote ${outXlsx}: ${(outStat.size / 1024 / 1024).toFixed(1)} MB`,
   );
 }
 
-if (args.skipCsv !== "true") await generateCsv();
-if (args.skipXlsx !== "true") await generateXlsx();
+if (args.skipCsv !== "true") {
+  await generateCsv();
+}
+if (args.skipXlsx !== "true") {
+  await generateXlsx();
+}
 
 console.log("\nDone.");

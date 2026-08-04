@@ -1,17 +1,28 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-// `chromium` is a runtime named export from @playwright/test (re-exported
-// from `playwright`) but the import-x rule can't see it through the chain.
-// eslint-disable-next-line import-x/named
 import { chromium } from "@playwright/test";
 
 const SCREENSHOT_DIR = ".playwright-mcp";
 const CHROME_PATH = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const BASE_URL = "http://localhost:5173";
 
+/** A tablet/desktop viewport and its expected `--mantine-scale` tier. */
+type Viewport = {
+  name: string;
+  width: number;
+  height: number;
+  expectedScale: string;
+};
+
+/** A checked viewport: the viewport plus its observed scale and screenshot. */
+type ScaleResult = Viewport & {
+  observed: string;
+  file: string;
+};
+
 // Standard tablet/iPad viewport widths. Each maps to the --mantine-scale
 // tier defined in src/index.css.
-const VIEWPORTS = [
+const VIEWPORTS: readonly Viewport[] = [
   { name: "ipad-portrait-768", width: 768, height: 1024, expectedScale: "0.8" },
   { name: "ipad-portrait-810", width: 810, height: 1080, expectedScale: "0.8" },
   {
@@ -43,10 +54,13 @@ const browser = await chromium.launch({
   args: ["--no-sandbox"],
 });
 
-const results = [];
-for (const vp of VIEWPORTS) {
+// One context per viewport, awaited in order so screenshots are captured
+// sequentially against a single browser. Sequential awaits are why this is a
+// for...of loop rather than a functional map.
+const results: ScaleResult[] = [];
+for (const viewport of VIEWPORTS) {
   const context = await browser.newContext({
-    viewport: { width: vp.width, height: vp.height },
+    viewport: { width: viewport.width, height: viewport.height },
     deviceScaleFactor: 1,
   });
   const page = await context.newPage();
@@ -54,24 +68,24 @@ for (const vp of VIEWPORTS) {
   // Give the React app a moment to paint after the network settles.
   await page.waitForTimeout(1500);
 
-  const observed = await page.evaluate(() =>
-    getComputedStyle(document.documentElement)
+  const observed = await page.evaluate(() => {
+    return getComputedStyle(document.documentElement)
       .getPropertyValue("--mantine-scale")
-      .trim(),
-  );
+      .trim();
+  });
 
-  const file = path.join(SCREENSHOT_DIR, `${vp.name}.png`);
+  const file = path.join(SCREENSHOT_DIR, `${viewport.name}.png`);
   await page.screenshot({ path: file, fullPage: false });
-  results.push({ ...vp, observed, file });
+  results.push({ ...viewport, observed, file });
 
   await context.close();
 }
 await browser.close();
 
 console.log("\nResults:");
-for (const r of results) {
-  const ok = r.observed === r.expectedScale ? "OK" : "MISMATCH";
+results.forEach((result) => {
+  const status = result.observed === result.expectedScale ? "OK" : "MISMATCH";
   console.log(
-    `  [${ok}] ${r.name.padEnd(28)} expected=${r.expectedScale} observed=${r.observed || "(empty)"}  -> ${r.file}`,
+    `  [${status}] ${result.name.padEnd(28)} expected=${result.expectedScale} observed=${result.observed || "(empty)"}  -> ${result.file}`,
   );
-}
+});

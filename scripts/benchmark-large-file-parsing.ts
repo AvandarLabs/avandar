@@ -18,7 +18,7 @@
  * at 250 MB for a 420 MB CSV, the WASM run will be close to that.
  *
  * Usage:
- *   node scripts/benchmark-large-file-parsing.mjs [--csv=path] [--xlsx=path]
+ *   node scripts/benchmark-large-file-parsing.ts [--csv=path] [--xlsx=path]
  *
  * Writes a JSON report to `tests/data/large/benchmark-report.json` and
  * a markdown summary to `tests/data/large/benchmark-report.md`.
@@ -26,18 +26,51 @@
 import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..");
+/** A single RSS sample taken while the DuckDB CLI runs. */
+type RssSample = {
+  tMs: number;
+  rssKb: number;
+};
 
-const args = Object.fromEntries(
+/** The measured result of one DuckDB run. */
+type BenchmarkResult = {
+  label: string;
+  durationMs: number;
+  peakRssMb: number;
+  finalRssMb: number;
+  samples: RssSample[];
+  exitCode: number | null;
+  stderr: string;
+  stdout: string;
+  outputSizes: Record<string, number | null>;
+};
+
+/** One DuckDB benchmark run: a label, the SQL to run, and outputs to size. */
+type DuckDbRun = {
+  label: string;
+  sql: string;
+  outputPaths?: readonly string[];
+};
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(scriptDir, "..");
+
+// Parse `--key=value` and bare `--flag` args into a string record; bare flags
+// map to "true". Kept inline (rather than a shared helper) because Node's
+// direct TS execution needs a `.ts` import extension that the repo lint rules
+// reject for relative imports.
+const args: Record<string, string> = Object.fromEntries(
   process.argv
     .slice(2)
-    .filter((arg) => arg.startsWith("--"))
+    .filter((arg) => {
+      return arg.startsWith("--");
+    })
     .map((arg) => {
-      const [k, v] = arg.replace(/^--/, "").split("=");
-      return [k, v ?? "true"];
+      const [flagName, flagValue] = arg.replace(/^--/, "").split("=");
+      return [flagName, flagValue ?? "true"];
     }),
 );
 
@@ -49,45 +82,79 @@ const XLSX =
 const OUT_DIR = join(ROOT, "tests/data/large");
 mkdirSync(OUT_DIR, { recursive: true });
 
-function readRssKb(pid) {
+/** Reads a process's resident-set size in kB from /proc, or null if absent. */
+function readRssKb(pid: number | undefined): number | null {
+  if (pid === undefined) {
+    return null;
+  }
   try {
     const status = readFileSync(`/proc/${pid}/status`, "utf8");
-    const m = status.match(/VmRSS:\s+(\d+) kB/);
-    return m ? Number(m[1]) : null;
+    const rssMatch = status.match(/VmRSS:\s+(\d+) kB/);
+    return rssMatch?.[1] ? Number(rssMatch[1]) : null;
   } catch {
     return null;
   }
 }
 
-async function runDuckDbWithSampling({ label, sql, outputPaths }) {
+/** Sizes each output path in bytes, logging as it goes; null when missing. */
+function collectOutputSizes(
+  outputPaths: readonly string[],
+): Record<string, number | null> {
+  const outputSizes: Record<string, number | null> = {};
+  outputPaths.forEach((outputPath) => {
+    try {
+      const sizeBytes = statSync(outputPath).size;
+      outputSizes[outputPath] = sizeBytes;
+      console.log(
+        `Output ${outputPath}: ${(sizeBytes / 1024 / 1024).toFixed(1)} MB`,
+      );
+    } catch {
+      outputSizes[outputPath] = null;
+    }
+  });
+  return outputSizes;
+}
+
+/**
+ * Runs one DuckDB SQL invocation while sampling its RSS, and returns the
+ * duration, peak/final memory, exit code, and output file sizes.
+ */
+async function runDuckDbWithSampling(
+  run: DuckDbRun,
+): Promise<BenchmarkResult> {
+  const { label, sql, outputPaths } = run;
   console.log(`\n=== ${label} ===`);
-  const t0 = Date.now();
-  const proc = spawn(DUCKDB, ["-c", sql], {
+  const startMs = Date.now();
+  const duckDbProcess = spawn(DUCKDB, ["-c", sql], {
     stdio: ["ignore", "pipe", "pipe"],
   });
-  const samples = [];
+  const samples: RssSample[] = [];
   const sampler = setInterval(() => {
-    const rss = readRssKb(proc.pid);
-    if (rss != null) samples.push({ tMs: Date.now() - t0, rssKb: rss });
+    const rssKb = readRssKb(duckDbProcess.pid);
+    if (rssKb != null) {
+      samples.push({ tMs: Date.now() - startMs, rssKb });
+    }
   }, 100);
   let stdout = "";
   let stderr = "";
-  proc.stdout.on("data", (b) => {
-    stdout += b.toString();
+  duckDbProcess.stdout.on("data", (buffer) => {
+    stdout += buffer.toString();
   });
-  proc.stderr.on("data", (b) => {
-    stderr += b.toString();
+  duckDbProcess.stderr.on("data", (buffer) => {
+    stderr += buffer.toString();
   });
-  const exitCode = await new Promise((resolve) => {
-    proc.on("close", (c) => resolve(c));
+  const exitCode = await new Promise<number | null>((resolve) => {
+    duckDbProcess.on("close", (code) => {
+      resolve(code);
+    });
   });
   clearInterval(sampler);
-  const durationMs = Date.now() - t0;
-  const peakRssKb = samples.reduce((a, s) => Math.max(a, s.rssKb), 0);
+  const durationMs = Date.now() - startMs;
+  const peakRssKb = samples.reduce((maxRssKb, sample) => {
+    return Math.max(maxRssKb, sample.rssKb);
+  }, 0);
   const peakRssMb = Math.round(peakRssKb / 1024);
-  const finalRssMb = Math.round(
-    (samples[samples.length - 1]?.rssKb ?? 0) / 1024,
-  );
+  const finalRssMb = Math.round((samples.at(-1)?.rssKb ?? 0) / 1024);
 
   console.log(`Exit: ${exitCode}`);
   console.log(`Duration: ${(durationMs / 1000).toFixed(1)}s`);
@@ -95,17 +162,6 @@ async function runDuckDbWithSampling({ label, sql, outputPaths }) {
   console.log(`Final RSS: ${finalRssMb} MB`);
   if (exitCode !== 0) {
     console.log(`stderr:\n${stderr.slice(0, 1000)}`);
-  }
-  const outputSizes = {};
-  for (const p of outputPaths ?? []) {
-    try {
-      outputSizes[p] = statSync(p).size;
-      console.log(
-        `Output ${p}: ${(outputSizes[p] / 1024 / 1024).toFixed(1)} MB`,
-      );
-    } catch {
-      outputSizes[p] = null;
-    }
   }
   return {
     label,
@@ -116,11 +172,10 @@ async function runDuckDbWithSampling({ label, sql, outputPaths }) {
     exitCode,
     stderr: stderr.slice(0, 4000),
     stdout: stdout.slice(0, 1000),
-    outputSizes,
+    outputSizes: collectOutputSizes(outputPaths ?? []),
   };
 }
 
-const results = [];
 const csvStat = statSync(CSV);
 const xlsxStat = statSync(XLSX);
 
@@ -149,13 +204,6 @@ const csvStreamingSql = `
     )
   ) TO '${csvParquetOut}' (FORMAT PARQUET, COMPRESSION ZSTD);
 `;
-results.push(
-  await runDuckDbWithSampling({
-    label: `STREAMING: CSV → parquet (${(csvStat.size / 1024 / 1024).toFixed(1)} MB input, 1 thread)`,
-    sql: csvStreamingSql,
-    outputPaths: [csvParquetOut],
-  }),
-);
 
 // === XLSX → parquet streaming COPY ===
 const xlsxParquetOut = join(OUT_DIR, "california-covid-420mb.xlsx.parquet");
@@ -167,13 +215,6 @@ const xlsxStreamingSql = `
     SELECT * FROM read_xlsx('${XLSX}', header=true)
   ) TO '${xlsxParquetOut}' (FORMAT PARQUET, COMPRESSION ZSTD);
 `;
-results.push(
-  await runDuckDbWithSampling({
-    label: `STREAMING: XLSX → parquet (${(xlsxStat.size / 1024 / 1024).toFixed(1)} MB input, 1 thread)`,
-    sql: xlsxStreamingSql,
-    outputPaths: [xlsxParquetOut],
-  }),
-);
 
 // === Baseline: materialize CSV as a TABLE first (the *pre*-optimization
 // behaviour) so we can show the memory difference. Importantly, we keep
@@ -193,13 +234,6 @@ const csvBaselineSql = `
   -- the actual two-stage pre-optimization behaviour.
   SELECT COUNT(*) FROM baseline;
 `;
-results.push(
-  await runDuckDbWithSampling({
-    label: `BASELINE: CSV → TABLE → parquet (${(csvStat.size / 1024 / 1024).toFixed(1)} MB input, 1 thread)`,
-    sql: csvBaselineSql,
-    outputPaths: [csvBaselineParquet],
-  }),
-);
 
 // === Baseline for XLSX too ===
 const xlsxBaselineParquet = join(
@@ -215,13 +249,40 @@ const xlsxBaselineSql = `
   COPY xlsx_baseline TO '${xlsxBaselineParquet}' (FORMAT PARQUET, COMPRESSION ZSTD);
   SELECT COUNT(*) FROM xlsx_baseline;
 `;
-results.push(
-  await runDuckDbWithSampling({
-    label: `BASELINE: XLSX → TABLE → parquet (${(xlsxStat.size / 1024 / 1024).toFixed(1)} MB input, 1 thread)`,
+
+const megabytes = (bytes: number): string => {
+  return (bytes / 1024 / 1024).toFixed(1);
+};
+
+// Runs are awaited in sequence so their RSS samples never overlap on the
+// same machine, which is why this is a for...of over the run configs.
+const runConfigs: readonly DuckDbRun[] = [
+  {
+    label: `STREAMING: CSV → parquet (${megabytes(csvStat.size)} MB input, 1 thread)`,
+    sql: csvStreamingSql,
+    outputPaths: [csvParquetOut],
+  },
+  {
+    label: `STREAMING: XLSX → parquet (${megabytes(xlsxStat.size)} MB input, 1 thread)`,
+    sql: xlsxStreamingSql,
+    outputPaths: [xlsxParquetOut],
+  },
+  {
+    label: `BASELINE: CSV → TABLE → parquet (${megabytes(csvStat.size)} MB input, 1 thread)`,
+    sql: csvBaselineSql,
+    outputPaths: [csvBaselineParquet],
+  },
+  {
+    label: `BASELINE: XLSX → TABLE → parquet (${megabytes(xlsxStat.size)} MB input, 1 thread)`,
     sql: xlsxBaselineSql,
     outputPaths: [xlsxBaselineParquet],
-  }),
-);
+  },
+];
+
+const results: BenchmarkResult[] = [];
+for (const runConfig of runConfigs) {
+  results.push(await runDuckDbWithSampling(runConfig));
+}
 
 const report = {
   generatedAt: new Date().toISOString(),
@@ -238,26 +299,29 @@ writeFileSync(
   JSON.stringify(report, null, 2),
 );
 
+const resultRows = results.map((result) => {
+  const outputSummary = Object.entries(result.outputSizes)
+    .map(([outputPath, sizeBytes]) => {
+      const fileName = outputPath.split("/").pop();
+      const sizeLabel = sizeBytes ? `${megabytes(sizeBytes)} MB` : "missing";
+      return `${fileName}: ${sizeLabel}`;
+    })
+    .join("; ");
+  return `| ${result.label} | ${(result.durationMs / 1000).toFixed(1)} | ${result.peakRssMb} | ${result.finalRssMb} | ${outputSummary} | ${result.exitCode} |`;
+});
+
 const md = [
   `# Large-file parsing benchmark`,
   ``,
   `Generated: ${report.generatedAt}`,
   ``,
   `Inputs:`,
-  `- CSV: \`${CSV}\` (${(csvStat.size / 1024 / 1024).toFixed(1)} MB)`,
-  `- XLSX: \`${XLSX}\` (${(xlsxStat.size / 1024 / 1024).toFixed(1)} MB)`,
+  `- CSV: \`${CSV}\` (${megabytes(csvStat.size)} MB)`,
+  `- XLSX: \`${XLSX}\` (${megabytes(xlsxStat.size)} MB)`,
   ``,
   `| Run | Duration (s) | Peak RSS (MB) | Final RSS (MB) | Output | Exit |`,
   `|---|---|---|---|---|---|`,
-  ...results.map((r) => {
-    const out = Object.entries(r.outputSizes ?? {})
-      .map(
-        ([p, s]) =>
-          `${p.split("/").pop()}: ${s ? (s / 1024 / 1024).toFixed(1) + " MB" : "missing"}`,
-      )
-      .join("; ");
-    return `| ${r.label} | ${(r.durationMs / 1000).toFixed(1)} | ${r.peakRssMb} | ${r.finalRssMb} | ${out} | ${r.exitCode} |`;
-  }),
+  ...resultRows,
   ``,
   `## Interpretation`,
   ``,
