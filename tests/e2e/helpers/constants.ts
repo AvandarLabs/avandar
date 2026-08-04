@@ -18,18 +18,18 @@ export const DATA_IMPORT_MAX_PREVIEW_ROWS = 200;
 
 export const CALIFORNIA_CSV_PATH = path.join(
   process.cwd(),
-  "tests/data/california-covid-sample.csv",
+  "tests/data/california-covid-sample/california-covid-sample.csv",
 );
 
 /** Same dataset as {@link CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),
-  "tests/data/california-covid-sample.xlsx",
+  "tests/data/california-covid-sample/california-covid-sample.xlsx",
 );
 
 export const CHOLERA_NYC_XLSX_PATH = path.join(
   process.cwd(),
-  "tests/data/fake_cholera_nyc_linelist_geocoded.xlsx",
+  "tests/data/fake_cholera_nyc_linelist_geocoded/fake_cholera_nyc_linelist_geocoded.xlsx",
 );
 
 /**
@@ -44,7 +44,7 @@ export const CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT = 17367;
  */
 export const SMALL_CALIFORNIA_CSV_PATH = path.join(
   process.cwd(),
-  "tests/data/small-california-covid-sample.csv",
+  "tests/data/small-california-covid-sample/small-california-covid-sample.csv",
 );
 
 /** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
@@ -53,13 +53,13 @@ export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),
-  "tests/data/small-california-covid-sample.xlsx",
+  "tests/data/small-california-covid-sample/small-california-covid-sample.xlsx",
 );
 
 /** 100-row slice of {@link CHOLERA_NYC_XLSX_PATH}. */
 export const SMALL_CHOLERA_NYC_XLSX_PATH = path.join(
   process.cwd(),
-  "tests/data/small-fake_cholera_nyc_linelist_geocoded.xlsx",
+  "tests/data/small-fake_cholera_nyc_linelist_geocoded/small-fake_cholera_nyc_linelist_geocoded.xlsx",
 );
 
 export const EXPECTED_CHOLERA_COLUMN_NAMES = [

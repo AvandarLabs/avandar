@@ -16,7 +16,7 @@ import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 /** Quotes appear only after the first 20_480-byte DuckDB sniff window. */
 const GLOBAL_DEATHS_LATE_QUOTES_CSV_PATH = path.join(
   process.cwd(),
-  "tests/data/global-deaths-late-quotes.csv",
+  "tests/data/global-deaths-late-quotes/global-deaths-late-quotes.csv",
 );
 
 /**
@@ -25,7 +25,7 @@ const GLOBAL_DEATHS_LATE_QUOTES_CSV_PATH = path.join(
  */
 const GLOBAL_DEATHS_SNIFF_MISSES_QUOTES_CSV_PATH = path.join(
   process.cwd(),
-  "tests/data/global-deaths-sniff-misses-quotes.csv",
+  "tests/data/global-deaths-sniff-misses-quotes/global-deaths-sniff-misses-quotes.csv",
 );
 
 /** Rows in global-deaths-sniff-misses-quotes.csv (may reject 1–2). */

@@ -25,7 +25,7 @@ import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),
-  "tests/data/california-covid-sample.csv",
+  "tests/data/california-covid-sample/california-covid-sample.csv",
 );
 
 /**

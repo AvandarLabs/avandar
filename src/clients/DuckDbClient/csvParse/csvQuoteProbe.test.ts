@@ -7,7 +7,7 @@ import { inferQuoteCharFromSniffAndProbeTexts } from "@/clients/DuckDbClient/csv
 
 const SNIFF_MISSES_QUOTES_FIXTURE = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../../../../tests/data/global-deaths-sniff-misses-quotes.csv",
+  "../../../../tests/data/global-deaths-sniff-misses-quotes/global-deaths-sniff-misses-quotes.csv",
 );
 
 const FIXTURE_UTF8 = readFileSync(SNIFF_MISSES_QUOTES_FIXTURE, "utf8");

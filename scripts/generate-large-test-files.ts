@@ -36,8 +36,8 @@ const args: Record<string, string> = Object.fromEntries(
 
 const TARGET_MB = Number.parseInt(args["target-mb"] ?? "420", 10);
 const OUT_DIR = join(ROOT, args["out-dir"] ?? "tests/data/large");
-const SRC_CSV = join(ROOT, "tests/data/california-covid-sample.csv");
-const SRC_XLSX = join(ROOT, "tests/data/california-covid-sample.xlsx");
+const SRC_CSV = join(ROOT, "tests/data/california-covid-sample/california-covid-sample.csv");
+const SRC_XLSX = join(ROOT, "tests/data/california-covid-sample/california-covid-sample.xlsx");
 
 mkdirSync(OUT_DIR, { recursive: true });
 

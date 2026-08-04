@@ -26,7 +26,7 @@ import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),
-  "tests/data/california-covid-sample.csv",
+  "tests/data/california-covid-sample/california-covid-sample.csv",
 );
 
 /**
@@ -222,7 +222,7 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
 /**
  * Full DuckDB WASM does not finish reliably in Vitest/jsdom (web workers), so
  * `LocalDatasetClient.startCsvImport` is mocked. Sniff metadata matches DuckDB
- * inference for `tests/data/california-covid-sample.csv`.
+ * inference for the `california-covid-sample` CSV fixture.
  */
 describe("ManualUploadView", () => {
   beforeEach(() => {
