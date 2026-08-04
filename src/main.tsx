@@ -15,7 +15,7 @@ import { createRoot } from "react-dom/client";
 import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
-import { registerSessionExpiredHandler } from "@/config/registerSessionExpiredHandler";
+import { registerSessionExpiredHandler } from "@/lib/auth/registerSessionExpiredHandler";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
