@@ -21,7 +21,7 @@ import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWo
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
-import { modelSchema } from "$/lib/zodHelpers.ts";
+import { AvaModelSchema } from "@models/zod/index.ts";
 import { z } from "zod";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 
@@ -57,20 +57,26 @@ export const PostChatMessages = POST({
   },
 })
   .bodySchema({
-    messages: modelSchema("ChatClientMessage", {
-      role: z.enum(["user", "assistant", "system"]),
-      content: z.string(),
+    messages: AvaModelSchema({
+      type: "ChatClientMessage",
+      props: {
+        role: z.enum(["user", "assistant", "system"]),
+        content: z.string(),
+      },
     }).array(),
-    context: modelSchema("ChatPageContext", {
-      app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
-      openDatasetId: z.string().optional(),
-      lastSql: z.string().optional(),
-      lastResultColumns: z
-        .array(z.object({ name: z.string(), dataType: z.string() }))
-        .readonly()
-        .optional(),
-      lastError: z.string().optional(),
-      dashboardId: z.string().optional(),
+    context: AvaModelSchema({
+      type: "ChatPageContext",
+      props: {
+        app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
+        openDatasetId: z.string().optional(),
+        lastSql: z.string().optional(),
+        lastResultColumns: z
+          .array(z.object({ name: z.string(), dataType: z.string() }))
+          .readonly()
+          .optional(),
+        lastError: z.string().optional(),
+        dashboardId: z.string().optional(),
+      },
     }),
     model: z.string().optional(),
     consentAcks: z
