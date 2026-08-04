@@ -5,7 +5,9 @@
   "license": "CPAL-1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./encoding": "./src/encoding/index.ts",
+    "./sql": "./src/sql/index.ts"
   },
   "scripts": {
     "test": "vitest run",

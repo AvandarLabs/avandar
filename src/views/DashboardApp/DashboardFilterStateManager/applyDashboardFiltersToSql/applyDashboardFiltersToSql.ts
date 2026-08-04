@@ -1,4 +1,5 @@
-import { isDefined, matchLiteral, quoteSqlIdentifier } from "@utils";
+import { isDefined, matchLiteral } from "@utils";
+import { quoteSqlIdentifier } from "@utils/sql";
 import type {
   DashboardFilterRecord,
   DashboardFilterValue,

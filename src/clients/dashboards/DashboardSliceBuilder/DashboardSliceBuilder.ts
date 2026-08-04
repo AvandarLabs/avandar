@@ -1,10 +1,5 @@
-import {
-  isDefined,
-  isPlainObject,
-  isString,
-  quoteSqlIdentifier,
-  traverse,
-} from "@utils";
+import { isDefined, isPlainObject, isString, traverse } from "@utils";
+import { quoteSqlIdentifier } from "@utils/sql";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { Parser } from "node-sql-parser";
 import { match } from "ts-pattern";

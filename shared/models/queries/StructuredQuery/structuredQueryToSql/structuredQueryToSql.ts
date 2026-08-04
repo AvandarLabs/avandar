@@ -16,7 +16,7 @@ import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectValues } from "@utils/objects/objectValues.ts";
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList.ts";
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";

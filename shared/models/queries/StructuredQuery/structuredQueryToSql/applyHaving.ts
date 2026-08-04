@@ -1,4 +1,4 @@
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { match } from "ts-pattern";
 import type {

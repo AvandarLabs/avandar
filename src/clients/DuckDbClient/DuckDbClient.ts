@@ -7,8 +7,8 @@ import {
   objectKeys,
   objectValuesMap,
   prop,
-  quoteSqlIdentifier,
 } from "@utils";
+import { quoteSqlIdentifier } from "@utils/sql";
 import { uuid } from "$/lib/uuid";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";

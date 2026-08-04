@@ -1,4 +1,4 @@
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { match } from "ts-pattern";
 import type {
   QueryJoin,

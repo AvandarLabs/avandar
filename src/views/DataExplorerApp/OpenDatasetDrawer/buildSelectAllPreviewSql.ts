@@ -1,4 +1,4 @@
-import { quoteSqlIdentifier } from "@utils";
+import { quoteSqlIdentifier } from "@utils/sql";
 
 /**
  * Builds a `SELECT * FROM "<datasetId>" LIMIT 100` query used by the Data

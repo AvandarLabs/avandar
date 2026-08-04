@@ -1,4 +1,4 @@
-import { quoteSqlIdentifier } from "@utils/strings/quoteSqlIdentifier/quoteSqlIdentifier.ts";
+import { quoteSqlIdentifier } from "@utils/sql/quoteSqlIdentifier/quoteSqlIdentifier.ts";
 import { describe, expect, it } from "vitest";
 
 describe("quoteSqlIdentifier", () => {
