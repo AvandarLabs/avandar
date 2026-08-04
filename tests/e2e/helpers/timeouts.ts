@@ -8,4 +8,4 @@ export const MEDIUM_WAIT = 15_000;
 export const LONG_WAIT = 30_000;
 
 /** Polar sandbox checkout + fetch-and-sync round trip. */
-export const CHECKOUT_WAIT = 90_000;
+export const POLAR_CHECKOUT_WAIT = 90_000;
