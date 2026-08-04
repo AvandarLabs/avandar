@@ -2,10 +2,10 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
-import { ensureE2eViteFeatureFlags } from "./tests/e2e/setup/ensureE2eViteFeatureFlags";
+import { ensureE2EViteFeatureFlags } from "./tests/e2e/setup/ensureE2EViteFeatureFlags";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
-ensureE2eViteFeatureFlags();
+ensureE2EViteFeatureFlags();
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
 const isCI = !!process.env.CI;
