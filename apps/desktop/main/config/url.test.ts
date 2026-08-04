@@ -5,16 +5,16 @@ describe("resolveWebviewUrl", () => {
   it("returns the Vite dev URL in development", () => {
     const url = resolveWebviewUrl({
       mode: "development",
-      viteDevUrl: "http://localhost:5173",
+      viteDevUrl: "http://127.0.0.1:5173",
       bundledIndexPath: "/tmp/should-be-ignored/index.html",
     });
-    expect(url).toBe("http://localhost:5173");
+    expect(url).toBe("http://127.0.0.1:5173");
   });
 
   it("returns a file:// URL pointing at the bundled index in production", () => {
     const url = resolveWebviewUrl({
       mode: "production",
-      viteDevUrl: "http://localhost:5173",
+      viteDevUrl: "http://127.0.0.1:5173",
       bundledIndexPath:
         "/Applications/Avandar.app/Contents/Resources/web/index.html",
     });
@@ -27,7 +27,7 @@ describe("resolveWebviewUrl", () => {
     expect(() => {
       return resolveWebviewUrl({
         mode: "production",
-        viteDevUrl: "http://localhost:5173",
+        viteDevUrl: "http://127.0.0.1:5173",
         bundledIndexPath: "",
       });
     }).toThrow(/bundledIndexPath required in production/);

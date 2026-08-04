@@ -10,7 +10,7 @@ import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
-import { OfflineGated } from "@/components/offline/OfflineGated";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";

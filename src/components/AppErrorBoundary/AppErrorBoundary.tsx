@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { GenericError } from "@/components/AppErrorBoundary/GenericError";
 import { isSessionError } from "@/components/AppErrorBoundary/isSessionError";
 import { ManualRecoveryScreen } from "@/components/AppErrorBoundary/ManualRecoveryScreen";
-import {
-  isSessionRecoveryLooping,
-  recoverFromSessionError,
-} from "@/components/AppErrorBoundary/recoverFromSessionError";
 import { SessionRecoveringScreen } from "@/components/AppErrorBoundary/SessionRecoveringScreen";
+import { SessionRecovery } from "@/components/AppErrorBoundary/SessionRecovery/SessionRecovery";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 
 /**
@@ -34,14 +31,17 @@ export function AppErrorBoundary({
   // Snapshot loop state once on mount so the render stays stable across the
   // recovery redirect.
   const [looping] = useState(() => {
-    return sessionError && isSessionRecoveryLooping();
+    return sessionError && SessionRecovery.isLooping();
   });
 
-  useEffect(() => {
-    if (sessionError && !looping) {
-      void recoverFromSessionError();
-    }
-  }, [sessionError, looping]);
+  useEffect(
+    function recoverInvalidSession() {
+      if (sessionError && !looping) {
+        void SessionRecovery.recover();
+      }
+    },
+    [sessionError, looping],
+  );
 
   if (sessionError) {
     return looping ? <ManualRecoveryScreen /> : <SessionRecoveringScreen />;

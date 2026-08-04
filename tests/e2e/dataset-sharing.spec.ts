@@ -30,8 +30,6 @@ test.describe("Dataset sharing access", () => {
       e2eWorkerDb,
       e2eViewerMembership,
     }) => {
-      test.setTimeout(240_000);
-
       const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
       const { admin } = e2eViewerMembership;
       const datasetName = "E2E CSV share user";
@@ -110,8 +108,6 @@ test.describe("Dataset sharing access", () => {
       e2eWorkerDb,
       e2eViewerMembership,
     }) => {
-      test.setTimeout(240_000);
-
       const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
       const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
       const datasetName = "E2E CSV share restricted editor";
@@ -202,8 +198,6 @@ test.describe("Dataset sharing access", () => {
       e2eWorkerDb,
       e2eViewerMembership,
     }) => {
-      test.setTimeout(240_000);
-
       const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
       const { admin, workspaceId } = e2eViewerMembership;
       const datasetName = "E2E CSV share user tag";
@@ -298,8 +292,6 @@ test.describe("Dataset sharing access", () => {
       e2eWorkerDb,
       e2eViewerMembership,
     }) => {
-      test.setTimeout(240_000);
-
       const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
       const { admin, workspaceId, viewerUserId } = e2eViewerMembership;
       const datasetName = "E2E CSV share editor tag";

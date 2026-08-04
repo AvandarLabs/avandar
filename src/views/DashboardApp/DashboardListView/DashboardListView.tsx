@@ -12,9 +12,8 @@ import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyDevAlert, Paper } from "@ui";
 import { prop, where } from "@utils";
-import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds";
+import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
-import { useMemo } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
@@ -38,12 +37,10 @@ export function DashboardListView({
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const localDatasetIds = useLocalDatasetIds();
-  const [workspaceDatasets] = DatasetClient.useGetAll(
+  const [workspaceDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const workspaceDatasetIds = useMemo(() => {
-    return (workspaceDatasets ?? []).map(prop("id"));
-  }, [workspaceDatasets]);
+  const workspaceDatasetIds = workspaceDatasets.map(prop("id"));
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
 
   const getDashboardOfflineStatus = (
@@ -94,7 +91,7 @@ export function DashboardListView({
         workspaceId: workspace.id,
         ownerId: userProfile.userId,
         ownerProfileId: userProfile.profileId,
-        name: "Untitled dashboard",
+        name: t`Untitled dashboard`,
         description: undefined,
         slug: undefined,
         isPublic: false,

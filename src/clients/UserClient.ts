@@ -7,7 +7,7 @@ import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import { Tables } from "$/types/database.types";
 import { z } from "zod";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type { ServiceClient } from "@clients";
 import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger";
@@ -253,13 +253,14 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             throw new Error("User not found.");
           }
 
-          const updatePayload: Partial<Tables<"user_profiles">> = {};
-          if (data.displayName !== undefined) {
-            updatePayload.display_name = data.displayName;
-          }
-          if (data.fullName !== undefined) {
-            updatePayload.full_name = data.fullName;
-          }
+          const updatePayload = {
+            ...(data.displayName !== undefined ?
+              { display_name: data.displayName }
+            : {}),
+            ...(data.fullName !== undefined ?
+              { full_name: data.fullName }
+            : {}),
+          } satisfies Partial<Tables<"user_profiles">>;
 
           const { data: row } = await dbClient
             .from("user_profiles")

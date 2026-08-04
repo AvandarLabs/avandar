@@ -1,5 +1,5 @@
-import { useIsOnline } from "@/lib/offline/useIsOnline";
-import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
 
 /**
  * True when the browser is offline and no local WebLLM model has been
@@ -10,5 +10,5 @@ export function useOfflineBlocksCloudChat(): boolean {
   if (isOnline) {
     return false;
   }
-  return !hasAnyDownloadedLocalChatModel();
+  return !LocalChatModelStore.hasAnyDownloaded();
 }

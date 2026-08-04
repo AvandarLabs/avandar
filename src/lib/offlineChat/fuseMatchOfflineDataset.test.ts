@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDataset";
+import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName";
 
 const DATASETS = [
   { id: "id-deaths", name: "LONG_us_deaths.csv" },

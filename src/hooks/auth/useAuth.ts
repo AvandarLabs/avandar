@@ -1,6 +1,6 @@
 import { hasDefinedProps } from "@utils";
 import { useEffect, useRef, useState } from "react";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";

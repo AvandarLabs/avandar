@@ -5,6 +5,7 @@ import {
   SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
+import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -153,11 +154,10 @@ test.describe("DataViz PBlock - every visualization", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(360_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const seededDashboardIds: string[] = [];
+    let uploadedDatasetId = "";
 
     try {
       await signInWithEmailPassword(page, {
@@ -215,6 +215,7 @@ test.describe("DataViz PBlock - every visualization", () => {
       if (!datasetId) {
         throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
       }
+      uploadedDatasetId = datasetId;
       await pollUntilCloudDatasetToggleShowsOnline(page);
 
       const workspaceId = await getWorkspaceIdBySlug({
@@ -250,6 +251,12 @@ test.describe("DataViz PBlock - every visualization", () => {
       }
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: seededDashboardIds });
+      if (uploadedDatasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId: uploadedDatasetId,
+        });
+      }
     }
   });
 });

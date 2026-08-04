@@ -6,7 +6,7 @@ import type {
 
 export { DashboardParsers } from "$/models/Dashboard/DashboardParsers.ts";
 
-export { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds.ts";
+export { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds.ts";
 
 export namespace Dashboard {
   export type T<K extends keyof DashboardModel = "Read"> = DashboardModel[K];

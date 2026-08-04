@@ -2,14 +2,10 @@ import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,
   buildOfflineSqlPrompt,
-} from "./buildOfflinePrompts";
+} from "./buildOfflinePrompts/buildOfflinePrompts";
+import { logOfflineChat } from "./logOfflineChat";
 import { narrowOfflineSchema } from "./narrowOfflineSchema";
-import { logOfflineChat } from "./offlineChatDebugLog";
-import {
-  extractSqlFromLlmText,
-  parseAnalyzeJson,
-  stripSqlFenceForAssistantText,
-} from "./parseOfflineLlmOutput";
+import { OfflineLlmOutput } from "./OfflineLlmOutput/OfflineLlmOutput";
 import { repairOfflineGeneratedSql } from "./repairOfflineGeneratedSql";
 import { resolveOfflineDataset } from "./resolveOfflineDataset";
 import type {
@@ -70,7 +66,7 @@ export async function runOfflineChatPipeline(
     args.pageContext.app === "dashboards";
 
   if (!needsSql) {
-    appendPhase(phaseLabels, "Replying…", args.onPhase);
+    appendPhase(phaseLabels, args.copy.replying, args.onPhase);
     const text = await args.engine.complete({
       messages: [
         {
@@ -90,7 +86,7 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  appendPhase(phaseLabels, "Understanding your question…", args.onPhase);
+  appendPhase(phaseLabels, args.copy.understandingQuestion, args.onPhase);
   const analyzeRaw = await args.engine.complete({
     messages: [
       {
@@ -106,7 +102,7 @@ export async function runOfflineChatPipeline(
     maxTokens: ANALYZE_MAX_TOKENS,
   });
 
-  const analyze = parseAnalyzeJson(analyzeRaw);
+  const analyze = OfflineLlmOutput.parseAnalyzeJson(analyzeRaw);
   const summary = analyze?.summary ?? "Proceeding with your question.";
   const proceed = analyze?.proceed ?? true;
 
@@ -145,7 +141,7 @@ export async function runOfflineChatPipeline(
       narrowOfflineSchema(args.schema, resolvedDataset.id)
     : args.schema;
 
-  appendPhase(phaseLabels, "Writing query…", args.onPhase);
+  appendPhase(phaseLabels, args.copy.writingQuery, args.onPhase);
   let sqlPassText = await args.engine.complete({
     messages: [
       {
@@ -166,15 +162,18 @@ export async function runOfflineChatPipeline(
     onToken:
       args.onPhase ?
         (delta) => {
-          if (delta.length > 0 && !phaseLabels.includes("streaming_sql")) {
-            phaseLabels.push("streaming_sql");
-            args.onPhase?.("Generating SQL…");
+          if (
+            delta.length > 0 &&
+            !phaseLabels.includes(args.copy.generatingSql)
+          ) {
+            phaseLabels.push(args.copy.generatingSql);
+            args.onPhase?.(args.copy.generatingSql);
           }
         }
       : undefined,
   });
 
-  let sql = extractSqlFromLlmText(sqlPassText);
+  let sql = OfflineLlmOutput.extractSql(sqlPassText);
   logOfflineChat("runOfflineChatPipeline:sqlExtracted", {
     rawLlmSql: sql,
   });
@@ -185,7 +184,7 @@ export async function runOfflineChatPipeline(
   });
 
   if (sql) {
-    appendPhase(phaseLabels, "Repairing query…", args.onPhase);
+    appendPhase(phaseLabels, args.copy.repairingQuery, args.onPhase);
     sql = hardenExtractedSql({
       sql,
       schema: args.schema,
@@ -211,7 +210,7 @@ export async function runOfflineChatPipeline(
       exec = await args.executeSql(sql);
     }
     if (!exec.ok) {
-      appendPhase(phaseLabels, "Fixing query…", args.onPhase);
+      appendPhase(phaseLabels, args.copy.fixingQuery, args.onPhase);
       sqlPassText = await args.engine.complete({
         messages: [
           {
@@ -228,7 +227,7 @@ export async function runOfflineChatPipeline(
         ],
         maxTokens: FIX_MAX_TOKENS,
       });
-      const fixedSql = extractSqlFromLlmText(sqlPassText);
+      const fixedSql = OfflineLlmOutput.extractSql(sqlPassText);
       if (fixedSql) {
         sql = hardenExtractedSql({
           sql: fixedSql,
@@ -253,9 +252,7 @@ export async function runOfflineChatPipeline(
 
   if (!sql) {
     return {
-      assistantText:
-        assistantText ||
-        "I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.",
+      assistantText: assistantText || args.copy.noSql,
       phaseLabels,
     };
   }
@@ -265,9 +262,7 @@ export async function runOfflineChatPipeline(
   return {
     assistantText:
       assistantText ||
-      (args.pageContext.app === "data-explorer" ?
-        ""
-      : "Here is a query based on your workspace metadata."),
+      (args.pageContext.app === "data-explorer" ? "" : args.copy.metadataQuery),
     generatedSql: { sql, prompt: args.lastUserPrompt },
     phaseLabels,
   };
@@ -281,5 +276,5 @@ function resolveOfflineSqlAssistantText(args: {
   if (args.pageContext.app === "data-explorer" && args.hasSql) {
     return "";
   }
-  return stripSqlFenceForAssistantText(args.sqlPassText);
+  return OfflineLlmOutput.stripSqlFence(args.sqlPassText);
 }

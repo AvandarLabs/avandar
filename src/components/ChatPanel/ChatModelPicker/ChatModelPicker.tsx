@@ -7,8 +7,8 @@ import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
-import { writeStoredLocalChatModelId } from "@/lib/offlineChat/localChatModelStore";
-import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
+import { OfflineChatPickerModels } from "@/lib/offlineChat/offlineChatPickerModels";
 import css from "./ChatModelPicker.module.css";
 
 type Props = {
@@ -59,15 +59,19 @@ export function ChatModelPicker({
     });
   }, [models, selectedModelId, isLoading]);
 
-  useEffect(() => {
-    if (!resolvedModelId) {
-      return;
-    }
-    const localModelId = parseOfflineChatPickerModelId(resolvedModelId);
-    if (localModelId) {
-      writeStoredLocalChatModelId(localModelId);
-    }
-  }, [resolvedModelId]);
+  useEffect(
+    function persistSelectedOfflineModel() {
+      if (!resolvedModelId) {
+        return;
+      }
+      const localModelId =
+        OfflineChatPickerModels.parseModelId(resolvedModelId);
+      if (localModelId) {
+        LocalChatModelStore.writeSelectedId(localModelId);
+      }
+    },
+    [resolvedModelId],
+  );
 
   useEffect(
     function writeResolvedModelIdToStorage() {

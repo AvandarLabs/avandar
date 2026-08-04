@@ -1,24 +1,13 @@
 import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Model } from "@models";
-import { isNotNull, matchLiteral, prop } from "@utils";
-import { useMemo, useRef } from "react";
+import { isNotNull, matchLiteral, prop, propEq } from "@utils";
+import { useEffect, useMemo, useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
-import { hasAnyDownloadedLocalChatModel } from "@/lib/offlineChat/localChatModelStore";
-import { logOfflineChat } from "@/lib/offlineChat/offlineChatDebugLog";
-import { offerOfflineChatFallback } from "@/lib/offlineChat/offlineChatFallbackToast";
-import { parseOfflineChatPickerModelId } from "@/lib/offlineChat/offlineChatPickerModels";
-import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
-import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
-import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import {
@@ -26,11 +15,22 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { isNetworkChatFailure } from "@/lib/offlineChat/isNetworkChatFailure";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
+import { logOfflineChat } from "@/lib/offlineChat/logOfflineChat";
+import { offerOfflineChatFallback } from "@/lib/offlineChat/offerOfflineChatFallback";
+import { OfflineChatPickerModels } from "@/lib/offlineChat/offlineChatPickerModels";
+import { resolveOfflineChatMode } from "@/lib/offlineChat/resolveOfflineChatMode";
+import { runOfflineChatTurn } from "@/lib/offlineChat/runOfflineChatTurn";
+import { tryExecuteOfflineSql } from "@/lib/offlineChat/tryExecuteOfflineSql";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { LocalChatModelId } from "@/lib/offlineChat/localChatModelCatalog";
+import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
@@ -51,7 +51,7 @@ const CLARIFICATION_ANSWER_RE = /^\[Clarification answer:/;
 /**
  * Computes a stable key for a `messages` array so we can tell whether
  * an incoming `run()` is a "Try Again" (same messages as the last
- * completed turn) or a fresh user turn. Role+content is enough — the
+ * completed turn) or a fresh user turn. Role and content are enough: the
  * runtime adapter never sees structured metadata that would change
  * without the content also changing.
  */
@@ -71,23 +71,26 @@ function chatMessagesKey(messages: readonly ChatClientMessage.T[]): string {
 function buildRetryContext(
   response: ChatResponse.T,
 ): ChatRetryContext | undefined {
-  const ctx: ChatRetryContext = {};
-  if (response.assistantText && response.assistantText.trim().length > 0) {
-    ctx.priorAssistantText = response.assistantText.slice(0, 2000);
-  }
-  if (response.generatedSql?.sql) {
-    ctx.priorGeneratedSql = response.generatedSql.sql.slice(0, 8000);
-  }
-  if (response.clarification?.question) {
-    ctx.priorClarificationQuestion = response.clarification.question.slice(
-      0,
-      400,
-    );
-  }
-  if (response.dashboardBlock?.kind) {
-    ctx.priorDashboardBlockKind = response.dashboardBlock.kind.slice(0, 40);
-  }
-  return Object.keys(ctx).length > 0 ? ctx : undefined;
+  const retryContext: ChatRetryContext = {
+    ...(response.assistantText?.trim() ?
+      { priorAssistantText: response.assistantText.slice(0, 2000) }
+    : {}),
+    ...(response.generatedSql?.sql ?
+      { priorGeneratedSql: response.generatedSql.sql.slice(0, 8000) }
+    : {}),
+    ...(response.clarification?.question ?
+      {
+        priorClarificationQuestion: response.clarification.question.slice(
+          0,
+          400,
+        ),
+      }
+    : {}),
+    ...(response.dashboardBlock?.kind ?
+      { priorDashboardBlockKind: response.dashboardBlock.kind.slice(0, 40) }
+    : {}),
+  };
+  return Object.keys(retryContext).length > 0 ? retryContext : undefined;
 }
 
 function extractText(parts: ReadonlyArray<{ type: string }>): string {
@@ -124,33 +127,67 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   // changes, which thrashes assistant-ui's local runtime and drops side
   // effects such as `setRawSql` (CHECKPOINTS bug #29).
   const pageContextRef = useRef(pageContext);
-  pageContextRef.current = pageContext;
-
   const parseSqlRef = useRef(parseSql);
-  parseSqlRef.current = parseSql;
-
   const userRef = useRef(user);
-  userRef.current = user;
-
   const workspaceIdRef = useRef(workspace.id);
-  workspaceIdRef.current = workspace.id;
-
   const workspaceRef = useRef(workspace);
-  workspaceRef.current = workspace;
+  const copyRef = useRef({
+    messageNotSent: t`(Message not sent.)`,
+    offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
+    sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
+    sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
+    fallbackTitle: t`Chat request failed`,
+    fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
+    replying: t`Replying…`,
+    understandingQuestion: t`Understanding your question…`,
+    writingQuery: t`Writing query…`,
+    generatingSql: t`Generating SQL…`,
+    repairingQuery: t`Repairing query…`,
+    fixingQuery: t`Fixing query…`,
+    noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
+    metadataQuery: t`Here is a query based on your workspace metadata.`,
+  });
 
-  const tRef = useRef(t);
-  tRef.current = t;
+  useEffect(
+    function synchronizeChatRuntimeDependencies() {
+      pageContextRef.current = pageContext;
+      parseSqlRef.current = parseSql;
+      userRef.current = user;
+      workspaceIdRef.current = workspace.id;
+      workspaceRef.current = workspace;
+      copyRef.current = {
+        messageNotSent: t`(Message not sent.)`,
+        offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
+        sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
+        sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
+        fallbackTitle: t`Chat request failed`,
+        fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
+        replying: t`Replying…`,
+        understandingQuestion: t`Understanding your question…`,
+        writingQuery: t`Writing query…`,
+        generatingSql: t`Generating SQL…`,
+        repairingQuery: t`Repairing query…`,
+        fixingQuery: t`Fixing query…`,
+        noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
+        metadataQuery: t`Here is a query based on your workspace metadata.`,
+      };
+    },
+    [pageContext, parseSql, t, user, workspace],
+  );
 
   // Tracks the last completed turn so we can detect "Try Again". When the
   // user clicks the reload button on an assistant message, assistant-ui
   // removes that message and re-invokes `run()` with the SAME `messages`
-  // array as the previous turn — so a key match here is a reliable retry
+  // array as the previous turn, so a key match here is a reliable retry
   // signal. We surface the prior response as `retryContext` on the next
   // request so the backend can nudge the model to a different output.
-  const lastTurnRef = useRef<{
-    messagesKey: string;
-    response: ChatResponse.T;
-  } | null>(null);
+  const lastTurnRef = useRef<
+    | {
+        messagesKey: string;
+        response: ChatResponse.T;
+      }
+    | undefined
+  >(undefined);
 
   const adapter: ChatModelAdapter = useMemo(() => {
     return {
@@ -185,9 +222,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         // browser. Clarification-answer markers (`[Clarification answer:
         // ...]`) are pre-vetted upstream via `crossBoundary`, so we don't
         // double-check them here.
-        const lastUserMsg = [...apiMessages].reverse().find((m) => {
-          return m.role === "user";
-        });
+        const lastUserMsg = [...apiMessages]
+          .reverse()
+          .find(propEq("role", "user"));
         const currentUser = userRef.current;
         const workspaceId = workspaceIdRef.current;
         const currentPageContext = pageContextRef.current;
@@ -213,7 +250,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 content: [
                   {
                     type: "text" as const,
-                    text: tRef.current`(Message not sent.)`,
+                    text: copyRef.current.messageNotSent,
                   },
                 ],
               };
@@ -225,20 +262,34 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         // are about to send. `crossBoundary` registers acks in a
         // module-scope queue keyed by content hash; we drain matching
         // entries here and attach them to the backend request.
-        const consentAcks: ConsentAck[] = [];
-        for (let i = 0; i < apiMessages.length; i++) {
-          const msg = apiMessages[i]!;
-          if (msg.role !== "user") {
-            continue;
-          }
-          const ackToken = await PendingAcks.consumeAckForText(msg.content);
-          if (ackToken) {
-            consentAcks.push({
-              ackToken,
-              scope: { kind: "message_index", index: i },
-            });
-          }
-        }
+        const consentAcks = (
+          await Promise.all(
+            apiMessages.map(
+              async (
+                message,
+                messageIndex,
+              ): Promise<ConsentAck | undefined> => {
+                if (message.role !== "user") {
+                  return undefined;
+                }
+                const ackToken = await PendingAcks.consumeAckForText(
+                  message.content,
+                );
+                return ackToken ?
+                    {
+                      ackToken,
+                      scope: {
+                        kind: "message_index" as const,
+                        index: messageIndex,
+                      },
+                    }
+                  : undefined;
+              },
+            ),
+          )
+        ).filter((consentAck): consentAck is ConsentAck => {
+          return consentAck !== undefined;
+        });
 
         if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
           void AnalyticsClient.logEvent({
@@ -277,9 +328,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             }
           }
           const prompt =
-            [...apiMessages].reverse().find((message) => {
-              return message.role === "user";
-            })?.content ?? "";
+            [...apiMessages].reverse().find(propEq("role", "user"))?.content ??
+            "";
           dataExplorerDispatch.setRawSql(sql);
           dataExplorerDispatch.setNlPrompt(prompt);
           try {
@@ -303,9 +353,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const applyResponse = async (
           response: ChatResponse.T,
         ): Promise<ChatModelRunResult> => {
-          let sqlApplied = false;
+          const sqlApplied =
+            response.generatedSql ?
+              await reviewAndApplySql(response.generatedSql.sql)
+            : false;
           if (response.generatedSql) {
-            sqlApplied = await reviewAndApplySql(response.generatedSql.sql);
             if (
               response.generatedSql &&
               !sqlApplied &&
@@ -318,6 +370,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                     text: buildSqlNotAppliedAssistantText(
                       response.assistantText,
                       currentUser ?? undefined,
+                      copyRef.current,
                     ),
                   },
                 ],
@@ -353,10 +406,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 const questionBias = detectBias(clarification.question);
                 if (questionBias.hits.length > 0) {
                   console.warn(
-                    "[chat] LLM clarification trips bias detector — passing through for v1:",
-                    questionBias.hits.map((hit) => {
-                      return hit.label;
-                    }),
+                    "[chat] LLM clarification trips bias detector; passing through:",
+                    questionBias.hits.map(prop("label")),
                   );
                 }
                 return ClarificationAuditEntryClient.recordShown({
@@ -371,12 +422,12 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const runOfflineTurn = async (
           localChatModelId?: LocalChatModelId,
         ): Promise<ChatModelRunResult> => {
-          if (!hasAnyDownloadedLocalChatModel()) {
+          if (!LocalChatModelStore.hasAnyDownloaded()) {
             return {
               content: [
                 {
                   type: "text",
-                  text: "You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.",
+                  text: copyRef.current.offlineModelRequired,
                 },
               ],
             };
@@ -387,6 +438,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             messages: apiMessages,
             navigatorOnLine: navigator.onLine,
             localChatModelId,
+            copy: copyRef.current,
             executeSql:
               currentPageContext.app === "data-explorer" ?
                 tryExecuteOfflineSql
@@ -420,7 +472,9 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         }
 
         const cloudModelId =
-          model && !parseOfflineChatPickerModelId(model) ? model : undefined;
+          model && !OfflineChatPickerModels.parseModelId(model) ?
+            model
+          : undefined;
 
         const currentMessagesKey = chatMessagesKey(apiMessages);
         const cachedTurn = lastTurnRef.current;
@@ -453,10 +507,13 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             selectedChatModelId: model,
           });
           if (fallbackMode.kind === "offer_local_fallback") {
-            const accepted = await offerOfflineChatFallback();
+            const accepted = await offerOfflineChatFallback({
+              title: copyRef.current.fallbackTitle,
+              message: copyRef.current.fallbackMessage,
+            });
             if (accepted) {
               const pickerLocalId =
-                model ? parseOfflineChatPickerModelId(model) : undefined;
+                model ? OfflineChatPickerModels.parseModelId(model) : undefined;
               return runOfflineTurn(pickerLocalId);
             }
           }
@@ -489,10 +546,11 @@ function assumptionNeedsSignInOrApproval(
 function buildSqlNotAppliedAssistantText(
   assistantText: string,
   user: User.T | undefined,
+  copy: {
+    sqlApprovalRequired: string;
+    sqlSignInRequired: string;
+  },
 ): string {
-  const suffix =
-    user ?
-      "SQL was not applied. Approve the assumed filter values to run this query."
-    : "SQL was not applied. Sign in to approve filter values.";
+  const suffix = user ? copy.sqlApprovalRequired : copy.sqlSignInRequired;
   return `${assistantText}\n\n(${suffix})`;
 }

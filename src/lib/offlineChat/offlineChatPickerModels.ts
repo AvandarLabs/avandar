@@ -1,60 +1,52 @@
 import { Model } from "@models";
-import { formatModelSelectDescription } from "@/lib/localModels/formatModelPickerCopy";
-import {
-  findLocalChatModel,
-  isLocalChatModelId,
-} from "./localChatModelCatalog";
-import type { LocalChatModelId } from "./localChatModelCatalog";
+import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
+import { LocalChatModelCatalog } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import type {
+  LocalChatModelCopy,
+  LocalChatModelId,
+} from "./LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 /** Prefix for offline model ids in the shared chat model picker. */
-export const OFFLINE_CHAT_PICKER_ID_PREFIX = "offline:" as const;
-
-/** Combobox group label for downloaded on-device chat models. */
-export const OFFLINE_CHAT_PICKER_GROUP_LABEL = "Offline models" as const;
+const ID_PREFIX = "offline:" as const;
 
 /**
  * Builds the picker id stored in chat model local storage and assistant-ui
  * model context.
  */
-export function buildOfflineChatPickerModelId(
-  localModelId: LocalChatModelId,
-): string {
-  return `${OFFLINE_CHAT_PICKER_ID_PREFIX}${localModelId}`;
+function buildModelId(localModelId: LocalChatModelId): string {
+  return `${ID_PREFIX}${localModelId}`;
 }
 
 /** Parses a picker id back to a local catalog id, if it is an offline model. */
-export function parseOfflineChatPickerModelId(
-  modelId: string,
-): LocalChatModelId | undefined {
-  if (!modelId.startsWith(OFFLINE_CHAT_PICKER_ID_PREFIX)) {
+function parseModelId(modelId: string): LocalChatModelId | undefined {
+  if (!modelId.startsWith(ID_PREFIX)) {
     return undefined;
   }
-  const localId = modelId.slice(OFFLINE_CHAT_PICKER_ID_PREFIX.length);
-  if (isLocalChatModelId(localId)) {
+  const localId = modelId.slice(ID_PREFIX.length);
+  if (LocalChatModelCatalog.isValidId(localId)) {
     return localId;
   }
   return undefined;
 }
 
-function localChatModelDisplayNameForPicker(displayName: string): string {
-  return displayName.replace(/ \(offline\)$/u, "");
-}
-
 /** Maps downloaded local models to chat picker options. */
-export function buildOfflineChatPickerOptions(
+function buildOptions(
   downloadedIds: readonly LocalChatModelId[],
+  getCopy: (
+    model: ReturnType<typeof LocalChatModelCatalog.find>,
+  ) => LocalChatModelCopy,
 ): ChatModelOption.T[] {
   return downloadedIds.map((localModelId) => {
-    const model = findLocalChatModel(localModelId);
-    const name = localChatModelDisplayNameForPicker(model.displayName);
+    const model = LocalChatModelCatalog.find(localModelId);
+    const copy = getCopy(model);
     return Model.make("ChatModelOption", {
-      id: buildOfflineChatPickerModelId(localModelId),
-      name,
-      nameWithoutProvider: name,
-      description: formatModelSelectDescription({
-        description: model.description,
-        recommendedIf: model.recommendedIf,
+      id: buildModelId(localModelId),
+      name: copy.pickerName,
+      nameWithoutProvider: copy.pickerName,
+      description: ModelPickerCopy.formatDescription({
+        description: copy.description,
+        recommendedIf: copy.recommendedIf,
         approxSizeMb: model.approxSizeMb,
       }),
       supportsTools: false,
@@ -65,15 +57,28 @@ export function buildOfflineChatPickerOptions(
 }
 
 /** Offline models group for the chat picker (empty when none downloaded). */
-export function buildOfflineChatPickerGroup(
+function buildGroup(
   downloadedIds: readonly LocalChatModelId[],
-): ChatModelOption.OptionGroup | null {
-  const models = buildOfflineChatPickerOptions(downloadedIds);
+  getCopy: (
+    model: ReturnType<typeof LocalChatModelCatalog.find>,
+  ) => LocalChatModelCopy,
+  groupLabel: string,
+): ChatModelOption.OptionGroup | undefined {
+  const models = buildOptions(downloadedIds, getCopy);
   if (models.length === 0) {
-    return null;
+    return undefined;
   }
   return {
-    group: OFFLINE_CHAT_PICKER_GROUP_LABEL,
+    group: groupLabel,
     models,
   };
 }
+
+/** Builds and parses downloaded local-model entries for the chat picker. */
+export const OfflineChatPickerModels = {
+  idPrefix: ID_PREFIX,
+  buildModelId,
+  parseModelId,
+  buildOptions,
+  buildGroup,
+};

@@ -38,10 +38,14 @@ dist-ssr
 supabase/.temp
 supabase/.branches
 
+# Deno (local type-check only; breaks Supabase edge bundler when committed)
+deno.lock
+
 # Cursor
 .cursor/plans
 
 # Playwright
+/playwright/
 /playwright-report/
 /test-results/
 
@@ -67,6 +71,15 @@ etl-output/
 
 # Claude Code per-session runtime state
 .claude/scheduled_tasks*
+
+# Large generated test files for memory/perf benchmarking (do not commit)
+tests/data/large/
+.claude/worktrees
+
+# Git worktrees must live under ~/projects/worktrees/<repo>/, never inside the repo.
+# These patterns are tripwires in case a tool drops a worktree directory here by mistake.
+worktrees/
+.worktrees/
 
 # Difit session comments
 .difit/

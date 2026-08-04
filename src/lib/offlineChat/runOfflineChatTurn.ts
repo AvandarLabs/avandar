@@ -1,12 +1,16 @@
+import { propEq } from "@utils";
 import { ensureOfflineChatSchema } from "./ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
-import { readStoredLocalChatModelId } from "./localChatModelStore";
-import { logOfflineChat } from "./offlineChatDebugLog";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { logOfflineChat } from "./logOfflineChat";
 import { OfflineChatResourceManager } from "./OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "./runOfflineChatPipeline";
-import type { LocalChatModelId } from "./localChatModelCatalog";
-import type { OfflineChatTurnResult } from "./offlineChat.types";
+import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
+import type {
+  OfflineChatPipelineCopy,
+  OfflineChatTurnResult,
+} from "./offlineChat.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -16,6 +20,7 @@ export type RunOfflineChatTurnArgs = {
   pageContext: ChatPageContext.T;
   messages: readonly ChatClientMessage.T[];
   navigatorOnLine: boolean;
+  copy: OfflineChatPipelineCopy;
   localChatModelId?: LocalChatModelId;
   executeSql?: (
     sql: string,
@@ -30,9 +35,7 @@ export async function runOfflineChatTurn(
   args: RunOfflineChatTurnArgs,
 ): Promise<OfflineChatTurnResult> {
   const lastUserPrompt =
-    [...args.messages].reverse().find((message) => {
-      return message.role === "user";
-    })?.content ?? "";
+    [...args.messages].reverse().find(propEq("role", "user"))?.content ?? "";
 
   const fetchedSchema = await fetchOfflineChatSchema({
     workspace: args.workspace,
@@ -54,7 +57,7 @@ export async function runOfflineChatTurn(
     }),
   });
 
-  const modelId = args.localChatModelId ?? readStoredLocalChatModelId();
+  const modelId = args.localChatModelId ?? LocalChatModelStore.readSelectedId();
   const engine = await OfflineChatResourceManager.ensureEngine(modelId);
 
   const pipelineMessages = args.messages.map((message) => {
@@ -72,6 +75,7 @@ export async function runOfflineChatTurn(
     lastUserPrompt,
     lastSql: args.pageContext.lastSql,
     lastError: args.pageContext.lastError,
+    copy: args.copy,
     executeSql: args.executeSql,
     onPhase: args.onPhase,
   });

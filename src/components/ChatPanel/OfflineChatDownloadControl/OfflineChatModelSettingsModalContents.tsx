@@ -1,34 +1,17 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  ActionIcon,
-  Button,
-  Group,
-  Select,
-  Stack,
-  Text,
-  Tooltip,
-} from "@mantine/core";
+import { Button, Group, Select, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
-import {
-  formatModelSelectDescription,
-  formatModelSelectLabel,
-} from "@/lib/localModels/formatModelPickerCopy";
-import {
-  findLocalChatModel,
-  LOCAL_CHAT_MODELS,
-} from "@/lib/offlineChat/localChatModelCatalog";
-import {
-  isLocalChatModelMarkedDownloaded,
-  listDownloadedLocalChatModelIds,
-  readStoredLocalChatModelId,
-  writeStoredLocalChatModelId,
-} from "@/lib/offlineChat/localChatModelStore";
+import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
+import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
+import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
-import type { LocalChatModelId } from "@/lib/offlineChat/localChatModelCatalog";
+import { DownloadedModelList } from "./DownloadedModelList";
+import { useDeleteOfflineChatModel } from "./useDeleteOfflineChatModel";
+import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
 
 type Props = {
   settingsModalId: string;
@@ -87,125 +70,85 @@ export function OfflineChatModelSettingsModalContents({
   onDownloadedListChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
+  const getLocalChatModelCopy = useLocalChatModelCopy();
   const managerStatus = useOfflineChatManagerStatus();
   const [selectedModelId, setSelectedModelId] = useState<LocalChatModelId>(
     () => {
-      return readStoredLocalChatModelId();
+      return LocalChatModelStore.readSelectedId();
     },
   );
   const [downloadedRevision, setDownloadedRevision] = useState(0);
-  const [deletingModelId, setDeletingModelId] =
-    useState<LocalChatModelId | null>(null);
+  const onModelDeleted = useCallback(() => {
+    onDownloadedListChange?.();
+    refreshSettingsModal({ settingsModalId, onDownloadedListChange });
+  }, [onDownloadedListChange, settingsModalId]);
+  const { deletingModelId, onRequestDelete } = useDeleteOfflineChatModel({
+    onDeleted: onModelDeleted,
+  });
 
   const isBusy = managerStatus.kind === "downloading";
 
   void downloadedRevision;
   const isSelectedDownloaded =
-    isLocalChatModelMarkedDownloaded(selectedModelId);
-  const downloadedModelIds = listDownloadedLocalChatModelIds();
+    LocalChatModelStore.isDownloaded(selectedModelId);
+  const downloadedModelIds = LocalChatModelStore.listDownloadedIds();
 
-  useEffect(() => {
-    if (managerStatus.kind === "ready") {
-      setDownloadedRevision((revision) => {
-        return revision + 1;
-      });
-    }
-  }, [managerStatus.kind]);
+  useEffect(
+    function refreshDownloadedModelsWhenReady() {
+      if (managerStatus.kind === "ready") {
+        setDownloadedRevision((revision) => {
+          return revision + 1;
+        });
+      }
+    },
+    [managerStatus.kind],
+  );
 
-  useEffect(() => {
-    try {
-      writeStoredLocalChatModelId(selectedModelId);
-    } catch {
-      // Ignore storage errors.
-    }
-  }, [selectedModelId]);
+  useEffect(
+    function persistSelectedModel() {
+      try {
+        LocalChatModelStore.writeSelectedId(selectedModelId);
+      } catch {
+        // Ignore storage errors.
+      }
+    },
+    [selectedModelId],
+  );
 
-  const handleConfirmDownload = useCallback(async () => {
+  const onConfirmDownload = useCallback(async () => {
     onClose();
-    const model = findLocalChatModel(selectedModelId);
+    const model = LocalChatModelCatalog.find(selectedModelId);
+    const modelCopy = getLocalChatModelCopy(model);
     try {
       await OfflineChatResourceManager.ensureEngine(selectedModelId);
       notifications.show({
         title: t`Offline chat model ready`,
-        message: t`${model.displayName} is available when you are offline.`,
+        message: t`${modelCopy.displayName} is available when you are offline.`,
         color: "success",
       });
       setDownloadedRevision((revision) => {
         return revision + 1;
       });
-    } catch (error) {
+    } catch {
       notifications.show({
         title: t`Offline model download failed`,
-        message:
-          error instanceof Error ?
-            error.message
-          : t`Could not prepare the offline chat model.`,
+        message: t`Could not prepare the offline chat model.`,
         color: "danger",
       });
     }
-  }, [onClose, selectedModelId, t]);
+  }, [getLocalChatModelCopy, onClose, selectedModelId, t]);
 
-  const handleDeleteModel = useCallback(
-    async (modelId: LocalChatModelId) => {
-      setDeletingModelId(modelId);
-      try {
-        await OfflineChatResourceManager.deleteModel(modelId);
-        const model = findLocalChatModel(modelId);
-        notifications.show({
-          title: t`Offline chat model removed`,
-          message: t`${model.displayName} was deleted from this browser.`,
-          color: "success",
-        });
-        onDownloadedListChange?.();
-        refreshSettingsModal({ settingsModalId, onDownloadedListChange });
-      } catch (error) {
-        notifications.show({
-          title: t`Could not remove offline chat model`,
-          message:
-            error instanceof Error ?
-              error.message
-            : t`Unable to delete the offline chat model from cache.`,
-          color: "danger",
-        });
-      } finally {
-        setDeletingModelId(null);
-      }
-    },
-    [onDownloadedListChange, settingsModalId, t],
-  );
-
-  const requestDeleteModel = useCallback(
-    (modelId: LocalChatModelId) => {
-      const model = findLocalChatModel(modelId);
-      modals.openConfirmModal({
-        title: t`Remove offline chat model?`,
-        labels: { confirm: t`Remove`, cancel: t`Cancel` },
-        confirmProps: { color: "danger" },
-        children: (
-          <Text size="sm">
-            <Trans>
-              {model.displayName} (~{model.approxSizeMb} MB) will be deleted
-              from this browser to free space. You can download it again later.
-            </Trans>
-          </Text>
-        ),
-        onConfirm: () => {
-          void handleDeleteModel(modelId);
-        },
-      });
-    },
-    [handleDeleteModel, t],
-  );
-
-  const selectedModel = findLocalChatModel(selectedModelId);
-  const modelSelectData = LOCAL_CHAT_MODELS.map((model) => {
+  const selectedModel = LocalChatModelCatalog.find(selectedModelId);
+  const selectedModelCopy = getLocalChatModelCopy(selectedModel);
+  const modelSelectData = LocalChatModelCatalog.values.map((model) => {
+    const modelCopy = getLocalChatModelCopy(model);
     const downloadedSuffix =
-      isLocalChatModelMarkedDownloaded(model.id) ? t` · downloaded` : "";
+      LocalChatModelStore.isDownloaded(model.id) ? t` · downloaded` : "";
     return {
       value: model.id,
-      label: formatModelSelectLabel({
-        displayName: model.displayName,
-        systemRequirements: model.systemRequirements,
+      label: ModelPickerCopy.formatLabel({
+        displayName: modelCopy.displayName,
+        systemRequirements: modelCopy.systemRequirements,
         approxSizeMb: model.approxSizeMb,
         downloadedSuffix,
       }),
@@ -215,7 +158,7 @@ export function OfflineChatModelSettingsModalContents({
   const downloadButtonLabel =
     isSelectedDownloaded ? t`Re-download` : t`Download`;
 
-  const controlsDisabled = isBusy || deletingModelId !== null;
+  const controlsDisabled = isBusy || deletingModelId !== undefined;
 
   return (
     <Stack gap="md">
@@ -227,9 +170,9 @@ export function OfflineChatModelSettingsModalContents({
 
       <Select
         label={t`Model`}
-        description={formatModelSelectDescription({
-          description: selectedModel.description,
-          recommendedIf: selectedModel.recommendedIf,
+        description={ModelPickerCopy.formatDescription({
+          description: selectedModelCopy.description,
+          recommendedIf: selectedModelCopy.recommendedIf,
           approxSizeMb: selectedModel.approxSizeMb,
         })}
         value={selectedModelId}
@@ -243,39 +186,12 @@ export function OfflineChatModelSettingsModalContents({
         disabled={controlsDisabled}
       />
 
-      {downloadedModelIds.length > 0 ?
-        <Stack gap={4}>
-          <Text size="xs" c="dimmed">
-            <Trans>Downloaded on this browser</Trans>
-          </Text>
-          {downloadedModelIds.map((modelId) => {
-            const model = findLocalChatModel(modelId);
-            const isDeleting = deletingModelId === modelId;
-            return (
-              <Group key={modelId} justify="space-between" wrap="nowrap">
-                <Text size="sm" truncate>
-                  {model.displayName}
-                </Text>
-                <Tooltip label={t`Remove ${model.displayName}`}>
-                  <ActionIcon
-                    variant="subtle"
-                    color="neutral"
-                    size="sm"
-                    aria-label={t`Remove ${model.displayName}`}
-                    loading={isDeleting}
-                    disabled={controlsDisabled}
-                    onClick={() => {
-                      requestDeleteModel(modelId);
-                    }}
-                  >
-                    <IconTrash size={14} />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
-            );
-          })}
-        </Stack>
-      : null}
+      <DownloadedModelList
+        downloadedModelIds={downloadedModelIds}
+        deletingModelId={deletingModelId}
+        areControlsDisabled={controlsDisabled}
+        onRequestDelete={onRequestDelete}
+      />
 
       <Group justify="flex-end" gap="sm">
         <Button variant="default" onClick={onClose}>
@@ -287,7 +203,7 @@ export function OfflineChatModelSettingsModalContents({
           loading={isBusy}
           disabled={controlsDisabled}
           onClick={() => {
-            void handleConfirmDownload();
+            void onConfirmDownload();
           }}
         >
           {downloadButtonLabel}

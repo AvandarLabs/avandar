@@ -9,12 +9,8 @@ import type {
  * Desktop-side {@link ServerApiClient} that forwards every call to the
  * Bun-main `serverApi.*` IPC handlers in
  * `apps/desktop/main/ipc/registerServerApiHandlers/`. The Bun-main
- * process is the sole network egress on desktop — the auth token, the
+ * process is the sole network egress on desktop. The auth token, the
  * Supabase URL, and any retry policy live there, not in the webview.
- *
- * Phase 2 makes this the live desktop implementation; previously
- * `createServerApiClient.ts` fell through to the browser-backed adapter
- * on both platforms because this file threw.
  *
  * @returns A {@link ServerApiClient} that issues IPC calls.
  */
@@ -43,13 +39,8 @@ export function createIpcServerApiClient(): ServerApiClient {
         queryParams: request.queryParams as Record<string, unknown> | undefined,
         body: request.body,
       });
-      /*
-       * The Bun-main handler returns `{ data, status }`. The
-       * platform-level interface narrows the return to `TResult`, so
-       * callers that need the HTTP status code have to plumb it
-       * separately (web's `invokeFunction` likewise returns just
-       * `data`). Match that shape here.
-       */
+      // The Bun-main handler returns `{ data, status }`. The platform-level
+      // interface narrows the return to `TResult`, matching the web adapter.
       return reply.data as TResult;
     },
   };

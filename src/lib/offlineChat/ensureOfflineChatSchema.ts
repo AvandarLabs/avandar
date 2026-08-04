@@ -1,3 +1,4 @@
+import { propEq } from "@utils";
 import type { OfflineChatSchema } from "./offlineChat.types";
 
 /**
@@ -13,16 +14,14 @@ export function ensureOfflineChatSchema(args: {
     return args.schema;
   }
 
-  const hasOpen = args.schema.datasets.some((dataset) => {
-    return dataset.id === openDatasetId;
-  });
+  const hasOpen = args.schema.datasets.some(propEq("id", openDatasetId));
   if (hasOpen) {
     return args.schema;
   }
 
-  const columns = args.schema.columns.filter((column) => {
-    return column.dataset_id === openDatasetId;
-  });
+  const columns = args.schema.columns.filter(
+    propEq("dataset_id", openDatasetId),
+  );
 
   return {
     datasets: [

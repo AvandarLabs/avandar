@@ -250,10 +250,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
   const visualizationSettingsPanelButtonRef = useRef<HTMLButtonElement>(null);
   const wasFetchingRef = useRef(false);
-  /**
-   * Auto-open settings once on the first successful query when nothing is in
-   * session storage yet.
-   */
+  // Auto-open settings on the first successful query when session storage
+  // does not already contain panel preferences.
   const hasAutoOpenedVisualizationSettingsRef = useRef(
     hasDataExplorerPanelPreferencesInSessionStorage(),
   );
@@ -381,7 +379,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                         });
                       }}
                     >
-                      <Trans>Save — {state.openDataset.name}</Trans>
+                      <Trans>Save: {state.openDataset.name}</Trans>
                     </Menu.Item>
                   : null}
                   <Menu.Item
@@ -417,7 +415,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                       });
                     }}
                   >
-                    <Trans>Delete — {state.openDataset.name}</Trans>
+                    <Trans>Delete: {state.openDataset.name}</Trans>
                   </Menu.Item>
                   <Menu.Divider />
                 </>

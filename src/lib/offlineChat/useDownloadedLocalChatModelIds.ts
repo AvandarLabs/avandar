@@ -1,9 +1,6 @@
 import { useSyncExternalStore } from "react";
-import {
-  listDownloadedLocalChatModelIds,
-  subscribeDownloadedLocalChatModels,
-} from "./localChatModelStore";
-import type { LocalChatModelId } from "./localChatModelCatalog";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
 
 const EMPTY_DOWNLOADED_IDS: readonly LocalChatModelId[] = [];
 
@@ -11,18 +8,19 @@ let cachedDownloadedIds: readonly LocalChatModelId[] = EMPTY_DOWNLOADED_IDS;
 let cachedDownloadedKey = "";
 
 /**
- * Stable snapshot for `useSyncExternalStore`. `listDownloadedLocalChatModelIds`
- * allocates a new array each call; returning it directly causes infinite
- * re-renders because React compares snapshots with `Object.is`.
+ * Stable snapshot for `useSyncExternalStore`. The store allocates a new array
+ * each call; returning it directly causes infinite re-renders because React
+ * compares snapshots with `Object.is`.
  */
 function getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
-  const next = listDownloadedLocalChatModelIds();
-  const nextKey = next.join("\0");
-  if (nextKey === cachedDownloadedKey) {
+  const downloadedIds = LocalChatModelStore.listDownloadedIds();
+  const downloadedKey = downloadedIds.join("\0");
+  if (downloadedKey === cachedDownloadedKey) {
     return cachedDownloadedIds;
   }
-  cachedDownloadedKey = nextKey;
-  cachedDownloadedIds = next.length === 0 ? EMPTY_DOWNLOADED_IDS : next;
+  cachedDownloadedKey = downloadedKey;
+  cachedDownloadedIds =
+    downloadedIds.length === 0 ? EMPTY_DOWNLOADED_IDS : downloadedIds;
   return cachedDownloadedIds;
 }
 
@@ -31,7 +29,7 @@ function getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
  */
 export function useDownloadedLocalChatModelIds(): readonly LocalChatModelId[] {
   return useSyncExternalStore(
-    subscribeDownloadedLocalChatModels,
+    LocalChatModelStore.subscribeDownloadedModels,
     getDownloadedLocalChatModelIdsSnapshot,
     () => {
       return EMPTY_DOWNLOADED_IDS;

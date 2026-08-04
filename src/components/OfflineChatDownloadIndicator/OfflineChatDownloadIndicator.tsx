@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Progress, Text } from "@mantine/core";
-import { findLocalChatModel } from "@/lib/offlineChat/localChatModelCatalog";
+import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
 import css from "./OfflineChatDownloadIndicator.module.css";
 
@@ -10,14 +11,16 @@ import css from "./OfflineChatDownloadIndicator.module.css";
  */
 export function OfflineChatDownloadIndicator(): JSX.Element | null {
   const { t } = useLingui();
+  const getLocalChatModelCopy = useLocalChatModelCopy();
   const status = useOfflineChatManagerStatus();
 
   if (status.kind !== "downloading") {
     return null;
   }
 
-  const model = findLocalChatModel(status.modelId);
-  const message = t`Downloading ${model.displayName} for offline chat`;
+  const model = LocalChatModelCatalog.find(status.modelId);
+  const modelCopy = getLocalChatModelCopy(model);
+  const message = t`Downloading ${modelCopy.displayName} for offline chat`;
   const progressPercent = Math.round(
     Math.min(100, Math.max(0, status.progress * 100)),
   );
@@ -26,19 +29,26 @@ export function OfflineChatDownloadIndicator(): JSX.Element | null {
 
   return (
     <div
-      className={css.root}
+      className={css.offlineChatDownloadIndicator}
       role="status"
       aria-live="polite"
       aria-label={message}
     >
-      <div className={css.titleRow}>
-        <p className={css.title}>{model.displayName}</p>
+      <div className={css.offlineChatDownloadIndicatorTitleRow}>
+        <p className={css.offlineChatDownloadIndicatorTitle}>
+          {modelCopy.displayName}
+        </p>
         <Text size="xs" c="neutral.7" fw={600}>
           {overallLabel}
         </Text>
       </div>
 
-      <Text size="xs" c="danger" fw={600} className={css.warning}>
+      <Text
+        size="xs"
+        c="danger"
+        fw={600}
+        className={css.offlineChatDownloadIndicatorWarning}
+      >
         <Trans>
           Do not refresh or close this tab or else the download will be
           canceled.
@@ -53,11 +63,9 @@ export function OfflineChatDownloadIndicator(): JSX.Element | null {
         aria-label={overallLabel}
       />
 
-      {status.statusText.length > 0 ?
-        <Text size="xs" className={css.statusText}>
-          {status.statusText}
-        </Text>
-      : null}
+      <Text size="xs" className={css.offlineChatDownloadIndicatorStatus}>
+        <Trans>Preparing model files…</Trans>
+      </Text>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { APIClient } from "@/clients/APIClient";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UserId } from "$/models/User/User.types";

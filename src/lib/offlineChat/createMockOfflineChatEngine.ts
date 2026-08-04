@@ -1,3 +1,4 @@
+import { prop } from "@utils";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
@@ -38,24 +39,17 @@ export function createMockOfflineChatEngine(
       // no-op
     },
     async complete(request: OfflineChatCompletionRequest): Promise<string> {
-      const blob = request.messages
-        .map((message) => {
-          return message.content;
-        })
-        .join("\n");
-      for (const entry of resolveMockScript(scripted)) {
-        const matches =
-          typeof entry.match === "string" ?
+      const blob = request.messages.map(prop("content")).join("\n");
+      const matchingEntry = resolveMockScript(scripted).find((entry) => {
+        return typeof entry.match === "string" ?
             blob.includes(entry.match)
           : entry.match.test(blob);
-        if (matches) {
-          if (request.onToken) {
-            for (const char of entry.response) {
-              request.onToken(char);
-            }
-          }
-          return entry.response;
+      });
+      if (matchingEntry) {
+        if (request.onToken) {
+          [...matchingEntry.response].forEach(request.onToken);
         }
+        return matchingEntry.response;
       }
       return '{"summary":"Mock fallback","proceed":true}';
     },

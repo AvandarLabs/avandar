@@ -9,11 +9,11 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
 import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   QueryDataSource,
   QueryDataSourceId,
@@ -83,13 +83,15 @@ export function QueryDataSourceSelect({
     if (isOnline) {
       return new Set<QueryDataSourceId>();
     }
-    const ids = new Set<QueryDataSourceId>();
-    for (const dataset of datasets ?? []) {
-      if (!localDatasetIds.has(dataset.id as DatasetId)) {
-        ids.add(dataset.id as QueryDataSourceId);
-      }
-    }
-    return ids;
+    return new Set(
+      (datasets ?? [])
+        .filter((dataset) => {
+          return !localDatasetIds.has(dataset.id as Dataset.Id);
+        })
+        .map((dataset) => {
+          return dataset.id as QueryDataSourceId;
+        }),
+    );
   }, [datasets, isOnline, localDatasetIds]);
 
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {

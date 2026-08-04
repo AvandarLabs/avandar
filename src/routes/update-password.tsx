@@ -5,7 +5,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 export const Route = createFileRoute("/update-password")({
   component: UpdatePasswordPage,

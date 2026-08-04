@@ -1,3 +1,4 @@
+import { isDefined } from "@utils";
 import Fuse from "fuse.js";
 import type {
   OfflineChatSchema,
@@ -24,18 +25,16 @@ function resolveColumnFromAliasDictionary(
   if (!candidates) {
     return undefined;
   }
-  for (const candidate of candidates) {
-    const column = columns.find((entry) => {
-      return (
-        entry.name === candidate ||
-        entry.name.toLowerCase() === candidate.toLowerCase()
-      );
-    });
-    if (column) {
-      return column.name;
-    }
-  }
-  return undefined;
+  return candidates
+    .map((candidate) => {
+      return columns.find((entry) => {
+        return (
+          entry.name === candidate ||
+          entry.name.toLowerCase() === candidate.toLowerCase()
+        );
+      });
+    })
+    .find(isDefined)?.name;
 }
 
 /**

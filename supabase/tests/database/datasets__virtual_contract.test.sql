@@ -2,7 +2,7 @@
 
 begin;
 
-select plan(2);
+select plan(3);
 
 select hasnt_column(
   'public',
@@ -23,6 +23,21 @@ select has_function(
     'text'
   ]::name[],
   'virtual dataset RPC keeps the six-argument contract'
+);
+
+select hasnt_function(
+  'public',
+  'rpc_datasets__add_virtual_dataset',
+  array[
+    'uuid',
+    'uuid',
+    'text',
+    'text',
+    'dataset_column_input[]',
+    'text',
+    'jsonb'
+  ]::name[],
+  'virtual dataset RPC removes the retired planning argument'
 );
 
 select * from finish();

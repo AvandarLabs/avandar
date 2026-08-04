@@ -46,7 +46,7 @@ vi.mock("@/clients/WorkspaceClient", () => {
   };
 });
 
-vi.mock("@/clients/AuthClient", () => {
+vi.mock("@/clients/AuthClient/AuthClient", () => {
   return {
     AuthClient: {
       getCurrentSession: getCurrentSessionMock,

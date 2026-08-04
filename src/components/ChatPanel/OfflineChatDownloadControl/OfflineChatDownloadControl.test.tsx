@@ -4,11 +4,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
-import {
-  clearLocalChatModelDownloaded,
-  isLocalChatModelMarkedDownloaded,
-  markLocalChatModelDownloaded,
-} from "@/lib/offlineChat/localChatModelStore";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { OfflineChatDownloadControl } from "./OfflineChatDownloadControl";
 
@@ -55,12 +51,12 @@ describe("OfflineChatDownloadControl", () => {
 
   afterEach(() => {
     window.localStorage.clear();
-    clearLocalChatModelDownloaded("qwen-1.5b");
-    clearLocalChatModelDownloaded("llama-1b");
+    LocalChatModelStore.clearDownloaded("qwen-1.5b");
+    LocalChatModelStore.clearDownloaded("llama-1b");
   });
 
   it("keeps the download control clickable after a model is marked downloaded", () => {
-    markLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
 
     renderControl();
 
@@ -75,9 +71,9 @@ describe("OfflineChatDownloadControl", () => {
   });
 
   it("removes a downloaded model after confirmation", async () => {
-    markLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
     deleteModelMock.mockImplementation(async () => {
-      clearLocalChatModelDownloaded("qwen-1.5b");
+      LocalChatModelStore.clearDownloaded("qwen-1.5b");
     });
 
     renderControl();
@@ -100,7 +96,7 @@ describe("OfflineChatDownloadControl", () => {
       expect(deleteModelMock).toHaveBeenCalledWith("qwen-1.5b");
     });
     await waitFor(() => {
-      expect(isLocalChatModelMarkedDownloaded("qwen-1.5b")).toBe(false);
+      expect(LocalChatModelStore.isDownloaded("qwen-1.5b")).toBe(false);
     });
     await waitFor(() => {
       expect(

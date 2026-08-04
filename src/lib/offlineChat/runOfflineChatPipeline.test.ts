@@ -8,6 +8,17 @@ const SCHEMA = {
   columns: [{ dataset_id: "ds-1", name: "amount", data_type: "number" }],
 } as const;
 
+const COPY = {
+  replying: "Respondiendo…",
+  understandingQuestion: "Analizando tu pregunta…",
+  writingQuery: "Escribiendo consulta…",
+  generatingSql: "Generando SQL…",
+  repairingQuery: "Reparando consulta…",
+  fixingQuery: "Corrigiendo consulta…",
+  noSql: "No se pudo generar SQL sin conexión.",
+  metadataQuery: "Esta es una consulta basada en los metadatos.",
+} as const;
+
 describe("runOfflineChatPipeline", () => {
   it("runs analyze then SQL and returns generatedSql", async () => {
     const engine = createMockOfflineChatEngine([
@@ -29,11 +40,12 @@ describe("runOfflineChatPipeline", () => {
       }),
       messages: [{ role: "user", content: "How many rows?" }],
       lastUserPrompt: "How many rows?",
+      copy: COPY,
     });
 
     expect(result.generatedSql?.sql).toContain("SELECT COUNT");
     expect(result.assistantText).toBe("");
-    expect(result.phaseLabels).toContain("Repairing query…");
+    expect(result.phaseLabels).toContain("Reparando consulta…");
     expect(result.clarification).toBeUndefined();
   });
 
@@ -52,6 +64,7 @@ describe("runOfflineChatPipeline", () => {
       pageContext: ChatPageContext.createDataExplorerViewContext(),
       messages: [{ role: "user", content: "Trends this year" }],
       lastUserPrompt: "Trends this year",
+      copy: COPY,
     });
 
     expect(result.clarification?.question).toBe("Which year?");

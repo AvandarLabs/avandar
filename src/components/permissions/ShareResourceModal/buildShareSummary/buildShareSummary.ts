@@ -74,56 +74,57 @@ export function buildShareSummary(
     ];
   }
 
-  const spans: SummarySpan[] = [
-    { kind: "text", text: t`This ${resource} is shared with: ` },
-  ];
-
-  const fragments: SummarySpan[][] = [];
-
   // Combine user shares into a single comma-joined fragment so the
   // sentence reads as one "list" item separated from group shares.
-  if (userShares.length > 0) {
-    const userFragment: SummarySpan[] = [];
-    userShares.forEach((share, idx) => {
-      const name = opts.userById[share.principalId] ?? t`Unknown user`;
-      if (idx > 0) {
-        userFragment.push({ kind: "text", text: ", " });
-      }
-      userFragment.push({ kind: "pill", label: name, variant: "user" });
-    });
-    fragments.push(userFragment);
-  }
-
-  groupShares.forEach((share) => {
-    const groupName = opts.groupById[share.principalId] ?? t`Unknown group`;
-    const fragment: SummarySpan[] = [
-      { kind: "text", text: t`all members of ` },
-      { kind: "pill", label: groupName, variant: "group" },
+  const userFragment = userShares.flatMap((share, shareIndex) => {
+    const name = opts.userById[share.principalId] ?? t`Unknown user`;
+    return [
+      ...(shareIndex > 0 ? [{ kind: "text" as const, text: ", " }] : []),
+      { kind: "pill" as const, label: name, variant: "user" as const },
     ];
-    if (share.requiresAppAccess) {
-      fragment.push({ kind: "text", text: t` who also have ` });
-      fragment.push({ kind: "pill", label: app, variant: "app" });
-      fragment.push({ kind: "text", text: t` access` });
-    }
-    fragments.push(fragment);
   });
 
-  if (!opts.isRestricted) {
-    fragments.push(buildGeneralAccessFragment(app, generalAccessRole));
-  }
+  const groupFragments = groupShares.map((share): SummarySpan[] => {
+    const groupName = opts.groupById[share.principalId] ?? t`Unknown group`;
+    return [
+      { kind: "text", text: t`all members of ` },
+      { kind: "pill", label: groupName, variant: "group" },
+      ...(share.requiresAppAccess ?
+        [
+          { kind: "text" as const, text: t` who also have ` },
+          { kind: "pill" as const, label: app, variant: "app" as const },
+          { kind: "text" as const, text: t` access` },
+        ]
+      : []),
+    ];
+  });
+
+  const fragments = [
+    ...(userFragment.length > 0 ? [userFragment] : []),
+    ...groupFragments,
+    ...(!opts.isRestricted ?
+      [buildGeneralAccessFragment(app, generalAccessRole)]
+    : []),
+  ];
 
   // Join fragments with commas; if there are 2+ fragments, the final
   // separator becomes ", and " (Oxford-style for readability).
-  fragments.forEach((fragment, idx) => {
-    if (idx > 0) {
-      const separator = idx === fragments.length - 1 ? t`, and ` : ", ";
-      spans.push({ kind: "text", text: separator });
-    }
-    spans.push(...fragment);
+  const joinedFragments = fragments.flatMap((fragment, fragmentIndex) => {
+    const separator =
+      fragmentIndex === 0 ? undefined
+      : fragmentIndex === fragments.length - 1 ? t`, and `
+      : ", ";
+    return [
+      ...(separator ? [{ kind: "text" as const, text: separator }] : []),
+      ...fragment,
+    ];
   });
 
-  spans.push({ kind: "text", text: "." });
-  return spans;
+  return [
+    { kind: "text", text: t`This ${resource} is shared with: ` },
+    ...joinedFragments,
+    { kind: "text", text: "." },
+  ];
 }
 
 function buildGeneralAccessOnlySummary(

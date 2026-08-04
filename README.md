@@ -107,6 +107,11 @@ Without this step, e2e tests fail with `browserType.launch: Executable doesn't
 exist`. Browsers are stored under `~/Library/Caches/ms-playwright/` on macOS
 (not in the repo).
 
+Playwright's web server enables `enable-shared-with-me` in
+`VITE_FEATURE_FLAGS`. If you reuse an existing dev server on port 5173, add
+that flag to your `.env.development` or stop the dev server so Playwright can
+start one with the correct flags.
+
 E2E tests expect a **full local Supabase stack**: `supabase start`, seeded DB
 (`pnpm db:reset` or equivalent), **Edge Functions served** (e.g. `pnpm fns:serve`
 after `pnpm fns:update-env`), and `.env.development` filled in (including

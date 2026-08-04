@@ -12,9 +12,8 @@ import type {
 /**
  * Build the relative URL `supabase.functions.invoke` is called with.
  * Mirrors the path-param / query-string substitution `APIClient.ts` performs
- * today so this adapter is a behavior-preserving wrapper. Phase 2 may
- * centralize this builder; for now keeping it local keeps the
- * `packages/shared/` → `src/` boundary clean.
+ * today so this adapter is a behavior-preserving wrapper. Keeping it local
+ * preserves the dependency boundary between `packages/shared/` and `src/`.
  */
 function buildRelativeFunctionUrl(request: ServerApiFunctionRequest): string {
   const { route, pathParams, queryParams } = request;
@@ -74,12 +73,9 @@ function _isUnauthorized(error: unknown): boolean {
 
 /**
  * Web-side {@link ServerApiClient}. Thin wrapper over the shared `AvaSupabase`
- * singleton — `rpc` is a direct passthrough; `invokeFunction` builds the
+ * singleton: `rpc` is a direct passthrough, and `invokeFunction` builds the
  * relative URL the same way `APIClient.sendHTTPRequest` does today and
  * delegates to `supabase.functions.invoke(...)`.
- *
- * Phase 2 may replace this with a more typed shim; the current goal is zero
- * behavior change on web while desktop migrates to its own IPC backend.
  *
  * @returns A browser-backed {@link ServerApiClient}.
  */

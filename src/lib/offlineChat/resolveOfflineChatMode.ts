@@ -1,8 +1,5 @@
-import {
-  hasAnyDownloadedLocalChatModel,
-  isLocalChatModelMarkedDownloaded,
-} from "./localChatModelStore";
-import { parseOfflineChatPickerModelId } from "./offlineChatPickerModels";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { OfflineChatPickerModels } from "./offlineChatPickerModels";
 import type { OfflineChatMode } from "./offlineChat.types";
 
 export function resolveOfflineChatMode(args: {
@@ -11,13 +8,13 @@ export function resolveOfflineChatMode(args: {
   /** Active chat model picker id (includes `offline:` ids). */
   selectedChatModelId?: string;
 }): OfflineChatMode {
-  const hasDownloaded = hasAnyDownloadedLocalChatModel();
+  const hasDownloaded = LocalChatModelStore.hasAnyDownloaded();
   const pickerLocalId =
     args.selectedChatModelId ?
-      parseOfflineChatPickerModelId(args.selectedChatModelId)
+      OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
     : undefined;
 
-  if (pickerLocalId && isLocalChatModelMarkedDownloaded(pickerLocalId)) {
+  if (pickerLocalId && LocalChatModelStore.isDownloaded(pickerLocalId)) {
     return { kind: "local", localChatModelId: pickerLocalId };
   }
 

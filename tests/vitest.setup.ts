@@ -1,7 +1,9 @@
+import path from "node:path";
 import "@testing-library/jest-dom";
 import { i18n } from "@lingui/core";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { cleanup } from "@testing-library/react";
+import dotenv from "dotenv";
 import { afterEach, expect } from "vitest";
 
 // Activate the Lingui singleton with an empty English catalog so any test
@@ -9,6 +11,13 @@ import { afterEach, expect } from "vitest";
 // having to load a real compiled catalog. Tests that wrap their tree in
 // `<I18nProvider i18n={i18n}>` will see this active locale.
 i18n.loadAndActivate({ locale: "en", messages: {} });
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
+
+// Local `.env.development` may enable product feature flags that change which
+// components mount in tests (for example FeedbackButton). E2E injects flags
+// via `ensureE2eViteFeatureFlags` instead.
+delete process.env.VITE_FEATURE_FLAGS;
 
 const noop = (): void => {
   return;

@@ -38,7 +38,6 @@ describe("OfflineChatDownloadIndicator", () => {
       kind: "downloading",
       modelId: "qwen-1.5b",
       progress: 0.42,
-      statusText: "Fetching param cache[3/5]",
     };
     render(
       <I18nProvider i18n={i18n}>
@@ -50,7 +49,7 @@ describe("OfflineChatDownloadIndicator", () => {
 
     expect(screen.getByText(/Qwen 2.5 1.5B \(offline\)/i)).toBeInTheDocument();
     expect(screen.getByText("42%")).toBeInTheDocument();
-    expect(screen.getByText("Fetching param cache[3/5]")).toBeInTheDocument();
+    expect(screen.getByText("Preparing model files…")).toBeInTheDocument();
     expect(
       screen.getByText(/Do not refresh or close this tab/i),
     ).toBeInTheDocument();

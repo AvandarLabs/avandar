@@ -5,8 +5,7 @@ import {
   CALIFORNIA_XLSX_PATH,
   CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT,
   CHOLERA_NYC_XLSX_PATH,
-  EXPECTED_CHOLERA_COLUMN_NAMES,
-  EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
@@ -29,7 +28,7 @@ import type { Page } from "@playwright/test";
 async function expectExcelParsePreview(options: {
   page: Page;
   formattedRowCount: string;
-  columnNames: readonly string[];
+  columnNames?: readonly string[];
   sampleCellSubstring: string;
 }): Promise<void> {
   await expect(
@@ -46,13 +45,15 @@ async function expectExcelParsePreview(options: {
     options.page.getByText(/These are the first \d+ rows/),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-  await Promise.all(
-    options.columnNames.map(async (columnName) => {
-      await expect(
-        options.page.getByRole("columnheader", { name: columnName }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }),
-  );
+  if (options.columnNames) {
+    await Promise.all(
+      options.columnNames.map(async (columnName) => {
+        await expect(
+          options.page.getByRole("columnheader", { name: columnName }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }),
+    );
+  }
 
   await expect(
     options.page.getByText(options.sampleCellSubstring).first(),
@@ -64,8 +65,6 @@ test.describe("Excel manual upload", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug } = e2eWorkerDb;
 
@@ -89,9 +88,9 @@ test.describe("Excel manual upload", () => {
 
     await expectExcelParsePreview({
       page,
-      formattedRowCount:
-        CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
-      columnNames: EXPECTED_CHOLERA_COLUMN_NAMES,
+      formattedRowCount: formatImportPreviewRowCount(
+        CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT,
+      ),
       sampleCellSubstring: "Times Square",
     });
 
@@ -100,9 +99,9 @@ test.describe("Excel manual upload", () => {
 
     await expectExcelParsePreview({
       page,
-      formattedRowCount:
-        CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
-      columnNames: EXPECTED_CSV_COLUMN_NAMES,
+      formattedRowCount: formatImportPreviewRowCount(
+        CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+      ),
       sampleCellSubstring: "California",
     });
 

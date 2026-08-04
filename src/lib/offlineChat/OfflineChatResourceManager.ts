@@ -1,10 +1,7 @@
 import { createOfflineChatEngine } from "./createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "./deleteLocalChatModelCache";
-import {
-  clearLocalChatModelDownloaded,
-  markLocalChatModelDownloaded,
-} from "./localChatModelStore";
-import type { LocalChatModelId } from "./localChatModelCatalog";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
 import type { OfflineChatEngine } from "./offlineChat.types";
 
 export type OfflineChatManagerStatus =
@@ -13,7 +10,6 @@ export type OfflineChatManagerStatus =
       kind: "downloading";
       modelId: LocalChatModelId;
       progress: number;
-      statusText: string;
     }
   | { kind: "ready"; modelId: LocalChatModelId }
   | { kind: "error"; modelId: LocalChatModelId; message: string };
@@ -26,9 +22,10 @@ type Listener = (status: OfflineChatManagerStatus) => void;
 class OfflineChatResourceManagerImpl {
   private status: OfflineChatManagerStatus = { kind: "idle" };
   private listeners = new Set<Listener>();
-  private engine: OfflineChatEngine | null = null;
-  private loadedModelId: LocalChatModelId | null = null;
+  private engine: OfflineChatEngine | undefined;
+  private loadedModelId: LocalChatModelId | undefined;
 
+  /** Subscribes to status changes and immediately emits the current status. */
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener);
     listener(this.status);
@@ -37,17 +34,19 @@ class OfflineChatResourceManagerImpl {
     };
   }
 
+  /** Returns the current engine lifecycle status. */
   getStatus(): OfflineChatManagerStatus {
     return this.status;
   }
 
-  private setStatus(next: OfflineChatManagerStatus): void {
-    this.status = next;
-    for (const listener of this.listeners) {
-      listener(next);
-    }
+  private setStatus(status: OfflineChatManagerStatus): void {
+    this.status = status;
+    this.listeners.forEach((listener) => {
+      listener(status);
+    });
   }
 
+  /** Loads the selected model and returns its reusable chat engine. */
   async ensureEngine(modelId: LocalChatModelId): Promise<OfflineChatEngine> {
     if (this.engine && this.loadedModelId === modelId) {
       return this.engine;
@@ -57,7 +56,6 @@ class OfflineChatResourceManagerImpl {
       kind: "downloading",
       modelId,
       progress: 0,
-      statusText: "Preparing offline chat model…",
     });
     const engine = createOfflineChatEngine({
       modelId,
@@ -66,7 +64,6 @@ class OfflineChatResourceManagerImpl {
           kind: "downloading",
           modelId,
           progress: report.progress,
-          statusText: report.text,
         });
       },
     });
@@ -74,12 +71,12 @@ class OfflineChatResourceManagerImpl {
       await engine.preload();
       this.engine = engine;
       this.loadedModelId = modelId;
-      markLocalChatModelDownloaded(modelId);
+      LocalChatModelStore.markDownloaded(modelId);
       this.setStatus({ kind: "ready", modelId });
       return engine;
     } catch (error) {
-      this.engine = null;
-      this.loadedModelId = null;
+      this.engine = undefined;
+      this.loadedModelId = undefined;
       const message =
         error instanceof Error ? error.message : "Failed to load offline model";
       this.setStatus({ kind: "error", modelId, message });
@@ -96,7 +93,7 @@ class OfflineChatResourceManagerImpl {
       await this.unload();
     }
     await deleteLocalChatModelCache(modelId);
-    clearLocalChatModelDownloaded(modelId);
+    LocalChatModelStore.clearDownloaded(modelId);
     if (
       this.status.kind !== "idle" &&
       "modelId" in this.status &&
@@ -106,18 +103,20 @@ class OfflineChatResourceManagerImpl {
     }
   }
 
+  /** Unloads the resident engine and resets lifecycle status. */
   async unload(): Promise<void> {
     if (this.engine) {
       await this.engine.unload();
     }
-    this.engine = null;
-    this.loadedModelId = null;
+    this.engine = undefined;
+    this.loadedModelId = undefined;
     if (this.status.kind !== "idle") {
       this.setStatus({ kind: "idle" });
     }
   }
 }
 
+/** Shared owner of the browser's resident offline chat engine. */
 export const OfflineChatResourceManager = new OfflineChatResourceManagerImpl();
 
 declare global {

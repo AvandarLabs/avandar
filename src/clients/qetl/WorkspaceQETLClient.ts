@@ -1,7 +1,7 @@
 import { createModule, Module } from "@modules";
 import { EmptyObject, prop, where } from "@utils";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";

@@ -22,19 +22,18 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { Link } from "@ui";
 import { APP_NAME } from "$/config/AppConfig";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
+import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
-import { OfflineGated } from "@/components/offline/OfflineGated";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -249,100 +248,26 @@ export function Navbar({
               return null;
             }
 
-            const isOfflineBlocked =
-              !isOnline && !isAppLinkAvailableOffline(link);
-            const linkContent = (
-              <Flex
-                px="xs"
-                py="xs"
-                bdrs="md"
-                align="center"
-                className={css.navbarLinkPill}
-              >
-                <Box mr="xs">{icon}</Box>
-                <Text span fw={500} className={css.collapsibleText}>
-                  {link.label}
-                </Text>
-              </Flex>
-            );
-
-            if (isOfflineBlocked) {
-              return (
-                <OfflineGated key={link.key} isBlocked>
-                  <Box component="span" display="block" w="100%">
-                    {linkContent}
-                  </Box>
-                </OfflineGated>
-              );
-            }
-
             return (
-              <Link
+              <NavbarLinkItem
                 key={link.key}
-                to={link.to}
-                underline="never"
-                params={link.params}
-                className="transition-colors"
-                size="sm"
-                activeOptions={
-                  link.to === "/$workspaceSlug" ? { exact: true } : undefined
-                }
-              >
-                {linkContent}
-              </Link>
+                item={{ link, icon, isEnabled }}
+                isOnline={isOnline}
+              />
             );
           })}
         </Stack>
         <BetaBadge size="md" style={{ alignSelf: "center" }} />
         <Divider />
         <Stack gap={0} pb="xs" pos="relative">
-          {utilityLinks.map(({ link, icon }) => {
-            const isOfflineBlocked =
-              !isOnline && !isAppLinkAvailableOffline(link);
-            const linkContent = (
-              <Flex
-                px="sm"
-                py="xs"
-                bdrs="md"
-                align="center"
-                className={css.navbarLinkPill}
-              >
-                <Group gap={0} wrap="nowrap">
-                  <Box mr="xs">{icon}</Box>
-                  <Text span fw={500} className={css.collapsibleText}>
-                    {link.label}
-                  </Text>
-                </Group>
-              </Flex>
-            );
-
-            if (isOfflineBlocked) {
-              return (
-                <OfflineGated key={link.key} isBlocked>
-                  <Box component="span" display="block" w="100%">
-                    {linkContent}
-                  </Box>
-                </OfflineGated>
-              );
-            }
-
+          {utilityLinks.map((item) => {
             return (
-              <Link
-                key={link.key}
-                to={link.to}
-                underline="never"
-                params={link.params}
-                className="transition-colors"
-                py="xxs"
-                pl="xs"
-                pr="sm"
-                size="sm"
-                activeOptions={
-                  link.to === "/$workspaceSlug" ? { exact: true } : undefined
-                }
-              >
-                {linkContent}
-              </Link>
+              <NavbarLinkItem
+                key={item.link.key}
+                item={item}
+                isOnline={isOnline}
+                isUtility
+              />
             );
           })}
         </Stack>

@@ -1,8 +1,8 @@
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Argument, Command } from "commander";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { z } from "zod";
-import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 const httpMethodChoices = [
   "get",

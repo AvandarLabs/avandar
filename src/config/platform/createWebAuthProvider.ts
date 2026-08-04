@@ -1,4 +1,4 @@
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   AuthCredentials,
   AuthProvider,
@@ -6,26 +6,18 @@ import type {
   Unsubscribe,
 } from "$/platform/types/AuthProvider.types";
 
-/*
- * Web-side adapter wrapping the existing `AuthClient` over the smaller
- * platform-agnostic `AuthProvider` interface. The legacy `AuthClient`
- * has a wider surface (password reset, email update, registration);
- * those stay reachable at their existing import path until consumers
- * are migrated individually.
- */
+const listeners = new Set<(session: Session | undefined) => void>();
 
-const listeners = new Set<(session: Session | null) => void>();
-
-function notify(session: Session | null): void {
+function notify(session: Session | undefined): void {
   listeners.forEach((cb) => {
     return cb(session);
   });
 }
 
-async function getSession(): Promise<Session | null> {
+async function getSession(): Promise<Session | undefined> {
   const supabaseSession = await AuthClient.getCurrentSession();
   if (supabaseSession === undefined) {
-    return null;
+    return undefined;
   }
   return {
     userId: supabaseSession.user.id,
@@ -63,21 +55,16 @@ async function signIn(credentials: AuthCredentials): Promise<Session> {
 
 async function signOut(): Promise<void> {
   await AuthClient.signOut();
-  notify(null);
+  notify(undefined);
 }
 
 async function refreshIfNeeded(): Promise<void> {
-  /*
-   * `@supabase/supabase-js` refreshes automatically on its own
-   * timer; no explicit poke needed from the platform-agnostic layer.
-   * The method exists in the interface so the desktop side can
-   * trigger a refresh when its in-memory access token is near
-   * expiry. On web this is a no-op.
-   */
+  // Supabase JS refreshes automatically on its own timer. The method remains
+  // in the shared interface because desktop refreshes its in-memory token.
 }
 
 function onAuthChange(
-  callback: (session: Session | null) => void,
+  callback: (session: Session | undefined) => void,
 ): Unsubscribe {
   listeners.add(callback);
   return () => {
@@ -86,9 +73,9 @@ function onAuthChange(
 }
 
 /**
- * Builds the web {@link AuthProvider} adapter. Methods proxy through
- * the existing `AuthClient`; the wider `AuthClient` surface stays
- * reachable for unmigrated consumers.
+ * Builds the web {@link AuthProvider} adapter over the existing `AuthClient`.
+ * Password reset, email update, and registration remain available directly
+ * from the wider client surface.
  */
 export function createWebAuthProvider(): AuthProvider {
   return {

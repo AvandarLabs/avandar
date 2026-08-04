@@ -1,4 +1,4 @@
-.root {
+.offlineChatDownloadIndicator {
   background: var(--mantine-color-white);
   border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
   border-radius: var(--mantine-radius-md);
@@ -14,7 +14,7 @@
   z-index: 200;
 }
 
-.titleRow {
+.offlineChatDownloadIndicatorTitleRow {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);
@@ -22,7 +22,7 @@
   margin-bottom: var(--mantine-spacing-xs);
 }
 
-.title {
+.offlineChatDownloadIndicatorTitle {
   color: var(--mantine-color-neutral-9);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
@@ -32,12 +32,12 @@
   white-space: nowrap;
 }
 
-.warning {
+.offlineChatDownloadIndicatorWarning {
   line-height: 1.35;
   margin-bottom: var(--mantine-spacing-xs);
 }
 
-.statusText {
+.offlineChatDownloadIndicatorStatus {
   color: var(--mantine-color-neutral-6);
   line-height: 1.35;
   margin-top: var(--mantine-spacing-xs);

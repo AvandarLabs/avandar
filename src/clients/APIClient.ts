@@ -11,11 +11,11 @@ import type {
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
 
 // Platform-aware server API client. On web this delegates to the registered
-// Supabase client's `functions.invoke`; on desktop (Phase 2+) it bridges
+// Supabase client's `functions.invoke`; on desktop it bridges
 // through Bun-main IPC. Module-scope singleton so all APIClient call sites
 // share one instance. Path-param and query-string substitution that used to
 // live in this file (the `_buildRelativeAPIURL` helper) now happens inside
-// the ServerApiClient browser adapter — see
+// the ServerApiClient browser adapter. See
 // `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient`.
 const serverApi = createServerApiClient();
 
@@ -46,7 +46,7 @@ async function sendHTTPRequest<
   const { method, body, route } = options;
   // Delegate to the platform-aware ServerApiClient. The browser adapter does
   // the same `supabase.functions.invoke(...)` underneath; the desktop adapter
-  // bridges through IPC in Phase 2. Path/query param substitution and the
+  // bridges through IPC. Path/query param substitution and the
   // error-shape unwrapping that previously lived here move into the adapter.
   return await serverApi.invokeFunction<APIReturnType<Route, Method>>({
     route: route as string,

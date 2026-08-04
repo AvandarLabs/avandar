@@ -1,9 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
-import {
-  clearLocalChatModelDownloaded,
-  markLocalChatModelDownloaded,
-} from "./localChatModelStore";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
 import { useDownloadedLocalChatModelIds } from "./useDownloadedLocalChatModelIds";
 
 describe("useDownloadedLocalChatModelIds", () => {
@@ -12,7 +9,7 @@ describe("useDownloadedLocalChatModelIds", () => {
   });
 
   it("returns a stable array reference when the downloaded set is unchanged", () => {
-    markLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
 
     const { result, rerender } = renderHook(() => {
       return useDownloadedLocalChatModelIds();
@@ -31,7 +28,7 @@ describe("useDownloadedLocalChatModelIds", () => {
     expect(result.current).toEqual([]);
 
     act(() => {
-      markLocalChatModelDownloaded("llama-1b");
+      LocalChatModelStore.markDownloaded("llama-1b");
     });
     rerender();
 
@@ -39,7 +36,7 @@ describe("useDownloadedLocalChatModelIds", () => {
   });
 
   it("updates when a model is cleared from the downloaded set", () => {
-    markLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
 
     const { result, rerender } = renderHook(() => {
       return useDownloadedLocalChatModelIds();
@@ -48,7 +45,7 @@ describe("useDownloadedLocalChatModelIds", () => {
     expect(result.current).toEqual(["qwen-1.5b"]);
 
     act(() => {
-      clearLocalChatModelDownloaded("qwen-1.5b");
+      LocalChatModelStore.clearDownloaded("qwen-1.5b");
     });
     rerender();
 

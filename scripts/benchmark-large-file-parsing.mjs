@@ -9,7 +9,7 @@
  *   - wall-clock duration
  *   - resulting parquet size vs. input size (the compression ratio is
  *     the whole reason the streaming approach unlocks 1 GB+ files in a
- *     browser tab — peak memory tracks the *parquet* size, not the
+ *     browser tab: peak memory tracks the *parquet* size, not the
  *     input CSV size)
  *
  * The CLI's memory profile is a useful upper bound for what to expect
@@ -269,7 +269,7 @@ const md = [
   ``,
   `The **streaming** vs **baseline** comparison is the key signal: the`,
   `baseline first materializes the CSV/XLSX as a DuckDB \`TABLE\` and`,
-  `*then* exports it to parquet — peak memory scales with the input`,
+  `*then* exports it to parquet; peak memory scales with the input`,
   `size and the table stays resident through the export. The streaming`,
   `COPY pipes \`read_csv\` rows directly into the parquet encoder and`,
   `never materializes the table; peak memory is bounded by one row`,
@@ -283,7 +283,7 @@ const md = [
   `## XLSX caveat`,
   ``,
   `The XLSX benchmark requires DuckDB's \`excel\` extension, which is`,
-  `not statically linked into the native CLI distribution — it is`,
+  `not statically linked into the native CLI distribution; it is`,
   `downloaded from \`extensions.duckdb.org\` on first \`INSTALL excel\` /`,
   `\`LOAD excel\`. In network-restricted environments that domain may be`,
   `unreachable; in that case the XLSX rows will show exit code 1 and`,

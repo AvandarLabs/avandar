@@ -1,18 +1,11 @@
-import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDataset";
+import { propEq } from "@utils";
+import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName";
 import { matchOfflineDatasetTable } from "./matchOfflineDatasetTable";
-import {
-  scoreDatasetLabelMatch,
-  tokenizeForDatasetMatch,
-} from "./offlineDatasetLabelMatch";
+import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "./offlineChat.types";
-
-export {
-  scoreDatasetLabelMatch,
-  tokenizeForDatasetMatch,
-} from "./offlineDatasetLabelMatch";
 
 /** Minimum score to prefer label match over fuzzy or open-dataset fallbacks. */
 const MIN_LABEL_MATCH_SCORE = 2;
@@ -30,9 +23,7 @@ export function resolveOfflineDataset(args: {
 }): OfflineChatSchemaDataset | undefined {
   const analyzeRef = args.analyzeTableName?.trim();
   if (analyzeRef) {
-    const fromAnalyzeId = args.schema.datasets.find((dataset) => {
-      return dataset.id === analyzeRef;
-    });
+    const fromAnalyzeId = args.schema.datasets.find(propEq("id", analyzeRef));
     if (fromAnalyzeId) {
       return fromAnalyzeId;
     }
@@ -56,21 +47,21 @@ export function resolveOfflineDataset(args: {
   }
 
   const promptLower = args.lastUserPrompt.toLowerCase();
-  const promptTokens = tokenizeForDatasetMatch(promptLower);
+  const promptTokens = OfflineDatasetLabelMatch.tokenize(promptLower);
 
-  let best: OfflineChatSchemaDataset | undefined;
-  let bestScore = -1;
-
-  for (const dataset of args.schema.datasets) {
-    const score = scoreDatasetLabelMatch({
-      datasetName: dataset.name,
-      promptTokens,
-    });
-    if (score > bestScore) {
-      best = dataset;
-      bestScore = score;
-    }
-  }
+  const { dataset: best, score: bestScore } = args.schema.datasets.reduce<{
+    dataset?: OfflineChatSchemaDataset;
+    score: number;
+  }>(
+    (bestMatch, dataset) => {
+      const score = OfflineDatasetLabelMatch.score({
+        datasetName: dataset.name,
+        promptTokens,
+      });
+      return score > bestMatch.score ? { dataset, score } : bestMatch;
+    },
+    { score: -1 },
+  );
 
   if (best && bestScore >= MIN_LABEL_MATCH_SCORE) {
     return best;
@@ -95,9 +86,7 @@ export function resolveOfflineDataset(args: {
   }
 
   if (args.openDatasetId) {
-    const open = args.schema.datasets.find((dataset) => {
-      return dataset.id === args.openDatasetId;
-    });
+    const open = args.schema.datasets.find(propEq("id", args.openDatasetId));
     if (open) {
       return open;
     }

@@ -88,12 +88,12 @@ async function generateCsv() {
   await new Promise((r) => out.end(r));
   const stat = statSync(outCsv);
   console.log(
-    `[CSV] Wrote ${outCsv} — ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
+    `[CSV] Wrote ${outCsv}: ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
   );
 }
 
 // === XLSX: stream rows via exceljs WorkbookWriter so the workbook is never
-// fully materialized in memory — rows flush into the on-disk zip as they
+// fully materialized in memory. Rows flush into the on-disk zip as they
 // commit. ===
 async function generateXlsx() {
   console.log(`\n[XLSX] Reading source: ${SRC_XLSX}`);
@@ -106,7 +106,7 @@ async function generateXlsx() {
   await srcWb.xlsx.readFile(SRC_XLSX);
   const srcWs = srcWb.worksheets[0];
   const sheetName = srcWs.name;
-  // exceljs `.values` is 1-based — index 0 is always empty.
+  // exceljs `.values` is 1-based; index 0 is always empty.
   const header = srcWs.getRow(1).values.slice(1);
   const body = [];
   for (let r = 2; r <= srcWs.rowCount; r++) {
@@ -148,7 +148,7 @@ async function generateXlsx() {
 
   const stat = statSync(outXlsx);
   console.log(
-    `[XLSX] Wrote ${outXlsx} — ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
+    `[XLSX] Wrote ${outXlsx}: ${(stat.size / 1024 / 1024).toFixed(1)} MB`,
   );
 }
 

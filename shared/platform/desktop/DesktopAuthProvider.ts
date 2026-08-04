@@ -1,19 +1,3 @@
-/*
- * Webview-side adapter that satisfies the platform-agnostic `AuthProvider`
- * interface by forwarding every call to the Bun-main auth IPC handlers
- * (`apps/desktop/main/ipc/registerAuthHandlers/registerAuthHandlers.ts`).
- *
- * Ships in isolation for now: no React code imports it yet. Soon, the
- * `PlatformProvider` + `usePlatform()` plumbing will pick this adapter
- * for desktop builds and the existing browser/Supabase one for web.
- *
- * `onAuthChange` is local-only in this build — listeners fire in
- * response to `signIn` / `signOut` from the same webview process, not
- * in response to keychain edits from another tab or process. The web
- * adapter has the same shape for symmetry; cross-process notification
- * isn't on the design's risk register.
- */
-
 import { callIpc } from "$/platform/ipc/client.ts";
 import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts.ts";
 import type {
@@ -23,17 +7,17 @@ import type {
   Unsubscribe,
 } from "$/platform/types/AuthProvider.types.ts";
 
-const listeners = new Set<(session: Session | null) => void>();
+const listeners = new Set<(session: Session | undefined) => void>();
 
-function notify(session: Session | null): void {
+function notify(session: Session | undefined): void {
   listeners.forEach((cb) => {
     return cb(session);
   });
 }
 
-async function getSession(): Promise<Session | null> {
+async function getSession(): Promise<Session | undefined> {
   const reply = await callIpc(AuthContracts.getSession, {});
-  return reply.session;
+  return reply.session ?? undefined;
 }
 
 async function signIn(credentials: AuthCredentials): Promise<Session> {
@@ -59,7 +43,7 @@ async function signIn(credentials: AuthCredentials): Promise<Session> {
 
 async function signOut(): Promise<void> {
   await callIpc(AuthContracts.signOut, {});
-  notify(null);
+  notify(undefined);
 }
 
 async function refreshIfNeeded(): Promise<void> {
@@ -67,7 +51,7 @@ async function refreshIfNeeded(): Promise<void> {
 }
 
 function onAuthChange(
-  callback: (session: Session | null) => void,
+  callback: (session: Session | undefined) => void,
 ): Unsubscribe {
   listeners.add(callback);
   return () => {
@@ -78,7 +62,8 @@ function onAuthChange(
 /**
  * Desktop {@link AuthProvider} implementation that routes through IPC to
  * the Bun-main process. The refresh token lives in the OS keychain; only
- * the short-lived access token crosses the IPC boundary.
+ * the short-lived access token crosses the IPC boundary. Auth-change
+ * listeners observe sign-in and sign-out calls from this webview process.
  */
 export const DesktopAuthProvider: AuthProvider = {
   getSession,

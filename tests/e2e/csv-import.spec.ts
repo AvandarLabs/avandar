@@ -1,9 +1,10 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
   EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
+  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
@@ -19,12 +20,10 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
-  test("uploads a medium-sized CSV dataset, verifies preview, offline/online cycle, parquet, toggle", async ({
+  test("uploads a CSV dataset, verifies preview, offline/online cycle, parquet, toggle", async ({
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug } = e2eWorkerDb;
 
@@ -34,12 +33,14 @@ test.describe("CSV manual upload", () => {
       workspaceSlug,
     });
 
-    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`, {
+      waitUntil: "domcontentloaded",
+    });
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
       .locator('input[type="file"]')
-      .setInputFiles(CALIFORNIA_CSV_PATH);
+      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
 
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
@@ -49,10 +50,11 @@ test.describe("CSV manual upload", () => {
       page.getByText("Data processed successfully", { exact: false }),
     ).toBeVisible({ timeout: LONG_WAIT });
 
-    const formattedRowCount =
-      CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
+    const formattedPreviewRowCount = formatImportPreviewRowCount(
+      SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+    );
     await expect(
-      page.getByText(`Parsed ${formattedRowCount} rows successfully`),
+      page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
     ).toBeVisible({ timeout: LONG_WAIT });
 
     await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({

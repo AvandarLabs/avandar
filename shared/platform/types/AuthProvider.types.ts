@@ -7,11 +7,11 @@
  * macOS, `cmdkey` on Windows).
  */
 export interface AuthProvider {
-  getSession(): Promise<Session | null>;
+  getSession(): Promise<Session | undefined>;
   signIn(credentials: AuthCredentials): Promise<Session>;
   signOut(): Promise<void>;
   refreshIfNeeded(): Promise<void>;
-  onAuthChange(callback: (session: Session | null) => void): Unsubscribe;
+  onAuthChange(callback: (session: Session | undefined) => void): Unsubscribe;
 }
 
 /**

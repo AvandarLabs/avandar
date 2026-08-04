@@ -26,7 +26,7 @@ export const AvaQueryClient = new QueryClient({
       // recently-visited screen does not re-fetch from scratch.
       gcTime: 24 * HOUR_MS,
 
-      // Online: 1 retry on failure. Offline: do not retry at all — the call
+      // Online: 1 retry on failure. Offline: do not retry because the call
       // is guaranteed to fail and the user already sees the offline banner.
       // A dead session is not retryable: the invoke wrapper already refreshed
       // once and gave up, so a retry would just repeat a failing 401.
@@ -46,7 +46,7 @@ export const AvaQueryClient = new QueryClient({
       // Most mutations are not idempotent: do not auto-retry.
       retry: 0,
 
-      // Same rationale as queries — let mutations enqueue offline instead
+      // Same rationale as queries: let mutations enqueue offline instead
       // of immediately erroring out.
       networkMode: "offlineFirst",
     },

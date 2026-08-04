@@ -51,7 +51,7 @@ function CreateFirstWorkspacePage() {
           </Title>
           <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
             <CreateWorkspaceForm
-              introText={t`It's time to create your first workspace. Don't think for too long—you can always change these later!`}
+              introText={t`It's time to create your first workspace. Don't think for too long; you can always change these later!`}
             />
           </Paper>
         </Stack>

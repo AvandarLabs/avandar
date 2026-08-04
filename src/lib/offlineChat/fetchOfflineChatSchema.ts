@@ -1,15 +1,12 @@
 import { where } from "@utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import {
-  readCachedOfflineChatSchema,
-  writeCachedOfflineChatSchema,
-} from "./offlineChatSchemaCache";
+import { OfflineChatSchemaCache } from "./OfflineChatSchemaCache";
 import { truncateSchemaForOffline } from "./truncateSchemaForOffline";
 import type { OfflineChatSchema } from "./offlineChat.types";
-import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-function mapFromDatasetClient(rows: DatasetWithColumns[]): OfflineChatSchema {
+function mapFromDatasetClient(rows: Dataset.WithColumns[]): OfflineChatSchema {
   const datasets = rows.map((row) => {
     return { id: row.id, name: row.name };
   });
@@ -34,7 +31,7 @@ export async function fetchOfflineChatSchema(args: {
   openDatasetId?: string;
   navigatorOnLine: boolean;
 }): Promise<OfflineChatSchema> {
-  const cached = readCachedOfflineChatSchema(args.workspace.id);
+  const cached = OfflineChatSchemaCache.read(args.workspace.id);
 
   if (args.navigatorOnLine) {
     try {
@@ -42,7 +39,7 @@ export async function fetchOfflineChatSchema(args: {
         where("workspace_id", "eq", args.workspace.id),
       );
       const schema = mapFromDatasetClient(rows);
-      writeCachedOfflineChatSchema(args.workspace.id, schema);
+      OfflineChatSchemaCache.write(args.workspace.id, schema);
       return truncateSchemaForOffline(schema, args.openDatasetId);
     } catch {
       if (cached) {
@@ -50,8 +47,6 @@ export async function fetchOfflineChatSchema(args: {
       }
     }
   }
-
-  console.log("is cached?", cached);
 
   if (cached) {
     return truncateSchemaForOffline(cached, args.openDatasetId);

@@ -1,6 +1,6 @@
+import { makeBucketMap, prop, propEq } from "@utils";
 import type {
   OfflineChatSchema,
-  OfflineChatSchemaColumn,
   OfflineChatSchemaDataset,
 } from "./offlineChat.types";
 
@@ -18,49 +18,32 @@ export function truncateSchemaForOffline(
 ): OfflineChatSchema {
   const datasets = schema.datasets.slice(0, MAX_DATASETS);
 
-  const columnsByDataset = new Map<string, OfflineChatSchemaColumn[]>();
-  for (const column of schema.columns) {
-    const bucket = columnsByDataset.get(column.dataset_id) ?? [];
-    bucket.push(column);
-    columnsByDataset.set(column.dataset_id, bucket);
-  }
+  const columnsByDataset = makeBucketMap(schema.columns, {
+    key: "dataset_id",
+  });
 
   const hasPreferred =
     preferredDatasetId !== undefined &&
-    datasets.some((dataset) => {
-      return dataset.id === preferredDatasetId;
-    });
+    datasets.some(propEq("id", preferredDatasetId));
 
   const orderedDatasetIds =
     hasPreferred ?
       [
         preferredDatasetId,
-        ...datasets
-          .map((dataset) => {
-            return dataset.id;
-          })
-          .filter((id) => {
-            return id !== preferredDatasetId;
-          }),
+        ...datasets.map(prop("id")).filter((id) => {
+          return id !== preferredDatasetId;
+        }),
       ]
-    : datasets.map((dataset) => {
-        return dataset.id;
-      });
+    : datasets.map(prop("id"));
 
-  const columns: OfflineChatSchemaColumn[] = [];
-  for (const datasetId of orderedDatasetIds) {
-    if (columns.length >= MAX_COLUMNS_TOTAL) {
-      break;
-    }
-    const bucket = columnsByDataset.get(datasetId) ?? [];
-    const slice = bucket.slice(0, MAX_COLUMNS_PER_DATASET);
-    for (const column of slice) {
-      if (columns.length >= MAX_COLUMNS_TOTAL) {
-        break;
-      }
-      columns.push(column);
-    }
-  }
+  const columns = orderedDatasetIds
+    .flatMap((datasetId) => {
+      return (columnsByDataset.get(datasetId) ?? []).slice(
+        0,
+        MAX_COLUMNS_PER_DATASET,
+      );
+    })
+    .slice(0, MAX_COLUMNS_TOTAL);
 
   const datasetIdSet = new Set(
     columns.map((column) => {

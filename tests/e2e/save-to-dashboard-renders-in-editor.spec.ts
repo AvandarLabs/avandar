@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { SMALL_CALIFORNIA_XLSX_PATH } from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -22,7 +22,7 @@ const TARGET_DASHBOARD_NAME = "E2E renders-in-editor target";
  * renders inside the target dashboard's editor.
  *
  * Exercises the full path:
- *   1. Upload a real xlsx dataset.
+ *   1. Upload a small CSV dataset.
  *   2. Create + save an empty dashboard.
  *   3. Run a SQL query in the Data Explorer and switch the viz to bar.
  *   4. Save to the existing dashboard.
@@ -65,7 +65,7 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
       await uploadPanel
         .locator('input[type="file"]')
-        .setInputFiles(SMALL_CALIFORNIA_XLSX_PATH);
+        .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
       await uploadPanel
         .getByRole("button", { name: "Upload", exact: true })
         .click();

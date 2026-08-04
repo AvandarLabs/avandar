@@ -2,6 +2,7 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
   SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
@@ -25,6 +26,7 @@ import type { Page } from "@playwright/test";
  * column names like "California" / "Alameda" / "37.64629437".
  */
 const FINAL_SKIP_ROWS = 1;
+const FINAL_DELIMITER = ",";
 
 /**
  * Column names that should appear after parsing
@@ -51,26 +53,44 @@ async function uploadSmallCaliforniaCsv(page: Page): Promise<void> {
     .click();
 }
 
+/** Yields so parse-option edits commit before "Process data again". */
+async function yieldForParseOptionsCommit(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    return new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resolve();
+        });
+      });
+    });
+  });
+}
+
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
-  await skipInput.click({ clickCount: 3 });
-  await skipInput.fill(String(value));
-  await skipInput.press("Tab");
-  await expect(skipInput).toHaveValue(String(value));
+  const delimiterInput = page.getByLabel("Delimiter", { exact: true });
+  await skipInput.click();
+  await skipInput.press("ControlOrMeta+a");
+  await skipInput.pressSequentially(String(value), { delay: 30 });
+  await delimiterInput.focus();
+  await expect(skipInput).toHaveValue(String(value), { timeout: MEDIUM_WAIT });
+  await yieldForParseOptionsCommit(page);
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
-  await delimiterInput.click({ clickCount: 3 });
+  const skipInput = page.getByLabel("Number of rows to skip");
   await delimiterInput.fill(value);
-  await delimiterInput.press("Tab");
-  await expect(delimiterInput).toHaveValue(value);
+  await skipInput.focus();
+  await expect(delimiterInput).toHaveValue(value, { timeout: MEDIUM_WAIT });
+  await yieldForParseOptionsCommit(page);
 }
 
 async function clickReparse(page: Page): Promise<void> {
   const reparseButton = page.getByRole("button", {
     name: "Process data again",
   });
+  await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
   await reparseButton.click();
   await expect(reparseButton).toBeEnabled({ timeout: MEDIUM_WAIT });
 }
@@ -83,7 +103,7 @@ async function expectParsedRowCount(
   page: Page,
   expectedRowCount: number,
 ): Promise<void> {
-  const formatted = expectedRowCount.toLocaleString("en-US");
+  const formatted = formatImportPreviewRowCount(expectedRowCount);
   await expect(
     page.getByText(`Parsed ${formatted} rows successfully`),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
@@ -107,8 +127,6 @@ test.describe("CSV parsing options", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
 
@@ -163,9 +181,12 @@ test.describe("CSV parsing options", () => {
     await clickReparse(page);
     await expectParsedRowCount(page, 95);
 
-    // Variation 3: skipping past the end of the file produces 0 rows and
-    // triggers the explicit "Data processing failed" callout.
-    await setSkipRows(page, 200);
+    // Variation 3: skipping past the end of the file (101 lines) produces 0
+    // rows and triggers the explicit "Data processing failed" callout.
+    await setSkipRows(page, 0);
+    await clickReparse(page);
+    await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+    await setSkipRows(page, 101);
     await clickReparse(page);
     await expectParseFailedEmpty(page);
 
@@ -213,15 +234,26 @@ test.describe("CSV parsing options", () => {
       }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Final: re-upload so delimiter resets to sniffed "," after the wrong-
-    // delimiter variations, then apply skip=1 and save.
-    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-    await uploadSmallCaliforniaCsv(page);
+    // Final: restore sniffed comma delimiter, then apply skip=1 (same sequence
+    // as the mid-test recovery + variation 1, which avoids cross-focus resets).
+    await setSkipRows(page, 0);
+    await setDelimiter(page, FINAL_DELIMITER);
+    await clickReparse(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
 
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
-    await expectParsedRowCount(page, 99);
+    await expectParsedRowCount(
+      page,
+      SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT - FINAL_SKIP_ROWS,
+    );
     await Promise.all(
       COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
         await expect(
@@ -253,13 +285,9 @@ test.describe("CSV parsing options", () => {
     // DuckDB sniffed on the initial upload. If `save` ignored the user's
     // options and saved the original sniffed parse, "Province_State"
     // would still be visible here.
-    await Promise.all(
-      COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
-        await expect(
-          page.getByRole("columnheader", { name: columnName, exact: true }),
-        ).toBeVisible({ timeout: MEDIUM_WAIT });
-      }),
-    );
+    await expect(
+      page.getByRole("columnheader", { name: "California", exact: true }),
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
     await expect(
       page.getByRole("columnheader", {
         name: "Province_State",

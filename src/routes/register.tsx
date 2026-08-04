@@ -21,15 +21,15 @@ import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -154,39 +154,42 @@ function RegisterPage() {
   });
 
   // Maintain container height during transitions
-  useEffect(() => {
-    if (!formContainerRef.current) {
-      return;
-    }
-
-    const updateHeight = () => {
-      const container = formContainerRef.current;
-      if (!container) {
+  useEffect(
+    function synchronizeFormContainerHeight() {
+      if (!formContainerRef.current) {
         return;
       }
 
-      // Get the height of the currently visible form
-      const visibleForm =
-        isRegistrationFormVisible ?
-          registrationFormRef.current
-        : signupFormRef.current;
+      const updateHeight = () => {
+        const container = formContainerRef.current;
+        if (!container) {
+          return;
+        }
 
-      if (visibleForm) {
-        const height = visibleForm.offsetHeight;
-        container.style.minHeight = `${height}px`;
-      }
-    };
+        // Get the height of the currently visible form
+        const visibleForm =
+          isRegistrationFormVisible ?
+            registrationFormRef.current
+          : signupFormRef.current;
 
-    // Update height immediately and after delays to account for transitions
-    updateHeight();
-    const timeoutId = setTimeout(updateHeight, 50);
-    const transitionTimeoutId = setTimeout(updateHeight, 300);
+        if (visibleForm) {
+          const height = visibleForm.offsetHeight;
+          container.style.minHeight = `${height}px`;
+        }
+      };
 
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(transitionTimeoutId);
-    };
-  }, [isRegistrationFormVisible]);
+      // Update height immediately and after delays to account for transitions
+      updateHeight();
+      const timeoutId = setTimeout(updateHeight, 50);
+      const transitionTimeoutId = setTimeout(updateHeight, 300);
+
+      return () => {
+        clearTimeout(timeoutId);
+        clearTimeout(transitionTimeoutId);
+      };
+    },
+    [isRegistrationFormVisible],
+  );
 
   const elements = {
     waitlistLink: (text: string) => {

@@ -13,6 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Delete: {0}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "يمكن إجراء تغييرات على طريقة الدفع الخاصة بك في"
@@ -35,6 +40,11 @@ msgstr "على الأقل استعلام واحد في مجموعة البيان
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها متاحة دون اتصال."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "You are offline. Download an offline chat model using the cloud icon "
+"next to the composer before asking data questions."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -147,6 +157,11 @@ msgstr "رابط المصدر"
 msgid " access"
 msgstr "الوصول"
 
+#. placeholder {0}: model.minRamGb
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "{0} GB RAM"
+msgstr ""
+
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "لا يمكن عرض {chartName}."
@@ -207,7 +222,7 @@ msgstr "لم يتمكن من تحميل استعلام SQL لمجموعة الب
 msgid "Avandar"
 msgstr "أفاندار"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
 
@@ -223,6 +238,10 @@ msgstr "ملاحظات"
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
 "differed from the import preview and have been overwritten with the "
 "actual values."
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.2 1B"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -273,7 +292,7 @@ msgid "Save and re-run query"
 msgstr "احفظ وأعد تشغيل الاستعلام"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "تم الحفظ كـ \"{0}\"."
 
@@ -331,6 +350,11 @@ msgid "For more control over your subscription, you can manage your "
 "subscription in your"
 msgstr "للحصول على مزيد من التحكم في اشتراكك، يمكنك إدارة اشتراكك في"
 
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Save: {0}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -349,6 +373,10 @@ msgstr "حولك"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "عناوين أحادية المسافة"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 4 GB RAM or need the lightest download."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -373,6 +401,10 @@ msgstr ""
 msgid " {numRejectedRows} rows were rejected"
 msgstr "تم رفض {numRejectedRows} صفوف"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Replying…"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Re-download"
 msgstr "إعادة التنزيل"
@@ -380,6 +412,10 @@ msgstr "إعادة التنزيل"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow multiple values"
 msgstr "السماح بقيم متعددة"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.1 8B (offline)"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -394,6 +430,10 @@ msgstr "لم تتم إضافة أي مجموعات بيانات حتى الآن"
 #~ "- يقوم بتحميل الأعمدة التي تقرأها تصوراتك. قم بتوسيع النطاق إذا كنت قد "
 #~ "أضفت فلاتر قابلة للتعديل من قبل المشاهدين وترغب في أن يتمكن المشاهدون "
 #~ "من التصفية بما يتجاوز الافتراضات الخاصة بك."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Fixing query…"
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -429,7 +469,6 @@ msgstr "الانحراف المعياري"
 msgid "Get a count of how many values there are"
 msgstr "احصل على عدد القيم الموجودة"
 
-#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "شيء آخر…"
@@ -537,7 +576,7 @@ msgid "Please check your email for a confirmation link. It may take a few "
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق "
 "وصوله بضع دقائق."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Remove offline chat model?"
 msgstr "هل تريد إزالة نموذج الدردشة دون اتصال؟"
 
@@ -614,7 +653,7 @@ msgstr "عرض الحاوية الأقصى"
 msgid "Close sidebar"
 msgstr "إغلاق الشريط الجانبي"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Unable to delete the offline chat model from cache."
 msgstr "غير قادر على حذف نموذج الدردشة دون اتصال من الذاكرة المؤقتة."
 
@@ -677,6 +716,10 @@ msgstr "إعداد مسبق"
 msgid "Permanently delete <0>{0}</0>?"
 msgstr "هل تريد حذف <0>{0}</0> بشكل دائم؟"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة بك"
@@ -712,6 +755,11 @@ msgstr "الاسم"
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "سؤالك يحتوي على لغة قد تؤثر على إجابة الذكاء الاصطناعي."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
+"for this message?"
+msgstr ""
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -827,12 +875,12 @@ msgid "Timestamp"
 msgstr ""
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-msgid "It's time to create your first workspace. Don't think for too long—you "
-"can always change these later!"
-msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك "
-"دائمًا تغيير هذه لاحقًا!"
+#~ msgid "It's time to create your first workspace. Don't think for too long—you "
+#~ "can always change these later!"
+#~ msgstr "حان الوقت لإنشاء مساحة العمل الأولى الخاصة بك. لا تفكر طويلاً - يمكنك "
+#~ "دائمًا تغيير هذه لاحقًا!"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -864,6 +912,10 @@ msgstr "إزالة عضو"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
 msgstr "مرحبًا بعودتك"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Phi 3.5 Mini"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -905,6 +957,10 @@ msgstr "فشل الاستعلام."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
 msgstr "تراجع"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have about 8 GB RAM (default for most users)."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -963,8 +1019,8 @@ msgstr "حقول الملف الشخصي"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Delete — {0}"
-msgstr "حذف — {0}"
+#~ msgid "Delete — {0}"
+#~ msgstr "حذف — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1141,7 +1197,7 @@ msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! �
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspaceName}."
 
@@ -1249,6 +1305,10 @@ msgstr ""
 msgid "Manual"
 msgstr "يدوي"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Understanding your question…"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
 msgstr "أو"
@@ -1283,6 +1343,10 @@ msgstr "اختر مجموعة بيانات محفوظة أو استورد بيا
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "الإبلاغ عن خطأ"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Writing query…"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -1323,6 +1387,10 @@ msgstr "تنازلي"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "محور الفئة"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Balanced offline model for everyday SQL questions on typical laptops."
+msgstr ""
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -1439,6 +1507,11 @@ msgstr "ليس في"
 msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgstr "{usedSeats} من {maxSeats} مقعد مستخدم · {remainingSeats} متبقي"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Largest catalog option. Maximum offline capability when RAM and download "
+"size are not constraints."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "أدخل اسمًا لهذه المجموعة من البيانات"
@@ -1466,6 +1539,7 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1507,6 +1581,11 @@ msgstr "نطاق البيانات"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "معاينة البيانات"
+
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Please sign in again to continue. If signing in does not work, reset the "
+"app to clear cached data and try once more."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
@@ -1592,9 +1671,9 @@ msgid "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
 msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {entityConfigName} واحدة."
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} ميغابايت) سيتم حذفه من هذا المتصفح لتحرير المساحة. يمكنك "
@@ -1618,7 +1697,7 @@ msgstr "قم بالتمرير لأعلى إلى الحقول أعلاه، أو �
 msgid "None"
 msgstr "لا شيء"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
 
@@ -1676,9 +1755,19 @@ msgstr "إنشاء مخطط في الدردشة"
 msgid "Additional seats required"
 msgstr "مقاعد إضافية مطلوبة"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Microsoft's compact instruct model. Solid structure and instruction "
+"following for dashboards."
+msgstr ""
+
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
 msgstr "تعديل"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "SQL was not applied. Approve the assumed filter values to run this "
+"query."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1908,9 +1997,18 @@ msgstr "ميزات الخطة:"
 msgid "Start your journey with us"
 msgstr "ابدأ رحلتك معنا"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 7B (offline)"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "رمز الاستجابة السريعة"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
+"analytics work."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -1924,7 +2022,6 @@ msgstr "فارغ"
 msgid "Invite sent"
 msgstr "تم إرسال الدعوة"
 
-#: src/components/offline/OfflineIndicator.tsx
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "أنت غير متصل"
@@ -1971,7 +2068,7 @@ msgstr "شريط"
 msgid "Delete dashboard?"
 msgstr "حذف اللوحة؟"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 msgid "Change password"
 msgstr "تغيير كلمة المرور"
 
@@ -2023,9 +2120,17 @@ msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
 msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {maxDatasetNameLength} حرفًا "
 "(الحالي: {0})."
 
+#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+msgid "Preparing model files…"
+msgstr ""
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
 msgstr "إعادة تشغيل الاستعلام"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -2045,7 +2150,7 @@ msgstr "لا توجد قيم للتلخيص."
 msgid "Dashboard not ready"
 msgstr "اللوحة غير جاهزة"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 msgid "Downloaded on this browser"
 msgstr "تم التنزيل على هذا المتصفح"
 
@@ -2138,8 +2243,8 @@ msgstr "إرسال"
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#. placeholder {0}: modelCopy.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
 msgstr "{0} تم حذفه من هذا المتصفح."
 
@@ -2328,6 +2433,10 @@ msgstr "عمود Y"
 #~ msgid "Count how many rows there are in {datasetName}"
 #~ msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Generating SQL…"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "فشل تحميل النموذج غير المتصل"
@@ -2364,6 +2473,15 @@ msgstr "لا توجد بيانات تكرارية متاحة."
 msgid "We'll add this visualization to your new dashboard."
 msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Repairing query…"
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
+"the 8 GB tier."
+msgstr ""
+
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "جارٍ البدء…"
@@ -2375,6 +2493,10 @@ msgstr "نطاق الأرقام"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "الأعمدة"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Here is a query based on your workspace metadata."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
@@ -2420,6 +2542,11 @@ msgstr "فشل الاستيراد: {reason}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "تنسيق الطابع الزمني"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
+"SQL offline."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -2542,6 +2669,10 @@ msgstr "غابة"
 msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.2 1B (offline)"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2567,6 +2698,10 @@ msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخر�
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "شراء {seatsToAdd} مقعد"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "SQL was not applied. Sign in to approve filter values."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
@@ -2650,6 +2785,15 @@ msgstr "موافقة"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
 msgstr "تعديل مجموعة المستخدمين"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
+"device."
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 1.5B"
+msgstr ""
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -2788,7 +2932,11 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طرح الدردشة لأسئلة توضيحية."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.1 8B"
+msgstr ""
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
 msgstr "تمت إزالة نموذج الدردشة غير المتصل"
 
@@ -2882,7 +3030,7 @@ msgstr "تم استلام قيمة غير نصية لحقل تحديد"
 msgid "Time to answer"
 msgstr "وقت الرد"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Could not remove offline chat model"
 msgstr "لم يتمكن من إزالة نموذج الدردشة غير المتصل"
 
@@ -3034,6 +3182,10 @@ msgstr "غير قادر على تحميل مجموعات بيانات لوحة �
 msgid "No description has been added yet."
 msgstr "لم يتم إضافة أي وصف بعد."
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 3B"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "فشل المشاركة"
@@ -3055,6 +3207,10 @@ msgstr "فشل إنشاء لوحة التحكم: {0}"
 msgid "kind"
 msgstr "نوع"
 
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+msgid "you@example.com"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
 msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
@@ -3066,6 +3222,10 @@ msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
 msgstr "رسم تخطيطي"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Chat request failed"
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3156,7 +3316,7 @@ msgstr "لم تقم بإضافة أي سلاسل"
 msgid "Welcome back, {0}"
 msgstr "مرحبًا بعودتك، {0}"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Change"
 msgstr "تغيير"
 
@@ -3175,7 +3335,7 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "جارٍ البحث عن القيم في {column}…"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -3356,6 +3516,10 @@ msgstr "مستكشف البيانات"
 #~ msgid "Count rows in {datasetName} by {secondGroupBy}"
 #~ msgstr "احسب الصفوف في {datasetName} حسب {secondGroupBy}"
 
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Sign in again"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -3365,7 +3529,7 @@ msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة ا
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/مقعد"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Display name"
 msgstr "اسم العرض"
 
@@ -3374,6 +3538,7 @@ msgid "Dataset is now synced online"
 msgstr "تم مزامنة مجموعة البيانات الآن عبر الإنترنت"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Your session has expired"
 msgstr "انتهت جلستك"
 
@@ -3408,6 +3573,10 @@ msgstr "عارض عالمي"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create a new workspace. You can always edit it later."
 msgstr "إنشاء مساحة عمل جديدة. يمكنك دائمًا تعديلها لاحقًا."
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 7B"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -3453,11 +3622,11 @@ msgstr "لقطة لوحة التحكم"
 msgid "Query Details"
 msgstr "تفاصيل الاستعلام"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Your name"
 msgstr "اسمك"
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Downloading {0} for offline chat"
 msgstr "تحميل {0} للدردشة غير المتصلة"
@@ -3553,6 +3722,10 @@ msgstr "سجل الخصوصية"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "إعدادات التصويرية"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Phi 3.5 Mini (offline)"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
@@ -3682,7 +3855,7 @@ msgstr "خط"
 msgid "Make offline-only"
 msgstr "اجعلها متاحة فقط عند عدم الاتصال"
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "{0} is available when you are offline."
 msgstr "{0} متاح عندما تكون غير متصل."
@@ -3728,6 +3901,11 @@ msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
+"cloud chat."
+msgstr ""
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3803,7 +3981,7 @@ msgstr "تحديد وصول التطبيق"
 msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى "
@@ -3830,6 +4008,10 @@ msgstr "جميع القرارات"
 msgid "Show labels"
 msgstr "عرض التسميات"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 1.5B (offline)"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "محور X"
@@ -3852,8 +4034,8 @@ msgstr "فشل تحميل مجموعة البيانات"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Save — {0}"
-msgstr "احفظ — {0}"
+#~ msgid "Save — {0}"
+#~ msgstr "احفظ — {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
@@ -3929,7 +4111,7 @@ msgid "Google sheets connector is disabled while this feature is under "
 "maintenance."
 msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "إزالة"
@@ -3946,6 +4128,10 @@ msgstr "الخدمة"
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
 msgstr "لا يوجد المزيد لتحميله"
+
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Reset app"
+msgstr ""
 
 #. placeholder {0}: workspace.name
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -3984,6 +4170,10 @@ msgstr "تحرير الأذونات"
 msgid "queried"
 msgstr "تم الاستعلام"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 3B (offline)"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "رسالة الدردشة"
@@ -3994,7 +4184,7 @@ msgstr "خطأ في حفظ مجموعة البيانات"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -4080,7 +4270,7 @@ msgstr "تم حفظ اسم مساحة العمل بنجاح."
 msgid "dataset name"
 msgstr "اسم مجموعة البيانات"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
 
@@ -4128,6 +4318,11 @@ msgstr "تم النشر"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "الفلاتر (أين)"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
+"offline."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -4222,7 +4417,6 @@ msgstr "مجموعة مستخدمين جديدة"
 #~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
 #~ msgstr "ما هي القيم المميزة لـ {pickedGroupBy} في {datasetName}؟"
 
-#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "لا شيء مما سبق"
@@ -4280,6 +4474,10 @@ msgstr "يحتوي على"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "إضافة فلتر"
+
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Offline models"
+msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -4367,7 +4565,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "تم إنشاء مجموعة الأدوار"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "فشل في تحديث اسم العرض"
 
@@ -4400,8 +4598,8 @@ msgstr "تعذر قراءة الملف"
 msgid "Pay what you want"
 msgstr "ادفع ما تريد"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#. placeholder {0}: modelCopy.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 msgid "Remove {0}"
 msgstr "إزالة {0}"
 
@@ -4574,7 +4772,7 @@ msgstr "تم اختيار عمود قيمة غير صالح"
 msgid "No columns have been added yet."
 msgstr "لم يتم إضافة أي أعمدة بعد."
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "تم تحديث اسم العرض"
 
@@ -4635,6 +4833,10 @@ msgstr "المستند المحدد: {0}"
 msgid "Activity"
 msgstr "النشاط"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "(Message not sent.)"
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "No workspace was found"
 msgstr "لم يتم العثور على مساحة عمل"
@@ -4679,6 +4881,11 @@ msgstr "أدخل عنوان بريدك الإلكتروني"
 msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
 
+#: src/routes/_auth/(no-workspace)/index.tsx
+msgid "It's time to create your first workspace. Don't think for too long; you "
+"can always change these later!"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "مزامنة عبر الإنترنت؟"
@@ -4687,7 +4894,7 @@ msgstr "مزامنة عبر الإنترنت؟"
 msgid "Neutral failure"
 msgstr "فشل محايد"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
 
@@ -4738,7 +4945,7 @@ msgstr "بيتا"
 msgid "Search by name or user group"
 msgstr "ابحث بالاسم أو مجموعة المستخدمين"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Failed to update email"
 msgstr "فشل في تحديث البريد الإلكتروني"
 
@@ -4814,6 +5021,7 @@ msgid "Editorial serif"
 msgstr "خط تحرير"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Untitled dashboard"
@@ -4846,7 +5054,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "فشل تحميل الكيان"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "يستخدم لتسجيل الدخول إلى حسابك."
 

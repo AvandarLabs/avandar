@@ -1,17 +1,12 @@
+import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
 import { forceFromTableToDatasetId } from "./forceFromTableToDatasetId";
+import { logOfflineChat } from "./logOfflineChat";
 import { matchOfflineDatasetTable } from "./matchOfflineDatasetTable";
-import { logOfflineChat } from "./offlineChatDebugLog";
-import {
-  applyOfflineSqlHallucinationSubstitutions,
-  normalizeSelectTopToLimit,
-} from "./offlineSqlHallucinationSubstitutions";
+import { OfflineSqlHallucinationSubstitutions } from "./OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
+import { OfflineSqlTableNamespaces } from "./OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "./repairOfflineColumnFromError";
 import { resolveOfflineDataset } from "./resolveOfflineDataset";
-import {
-  stripQualifiedTableNamespacesInSql,
-  stripTableNamespacesInSelectAst,
-} from "./stripOfflineSqlTableNamespaces";
 import type { OfflineChatSchema } from "./offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
@@ -41,11 +36,7 @@ export type RepairOfflineGeneratedSqlResult = {
 function buildAllowedTableIdSet(
   schema: OfflineChatSchema,
 ): ReadonlySet<string> {
-  return new Set(
-    schema.datasets.map((dataset) => {
-      return dataset.id;
-    }),
-  );
+  return new Set(schema.datasets.map(prop("id")));
 }
 
 function applyParseFailureHeuristics(
@@ -55,15 +46,16 @@ function applyParseFailureHeuristics(
   const applied: string[] = [];
   let current = sql;
   if (/\bTOP\b/i.test(errorMessage) || /\bSELECT\s+TOP\b/i.test(current)) {
-    const next = normalizeSelectTopToLimit(current);
-    if (next !== current) {
+    const normalizedSql =
+      OfflineSqlHallucinationSubstitutions.normalizeSelectTopToLimit(current);
+    if (normalizedSql !== current) {
       applied.push("parse_heuristic_top_to_limit");
-      current = next;
+      current = normalizedSql;
     }
   }
   if (/FROM/i.test(errorMessage)) {
     const { sql: quoted, appliedRuleIds } =
-      applyOfflineSqlHallucinationSubstitutions(current);
+      OfflineSqlHallucinationSubstitutions.apply(current);
     if (quoted !== current) {
       applied.push(
         ...appliedRuleIds.map((id) => {
@@ -88,11 +80,11 @@ function remapTableInFromList(
     return false;
   }
   let changed = false;
-  for (const rawItem of fromList) {
+  fromList.forEach((rawItem) => {
     const item = rawItem as FromEntry;
     const tableName = typeof item.table === "string" ? item.table : undefined;
     if (!tableName) {
-      continue;
+      return;
     }
     const matched = matchOfflineDatasetTable({
       tableRef: tableName,
@@ -104,7 +96,7 @@ function remapTableInFromList(
       item.table = matched.id;
       changed = true;
     }
-  }
+  });
   return changed;
 }
 
@@ -167,7 +159,7 @@ function tryParseRemapAndSqlify(args: {
         remapped: false,
       };
     }
-    const namespaceStripped = stripTableNamespacesInSelectAst(ast);
+    const namespaceStripped = OfflineSqlTableNamespaces.stripInSelectAst(ast);
     const tablesRemapped = remapTablesInSelectAst(ast, {
       schema: args.schema,
       lastUserPrompt: args.lastUserPrompt,
@@ -249,10 +241,10 @@ export function repairOfflineGeneratedSql(
     });
   }
 
-  const sub = applyOfflineSqlHallucinationSubstitutions(sql);
-  if (sub.appliedRuleIds.length > 0) {
-    appliedSteps.push(...sub.appliedRuleIds);
-    sql = sub.sql;
+  const substitutions = OfflineSqlHallucinationSubstitutions.apply(sql);
+  if (substitutions.appliedRuleIds.length > 0) {
+    appliedSteps.push(...substitutions.appliedRuleIds);
+    sql = substitutions.sql;
   }
 
   if (preferredDatasetId) {
@@ -274,7 +266,7 @@ export function repairOfflineGeneratedSql(
 
   for (let round = 0; round < MAX_REPAIR_ROUNDS; round += 1) {
     const before = sql;
-    const namespaceStrippedSql = stripQualifiedTableNamespacesInSql(sql);
+    const namespaceStrippedSql = OfflineSqlTableNamespaces.stripInSql(sql);
     if (namespaceStrippedSql !== sql) {
       appliedSteps.push("strip_table_namespace_qualifiers");
       sql = namespaceStrippedSql;
@@ -314,13 +306,14 @@ export function repairOfflineGeneratedSql(
     });
   }
 
-  const finalSub = applyOfflineSqlHallucinationSubstitutions(sql);
+  const finalSub = OfflineSqlHallucinationSubstitutions.apply(sql);
   if (finalSub.appliedRuleIds.length > 0) {
-    for (const id of finalSub.appliedRuleIds) {
-      if (!appliedSteps.includes(id)) {
-        appliedSteps.push(id);
-      }
-    }
+    const appliedStepSet = new Set(appliedSteps);
+    appliedSteps.push(
+      ...finalSub.appliedRuleIds.filter((ruleId) => {
+        return !appliedStepSet.has(ruleId);
+      }),
+    );
     sql = finalSub.sql;
   }
 

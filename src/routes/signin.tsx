@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { Link } from "@ui";
 import { z } from "zod";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";

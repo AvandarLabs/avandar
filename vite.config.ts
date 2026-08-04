@@ -27,14 +27,28 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const supabaseApiUrl = env.VITE_SUPABASE_API_URL ?? "";
 
-  const supabaseRestUrlPattern =
+  // vite-plugin-pwa serializes `urlPattern` callbacks via `Function#toString`,
+  // which drops the surrounding closure and leaves any captured variable as a
+  // free reference in the emitted `sw.js` (it caused `supabaseApiUrl is not
+  // defined` on every routed fetch in prod). Use a RegExp instead: those are
+  // serialized by value, so the supabase origin is baked into `sw.js` as a
+  // literal.
+  const escapeRegExp = (s: string) => {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+  const supabaseRestPattern =
     supabaseApiUrl ?
-      new RegExp(
-        `^${supabaseApiUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/rest/`,
-      )
+      new RegExp(`^${escapeRegExp(supabaseApiUrl)}/rest/`)
     : undefined;
 
   return {
+    worker: {
+      format: "es",
+    },
+    optimizeDeps: {
+      // Pre-bundling adds node polyfills to Emscripten glue; breaks workers.
+      exclude: ["@duckdb/duckdb-wasm"],
+    },
     plugins:
       mode === "test" ?
         [reactWithLinguiMacro(), lingui()]
@@ -50,10 +64,7 @@ export default defineConfig(({ mode }) => {
           reactWithLinguiMacro(),
           lingui(),
           eslintPlugin(),
-
-          // node polyfills are necessary to run `knex` in browser
           nodePolyfills(),
-
           VitePWA({
             registerType: "autoUpdate",
             injectRegister: false,
@@ -63,18 +74,10 @@ export default defineConfig(({ mode }) => {
               navigateFallback: "/index.html",
               navigateFallbackDenylist: [/^\/functions\//, /^\/auth\//],
               runtimeCaching: [
-                ...(supabaseRestUrlPattern ?
+                ...(supabaseRestPattern ?
                   [
                     {
-                      // This needs to be a RegExp instead of a callback because
-                      // vite-plugin-pwa serializes `urlPattern` callbacks via
-                      // `Function#toString`, which drops the surrounding
-                      // closure and leaves any captured variable as a free
-                      // reference in the emitted `sw.js`. This caused a
-                      // 'supabaseApiUrl is not defined' on every routed fetch
-                      // in prod. A RegExp gets serialized by value, so the
-                      // supabase origin is baked into `sw.js` as a literal.
-                      urlPattern: supabaseRestUrlPattern,
+                      urlPattern: supabaseRestPattern,
                       handler: "NetworkFirst" as const,
                       options: {
                         cacheName: "supabase-rest",

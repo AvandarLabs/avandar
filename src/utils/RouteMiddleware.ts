@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import { propEq } from "@utils";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { UserId } from "$/models/User/User.types";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";

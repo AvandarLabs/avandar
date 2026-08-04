@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Orchestrates the three-step Lingui translation pipeline:
 #   1. Extract msgid keys from source code into the .po catalogs.
-#   2. Use OpenAI (via scripts/i18n/translateWithLLM.ts) to fill empty
+#   2. Use OpenAI (via scripts/i18n/translateWithLlm/translateWithLlm.ts) to fill empty
 #      msgstr entries in every non-English locale.
 #   3. Compile the .po catalogs into the runtime .ts modules the app loads.
 #
@@ -16,7 +16,7 @@
 #
 # Notes:
 #   - Step 1 always scans every path in lingui.config.ts. Narrowing only
-#     affects step 2 — the catalogs themselves stay consistent across runs.
+#     affects step 2; the catalogs themselves stay consistent across runs.
 #   - If step 1 produces no catalog changes, steps 2 and 3 are skipped.
 
 set -uo pipefail
@@ -47,7 +47,7 @@ SOURCE_LOCALE="en"
 # by continuation lines) nor otherwise continued. `lingui extract` only rewrites
 # a catalog when a msgid is added or removed, so once an empty msgstr has been
 # committed it produces no extract diff and the git-diff gate below never sees
-# it — the translation step would be skipped forever. This catches those
+# it; the translation step would be skipped forever. This catches those
 # entries directly so they always get sent to the LLM.
 has_untranslated_entries() {
   local d locale
@@ -88,7 +88,7 @@ if ! pnpm exec lingui extract --clean; then
 fi
 
 if git diff --quiet -- "$LOCALES_DIR" 2>/dev/null && ! has_untranslated_entries; then
-  printf '\n%s\n' "${DIM}No new or untranslated keys — skipping LLM translation and compile.${RESET}"
+  printf '\n%s\n' "${DIM}No new or untranslated keys; skipping LLM translation and compile.${RESET}"
   printf '%s\n' "${BOLD}${GREEN}✓ Translations already up to date.${RESET}"
   exit 0
 fi
@@ -113,18 +113,18 @@ fi
 for locale in "${TARGET_LOCALES[@]}"; do
   printf '\n%s\n' "${YELLOW}  → translating ${BOLD}${locale}${RESET}${YELLOW}...${RESET}"
   if [[ ${#SCOPE_ARGS[@]} -eq 0 ]]; then
-    if ! pnpm vite-script scripts/i18n/translateWithLLM.ts --locale "$locale"; then
+    if ! pnpm vite-script scripts/i18n/translateWithLlm/translateWithLlm.ts --locale "$locale"; then
       printf '%s\n' "${BOLD}${YELLOW}  ✗ ${locale} translation step failed; continuing.${RESET}" >&2
     fi
   else
-    if ! pnpm vite-script scripts/i18n/translateWithLLM.ts \
+    if ! pnpm vite-script scripts/i18n/translateWithLlm/translateWithLlm.ts \
           --locale "$locale" "${SCOPE_ARGS[@]}"; then
       printf '%s\n' "${BOLD}${YELLOW}  ✗ ${locale} translation step failed; continuing.${RESET}" >&2
     fi
   fi
 done
 
-# Step 3 re-canonicalizes the catalogs. translateWithLLM.ts writes msgstr
+# Step 3 re-canonicalizes the catalogs. translateWithLlm.ts writes msgstr
 # entries with its own minimal serializer, which does NOT reproduce Lingui's
 # PO line-wrapping (long strings wrapped at ~76 columns by @lingui/format-po).
 # Re-running extract rewrites every catalog in Lingui's canonical format while

@@ -1,0 +1,75 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { useCallback, useState } from "react";
+import { LocalChatModelCatalog } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+import { OfflineChatResourceManager } from "@/lib/offlineChat/OfflineChatResourceManager";
+import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
+import type { LocalChatModelId } from "@/lib/offlineChat/LocalChatModelCatalog/LocalChatModelCatalog";
+
+type Props = {
+  onDeleted: () => void;
+};
+
+/** Owns confirmation, progress, and notifications for local-model deletion. */
+export function useDeleteOfflineChatModel({ onDeleted }: Props): {
+  deletingModelId: LocalChatModelId | undefined;
+  onRequestDelete: (modelId: LocalChatModelId) => void;
+} {
+  const { t } = useLingui();
+  const getLocalChatModelCopy = useLocalChatModelCopy();
+  const [deletingModelId, setDeletingModelId] = useState<LocalChatModelId>();
+
+  const onDelete = useCallback(
+    async (modelId: LocalChatModelId) => {
+      setDeletingModelId(modelId);
+      try {
+        await OfflineChatResourceManager.deleteModel(modelId);
+        const model = LocalChatModelCatalog.find(modelId);
+        const modelCopy = getLocalChatModelCopy(model);
+        notifications.show({
+          title: t`Offline chat model removed`,
+          message: t`${modelCopy.displayName} was deleted from this browser.`,
+          color: "success",
+        });
+        onDeleted();
+      } catch {
+        notifications.show({
+          title: t`Could not remove offline chat model`,
+          message: t`Unable to delete the offline chat model from cache.`,
+          color: "danger",
+        });
+      } finally {
+        setDeletingModelId(undefined);
+      }
+    },
+    [getLocalChatModelCopy, onDeleted, t],
+  );
+
+  const onRequestDelete = useCallback(
+    (modelId: LocalChatModelId) => {
+      const model = LocalChatModelCatalog.find(modelId);
+      const modelCopy = getLocalChatModelCopy(model);
+      modals.openConfirmModal({
+        title: t`Remove offline chat model?`,
+        labels: { confirm: t`Remove`, cancel: t`Cancel` },
+        confirmProps: { color: "danger" },
+        children: (
+          <Text size="sm">
+            <Trans>
+              {modelCopy.displayName} (~{model.approxSizeMb} MB) will be deleted
+              from this browser to free space. You can download it again later.
+            </Trans>
+          </Text>
+        ),
+        onConfirm: () => {
+          void onDelete(modelId);
+        },
+      });
+    },
+    [getLocalChatModelCopy, onDelete, t],
+  );
+
+  return { deletingModelId, onRequestDelete };
+}

@@ -16,7 +16,7 @@ type Props = {
 export function AppI18nProvider({ children }: Props): ReactNode {
   const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
+  useEffect(function activateDefaultLocale() {
     let cancelled = false;
     void activateLocale(DEFAULT_LOCALE).then(() => {
       if (!cancelled) {

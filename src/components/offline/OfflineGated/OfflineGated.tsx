@@ -8,6 +8,8 @@ import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import type { MouseEvent, ReactElement, ReactNode } from "react";
 
 type Props = {
+  /** Overrides the browser-derived blocked state when already known. */
+  isBlocked?: boolean;
   children: ReactNode;
   className?: string;
 };
@@ -23,10 +25,15 @@ function blockPointerEvent(event: MouseEvent): void {
  * (no wrapper) when online. Self-contained: callers do not pass any
  * offline state in.
  */
-export function OfflineGated({ children, className }: Props): JSX.Element {
+export function OfflineGated({
+  isBlocked,
+  children,
+  className,
+}: Props): JSX.Element {
   const isOnline = useIsOnline();
+  const shouldBlock = isBlocked ?? !isOnline;
   const child = Children.only(children);
-  if (isOnline || !isValidElement(child)) {
+  if (!shouldBlock || !isValidElement(child)) {
     return <>{children}</>;
   }
 

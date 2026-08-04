@@ -1,5 +1,6 @@
 import path from "node:path";
 import { config } from "dotenv";
+import { ensureE2eViteFeatureFlags } from "./ensureE2eViteFeatureFlags";
 
 /**
  * Loads `.env.development` from the repository root so Playwright and the
@@ -7,6 +8,7 @@ import { config } from "dotenv";
  */
 function _loadDevelopmentEnv(): void {
   config({ path: path.resolve(process.cwd(), ".env.development") });
+  ensureE2eViteFeatureFlags();
 }
 
 /**

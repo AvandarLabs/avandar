@@ -1,10 +1,12 @@
 import { useQuery } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
 import { prop } from "@utils";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { buildOfflineChatPickerGroup } from "@/lib/offlineChat/offlineChatPickerModels";
+import { OfflineChatPickerModels } from "@/lib/offlineChat/offlineChatPickerModels";
 import { useDownloadedLocalChatModelIds } from "@/lib/offlineChat/useDownloadedLocalChatModelIds";
+import { useLocalChatModelCopy } from "@/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type UseChatModelCatalogResult = {
   groups: ChatModelOption.OptionGroup[];
@@ -19,6 +21,8 @@ type UseChatModelCatalogResult = {
  * models" group at the top of the picker.
  */
 export function useChatModelCatalog(): UseChatModelCatalogResult {
+  const { t } = useLingui();
+  const getLocalChatModelCopy = useLocalChatModelCopy();
   const [cloudGroups = [], isLoading, queryResult] = useQuery({
     queryKey: ["chat", "models"],
     queryFn: async () => {
@@ -34,8 +38,12 @@ export function useChatModelCatalog(): UseChatModelCatalogResult {
   const downloadedOfflineIds = useDownloadedLocalChatModelIds();
 
   const offlineGroup = useMemo(() => {
-    return buildOfflineChatPickerGroup(downloadedOfflineIds);
-  }, [downloadedOfflineIds]);
+    return OfflineChatPickerModels.buildGroup(
+      downloadedOfflineIds,
+      getLocalChatModelCopy,
+      t`Offline models`,
+    );
+  }, [downloadedOfflineIds, getLocalChatModelCopy, t]);
 
   const groups = useMemo(() => {
     if (!offlineGroup) {

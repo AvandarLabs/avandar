@@ -1,6 +1,6 @@
-import type { LocalChatModelId } from "./localChatModelCatalog";
+import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { ChatGeneratedSql } from "$/models/chat/ChatResponse/ChatResponse.types";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
 /** Compact schema slice sent to offline prompts. */
@@ -31,6 +31,18 @@ export type OfflineChatCompletionRequest = {
   onToken?: (delta: string) => void;
 };
 
+/** Translated copy emitted by the offline chat pipeline. */
+export type OfflineChatPipelineCopy = {
+  replying: string;
+  understandingQuestion: string;
+  writingQuery: string;
+  generatingSql: string;
+  repairingQuery: string;
+  fixingQuery: string;
+  noSql: string;
+  metadataQuery: string;
+};
+
 /** Pluggable local LLM backend (WebLLM in prod, mock in tests). */
 export type OfflineChatEngine = {
   preload: () => Promise<void>;
@@ -55,6 +67,7 @@ export type OfflineChatPipelineArgs = {
   lastUserPrompt: string;
   lastSql?: string;
   lastError?: string;
+  copy: OfflineChatPipelineCopy;
   executeSql?: (
     sql: string,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -63,14 +76,14 @@ export type OfflineChatPipelineArgs = {
 
 export type OfflineChatPipelineResult = {
   assistantText: string;
-  generatedSql?: ChatGeneratedSql;
+  generatedSql?: ChatResponse.GeneratedSql;
   clarification?: ChatClarifyRequest;
   phaseLabels: readonly string[];
 };
 
 export type OfflineChatTurnResult = {
   assistantText: string;
-  generatedSql?: ChatGeneratedSql;
+  generatedSql?: ChatResponse.GeneratedSql;
   clarification?: ChatClarifyRequest;
 };
 

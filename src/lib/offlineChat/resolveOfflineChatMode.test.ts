@@ -1,18 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-  clearLocalChatModelDownloaded,
-  markLocalChatModelDownloaded,
-} from "./localChatModelStore";
-import { buildOfflineChatPickerModelId } from "./offlineChatPickerModels";
+import { LocalChatModelStore } from "./LocalChatModelStore/LocalChatModelStore";
+import { OfflineChatPickerModels } from "./offlineChatPickerModels";
 import { resolveOfflineChatMode } from "./resolveOfflineChatMode";
 
 describe("resolveOfflineChatMode", () => {
   beforeEach(() => {
-    markLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
   });
 
   afterEach(() => {
-    clearLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.clearDownloaded("qwen-1.5b");
   });
 
   it("uses local when offline and model downloaded", () => {
@@ -31,7 +28,7 @@ describe("resolveOfflineChatMode", () => {
   });
 
   it("stays on cloud when offline but no model is downloaded", () => {
-    clearLocalChatModelDownloaded("qwen-1.5b");
+    LocalChatModelStore.clearDownloaded("qwen-1.5b");
     expect(resolveOfflineChatMode({ navigatorOnLine: false })).toEqual({
       kind: "cloud",
     });
@@ -41,7 +38,7 @@ describe("resolveOfflineChatMode", () => {
     expect(
       resolveOfflineChatMode({
         navigatorOnLine: true,
-        selectedChatModelId: buildOfflineChatPickerModelId("qwen-1.5b"),
+        selectedChatModelId: OfflineChatPickerModels.buildModelId("qwen-1.5b"),
       }),
     ).toEqual({ kind: "local", localChatModelId: "qwen-1.5b" });
   });

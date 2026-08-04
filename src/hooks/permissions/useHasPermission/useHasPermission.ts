@@ -1,6 +1,6 @@
 import { Permissions } from "$/models/Permissions/Permissions";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
-import type { PermissionKey } from "$/models/Permissions/Permissions.types";
+import type { PermissionKey } from "$/models/Permissions/Permissions";
 
 /**
  * Whether the current user has the given permission.

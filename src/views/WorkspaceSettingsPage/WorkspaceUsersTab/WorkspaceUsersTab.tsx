@@ -19,7 +19,7 @@ import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
-import { OfflineGated } from "@/components/offline/OfflineGated";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";

@@ -1,21 +1,3 @@
-/*
- * Webview-side adapter that satisfies the platform-agnostic
- * `DatasetBlobStore` interface by routing every call through the
- * Bun-main blob IPC handlers
- * (`apps/desktop/main/ipc/registerDatasetBlobHandlers/`).
- *
- * Ships in isolation for now: no React code imports it yet. Soon, the
- * `PlatformProvider` + `usePlatform()` plumbing will pick this adapter
- * for desktop builds and the existing Dexie-backed one for web.
- *
- * Bytes cross IPC as base64 strings. The interface promises a
- * `ReadableStream<Uint8Array>` from `get`, which is faithfully recreated
- * here from the base64-decoded bytes; in V1 the stream is materialised
- * eagerly because every consumer reads the parquet/source fully into
- * DuckDB anyway. Phase 3 may introduce a chunked variant for large
- * uploads.
- */
-
 import { callIpc } from "$/platform/ipc/client.ts";
 import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 import type {
@@ -42,19 +24,16 @@ async function _readStreamToUint8Array(
   }
   const out = new Uint8Array(total);
   let offset = 0;
-  for (const chunk of chunks) {
+  chunks.forEach((chunk) => {
     out.set(chunk, offset);
     offset += chunk.byteLength;
-  }
+  });
   return out;
 }
 
 function _uint8ToBase64(bytes: Uint8Array): string {
-  /*
-   * Chunked encode to keep `String.fromCharCode(...)` from blowing the
-   * call-stack limit on large buffers. `btoa` only accepts strings of
-   * char-codes < 256, which is what we feed it.
-   */
+  // Chunked encoding avoids the `String.fromCharCode(...)` call-stack limit.
+  // `btoa` accepts the byte-sized character codes produced here.
   const chunkSize = 0x8000;
   let binary = "";
   for (let i = 0; i < bytes.byteLength; i += chunkSize) {
@@ -122,7 +101,8 @@ async function stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null> {
 
 /**
  * Desktop {@link DatasetBlobStore} implementation that routes through
- * IPC to the filesystem-backed Bun-main blob store.
+ * IPC to the filesystem-backed Bun-main blob store. Bytes cross IPC as
+ * base64 and `get` recreates the promised readable stream eagerly.
  */
 export const DesktopDatasetBlobStore: DatasetBlobStore = {
   put,

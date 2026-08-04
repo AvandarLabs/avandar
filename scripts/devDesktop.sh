@@ -21,7 +21,7 @@ cd "$ROOT_DIR"
 
 VITE_PORT="${AVA_VITE_DEV_PORT:-5173}"
 VITE_URL="http://127.0.0.1:${VITE_PORT}"
-# Generous default — first run after `pnpm install` cold-starts esbuild,
+# Generous default: first run after `pnpm install` cold-starts esbuild,
 # downloads native binaries, builds Lingui catalogs, etc.
 WAIT_TIMEOUT_SECONDS="${AVA_DEV_DESKTOP_WAIT_TIMEOUT:-180}"
 
@@ -34,7 +34,7 @@ vite_ready() {
 }
 
 if [ ! -f "${ROOT_DIR}/.env.development" ]; then
-  echo "[dev:desktop] .env.development not found at ${ROOT_DIR}/.env.development — run 'pnpm env:reset' first." >&2
+  echo "[dev:desktop] .env.development not found at ${ROOT_DIR}/.env.development; run 'pnpm env:reset' first." >&2
   exit 1
 fi
 
@@ -46,11 +46,11 @@ fi
 DESKTOP_CMD=(pnpm dotenv -e .env.development -- pnpm --filter @avandar/desktop dev)
 
 if vite_ready; then
-  echo "[dev:desktop] Vite already serving on ${VITE_URL} — reusing it (skipping pnpm dev)"
+  echo "[dev:desktop] Vite already serving on ${VITE_URL}; reusing it (skipping pnpm dev)"
   exec "${DESKTOP_CMD[@]}"
 fi
 
-echo "[dev:desktop] No dev server on ${VITE_URL} — starting pnpm dev in the background"
+echo "[dev:desktop] No dev server on ${VITE_URL}; starting pnpm dev in the background"
 
 # Start `pnpm dev` in its own process group so we can terminate the entire
 # tree (vite, supabase, etc.) on exit.
@@ -82,7 +82,7 @@ echo "[dev:desktop] Waiting up to ${WAIT_TIMEOUT_SECONDS}s for Vite at ${VITE_UR
 elapsed=0
 while ! vite_ready; do
   if ! kill -0 "$DEV_PID" 2>/dev/null; then
-    echo "[dev:desktop] pnpm dev exited before Vite became ready — aborting." >&2
+    echo "[dev:desktop] pnpm dev exited before Vite became ready; aborting." >&2
     exit 1
   fi
   if [ "$elapsed" -ge "$WAIT_TIMEOUT_SECONDS" ]; then
@@ -93,5 +93,5 @@ while ! vite_ready; do
   elapsed=$((elapsed + 1))
 done
 
-echo "[dev:desktop] Vite is up after ${elapsed}s — launching Electrobun."
+echo "[dev:desktop] Vite is up after ${elapsed}s; launching Electrobun."
 "${DESKTOP_CMD[@]}"

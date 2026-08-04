@@ -3,11 +3,7 @@ import { ActionIcon, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
-import {
-  hasAnyDownloadedLocalChatModel,
-  isLocalChatModelMarkedDownloaded,
-  readStoredLocalChatModelId,
-} from "@/lib/offlineChat/localChatModelStore";
+import { LocalChatModelStore } from "@/lib/offlineChat/LocalChatModelStore/LocalChatModelStore";
 import { useOfflineChatManagerStatus } from "@/lib/offlineChat/useOfflineChatManagerStatus";
 import { createOfflineChatModelSettingsModalChildren } from "./OfflineChatModelSettingsModalContents";
 
@@ -30,18 +26,21 @@ export function OfflineChatDownloadControl({
   const isBusy = managerStatus.kind === "downloading";
 
   void downloadedRevision;
-  const selectedModelId = readStoredLocalChatModelId();
+  const selectedModelId = LocalChatModelStore.readSelectedId();
   const isSelectedDownloaded =
-    isLocalChatModelMarkedDownloaded(selectedModelId);
-  const hasAnyDownloaded = hasAnyDownloadedLocalChatModel();
+    LocalChatModelStore.isDownloaded(selectedModelId);
+  const hasAnyDownloaded = LocalChatModelStore.hasAnyDownloaded();
 
-  useEffect(() => {
-    if (managerStatus.kind === "ready") {
-      setDownloadedRevision((revision) => {
-        return revision + 1;
-      });
-    }
-  }, [managerStatus.kind]);
+  useEffect(
+    function refreshDownloadStateWhenReady() {
+      if (managerStatus.kind === "ready") {
+        setDownloadedRevision((revision) => {
+          return revision + 1;
+        });
+      }
+    },
+    [managerStatus.kind],
+  );
 
   const openSettingsModal = useCallback(() => {
     const onDownloadedListChange = (): void => {

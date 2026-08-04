@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import dotenv from "dotenv";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 const PROJECT_ROOT = path.resolve(

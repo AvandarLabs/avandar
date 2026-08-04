@@ -1,10 +1,11 @@
 import { createMockOfflineChatEngine } from "./createMockOfflineChatEngine";
-import { createWebLLMOfflineChatEngine } from "./createWebLLMOfflineChatEngine";
-import { isOfflineChatMockForced } from "./isOfflineChatEnabled";
+import { createWebLlmOfflineChatEngine } from "./createWebLlmOfflineChatEngine";
+import { isOfflineChatMockForced } from "./isOfflineChatMockForced";
 import type { MockOfflineChatResponse } from "./createMockOfflineChatEngine";
-import type { LocalChatModelId } from "./localChatModelCatalog";
+import type { LocalChatModelId } from "./LocalChatModelCatalog/LocalChatModelCatalog";
 import type { OfflineChatEngine } from "./offlineChat.types";
 
+/** Creates the configured offline chat engine for production or mock use. */
 export function createOfflineChatEngine(args: {
   modelId: LocalChatModelId;
   onDownloadProgress?: (report: { text: string; progress: number }) => void;
@@ -31,7 +32,7 @@ export function createOfflineChatEngine(args: {
     );
   }
 
-  return createWebLLMOfflineChatEngine({
+  return createWebLlmOfflineChatEngine({
     modelId: args.modelId,
     onDownloadProgress: args.onDownloadProgress,
   });

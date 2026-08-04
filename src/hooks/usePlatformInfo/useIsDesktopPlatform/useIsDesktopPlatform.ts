@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
  * this observer, the component would only correct itself once some other
  * trigger forces a re-render (route load, hook value change, etc.). In
  * practice that happens within microseconds during normal page boot, so
- * the inline call almost always looks fine — but it's a race. This hook
+ * the inline call almost always looks fine, but it is a race. This hook
  * removes the race by forcing a re-render the moment the platform marker
  * actually lands. If a caller never sees a flash of "wrong platform" UI
  * on initial load, calling `isDesktop()` directly is sufficient.

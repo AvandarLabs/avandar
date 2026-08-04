@@ -29,8 +29,8 @@ import type { CSSProperties, ReactNode } from "react";
 // mousedown to send `startWindowMove` to native. We render a real <div>
 // filling the (otherwise empty) Mantine header rather than passing the
 // style to <AppShell.Header style={…}> directly, because Mantine doesn't
-// reliably forward `style` as an inline `style="…"` attribute — and
-// Electrobun's detector specifically looks for the substring in the inline
+// reliably forward `style` as an inline `style="…"` attribute. Electrobun's
+// detector specifically looks for the substring in the inline
 // attribute (`[style*="app-region"][style*="drag"]`).
 const DRAG_REGION_FILL_STYLE: CSSProperties = {
   position: "absolute",

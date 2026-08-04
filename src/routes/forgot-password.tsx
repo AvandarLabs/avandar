@@ -4,10 +4,10 @@ import { Alert, Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
-import { useIsOnline } from "@/lib/offline/useIsOnline";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,

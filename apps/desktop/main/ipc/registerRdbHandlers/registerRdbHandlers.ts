@@ -1,4 +1,4 @@
-import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts";
+import { RdbContracts } from "../../../../../shared/platform/ipc/contracts/RdbContracts";
 import type { AvaSqliteDatabase } from "../../services/SqliteService/Sqlite";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 import type { SQLQueryBindings } from "bun:sqlite";

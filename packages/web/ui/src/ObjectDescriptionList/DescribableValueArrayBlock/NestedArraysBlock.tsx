@@ -51,13 +51,21 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
     ...itemRenderOptions,
   } as DescribableValueArrayRenderOptions<T, RootData>;
 
-  // TODO(jpsyx): use a stable key
   return (
     <Stack>
-      {valuesToRender.map((valueArray, idx) => {
-        const collectionNumber = idx + 1;
+      {valuesToRender.map((valueArray, arrayIndex) => {
+        const collectionNumber = arrayIndex + 1;
+        const serializedValue = JSON.stringify(valueArray);
+        const duplicateNumber = valuesToRender
+          .slice(0, arrayIndex)
+          .filter((priorValue) => {
+            return JSON.stringify(priorValue) === serializedValue;
+          }).length;
         return (
-          <Fieldset key={idx} title={t`Collection ${collectionNumber}`}>
+          <Fieldset
+            key={`${serializedValue}:${duplicateNumber}`}
+            title={t`Collection ${collectionNumber}`}
+          >
             <ValueItemContainer
               type="array"
               value={valueArray}

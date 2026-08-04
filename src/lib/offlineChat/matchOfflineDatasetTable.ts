@@ -1,8 +1,6 @@
-import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDataset";
-import {
-  scoreDatasetLabelMatch,
-  tokenizeForDatasetMatch,
-} from "./offlineDatasetLabelMatch";
+import { propEq } from "@utils";
+import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName";
+import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type { OfflineChatSchemaDataset } from "./offlineChat.types";
 
 /** DuckDB/Postgres catalog names small models hallucinate on errors. */
@@ -55,13 +53,9 @@ export function matchOfflineDatasetTable(args: {
     return exact;
   }
 
-  const isKnownWorkspaceTable = args.datasets.some((dataset) => {
-    return dataset.id === ref;
-  });
+  const isKnownWorkspaceTable = args.datasets.some(propEq("id", ref));
   if (args.preferredDatasetId && !isKnownWorkspaceTable) {
-    const preferred = args.datasets.find((dataset) => {
-      return dataset.id === args.preferredDatasetId;
-    });
+    const preferred = args.datasets.find(propEq("id", args.preferredDatasetId));
     if (preferred) {
       return preferred;
     }
@@ -69,20 +63,22 @@ export function matchOfflineDatasetTable(args: {
 
   const promptLower = args.lastUserPrompt.toLowerCase();
 
-  let best: OfflineChatSchemaDataset | undefined;
-  let bestScore = -1;
-  for (const dataset of args.datasets) {
-    const score = scoreDatasetLabelMatch({
-      datasetName: dataset.name,
-      promptTokens: tokenizeForDatasetMatch(
-        `${promptLower} ${ref.toLowerCase()}`,
-      ),
-    });
-    if (score > bestScore) {
-      best = dataset;
-      bestScore = score;
-    }
-  }
+  const promptTokens = OfflineDatasetLabelMatch.tokenize(
+    `${promptLower} ${ref.toLowerCase()}`,
+  );
+  const { dataset: best, score: bestScore } = args.datasets.reduce<{
+    dataset?: OfflineChatSchemaDataset;
+    score: number;
+  }>(
+    (bestMatch, dataset) => {
+      const score = OfflineDatasetLabelMatch.score({
+        datasetName: dataset.name,
+        promptTokens,
+      });
+      return score > bestMatch.score ? { dataset, score } : bestMatch;
+    },
+    { score: -1 },
+  );
 
   if (best && bestScore >= MIN_TABLE_REF_HEURISTIC_SCORE) {
     return best;
@@ -97,9 +93,7 @@ export function matchOfflineDatasetTable(args: {
   }
 
   if (args.preferredDatasetId) {
-    return args.datasets.find((dataset) => {
-      return dataset.id === args.preferredDatasetId;
-    });
+    return args.datasets.find(propEq("id", args.preferredDatasetId));
   }
 
   return undefined;

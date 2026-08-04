@@ -1,27 +1,15 @@
 import { asDatasetBlobKey } from "$/platform/types/DatasetBlobStore.types";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetBlobKey,
   DatasetBlobStat,
   DatasetBlobStore,
 } from "$/platform/types/DatasetBlobStore.types";
 
-/**
- * Web-side adapter that maps the platform-agnostic `DatasetBlobStore`
- * interface onto the existing Dexie-backed `LocalDataset` table.
- *
- * Today only the canonical `data.parquet` key kind is meaningful on web:
- * the Dexie row stores the transcoded parquet bytes (`parquetData`)
- * alongside the dataset metadata. `source.<ext>` and `meta.json` keys
- * are desktop-only (the filesystem blob store covers them); the web
- * adapter rejects them loudly so a migrated caller surfaces the gap
- * instead of silently dropping bytes.
- */
-
 type ParsedKey = {
   workspaceId: string;
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   kind: "parquet";
 };
 
@@ -40,7 +28,7 @@ function _parseKey(key: DatasetBlobKey): ParsedKey {
   const [, workspaceId, datasetId] = match;
   return {
     workspaceId: workspaceId ?? "",
-    datasetId: (datasetId ?? "") as DatasetId,
+    datasetId: (datasetId ?? "") as Dataset.Id,
     kind: "parquet",
   };
 }
@@ -81,8 +69,10 @@ async function put(
   bytes: Uint8Array | ReadableStream<Uint8Array>,
 ): Promise<void> {
   const parsed = _parseKey(key);
-  const blob = await _bytesToBlob(bytes);
-  const existing = await AvaDexie.DB.LocalDataset.get(parsed.datasetId);
+  const [blob, existing] = await Promise.all([
+    _bytesToBlob(bytes),
+    AvaDexie.DB.LocalDataset.get(parsed.datasetId),
+  ]);
   if (existing === undefined) {
     throw new Error(
       `createWebDatasetBlobStore.put: no LocalDataset row exists for ` +
@@ -129,22 +119,21 @@ async function list(
   prefix: DatasetBlobKey,
 ): Promise<readonly DatasetBlobKey[]> {
   // Dexie isn't a prefix tree, so this is a linear scan. Acceptable in
-  // V1 — only a handful of datasets per workspace at this size; if the
+  // This is acceptable for a handful of datasets per workspace. If the
   // count grows, swap to a `workspaceId`-indexed query.
   const all = await AvaDexie.DB.LocalDataset.toArray();
-  const out: DatasetBlobKey[] = [];
-  for (const row of all) {
-    if (row.parquetData === undefined) {
-      continue;
-    }
-    const candidate = asDatasetBlobKey(
-      `workspaces/${row.workspaceId}/datasets/${row.datasetId}/data.parquet`,
-    );
-    if (candidate.startsWith(prefix)) {
-      out.push(candidate);
-    }
-  }
-  return out;
+  return all
+    .filter((row) => {
+      return row.parquetData !== undefined;
+    })
+    .map((row) => {
+      return asDatasetBlobKey(
+        `workspaces/${row.workspaceId}/datasets/${row.datasetId}/data.parquet`,
+      );
+    })
+    .filter((candidate) => {
+      return candidate.startsWith(prefix);
+    });
 }
 
 async function stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null> {
@@ -156,7 +145,7 @@ async function stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null> {
   return {
     sizeBytes: row.parquetData.size,
     // Dexie rows have no native mtime; the closest analogue is
-    // `parseStartedAt` (set when Phase B begins). Fall back to `Date.now()`
+    // `parseStartedAt` (set when parquet parsing begins). Fall back to now
     // so callers that only check freshness get a sane value.
     mtimeMs: row.parseStartedAt ?? Date.now(),
   };
@@ -166,7 +155,8 @@ async function stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null> {
  * Builds the web {@link DatasetBlobStore} adapter. Wraps the existing
  * Dexie `LocalDataset` table so consumers reached through
  * `usePlatform().datasetBlobStore` see the same parquet bytes the
- * legacy paths cache today.
+ * legacy paths cache today. The web adapter supports canonical
+ * `data.parquet` keys; source uploads and metadata keys remain desktop-only.
  */
 export function createWebDatasetBlobStore(): DatasetBlobStore {
   return {

@@ -7,21 +7,6 @@ import type {
   UploadSource,
 } from "$/platform/types/DuckDbClient.types";
 
-/**
- * Web-side adapter that wraps the legacy `DuckDbClient` singleton
- * (`src/clients/DuckDbClient/DuckDbClient.ts`) behind the platform-agnostic
- * `DuckDbClient` interface. Consumers reached through `usePlatform().duckDb`
- * use this on web; the legacy singleton stays directly callable for code
- * that still imports it.
- *
- * The platform interface is narrower than the legacy surface (no
- * `returnType: 'parquet'`, no shared `conn`, positional params instead of
- * named `$param$` templates). For the small set of legacy features the
- * platform interface does not cover, callers that need them continue to
- * import the legacy singleton directly until the platform interface is
- * widened.
- */
-
 function _safeTableName(datasetId: string): string {
   // Mirrors the desktop-side scrub in
   // `apps/desktop/main/ipc/registerDuckDbHandlers/registerDuckDbHandlers.ts`.
@@ -48,7 +33,7 @@ async function runStructuredQuery<TRow extends Record<string, unknown>>(
 ): Promise<TRow[]> {
   // The platform `StructuredQuery` is a placeholder (`{_placeholder:
   // unknown}`); the legacy client's structured-query AST is the canonical
-  // shape. Cast through and trust the caller is passing the right thing —
+  // shape. Cast through and trust the caller is passing the right thing,
   // the same arrangement the desktop adapter makes.
   type LegacyArg = Parameters<typeof LegacyDuckDbClient.runStructuredQuery>[0];
   const result = await LegacyDuckDbClient.runStructuredQuery<TRow>(
@@ -124,7 +109,7 @@ async function loadFromUpload(
       }),
     };
   }
-  // Exhaustiveness guard — the union is closed at the type level.
+  // Exhaustiveness guard: the union is closed at the type level.
   const exhaustive: never = options.format;
   throw new Error(`Unsupported format: ${String(exhaustive)}`);
 }
@@ -133,7 +118,8 @@ async function loadFromUpload(
  * Builds the web {@link DuckDbClient} adapter. Methods forward to the
  * legacy `DuckDbClient` singleton; legacy-only features (named params,
  * `returnType: 'parquet'`, shared connection) throw with a pointer to
- * the legacy import path.
+ * the legacy import path. Consumers access this adapter through
+ * `usePlatform().duckDb`.
  */
 export function createWebDuckDbClient(): DuckDbClient {
   return {

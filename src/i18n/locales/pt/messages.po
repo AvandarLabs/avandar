@@ -13,6 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Delete: {0}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "As alterações no seu método de pagamento podem ser feitas em seu"
@@ -36,6 +41,11 @@ msgstr "Pelo menos uma consulta neste conjunto de dados usa <0>SELECT *</0> ou "
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "Retorne online para visualizar ou tornar a página disponível offline."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "You are offline. Download an offline chat model using the cloud icon "
+"next to the composer before asking data questions."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -149,6 +159,11 @@ msgstr "URL de origem"
 msgid " access"
 msgstr " acesso"
 
+#. placeholder {0}: model.minRamGb
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "{0} GB RAM"
+msgstr ""
+
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "O {chartName} não pode ser exibido."
@@ -210,7 +225,7 @@ msgstr "Não foi possível carregar a consulta SQL do conjunto de dados."
 msgid "Avandar"
 msgstr "Avandar"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "Por favor, verifique seu e-mail para um link de confirmação."
 
@@ -226,6 +241,10 @@ msgstr "Notas"
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
 "differed from the import preview and have been overwritten with the "
 "actual values."
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.2 1B"
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -276,7 +295,7 @@ msgid "Save and re-run query"
 msgstr "Salvar e reexecutar consulta"
 
 #. placeholder {0}: updated.displayName
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "Salvo como \"{0}\"."
 
@@ -336,6 +355,11 @@ msgid "For more control over your subscription, you can manage your "
 msgstr "Para mais controle sobre sua assinatura, você pode gerenciar sua "
 "assinatura em seu"
 
+#. placeholder {0}: state.openDataset.name
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Save: {0}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -354,6 +378,10 @@ msgstr "Sobre você"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "Títulos em monoespaço"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 4 GB RAM or need the lightest download."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -379,6 +407,10 @@ msgstr ""
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} linhas foram rejeitadas"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Replying…"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Re-download"
 msgstr "Baixar novamente"
@@ -386,6 +418,10 @@ msgstr "Baixar novamente"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Allow multiple values"
 msgstr "Permitir múltiplos valores"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.1 8B (offline)"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -401,6 +437,10 @@ msgstr "Nenhum conjunto de dados adicionado ainda"
 #~ "visualizações leem. Amplie o escopo se você adicionou filtros editáveis "
 #~ "pelos visualizadores e deseja que eles possam filtrar além de seus "
 #~ "padrões."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Fixing query…"
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -437,7 +477,6 @@ msgstr "desvio padrão"
 msgid "Get a count of how many values there are"
 msgstr "Obter uma contagem de quantos valores existem"
 
-#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "Algo mais…"
@@ -545,7 +584,7 @@ msgid "Please check your email for a confirmation link. It may take a few "
 msgstr "Por favor, verifique seu e-mail para um link de confirmação. Pode levar "
 "alguns minutos para chegar."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Remove offline chat model?"
 msgstr "Remover modelo de chat offline?"
 
@@ -623,7 +662,7 @@ msgstr "Largura máxima do contêiner"
 msgid "Close sidebar"
 msgstr "Fechar barra lateral"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Unable to delete the offline chat model from cache."
 msgstr "Não foi possível excluir o modelo de chat offline do cache."
 
@@ -687,6 +726,10 @@ msgstr "Predefinição"
 msgid "Permanently delete <0>{0}</0>?"
 msgstr "Excluir permanentemente <0>{0}</0>?"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "Bem-vindo ao seu primeiro espaço de trabalho"
@@ -722,6 +765,11 @@ msgstr "Nome"
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Sua pergunta contém linguagem que pode enviesar a resposta da IA."
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
+"for this message?"
+msgstr ""
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -838,12 +886,12 @@ msgid "Timestamp"
 msgstr ""
 
 #: src/routes/_auth/(no-workspace)/index.tsx
-msgid "It's time to create your first workspace. Don't think for too long—you "
-"can always change these later!"
-msgstr "É hora de criar seu primeiro espaço de trabalho. Não pense muito—você "
-"pode sempre mudar isso depois!"
+#~ msgid "It's time to create your first workspace. Don't think for too long—you "
+#~ "can always change these later!"
+#~ msgstr "É hora de criar seu primeiro espaço de trabalho. Não pense muito—você "
+#~ "pode sempre mudar isso depois!"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -875,6 +923,10 @@ msgstr "Remover membro"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
 msgstr "Bem-vindo de volta"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Phi 3.5 Mini"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -916,6 +968,10 @@ msgstr "Consulta falhou."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
 msgstr "Desfazer"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have about 8 GB RAM (default for most users)."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -974,8 +1030,8 @@ msgstr "Campos de perfil"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Delete — {0}"
-msgstr "Excluir — {0}"
+#~ msgid "Delete — {0}"
+#~ msgstr "Excluir — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1157,7 +1213,7 @@ msgstr "{0} para ser notificado quando for sua vez de se registrar! Se você já
 msgid "Bias detected:"
 msgstr "Viés detectado:"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "O nome que outros membros veem em {workspaceName}."
 
@@ -1268,6 +1324,10 @@ msgstr ""
 msgid "Manual"
 msgstr "Manual"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Understanding your question…"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
 msgstr "ou"
@@ -1302,6 +1362,10 @@ msgstr "Escolha um conjunto de dados salvo ou importe novos dados para seu "
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "Reportar um bug"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Writing query…"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -1343,6 +1407,10 @@ msgstr "Decrescente"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "Eixo de categoria"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Balanced offline model for everyday SQL questions on typical laptops."
+msgstr ""
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -1460,6 +1528,11 @@ msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
 msgstr "{usedSeats} de {maxSeats} assentos utilizados · {remainingSeats} "
 "restantes"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Largest catalog option. Maximum offline capability when RAM and download "
+"size are not constraints."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "Digite um nome para este conjunto de dados"
@@ -1487,6 +1560,7 @@ msgstr "seu conjunto de dados"
 #: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
@@ -1528,6 +1602,11 @@ msgstr "Escopo de dados"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Pré-visualização de dados"
+
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Please sign in again to continue. If signing in does not work, reset the "
+"app to clear cached data and try once more."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
@@ -1614,9 +1693,9 @@ msgid "We will use those columns to merge datasets into a single "
 msgstr "Usaremos essas colunas para mesclar conjuntos de dados em um único "
 "{entityConfigName}."
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 "download it again later."
 msgstr "{0} (~{1} MB) será excluído deste navegador para liberar espaço. Você "
@@ -1641,7 +1720,7 @@ msgstr "Role para cima até os campos acima ou use a lista abaixo."
 msgid "None"
 msgstr "Nenhum"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 msgid "You'll be asked to confirm your current password."
 msgstr "Você será solicitado a confirmar sua senha atual."
 
@@ -1699,9 +1778,19 @@ msgstr "Crie um gráfico no chat"
 msgid "Additional seats required"
 msgstr "Assentos adicionais necessários"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Microsoft's compact instruct model. Solid structure and instruction "
+"following for dashboards."
+msgstr ""
+
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
 msgstr "Editar"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "SQL was not applied. Approve the assumed filter values to run this "
+"query."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1933,9 +2022,18 @@ msgstr "Recursos do Plano:"
 msgid "Start your journey with us"
 msgstr "Comece sua jornada conosco"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 7B (offline)"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "Código QR"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
+"analytics work."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -1949,7 +2047,6 @@ msgstr "é nulo"
 msgid "Invite sent"
 msgstr "Convite enviado"
 
-#: src/components/offline/OfflineIndicator.tsx
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "Você está offline"
@@ -1996,7 +2093,7 @@ msgstr "Barra"
 msgid "Delete dashboard?"
 msgstr "Excluir painel?"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-PasswordSection.tsx
 msgid "Change password"
 msgstr "Alterar senha"
 
@@ -2049,9 +2146,17 @@ msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
 msgstr "O nome do conjunto de dados deve ter menos de {maxDatasetNameLength} "
 "caracteres (atual: {0})."
 
+#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+msgid "Preparing model files…"
+msgstr ""
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
 msgstr "Reexecutar consulta"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -2071,7 +2176,7 @@ msgstr "Nenhum valor para resumir."
 msgid "Dashboard not ready"
 msgstr "Painel não está pronto"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 msgid "Downloaded on this browser"
 msgstr "Baixado neste navegador"
 
@@ -2164,8 +2269,8 @@ msgstr "Enviar"
 msgid "dashboard"
 msgstr "painel"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#. placeholder {0}: modelCopy.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
 msgstr "{0} foi excluído deste navegador."
 
@@ -2357,6 +2462,10 @@ msgstr "Coluna Y"
 #~ msgid "Count how many rows there are in {datasetName}"
 #~ msgstr "Conte quantas linhas existem em {datasetName}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Generating SQL…"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Falha ao baixar o modelo offline"
@@ -2393,6 +2502,15 @@ msgstr "Nenhum dado de frequência disponível."
 msgid "We'll add this visualization to your new dashboard."
 msgstr "Adicionaremos esta visualização ao seu novo painel."
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Repairing query…"
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
+"the 8 GB tier."
+msgstr ""
+
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Starting…"
 msgstr "Iniciando…"
@@ -2404,6 +2522,10 @@ msgstr "Intervalo de números"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "Colunas"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Here is a query based on your workspace metadata."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
@@ -2449,6 +2571,11 @@ msgstr "Importação falhou: {reason}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "Formato de timestamp"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
+"SQL offline."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -2574,6 +2701,10 @@ msgstr "Floresta"
 msgid "Allow manual edit"
 msgstr "Permitir edição manual"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.2 1B (offline)"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2600,6 +2731,10 @@ msgstr "A entidade falhou ao carregar. Por favor, tente novamente mais tarde ou 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Comprar {seatsToAdd} assento"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "SQL was not applied. Sign in to approve filter values."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
@@ -2685,6 +2820,15 @@ msgstr "Consentimento"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
 msgstr "Editar grupo de usuários"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
+"device."
+msgstr ""
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 1.5B"
+msgstr ""
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -2826,7 +2970,11 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "Ainda não há esclarecimentos. O registro se preenche à medida que o "
 "chat faz perguntas esclarecedoras."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Llama 3.1 8B"
+msgstr ""
+
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
 msgstr "Modelo de chat offline removido"
 
@@ -2921,7 +3069,7 @@ msgstr "Recebido um valor não-string para um campo de seleção"
 msgid "Time to answer"
 msgstr "Tempo de resposta"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Could not remove offline chat model"
 msgstr "Não foi possível remover o modelo de chat offline"
 
@@ -3075,6 +3223,10 @@ msgstr "Não foi possível carregar os conjuntos de dados do painel"
 msgid "No description has been added yet."
 msgstr "Nenhuma descrição foi adicionada ainda."
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 3B"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Compartilhamento falhou"
@@ -3096,6 +3248,10 @@ msgstr "Falha ao criar o painel: {0}"
 msgid "kind"
 msgstr "tipo"
 
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
+msgid "you@example.com"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
 msgstr "Configurações de compartilhamento do painel atualizadas."
@@ -3107,6 +3263,10 @@ msgstr "Configurações de compartilhamento do painel atualizadas."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
 msgstr "Esboço"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "Chat request failed"
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3199,7 +3359,7 @@ msgstr "Você não adicionou nenhuma série"
 msgid "Welcome back, {0}"
 msgstr "Bem-vindo de volta, {0}"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Change"
 msgstr "Alterar"
 
@@ -3219,7 +3379,7 @@ msgstr ""
 msgid "Looking up values in {column}…"
 msgstr "Buscando valores em {column}…"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -3401,6 +3561,10 @@ msgstr "Explorador de Dados"
 #~ msgid "Count rows in {datasetName} by {secondGroupBy}"
 #~ msgstr "Conte linhas em {datasetName} por {secondGroupBy}"
 
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Sign in again"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -3411,7 +3575,7 @@ msgstr "Cada série é uma coluna numérica plotada no valor radial. Escolha o "
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/assento"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Display name"
 msgstr "Nome de exibição"
 
@@ -3420,6 +3584,7 @@ msgid "Dataset is now synced online"
 msgstr "Conjunto de dados agora está sincronizado online"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Your session has expired"
 msgstr "Sua sessão expirou"
 
@@ -3455,6 +3620,10 @@ msgstr "Visualizador Global"
 msgid "Create a new workspace. You can always edit it later."
 msgstr "Criar um novo espaço de trabalho. Você pode editá-lo a qualquer "
 "momento."
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 7B"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -3500,11 +3669,11 @@ msgstr "Captura de tela do painel"
 msgid "Query Details"
 msgstr "Detalhes da Consulta"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Seu nome"
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Downloading {0} for offline chat"
 msgstr "Baixando {0} para chat offline"
@@ -3602,6 +3771,10 @@ msgstr "Registro de privacidade"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "Configurações de Visualização"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Phi 3.5 Mini (offline)"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
@@ -3733,7 +3906,7 @@ msgstr "Linha"
 msgid "Make offline-only"
 msgstr "Tornar apenas offline"
 
-#. placeholder {0}: model.displayName
+#. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "{0} is available when you are offline."
 msgstr "{0} está disponível quando você estiver offline."
@@ -3779,6 +3952,11 @@ msgstr "Por favor, escolha uma senha para completar seu registro"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
 msgstr "Painel publicado!"
+
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
+"cloud chat."
+msgstr ""
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -3853,7 +4031,7 @@ msgstr "Limitar ao acesso do aplicativo"
 msgid "Enter dataset name"
 msgstr "Digite o nome do conjunto de dados"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "Este nome se aplica apenas em {workspaceName}. Seus outros espaços de "
@@ -3880,6 +4058,10 @@ msgstr "Todas as decisões"
 msgid "Show labels"
 msgstr "Mostrar rótulos"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 1.5B (offline)"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "Eixo X"
@@ -3902,8 +4084,8 @@ msgstr "Falha ao carregar o conjunto de dados"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Save — {0}"
-msgstr "Salvar — {0}"
+#~ msgid "Save — {0}"
+#~ msgstr "Salvar — {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
@@ -3981,7 +4163,7 @@ msgid "Google sheets connector is disabled while this feature is under "
 msgstr "O conector do Google Sheets está desativado enquanto este recurso está "
 "em manutenção."
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "Remover"
@@ -3998,6 +4180,10 @@ msgstr "Serviço"
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
 msgstr "Nada mais para carregar"
+
+#: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+msgid "Reset app"
+msgstr ""
 
 #. placeholder {0}: workspace.name
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -4037,6 +4223,10 @@ msgstr "Editar permissões"
 msgid "queried"
 msgstr "consultado"
 
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Qwen 2.5 3B (offline)"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Mensagem de chat"
@@ -4047,7 +4237,7 @@ msgstr "Erro ao salvar o conjunto de dados"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 #: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -4134,7 +4324,7 @@ msgstr "O nome do espaço de trabalho foi salvo com sucesso."
 msgid "dataset name"
 msgstr "nome do conjunto de dados"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Email address updated"
 msgstr "Endereço de e-mail atualizado"
 
@@ -4182,6 +4372,11 @@ msgstr "Publicado"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
 msgstr "Filtros (Onde)"
+
+#: src/lib/offlineChat/useLocalChatModelCopy/useLocalChatModelCopy.ts
+msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
+"offline."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -4278,7 +4473,6 @@ msgstr "Novo grupo de usuários"
 #~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
 #~ msgstr "Quais são os valores distintos de {pickedGroupBy} em {datasetName}?"
 
-#: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
 msgstr "Nenhuma das opções acima"
@@ -4336,6 +4530,10 @@ msgstr "contém"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "Adicionar filtro"
+
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Offline models"
+msgstr ""
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/routes/_auth/$workspaceSlug/profile.tsx
@@ -4426,7 +4624,7 @@ msgstr ""
 msgid "Role group created"
 msgstr "Grupo de funções criado"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "Falha ao atualizar o nome exibido"
 
@@ -4459,8 +4657,8 @@ msgstr "Não foi possível ler o arquivo"
 msgid "Pay what you want"
 msgstr "Pague o que quiser"
 
-#. placeholder {0}: model.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
+#. placeholder {0}: modelCopy.displayName
+#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 msgid "Remove {0}"
 msgstr "Remover {0}"
 
@@ -4634,7 +4832,7 @@ msgstr "Coluna de valor inválido selecionada"
 msgid "No columns have been added yet."
 msgstr "Nenhuma coluna foi adicionada ainda."
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-DisplayNameSection.tsx
 msgid "Display name updated"
 msgstr "Nome de exibição atualizado"
 
@@ -4697,6 +4895,10 @@ msgstr "Documento selecionado: {0}"
 msgid "Activity"
 msgstr "Atividade"
 
+#: src/components/ChatPanel/useAvandarChatRuntime.ts
+msgid "(Message not sent.)"
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "No workspace was found"
 msgstr "Nenhum espaço de trabalho foi encontrado"
@@ -4742,6 +4944,11 @@ msgstr "Digite seu endereço de e-mail"
 msgid "Delete user group"
 msgstr "Excluir grupo de usuários"
 
+#: src/routes/_auth/(no-workspace)/index.tsx
+msgid "It's time to create your first workspace. Don't think for too long; you "
+"can always change these later!"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "Sincronizar online?"
@@ -4750,7 +4957,7 @@ msgstr "Sincronizar online?"
 msgid "Neutral failure"
 msgstr "Falha neutra"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "Por favor, tente novamente ou entre em contato com o suporte."
 
@@ -4801,7 +5008,7 @@ msgstr "Beta"
 msgid "Search by name or user group"
 msgstr "Pesquisar por nome ou grupo de usuários"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Failed to update email"
 msgstr "Falha ao atualizar o e-mail"
 
@@ -4878,6 +5085,7 @@ msgid "Editorial serif"
 msgstr "Serif editorial"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Untitled dashboard"
@@ -4910,7 +5118,7 @@ msgstr ""
 msgid "Entity failed to load"
 msgstr "Entidade falhou ao carregar"
 
-#: src/routes/_auth/$workspaceSlug/profile.tsx
+#: src/routes/_auth/$workspaceSlug/profile/-EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "Usado para fazer login na sua conta."
 

@@ -17,7 +17,7 @@ pnpm dev:desktop
 
 You can also run `pnpm dev` and `pnpm dev:desktop` simultaneously without spawning the dev environment twice.
 
-The webview points at `http://localhost:5173`. Internally, the desktop package's `dev` script invokes `electrobun dev`, which rebuilds the `.app` and launches it — bare `bun run main/index.ts` does not work because Electrobun's native FFI is only initialized by the launched `.app` launcher, not by Bun directly.
+The webview points at `http://127.0.0.1:5173`. Internally, the desktop package's `dev` script invokes `electrobun dev`, which rebuilds the `.app` and launches it - bare `bun run main/index.ts` does not work because Electrobun's native FFI is only initialized by the launched `.app` launcher, not by Bun directly.
 
 ## Building
 
