@@ -94,10 +94,6 @@ msgstr "邀請成員"
 msgid "Or {0} to be notified when our public launch is ready."
 msgstr "或 {0} 以在我們的公開啟動準備好時獲得通知。"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
-#~ msgstr "按 {pickedGroupBy} 計算 {datasetName} 中的行數"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "搜尋資料集..."
@@ -218,7 +214,7 @@ msgstr "備註"
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
 "differed from the import preview and have been overwritten with the "
 "actual values."
-msgstr ""
+msgstr "在 \"{sourceFileName}\" 中檢測到 {changedCount} 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -280,10 +276,6 @@ msgstr "從 Excel"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Unknown error"
 msgstr "未知錯誤"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a line chart showing trends in {datasetName} over time"
-#~ msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -361,7 +353,7 @@ msgstr "無法顯示 {chartName}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
-msgstr ""
+msgstr "數據集處理失敗"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -378,14 +370,6 @@ msgstr "允許多個值"
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "尚未添加任何資料集"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-#~ "queried\" — uploads just the columns your visualizations read. Widen the "
-#~ "scope if you've added viewer-editable filters and want viewers to be "
-#~ "able to filter beyond your defaults."
-#~ msgstr "選擇要發布的每個資料集的數量。預設為「僅查詢的內容」— "
-#~ "僅上傳您的視覺化所需的欄位。如果您添加了可供觀眾編輯的過濾器並希望觀眾能夠超越您的預設進行過濾，請擴大範圍。"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -502,7 +486,8 @@ msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
 "able to filter beyond your defaults."
-msgstr ""
+msgstr "選擇要發布每個數據集的數量。預設選項：「僅查詢的內容」：僅上傳您的視覺化所需的列。如果您添加了可供觀眾編輯的篩選器並希望觀眾能夠超越預設進行篩"
+"選，請擴大範圍。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
@@ -650,10 +635,6 @@ msgstr "CSV"
 msgid "Preset"
 msgstr "預設"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
-#~ msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
-
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Permanently delete <0>{0}</0>?"
@@ -729,12 +710,6 @@ msgstr "用戶組"
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-#~ msgstr "發布後，任何擁有鏈接的人都可以查看此儀表板 — 無需 Avandar 帳戶。儀表板引用的數據集在發布時會複製到公共存儲。"
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "密碼重置失敗"
@@ -803,7 +778,7 @@ msgstr "自定義"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
-msgstr ""
+msgstr "時間戳"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long—you "
@@ -816,10 +791,6 @@ msgstr "是時候創建您的第一個工作區了。不要想太久—您隨時
 #: src/routes/update-password.tsx
 msgid "Password"
 msgstr "密碼"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Show the first 20 rows of {datasetName}"
-#~ msgstr "顯示 {datasetName} 的前 20 行"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -873,7 +844,7 @@ msgstr "此圖表的篩選器"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
-msgstr ""
+msgstr "發布每一列，所有行。為觀眾提供最大的靈活性，最大限度地曝光。"
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
@@ -1147,7 +1118,7 @@ msgstr "付款方式"
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
 "the import preview and have been overwritten with the actual values."
-msgstr ""
+msgstr "在 \"{sourceFileName}\" 中檢測到 1 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1209,7 +1180,7 @@ msgstr "使用的建議"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr ""
+msgstr "\"{sourceFileName}\" 處理完成，準備使用。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1238,7 +1209,7 @@ msgstr "連接到 Google Sheets"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
-msgstr ""
+msgstr "數據可視化"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -1695,7 +1666,7 @@ msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確�
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
-msgstr ""
+msgstr "文本"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
@@ -1751,7 +1722,7 @@ msgstr "不適用"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
-msgstr ""
+msgstr "僅發布儀表板所需的列。最狹窄，最私密。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
@@ -1779,7 +1750,7 @@ msgstr "返回編輯器"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
-msgstr ""
+msgstr "約一分鐘"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
@@ -1791,7 +1762,7 @@ msgstr "請檢查您的電子郵件"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
-msgstr ""
+msgstr "選擇列並添加行約束（枚舉、數字範圍、日期範圍）。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
@@ -1816,7 +1787,7 @@ msgstr "這是一個無效的候補名單代碼"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
-msgstr ""
+msgstr "請再試一次。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Field Name"
@@ -2071,10 +2042,6 @@ msgstr "儲存到儀表板"
 msgid "Label type"
 msgstr "標籤類型"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a bar chart of row counts in {datasetName}"
-#~ msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
-
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "No file selected"
 msgstr "未選擇任何檔案"
@@ -2101,7 +2068,7 @@ msgstr "某些已發佈的數據集無法加載。請稍後再試。"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
-msgstr ""
+msgstr "少於一分鐘"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2149,11 +2116,6 @@ msgstr "符號大小欄位必須為數字。"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar（預設）"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-#~ "columns:}}"
-#~ msgstr "{numCols, plural, one {將發佈 # 列：} other {將發佈 # 列：}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2237,10 +2199,6 @@ msgstr "許可證"
 msgid "Describe your answer…"
 msgstr "描述您的答案…"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What is the average {averageColumn} in {datasetName}?"
-#~ msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
 msgstr "拖放以導入"
@@ -2271,10 +2229,6 @@ msgstr "請先運行 AI 查詢。"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
 msgstr "Y 欄"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count how many rows there are in {datasetName}"
-#~ msgstr "計算 {datasetName} 中有多少行"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2375,7 +2329,7 @@ msgstr "查看"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
-msgstr ""
+msgstr "不可用"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "dataset"
@@ -2498,10 +2452,6 @@ msgstr "允許手動編輯"
 msgid "Series"
 msgstr "系列"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
-#~ msgstr "請先保存您的更改 — PDF 反映已保存的儀表板。"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
 msgstr "尚未發布。公眾觀眾將無法看到此內容。"
@@ -2622,7 +2572,7 @@ msgstr "選擇最常見的值"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Please try again. The PDF was not created."
-msgstr ""
+msgstr "請再試一次。PDF未創建。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
@@ -2634,7 +2584,7 @@ msgstr "分享摘要"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -2880,7 +2830,7 @@ msgstr "添加系列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
@@ -2949,7 +2899,7 @@ msgstr "在 Avandar 還處於測試階段時，我們僅允許在您在候補名
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
-msgstr ""
+msgstr "忽略所有全局篩選器：此可視化未經篩選。"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
@@ -2995,10 +2945,6 @@ msgstr "類型"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
 msgstr "儀表板分享設定已更新。"
-
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#~ msgid "Ignore all global filters — this visualization is unfiltered."
-#~ msgstr "忽略所有全域過濾器 — 此視覺化未過濾。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
@@ -3066,7 +3012,7 @@ msgstr "更新頻率"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr ""
+msgstr "\"{sourceFileName}\" 無法解析：{message}"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -3105,7 +3051,7 @@ msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努�
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Please try again. Your dashboard has not been published."
-msgstr ""
+msgstr "請再試一次。您的儀表板尚未發布。"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
@@ -3216,7 +3162,7 @@ msgstr "上傳"
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about {0} minutes"
-msgstr ""
+msgstr "約 {0} 分鐘"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3268,7 +3214,7 @@ msgstr "確認密碼"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
-msgstr ""
+msgstr "列類型已更新"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3285,10 +3231,6 @@ msgstr "編輯查詢"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "數據探索器"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
-#~ msgstr "按 {secondGroupBy} 計算 {datasetName} 中的行數"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3321,11 +3263,11 @@ msgstr "已複製！"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "date"
-msgstr ""
+msgstr "日期"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
-msgstr ""
+msgstr "此儀表板未引用任何數據集：無法發布。"
 
 #: src/routes/register.tsx
 msgid "A confirmation email has been sent to your email address."
@@ -3354,7 +3296,7 @@ msgstr "導入電子表格，連接到 Google Sheets，或從其他來源添加�
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Please try again later."
-msgstr ""
+msgstr "請稍後再試。"
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
@@ -3444,11 +3386,6 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 
-#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
-#~ "offline."
-#~ msgstr "下載離線聊天模型（雲圖標），以便在離線時提問。"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "此目錄項目沒有欄位元資料。尚無法匯入。"
@@ -3463,7 +3400,7 @@ msgstr "欄位描述已成功更新！"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
-msgstr ""
+msgstr "請先保存您的更改：PDF反映已保存的儀表板。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
@@ -3497,10 +3434,6 @@ msgstr "此功能尚未實現。"
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "此資料集很大，因此我們應用了 100 行的限制。您可以隨時更改此限制。"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
-#~ msgstr "此儀表板未引用任何資料集—無法發佈。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -3563,7 +3496,7 @@ msgstr "{displayName} 的角色"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
-msgstr ""
+msgstr "發送前檢查"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -3644,7 +3577,7 @@ msgstr "從您的電腦選擇一個 Excel 或 CSV 檔案以匯入"
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required. Datasets referenced by the dashboard are "
 "copied to public storage at publish time."
-msgstr ""
+msgstr "發布後，任何擁有鏈接的人都可以查看此儀表板，無需 Avandar 帳戶。儀表板引用的數據集在發布時複製到公共存儲。"
 
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
@@ -3777,7 +3710,7 @@ msgstr "保存 — {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
-msgstr ""
+msgstr "小數"
 
 #: packages/web/ui/src/notifications/notify.ts
 msgid "Error"
@@ -3934,7 +3867,7 @@ msgstr "訂閱成功更新"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "{0, plural, one {Will publish # column:} other {Will publish # "
 "columns:}}"
-msgstr ""
+msgstr "{0, plural, one {將發布 # 列：} other {將發布 # 列：}}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -4091,10 +4024,6 @@ msgstr "您尚未選擇值欄位"
 msgid "Text contains"
 msgstr "文本包含"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
-#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-#~ msgstr "要確認，請在下方輸入 <0>{MEDICAL_CONFIRMATION_PHRASE}</0>："
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
 msgstr "新共享的角色"
@@ -4105,7 +4034,7 @@ msgstr "展開面板"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
-msgstr ""
+msgstr "發送給 AI 嗎？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4131,10 +4060,6 @@ msgstr "未成功讀取任何行"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "New user group"
 msgstr "新使用者群組"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-#~ msgstr "{datasetName} 中 {pickedGroupBy} 的不同值是什麼？"
 
 #: src/components/ChatPanel/ClarificationCard/clarificationAnswer.ts
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
@@ -4224,7 +4149,7 @@ msgstr "沒有可用的欄位"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
-msgstr ""
+msgstr "數據集已準備好"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4273,7 +4198,7 @@ msgstr "已取消"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
-msgstr ""
+msgstr "數字"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -4295,10 +4220,6 @@ msgstr "關閉面板 (⌘/)"
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
 msgstr "使用錯誤重新生成"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Add a table of the top 10 rows of {datasetName}"
-#~ msgstr "添加 {datasetName} 的前 10 行表格"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
@@ -4685,7 +4606,7 @@ msgstr "筆劃 ({strokeWidth}px)"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
-msgstr ""
+msgstr "整數"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -4706,7 +4627,7 @@ msgstr "CSV 或 Excel 文件"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
-msgstr ""
+msgstr "儀表板尚未加載。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -4737,7 +4658,7 @@ msgstr "Hello DateValueItem"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
-msgstr ""
+msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -4820,7 +4741,7 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
-msgstr ""
+msgstr "處理中，剩餘 {remainingLabel}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Loose"
