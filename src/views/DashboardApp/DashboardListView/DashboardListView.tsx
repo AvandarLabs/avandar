@@ -12,17 +12,19 @@ import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyDevAlert, Paper } from "@ui";
 import { prop, where } from "@utils";
+import { useMemo } from "react";
 import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
-import { useLocalDatasetIds } from "@/lib/offline/useLocalDatasetIds";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { UserId } from "$/models/User/User.types";
 
 type Props = {
   dashboards: Dashboard.T[];
@@ -36,12 +38,24 @@ export function DashboardListView({
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const localDatasetIds = useLocalDatasetIds();
   const [workspaceDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const workspaceDatasetIds = workspaceDatasets.map(prop("id"));
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+
+  // Dataset ids with parquet cached locally for the current user/workspace.
+  const userId = userProfile?.userId;
+  const [localDatasets = []] = LocalDatasetClient.useGetAll({
+    where: {
+      userId: { eq: userId as UserId },
+      workspaceId: { eq: workspace.id },
+    },
+    useQueryOptions: { enabled: !!userId },
+  });
+  const localDatasetIds = useMemo(() => {
+    return new Set(localDatasets.map(prop("datasetId")));
+  }, [localDatasets]);
 
   const getDashboardOfflineStatus = (
     dashboard: Dashboard.T,
