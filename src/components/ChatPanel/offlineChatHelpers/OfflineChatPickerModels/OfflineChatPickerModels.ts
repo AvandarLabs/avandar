@@ -29,9 +29,7 @@ function parseModelId(modelId: string): LocalChatModel.Id | undefined {
 /** Maps downloaded local models to chat picker options. */
 function buildOptions(
   downloadedIds: readonly LocalChatModel.Id[],
-  getCopy: (
-    model: ReturnType<typeof LocalChatModel.Catalog.find>,
-  ) => LocalChatModel.Copy,
+  getCopy: (model: LocalChatModel.T) => LocalChatModel.Copy,
 ): ChatModelOption.T[] {
   return downloadedIds.map((localModelId) => {
     const model = LocalChatModel.Catalog.find(localModelId);
@@ -55,9 +53,7 @@ function buildOptions(
 /** Offline models group for the chat picker (empty when none downloaded). */
 function buildGroup(
   downloadedIds: readonly LocalChatModel.Id[],
-  getCopy: (
-    model: ReturnType<typeof LocalChatModel.Catalog.find>,
-  ) => LocalChatModel.Copy,
+  getCopy: (model: LocalChatModel.T) => LocalChatModel.Copy,
   groupLabel: string,
 ): ChatModelOption.OptionGroup | undefined {
   const models = buildOptions(downloadedIds, getCopy);
