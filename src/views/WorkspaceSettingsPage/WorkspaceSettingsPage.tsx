@@ -15,6 +15,11 @@ import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
 
+/**
+ * Settings tabs shown to the workspace owner (the user whose id matches
+ * `workspace.ownerId`). The owner sees every tab, including "billing", which
+ * manages the workspace subscription and is owner-only.
+ */
 const OWNER_TAB_IDS = [
   "general",
   "users",
@@ -24,6 +29,10 @@ const OWNER_TAB_IDS = [
   "privacy",
   "billing",
 ] as const;
+/**
+ * Settings tabs shown to a non-owner settings admin: the same set as the owner
+ * minus "billing", since only the workspace owner can manage billing.
+ */
 const NON_OWNER_TAB_IDS = [
   "general",
   "users",
