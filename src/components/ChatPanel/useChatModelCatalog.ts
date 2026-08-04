@@ -46,10 +46,7 @@ export function useChatModelCatalog(): UseChatModelCatalogResult {
   }, [downloadedOfflineIds, getLocalChatModelCopy, t]);
 
   const groups = useMemo(() => {
-    if (!offlineGroup) {
-      return cloudGroups;
-    }
-    return [offlineGroup, ...cloudGroups];
+    return offlineGroup ? [offlineGroup, ...cloudGroups] : cloudGroups;
   }, [cloudGroups, offlineGroup]);
 
   const models = useMemo(() => {

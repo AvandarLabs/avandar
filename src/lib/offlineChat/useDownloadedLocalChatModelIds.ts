@@ -12,7 +12,7 @@ let cachedDownloadedKey = "";
  * each call; returning it directly causes infinite re-renders because React
  * compares snapshots with `Object.is`.
  */
-function getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
+function _getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
   const downloadedIds = LocalChatModelStore.listDownloadedIds();
   const downloadedKey = downloadedIds.join("\0");
   if (downloadedKey === cachedDownloadedKey) {
@@ -30,7 +30,7 @@ function getDownloadedLocalChatModelIdsSnapshot(): readonly LocalChatModelId[] {
 export function useDownloadedLocalChatModelIds(): readonly LocalChatModelId[] {
   return useSyncExternalStore(
     LocalChatModelStore.subscribeDownloadedModels,
-    getDownloadedLocalChatModelIdsSnapshot,
+    _getDownloadedLocalChatModelIdsSnapshot,
     () => {
       return EMPTY_DOWNLOADED_IDS;
     },

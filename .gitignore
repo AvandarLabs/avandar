@@ -37,7 +37,8 @@ dist-ssr
 # Supabase
 supabase/.temp
 supabase/.branches
-# Personal SQL queries saved by Supabase Studio — local only, not project files.
+
+# Personal SQL queries saved by Supabase Studio. Local only, not project files.
 supabase/snippets/
 
 # Deno (local type-check only; breaks Supabase edge bundler when committed)

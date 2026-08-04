@@ -1,13 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { ValueItemContainer } from "../ValueItemContainer";
 import type {
-  DescribableValueArrayRenderOptions,
-  GenericRootData,
-  GetChildObjects,
-  NestedArrayRenderOptions,
+    DescribableValueArrayRenderOptions,
+    GenericRootData,
+    GetChildObjects,
+    NestedArrayRenderOptions,
 } from "../ObjectDescriptionList.types";
+import { ValueItemContainer } from "../ValueItemContainer";
 
 type Props<T, RootData extends GenericRootData> = {
   /** Array of arrays of field values */
@@ -53,11 +53,11 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
 
   return (
     <Stack>
-      {valuesToRender.map((valueArray, arrayIndex) => {
-        const collectionNumber = arrayIndex + 1;
+      {valuesToRender.map((valueArray, idx) => {
+        const collectionNumber = idx + 1;
         const serializedValue = JSON.stringify(valueArray);
         const duplicateNumber = valuesToRender
-          .slice(0, arrayIndex)
+          .slice(0, idx)
           .filter((priorValue) => {
             return JSON.stringify(priorValue) === serializedValue;
           }).length;
