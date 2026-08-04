@@ -5,14 +5,23 @@
  * directory.
  */
 export interface DatasetBlobStore {
+  /**
+   * Writes `bytes` to `key`, overwriting any existing blob. Accepts either a
+   * materialized `Uint8Array` or a `ReadableStream` that is drained in full.
+   */
   put(
     key: DatasetBlobKey,
     bytes: Uint8Array | ReadableStream<Uint8Array>,
   ): Promise<void>;
+  /** Reads the blob at `key` as a stream of its bytes. */
   get(key: DatasetBlobKey): Promise<ReadableStream<Uint8Array>>;
+  /** Removes the blob at `key`. */
   delete(key: DatasetBlobKey): Promise<void>;
+  /** Returns whether a blob is currently stored at `key`. */
   exists(key: DatasetBlobKey): Promise<boolean>;
+  /** Returns every stored blob key that begins with `prefix`. */
   list(prefix: DatasetBlobKey): Promise<readonly DatasetBlobKey[]>;
+  /** Returns size and mtime for the blob at `key`, or null if it is absent. */
   stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null>;
 }
 

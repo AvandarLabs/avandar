@@ -6,6 +6,7 @@ import type {
   DatasetBlobStore,
 } from "$/platform/types/DatasetBlobStore.types.ts";
 
+/** Drains a byte stream to completion and concatenates it into one array. */
 async function _readStreamToUint8Array(
   stream: ReadableStream<Uint8Array>,
 ): Promise<Uint8Array> {
@@ -31,6 +32,7 @@ async function _readStreamToUint8Array(
   return out;
 }
 
+/** Encodes bytes as a standard base64 string for transit over the IPC JSON. */
 function _uint8ToBase64(bytes: Uint8Array): string {
   // Chunked encoding avoids the `String.fromCharCode(...)` call-stack limit.
   // `btoa` accepts the byte-sized character codes produced here.
@@ -43,6 +45,7 @@ function _uint8ToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+/** Decodes a standard base64 string back into its raw bytes. */
 function _base64ToUint8(b64: string): Uint8Array {
   const binary = atob(b64);
   const out = new Uint8Array(binary.length);
@@ -52,6 +55,7 @@ function _base64ToUint8(b64: string): Uint8Array {
   return out;
 }
 
+/** Wraps a byte array in a single-chunk readable stream. */
 function _bytesToStream(bytes: Uint8Array): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     start(controller) {
