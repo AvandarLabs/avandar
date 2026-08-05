@@ -2,7 +2,7 @@ import { prop } from "@utils";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
-} from "../offlineChat.types";
+} from "$/types/offlineChat.types";
 
 export type MockOfflineChatResponse = {
   match: RegExp | string;

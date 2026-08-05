@@ -1,7 +1,7 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
-import type { ChatClarifyRequest } from "$/types/chat.types";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 /** Compact schema slice sent to offline prompts. */
 export type OfflineChatSchemaDataset = {

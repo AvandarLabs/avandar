@@ -20,7 +20,7 @@ import { isDefined, propEq } from "@utils";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
-} from "@/clients/LocalChatModel/offlineChat.types";
+} from "$/types/offlineChat.types";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 const REFINEMENT_HINTS =

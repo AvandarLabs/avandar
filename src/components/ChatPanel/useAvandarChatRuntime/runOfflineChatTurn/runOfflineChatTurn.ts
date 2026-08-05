@@ -10,7 +10,7 @@ import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRun
 import type {
   OfflineChatPipelineCopy,
   OfflineChatTurnResult,
-} from "@/clients/LocalChatModel/offlineChat.types";
+} from "$/types/offlineChat.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Workspace } from "$/models/Workspace/Workspace";

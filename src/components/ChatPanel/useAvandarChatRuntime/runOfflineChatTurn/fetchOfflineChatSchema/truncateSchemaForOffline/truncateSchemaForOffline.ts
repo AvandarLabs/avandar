@@ -2,7 +2,7 @@ import { makeBucketMap, prop, propEq } from "@utils";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
-} from "@/clients/LocalChatModel/offlineChat.types";
+} from "$/types/offlineChat.types";
 
 const MAX_DATASETS = 12;
 const MAX_COLUMNS_TOTAL = 80;

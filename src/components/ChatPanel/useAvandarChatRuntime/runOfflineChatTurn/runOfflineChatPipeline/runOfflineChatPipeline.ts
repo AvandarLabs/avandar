@@ -11,7 +11,7 @@ import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers
 import type {
   OfflineChatPipelineArgs,
   OfflineChatPipelineResult,
-} from "@/clients/LocalChatModel/offlineChat.types";
+} from "$/types/offlineChat.types";
 
 const ANALYZE_MAX_TOKENS = 220;
 const SQL_MAX_TOKENS = 450;

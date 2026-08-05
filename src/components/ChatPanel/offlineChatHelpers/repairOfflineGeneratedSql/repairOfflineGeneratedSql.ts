@@ -7,7 +7,7 @@ import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/off
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineColumnFromError";
 import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
-import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
+import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
 const MAX_REPAIR_ROUNDS = 4;

@@ -2,7 +2,7 @@ import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
-} from "@/clients/LocalChatModel/offlineChat.types";
+} from "$/types/offlineChat.types";
 
 type MlcEngine = {
   chat: {
