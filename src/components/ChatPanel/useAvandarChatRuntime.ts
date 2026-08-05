@@ -24,7 +24,7 @@ import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModel
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import { resolveOfflineChatMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveOfflineChatMode/resolveOfflineChatMode";
+import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
@@ -457,7 +457,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           );
         };
 
-        const mode = resolveOfflineChatMode({
+        const mode = resolveChatRuntimeMode({
           navigatorOnLine: navigator.onLine,
           selectedChatModelId: model,
         });
@@ -501,7 +501,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           };
           return applyResponse(response);
         } catch (error) {
-          const fallbackMode = resolveOfflineChatMode({
+          const fallbackMode = resolveChatRuntimeMode({
             navigatorOnLine: navigator.onLine,
             chatPostFailed: isNetworkChatFailure(error),
             selectedChatModelId: model,

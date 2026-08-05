@@ -1,13 +1,13 @@
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import type { OfflineChatMode } from "$/types/offlineChat.types";
+import type { ChatRuntimeMode } from "$/types/offlineChat.types";
 
-export function resolveOfflineChatMode(args: {
+export function resolveChatRuntimeMode(args: {
   navigatorOnLine: boolean;
   chatPostFailed?: boolean;
   /** Active chat model picker id (includes `offline:` ids). */
   selectedChatModelId?: string;
-}): OfflineChatMode {
+}): ChatRuntimeMode {
   const hasDownloaded = LocalChatModelStore.hasAnyDownloaded();
   const pickerLocalId =
     args.selectedChatModelId ?
