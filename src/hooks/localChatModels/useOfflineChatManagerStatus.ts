@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
-import { OfflineChatResourceManager } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
-import type { OfflineChatManagerStatus } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
+import { OfflineChatResourceStore } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
+import type { OfflineChatManagerStatus } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
 
 /**
  * Subscribes to offline chat engine load/download status for UI indicators.
@@ -8,10 +8,10 @@ import type { OfflineChatManagerStatus } from "@/stores/OfflineChatResourceManag
 export function useOfflineChatManagerStatus(): OfflineChatManagerStatus {
   return useSyncExternalStore(
     (listener) => {
-      return OfflineChatResourceManager.subscribe(listener);
+      return OfflineChatResourceStore.subscribe(listener);
     },
     () => {
-      return OfflineChatResourceManager.getStatus();
+      return OfflineChatResourceStore.getStatus();
     },
     () => {
       return { kind: "idle" } as const;

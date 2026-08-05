@@ -4,7 +4,7 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useState } from "react";
-import { OfflineChatResourceManager } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
+import { OfflineChatResourceStore } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type Props = {
@@ -24,7 +24,7 @@ export function useDeleteOfflineChatModel({ onDeleted }: Props): {
     async (modelId: LocalChatModel.Id) => {
       setDeletingModelId(modelId);
       try {
-        await OfflineChatResourceManager.deleteModel(modelId);
+        await OfflineChatResourceStore.deleteModel(modelId);
         const model = LocalChatModel.Catalog.find(modelId);
         const modelCopy = getLocalChatModelCopy(model);
         notifySuccess({

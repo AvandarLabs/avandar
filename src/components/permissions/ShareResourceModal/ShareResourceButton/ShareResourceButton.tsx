@@ -3,7 +3,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { resourceTypeLabel } from "@/components/permissions/ShareResourceModal/shareCopy";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";

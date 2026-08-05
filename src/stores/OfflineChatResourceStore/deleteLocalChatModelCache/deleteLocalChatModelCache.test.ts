@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { deleteLocalChatModelCache } from "@/stores/OfflineChatResourceManager/deleteLocalChatModelCache/deleteLocalChatModelCache";
+import { deleteLocalChatModelCache } from "@/stores/OfflineChatResourceStore/deleteLocalChatModelCache/deleteLocalChatModelCache";
 
 const deleteModelAllInfoInCacheMock = vi.fn().mockResolvedValue(undefined);
 

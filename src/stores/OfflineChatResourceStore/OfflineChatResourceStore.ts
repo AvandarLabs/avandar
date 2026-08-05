@@ -1,6 +1,6 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-import { createOfflineChatEngine } from "@/stores/OfflineChatResourceManager/createOfflineChatEngine/createOfflineChatEngine";
-import { deleteLocalChatModelCache } from "@/stores/OfflineChatResourceManager/deleteLocalChatModelCache/deleteLocalChatModelCache";
+import { createOfflineChatEngine } from "@/stores/OfflineChatResourceStore/createOfflineChatEngine/createOfflineChatEngine";
+import { deleteLocalChatModelCache } from "@/stores/OfflineChatResourceStore/deleteLocalChatModelCache/deleteLocalChatModelCache";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import type { OfflineChatEngine } from "$/types/offlineChat.types";
 
@@ -28,7 +28,7 @@ type Listener = (status: OfflineChatManagerStatus) => void;
  * TODO(pablo): migrate this to `createModule` once the module library exposes
  * a mutable-state API.
  */
-class OfflineChatResourceManagerImpl {
+class OfflineChatResourceStoreImpl {
   private status: OfflineChatManagerStatus = { kind: "idle" };
   private listeners = new Set<Listener>();
   private engine: OfflineChatEngine | undefined;
@@ -126,7 +126,7 @@ class OfflineChatResourceManagerImpl {
 }
 
 /** Shared owner of the browser's resident offline chat engine. */
-export const OfflineChatResourceManager = new OfflineChatResourceManagerImpl();
+export const OfflineChatResourceStore = new OfflineChatResourceStoreImpl();
 
 declare global {
   interface Window {
@@ -141,6 +141,6 @@ if (
   import.meta.env.VITE_OFFLINE_CHAT_MOCK === "true"
 ) {
   window.__resetOfflineChatEngine = async () => {
-    await OfflineChatResourceManager.unload();
+    await OfflineChatResourceStore.unload();
   };
 }

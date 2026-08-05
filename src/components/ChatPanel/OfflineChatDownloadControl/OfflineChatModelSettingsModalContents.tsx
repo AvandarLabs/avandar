@@ -7,7 +7,7 @@ import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useEffect, useState } from "react";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { OfflineChatResourceManager } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
+import { OfflineChatResourceStore } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import { DownloadedModelList } from "./DownloadedModelList";
@@ -119,7 +119,7 @@ export function OfflineChatModelSettingsModalContents({
     const model = LocalChatModel.Catalog.find(selectedModelId);
     const modelCopy = getLocalChatModelCopy(model);
     try {
-      await OfflineChatResourceManager.ensureEngine(selectedModelId);
+      await OfflineChatResourceStore.ensureEngine(selectedModelId);
       notifySuccess({
         title: t`Offline chat model ready`,
         message: t`${modelCopy.displayName} is available when you are offline.`,

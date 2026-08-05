@@ -1,37 +1,6 @@
-import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { matchLiteral } from "@utils";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { AppType } from "$/models/Permissions/Permissions.types";
-
-/**
- * Returns the human-readable label for a resource type. Used in headings,
- * tooltip copy, and the summary line ("dataset" / "dashboard").
- */
-export function resourceTypeLabel(type: ResourceType): string {
-  return type === "dashboard" ? t`dashboard` : t`dataset`;
-}
-
-/**
- * Returns the human-readable app label used in General-access copy and the
- * "Limit to app access" tooltip ("Data Sources", "Dashboards", …).
- */
-export function appLabel(app: AppType): string {
-  return matchLiteral(app, {
-    data_sources: () => {
-      return t`Data Sources`;
-    },
-    dashboards: () => {
-      return t`Dashboards`;
-    },
-    data_explorer: () => {
-      return t`Data Explorer`;
-    },
-    settings: () => {
-      return t`Settings`;
-    },
-  });
-}
 
 /**
  * Maps a `ResourceType` to the workspace app that owns it. Datasets live
