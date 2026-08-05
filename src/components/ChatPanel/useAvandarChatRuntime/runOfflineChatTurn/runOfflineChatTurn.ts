@@ -4,7 +4,7 @@ import { ensureOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRu
 import { fetchOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
+import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
@@ -47,7 +47,7 @@ export async function runOfflineChatTurn(
     openDatasetId: args.pageContext.openDatasetId,
   });
 
-  logOfflineChat("runOfflineChatTurn:schema", {
+  devLogOfflineChat("runOfflineChatTurn:schema", {
     navigatorOnLine: args.navigatorOnLine,
     pageContext: args.pageContext,
     fetchedDatasetCount: fetchedSchema.datasets.length,

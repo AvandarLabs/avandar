@@ -1,5 +1,5 @@
 /** Dev-only logging for offline chat SQL hardening (grep: `[offlineChat]`). */
-export function logOfflineChat(
+export function devLogOfflineChat(
   label: string,
   payload?: Record<string, unknown>,
 ): void {

@@ -21,7 +21,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
+import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { resolveOfflineChatMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveOfflineChatMode/resolveOfflineChatMode";
@@ -461,7 +461,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           navigatorOnLine: navigator.onLine,
           selectedChatModelId: model,
         });
-        logOfflineChat("useAvandarChatRuntime:mode", {
+        devLogOfflineChat("useAvandarChatRuntime:mode", {
           mode,
           navigatorOnLine: navigator.onLine,
           selectedChatModelId: model,

@@ -1,7 +1,7 @@
 import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
 import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
-import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
+import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
 import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
@@ -217,7 +217,7 @@ export function repairOfflineGeneratedSql(
     args.resolvedDatasetId ?? resolved?.id ?? args.openDatasetId;
   const allowedTableIds = buildAllowedTableIdSet(args.schema);
 
-  logOfflineChat("repairOfflineGeneratedSql:start", {
+  devLogOfflineChat("repairOfflineGeneratedSql:start", {
     sqlIn: args.sql.trim(),
     datasetCount: args.schema.datasets.length,
     datasetLabels: args.schema.datasets.map((dataset) => {
@@ -341,7 +341,7 @@ export function repairOfflineGeneratedSql(
     }
   }
 
-  logOfflineChat("repairOfflineGeneratedSql:done", {
+  devLogOfflineChat("repairOfflineGeneratedSql:done", {
     sqlOut: sql,
     appliedSteps,
     preferredDatasetId,

@@ -3,7 +3,7 @@ import {
   buildOfflineFixSqlPrompt,
   buildOfflineSqlPrompt,
 } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/buildOfflinePrompts/buildOfflinePrompts";
-import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
+import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { narrowOfflineSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/narrowOfflineSchema";
 import { OfflineLlmOutput } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/OfflineLlmOutput/OfflineLlmOutput";
 import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
@@ -44,7 +44,7 @@ function hardenExtractedSql(args: {
     resolvedDatasetId: args.resolvedDatasetId,
     executionError: args.executionError,
   });
-  logOfflineChat("hardenExtractedSql", {
+  devLogOfflineChat("hardenExtractedSql", {
     sqlIn: args.sql,
     sqlOut: repaired.sql,
     resolvedDatasetId: args.resolvedDatasetId,
@@ -129,7 +129,7 @@ export async function runOfflineChatPipeline(
     analyzeTableName: analyze?.tableName,
   });
 
-  logOfflineChat("runOfflineChatPipeline:resolvedDataset", {
+  devLogOfflineChat("runOfflineChatPipeline:resolvedDataset", {
     resolvedId: resolvedDataset?.id,
     resolvedName: resolvedDataset?.name,
     analyzeTableName: analyze?.tableName,
@@ -174,7 +174,7 @@ export async function runOfflineChatPipeline(
   });
 
   let sql = OfflineLlmOutput.extractSql(sqlPassText);
-  logOfflineChat("runOfflineChatPipeline:sqlExtracted", {
+  devLogOfflineChat("runOfflineChatPipeline:sqlExtracted", {
     rawLlmSql: sql,
   });
   let assistantText = resolveOfflineSqlAssistantText({
@@ -257,7 +257,7 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  logOfflineChat("runOfflineChatPipeline:finalSql", { sql });
+  devLogOfflineChat("runOfflineChatPipeline:finalSql", { sql });
 
   return {
     assistantText:
