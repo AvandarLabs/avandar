@@ -1,6 +1,6 @@
 import { propEq } from "@utils";
 import Fuse from "fuse.js";
-import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
+import { OfflineDatasetLabelMatch } from "../OfflineDatasetLabelMatch";
 import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
 
 /**
