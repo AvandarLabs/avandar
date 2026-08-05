@@ -11,8 +11,9 @@ import type {
 const MIN_LABEL_MATCH_SCORE = 2;
 
 /**
- * Picks the workspace dataset that best matches the user question. Uses exact
- * and token heuristics first, then Fuse on the prompt, then the open dataset.
+ * Picks the workspace dataset that best matches the user question. Tries exact
+ * and token heuristics first, then a fuzzy (Fuse.js) match of the dataset names
+ * against the prompt text, then falls back to the currently open dataset.
  */
 export function resolveOfflineDataset(args: {
   schema: OfflineChatSchema;
