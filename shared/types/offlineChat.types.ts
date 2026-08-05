@@ -87,6 +87,18 @@ export type OfflineChatTurnResult = {
   clarification?: ChatClarifyRequest;
 };
 
+/**
+ * The chat mode chosen by `resolveOfflineChatMode`. Despite the "offline"
+ * name, it enumerates every runtime outcome the offline-capability logic can
+ * pick, including staying on the normal cloud path:
+ * - `cloud`: use the normal server-backed chat. The default when online, and
+ *   the only non-erroring choice when offline with no local model downloaded.
+ * - `local`: run the whole turn on-device with a downloaded WebLLM model.
+ *   Chosen when the user selected a downloaded local model, or when the device
+ *   is offline and a model is available.
+ * - `offer_local_fallback`: online, but the cloud request just failed and a
+ *   local model is downloaded, so prompt the user to switch to it.
+ */
 export type OfflineChatMode =
   | { kind: "cloud" }
   | {
