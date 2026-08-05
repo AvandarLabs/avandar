@@ -5,7 +5,7 @@ import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { logOfflineChat } from "./logOfflineChat";
-import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/offlineChatHelpers/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
   OfflineChatPipelineCopy,

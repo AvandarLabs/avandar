@@ -4,7 +4,7 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useState } from "react";
-import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type Props = {

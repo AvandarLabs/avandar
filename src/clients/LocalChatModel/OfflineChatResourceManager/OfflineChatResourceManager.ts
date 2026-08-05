@@ -1,8 +1,8 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-import { createOfflineChatEngine } from "./createOfflineChatEngine/createOfflineChatEngine";
-import { deleteLocalChatModelCache } from "@/clients/LocalChatModel/deleteLocalChatModelCache/deleteLocalChatModelCache";
+import { createOfflineChatEngine } from "../createOfflineChatEngine/createOfflineChatEngine";
+import { deleteLocalChatModelCache } from "@/clients/LocalChatModel/OfflineChatResourceManager/deleteLocalChatModelCache/deleteLocalChatModelCache";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import type { OfflineChatEngine } from "./offlineChat.types";
+import type { OfflineChatEngine } from "../offlineChat.types";
 
 export type OfflineChatManagerStatus =
   | { kind: "idle" }
