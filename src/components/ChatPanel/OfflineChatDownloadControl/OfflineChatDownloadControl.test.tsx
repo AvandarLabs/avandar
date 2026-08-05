@@ -22,7 +22,7 @@ vi.mock("@/hooks/localChatModels/useOfflineChatManagerStatus", () => {
   };
 });
 
-vi.mock("@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager", () => {
+vi.mock("@/stores/OfflineChatResourceManager/OfflineChatResourceManager", () => {
   return {
     OfflineChatResourceManager: {
       ensureEngine: vi.fn(),

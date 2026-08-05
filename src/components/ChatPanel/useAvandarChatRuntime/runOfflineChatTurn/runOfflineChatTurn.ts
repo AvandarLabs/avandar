@@ -5,7 +5,7 @@ import { fetchOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRun
 import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
-import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
   OfflineChatPipelineCopy,

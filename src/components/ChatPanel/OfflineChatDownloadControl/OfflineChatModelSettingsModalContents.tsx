@@ -7,7 +7,7 @@ import { notifyError, notifySuccess } from "@ui";
 import { useCallback, useEffect, useState } from "react";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
+import { OfflineChatResourceManager } from "@/stores/OfflineChatResourceManager/OfflineChatResourceManager";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
 import { DownloadedModelList } from "./DownloadedModelList";

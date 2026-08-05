@@ -1,8 +1,8 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-import { createMockOfflineChatEngine } from "@/clients/LocalChatModel/createOfflineChatEngine/createMockOfflineChatEngine";
-import { createWebLlmOfflineChatEngine } from "@/clients/LocalChatModel/OfflineChatResourceManager/createOfflineChatEngine/createWebLlmOfflineChatEngine";
-import { isOfflineChatMockForced } from "@/clients/LocalChatModel/OfflineChatResourceManager/createOfflineChatEngine/isOfflineChatMockForced";
-import type { MockOfflineChatResponse } from "@/clients/LocalChatModel/createOfflineChatEngine/createMockOfflineChatEngine";
+import { createMockOfflineChatEngine } from "@/stores/OfflineChatResourceManager/createOfflineChatEngine/createMockOfflineChatEngine";
+import { createWebLlmOfflineChatEngine } from "@/stores/OfflineChatResourceManager/createOfflineChatEngine/createWebLlmOfflineChatEngine";
+import { isOfflineChatMockForced } from "@/stores/OfflineChatResourceManager/createOfflineChatEngine/isOfflineChatMockForced";
+import type { MockOfflineChatResponse } from "@/stores/OfflineChatResourceManager/createOfflineChatEngine/createMockOfflineChatEngine";
 import type { OfflineChatEngine } from "$/types/offlineChat.types";
 
 /** Creates the configured offline chat engine for production or mock use. */
