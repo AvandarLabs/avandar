@@ -1,7 +1,7 @@
 import { where } from "@utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { OfflineChatSchemaCache } from "./OfflineChatSchemaCache";
-import { truncateSchemaForOffline } from "@/components/ChatPanel/offlineChatHelpers/truncateSchemaForOffline/truncateSchemaForOffline";
+import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
+import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";

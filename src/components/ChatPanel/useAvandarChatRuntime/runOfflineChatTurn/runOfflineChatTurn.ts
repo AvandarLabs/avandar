@@ -1,12 +1,12 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { propEq } from "@utils";
-import { ensureOfflineChatSchema } from "@/components/ChatPanel/offlineChatHelpers/ensureOfflineChatSchema/ensureOfflineChatSchema";
-import { fetchOfflineChatSchema } from "./fetchOfflineChatSchema";
-import { formatOfflinePhaseAssistantText } from "./formatOfflinePhaseAssistantText";
+import { ensureOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/ensureOfflineChatSchema/ensureOfflineChatSchema";
+import { fetchOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/fetchOfflineChatSchema";
+import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { logOfflineChat } from "./logOfflineChat";
+import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
 import { OfflineChatResourceManager } from "@/clients/LocalChatModel/OfflineChatResourceManager/OfflineChatResourceManager";
-import { runOfflineChatPipeline } from "@/components/ChatPanel/offlineChatHelpers/runOfflineChatPipeline/runOfflineChatPipeline";
+import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
   OfflineChatPipelineCopy,
   OfflineChatTurnResult,

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import { resolveOfflineChatMode } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineChatMode/resolveOfflineChatMode";
+import { resolveOfflineChatMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveOfflineChatMode/resolveOfflineChatMode";
 
 describe("resolveOfflineChatMode", () => {
   beforeEach(() => {

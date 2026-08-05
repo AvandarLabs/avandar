@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OfflineLlmOutput } from "./OfflineLlmOutput";
+import { OfflineLlmOutput } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/OfflineLlmOutput/OfflineLlmOutput";
 
 describe("OfflineLlmOutput/OfflineLlmOutput", () => {
   it("parses analyze JSON", () => {

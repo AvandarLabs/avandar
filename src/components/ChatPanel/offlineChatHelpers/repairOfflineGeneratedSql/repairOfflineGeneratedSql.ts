@@ -1,11 +1,11 @@
 import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
-import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
 import { logOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/logOfflineChat";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
-import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
-import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
-import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineColumnFromError";
+import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
+import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
+import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineColumnFromError";
 import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
 import type { OfflineChatSchema } from "@/clients/LocalChatModel/offlineChat.types";
 

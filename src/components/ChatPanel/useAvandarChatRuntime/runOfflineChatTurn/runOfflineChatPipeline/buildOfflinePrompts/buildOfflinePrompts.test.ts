@@ -4,7 +4,7 @@ import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,
   buildOfflineSqlPrompt,
-} from "./buildOfflinePrompts";
+} from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/buildOfflinePrompts/buildOfflinePrompts";
 
 const DEATHS_TABLE_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 

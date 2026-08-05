@@ -5,7 +5,7 @@ import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/offlineChatHelpers/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
+import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/useChatModelCatalog/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type UseChatModelCatalogResult = {

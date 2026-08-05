@@ -1,6 +1,6 @@
 import { Parser } from "node-sql-parser";
 import { describe, expect, it } from "vitest";
-import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/forceFromTableToDatasetId/forceFromTableToDatasetId";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
 import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
 
 describe("node-sql-parser sqlify after remap", () => {
