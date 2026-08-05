@@ -1,6 +1,7 @@
 # Testing rules
 
-Rules for unit and integration tests (Vitest).
+Rules for unit and integration tests (Vitest). End-to-end (Playwright) rules
+live in [`e2e-testing.md`](e2e-testing.md).
 
 ## Every test must be able to fail for a real, behavioral reason
 

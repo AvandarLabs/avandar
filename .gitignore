@@ -86,3 +86,6 @@ worktrees/
 
 # Difit session comments
 .difit/
+
+# Temporary working files
+.temp/

@@ -1,10 +1,5 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
-import {
-  ensureCloudStorageCheckedAndSaveDataset,
-  parseDatasetIdFromDataManagerUrl,
-} from "./helpers/manualUploadCloudSyncFlow";
 import {
   deleteAllDashboardsForOwner,
   deleteDashboardsByIds,
@@ -15,16 +10,15 @@ import {
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
-const TARGET_DASHBOARD_NAME = "E2E renders-in-editor target";
-
 /**
  * End-to-end check that a bar chart saved from the Data Explorer actually
  * renders inside the target dashboard's editor.
  *
  * Exercises the full path:
- *   1. Upload a small CSV dataset.
+ *   1. Sign in (the viz is seeded from a constant query, so no dataset upload
+ *      is needed; see Step 3).
  *   2. Create + save an empty dashboard.
- *   3. Run a SQL query in the Data Explorer and switch the viz to bar.
+ *   3. Run a constant SQL query in the Data Explorer and switch the viz to bar.
  *   4. Save to the existing dashboard.
  *   5. Navigate (client-side) back to the dashboard editor.
  *   6. Assert the bar chart is visible inside the Puck canvas iframe.
@@ -53,43 +47,13 @@ test.describe("Data Explorer: save viz to dashboard", () => {
     const createdDashboardIds: string[] = [];
 
     try {
-      // Step 1: Sign in and upload the California COVID xlsx so the data
-      // explorer has a real dataset to query.
+      // Step 1: Sign in. The bar chart is seeded from a constant query in
+      // Step 3, so this test needs no uploaded dataset.
       await signInWithEmailPassword(page, {
         email: primaryUser.email,
         password: primaryUser.password,
         workspaceSlug,
       });
-
-      await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-      const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-      await uploadPanel
-        .locator('input[type="file"]')
-        .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-      await uploadPanel
-        .getByRole("button", { name: "Upload", exact: true })
-        .click();
-
-      await expect(
-        page.getByText("Data processed successfully", { exact: false }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-      // Note: we skip `pollUntilCloudDatasetToggleShowsOnline` because the
-      // data explorer can query the local IndexedDB parquet immediately
-      // after save. Waiting for cloud sync would blow the 45s budget.
-      await ensureCloudStorageCheckedAndSaveDataset({
-        page,
-        workspaceSlug,
-        navigationTimeout: MEDIUM_WAIT,
-      });
-
-      const datasetId = parseDatasetIdFromDataManagerUrl({
-        url: page.url(),
-        workspaceSlug,
-      });
-      if (!datasetId) {
-        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-      }
 
       // Step 2: Create an empty dashboard via the UI, then save it so the
       // editor's "unsaved changes" flag clears.
@@ -119,16 +83,6 @@ test.describe("Data Explorer: save viz to dashboard", () => {
         { timeout: MEDIUM_WAIT },
       );
 
-      const { error: renameError } = await admin
-        .from("dashboards")
-        .update({ name: TARGET_DASHBOARD_NAME })
-        .eq("id", dashboardId);
-      if (renameError) {
-        throw new Error(
-          `Failed to rename dashboard for e2e: ${renameError.message}`,
-        );
-      }
-
       // Step 3: Go to data explorer. Mock the AI generate route as a safety
       // net (we drive SQL through the URL instead, but a stray click on the
       // AI form must never hit a paid endpoint).
@@ -140,10 +94,17 @@ test.describe("Data Explorer: save viz to dashboard", () => {
         });
       });
 
+      // Seed the bar chart from a constant query (same pattern as
+      // save-to-dashboard.spec.ts's `SELECT 1 AS mocked_column`). This test
+      // verifies the save -> render path, not dataset querying, so a literal
+      // `VALUES` result keeps it deterministic: querying an uploaded dataset by
+      // id over a full page reload races DuckDB registration (a fresh reload
+      // starts an empty DuckDB and rehydrates a stale-empty workspace-datasets
+      // list, which gates the on-demand registration in
+      // `WorkspaceQETLClient.runQuery`).
       const sql =
-        `SELECT "Admin2", SUM("daily_new_cases")::DOUBLE AS total_cases ` +
-        `FROM "${datasetId}" GROUP BY "Admin2" ORDER BY total_cases DESC ` +
-        `LIMIT 10`;
+        `SELECT * FROM (VALUES ('Riverside', 1800), ('Orange', 1600), ` +
+        `('Kern', 900), ('Fresno', 700)) AS t("Admin2", "total_cases")`;
       await page.goto(
         `/${workspaceSlug}/data-explorer?sql=${encodeURIComponent(sql)}`,
       );
@@ -168,40 +129,28 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       });
 
       // Step 5: Open Save -> Save to dashboard, pick the dashboard we made.
+      // `deleteAllDashboardsForOwner` ran first, so this is the only dashboard
+      // in the list; select it without depending on its (default) name.
       await page.getByRole("button", { name: /^save$/i }).click();
       await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
-      await listbox
-        .getByRole("option", { name: TARGET_DASHBOARD_NAME })
-        .click();
+      await listbox.getByRole("option").first().click();
 
       await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
-      // Toast confirms the save hit the database. We navigate via the
-      // sidebar (instead of the toast link) because Mantine notifications
-      // auto-dismiss quickly and a slow CI click can miss them.
-      await expect(
-        page.getByText(`Added to "${TARGET_DASHBOARD_NAME}"`),
-      ).toBeVisible({ timeout: LONG_WAIT });
+      // Toast confirms the save hit the database.
+      await expect(page.getByText(/^Added to /)).toBeVisible({
+        timeout: LONG_WAIT,
+      });
 
-      await page.getByRole("link", { name: /^dashboards$/i }).click();
-      await expect(page).toHaveURL(
-        new RegExp(`/${workspaceSlug}/dashboards/?$`),
-        { timeout: SHORT_WAIT },
-      );
-      // The dashboard card wraps the title text in a Mantine Card with a
-      // JS onClick (no link role), so target the card root and click that.
-      const dashboardCard = page
-        .locator('[class*="mantine-Card-root"]')
-        .filter({ hasText: TARGET_DASHBOARD_NAME })
-        .first();
-      await dashboardCard.click();
-      await expect(page).toHaveURL(
-        new RegExp(`/dashboards/edit/${dashboardId}`),
-        { timeout: MEDIUM_WAIT },
-      );
+      // Step 6 setup: open the dashboard editor directly by id. The DataViz
+      // block was saved with a constant query, so it renders from a fresh page
+      // load without any dataset/DuckDB state; a hard navigation is safe here
+      // and avoids the flaky sidebar-link + card click on the reflowing Data
+      // Explorer canvas.
+      await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
 
       await expect(page.getByLabel("loading")).toBeHidden({
         timeout: LONG_WAIT,

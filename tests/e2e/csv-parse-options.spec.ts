@@ -16,7 +16,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 /**
  * Final settings hard-coded so the save assertion can verify that the column
@@ -66,24 +66,62 @@ async function yieldForParseOptionsCommit(page: Page): Promise<void> {
   });
 }
 
+/**
+ * Sets a controlled parse-option input and retries until the new value holds.
+ *
+ * The parse controls are React-controlled inputs whose value the reparse
+ * mutation also writes back (from its own request) in `onSuccess`; see
+ * `useLoadManualUploadFile`. If a set lands while a prior reparse is still
+ * settling, that late `setDataSourceMetadata` can revert the field to the
+ * previous value, and a one-shot `fill` never re-applies it. Retrying
+ * `apply()` until the field both reaches and holds the value defeats the race.
+ * This only hardens the test's timing (a human never edits faster than the
+ * async reparse); it is not covering for behavior a user would hit.
+ */
+async function _setParseOptionUntilStuck(options: {
+  page: Page;
+  input: Locator;
+  blurTo: Locator;
+  expectedValue: string;
+  apply: () => Promise<void>;
+}): Promise<void> {
+  const { page, input, blurTo, expectedValue, apply } = options;
+  await expect(async () => {
+    await apply();
+    await blurTo.focus();
+    await expect(input).toHaveValue(expectedValue, { timeout: SHORT_WAIT });
+  }).toPass({ timeout: MEDIUM_WAIT });
+  await yieldForParseOptionsCommit(page);
+}
+
 async function setSkipRows(page: Page, value: number): Promise<void> {
   const skipInput = page.getByLabel("Number of rows to skip");
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
-  await skipInput.click();
-  await skipInput.press("ControlOrMeta+a");
-  await skipInput.pressSequentially(String(value), { delay: 30 });
-  await delimiterInput.focus();
-  await expect(skipInput).toHaveValue(String(value), { timeout: MEDIUM_WAIT });
-  await yieldForParseOptionsCommit(page);
+  await _setParseOptionUntilStuck({
+    page,
+    input: skipInput,
+    blurTo: delimiterInput,
+    expectedValue: String(value),
+    apply: async () => {
+      await skipInput.click();
+      await skipInput.press("ControlOrMeta+a");
+      await skipInput.pressSequentially(String(value), { delay: 30 });
+    },
+  });
 }
 
 async function setDelimiter(page: Page, value: string): Promise<void> {
   const delimiterInput = page.getByLabel("Delimiter", { exact: true });
   const skipInput = page.getByLabel("Number of rows to skip");
-  await delimiterInput.fill(value);
-  await skipInput.focus();
-  await expect(delimiterInput).toHaveValue(value, { timeout: MEDIUM_WAIT });
-  await yieldForParseOptionsCommit(page);
+  await _setParseOptionUntilStuck({
+    page,
+    input: delimiterInput,
+    blurTo: skipInput,
+    expectedValue: value,
+    apply: () => {
+      return delimiterInput.fill(value);
+    },
+  });
 }
 
 async function clickReparse(page: Page): Promise<void> {

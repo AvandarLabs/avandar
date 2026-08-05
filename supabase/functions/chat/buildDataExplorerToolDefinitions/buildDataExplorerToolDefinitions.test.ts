@@ -1,4 +1,4 @@
-import { buildDataExplorerToolDefinitions } from "@sbfn/chat/dataExplorerToolDefinitions/dataExplorerToolDefinitions.ts";
+import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
 import { describe, expect, it } from "vitest";
 
 describe("buildDataExplorerToolDefinitions", () => {

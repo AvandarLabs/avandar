@@ -30,6 +30,15 @@ type ChatDashboardBlockResponse = {
 };
 
 test.describe("dashboard chat → P-block", () => {
+  // NOTE: this spec uploads the full California CSV (~14,700 rows), so by the
+  // row-count guideline it looks like a `freshBrowserPage` candidate. It
+  // intentionally stays on the shared `page`: its flake mode is the opposite of
+  // a slow parse on an *aged* process. The heavy Puck dashboard-editor route
+  // (recharts inside a Puck iframe) is slow to warm up *cold*, so the asserted
+  // chart misses its timeout on the first load. It needs a *warm* process, so a
+  // freshly-launched browser (`freshBrowserPage`) makes it worse, not better.
+  // The large upload here is only a precondition; the asserted chart runs a
+  // constant mock SQL, not the dataset.
   test("typing a chart request in chat appends a DataViz block to the dashboard", async ({
     page,
     e2eWorkerDb,
@@ -87,8 +96,10 @@ test.describe("dashboard chat → P-block", () => {
       { timeout: LONG_WAIT },
     );
 
-    // Open the chat panel.
-    const chatToggle = page.getByRole("button", { name: /Ask Avandar/i });
+    // Open the chat panel. The toggle in the AppToolbar is labelled
+    // "Open chat panel" when collapsed (see ChatAsideToggle); a fresh browser
+    // context always starts collapsed.
+    const chatToggle = page.getByRole("button", { name: /open chat panel/i });
     if (await chatToggle.isVisible()) {
       await chatToggle.click();
     }

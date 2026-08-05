@@ -26,6 +26,12 @@ export function useChatPageContext(): ChatPageContext.T {
         lastError: lastQueryError,
       });
     }
+    if (pathname.includes("/dashboards")) {
+      const dashboardId = pathname.match(
+        /\/dashboards\/edit\/([0-9a-f-]{36})/i,
+      )?.[1];
+      return ChatPageContext.createDashboardsViewContext({ dashboardId });
+    }
     if (
       pathname.includes("/data-import") ||
       pathname.includes("/data-sources")

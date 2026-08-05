@@ -61,8 +61,12 @@ async function expectExcelParsePreview(options: {
 }
 
 test.describe("Excel manual upload", () => {
+  // Runs in its own fresh browser process (see `freshBrowserPage`): the large
+  // XLSX (17k+ rows) DuckDB-WASM parse is slow enough that, on an aged shared
+  // process late in the run, it can exceed its timeout. A clean process removes
+  // that flakiness.
   test("medium-sized XLSX dataset import, cloud sync, offline then online again", async ({
-    page,
+    freshBrowserPage: page,
     e2eWorkerDb,
   }) => {
     const admin = createSupabaseAdminClient();

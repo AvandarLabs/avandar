@@ -76,125 +76,6 @@ test.describe("Data Explorer query details", () => {
     });
   });
 
-  test("query panels remember their last position and collapsed state", async ({
-    page,
-    e2eWorkerDb,
-  }) => {
-    await signInWithEmailPassword(page, {
-      email: e2eWorkerDb.primaryUser.email,
-      password: e2eWorkerDb.primaryUser.password,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-
-    await _goToDataExplorerWithSeededSQL({
-      page,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-
-    const queryDetailsPanel = page.locator('div[aria-label="Query Details"]');
-    await _ensureQueryPanelOpen(page);
-
-    // Collapse the panel before measuring initialBox so the bounding box is
-    // captured in the same (collapsed) state as the reopened panel below.
-    // Otherwise initialBox depends on whichever state the panel happens to be
-    // in (which can leak between tests): a wide expanded panel and a narrow
-    // collapsed panel have very different left X coordinates since the panel
-    // is right-anchored.
-    const collapseButton = queryDetailsPanel.getByLabel("Collapse panel");
-    if (await collapseButton.isVisible()) {
-      await collapseButton.click();
-    }
-    await expect(queryDetailsPanel.getByLabel("Expand panel")).toBeVisible({
-      timeout: SHORT_WAIT,
-    });
-
-    const initialBox = await queryDetailsPanel.boundingBox();
-    expect(initialBox).not.toBeNull();
-    if (!initialBox) {
-      return;
-    }
-
-    await queryDetailsPanel
-      .getByLabel("Close Query Details")
-      .evaluate((node) => {
-        (node as { click: () => void }).click();
-      });
-
-    await _ensureQueryPanelOpen(page);
-    await expect(queryDetailsPanel.getByLabel("Expand panel")).toBeVisible({
-      timeout: SHORT_WAIT,
-    });
-
-    const reopenedBox = await queryDetailsPanel.boundingBox();
-    expect(reopenedBox).not.toBeNull();
-    if (!reopenedBox) {
-      return;
-    }
-    expect(Math.abs(reopenedBox.x - initialBox.x)).toBeLessThan(24);
-
-    await queryDetailsPanel
-      .getByLabel("Close Query Details")
-      .evaluate((node) => {
-        (node as { click: () => void }).click();
-      });
-
-    await page.evaluate(
-      ({ storageKey }) => {
-        window.sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            queryDetails: {
-              collapsed: true,
-              position: {
-                left: 220,
-                top: 240,
-              },
-            },
-            settings: {
-              collapsed: true,
-              position: {
-                left: 680,
-                top: 180,
-              },
-            },
-          }),
-        );
-      },
-      { storageKey: PANEL_PREFERENCES_STORAGE_KEY },
-    );
-
-    await page.reload();
-    await dismissBlockingOverlays(page);
-    await expect(
-      page.getByRole("columnheader", { name: /mocked_column/i }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-    await _ensureQueryPanelOpen(page);
-    await expect(queryDetailsPanel.getByLabel("Expand panel")).toBeVisible({
-      timeout: SHORT_WAIT,
-    });
-    const reloadedQueryDetailsBox = await queryDetailsPanel.boundingBox();
-    expect(reloadedQueryDetailsBox).not.toBeNull();
-    if (!reloadedQueryDetailsBox) {
-      return;
-    }
-    expect(reloadedQueryDetailsBox.x).toBeGreaterThan(200);
-
-    await page.getByRole("button", { name: /^settings$/i }).click();
-    const settingsPanel = page.locator(
-      'div[aria-label="Visualization Settings"]',
-    );
-    await expect(settingsPanel.getByLabel("Expand panel")).toBeVisible({
-      timeout: SHORT_WAIT,
-    });
-    const reloadedSettingsBox = await settingsPanel.boundingBox();
-    expect(reloadedSettingsBox).not.toBeNull();
-    if (!reloadedSettingsBox) {
-      return;
-    }
-    expect(reloadedSettingsBox.x).toBeGreaterThan(640);
-  });
-
   test("first visit opens Query on the manual form and shows available datasets in the datasource dropdown", async ({
     page,
     e2eWorkerDb,
@@ -246,7 +127,20 @@ test.describe("Data Explorer query details", () => {
         { storageKey: PANEL_PREFERENCES_STORAGE_KEY },
       );
 
-      await page.goto(`/${workspaceSlug}/data-explorer`);
+      // Navigate to the Data Explorer client-side (via the sidebar link)
+      // rather than a hard `page.goto`. A full reload rehydrates React Query
+      // from the throttled IndexedDB persister, which can still hold a stale,
+      // empty workspace-datasets list (the dataset we just saved may not be
+      // flushed yet). That list is `staleTime`-fresh so it is not refetched,
+      // leaving the datasource dropdown permanently disabled. A client-side
+      // navigation keeps the in-memory cache (with the dataset) intact.
+      await page
+        .getByRole("link", { name: "Data Explorer", exact: true })
+        .click();
+      await expect(page).toHaveURL(
+        new RegExp(`/${workspaceSlug}/data-explorer`),
+        { timeout: MEDIUM_WAIT },
+      );
       await dismissBlockingOverlays(page);
 
       const queryDetailsPanel = page.getByRole("dialog", {

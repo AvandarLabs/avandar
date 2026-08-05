@@ -643,8 +643,11 @@ SKILL file.
   `expect(typeof x).toBe("function")`, which only fails if a symbol is deleted
   or renamed and stays green through any behavioral break), tests that assert
   implementation structure instead of observable behavior, placeholder tests,
-  and runtime assertions that only restate what the type system already
-  guarantees.
+  runtime assertions that only restate what the type system already
+  guarantees, and — for **e2e specs only** — direct database writes that
+  perform the behavior under test instead of driving it through the UI (direct
+  writes are for seeding preconditions before page load, teardown, bypassing
+  slow/external systems, or read-only oracles).
 
 ## Library-Gated Phases
 
