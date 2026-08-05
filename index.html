@@ -11,13 +11,14 @@
     />
     <title>Avandar</title>
     <!--
-      The app runs under Cross-Origin-Embedder-Policy: credentialless so the
-      whisper.cpp WASM pthread build can use SharedArrayBuffer. Under that
-      policy, cross-origin iframes (Featurebase widgets, etc.) must opt into
-      `credentialless` BEFORE they navigate; setting the property after
-      insertion is too late. This installer intercepts the `src` setter on
-      `HTMLIFrameElement` and marks any cross-origin frame credentialless
-      before its first navigation.
+      The app is cross-origin isolated (COOP: same-origin + COEP:
+      credentialless, set in vercel.json) so the offline-chat WebLLM runtime
+      (`@mlc-ai/web-llm`) can use SharedArrayBuffer for its WASM pthread build.
+      Under COEP credentialless, cross-origin iframes (Featurebase widgets,
+      etc.) must opt into `credentialless` BEFORE they navigate; setting the
+      property after insertion is too late. This installer intercepts the `src`
+      setter on `HTMLIFrameElement` and marks any cross-origin frame
+      credentialless before its first navigation.
     -->
     <script>
       (function () {
