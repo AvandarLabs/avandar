@@ -11,8 +11,8 @@ import {
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
 import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+import { buildChatToolConfig } from "@sbfn/chat/PostChatMessages/prompt/buildChatToolConfig.ts";
 import {
-  buildChatToolConfig,
   buildRetryContextNote,
   dashboardsSystemPrefix,
   dataExplorerSystemPrefix,

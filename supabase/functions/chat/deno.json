@@ -8,6 +8,7 @@
     "@modules/": "../../../packages/shared/modules/src/",
     "@utils/": "../../../packages/shared/utils/src/",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "ts-pattern": "npm:ts-pattern@5",
     "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
   },

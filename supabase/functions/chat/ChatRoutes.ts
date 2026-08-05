@@ -6,7 +6,7 @@ import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 
 /** Combines the chat endpoint definitions into the chat edge function API. */
 export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
-  "/models": GetChatModels,
-  "/:workspaceId/messages": PostChatMessages,
-  "/:workspaceId/session-secret": GetChatSessionSecret,
+  "/models": { GET: GetChatModels },
+  "/:workspaceId/messages": { POST: PostChatMessages },
+  "/:workspaceId/session-secret": { GET: GetChatSessionSecret },
 });
