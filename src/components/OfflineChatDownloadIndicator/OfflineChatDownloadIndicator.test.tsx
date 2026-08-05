@@ -4,13 +4,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
 import { render, screen } from "@/test-utils";
 import { OfflineChatDownloadIndicator } from "./OfflineChatDownloadIndicator";
-import type { OfflineChatManagerStatus } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
+import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 
 let mockStatus: OfflineChatManagerStatus = { kind: "idle" };
 
-vi.mock("@/hooks/localChatModels/useOfflineChatManagerStatus", () => {
+vi.mock("@/hooks/localChatModels/useOfflineChatEngineStatus", () => {
   return {
-    useOfflineChatManagerStatus: () => {
+    useOfflineChatEngineStatus: () => {
       return mockStatus;
     },
   };

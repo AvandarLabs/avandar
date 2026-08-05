@@ -14,17 +14,17 @@ const { deleteModelMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/hooks/localChatModels/useOfflineChatManagerStatus", () => {
+vi.mock("@/hooks/localChatModels/useOfflineChatEngineStatus", () => {
   return {
-    useOfflineChatManagerStatus: () => {
+    useOfflineChatEngineStatus: () => {
       return { kind: "idle" as const };
     },
   };
 });
 
-vi.mock("@/stores/OfflineChatResourceStore/OfflineChatResourceStore", () => {
+vi.mock("@/stores/OfflineChatEngineStore/OfflineChatEngineStore", () => {
   return {
-    OfflineChatResourceStore: {
+    OfflineChatEngineStore: {
       ensureEngine: vi.fn(),
       deleteModel: deleteModelMock,
     },

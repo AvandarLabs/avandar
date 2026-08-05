@@ -2,7 +2,7 @@ import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Progress, Text } from "@mantine/core";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
-import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
+import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import css from "./OfflineChatDownloadIndicator.module.css";
 
 /**
@@ -12,7 +12,7 @@ import css from "./OfflineChatDownloadIndicator.module.css";
 export function OfflineChatDownloadIndicator(): JSX.Element | null {
   const { t } = useLingui();
   const getLocalChatModelCopy = useLocalChatModelCopy();
-  const status = useOfflineChatManagerStatus();
+  const status = useOfflineChatEngineStatus();
 
   if (status.kind !== "downloading") {
     return null;

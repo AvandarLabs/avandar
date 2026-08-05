@@ -5,7 +5,7 @@ import { modals } from "@mantine/modals";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import { useOfflineChatManagerStatus } from "@/hooks/localChatModels/useOfflineChatManagerStatus";
+import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import { createOfflineChatModelSettingsModalChildren } from "./OfflineChatModelSettingsModalContents";
 
 type Props = {
@@ -21,7 +21,7 @@ export function OfflineChatDownloadControl({
   disabled = false,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const managerStatus = useOfflineChatManagerStatus();
+  const managerStatus = useOfflineChatEngineStatus();
   // The store reads below are non-reactive snapshots; forceUpdate re-runs them
   // when the manager becomes ready or the downloaded list changes.
   const forceUpdate = useForceUpdate();

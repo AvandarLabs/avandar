@@ -5,7 +5,7 @@ import { fetchOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRun
 import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/formatOfflinePhaseAssistantText";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
-import { OfflineChatResourceStore } from "@/stores/OfflineChatResourceStore/OfflineChatResourceStore";
+import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import type {
   OfflineChatPipelineCopy,
@@ -58,7 +58,7 @@ export async function runOfflineChatTurn(
   });
 
   const modelId = args.localChatModelId ?? LocalChatModelStore.readSelectedId();
-  const engine = await OfflineChatResourceStore.ensureEngine(modelId);
+  const engine = await OfflineChatEngineStore.ensureEngine(modelId);
 
   const pipelineMessages = args.messages.map((message) => {
     return {
