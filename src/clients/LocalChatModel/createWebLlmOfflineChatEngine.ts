@@ -19,7 +19,7 @@ type MlcEngine = {
   };
 };
 
-export type WebLLMEngineFactory = (
+export type WebLlmEngineFactory = (
   mlcModelId: string,
   initProgressCallback?: (report: { text: string; progress: number }) => void,
 ) => Promise<MlcEngine>;
@@ -31,7 +31,7 @@ export type WebLLMEngineFactory = (
 export function createWebLlmOfflineChatEngine(args: {
   modelId: LocalChatModel.Id;
   onDownloadProgress?: (report: { text: string; progress: number }) => void;
-  factory?: WebLLMEngineFactory;
+  factory?: WebLlmEngineFactory;
 }): OfflineChatEngine {
   const catalog = LocalChatModel.Catalog.find(args.modelId);
   let enginePromise: Promise<MlcEngine> | undefined;
