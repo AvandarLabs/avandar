@@ -12,7 +12,7 @@ export const OFFLINE_DATASET_FUSE_THRESHOLD = 0.38;
  * Picks the workspace dataset whose label is closest to `searchText` using
  * fuzzy matching. Used when exact or token-heuristic resolution fails.
  */
-export function fuseMatchOfflineDatasetByName(args: {
+export function fuzzyMatchOfflineDatasetByName(args: {
   searchText: string;
   datasets: readonly OfflineChatSchemaDataset[];
 }): OfflineChatSchemaDataset | undefined {

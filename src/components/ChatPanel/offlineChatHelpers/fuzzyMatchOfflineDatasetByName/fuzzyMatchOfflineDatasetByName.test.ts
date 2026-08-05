@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName";
+import { fuzzyMatchOfflineDatasetByName } from "./fuzzyMatchOfflineDatasetByName";
 
 const DATASETS = [
   { id: "id-deaths", name: "LONG_us_deaths.csv" },
   { id: "id-cases", name: "LONG_us_confirmed_cases.csv" },
 ] as const;
 
-describe("fuseMatchOfflineDatasetByName", () => {
+describe("fuzzyMatchOfflineDatasetByName", () => {
   it("matches a typo-heavy label to the closest dataset name", () => {
-    const matched = fuseMatchOfflineDatasetByName({
+    const matched = fuzzyMatchOfflineDatasetByName({
       searchText: "long_us_deths",
       datasets: DATASETS,
     });
@@ -16,7 +16,7 @@ describe("fuseMatchOfflineDatasetByName", () => {
   });
 
   it("returns undefined when nothing is close enough", () => {
-    const matched = fuseMatchOfflineDatasetByName({
+    const matched = fuzzyMatchOfflineDatasetByName({
       searchText: "completely unrelated inventory table",
       datasets: DATASETS,
     });

@@ -1,5 +1,5 @@
 import { propEq } from "@utils";
-import { fuseMatchOfflineDatasetByName } from "./fuseMatchOfflineDatasetByName/fuseMatchOfflineDatasetByName";
+import { fuzzyMatchOfflineDatasetByName } from "./fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
 
@@ -84,12 +84,12 @@ export function matchOfflineDatasetTable(args: {
     return best;
   }
 
-  const fuseMatch = fuseMatchOfflineDatasetByName({
+  const fuzzyMatch = fuzzyMatchOfflineDatasetByName({
     searchText: ref,
     datasets: args.datasets,
   });
-  if (fuseMatch) {
-    return fuseMatch;
+  if (fuzzyMatch) {
+    return fuzzyMatch;
   }
 
   if (args.preferredDatasetId) {

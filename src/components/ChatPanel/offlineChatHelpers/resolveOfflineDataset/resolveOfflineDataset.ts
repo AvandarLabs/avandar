@@ -1,5 +1,5 @@
 import { propEq } from "@utils";
-import { fuseMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuseMatchOfflineDatasetByName/fuseMatchOfflineDatasetByName";
+import { fuzzyMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
 import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offlineChatHelpers/OfflineDatasetLabelMatch";
 import type {
@@ -12,7 +12,7 @@ const MIN_LABEL_MATCH_SCORE = 2;
 
 /**
  * Picks the workspace dataset that best matches the user question. Tries exact
- * and token heuristics first, then a fuzzy (Fuse.js) match of the dataset names
+ * and token heuristics first, then a fuzzy match of the dataset names
  * against the prompt text, then falls back to the currently open dataset.
  */
 export function resolveOfflineDataset(args: {
@@ -68,21 +68,21 @@ export function resolveOfflineDataset(args: {
     return best;
   }
 
-  const fuseFromPrompt = fuseMatchOfflineDatasetByName({
+  const fuzzyFromPrompt = fuzzyMatchOfflineDatasetByName({
     searchText: args.lastUserPrompt,
     datasets: args.schema.datasets,
   });
-  if (fuseFromPrompt) {
-    return fuseFromPrompt;
+  if (fuzzyFromPrompt) {
+    return fuzzyFromPrompt;
   }
 
   if (analyzeRef) {
-    const fuseFromAnalyze = fuseMatchOfflineDatasetByName({
+    const fuzzyFromAnalyze = fuzzyMatchOfflineDatasetByName({
       searchText: analyzeRef,
       datasets: args.schema.datasets,
     });
-    if (fuseFromAnalyze) {
-      return fuseFromAnalyze;
+    if (fuzzyFromAnalyze) {
+      return fuzzyFromAnalyze;
     }
   }
 
