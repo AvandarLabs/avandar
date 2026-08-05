@@ -1,9 +1,9 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { createMockOfflineChatEngine } from "./createMockOfflineChatEngine";
 import { createWebLlmOfflineChatEngine } from "./createWebLlmOfflineChatEngine";
-import { isOfflineChatMockForced } from "./isOfflineChatMockForced";
+import { isOfflineChatMockForced } from "../isOfflineChatMockForced";
 import type { MockOfflineChatResponse } from "./createMockOfflineChatEngine";
-import type { OfflineChatEngine } from "./offlineChat.types";
+import type { OfflineChatEngine } from "../offlineChat.types";
 
 /** Creates the configured offline chat engine for production or mock use. */
 export function createOfflineChatEngine(args: {
