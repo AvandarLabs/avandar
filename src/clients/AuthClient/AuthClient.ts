@@ -5,6 +5,8 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
+import { ServerApiSessionRefresher } from "@clients";
+import { notifyExpiredSession } from "@ui";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { isDesktop } from "$/platform/isDesktop";
 import { PlatformRegistry } from "@/config/platform/PlatformRegistry/PlatformRegistry";
@@ -107,6 +109,12 @@ type AuthClient = {
    * Resets the manual sign out flag.
    */
   resetManualSignOut: () => void;
+
+  /**
+   * Wires the app's reaction to an unrecoverable session expiry (a `401`
+   * that a token refresh could not fix). Call once at startup.
+   */
+  registerSessionExpiredHandler: () => void;
 };
 
 /**
@@ -348,6 +356,20 @@ function createAuthClient(): AuthClient {
 
     resetManualSignOut: (): void => {
       _self.isManuallySignedOut = false;
+    },
+
+    registerSessionExpiredHandler: (): void => {
+      // On expiry we show the "session expired" toast and clear the stale
+      // local session. Clearing the session (rather than routing to `/signin`
+      // directly) lets the existing `SIGNED_OUT` -> `useAuth` -> `_auth`
+      // `beforeLoad` machinery do the redirect, which preserves the return-to
+      // URL. We deliberately clear the session at the Supabase layer rather
+      // than through this client's `signOut`, so it is not recorded as a
+      // manual sign-out and the redirect keeps its `redirect` search param.
+      ServerApiSessionRefresher.setOnExpired(() => {
+        notifyExpiredSession();
+        void AvaSupabase.db().auth.signOut({ scope: "local" });
+      });
     },
   };
 }

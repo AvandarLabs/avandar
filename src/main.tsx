@@ -15,7 +15,7 @@ import { createRoot } from "react-dom/client";
 import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
-import { registerSessionExpiredHandler } from "@/lib/auth/registerSessionExpiredHandler";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
@@ -26,7 +26,7 @@ AGGridModuleRegistry.registerModules([AllCommunityModule]);
 
 registerOfflineServiceWorker();
 
-registerSessionExpiredHandler();
+AuthClient.registerSessionExpiredHandler();
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MainWrapper() {
