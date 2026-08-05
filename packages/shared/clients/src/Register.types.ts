@@ -5,9 +5,9 @@
  *
  * @example
  * ```ts
- * import type { Database } from "@clients/database.types";
+ * import type { Database } from "$/types/database.types.ts";
  *
- * declare module "@avandar/clients" {
+ * declare module "@clients/Register.types.ts" {
  *   interface Register {
  *     supabaseDatabase: Database;
  *   }
