@@ -26,9 +26,7 @@ type Props = {
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
 
-function _makeSlugValidator(
-  i18n: I18n,
-): (value: string) => string | undefined {
+function _makeSlugValidator(i18n: I18n): (value: string) => string | undefined {
   return (value: string): string | undefined => {
     if (!value) {
       return i18n._(msg`The workspace ID cannot be empty`);

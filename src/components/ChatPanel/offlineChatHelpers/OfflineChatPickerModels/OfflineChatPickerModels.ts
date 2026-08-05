@@ -1,5 +1,5 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Model } from "@models";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 

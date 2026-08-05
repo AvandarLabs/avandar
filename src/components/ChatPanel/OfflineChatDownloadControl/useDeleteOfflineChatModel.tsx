@@ -1,11 +1,11 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback, useState } from "react";
-import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 
 type Props = {
   onDeleted: () => void;

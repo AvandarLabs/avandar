@@ -1,13 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import type {
-    DescribableValueArrayRenderOptions,
-    GenericRootData,
-    GetChildObjects,
-    NestedArrayRenderOptions,
-} from "../ObjectDescriptionList.types";
 import { ValueItemContainer } from "../ValueItemContainer";
+import type {
+  DescribableValueArrayRenderOptions,
+  GenericRootData,
+  GetChildObjects,
+  NestedArrayRenderOptions,
+} from "../ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   /** Array of arrays of field values */

@@ -140,19 +140,17 @@ export function createFileSystemDatasetBlobStore(
       }
 
       function walk(dir: string): string[] {
-        return fs
-          .readdirSync(dir, { withFileTypes: true })
-          .flatMap((entry) => {
-            const full = join(dir, entry.name);
-            if (entry.isDirectory()) {
-              return walk(full);
-            }
-            // In-flight `<final>.tmp` files are not visible to callers.
-            if (!entry.isFile() || entry.name.endsWith(".tmp")) {
-              return [];
-            }
-            return [relative(rootDir, full).split(pathSep).join("/")];
-          });
+        return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+          const full = join(dir, entry.name);
+          if (entry.isDirectory()) {
+            return walk(full);
+          }
+          // In-flight `<final>.tmp` files are not visible to callers.
+          if (!entry.isFile() || entry.name.endsWith(".tmp")) {
+            return [];
+          }
+          return [relative(rootDir, full).split(pathSep).join("/")];
+        });
       }
       return walk(baseDir);
     },

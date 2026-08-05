@@ -17,11 +17,11 @@
  */
 
 import { isDefined, propEq } from "@utils";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "$/types/offlineChat.types";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 const REFINEMENT_HINTS =
   /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;

@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { capitalize, propEq } from "@utils";
-import { appForResource } from "../shareCopy";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { appForResource } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,

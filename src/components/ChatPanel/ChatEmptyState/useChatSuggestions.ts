@@ -70,7 +70,9 @@ function _buildDataExplorerSuggestions(
     : secondGroupByColumn ?
       i18n._(msg`Count rows in ${datasetName} by ${secondGroupByColumn}`)
     : groupByColumn ?
-      i18n._(msg`What are the distinct values of ${groupByColumn} in ${datasetName}?`)
+      i18n._(
+        msg`What are the distinct values of ${groupByColumn} in ${datasetName}?`,
+      )
     : undefined,
   ].filter(isDefined);
 }

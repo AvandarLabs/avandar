@@ -1,6 +1,6 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLingui } from "@lingui/react/macro";
 import { matchLiteral } from "@utils";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback } from "react";
 
 /** Returns translated display copy for an offline chat model. */

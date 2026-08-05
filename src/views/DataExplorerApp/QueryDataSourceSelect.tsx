@@ -15,11 +15,11 @@ import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UserId } from "$/models/User/User.types";
 import type {
   QueryDataSource,
   QueryDataSourceId,
 } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { UserId } from "$/models/User/User.types";
 
 type Props = {
   value?: QueryDataSource | null;

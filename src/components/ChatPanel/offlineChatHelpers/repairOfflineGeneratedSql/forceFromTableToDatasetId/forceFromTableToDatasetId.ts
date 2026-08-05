@@ -26,7 +26,10 @@ export function forceFromTableToDatasetId(args: {
   const sql = args.sql
     .replace(/\b(FROM|JOIN)\s+"([^"]+)"/gi, replaceTable)
     .replace(/\b(FROM|JOIN)\s+`([^`]+)`/gi, replaceTable)
-    .replace(/\b(FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()/gi, replaceTable);
+    .replace(
+      /\b(FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()/gi,
+      replaceTable,
+    );
 
   return { sql, changed };
 }

@@ -1,7 +1,7 @@
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { describe, expect, it } from "vitest";
-import { createMockOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createMockOfflineChatEngine";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
+import { createMockOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createMockOfflineChatEngine";
 
 const SCHEMA = {
   datasets: [{ id: "ds-1", name: "Sales" }],

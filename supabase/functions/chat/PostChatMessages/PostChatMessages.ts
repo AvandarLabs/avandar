@@ -1,4 +1,5 @@
 import { Model } from "@models/Model/Model.ts";
+import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
@@ -21,7 +22,6 @@ import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWo
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
-import { AvaModelSchema } from "@models/zod/index.ts";
 import { z } from "zod";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 

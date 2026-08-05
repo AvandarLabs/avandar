@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import type { Database } from "$/types/database.types";
+import type { Database } from "$/types/database.types.ts";
 
 type ResourceType = Database["public"]["Enums"]["resource_type"];
 

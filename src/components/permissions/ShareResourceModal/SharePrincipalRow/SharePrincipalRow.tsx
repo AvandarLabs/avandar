@@ -9,9 +9,9 @@ import {
 } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { appForResource, useShareCopy } from "../shareCopy";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { appForResource, useShareCopy } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,

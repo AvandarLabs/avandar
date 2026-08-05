@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
-import { matchLiteral } from "@utils";
-import type { AppType } from "$/models/Permissions/Permissions.types";
+import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
+import type { AppType } from "$/models/Permissions/Permissions.types.ts";
 
 /**
  * Returns the human-readable label for a workspace app ("Data Sources",

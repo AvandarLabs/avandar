@@ -1,8 +1,8 @@
 import { prop } from "@utils";
 import { Parser } from "node-sql-parser";
-import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
+import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
 import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineColumnFromError";

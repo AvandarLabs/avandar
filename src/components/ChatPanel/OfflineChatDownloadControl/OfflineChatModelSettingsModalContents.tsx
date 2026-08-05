@@ -1,15 +1,15 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select, Stack, Text } from "@mantine/core";
 import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifyError, notifySuccess } from "@ui";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback, useEffect, useState } from "react";
+import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
+import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
-import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
-import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import { DownloadedModelList } from "./DownloadedModelList";
 import { useDeleteOfflineChatModel } from "./useDeleteOfflineChatModel";
 

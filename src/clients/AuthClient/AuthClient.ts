@@ -1,3 +1,4 @@
+import { ServerApiSessionRefresher } from "@clients";
 import {
   AuthChangeEvent,
   Session,
@@ -5,7 +6,6 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
-import { ServerApiSessionRefresher } from "@clients";
 import { notifyExpiredSession } from "@ui";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { isDesktop } from "$/platform/isDesktop";

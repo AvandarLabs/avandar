@@ -1368,7 +1368,10 @@ export function useDashboardPuckConfig(options: {
             },
           },
           defaultProps: {
-            items: [{ text: i18n._(msg`First point`) }, { text: i18n._(msg`Second point`) }],
+            items: [
+              { text: i18n._(msg`First point`) },
+              { text: i18n._(msg`Second point`) },
+            ],
             type: "unordered",
           },
           render: (props: ListBlockProps) => {
@@ -1453,7 +1456,9 @@ export function useDashboardPuckConfig(options: {
             if (!url) {
               return (
                 <Text c="dimmed" fz="sm">
-                  {i18n._(msg`Add a URL to embed a visualization or external content.`)}
+                  {i18n._(
+                    msg`Add a URL to embed a visualization or external content.`,
+                  )}
                 </Text>
               );
             }
@@ -1462,7 +1467,11 @@ export function useDashboardPuckConfig(options: {
               <Paper withBorder p={0} radius="sm">
                 <iframe
                   src={url}
-                  title={props.title.trim().length > 0 ? props.title : i18n._(msg`Embed`)}
+                  title={
+                    props.title.trim().length > 0 ?
+                      props.title
+                    : i18n._(msg`Embed`)
+                  }
                   loading="lazy"
                   sandbox="allow-scripts allow-presentation"
                   style={{

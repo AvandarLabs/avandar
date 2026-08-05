@@ -1,7 +1,7 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
 type Props = {
