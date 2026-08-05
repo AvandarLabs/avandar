@@ -34,7 +34,6 @@ export type ShareCopy = {
  * `ShareCopy` whose strings are localized via Lingui at call time.
  */
 export function useShareCopy(): ShareCopy {
-   
   const { t } = useLingui();
   return {
     addPlaceholder: t`Search by name or user group`,
