@@ -32,13 +32,18 @@ type ChatDashboardBlockResponse = {
 test.describe("dashboard chat → P-block", () => {
   // NOTE: this spec uploads the full California CSV (~14,700 rows), so by the
   // row-count guideline it looks like a `freshBrowserPage` candidate. It
-  // intentionally stays on the shared `page`: its flake mode is the opposite of
-  // a slow parse on an *aged* process. The heavy Puck dashboard-editor route
-  // (recharts inside a Puck iframe) is slow to warm up *cold*, so the asserted
-  // chart misses its timeout on the first load. It needs a *warm* process, so a
-  // freshly-launched browser (`freshBrowserPage`) makes it worse, not better.
-  // The large upload here is only a precondition; the asserted chart runs a
-  // constant mock SQL, not the dataset.
+  // intentionally stays on the shared `page`: the large upload here is only a
+  // precondition, and the asserted chart runs a constant mock SQL rather than
+  // the dataset, so a freshly-launched browser buys nothing.
+  //
+  // This test previously flaked because the heavy Puck editor route can finish
+  // mounting *after* the (mocked, instant) chat reply queues its DataViz block.
+  // When that happened the block was queued before `DashboardEditorView`
+  // registered the dashboard as active, and `queuePendingBlock` silently
+  // dropped it (see DashboardEditorStateManager): the chat said "Added a bar
+  // chart" but the canvas stayed empty. The state manager now buffers a block
+  // queued before the editor registers and flushes it on registration, so the
+  // ordering no longer matters.
   test("typing a chart request in chat appends a DataViz block to the dashboard", async ({
     page,
     e2eWorkerDb,

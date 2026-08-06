@@ -386,6 +386,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                 dashboardEditorDispatch.queuePendingBlock({
                   pendingId: crypto.randomUUID(),
                   block: buildPendingDashboardBlock(block),
+                  dashboardId: currentPageContext.dashboardId,
                 });
                 void AnalyticsClient.logEvent({
                   event: "dashboard.block_added_via_chat",
