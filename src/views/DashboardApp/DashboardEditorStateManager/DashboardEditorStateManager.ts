@@ -63,7 +63,9 @@ const INITIAL_STATE: DashboardEditorAppState = {
 };
 
 /** Reads the stable Puck content-item id used to de-duplicate blocks. */
-function _getBlockId(block: AvaPageData["content"][number]): string | undefined {
+function _getBlockId(
+  block: AvaPageData["content"][number],
+): string | undefined {
   const id: unknown = (block as { props?: { id?: unknown } }).props?.id;
   return typeof id === "string" ? id : undefined;
 }
