@@ -110,10 +110,6 @@ msgstr "Au {0} ili kuarifiwa wakati uzinduzi wetu wa umma uko tayari."
 msgid "Right span"
 msgstr ""
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
-#~ msgstr "Hesabu safu katika {datasetName} kwa {pickedGroupBy}"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Tafuta datasets..."
@@ -254,7 +250,9 @@ msgstr "Maelezo"
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
 "differed from the import preview and have been overwritten with the "
 "actual values."
-msgstr ""
+msgstr "Aina za safu zilizogundulika kwa {changedCount} safu katika "
+"\"{sourceFileName}\" zilitofautiana na muonekano wa kuagiza na "
+"zimeandikwa upya kwa thamani halisi."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
@@ -436,7 +434,7 @@ msgstr "Haiwezi kuonyesha {chartName}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
-msgstr ""
+msgstr "Seti ya data ilishindwa kushughulika"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -461,17 +459,6 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "Hakuna datasets zilizoongezwa bado"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-#~ "queried\" — uploads just the columns your visualizations read. Widen the "
-#~ "scope if you've added viewer-editable filters and want viewers to be "
-#~ "able to filter beyond your defaults."
-#~ msgstr "Chagua kiasi gani cha kila dataset kuchapishwa. Kiwango cha kawaida — "
-#~ "\"Tu kile kilichoulizwa\" — kinapakia tu safu ambazo mwangaza wako "
-#~ "unasoma. Panua upeo ikiwa umeongeza filtria zinazoweza kuhaririwa na "
-#~ "watazamaji na unataka watazamaji waweze kuchuja zaidi ya viwango vyako "
-#~ "vya kawaida."
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -623,7 +610,11 @@ msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
 "able to filter beyond your defaults."
-msgstr ""
+msgstr "Chagua kiasi gani cha kila seti ya data kuchapisha. Chaguo la msingi: "
+"\"Tu kile kinachoulizwa\": hupakia tu safu ambazo picha zako zinatumia. "
+"Panua wigo ikiwa umeongeza vichujio vinavyoweza kuhaririwa na "
+"watazamaji na unataka watazamaji waweze kuchuja zaidi ya chaguo zako za "
+"msingi."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
@@ -876,15 +867,6 @@ msgstr "Makundi ya watumiaji"
 msgid "Type your answer…"
 msgstr "Andika jibu lako..."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-#~ msgstr "Kuchapisha kunafanya dashibodi hii iweze kuonekana na mtu yeyote mwenye "
-#~ "kiungo — hakuna akaunti ya Avandar inahitajika. Seti za data "
-#~ "zinazotajwa na dashibodi zinakopishwa kwenye hifadhi ya umma wakati wa "
-#~ "kuchapisha."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "Kurekebisha nenosiri kumeshindikana"
@@ -961,13 +943,7 @@ msgstr "Kawaida"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
-msgstr ""
-
-#: src/routes/_auth/(no-workspace)/index.tsx
-#~ msgid "It's time to create your first workspace. Don't think for too long—you "
-#~ "can always change these later!"
-#~ msgstr "Ni wakati wa kuunda eneo lako la kazi la kwanza. Usifikirie kwa muda "
-#~ "mrefu—unaweza kila wakati kubadilisha haya baadaye!"
+msgstr "Wakati"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1049,7 +1025,8 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
-msgstr ""
+msgstr "Chapisha kila safu, mistari yote. Ufanisi mkubwa kwa watazamaji, "
+"uonyeshaji mkubwa."
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
@@ -1129,11 +1106,6 @@ msgstr "\"{0}\" sasa iko katika eneo lako la kazi."
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Profile fields"
 msgstr "Sehemu za wasifu"
-
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Delete — {0}"
-#~ msgstr "Futa — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1375,7 +1347,9 @@ msgstr "Njia za Malipo"
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
 "the import preview and have been overwritten with the actual values."
-msgstr ""
+msgstr "Aina za safu zilizogundulika kwa safu 1 katika \"{sourceFileName}\" "
+"zilitofautiana na muonekano wa kuagiza na zimeandikwa upya kwa thamani "
+"halisi."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1448,7 +1422,7 @@ msgstr "Pendekezo lililotumika"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr ""
+msgstr "\"{sourceFileName}\" imekamilisha usindikaji na iko tayari kutumika."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1490,7 +1464,7 @@ msgstr "Unganisha na Google Sheets"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
-msgstr ""
+msgstr "Uonyeshaji wa Data"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -2033,7 +2007,7 @@ msgstr "{0} safu zimebainishwa. Angalia taarifa za safu hapa chini ili "
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
-msgstr ""
+msgstr "maandishi"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
@@ -2095,7 +2069,8 @@ msgstr "S/H"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
-msgstr ""
+msgstr "Chapisha tu safu ambazo dashibodi yako inasoma. Nyembamba zaidi, "
+"binafsi zaidi."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
@@ -2127,7 +2102,7 @@ msgstr "Rudi kwa mhariri"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
-msgstr ""
+msgstr "takriban dakika moja"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
@@ -2143,7 +2118,8 @@ msgstr "Tafadhali angalia barua yako pepe"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
-msgstr ""
+msgstr "Chagua safu na ongeza vikwazo vya mistari (enum, anuwai ya nambari, "
+"anuwai ya tarehe)."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
@@ -2169,7 +2145,7 @@ msgstr "Hii ni nambari isiyo sahihi ya orodha ya kusubiri"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
-msgstr ""
+msgstr "Tafadhali jaribu tena."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Field Name"
@@ -2506,7 +2482,7 @@ msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
-msgstr ""
+msgstr "chini ya dakika moja"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2560,12 +2536,6 @@ msgstr "Safu ya ukubwa wa alama lazima iwe ya nambari."
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (chaguo la kawaida)"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-#~ "columns:}}"
-#~ msgstr "{numCols, plural, one {Itachapisha # safu:} other {Itachapisha # "
-#~ "safu:}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -2828,7 +2798,7 @@ msgstr "Tazama"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
-msgstr ""
+msgstr "Haipatikani"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -2967,11 +2937,6 @@ msgstr ""
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Mfululizo"
-
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
-#~ msgstr "Hifadhi mabadiliko yako kwanza — PDF inaonyesha dashibodi "
-#~ "iliyohifadhiwa."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
@@ -3129,7 +3094,7 @@ msgstr "Chagua thamani inayojirudia zaidi"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Please try again. The PDF was not created."
-msgstr ""
+msgstr "Tafadhali jaribu tena. PDF haikuundwa."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
@@ -3141,7 +3106,7 @@ msgstr "Shiriki muhtasari"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
-msgstr ""
+msgstr "Wakati"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -3415,7 +3380,7 @@ msgstr "Ongeza mfululizo"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
-msgstr ""
+msgstr "Tarehe"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -3501,7 +3466,7 @@ msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye "
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
-msgstr ""
+msgstr "Puuza vichujio vyote vya kimataifa: uonyeshaji huu haujafichwa."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
@@ -3555,10 +3520,6 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
 msgstr "Mipangilio ya kushiriki dashibodi imeboreshwa."
-
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#~ msgid "Ignore all global filters — this visualization is unfiltered."
-#~ msgstr "Puuza filters zote za kimataifa — picha hii haina filters."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
@@ -3640,7 +3601,7 @@ msgstr "Mara kwa mara ya sasisho"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr ""
+msgstr "\"{sourceFileName}\" haiwezi kuchambuliwa: {message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
@@ -3692,7 +3653,7 @@ msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Please try again. Your dashboard has not been published."
-msgstr ""
+msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
@@ -3810,7 +3771,7 @@ msgstr "Pakia"
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about {0} minutes"
-msgstr ""
+msgstr "takriban {0} dakika"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3870,7 +3831,7 @@ msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
-msgstr ""
+msgstr "Aina za safu zimeboreshwa"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3887,10 +3848,6 @@ msgstr "Hariri kuuliza"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "Mchambuzi wa Data"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
-#~ msgstr "Hesabu mistari katika {datasetName} kwa {secondGroupBy}"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
@@ -3937,11 +3894,12 @@ msgstr "Imekopiwa!"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "date"
-msgstr ""
+msgstr "tarehe"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
-msgstr ""
+msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
+"kuchapisha."
 
 #: src/routes/register.tsx
 msgid "A confirmation email has been sent to your email address."
@@ -3983,7 +3941,7 @@ msgstr "Ingiza karatasi za kazi, ungana na Google Sheets, au ongeza data kutoka 
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Please try again later."
-msgstr ""
+msgstr "Tafadhali jaribu tena baadaye."
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
@@ -4083,12 +4041,6 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 msgstr "Kila series ni wingu moja la mipira. Safu ya ukubwa inaamua radius ya "
 "mpira."
 
-#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
-#~ "offline."
-#~ msgstr "Pakua mfano wa mazungumzo ya mtandaoni (ikoni ya wingu) ili kuuliza "
-#~ "maswali wakati wa kutokuwa mtandaoni."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "Kichupo hiki hakina metadata ya safu. Hakiwezi kuingizwa bado."
@@ -4103,7 +4055,8 @@ msgstr "Maelezo ya safu yameboreshwa kwa mafanikio!"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
-msgstr ""
+msgstr "Hifadhi mabadiliko yako kwanza: PDF inaonyesha dashibodi "
+"iliyohifadhiwa."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
@@ -4142,11 +4095,6 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "Seti hii ya data ni kubwa, hivyo tumetumia kikomo cha safu 100. Unaweza "
 "kubadilisha wakati wowote."
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
-#~ msgstr "Dashibodi hii haina viungo vyovyote vya seti za data - hakuna "
-#~ "kinachoweza kuchapishwa."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -4223,7 +4171,7 @@ msgstr "Jukumu la {displayName}"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
-msgstr ""
+msgstr "Kagua kabla ya kutuma"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -4306,7 +4254,10 @@ msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required. Datasets referenced by the dashboard are "
 "copied to public storage at publish time."
-msgstr ""
+msgstr "Kuchapisha kunafanya dashibodi hii iweze kuonekana na mtu yeyote mwenye "
+"kiungo, hakuna akaunti ya Avandar inahitajika. Seti za data "
+"zinazorejelewa na dashibodi zinakopishwa kwenye hifadhi ya umma wakati "
+"wa kuchapisha."
 
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
@@ -4447,14 +4398,9 @@ msgstr "Bado huna akaunti?"
 msgid "Dataset failed to load"
 msgstr "Dataset ilishindwa kupakia"
 
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Save — {0}"
-#~ msgstr "Hifadhi — {0}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
-msgstr ""
+msgstr "Decimal"
 
 #: packages/web/ui/src/notifications/notify.ts
 msgid "Error"
@@ -4627,7 +4573,7 @@ msgstr "Usajili umeboreshwa kwa mafanikio"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "{0, plural, one {Will publish # column:} other {Will publish # "
 "columns:}}"
-msgstr ""
+msgstr "{0, plural, one {Itachapisha # safu:} other {Itachapisha # safu:}}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -4811,11 +4757,6 @@ msgstr "Hujachagua safu ya thamani"
 msgid "Text contains"
 msgstr "Maandishi yana"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
-#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-#~ msgstr "Ili kuthibitisha, andika <0>{MEDICAL_CONFIRMATION_PHRASE}</0> hapa "
-#~ "chini:"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
 msgstr "Jukumu la kushiriki mpya"
@@ -4826,7 +4767,7 @@ msgstr "Panua paneli"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
-msgstr ""
+msgstr "Tuma kwa AI?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4853,10 +4794,6 @@ msgstr "Hakuna safu zilizosomeka kwa mafanikio"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "New user group"
 msgstr "Kikundi kipya cha mtumiaji"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-#~ msgstr "Ni nini thamani tofauti za {pickedGroupBy} katika {datasetName}?"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
@@ -4988,7 +4925,7 @@ msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
-msgstr ""
+msgstr "Seti ya data iko tayari"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H2"
@@ -5055,7 +4992,7 @@ msgstr "Imesitishwa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
-msgstr ""
+msgstr "nambari"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -5527,7 +5464,7 @@ msgstr "Mchoro ({strokeWidth}px)"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
-msgstr ""
+msgstr "Nambari kamili"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -5549,7 +5486,7 @@ msgstr "Faili ya CSV au Excel"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
-msgstr ""
+msgstr "Dashibodi haijapakiwa bado."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -5582,7 +5519,7 @@ msgstr "Habari DateValueItem"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
-msgstr ""
+msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -5703,7 +5640,7 @@ msgstr "+{0} thamani zaidi zimefungwa kwenye {1} safu"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
-msgstr ""
+msgstr "Inashughulika, {remainingLabel} iliyobaki"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Loose"

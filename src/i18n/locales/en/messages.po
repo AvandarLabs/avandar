@@ -111,10 +111,6 @@ msgstr "Or {0} to be notified when our public launch is ready."
 msgid "Right span"
 msgstr "Right span"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
-#~ msgstr "Count rows in {datasetName} by {pickedGroupBy}"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Search datasets..."
@@ -463,16 +459,6 @@ msgstr "Llama 3.1 8B (offline)"
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "No datasets added yet"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-#~ "queried\" — uploads just the columns your visualizations read. Widen the "
-#~ "scope if you've added viewer-editable filters and want viewers to be "
-#~ "able to filter beyond your defaults."
-#~ msgstr "Choose how much of each dataset to publish. The default — \"Only what's "
-#~ "queried\" — uploads just the columns your visualizations read. Widen "
-#~ "the scope if you've added viewer-editable filters and want viewers to "
-#~ "be able to filter beyond your defaults."
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -878,14 +864,6 @@ msgstr "User groups"
 msgid "Type your answer…"
 msgstr "Type your answer…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-#~ msgstr "Publishing makes this dashboard viewable by anyone with the link — no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "Password reset failed"
@@ -963,12 +941,6 @@ msgstr "Custom"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Timestamp"
-
-#: src/routes/_auth/(no-workspace)/index.tsx
-#~ msgid "It's time to create your first workspace. Don't think for too long—you "
-#~ "can always change these later!"
-#~ msgstr "It's time to create your first workspace. Don't think for too long—you "
-#~ "can always change these later!"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1131,11 +1103,6 @@ msgstr "\"{0}\" is now in your workspace."
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Profile fields"
 msgstr "Profile fields"
-
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Delete — {0}"
-#~ msgstr "Delete — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -2562,12 +2529,6 @@ msgstr "Symbol size column must be numeric."
 msgid "Avandar (default)"
 msgstr "Avandar (default)"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-#~ "columns:}}"
-#~ msgstr "{numCols, plural, one {Will publish # column:} other {Will publish # "
-#~ "columns:}}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
 msgstr "Wide"
@@ -2969,10 +2930,6 @@ msgstr "Llama 3.2 1B (offline)"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Series"
-
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
-#~ msgstr "Save your changes first — the PDF reflects the saved dashboard."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
@@ -3553,10 +3510,6 @@ msgstr "you@example.com"
 msgid "Dashboard share settings updated."
 msgstr "Dashboard share settings updated."
 
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#~ msgid "Ignore all global filters — this visualization is unfiltered."
-#~ msgstr "Ignore all global filters — this visualization is unfiltered."
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
 msgstr "Sketch"
@@ -3884,10 +3837,6 @@ msgstr "Edit query"
 msgid "Data Explorer"
 msgstr "Data Explorer"
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
-#~ msgstr "Count rows in {datasetName} by {secondGroupBy}"
-
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
 msgstr "Sign in again"
@@ -4078,12 +4027,6 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 msgstr "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 
-#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
-#~ "offline."
-#~ msgstr "Download an offline chat model (cloud icon) to ask questions while "
-#~ "offline."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "This catalog entry has no column metadata. It cannot be imported yet."
@@ -4137,10 +4080,6 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
-#~ msgstr "This dashboard doesn't reference any datasets — nothing to publish."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -4438,11 +4377,6 @@ msgstr "Don't have an account yet?"
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
 msgstr "Dataset failed to load"
-
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Save — {0}"
-#~ msgstr "Save — {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
@@ -4803,10 +4737,6 @@ msgstr "You haven't chosen a value column"
 msgid "Text contains"
 msgstr "Text contains"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
-#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-#~ msgstr "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
 msgstr "Role for new share"
@@ -4843,10 +4773,6 @@ msgstr "No rows were read successfully"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "New user group"
 msgstr "New user group"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-#~ msgstr "What are the distinct values of {pickedGroupBy} in {datasetName}?"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"

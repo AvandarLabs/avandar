@@ -113,10 +113,6 @@ msgstr "Ou {0} para ser notificado quando nosso lançamento público estiver "
 msgid "Right span"
 msgstr ""
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {pickedGroupBy}"
-#~ msgstr "Conte as linhas em {datasetName} por {pickedGroupBy}"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Pesquisar conjuntos de dados..."
@@ -257,7 +253,9 @@ msgstr "Notas"
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
 "differed from the import preview and have been overwritten with the "
 "actual values."
-msgstr ""
+msgstr "Os tipos de coluna detectados para {changedCount} colunas em "
+"\"{sourceFileName}\" diferiram da pré-visualização de importação e "
+"foram substituídos pelos valores reais."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
@@ -439,7 +437,7 @@ msgstr "Não é possível exibir {chartName}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
-msgstr ""
+msgstr "O conjunto de dados falhou ao processar"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
@@ -464,17 +462,6 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "Nenhum conjunto de dados adicionado ainda"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "Choose how much of each dataset to publish. The default — \"Only what's "
-#~ "queried\" — uploads just the columns your visualizations read. Widen the "
-#~ "scope if you've added viewer-editable filters and want viewers to be "
-#~ "able to filter beyond your defaults."
-#~ msgstr "Escolha quanto de cada conjunto de dados publicar. O padrão — \"Apenas "
-#~ "o que foi consultado\" — faz o upload apenas das colunas que suas "
-#~ "visualizações leem. Amplie o escopo se você adicionou filtros editáveis "
-#~ "pelos visualizadores e deseja que eles possam filtrar além de seus "
-#~ "padrões."
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -627,7 +614,11 @@ msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
 "able to filter beyond your defaults."
-msgstr ""
+msgstr "Escolha quanto de cada conjunto de dados publicar. O padrão: \"Apenas o "
+"que foi consultado\": faz o upload apenas das colunas que suas "
+"visualizações leem. Amplie o escopo se você adicionou filtros editáveis "
+"por visualizadores e deseja que eles possam filtrar além de seus "
+"padrões."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I understand this data will be sent to the AI provider"
@@ -880,15 +871,6 @@ msgstr "Grupos de usuários"
 msgid "Type your answer…"
 msgstr "Digite sua resposta…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link — no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-#~ msgstr "Publicar torna este painel visível para qualquer pessoa com o link — "
-#~ "nenhuma conta Avandar é necessária. Os conjuntos de dados referenciados "
-#~ "pelo painel são copiados para o armazenamento público no momento da "
-#~ "publicação."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "Falha na redefinição da senha"
@@ -965,13 +947,7 @@ msgstr "Personalizado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
-msgstr ""
-
-#: src/routes/_auth/(no-workspace)/index.tsx
-#~ msgid "It's time to create your first workspace. Don't think for too long—you "
-#~ "can always change these later!"
-#~ msgstr "É hora de criar seu primeiro espaço de trabalho. Não pense muito—você "
-#~ "pode sempre mudar isso depois!"
+msgstr "Carimbo de data/hora"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1053,7 +1029,8 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
-msgstr ""
+msgstr "Publique todas as colunas, todas as linhas. Máxima flexibilidade para "
+"visualizadores, máxima exposição."
 
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Query failed."
@@ -1133,11 +1110,6 @@ msgstr "\"{0}\" agora está no seu espaço de trabalho."
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Profile fields"
 msgstr "Campos de perfil"
-
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Delete — {0}"
-#~ msgstr "Excluir — {0}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1383,7 +1355,9 @@ msgstr "Métodos de pagamento"
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
 "the import preview and have been overwritten with the actual values."
-msgstr ""
+msgstr "Os tipos de coluna detectados para 1 coluna em \"{sourceFileName}\" "
+"diferiram da pré-visualização de importação e foram substituídos pelos "
+"valores reais."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
@@ -1456,7 +1430,7 @@ msgstr "Sugestão usada"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
-msgstr ""
+msgstr "\"{sourceFileName}\" terminou de processar e está pronto para uso."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Manual"
@@ -1498,7 +1472,7 @@ msgstr "Conectar ao Google Sheets"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
-msgstr ""
+msgstr "Visualização de Dados"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -2039,7 +2013,7 @@ msgstr "{0} colunas foram detectadas. Revise as informações das colunas abaixo
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
-msgstr ""
+msgstr "texto"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
@@ -2101,7 +2075,8 @@ msgstr "N/A"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
-msgstr ""
+msgstr "Publique apenas as colunas que seu painel lê. O mais restrito, o mais "
+"privado."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
@@ -2133,7 +2108,7 @@ msgstr "Voltar para o editor"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
-msgstr ""
+msgstr "cerca de um minuto"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
@@ -2149,7 +2124,8 @@ msgstr "Por favor, verifique seu e-mail"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
-msgstr ""
+msgstr "Escolha colunas e adicione restrições de linha (enum, intervalo "
+"numérico, intervalo de data)."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
@@ -2174,7 +2150,7 @@ msgstr "Este é um código de lista de espera inválido"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
-msgstr ""
+msgstr "Por favor, tente novamente."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Field Name"
@@ -2511,7 +2487,7 @@ msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
-msgstr ""
+msgstr "menos de um minuto"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
@@ -2566,12 +2542,6 @@ msgstr "A coluna de tamanho do símbolo deve ser numérica."
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (padrão)"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "{numCols, plural, one {Will publish # column:} other {Will publish # "
-#~ "columns:}}"
-#~ msgstr "{numCols, plural, one {Publicará # coluna:} other {Publicará # "
-#~ "colunas:}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -2834,7 +2804,7 @@ msgstr "Ver"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
-msgstr ""
+msgstr "Indisponível"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -2976,10 +2946,6 @@ msgstr ""
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Série"
-
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
-#~ msgid "Save your changes first — the PDF reflects the saved dashboard."
-#~ msgstr "Salve suas alterações primeiro — o PDF reflete o painel salvo."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Not yet published. Public viewers will not see this."
@@ -3136,7 +3102,7 @@ msgstr "Escolha o valor mais frequente"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Please try again. The PDF was not created."
-msgstr ""
+msgstr "Por favor, tente novamente. O PDF não foi criado."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Date format"
@@ -3148,7 +3114,7 @@ msgstr "Compartilhar resumo"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
-msgstr ""
+msgstr "Hora"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -3424,7 +3390,7 @@ msgstr "Adicionar séries"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -3510,7 +3476,7 @@ msgstr "Enquanto o Avandar estiver em beta, estamos permitindo registro apenas "
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
-msgstr ""
+msgstr "Ignorar todos os filtros globais: esta visualização está sem filtro."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
@@ -3564,10 +3530,6 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
 msgstr "Configurações de compartilhamento do painel atualizadas."
-
-#: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#~ msgid "Ignore all global filters — this visualization is unfiltered."
-#~ msgstr "Ignorar todos os filtros globais — esta visualização está sem filtros."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Sketch"
@@ -3649,7 +3611,7 @@ msgstr "Frequência de atualização"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
-msgstr ""
+msgstr "\"{sourceFileName}\" não pôde ser analisado: {message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
@@ -3702,7 +3664,7 @@ msgstr "Partes deste SQL não puderam ser representadas na forma Manual. A forma
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Please try again. Your dashboard has not been published."
-msgstr ""
+msgstr "Por favor, tente novamente. Seu painel não foi publicado."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
 msgid "Looking up values in {column}…"
@@ -3820,7 +3782,7 @@ msgstr "Carregar"
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about {0} minutes"
-msgstr ""
+msgstr "cerca de {0} minutos"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Select columns to query"
@@ -3880,7 +3842,7 @@ msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
-msgstr ""
+msgstr "Tipos de coluna atualizados"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Partially offline"
@@ -3897,10 +3859,6 @@ msgstr "Editar consulta"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "Explorador de Dados"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "Count rows in {datasetName} by {secondGroupBy}"
-#~ msgstr "Conte linhas em {datasetName} por {secondGroupBy}"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
@@ -3947,11 +3905,12 @@ msgstr "Copiado!"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "date"
-msgstr ""
+msgstr "data"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
-msgstr ""
+msgstr "Este painel não faz referência a nenhum conjunto de dados: nada para "
+"publicar."
 
 #: src/routes/register.tsx
 msgid "A confirmation email has been sent to your email address."
@@ -3994,7 +3953,7 @@ msgstr "Importe planilhas, conecte-se ao Google Sheets ou adicione dados de "
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Please try again later."
-msgstr ""
+msgstr "Por favor, tente novamente mais tarde."
 
 #. placeholder {0}: totalCount ?? sampleValues?.length ?? 0
 #. placeholder {1}: (totalCount ?? sampleValues?.length ?? 0) === 1 ? "" : "s"
@@ -4094,12 +4053,6 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 msgstr "Cada série é uma nuvem de bolhas. A coluna de tamanho determina o raio "
 "da bolha."
 
-#: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
-#~ msgid "Download an offline chat model (cloud icon) to ask questions while "
-#~ "offline."
-#~ msgstr "Baixe um modelo de chat offline (ícone de nuvem) para fazer perguntas "
-#~ "enquanto estiver offline."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
 msgstr "Esta entrada de catálogo não possui metadados de coluna. Não pode ser "
@@ -4115,7 +4068,7 @@ msgstr "Descrição da coluna atualizada com sucesso!"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
-msgstr ""
+msgstr "Salve suas alterações primeiro: o PDF reflete o painel salvo."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
@@ -4154,11 +4107,6 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "Este conjunto de dados é grande, então aplicamos um limite de 100 "
 "linhas. Você pode alterá-lo a qualquer momento."
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
-#~ msgid "This dashboard doesn't reference any datasets — nothing to publish."
-#~ msgstr "Este painel não faz referência a nenhum conjunto de dados — nada para "
-#~ "publicar."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -4235,7 +4183,7 @@ msgstr "Função para {displayName}"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
-msgstr ""
+msgstr "Revise antes de enviar"
 
 #: src/views/DataExplorerApp/useDataQuery.tsx
 msgid "Public queries are not supported for structured queries. Use raw SQL "
@@ -4318,7 +4266,10 @@ msgstr "Selecione um arquivo Excel ou CSV do seu computador para importar"
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required. Datasets referenced by the dashboard are "
 "copied to public storage at publish time."
-msgstr ""
+msgstr "Publicar torna este painel visível para qualquer pessoa com o link, sem "
+"necessidade de conta Avandar. Os conjuntos de dados referenciados pelo "
+"painel são copiados para o armazenamento público no momento da "
+"publicação."
 
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
@@ -4457,14 +4408,9 @@ msgstr "Ainda não tem uma conta?"
 msgid "Dataset failed to load"
 msgstr "Falha ao carregar o conjunto de dados"
 
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Save — {0}"
-#~ msgstr "Salvar — {0}"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
-msgstr ""
+msgstr "Decimal"
 
 #: packages/web/ui/src/notifications/notify.ts
 msgid "Error"
@@ -4638,7 +4584,7 @@ msgstr "Assinatura atualizada com sucesso"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "{0, plural, one {Will publish # column:} other {Will publish # "
 "columns:}}"
-msgstr ""
+msgstr "{0, plural, one {Publicará # coluna:} other {Publicará # colunas:}}"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -4822,10 +4768,6 @@ msgstr "Você não escolheu uma coluna de valor"
 msgid "Text contains"
 msgstr "Texto contém"
 
-#: src/components/Privacy/ConsentModal/ConsentModal.tsx
-#~ msgid "To confirm, type <0>{MEDICAL_CONFIRMATION_PHRASE}</0> below:"
-#~ msgstr "Para confirmar, digite <0>{MEDICAL_CONFIRMATION_PHRASE}</0> abaixo:"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
 msgstr "Função para novo compartilhamento"
@@ -4836,7 +4778,7 @@ msgstr "Expandir painel"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
-msgstr ""
+msgstr "Enviar para IA?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
@@ -4863,10 +4805,6 @@ msgstr "Nenhuma linha foi lida com sucesso"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "New user group"
 msgstr "Novo grupo de usuários"
-
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#~ msgid "What are the distinct values of {pickedGroupBy} in {datasetName}?"
-#~ msgstr "Quais são os valores distintos de {pickedGroupBy} em {datasetName}?"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
@@ -4999,7 +4937,7 @@ msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
-msgstr ""
+msgstr "Conjunto de dados pronto"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H2"
@@ -5066,7 +5004,7 @@ msgstr "Cancelado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
-msgstr ""
+msgstr "número"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -5539,7 +5477,7 @@ msgstr "Traço ({strokeWidth}px)"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
-msgstr ""
+msgstr "Número inteiro"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -5561,7 +5499,7 @@ msgstr "Arquivo CSV ou Excel"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
-msgstr ""
+msgstr "O painel ainda não foi carregado."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Editorial serif"
@@ -5594,7 +5532,7 @@ msgstr "Olá DateValueItem"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
-msgstr ""
+msgstr "Para confirmar, digite <0>{confirmationTarget}</0> abaixo:"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -5715,7 +5653,7 @@ msgstr "+{0} mais valores empatados em {1} linhas"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
-msgstr ""
+msgstr "Processando, {remainingLabel} restante"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Loose"
