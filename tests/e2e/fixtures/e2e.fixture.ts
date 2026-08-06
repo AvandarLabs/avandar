@@ -12,7 +12,7 @@ import {
   purgeE2EWorkspacesForOwner,
 } from "../setup/e2eTestWorkspaceLifecycle";
 import { ensureAuthUserExists } from "../setup/ensureAuthUser";
-import type { BrowserContext, Page, TestInfo } from "@playwright/test";
+import type { Page, TestInfo } from "@playwright/test";
 
 export { expect } from "@playwright/test";
 
@@ -54,29 +54,32 @@ type E2ETestFixtures = {
    *
    * Being a fixture, it is lazy: the extra browser launches only for tests that
    * destructure it. It mirrors the project's context options (baseURL, reduced
-   * motion, viewport) and preserves failure debuggability (screenshot on
-   * failure, trace on retry) since the config's auto-wiring only applies to the
-   * default `page`.
+   * motion, viewport) and attaches a failure screenshot, since the config's
+   * `screenshot` auto-wiring only applies to the default `page`. Tracing needs
+   * no such mirroring; see `_attachFreshPageFailureArtifacts`.
    */
   freshBrowserPage: Page;
 };
 
 /**
- * Mirrors the project's failure debuggability for a `freshBrowserPage`
- * context: attaches a screenshot when the test failed and stops any
- * in-progress trace, writing the trace file only on failure. Never throws, so
- * cleanup always proceeds.
+ * Mirrors the project's `screenshot: "only-on-failure"` for a
+ * `freshBrowserPage`. Never throws, so cleanup always proceeds.
+ *
+ * Tracing is deliberately not handled here: Playwright's own
+ * `ArtifactsRecorder` hooks context creation and close for **every** context
+ * made through the `playwright` fixture, including one created by hand with
+ * `browser.newContext()`. It therefore already applies the config's
+ * `trace: "on-first-retry"` to this context and writes the trace on close.
+ * Starting a trace here as well threw `tracing.start: Tracing has been already
+ * started` on every retry, so no retry of a `freshBrowserPage` spec could pass.
  */
 async function _attachFreshPageFailureArtifacts(options: {
   page: Page;
-  context: BrowserContext;
   testInfo: TestInfo;
-  traceThisRun: boolean;
 }): Promise<void> {
-  const { page, context, testInfo, traceThisRun } = options;
+  const { page, testInfo } = options;
   const failed = testInfo.status !== testInfo.expectedStatus;
   if (failed) {
-    // Mirror the project's `screenshot: "only-on-failure"`.
     await page
       .screenshot()
       .then((body) => {
@@ -85,11 +88,6 @@ async function _attachFreshPageFailureArtifacts(options: {
           contentType: "image/png",
         });
       })
-      .catch(() => {});
-  }
-  if (traceThisRun) {
-    await context.tracing
-      .stop(failed ? { path: testInfo.outputPath("trace.zip") } : {})
       .catch(() => {});
   }
 }
@@ -128,25 +126,13 @@ export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
         reducedMotion: "reduce",
       });
 
-      // Mirror the project's `trace: "on-first-retry"`.
-      const traceThisRun = testInfo.retry > 0;
-      if (traceThisRun) {
-        await context.tracing.start({
-          screenshots: true,
-          snapshots: true,
-          sources: true,
-        });
-      }
-
       const page = await context.newPage();
       try {
         await use(page);
       } finally {
         await _attachFreshPageFailureArtifacts({
           page,
-          context,
           testInfo,
-          traceThisRun,
         });
         await context.close().catch(() => {});
       }

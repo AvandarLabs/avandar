@@ -48,6 +48,18 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       // Pre-bundling adds node polyfills to Emscripten glue; breaks workers.
       exclude: ["@duckdb/duckdb-wasm"],
+
+      // SheetJS is imported only by `src/workers/xlsxSniff.worker.ts`, which is
+      // reached through a `?worker` import. Vite's startup dependency scanner
+      // does not crawl into worker modules, so against a cold
+      // `node_modules/.vite` it stays unbundled until the browser first
+      // requests the worker, which happens mid-import right after the user
+      // uploads an XLSX. Vite then optimizes it and broadcasts a full page
+      // reload ("new dependencies optimized: xlsx"), wiping the import form's
+      // file state. Listing it here pre-bundles it at server start instead.
+      // Locally the cache is warm so the reload never fires; CI starts cold
+      // every run, which is why only CI saw it.
+      include: ["xlsx"],
     },
     plugins:
       mode === "test" ?
