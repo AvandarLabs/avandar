@@ -33,7 +33,7 @@ export type DashboardsApi = APITypeDef<
       POST: {
         body: {
           slug: string;
-          dashboardId: string | undefined;
+          dashboardId?: string;
         };
         returnType:
           | {

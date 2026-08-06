@@ -1,8 +1,4 @@
-import {
-  defineRoutes,
-  GET,
-  MiniServer,
-} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getAuthURL } from "@sbfn/google-auth/getAuthURL.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
 import { z } from "zod";
@@ -43,5 +39,3 @@ export const GoogleAuthRoutes = defineRoutes<GoogleAuthAPI>("google-auth", {
     }),
   },
 });
-
-MiniServer(Routes).serve();

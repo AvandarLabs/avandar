@@ -84,7 +84,7 @@ export function parseDashboardBlock(
   }
 
   return match(kind)
-    .with("DataViz", () => {
+    .with("DataViz", (): ChatGeneratedDashboardBlock | undefined => {
       const prompt = _trimString(parsed.prompt);
       const sqlRaw = _trimString(parsed.sql);
       const vizTypeRaw = _trimString(parsed.vizType);
@@ -98,7 +98,7 @@ export function parseDashboardBlock(
       }
       return { kind: "DataViz", prompt, sql, vizType };
     })
-    .with("HeadingBlock", () => {
+    .with("HeadingBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const text = _trimString(parsed.text);
       if (!text) {
         return undefined;
@@ -122,7 +122,7 @@ export function parseDashboardBlock(
         ...(align ? { align } : {}),
       };
     })
-    .with("ParagraphBlock", () => {
+    .with("ParagraphBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const text = _trimString(parsed.text);
       if (!text) {
         return undefined;
@@ -134,7 +134,7 @@ export function parseDashboardBlock(
         : undefined;
       return { kind: "ParagraphBlock", text, ...(align ? { align } : {}) };
     })
-    .with("QuoteBlock", () => {
+    .with("QuoteBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const quote = _trimString(parsed.quote);
       if (!quote) {
         return undefined;
@@ -142,10 +142,10 @@ export function parseDashboardBlock(
       const cite = _trimString(parsed.cite);
       return { kind: "QuoteBlock", quote, ...(cite ? { cite } : {}) };
     })
-    .with("DividerBlock", () => {
+    .with("DividerBlock", (): ChatGeneratedDashboardBlock | undefined => {
       return { kind: "DividerBlock" };
     })
-    .with("CalloutBlock", () => {
+    .with("CalloutBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const title = _trimString(parsed.title);
       const body = _trimString(parsed.body);
       if (!title || !body) {
@@ -158,7 +158,7 @@ export function parseDashboardBlock(
         : undefined;
       return { kind: "CalloutBlock", title, body, ...(tone ? { tone } : {}) };
     })
-    .with("ListBlock", () => {
+    .with("ListBlock", (): ChatGeneratedDashboardBlock | undefined => {
       if (!Array.isArray(parsed.items)) {
         return undefined;
       }
@@ -179,7 +179,7 @@ export function parseDashboardBlock(
         : undefined;
       return { kind: "ListBlock", items, ...(listType ? { listType } : {}) };
     })
-    .with("CodeBlock", () => {
+    .with("CodeBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const code = _trimString(parsed.code);
       if (!code) {
         return undefined;
@@ -187,7 +187,7 @@ export function parseDashboardBlock(
       const language = _trimString(parsed.language);
       return { kind: "CodeBlock", code, ...(language ? { language } : {}) };
     })
-    .with("TableBlock", () => {
+    .with("TableBlock", (): ChatGeneratedDashboardBlock | undefined => {
       const data = _trimString(parsed.data);
       if (!data) {
         return undefined;
@@ -206,7 +206,7 @@ export function parseDashboardBlock(
         ...(hasHeader !== undefined ? { hasHeader } : {}),
       };
     })
-    .with("Card", () => {
+    .with("Card", (): ChatGeneratedDashboardBlock | undefined => {
       const title = _trimString(parsed.title);
       return title ? { kind: "Card", title } : undefined;
     })

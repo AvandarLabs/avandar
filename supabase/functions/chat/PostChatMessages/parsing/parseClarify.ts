@@ -52,6 +52,7 @@ export function parseClarify(
     return undefined;
   }
 
+  const question = parsed.question.trim();
   const rationale =
     typeof parsed.rationale === "string" ?
       parsed.rationale.trim() || undefined
@@ -63,9 +64,9 @@ export function parseClarify(
 
   const turnNumber = (priorClarifications + 1) as 1 | 2 | 3;
   return match(shape.kind)
-    .with("free_text", () => {
+    .with("free_text", (): ChatClarifyRequest => {
       return {
-        question: parsed.question.trim(),
+        question,
         rationale,
         responseShape: {
           kind: "free_text",
@@ -76,7 +77,7 @@ export function parseClarify(
         turnNumber,
       };
     })
-    .with("fixed_options", () => {
+    .with("fixed_options", (): ChatClarifyRequest | undefined => {
       if (!Array.isArray(shape.options)) {
         return undefined;
       }
@@ -89,7 +90,7 @@ export function parseClarify(
         return undefined;
       }
       return {
-        question: parsed.question.trim(),
+        question,
         rationale,
         responseShape: {
           kind: "fixed_options",
@@ -99,7 +100,7 @@ export function parseClarify(
         turnNumber,
       };
     })
-    .with("discovery", () => {
+    .with("discovery", (): ChatClarifyRequest | undefined => {
       if (typeof shape.query !== "string" || typeof shape.column !== "string") {
         return undefined;
       }
@@ -109,7 +110,7 @@ export function parseClarify(
         return undefined;
       }
       return {
-        question: parsed.question.trim(),
+        question,
         rationale,
         responseShape: {
           kind: "discovery",
