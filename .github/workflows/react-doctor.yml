@@ -9,6 +9,11 @@ name: React Doctor
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    # `feat/ict4d-demo` is the demo branch and runs no CI. Excluded here so
+    # PRs *into* it are skipped; the job-level `if` below covers PRs *out* of
+    # it. See also the `if` guard in pr-develop.yaml.
+    branches-ignore:
+      - feat/ict4d-demo
   # Scans `main` on every push so you get a health-score trend on the
   # default branch — useful for tracking the overall number commit-by-commit
   # and catching regressions that slipped past PR review. PR-specific steps
@@ -39,6 +44,9 @@ concurrency:
 
 jobs:
   react-doctor:
+    # Skip PRs opened *from* the demo branch. `branches-ignore` above only
+    # filters the base branch, so this covers the other direction.
+    if: github.head_ref != 'feat/ict4d-demo'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
