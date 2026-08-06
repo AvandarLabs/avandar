@@ -120,5 +120,5 @@ jobs:
           version: 2.98.2
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - run: supabase db push --include-all
       - run: supabase functions deploy
