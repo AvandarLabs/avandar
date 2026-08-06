@@ -55,6 +55,10 @@ declare -A _development_env=(
   # Pipeline Server
   [AVA_PIPELINE_SERVER_URL]="http://127.0.0.1:4611"
   [AVA_PIPELINE_SERVER_SECRET]="$AVA_PIPELINE_SERVER_SECRET"
+
+  # OpenAI
+  [OPENAI_API_KEY]="$OPENAI_API_KEY"
+  [OPEN_ROUTER_API_KEY]="$OPEN_ROUTER_API_KEY"
 )
 
 cp .env.example $ENV_FILE_NAME
