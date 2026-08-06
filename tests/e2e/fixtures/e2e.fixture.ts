@@ -54,24 +54,31 @@ type E2ETestFixtures = {
    *
    * Being a fixture, it is lazy: the extra browser launches only for tests that
    * destructure it. It mirrors the project's context options (baseURL, reduced
-   * motion, viewport) and attaches a failure screenshot, since the config's
-   * `screenshot` auto-wiring only applies to the default `page`. Tracing needs
-   * no such mirroring; see `_attachFreshPageFailureArtifacts`.
+   * motion, viewport) and adds a fallback failure screenshot; see
+   * `_attachFreshPageFailureArtifacts` for why Playwright's own screenshot and
+   * trace wiring already reaches this context.
    */
   freshBrowserPage: Page;
 };
 
 /**
- * Mirrors the project's `screenshot: "only-on-failure"` for a
- * `freshBrowserPage`. Never throws, so cleanup always proceeds.
+ * Attaches a failure screenshot for a `freshBrowserPage`, as a fallback for
+ * Playwright's own capture. Never throws, so cleanup always proceeds.
  *
- * Tracing is deliberately not handled here: Playwright's own
- * `ArtifactsRecorder` hooks context creation and close for **every** context
- * made through the `playwright` fixture, including one created by hand with
- * `browser.newContext()`. It therefore already applies the config's
- * `trace: "on-first-retry"` to this context and writes the trace on close.
- * Starting a trace here as well threw `tracing.start: Tracing has been already
- * started` on every retry, so no retry of a `freshBrowserPage` spec could pass.
+ * Playwright's `ArtifactsRecorder` does cover this context: it hooks every
+ * context made through the `playwright` fixture, including one built by hand
+ * with `browser.newContext()`, so both `screenshot: "only-on-failure"` and
+ * `trace: "on-first-retry"` already apply. Tracing therefore must not be
+ * mirrored here: starting a trace as well threw `tracing.start: Tracing has
+ * been already started` on every retry, so no retry of a `freshBrowserPage`
+ * spec could pass.
+ *
+ * The screenshot is still worth duplicating. Playwright caps its own capture
+ * at a hardcoded 5s that config cannot raise, and it marks the page as
+ * snapshotted before attempting, so one slow capture silently loses the
+ * screenshot for the whole test. These specs fail mid heavy DuckDB-WASM parse
+ * with the renderer blocked, which is exactly when that 5s is missed, and this
+ * capture runs afterwards with no such cap.
  */
 async function _attachFreshPageFailureArtifacts(options: {
   page: Page;
