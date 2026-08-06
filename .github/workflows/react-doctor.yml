@@ -52,6 +52,12 @@ jobs:
       - uses: actions/checkout@v5
 
       - uses: millionco/react-doctor@v1
+        with:
+          # Pinned to test whether a pre-2026-07-12 release avoids the upstream
+          # "exited with status 0 before producing a JSON report" bug
+          # (stdout-flush race). 0.7.1 is the last version verified green in our
+          # CI (run #23, 2026-07-07). See millionco/react-doctor#1242.
+          version: "0.7.1"
         # Common configuration knobs — uncomment any to override the default.
         # Full reference: https://www.react.doctor/ci
         # with:
