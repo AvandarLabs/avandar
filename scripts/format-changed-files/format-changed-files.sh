@@ -71,12 +71,30 @@ fi
 # Stage 3: resolve the base branch
 #
 # Find the merge-base between HEAD and the upstream integration branch so we
-# only format files that this branch actually touched. Prefer `origin/develop`
-# (Gitflow default for this repo) and fall back to `origin/main`. If neither
-# ref exists locally we bail out cleanly: nothing to format yet.
+# only format files that this branch actually touched. Feature branches and
+# `develop` prefer `origin/develop` (Gitflow default for this repo) and fall
+# back to `origin/main`.
+#
+# `main` inverts that preference. Releases land on `main` as standalone
+# snapshot commits that are not descendants of the `develop` commits whose
+# trees they mirror, so the two branches share no recent history: a merge-base
+# against `origin/develop` reaches back to whenever they last touched, which is
+# months. That made every release push treat the whole accumulated release diff
+# as "changed" and re-format ~1700 files, and any one of them that predated
+# this hook would then trip the "formatters rewrote files" guard below and
+# block the push. Basing on `origin/main` scopes the set to the release itself.
+#
+# If neither ref exists locally we bail out cleanly: nothing to format yet.
 # ---------------------------------------------------------------------------
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+if [ "$CURRENT_BRANCH" = "main" ]; then
+  BASE_REFS=(origin/main origin/develop)
+else
+  BASE_REFS=(origin/develop origin/main)
+fi
+
 BASE=""
-for ref in origin/develop origin/main; do
+for ref in "${BASE_REFS[@]}"; do
   if git rev-parse --verify "$ref" >/dev/null 2>&1; then
     if BASE=$(git merge-base HEAD "$ref" 2>/dev/null) && [ -n "$BASE" ]; then
       break
