@@ -1,0 +1,17 @@
+/*
+ * Static layout styles for the series-aware viz settings form. Extracted
+ * from inline `style` props so the markup stays declarative and the
+ * values are reused across the form.
+ */
+
+/* Column picker wrapper that grows to fill its row while allowing the
+ * inner Select to shrink below its content width. */
+.flexFillMinW0 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The "what is a series?" info icon uses a help cursor on hover. */
+.helpCursor {
+  cursor: help;
+}

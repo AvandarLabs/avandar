@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import type { UnknownObject } from "@utils/types/common.types";
-import type { IdentityFnType } from "@utils/types/utilities.types";
+import type { UnknownObject } from "@utils";
 import type { Paths, Simplify } from "type-fest";
 
 type GetPathTail<Path, PathHead extends string> =
@@ -66,8 +65,7 @@ export type GetKeyAndPropsFn<
 
 export function useKeysAndPropsCallback<
   FormValues extends UnknownObject,
-  TransformValues extends (values: FormValues) => unknown =
-    IdentityFnType<FormValues>,
+  TransformValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 >(
   form: MantineUseFormReturnType<FormValues, TransformValues>,

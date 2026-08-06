@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { Tables } from "$/types/database.types.ts";
 import type {
   WorkspaceId,
-  WorkspaceModel,
   WorkspaceRole,
   WorkspaceWithSubscription,
 } from "$/models/Workspace/Workspace.types.ts";
+import type { WorkspaceModel } from "$/models/Workspace/WorkspaceParsers.ts";
 
 export { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers.ts";
 
@@ -14,5 +13,4 @@ export namespace Workspace {
   export type Id = WorkspaceId;
   export type Role = WorkspaceRole;
   export type WithSubscription = WorkspaceWithSubscription;
-  export type Invite = Tables<"workspace_invites">;
 }

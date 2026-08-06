@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/queries/queries.routes.ts";
+import { QueriesRoutes } from "@sbfn/queries/QueriesRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(QueriesRoutes).serve();

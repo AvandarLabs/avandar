@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>dif · web shell</title>
+  <link rel="stylesheet" href="/__wrap/shell.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="icon-btn" id="toggleSide" title="Toggle guide" aria-label="Toggle guide sidebar">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <div class="brand">
+          <span class="mark" id="brandTitle">dif</span>
+          <span class="wt-pill" id="worktreePill" title="worktree" hidden></span>
+          <button class="changes-btn" id="showChangesBtn" type="button" hidden title="The working tree changed — reload difit + the guide in place (keeps your in-progress comment)">
+            <svg class="rfx" width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13.5 2.5V5H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Show new changes</span>
+          </button>
+        </div>
+      </div>
+      <div class="view-info" id="viewInfo"></div>
+      <div class="tb-right">
+        <div class="view-prog" id="viewProg"></div>
+        <button class="cmd-btn" id="cmdBtn" type="button" title="Command palette">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span class="cmd-lbl">Jump to…</span>
+          <kbd class="cmd-kbd" id="cmdKbd">⌘K</kbd>
+        </button>
+        <button class="theme-btn" id="themeBtn" type="button">Theme</button>
+      </div>
+    </header>
+
+    <div class="body" id="bodyEl">
+      <aside class="sidebar" aria-label="Diff guide">
+        <div class="side-head">
+          <span class="st">Diff guide</span>
+          <button class="regen-btn" id="regenBtn" type="button" hidden title="A file was added or removed since the guide was generated - refresh it (asks the LLM via /diff-review)">
+            <svg class="regen-ic" width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13.5 2.5V5H11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="regen-lbl">Refresh diff guide</span>
+          </button>
+          <span class="prog" id="sideProg"></span>
+          <button class="icon-btn" id="collapseBtn" title="Collapse" aria-label="Collapse guide">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 3l-4 5 4 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="side-tabs" role="tablist" aria-label="Diff guide panels">
+          <button class="side-tab active" id="guideTab" type="button" role="tab" aria-selected="true">Diff guide</button>
+          <button class="side-tab" id="testPlanTab" type="button" role="tab" aria-selected="false">Test plan</button>
+        </div>
+        <div class="side-scroll" id="sideScroll"></div>
+      </aside>
+
+      <nav class="rail" id="rail" aria-label="Collapsed group nav"></nav>
+
+      <main class="main">
+        <div class="iframe-wrap">
+          <div class="loading" id="loading"><span class="spinner"></span> Loading difit…</div>
+          <div class="ifr-error" id="ifrError" hidden>
+            <div class="ifr-error-box">
+              <p class="ifr-error-msg">difit didn’t load.</p>
+              <p class="ifr-error-sub">The diff server may still be starting or was restarted.</p>
+              <button class="retry-btn" id="ifrRetry" type="button">Retry</button>
+            </div>
+          </div>
+          <iframe id="difit" title="difit diff viewer" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- command palette (spotlight) -->
+  <div class="spotlight" id="spotlight" hidden>
+    <div class="sl-backdrop" id="slBackdrop"></div>
+    <div class="sl-modal" role="dialog" aria-modal="true" aria-label="Command palette">
+      <div class="sl-input-wrap">
+        <svg class="sl-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input class="sl-input" id="slInput" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Jump to a file, group, or view — type a number for a group" aria-label="Command palette search" />
+      </div>
+      <div class="sl-list" id="slList" role="listbox"></div>
+      <div class="sl-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> open</span>
+        <span><kbd>esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+
+  <script src="/__wrap/shell.js"></script>
+</body>
+</html>

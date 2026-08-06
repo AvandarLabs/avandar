@@ -1,4 +1,4 @@
-import { promiseMap } from "@/lib/utils/promises";
+import { promiseMap } from "@utils";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { GenericSeedJob } from "scripts/SeedRunner";
@@ -34,12 +34,24 @@ export const SeedJobs = [
           displayName: string;
           role: Workspace.Role;
         }) => {
+          const builtinRoleGroupName =
+            user.role === "admin" ? "Global Admin" : "Global Viewer";
+
+          const { data: roleGroup } = await dbClient
+            .from("role_groups")
+            .select("id")
+            .eq("workspace_id", insertedWorkspace.id)
+            .eq("name", builtinRoleGroupName)
+            .single()
+            .throwOnError();
+
           // create the workspace membership row
           const { data: membership } = await dbClient
             .from("workspace_memberships")
             .insert({
               user_id: user.id,
               workspace_id: insertedWorkspace.id,
+              role_group_id: roleGroup.id,
             })
             .select()
             .single()
@@ -51,14 +63,6 @@ export const SeedJobs = [
             workspace_id: insertedWorkspace.id,
             full_name: user.fullName,
             display_name: user.displayName,
-            membership_id: membership.id,
-          });
-
-          // create the user role
-          await dbClient.from("user_roles").insert({
-            user_id: user.id,
-            workspace_id: insertedWorkspace.id,
-            role: user.role,
             membership_id: membership.id,
           });
         };

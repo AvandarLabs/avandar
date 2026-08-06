@@ -1,5 +1,5 @@
-import { isArray } from "@utils/guards/isArray/isArray";
-import type { UnknownObject } from "@utils/types/common.types";
+import { isArray } from "@utils";
+import type { UnknownObject } from "@utils";
 import type { SetRequired } from "type-fest";
 
 /**

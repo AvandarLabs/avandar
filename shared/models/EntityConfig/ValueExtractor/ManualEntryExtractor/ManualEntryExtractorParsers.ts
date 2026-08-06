@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
@@ -61,7 +61,7 @@ export const ManualEntryExtractorParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = ManualEntryExtractorModel;
+type CrudTypes = ManualEntryExtractorModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -69,7 +69,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

@@ -1,5 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconPencil } from "@tabler/icons-react";
-import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
+import { ActionIcon } from "../ActionIcon/ActionIcon";
 import type { ActionIconProps } from "@mantine/core";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 
@@ -30,20 +31,6 @@ type Props =
 
 const DEFAULT_ICON_SIZE = 16;
 
-const defaultButtonProps: ActionIconProps & HTMLButtonProps = {
-  variant: "default",
-  size: "md",
-  color: "neutral",
-  "aria-label": "Edit",
-};
-
-const defaultAnchorProps: ActionIconProps & HTMLAnchorProps = {
-  variant: "subtle",
-  size: "md",
-  color: "neutral",
-  "aria-label": "Edit",
-};
-
 /**
  * A button used in situations to trigger an "Edit". Renders as a
  * pencil icon by default.
@@ -54,6 +41,22 @@ export function EditButton({
   withTooltip = true,
   ...props
 }: Props): JSX.Element {
+  const { t } = useLingui();
+
+  const defaultButtonProps: ActionIconProps & HTMLButtonProps = {
+    variant: "default",
+    size: "md",
+    color: "neutral",
+    "aria-label": t`Edit`,
+  };
+
+  const defaultAnchorProps: ActionIconProps & HTMLAnchorProps = {
+    variant: "subtle",
+    size: "md",
+    color: "neutral",
+    "aria-label": t`Edit`,
+  };
+
   const passThroughProps =
     as === "button" ?
       {
@@ -70,8 +73,8 @@ export function EditButton({
       tooltip={
         withTooltip ?
           props.name ?
-            `Edit ${props.name}`
-          : "Edit"
+            t`Edit ${props.name}`
+          : t`Edit`
         : undefined
       }
       {...passThroughProps}

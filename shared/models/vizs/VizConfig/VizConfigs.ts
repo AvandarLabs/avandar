@@ -1,44 +1,22 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import {
-  AreaChartVizConfigs,
-} from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfigs.ts";
-import {
-  BarChartVizConfigs,
-} from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
-import {
-  BubbleChartVizConfigs,
-} from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfigs.ts";
-import {
-  FunnelChartVizConfigs,
-} from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfigs.ts";
-import {
-  LineChartVizConfigs,
-} from "$/models/vizs/LineChartVizConfig/LineChartVizConfigs.ts";
-import {
-  PieChartVizConfigs,
-} from "$/models/vizs/PieChartVizConfig/PieChartVizConfigs.ts";
-import {
-  RadarChartVizConfigs,
-} from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfigs.ts";
-import {
-  ScatterPlotVizConfigs,
-} from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
-import {
-  TableVizConfigs,
-} from "$/models/vizs/TableVizConfig/TableVizConfigs.ts";
+import { AreaChartVizConfigs } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfigs.ts";
+import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
+import { BubbleChartVizConfigs } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfigs.ts";
+import { FunnelChartVizConfigs } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfigs.ts";
+import { LineChartVizConfigs } from "$/models/vizs/LineChartVizConfig/LineChartVizConfigs.ts";
+import { PieChartVizConfigs } from "$/models/vizs/PieChartVizConfig/PieChartVizConfigs.ts";
+import { RadarChartVizConfigs } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfigs.ts";
+import { ScatterPlotVizConfigs } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
+import { TableVizConfigs } from "$/models/vizs/TableVizConfig/TableVizConfigs.ts";
 import {
   VizConfig,
   VizConfigType,
   VizConfigUtilRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
-import type {
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
-  QueryResultColumn,
-} from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 const VizConfigModulesRegistry = {
   table: TableVizConfigs,
@@ -77,6 +55,18 @@ function _getVizTypeModule<VType extends VizType>(
 export const VizConfigs = {
   getDisplayName: <VType extends VizType>(type: VType): string => {
     return _getVizTypeModule(type).displayName;
+  },
+
+  /**
+   * Get the descriptor registry for a viz type. Used by the
+   * settings form to render chart-level controls and to look up
+   * series-level controls (including from foreign viz types when a
+   * series's `renderAs` differs from the host).
+   */
+  getDescriptors: <VType extends VizType>(
+    type: VType,
+  ): IVizConfigModule<VType, VizConfigType<VType>>["descriptors"] => {
+    return _getVizTypeModule(type).descriptors;
   },
 
   makeEmptyConfig: <VType extends VizType>(

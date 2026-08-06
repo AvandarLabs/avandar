@@ -1,0 +1,54 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
+import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
+import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
+
+describe("resolveChatRuntimeMode", () => {
+  beforeEach(() => {
+    LocalChatModelStore.markDownloaded("qwen-1.5b");
+  });
+
+  afterEach(() => {
+    LocalChatModelStore.clearDownloaded("qwen-1.5b");
+  });
+
+  it("uses local when offline and model downloaded", () => {
+    expect(resolveChatRuntimeMode({ navigatorOnLine: false })).toEqual({
+      kind: "local",
+    });
+  });
+
+  it("offers fallback when online, post failed, model downloaded", () => {
+    expect(
+      resolveChatRuntimeMode({
+        navigatorOnLine: true,
+        chatPostFailed: true,
+      }),
+    ).toEqual({ kind: "offer_local_fallback" });
+  });
+
+  it("stays on cloud when offline but no model is downloaded", () => {
+    LocalChatModelStore.clearDownloaded("qwen-1.5b");
+    expect(resolveChatRuntimeMode({ navigatorOnLine: false })).toEqual({
+      kind: "cloud",
+    });
+  });
+
+  it("uses local when online and an offline model is selected in the picker", () => {
+    expect(
+      resolveChatRuntimeMode({
+        navigatorOnLine: true,
+        selectedChatModelId: OfflineChatPickerModels.buildModelId("qwen-1.5b"),
+      }),
+    ).toEqual({ kind: "local", localChatModelId: "qwen-1.5b" });
+  });
+
+  it("stays on cloud when online with a cloud model selected", () => {
+    expect(
+      resolveChatRuntimeMode({
+        navigatorOnLine: true,
+        selectedChatModelId: "anthropic/claude-3.5-sonnet",
+      }),
+    ).toEqual({ kind: "cloud" });
+  });
+});

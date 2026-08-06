@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { Routes } from "@sbfn/google-auth/google-auth.routes.ts";
+import { GoogleAuthRoutes } from "@sbfn/google-auth/GoogleAuthRoutes.ts";
 
-MiniServer(Routes).serve();
+MiniServer(GoogleAuthRoutes).serve();

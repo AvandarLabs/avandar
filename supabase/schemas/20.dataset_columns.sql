@@ -48,52 +48,46 @@ alter table public.dataset_columns enable row level security;
 create policy "User can select dataset_columns in their workspace" on public.dataset_columns for
 select
   to authenticated using (
-    public.dataset_columns.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.dataset_columns.dataset_id,
+      'viewer'
     )
   );
 
 create policy "User can insert dataset_columns in their workspace" on public.dataset_columns for insert to authenticated
 with
   check (
-    public.dataset_columns.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.dataset_columns.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can update dataset_columns in their workspace" on public.dataset_columns
 for update
   to authenticated using (
-    public.dataset_columns.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.dataset_columns.dataset_id,
+      'editor'
     )
   )
 with
   check (
-    -- New  values must still be in the auth user's workspace
-    public.dataset_columns.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.dataset_columns.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can delete dataset_columns in their workspace" on public.dataset_columns for delete to authenticated using (
-  public.dataset_columns.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_can_access_resource (
+    'dataset',
+    public.dataset_columns.dataset_id,
+    'admin'
   )
 );
 

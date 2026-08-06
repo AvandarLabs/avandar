@@ -1,6 +1,9 @@
 // arrays
 export { splitArray } from "@utils/arrays/splitArray/splitArray.ts";
 export { append } from "@utils/arrays/hofs/append/append.ts";
+export { getRandomItem } from "@utils/arrays/getRandomItem/getRandomItem.ts";
+export { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength.ts";
+export { removeAtIndex } from "@utils/arrays/removeAtIndex/removeAtIndex.ts";
 
 // asserts
 export { assert } from "@utils/asserts/assert/assert.ts";
@@ -82,6 +85,15 @@ export { sleep } from "@utils/misc/sleep/sleep.ts";
 export { traverse } from "@utils/misc/traverse/traverse.ts";
 export { pipe } from "@utils/misc/pipe/pipe.ts";
 
+// promises
+export { promiseMap } from "@utils/promises/promiseMap/promiseMap.ts";
+export { promiseFlatMap } from "@utils/promises/promiseFlatMap/promiseFlatMap.ts";
+export { promiseMapSequential } from "@utils/promises/promiseMapSequential/promiseMapSequential.ts";
+export { promiseReduce } from "@utils/promises/promiseReduce/promiseReduce.ts";
+
+// sets
+export { makeSet } from "@utils/sets/makeSet/makeSet.ts";
+
 // objects
 export { camelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 export { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
@@ -146,6 +158,7 @@ export { prefix } from "@utils/strings/prefix/prefix.ts";
 export { template } from "@utils/strings/template/template.ts";
 export { sqlTemplate } from "@utils/strings/template/sqlTemplate.ts";
 export { toSnakeCase } from "@utils/strings/toSnakeCase/toSnakeCase.ts";
+export { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 
 // constants
 export { MIMEType } from "@utils/types/common.types.ts";

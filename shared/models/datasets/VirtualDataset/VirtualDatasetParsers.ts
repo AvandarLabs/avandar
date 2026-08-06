@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
@@ -29,10 +29,8 @@ export const VirtualDatasetParsers =
     modelName: "VirtualDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      const { rawSql, ...rest } = obj;
       return Model.make("VirtualDataset", {
-        ...rest,
-        rawSQL: rawSql,
+        ...obj,
         id: obj.id as VirtualDatasetId,
         datasetId: obj.datasetId as DatasetId,
         workspaceId: obj.workspaceId as Workspace.Id,
@@ -45,7 +43,7 @@ export const VirtualDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = VirtualDatasetModel;
+type CrudTypes = VirtualDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -53,7 +51,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

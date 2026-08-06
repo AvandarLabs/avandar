@@ -1,16 +1,17 @@
 import { useBoolean } from "@hooks/useBoolean/useBoolean";
+import { Trans } from "@lingui/react/macro";
 import { Button, Group, Table } from "@mantine/core";
-import { EditButton } from "@ui/buttons/EditButton";
 import { StringKeyOf } from "@utils/types/utilities.types";
 import { useState } from "react";
-import { ValueItemContainer } from "@ui/ObjectDescriptionList/ValueItemContainer";
+import { EditButton } from "../../../buttons/EditButton";
+import { ValueItemContainer } from "../../ValueItemContainer";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   GetChildObjects,
   ObjectRowRenderOptions,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "../../ObjectDescriptionList.types";
 
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 
@@ -59,7 +60,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    Save
+                    <Trans>Save</Trans>
                   </Button>
                   <Button
                     size="compact-sm"
@@ -70,7 +71,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
                 </Group>
               </Table.Td>

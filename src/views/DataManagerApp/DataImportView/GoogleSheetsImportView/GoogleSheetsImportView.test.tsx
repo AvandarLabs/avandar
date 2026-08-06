@@ -1,22 +1,15 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  RenderOptions,
-  render as renderRtl,
-  screen,
-  waitFor,
-} from "@testing-library/react";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
+import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APIClient } from "@/clients/APIClient";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { act, render, RenderOptions, screen, waitFor } from "@/test-utils";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import type {
   DuckDbColumnSchema,
@@ -25,14 +18,14 @@ import type {
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),
-  "tests/data/california-covid-sample.csv",
+  "tests/data/california-covid-sample/california-covid-sample.csv",
 );
 
 /**
@@ -43,7 +36,7 @@ const COVID_SAMPLE_NUM_ROWS = 14_700;
 
 const {
   notifySuccessMock,
-  storeLocalCSVMock,
+  startCsvImportMock,
   dropLocalDatasetMock,
   useGetPreviewDataMock,
   googlePickerHarness,
@@ -63,15 +56,17 @@ const {
 
   return {
     notifySuccessMock: vi.fn(),
-    storeLocalCSVMock: vi.fn(),
+    startCsvImportMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
     useGetPreviewDataMock: vi.fn(),
     googlePickerHarness: harness,
   };
 });
 
-vi.mock("@ui/notifications/notify", () => {
+vi.mock("@ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@ui")>();
   return {
+    ...actual,
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),
     notifyWarning: vi.fn(),
@@ -141,10 +136,10 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/datasets/LocalDatasetClient", () => {
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
-      storeLocalCSV: storeLocalCSVMock,
+      startCsvImport: startCsvImportMock,
       dropLocalDataset: dropLocalDatasetMock,
     },
   };
@@ -193,7 +188,7 @@ vi.mock("@/lib/ui/viz/DataGrid", async () => {
 function renderWithProviders(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-): ReturnType<typeof renderRtl> {
+): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -202,11 +197,11 @@ function renderWithProviders(
     },
   });
 
-  return renderRtl(ui, {
-    wrapper: ({ children }) => {
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>{children}</AvandarUiProvider>
+          {children}
         </QueryClientProvider>
       );
     },
@@ -272,6 +267,7 @@ function _covidSampleLoadResult(options: {
       Prompt: `FROM read_csv('${datasetId}', …)`,
       table_name: datasetId,
     },
+    parquetData: new Blob(),
   };
 }
 
@@ -353,7 +349,7 @@ describe("GoogleSheetsImportView", () => {
     } as Workspace.WithSubscription);
 
     notifySuccessMock.mockClear();
-    storeLocalCSVMock.mockClear();
+    startCsvImportMock.mockClear();
     dropLocalDatasetMock.mockClear();
     useGetPreviewDataMock.mockClear();
     googlePickerHarness.pickerSetVisible.mockClear();
@@ -374,14 +370,20 @@ describe("GoogleSheetsImportView", () => {
       throw new Error(`Unexpected APIClient.get route: ${String(opts.route)}`);
     }) as typeof APIClient.get);
 
-    storeLocalCSVMock.mockImplementation(async (params) => {
-      return _covidSampleLoadResult({
+    const previewRows = _previewRowsFromCovidSample();
+
+    startCsvImportMock.mockImplementation(async (params) => {
+      const loadResult = _covidSampleLoadResult({
         csvName: "california-covid-sample",
         datasetId: params.datasetId,
       });
-    });
 
-    const previewRows = _previewRowsFromCovidSample();
+      return {
+        csvSniff: loadResult.csvSniff,
+        columns: loadResult.columns,
+        previewRows,
+      };
+    });
 
     useGetPreviewDataMock.mockReturnValue([previewRows]);
   });
@@ -402,7 +404,7 @@ describe("GoogleSheetsImportView", () => {
 
     expect(notifySuccessMock).toHaveBeenCalledWith({
       title: "File loaded successfully",
-      message: `Parsed ${formatNumber(COVID_SAMPLE_NUM_ROWS, {
+      message: `Parsed ${formatNumber(_previewRowsFromCovidSample().length, {
         locale: "en-US",
       })} rows`,
     });

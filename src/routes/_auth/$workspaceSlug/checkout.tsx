@@ -1,4 +1,5 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useQuery } from "@hooks";
+import { Trans } from "@lingui/react/macro";
 import {
   Button,
   Center,
@@ -16,7 +17,7 @@ import { useEffect } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -94,13 +95,15 @@ function CheckoutPage() {
         </ThemeIcon>
         <Stack gap="xs" align="center">
           <Title order={2} fw={600}>
-            Checkout Successful!
+            <Trans>Checkout Successful!</Trans>
           </Title>
           <Text size="lg" c="dimmed" maw={400}>
-            Your checkout was successful!
+            <Trans>Your checkout was successful!</Trans>
           </Text>
           <Text component="strong" size="lg" c="dimmed" maw={400} fw="bold">
-            It may take a few minutes for your subscription to take effect.
+            <Trans>
+              It may take a few minutes for your subscription to take effect.
+            </Trans>
           </Text>
         </Stack>
         <Button
@@ -110,7 +113,7 @@ function CheckoutPage() {
           size="md"
           mt="md"
         >
-          Continue to your workspace
+          <Trans>Continue to your workspace</Trans>
         </Button>
       </>
     : null;

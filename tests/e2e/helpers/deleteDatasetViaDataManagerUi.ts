@@ -1,14 +1,14 @@
 import { expect } from "@playwright/test";
-import { isDatasetParquetInStorage } from "../../helper/supabaseAdminClient";
-import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
+import { isDatasetParquetInStorage } from "./supabaseAdminClient";
+import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Deletes the dataset on the current Data Manager metadata page using the
  * Delete Dataset button, confirms the modal, then verifies redirect to the
- * data sources list, success copy, removal of the dataset row, and Parquet
- * object cleanup in storage.
+ * data sources list, removal of the dataset row, and Parquet object cleanup
+ * in storage.
  */
 export async function deleteDatasetViaDataManagerUiAndVerify(options: {
   admin: SupabaseClient;
@@ -26,19 +26,23 @@ export async function deleteDatasetViaDataManagerUiAndVerify(options: {
 
   await page.getByRole("button", { name: "Delete Dataset" }).click();
 
-  await page
+  const deleteConfirmButton = page
     .getByRole("dialog")
-    .getByRole("button", { name: "Delete", exact: true })
-    .click();
+    .getByRole("button", { name: "Delete", exact: true });
+  await expect(deleteConfirmButton).toBeVisible();
+  // Mantine modals and stacked notifications can keep the confirm button
+  // animating; evaluate-click avoids Playwright "not stable" retries.
+  await deleteConfirmButton.evaluate((node) => {
+    (node as HTMLButtonElement).click();
+  });
 
   await page.waitForURL(dataSourcesListUrl, {
     timeout: LONG_WAIT,
     waitUntil: "commit",
   });
 
-  await expect(page.getByText("Dataset deleted")).toBeVisible({
-    timeout: SHORT_WAIT,
-  });
+  // Deletion success is verified via DB and storage polls below. The Mantine
+  // toast auto-dismisses and can be buried under stacked import notifications.
 
   await expect
     .poll(
@@ -63,7 +67,7 @@ export async function deleteDatasetViaDataManagerUiAndVerify(options: {
     .poll(
       async () => {
         return !(await isDatasetParquetInStorage({
-          admin,
+          supabaseAdminClient: admin,
           workspaceId,
           datasetId,
         }));

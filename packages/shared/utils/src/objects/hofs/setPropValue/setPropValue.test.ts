@@ -1,13 +1,10 @@
-import { describe, expect, it } from "vitest";
 import { setPropValue } from "@utils/objects/hofs/setPropValue/setPropValue.ts";
+import { describe, expect, it } from "vitest";
 
 describe("setPropValue", () => {
   it("returns a function that sets a top-level key", () => {
     type Item = { name: string; age: number };
-    const setAge = setPropValue<Item, "age", number>(
-      "age",
-      99,
-    );
+    const setAge = setPropValue<Item, "age", number>("age", 99);
 
     const result = setAge({ name: "Alice", age: 30 });
 
@@ -27,11 +24,10 @@ describe("setPropValue", () => {
 
   it("sets nested values via dot notation", () => {
     type Obj = { meta: { color: string } };
-    const setColor = setPropValue<
-      Obj,
+    const setColor = setPropValue<Obj, "meta.color", string>(
       "meta.color",
-      string
-    >("meta.color", "blue");
+      "blue",
+    );
 
     const result = setColor({
       meta: { color: "red" },
@@ -50,10 +46,7 @@ describe("setPropValue", () => {
     ];
 
     const result = items.map(
-      setPropValue<Item, "active", boolean>(
-        "active",
-        false,
-      ),
+      setPropValue<Item, "active", boolean>("active", false),
     );
 
     expect(result).toEqual([

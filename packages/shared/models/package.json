@@ -5,7 +5,8 @@
   "license": "CPAL-1.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./zod": "./src/zod/index.ts"
   },
   "scripts": {
     "test": "vitest run",
@@ -14,6 +15,14 @@
   },
   "dependencies": {
     "type-fest": "^5.4.4"
+  },
+  "peerDependencies": {
+    "zod": "^4.1.13"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "typescript": "~5.9.3",

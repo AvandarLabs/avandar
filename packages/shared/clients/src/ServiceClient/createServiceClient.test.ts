@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { createServiceClient } from "@clients/ServiceClient/createServiceClient.ts";
+import { describe, expect, it } from "vitest";
 
 describe("createServiceClient", () => {
   it("should create a base service client", () => {

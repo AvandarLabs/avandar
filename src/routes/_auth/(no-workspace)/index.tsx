@@ -1,9 +1,10 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { isNonEmptyArray } from "@utils";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
-import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
+import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 
 /**
@@ -40,15 +41,18 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
  * We will always redirect them to their workspace page.
  */
 function CreateFirstWorkspacePage() {
+  const { t } = useLingui();
   return (
     <AppLayout>
       <Container py="xxxl">
         <Stack>
           <Title ta="center" order={1}>
-            Welcome to your first workspace
+            <Trans>Welcome to your first workspace</Trans>
           </Title>
           <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-            <CreateWorkspaceForm introText="It's time to create your first workspace. Don't think for too long—you can always change these later!" />
+            <CreateWorkspaceForm
+              introText={t`It's time to create your first workspace. Don't think for too long; you can always change these later!`}
+            />
           </Paper>
         </Stack>
       </Container>

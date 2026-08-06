@@ -1,12 +1,10 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { ManualEntryExtractorParsers } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractorParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 
 /**
  * Client for managing manual entry extractor configurations
  */
-export const ManualEntryExtractorClient = createSupabaseCRUDClient({
-  dbClient: AvaSupabase.DB,
+export const ManualEntryExtractorClient = createRdbCrudClient({
   modelName: "ManualEntryExtractor",
   tableName: "value_extractors__manual_entry",
   dbTablePrimaryKey: "id",

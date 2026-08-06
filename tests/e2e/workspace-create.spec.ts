@@ -1,13 +1,9 @@
-import { createSupabaseAdminClient } from "../helper/supabaseAdminClient";
-import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
+import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import {
-  E2E_SEEDED_WORKSPACE_SLUG,
-  E2E_TEST_USER,
-  SEEDED_WORKSPACE_MENU_BUTTON_NAME,
-} from "./helpers/constants";
+import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./helpers/constants";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import { deletePrimaryUserE2EWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
+import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
 import type { Response } from "@playwright/test";
 
 /**
@@ -28,15 +24,15 @@ async function _assertSlugResponseOk(response: Response): Promise<void> {
   }
 
   throw new Error(
-    `workspaces/validate-slug request failed: 
-  HTTP ${response.status} ${response.statusText}.
-  Response body:
-  ${bodySnippet}`,
+    `workspaces/validate-slug request failed: HTTP ${response.status()} ${response.statusText()}. Response body: ${bodySnippet}`,
   );
 }
 
 test.describe("workspace creation", () => {
-  test("creates a new workspace from the navbar", async ({ page }) => {
+  test("creates a new workspace from the navbar", async ({
+    page,
+    e2eWorkerDb,
+  }) => {
     const uniqueSuffix = Date.now().toString(36);
     const workspaceName = `E2E Org ${uniqueSuffix}`;
     /**
@@ -47,11 +43,12 @@ test.describe("workspace creation", () => {
 
     try {
       await signInWithEmailPassword(page, {
-        email: E2E_TEST_USER.email,
-        password: E2E_TEST_USER.password,
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
       });
 
-      await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}`);
+      await page.goto(`/${e2eWorkerDb.workspaceSlug}`);
 
       await page
         .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
@@ -105,9 +102,10 @@ ${detail}`,
     } finally {
       try {
         const admin = createSupabaseAdminClient();
-        await deletePrimaryUserE2EWorkspaceTreeBySlug({
-          admin,
+        await deleteUserOwnedWorkspaceTreeBySlug({
+          supabaseAdminClient: admin,
           slug: workspaceSlug,
+          ownerEmail: e2eWorkerDb.primaryUser.email,
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);

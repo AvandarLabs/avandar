@@ -3,7 +3,7 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { ValueExtractorType } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -35,7 +35,7 @@ type EntityFieldConfigInsert = SetOptional<
 
 type EntityFieldConfigUpdate = Partial<EntityFieldConfigRead>;
 
-export type EntityFieldConfigModel = SupabaseCRUDModelSpec<
+export type EntityFieldConfigModel = SupabaseCrudModelSpec<
   {
     tableName: "entity_field_configs";
     modelName: "EntityFieldConfig";

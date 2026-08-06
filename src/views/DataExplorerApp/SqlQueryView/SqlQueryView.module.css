@@ -1,0 +1,23 @@
+.root {
+  padding-top: 0;
+}
+
+.sqlPaper {
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.editQueryRow {
+  margin-top: 0;
+}
+
+.sqlReadOnlyInput {
+  background-color: transparent;
+  border: none;
+  font-family: monospace;
+  padding: 0;
+}
+
+.sqlEditInput {
+  font-family: monospace;
+}

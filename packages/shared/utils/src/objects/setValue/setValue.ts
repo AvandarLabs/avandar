@@ -1,7 +1,7 @@
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
-import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { Paths, UnknownArray } from "type-fest";
 
 /**
@@ -56,10 +56,13 @@ export function _setValue(
   }
 
   // Otherwise, keep traversing and immutably changing things as we go.
-  const nextObj = isArray(obj) ? obj[Number(key)] : obj[key];
+  const nextObjRaw = isArray(obj) ? obj[Number(key)] : obj[key];
+  // Create a missing intermediate object so deep sets work on sparse objects
+  // (e.g. setting `chartStyle.xAxis.labelColor` when `chartStyle` is unset).
+  const nextObj = nextObjRaw === undefined ? {} : nextObjRaw;
 
-  // If our next object is a primitive (i.e. non-traversable) then we raise an
-  // error
+  // If our next object is a (non-undefined) primitive, i.e. non-traversable,
+  // then we raise an error.
   if (isPrimitive(nextObj)) {
     const remainingPath = pathTail.join(".");
     throw new Error(

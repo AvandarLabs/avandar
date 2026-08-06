@@ -1,23 +1,25 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { where } from "@utils/filters/where/where";
-import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { makeSelectOptions, Select, Tooltip } from "@ui";
+import { makeBucketMap, prop, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import type {
-  SelectData,
-  SelectOptionGroup,
-  SelectProps,
-} from "@ui/inputs/Select/Select";
+import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   QueryDataSource,
   QueryDataSourceId,
 } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { UserId } from "$/models/User/User.types";
 
 type Props = {
   value?: QueryDataSource | null;
@@ -39,6 +41,8 @@ export function QueryDataSourceSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const isControlled = value !== undefined;
   const [currentDataSource, setCurrentDataSource] =
     useUncontrolled<QueryDataSource | null>({
       value,
@@ -48,6 +52,20 @@ export function QueryDataSourceSelect({
     });
 
   const workspace = useCurrentWorkspace();
+  const isOnline = useIsOnline();
+  const [userProfile] = useCurrentUserProfile();
+  // Dataset ids with parquet cached locally for the current user/workspace.
+  const userId = userProfile?.userId;
+  const [localDatasets = []] = LocalDatasetClient.useGetAll({
+    where: {
+      userId: { eq: userId as UserId },
+      workspaceId: { eq: workspace.id },
+    },
+    useQueryOptions: { enabled: !!userId },
+  });
+  const localDatasetIds = useMemo(() => {
+    return new Set(localDatasets.map(prop("datasetId")));
+  }, [localDatasets]);
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
@@ -59,8 +77,10 @@ export function QueryDataSourceSelect({
   }, [datasets, entityConfigs]);
 
   useOnBecomesDefined(dataSources, (dsources) => {
-    // if the current value is contained in the datasource list, then
-    // we don't have to trigger any change
+    if (isControlled) {
+      return;
+    }
+
     if (
       dsources.some((ds) => {
         return ds.id === currentDataSource?.id;
@@ -73,41 +93,67 @@ export function QueryDataSourceSelect({
     setCurrentDataSource(firstDataSource ?? null);
   });
 
+  const unqueryableOfflineIds = useMemo(() => {
+    if (isOnline) {
+      return new Set<QueryDataSourceId>();
+    }
+    return new Set(
+      (datasets ?? [])
+        .filter((dataset) => {
+          return !localDatasetIds.has(dataset.id as Dataset.Id);
+        })
+        .map((dataset) => {
+          return dataset.id as QueryDataSourceId;
+        }),
+    );
+  }, [datasets, isOnline, localDatasetIds]);
+
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {
+    const buildDatasetOptions = (
+      bucketValues: Array<{ id: QueryDataSourceId; name: string }>,
+    ) => {
+      return bucketValues.map((dataset) => {
+        const isUnqueryableOffline = unqueryableOfflineIds.has(dataset.id);
+        return {
+          value: dataset.id,
+          label: dataset.name,
+          disabled: isUnqueryableOffline,
+        };
+      });
+    };
+
     const datasetBucketsByType = makeBucketMap(datasets ?? [], {
       key: "sourceType",
     });
 
-    // if there is only what dataset type and no entity configs, we
-    // can just show a flat list
     if (
       datasetBucketsByType.size === 1 &&
       (!entityConfigs || entityConfigs.length === 0)
     ) {
-      return makeSelectOptions(datasets ?? [], {
-        valueKey: "id",
-        labelKey: "name",
-      });
+      return buildDatasetOptions(
+        (datasets ?? []).map((dataset) => {
+          return { id: dataset.id as QueryDataSourceId, name: dataset.name };
+        }),
+      );
     }
 
-    // if we have more than 1 bucket that means we need to group things
     const groups: Array<SelectOptionGroup<QueryDataSourceId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
         .with("csv_file", () => {
-          return "CSVs";
+          return t`CSVs`;
         })
         .with("google_sheets", () => {
-          return "Google Sheets";
+          return t`Google Sheets`;
         })
         .with("virtual", () => {
-          return "Derived Dataset";
+          return t`Derived Dataset`;
         })
         .with("open_data", () => {
-          return "Open Data";
+          return t`Open Data`;
         })
         .with("xlsx_file", () => {
-          return "Excel files";
+          return t`Excel files`;
         })
         .exhaustive(() => {
           return undefined;
@@ -115,24 +161,28 @@ export function QueryDataSourceSelect({
       if (bucketName) {
         groups.push({
           group: bucketName,
-          items: makeSelectOptions(bucketValues, {
-            valueKey: "id",
-            labelKey: "name",
-          }),
+          items: buildDatasetOptions(
+            bucketValues.map((dataset) => {
+              return {
+                id: dataset.id as QueryDataSourceId,
+                name: dataset.name,
+              };
+            }),
+          ),
         });
       }
     });
     return [
       ...groups,
       {
-        group: "Profiles",
+        group: t`Profiles`,
         items: makeSelectOptions(entityConfigs ?? [], {
           valueKey: "id",
           labelKey: "name",
         }),
       },
     ];
-  }, [datasets, entityConfigs]);
+  }, [datasets, entityConfigs, unqueryableOfflineIds, t]);
 
   const onDataSourceChange = (newDataSourceId: QueryDataSourceId | null) => {
     const newDataSource =
@@ -142,14 +192,32 @@ export function QueryDataSourceSelect({
     setCurrentDataSource(newDataSource);
   };
 
+  const hasDataSources = dataSources.length > 0;
+  const { disabled: disabledProp, ...restSelectProps } = selectProps;
+
   return (
     <Select
       data={dataSourceOptions}
-      label="Data source"
-      placeholder="Select a data source"
+      label={t`Data source`}
+      placeholder={t`Select a data source`}
       value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
-      {...selectProps}
+      disabled={disabledProp ?? !hasDataSources}
+      renderOption={({ option }) => {
+        return (
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="sm">{option.label}</Text>
+            {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
+              <Tooltip label={<OfflineUnavailableTooltipLabel />}>
+                <Badge size="xs" color="red" variant="light">
+                  <Trans>Not offline</Trans>
+                </Badge>
+              </Tooltip>
+            : null}
+          </Group>
+        );
+      }}
+      {...restSelectProps}
     />
   );
 }

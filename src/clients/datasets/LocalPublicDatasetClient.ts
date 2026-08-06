@@ -1,4 +1,4 @@
-import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalPublicDatasetParsers } from "@/models/LocalPublicDataset/LocalPublicDatasetParsers";
@@ -6,7 +6,7 @@ import type {
   LocalPublicDataset,
   LocalPublicDatasetModel,
 } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { EmptyObject } from "@utils/types/common.types";
+import type { EmptyObject } from "@utils";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -25,7 +25,7 @@ type LocalPublicDatasetClientMutations = {
  * Manages public datasets that are stored locally in a user's browser's
  * IndexedDB.
  */
-export const LocalPublicDatasetClient = createDexieCRUDClient<
+export const LocalPublicDatasetClient = createDexieCrudClient<
   LocalPublicDatasetModel,
   EmptyObject,
   LocalPublicDatasetClientMutations

@@ -1,0 +1,28 @@
+{
+  "name": "@avandar/desktop",
+  "version": "0.0.0",
+  "description": "Avandar desktop shell (Electrobun)",
+  "license": "CPAL-1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "electrobun dev",
+    "build": "electrobun build",
+    "test": "vitest run -c vitest.config.ts",
+    "test:integration": "find main -name '*.integration.test.ts' -print0 | xargs -0 bun test",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "duckdb": "^1.4.4",
+    "electrobun": "latest"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "bun": ">=1.1.0",
+    "node": ">=22.0.0"
+  }
+}

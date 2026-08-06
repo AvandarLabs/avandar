@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
+import { describe, expect, it } from "vitest";
 
 describe("excludeNullsExceptInProps", () => {
   it("keeps null for the specified key and removes other nulls", () => {
@@ -8,9 +8,7 @@ describe("excludeNullsExceptInProps", () => {
       b: string | null;
       c: number;
     };
-    const clean = excludeNullsExceptInProps<Item, "a">(
-      "a",
-    );
+    const clean = excludeNullsExceptInProps<Item, "a">("a");
 
     const result = clean({ a: null, b: null, c: 5 });
 
@@ -23,9 +21,7 @@ describe("excludeNullsExceptInProps", () => {
       b: string | null;
       c: number;
     };
-    const clean = excludeNullsExceptInProps<Item, "a">(
-      "a",
-    );
+    const clean = excludeNullsExceptInProps<Item, "a">("a");
 
     const result = clean({ a: 1, b: "hi", c: 5 });
 
@@ -43,9 +39,7 @@ describe("excludeNullsExceptInProps", () => {
       { id: 2, tag: "x", note: null },
     ];
 
-    const result = items.map(
-      excludeNullsExceptInProps<Item, "tag">("tag"),
-    );
+    const result = items.map(excludeNullsExceptInProps<Item, "tag">("tag"));
 
     expect(result).toEqual([
       { id: 1, tag: null },

@@ -1,11 +1,12 @@
+import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { PrimitiveValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem";
+import { PrimitiveValueItem } from "../PrimitiveValueItem/PrimitiveValueItem";
 import type {
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "../ObjectDescriptionList.types";
 
 type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
   values: readonly T[];
@@ -32,9 +33,12 @@ export function PrimitiveFieldValueArrayBlock<
     return null;
   }
 
+  const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>... and {values.length - valuesToRender.length} more</Text>
+      <Text>
+        <Trans>... and {remainingCount} more</Trans>
+      </Text>
     : null;
 
   // TODO(jpsyx): use a stable key

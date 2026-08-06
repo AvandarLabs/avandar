@@ -154,6 +154,7 @@ export type Database = {
           description: string | null
           id: string
           is_public: boolean
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -167,6 +168,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          is_restricted?: boolean
           name: string
           owner_id?: string
           owner_profile_id: string
@@ -180,6 +182,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          is_restricted?: boolean
           name?: string
           owner_id?: string
           owner_profile_id?: string
@@ -270,6 +273,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -282,6 +286,7 @@ export type Database = {
           date_of_last_sync?: string | null
           description?: string | null
           id?: string
+          is_restricted?: boolean
           name: string
           owner_id?: string
           owner_profile_id: string
@@ -294,6 +299,7 @@ export type Database = {
           date_of_last_sync?: string | null
           description?: string | null
           id?: string
+          is_restricted?: boolean
           name?: string
           owner_id?: string
           owner_profile_id?: string
@@ -581,14 +587,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "datasets__xls_file_dataset_id_fkey"
+            foreignKeyName: "datasets__xlsx_file_dataset_id_fkey"
             columns: ["dataset_id"]
             isOneToOne: true
             referencedRelation: "datasets"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "datasets__xls_file_workspace_id_fkey"
+            foreignKeyName: "datasets__xlsx_file_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -781,6 +787,123 @@ export type Database = {
           },
         ]
       }
+      resource_shares: {
+        Row: {
+          created_at: string
+          id: string
+          principal_id: string | null
+          principal_type: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access: boolean
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          principal_id?: string | null
+          principal_type: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access?: boolean
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          principal_id?: string | null
+          principal_type?: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access?: boolean
+          resource_id?: string
+          resource_type?: Database["public"]["Enums"]["resource_type"]
+          role?: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_shares_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_group_app_roles: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["role_level"]
+          role_group_id: string
+          updated_at: string
+        }
+        Insert: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["role_level"]
+          role_group_id: string
+          updated_at?: string
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["role_level"]
+          role_group_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_group_app_roles_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_groups: {
+        Row: {
+          created_at: string
+          id: string
+          is_builtin: boolean
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -789,14 +912,15 @@ export type Database = {
           ended_at: string | null
           ends_at: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id: string
           max_dashboards_allowed: number | null
           max_datasets_allowed: number | null
           max_seats_allowed: number
           max_shareable_dashboards_allowed: number | null
-          polar_customer_email: string
-          polar_customer_id: string
-          polar_product_id: string
-          polar_subscription_id: string
+          polar_customer_email: string | null
+          polar_customer_id: string | null
+          polar_product_id: string | null
+          polar_subscription_id: string | null
           started_at: string | null
           subscription_owner_id: string
           subscription_status: Database["public"]["Enums"]["subscriptions__status"]
@@ -810,14 +934,15 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
           max_dashboards_allowed?: number | null
           max_datasets_allowed?: number | null
           max_seats_allowed: number
           max_shareable_dashboards_allowed?: number | null
-          polar_customer_email: string
-          polar_customer_id: string
-          polar_product_id: string
-          polar_subscription_id: string
+          polar_customer_email?: string | null
+          polar_customer_id?: string | null
+          polar_product_id?: string | null
+          polar_subscription_id?: string | null
           started_at?: string | null
           subscription_owner_id: string
           subscription_status: Database["public"]["Enums"]["subscriptions__status"]
@@ -831,14 +956,15 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
           max_dashboards_allowed?: number | null
           max_datasets_allowed?: number | null
           max_seats_allowed?: number
           max_shareable_dashboards_allowed?: number | null
-          polar_customer_email?: string
-          polar_customer_id?: string
-          polar_product_id?: string
-          polar_subscription_id?: string
+          polar_customer_email?: string | null
+          polar_customer_id?: string | null
+          polar_product_id?: string | null
+          polar_subscription_id?: string | null
           started_at?: string | null
           subscription_owner_id?: string
           subscription_status?: Database["public"]["Enums"]["subscriptions__status"]
@@ -894,6 +1020,108 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_analytics_events: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"] | null
+          created_at: string
+          event_name: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"] | null
+          created_at?: string
+          event_name?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_analytics_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_group_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          user_group_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_group_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_group_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_group_memberships_user_group_id_fkey"
+            columns: ["user_group_id"]
+            isOneToOne: false
+            referencedRelation: "user_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_groups: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           created_at: string
@@ -941,51 +1169,6 @@ export type Database = {
           },
           {
             foreignKeyName: "user_profiles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          membership_id: string
-          role: string
-          updated_at: string | null
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          membership_id: string
-          role: string
-          updated_at?: string | null
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          membership_id?: string
-          role?: string
-          updated_at?: string | null
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_roles_membership_id_fkey"
-            columns: ["membership_id"]
-            isOneToOne: true
-            referencedRelation: "workspace_memberships"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_roles_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1110,8 +1293,11 @@ export type Database = {
           email: string
           id: string
           invite_status: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids: string[]
           invited_by: string
           role: string
+          role_group_id: string | null
+          role_overrides: Json
           updated_at: string
           user_id: string | null
           workspace_id: string
@@ -1121,8 +1307,11 @@ export type Database = {
           email: string
           id?: string
           invite_status: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids?: string[]
           invited_by: string
           role: string
+          role_group_id?: string | null
+          role_overrides?: Json
           updated_at?: string
           user_id?: string | null
           workspace_id: string
@@ -1132,13 +1321,23 @@ export type Database = {
           email?: string
           id?: string
           invite_status?: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids?: string[]
           invited_by?: string
           role?: string
+          role_group_id?: string | null
+          role_overrides?: Json
           updated_at?: string
           user_id?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_invites_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_invites_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -1152,22 +1351,35 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          role_group_id: string | null
+          updated_at: string
           user_id: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          role_group_id?: string | null
+          updated_at?: string
           user_id: string
           workspace_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          role_group_id?: string | null
+          updated_at?: string
           user_id?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_memberships_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_memberships_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -1232,6 +1444,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1260,6 +1473,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1290,6 +1504,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1318,6 +1533,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1346,6 +1562,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1379,6 +1596,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1415,19 +1633,104 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      util__auth_user_can_access_resource: {
+        Args: {
+          p_min_role: Database["public"]["Enums"]["role_level"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_delete_resource: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_insert_workspace_resource: {
+        Args: {
+          p_owner_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_update_resource: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_may_select_dashboard: {
+        Args: { p_dashboard_id: string }
+        Returns: boolean
+      }
+      util__auth_user_may_select_dataset: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
+      util__auth_user_meets_min_app_role: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_min_role: Database["public"]["Enums"]["role_level"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__can_manage_workspace_settings: {
+        Args: { p_workspace_id: string }
+        Returns: boolean
+      }
+      util__get_auth_user_app_role: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_workspace_id: string
+        }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
       util__get_auth_user_owned_workspaces: { Args: never; Returns: string[] }
-      util__get_auth_user_workspaces: { Args: never; Returns: string[] }
-      util__get_auth_user_workspaces_by_role: {
-        Args: { role: string }
+      util__get_auth_user_user_group_ids: {
+        Args: { p_workspace_id: string }
         Returns: string[]
       }
+      util__get_auth_user_workspaces: { Args: never; Returns: string[] }
       util__get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       util__get_workspace_members: {
         Args: { workspace_id: string }
         Returns: string[]
       }
+      util__is_settings_admin: {
+        Args: { p_workspace_id: string }
+        Returns: boolean
+      }
+      util__rank_to_role_level: {
+        Args: { p_rank: number }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
+      util__resource_effective_role: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
+      util__resource_type_to_app_type: {
+        Args: { p_resource_type: Database["public"]["Enums"]["resource_type"] }
+        Returns: Database["public"]["Enums"]["app_type"]
+      }
+      util__role_level_rank: {
+        Args: { p_role: Database["public"]["Enums"]["role_level"] }
+        Returns: number
+      }
+      util__seed_builtin_role_groups_for_workspace: {
+        Args: { p_workspace_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
+      app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -1476,6 +1779,9 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
+      resource_type: "dashboard" | "dataset"
+      role_level: "viewer" | "editor" | "admin"
+      share_principal_type: "user" | "user_group" | "workspace"
       subscriptions__feature_plan_type: "free" | "basic" | "premium"
       subscriptions__status:
         | "incomplete"
@@ -1642,6 +1948,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      app_type: ["data_sources", "data_explorer", "dashboards", "settings"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -1694,6 +2001,9 @@ export const Constants = {
         "dataset_column_value",
         "manual_entry",
       ],
+      resource_type: ["dashboard", "dataset"],
+      role_level: ["viewer", "editor", "admin"],
+      share_principal_type: ["user", "user_group", "workspace"],
       subscriptions__feature_plan_type: ["free", "basic", "premium"],
       subscriptions__status: [
         "incomplete",

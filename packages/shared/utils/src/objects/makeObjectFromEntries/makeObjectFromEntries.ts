@@ -9,7 +9,7 @@
  * @returns An object with keys and values extracted from the entries.
  */
 export function makeObjectFromEntries<K extends string | number, V>(
-  entries: ReadonlyArray<[K, V]>,
+  entries: ReadonlyArray<readonly [K, V]>,
 ): Record<K, V> {
   return Object.fromEntries(entries) as Record<K, V>;
 }

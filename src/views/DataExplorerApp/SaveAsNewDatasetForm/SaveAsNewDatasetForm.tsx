@@ -1,6 +1,7 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Stack, TextInput } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui/index";
-import { prop, UnknownDataFrame } from "@utils/index";
+import { notifyError, notifySuccess } from "@ui";
+import { prop, UnknownDataFrame } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -14,7 +15,7 @@ type Props = {
   queryResultData: UnknownDataFrame;
   columns: readonly QueryResultColumn[];
   dateColumns: ReadonlySet<string>;
-  rawSQL: string;
+  rawSql: string;
   onSaveSuccess: () => void;
 };
 
@@ -22,19 +23,20 @@ export function SaveAsNewDatasetForm({
   queryResultData,
   columns,
   dateColumns,
-  rawSQL,
+  rawSql,
   onSaveSuccess,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [saveNewDataset, isSavingNewDataset] =
     DatasetClient.useInsertVirtualDataset({
       queryToInvalidate: DatasetClient.QueryKeys.getAll(),
       onSuccess: () => {
         onSaveSuccess();
-        notifySuccess("Dataset saved successfully!");
+        notifySuccess(t`Dataset saved successfully!`);
       },
       onError: (error) => {
-        notifyError(`Error saving dataset: ${error.message}`);
+        notifyError(t`Error saving dataset: ${error.message}`);
       },
     });
   const columnNames = columns.map(prop("name"));
@@ -45,7 +47,7 @@ export function SaveAsNewDatasetForm({
     validate: {
       datasetName: (value) => {
         if (value.trim().length === 0) {
-          return "Dataset name is required";
+          return t`Dataset name is required`;
         }
         return undefined;
       },
@@ -74,15 +76,15 @@ export function SaveAsNewDatasetForm({
                 data_type: col.dataType,
               };
             }),
-            rawSQL,
+            rawSql,
           });
         })}
       >
         <Stack gap="md">
           <TextInput
             required
-            label="Dataset Name"
-            placeholder="Enter dataset name"
+            label={t`Dataset Name`}
+            placeholder={t`Enter dataset name`}
             {...form.getInputProps("datasetName")}
           />
           <DataGrid
@@ -98,7 +100,7 @@ export function SaveAsNewDatasetForm({
             type="submit"
             loading={isSavingNewDataset}
           >
-            Save
+            <Trans>Save</Trans>
           </Button>
         </Stack>
       </form>

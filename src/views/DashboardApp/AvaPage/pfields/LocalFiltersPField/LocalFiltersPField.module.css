@@ -1,0 +1,9 @@
+.localFilterEditorContainer {
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-sm);
+}
+
+.localFilterEditorLabel {
+  flex: 1;
+}

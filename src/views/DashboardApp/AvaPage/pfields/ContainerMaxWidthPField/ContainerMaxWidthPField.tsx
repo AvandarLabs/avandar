@@ -1,8 +1,10 @@
+import { useLingui } from "@lingui/react/macro";
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
+import { SegmentedControl } from "@ui";
+import { isPlainObject } from "@utils";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 
@@ -69,7 +71,8 @@ export function ContainerMaxWidthPField({
   value,
   onChange,
   readOnly,
-}: Props): JSX.Element {
+}: Props): ReactElement {
+  const { t } = useLingui();
   const normalized = _normalizeContainerMaxWidth(value);
 
   const onUnitChange = (nextUnit: ContainerMaxWidthUnit): void => {
@@ -100,7 +103,7 @@ export function ContainerMaxWidthPField({
 
   return (
     <Stack gap={0}>
-      <FieldLabel label="Container max width" />
+      <FieldLabel label={t`Container max width`} />
       <Group gap={6} wrap="nowrap">
         <NumberInput
           value={normalized.value}

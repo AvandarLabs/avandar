@@ -1,35 +1,32 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  fireEvent,
-  RenderOptions,
-  render as renderRtl,
-  screen,
-  waitFor,
-} from "@testing-library/react";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import {
+  fireEvent,
+  render,
+  RenderOptions,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UseQueryResult } from "@tanstack/react-query";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),
-  "tests/data/california-covid-sample.csv",
+  "tests/data/california-covid-sample/california-covid-sample.csv",
 );
 
 /**
@@ -38,27 +35,10 @@ const FIXTURE_CSV_PATH = path.resolve(
  */
 const COVID_SAMPLE_NUM_ROWS = 14_700;
 
-const {
-  notifySuccessMock,
-  storeLocalCSVMock,
-  dropLocalDatasetMock,
-  getPreviewDataMock,
-  useGetPreviewDataMock,
-} = vi.hoisted(() => {
+const { startCsvImportMock, dropLocalDatasetMock } = vi.hoisted(() => {
   return {
-    notifySuccessMock: vi.fn(),
-    storeLocalCSVMock: vi.fn(),
+    startCsvImportMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
-    getPreviewDataMock: vi.fn(),
-    useGetPreviewDataMock: vi.fn(),
-  };
-});
-
-vi.mock("@ui/notifications/notify", () => {
-  return {
-    notifySuccess: notifySuccessMock,
-    notifyError: vi.fn(),
-    notifyWarning: vi.fn(),
   };
 });
 
@@ -109,20 +89,11 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/datasets/LocalDatasetClient", () => {
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
-      storeLocalCSV: storeLocalCSVMock,
+      startCsvImport: startCsvImportMock,
       dropLocalDataset: dropLocalDatasetMock,
-    },
-  };
-});
-
-vi.mock("@/clients/datasets/DatasetQueryClient", () => {
-  return {
-    DatasetQueryClient: {
-      getPreviewData: getPreviewDataMock,
-      useGetPreviewData: useGetPreviewDataMock,
     },
   };
 });
@@ -140,7 +111,7 @@ vi.mock("@/lib/ui/viz/DataGrid", async () => {
 function renderWithProviders(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-): ReturnType<typeof renderRtl> {
+): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -149,11 +120,11 @@ function renderWithProviders(
     },
   });
 
-  return renderRtl(ui, {
-    wrapper: ({ children }) => {
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>{children}</AvandarUiProvider>
+          {children}
         </QueryClientProvider>
       );
     },
@@ -219,6 +190,7 @@ function _covidSampleLoadResult(options: {
       Prompt: `FROM read_csv('${datasetId}', …)`,
       table_name: datasetId,
     },
+    parquetData: new Blob(),
   };
 }
 
@@ -249,9 +221,8 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
 
 /**
  * Full DuckDB WASM does not finish reliably in Vitest/jsdom (web workers), so
- * `LocalDatasetClient.storeLocalCSV` and `DatasetQueryClient.useGetPreviewData`
- * use mocks. Load metadata matches DuckDB inference for
- * `tests/data/california-covid-sample.csv`.
+ * `LocalDatasetClient.startCsvImport` is mocked. Sniff metadata matches DuckDB
+ * inference for the `california-covid-sample` CSV fixture.
  */
 describe("ManualUploadView", () => {
   beforeEach(() => {
@@ -270,40 +241,21 @@ describe("ManualUploadView", () => {
       subscription: undefined,
     } as Workspace.WithSubscription);
 
-    notifySuccessMock.mockClear();
-    storeLocalCSVMock.mockClear();
     dropLocalDatasetMock.mockClear();
-    getPreviewDataMock.mockClear();
-    useGetPreviewDataMock.mockClear();
+    startCsvImportMock.mockClear();
 
-    storeLocalCSVMock.mockImplementation(async (params) => {
-      const file = params.csvParseOptions.file as File | undefined;
-      const csvName = file?.name ?? "fixture.csv";
-
-      return _covidSampleLoadResult({
+    startCsvImportMock.mockImplementation(async (params) => {
+      const csvName = params.file?.name ?? "fixture.csv";
+      const loadResult = _covidSampleLoadResult({
         datasetId: params.datasetId,
         csvName,
       });
-    });
 
-    const previewRows = _previewRowsFromCovidSample();
-
-    getPreviewDataMock.mockResolvedValue(previewRows);
-
-    useGetPreviewDataMock.mockImplementation((options) => {
-      const enabled = Boolean(options?.useQueryOptions?.enabled);
-      const data = enabled ? previewRows : undefined;
-      const queryResult = {
-        data,
-        error: null,
-        isError: false,
-        isLoading: false,
-        isPending: !enabled,
-        isSuccess: enabled,
-        status: enabled ? "success" : "pending",
-      } as UseQueryResult<UnknownObject[]>;
-
-      return [data, false, queryResult];
+      return {
+        csvSniff: loadResult.csvSniff,
+        columns: loadResult.columns,
+        previewRows: _previewRowsFromCovidSample(),
+      };
     });
   });
 
@@ -331,18 +283,6 @@ describe("ManualUploadView", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Upload" }));
 
-    // expect success notification
-    await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalled();
-    });
-
-    expect(notifySuccessMock).toHaveBeenCalledWith({
-      title: "File loaded successfully",
-      message: `Parsed ${formatNumber(COVID_SAMPLE_NUM_ROWS, {
-        locale: "en-US",
-      })} rows`,
-    });
-
     await waitFor(() => {
       expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
     });
@@ -362,5 +302,22 @@ describe("ManualUploadView", () => {
     expect(screen.getAllByText("Text").length).toBe(2);
     expect(screen.getAllByText("Number").length).toBe(2);
     expect(screen.getAllByText("Integer").length).toBe(2);
+  });
+
+  it("automatically parses the file when initialFile is provided", async () => {
+    const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
+    const file = new File([csvBuffer], "preloaded.csv", {
+      type: "text/csv",
+    });
+
+    renderWithProviders(<ManualUploadView initialFile={file} />);
+
+    await waitFor(() => {
+      expect(startCsvImportMock).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+    });
   });
 });

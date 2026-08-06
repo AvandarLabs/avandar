@@ -1,0 +1,237 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { ObjectDescriptionList, Paper } from "@ui";
+import {
+  isNonNullish,
+  makeIdLookupMap,
+  makeMap,
+  makeObject,
+  omit,
+  prop,
+  propEq,
+  unknownToString,
+  where,
+} from "@utils";
+import { useMemo } from "react";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { SourceBadge } from "@/components/badges/SourceBadge";
+import { ActivityBlock } from "@/views/EntityManagerApp/SingleEntityView/ActivityBlock";
+import { StatusPill } from "@/views/EntityManagerApp/SingleEntityView/StatusPill";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { Entity } from "$/models/entities/Entity/Entity";
+import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+
+type HydratedEntity = Entity.T & {
+  idField?: EntityFieldConfig.T;
+  nameField?: EntityFieldConfig.T;
+  fieldConfigs?: EntityFieldConfig.T[];
+  fieldValues?: Array<
+    EntityFieldValue.T & {
+      fieldName?: string;
+      sourceType?: DatasetSource.SourceType;
+      sourceName?: string;
+    }
+  >;
+  nameFieldValue?: EntityFieldValue.T;
+};
+
+/**
+ * Hydrates an entity with all its field configs and values.
+ */
+function useHydratedEntity({
+  entityConfig,
+  entity,
+}: {
+  entityConfig: EntityConfig.T;
+  entity: Entity.T;
+}): [HydratedEntity, boolean] {
+  // TODO(jpsyx): move this to a generalized implementation of useHydration
+  const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
+    EntityFieldConfigClient.useGetAll({
+      where: { entity_config_id: { eq: entityConfig.id } },
+    });
+  const [entityFieldValues, isLoadingEntityFieldValues] =
+    EntityFieldValueClient.withLogger().useGetEntityFieldValues({
+      workspaceId: entity.workspaceId,
+      entityId: entity.id,
+      entityFieldConfigs: entityFieldConfigs ?? [],
+    });
+
+  const datasetIds = useMemo(() => {
+    return [
+      ...new Set(
+        (entityFieldValues ?? []).map(prop("datasetId")).filter(isNonNullish),
+      ),
+    ];
+  }, [entityFieldValues]);
+
+  const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
+
+  const datasetsMap = useMemo(() => {
+    return datasets ? makeMap(datasets, { keyFn: prop("id") }) : undefined;
+  }, [datasets]);
+
+  // TODO(jpsyx): move this to a module that can also use cacheing.
+  const hydratedEntity = useMemo(() => {
+    let configInfo = undefined;
+    let fieldValuesInfo = undefined;
+    let fieldConfigsMap:
+      | Map<EntityFieldConfig.Id, EntityFieldConfig.T>
+      | undefined = undefined;
+
+    if (entityFieldConfigs) {
+      const idField = entityFieldConfigs.find(propEq("isIdField", true));
+      const nameField = entityFieldConfigs.find(propEq("isTitleField", true));
+      fieldConfigsMap = makeIdLookupMap(entityFieldConfigs);
+      configInfo = {
+        idField,
+        nameField,
+        fieldConfigs: entityFieldConfigs,
+      };
+    }
+
+    if (entityFieldValues) {
+      const fieldValuesMap = makeMap(entityFieldValues, {
+        keyFn: prop("entityFieldConfigId"),
+        valueFn: (fieldValue) => {
+          const config = fieldConfigsMap?.get(fieldValue.entityFieldConfigId);
+          const dataset =
+            fieldValue.datasetId ?
+              datasetsMap?.get(fieldValue.datasetId)
+            : undefined;
+          return {
+            ...fieldValue,
+            fieldName: config?.name,
+            sourceType: dataset?.sourceType ?? dataset?.sourceType,
+            sourceName: dataset?.name,
+          };
+        },
+      });
+
+      const nameFieldId = configInfo?.nameField?.id;
+
+      fieldValuesInfo = {
+        fieldValues: [...fieldValuesMap.values()],
+        nameFieldValue:
+          nameFieldId ? fieldValuesMap.get(nameFieldId) : undefined,
+      };
+    }
+
+    return {
+      ...entity,
+      ...configInfo,
+      ...fieldValuesInfo,
+    };
+  }, [entity, entityFieldConfigs, entityFieldValues, datasetsMap]);
+
+  return [
+    hydratedEntity,
+    isLoadingEntityFieldConfigs || isLoadingEntityFieldValues,
+  ];
+}
+
+type Props = {
+  entityConfig: EntityConfig.T;
+  entity: Entity.T;
+};
+
+type FieldValueMetadata = {
+  value: EntityFieldValue.T["value"];
+  sourceType?: DatasetSource.SourceType;
+  sourceName?: string;
+};
+
+export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
+  const { t } = useLingui();
+  const [hydratedEntity, isLoadingHydratedEntity] = useHydratedEntity({
+    entityConfig,
+    entity,
+  });
+
+  const [entityMetadata, fieldValues] = useMemo(() => {
+    // convert the field values array into a record
+    const fieldValuesRecord: Record<string, FieldValueMetadata> | undefined =
+      hydratedEntity.fieldValues ?
+        makeObject(hydratedEntity.fieldValues, {
+          keyFn: (fieldValue) => {
+            return fieldValue.fieldName ?? t`Loading...`;
+          },
+          valueFn: (fieldValue) => {
+            return {
+              value: fieldValue.value,
+              sourceType: fieldValue.sourceType,
+              sourceName: fieldValue.sourceName,
+            };
+          },
+        })
+      : undefined;
+
+    return [omit(hydratedEntity, "fieldValues"), fieldValuesRecord];
+  }, [hydratedEntity, t]);
+
+  return (
+    <Container pt="xxl">
+      <Stack>
+        <Group>
+          <Title order={2}>
+            {isLoadingHydratedEntity ?
+              <Loader />
+            : unknownToString(hydratedEntity.name)}
+          </Title>
+          <StatusPill />
+        </Group>
+        <Paper>
+          <Stack>
+            <Text>{entityConfig.description}</Text>
+            <ObjectDescriptionList
+              data={entityMetadata}
+              dateFormat="MMMM D, YYYY"
+              excludeKeys={[
+                "id",
+                "externalId",
+                "entityConfigId",
+                "idField",
+                "nameField",
+                "nameFieldValue",
+                "fieldConfigs",
+                "workspaceId",
+              ]}
+            />
+
+            <Title order={4}>
+              <Trans>Data</Trans>
+            </Title>
+            {fieldValues === undefined ?
+              <Loader />
+            : <ObjectDescriptionList
+                data={fieldValues}
+                dateFormat="MMMM D, YYYY"
+                renderObjectKeyLabel={(key, obj) => {
+                  const { sourceType, sourceName } = obj[key]!;
+                  return (
+                    <Group gap="xs" wrap="nowrap" align="center">
+                      <SourceBadge
+                        sourceType={sourceType}
+                        sourceName={sourceName}
+                      />
+                      <Text fw={500}>{key}</Text>
+                    </Group>
+                  );
+                }}
+                itemRenderOptions={{
+                  getRenderableValue: "value",
+                }}
+              />
+            }
+
+            <ActivityBlock />
+          </Stack>
+        </Paper>
+      </Stack>
+    </Container>
+  );
+}

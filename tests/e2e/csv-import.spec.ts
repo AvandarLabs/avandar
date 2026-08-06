@@ -1,16 +1,10 @@
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-  isDatasetParquetInStorage,
-} from "../helper/supabaseAdminClient";
-import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
+import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
-  E2E_SEEDED_WORKSPACE_SLUG,
-  E2E_TEST_USER,
   EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
+  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
@@ -18,27 +12,35 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+  isDatasetParquetInStorage,
+} from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
-  test("uploads CSV, verifies preview, offline/online cycle, parquet, toggle", async ({
+  test("uploads a CSV dataset, verifies preview, offline/online cycle, parquet, toggle", async ({
     page,
+    e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
+    const { workspaceSlug } = e2eWorkerDb;
 
     await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug,
     });
 
-    await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}/data-manager/data-import`);
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`, {
+      waitUntil: "domcontentloaded",
+    });
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
       .locator('input[type="file"]')
-      .setInputFiles(CALIFORNIA_CSV_PATH);
+      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
 
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
@@ -48,21 +50,24 @@ test.describe("CSV manual upload", () => {
       page.getByText("Data processed successfully", { exact: false }),
     ).toBeVisible({ timeout: LONG_WAIT });
 
-    const formattedRowCount =
-      CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
+    const formattedPreviewRowCount = formatImportPreviewRowCount(
+      SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+    );
     await expect(
-      page.getByText(`Parsed ${formattedRowCount} rows successfully`),
+      page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
     ).toBeVisible({ timeout: LONG_WAIT });
 
     await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
       timeout: MEDIUM_WAIT,
     });
 
-    for (const columnName of EXPECTED_CSV_COLUMN_NAMES) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }),
+    );
 
     await expect(page.getByText("California").first()).toBeVisible({
       timeout: SHORT_WAIT,
@@ -70,12 +75,12 @@ test.describe("CSV manual upload", () => {
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     const datasetId = parseDatasetIdFromDataManagerUrl({
       url: page.url(),
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     if (!datasetId) {
@@ -83,8 +88,8 @@ test.describe("CSV manual upload", () => {
     }
 
     const workspaceId = await getWorkspaceIdBySlug({
-      admin,
-      slug: E2E_SEEDED_WORKSPACE_SLUG,
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
     });
 
     await pollUntilCloudDatasetToggleShowsOnline(page);
@@ -93,7 +98,7 @@ test.describe("CSV manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -116,7 +121,7 @@ test.describe("CSV manual upload", () => {
       .poll(
         async () => {
           const parquetGone = !(await isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           }));
@@ -146,7 +151,7 @@ test.describe("CSV manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -167,7 +172,7 @@ test.describe("CSV manual upload", () => {
       datasetId,
       page,
       workspaceId,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
   });
 });

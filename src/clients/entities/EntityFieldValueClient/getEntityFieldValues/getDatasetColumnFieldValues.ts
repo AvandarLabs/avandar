@@ -1,12 +1,15 @@
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { where } from "@utils/filters/where/where";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
-import { objectEntries } from "@utils/objects/objectEntries";
-import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
+import {
+  assertIsDefined,
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupMap,
+  makeIdLookupRecord,
+  objectEntries,
+  promiseFlatMap,
+  prop,
+  sqlTemplate,
+  where,
+} from "@utils";
 import { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -14,7 +17,6 @@ import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigCli
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { promiseFlatMap } from "@/lib/utils/promises";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
@@ -167,7 +169,7 @@ async function _extractFieldValuesFromDataset({
     Record<EntityFieldConfigId, unknown>
   >({
     workspaceId,
-    rawSQL: sqlTemplate(`
+    rawSql: sqlTemplate(`
       -- Get all the external IDs we will pull values for
       WITH external_ids AS (
         SELECT

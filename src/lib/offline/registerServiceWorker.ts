@@ -1,0 +1,22 @@
+import { notifyWarning } from "@ui";
+import { registerSW } from "virtual:pwa-register";
+
+/**
+ * Registers the PWA service worker in production builds and notifies the
+ * user when a new version is ready to install. No-op in dev mode.
+ */
+export function registerOfflineServiceWorker(): void {
+  if (import.meta.env.DEV) {
+    return;
+  }
+
+  registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      notifyWarning({
+        title: "Update available",
+        message: "A new version is available. Refresh to update.",
+      });
+    },
+  });
+}

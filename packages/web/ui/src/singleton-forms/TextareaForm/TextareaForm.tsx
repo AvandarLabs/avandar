@@ -1,0 +1,197 @@
+import { getIsMacPlatform } from "@browser-utils";
+import { useLingui } from "@lingui/react/macro";
+import { Button, Group, Text, Textarea } from "@mantine/core";
+import { getHotkeyHandler } from "@mantine/hooks";
+import { useId, useRef } from "react";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import type { TextareaProps } from "@mantine/core";
+
+type Props = {
+  /**
+   * When true, renders without wrapping the component in a `<form>` element.
+   * This is useful when you want to use this sub-form as a field in a larger
+   * form.
+   */
+  asField?: boolean;
+  defaultValue: string;
+  required?: boolean;
+  minLength?: number;
+  inputWidth?: number | string;
+  validateOnChange?: boolean;
+  validateOnBlur?: boolean;
+
+  /**
+   * Label to display above the Textarea (unless `hideLabel` is true). This
+   * label is also used in the validation error message.
+   */
+  label?: string;
+  hideLabel?: boolean;
+
+  /**
+   * Whether to show a submit button. If true, the `onSubmit` prop will be
+   * called with the value when the form is submitted.
+   */
+  showSubmitButton?: boolean;
+
+  /**
+   * Whether to show a cancel button. If true, the `onCancel` prop will be
+   * called when the cancel button is clicked.
+   */
+  showCancelButton?: boolean;
+
+  /**
+   * If true, the submit button will be disabled until the input value
+   * has changed from its initial defaultValue.
+   */
+  disabledUntilDirty?: boolean;
+
+  onSubmit?: (
+    value: string,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => void;
+  onCancel?: () => void;
+  submitButtonLabel?: string;
+  cancelButtonLabel?: string;
+  isSubmitting?: boolean;
+} & Omit<
+  TextareaProps,
+  "defaultValue" | "required" | "minLength" | "label" | "onSubmit"
+>;
+
+type SingleInputForm = {
+  value: string;
+};
+
+/**
+ * A textarea field wrapped in a form with validation and a button
+ * to submit the value. This is useful for situations where you only
+ * need a single field input for multi-line text.
+ *
+ * The form can be submitted with cmd+enter (Mac) or ctrl+enter (Windows/Linux).
+ *
+ * If you're using multiple fields, use Mantine's `useForm` hook instead of
+ * multiple XField components.
+ */
+export function TextareaForm({
+  asField = false,
+  defaultValue,
+  required = false,
+  minLength,
+  inputWidth,
+  validateOnChange = false,
+  validateOnBlur = false,
+  label,
+  hideLabel = false,
+  isSubmitting = false,
+  onSubmit,
+  onCancel,
+  showSubmitButton = true,
+  showCancelButton = false,
+  submitButtonLabel,
+  cancelButtonLabel,
+  disabledUntilDirty = false,
+  ...moreTextareaProps
+}: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedSubmitLabel = submitButtonLabel ?? t`Submit`;
+  const resolvedCancelLabel = cancelButtonLabel ?? t`Cancel`;
+  const formId = useId();
+  const form = useForm<SingleInputForm>({
+    mode: "uncontrolled",
+    initialValues: {
+      value: defaultValue,
+    },
+    validateInputOnBlur: validateOnBlur,
+    validateInputOnChange: validateOnChange,
+    validate: {
+      value: (value) => {
+        if (required && value.trim().length === 0) {
+          // prevent a value that is only empty spaces
+          return t`This field cannot be empty`;
+        }
+
+        if (minLength && value.length < minLength) {
+          const fieldName = hideLabel || !label ? t`This field` : label;
+          return t`${fieldName} must be at least ${minLength} characters long`;
+        }
+        return null;
+      },
+    },
+  });
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const isMac = getIsMacPlatform();
+
+  const shortcutText = isMac ? "⌘↵" : "Ctrl↵";
+
+  const onFormSubmit = form.onSubmit(({ value }, event) => {
+    onSubmit?.(value, event);
+  });
+
+  const formContent = (
+    <Group gap="xs" align="start" wrap="wrap">
+      <Textarea
+        key={form.key("value")}
+        {...form.getInputProps("value")}
+        required={required}
+        label={hideLabel ? undefined : label}
+        style={{ width: inputWidth }}
+        onKeyDown={getHotkeyHandler([
+          [
+            "mod+Enter",
+            (event) => {
+              event.preventDefault();
+              if (asField) {
+                onFormSubmit();
+              } else {
+                // trigger the `<form>` element's submit event, which will in
+                // turn call `onFormSubmit()`
+                formRef.current?.requestSubmit();
+              }
+            },
+          ],
+        ])}
+        {...moreTextareaProps}
+      />
+      {showSubmitButton ?
+        <Button
+          type="submit"
+          form={formId}
+          loading={isSubmitting}
+          onClick={
+            asField ?
+              () => {
+                onFormSubmit();
+              }
+            : undefined
+          }
+          disabled={
+            isSubmitting ||
+            (validateOnChange && !form.isValid()) ||
+            (disabledUntilDirty && !form.isDirty())
+          }
+        >
+          {resolvedSubmitLabel}
+          <Text ml="xxs" span size="xs" c="white">
+            {shortcutText}
+          </Text>
+        </Button>
+      : null}
+      {showCancelButton ?
+        <Button variant="default" onClick={onCancel}>
+          {resolvedCancelLabel}
+        </Button>
+      : null}
+    </Group>
+  );
+
+  if (asField) {
+    return formContent;
+  }
+
+  return (
+    <form ref={formRef} id={formId} onSubmit={onFormSubmit}>
+      {formContent}
+    </form>
+  );
+}

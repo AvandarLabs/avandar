@@ -1,12 +1,9 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry";
-import { identity } from "@utils/misc/identity";
+import { makeParserRegistry } from "@clients";
+import { identity } from "@utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type {
-  Expect,
-  ZodSchemaEqualsTypes,
-} from "@utils/types/test-utilities.types";
+import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -29,7 +26,7 @@ export const LocalPublicDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = LocalPublicDatasetModel;
+type CrudTypes = LocalPublicDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -37,7 +34,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

@@ -1,5 +1,6 @@
 import { Model } from "@models/Model/Model.ts";
 import { uuid } from "$/lib/uuid.ts";
+import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { toRawDuckDBQuery } from "$/models/queries/StructuredQuery/toRawDuckDBQuery.ts";
 import type {
   PartialStructuredQuery,
@@ -17,6 +18,9 @@ export const StructuredQueryModule = {
       orderByColumn: undefined,
       orderByDirection: undefined,
       aggregations: {},
+      filters: EMPTY_QUERY_FILTER,
+      having: EMPTY_QUERY_FILTER,
+      joins: [],
       offset: undefined,
       limit: undefined,
     } as const);

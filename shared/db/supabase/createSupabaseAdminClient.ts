@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "$/types/database.types.ts";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
 /**
  * An admin client for interacting with Supabase. This should only be used
@@ -14,7 +13,7 @@ export function createSupabaseAdminClient(
     apiUrl?: string;
     serviceRoleKey?: string;
   } = {},
-): SupabaseClient<Database> {
+): AvaSupabaseDBClient {
   const {
     apiUrl = process.env.SUPABASE_URL ?? "",
     serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",

@@ -1,15 +1,20 @@
-import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { withLogger } from "@logger/module-augmenters/withLogger";
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { where } from "@utils/filters/where/where";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
-import { objectEntries } from "@utils/objects/objectEntries";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
+import { createServiceClient } from "@clients";
+import { withQueryHooks } from "@hooks";
+import { withLogger } from "@logger";
+import {
+  assertIsDefined,
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupRecord,
+  makeSet,
+  objectEntries,
+  objectKeys,
+  promiseFlatMap,
+  promiseMap,
+  prop,
+  sqlTemplate,
+  where,
+} from "@utils";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { EntityFieldValueRead } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
@@ -24,13 +29,11 @@ import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
-import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
-import type { ILogger, WithLogger } from "@logger/Logger.types";
-import type { RegistryOfArrays } from "@utils/types/utilities.types";
+import type { ServiceClient } from "@clients";
+import type { WithQueryHooks } from "@hooks";
+import type { ILogger, WithLogger } from "@logger";
+import type { RegistryOfArrays } from "@utils";
 import type { EntityId } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
@@ -194,7 +197,7 @@ function createEntityFieldValueClient(): WithLogger<
                         Record<EntityFieldConfigId, unknown>
                       >({
                         workspaceId: entity.workspaceId,
-                        rawSQL: sqlTemplate(`
+                        rawSql: sqlTemplate(`
                           -- Get all rows matching this external_id
                           WITH entity_rows AS (
                             SELECT

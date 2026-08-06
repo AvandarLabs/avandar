@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
@@ -7,7 +7,7 @@ import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOI
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { z } from "zod";
 import type {
   Expect,
@@ -17,19 +17,52 @@ import type {
   PolarCustomerId,
   PolarProductId,
   SubscriptionId,
-  SubscriptionModel,
+  SubscriptionPolarId,
   SubscriptionRead,
 } from "$/models/Subscription/Subscription.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { SetOptional } from "type-fest";
+
+export type SubscriptionModel = SupabaseCrudModelSpec<
+  {
+    tableName: "subscriptions";
+    modelName: "Subscription";
+    modelPrimaryKeyType: SubscriptionId;
+    modelTypes: {
+      Read: SubscriptionRead;
+      Insert: SetOptional<
+        SubscriptionRead,
+        | "createdAt"
+        | "currentPeriodEnd"
+        | "currentPeriodStart"
+        | "endedAt"
+        | "endsAt"
+        | "id"
+        | "polarCustomerEmail"
+        | "polarCustomerId"
+        | "polarProductId"
+        | "polarSubscriptionId"
+        | "startedAt"
+        | "updatedAt"
+      >;
+      Update: Partial<SubscriptionRead>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
 
 const DBReadSchema = z.object({
-  polar_subscription_id: z.uuid(),
+  id: z.uuid(),
+  polar_subscription_id: z.uuid().nullable(),
   workspace_id: z.uuid(),
   subscription_owner_id: z.uuid(),
-  polar_customer_id: z.uuid(),
-  polar_customer_email: z.string(),
-  polar_product_id: z.uuid(),
+  polar_customer_id: z.uuid().nullable(),
+  polar_customer_email: z.string().nullable(),
+  polar_product_id: z.uuid().nullable(),
   feature_plan_type: z.enum(SubscriptionModule.FeaturePlanTypes),
   subscription_status: z.enum(SubscriptionModule.Statuses),
   started_at: z.iso.datetime({ offset: true }).nullable(),
@@ -64,11 +97,23 @@ export const SubscriptionParsers =
       (obj): SubscriptionRead => {
         return {
           ...obj,
+          id: obj.id as SubscriptionId,
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
-          polarCustomerId: obj.polarCustomerId as PolarCustomerId,
-          polarSubscriptionId: obj.polarSubscriptionId as SubscriptionId,
-          polarProductId: obj.polarProductId as PolarProductId,
+          polarCustomerId:
+            obj.polarCustomerId != null ?
+              (obj.polarCustomerId as PolarCustomerId)
+            : undefined,
+          polarCustomerEmail:
+            obj.polarCustomerEmail != null ? obj.polarCustomerEmail : undefined,
+          polarProductId:
+            obj.polarProductId != null ?
+              (obj.polarProductId as PolarProductId)
+            : undefined,
+          polarSubscriptionId:
+            obj.polarSubscriptionId != null ?
+              (obj.polarSubscriptionId as SubscriptionPolarId)
+            : undefined,
         };
       },
     ),
@@ -107,7 +152,7 @@ export const SubscriptionParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = SubscriptionModel;
+type CrudTypes = SubscriptionModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -115,7 +160,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

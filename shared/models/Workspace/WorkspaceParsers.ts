@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
@@ -10,12 +10,29 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
-  WorkspaceModel,
   WorkspaceRead,
 } from "$/models/Workspace/Workspace.types.ts";
+import type { SetOptional } from "type-fest";
+
+export type WorkspaceModel = SupabaseCrudModelSpec<
+  {
+    tableName: "workspaces";
+    modelName: "Workspace";
+    modelPrimaryKeyType: WorkspaceId;
+    modelTypes: {
+      Read: WorkspaceRead;
+      Insert: SetOptional<WorkspaceRead, "id" | "createdAt" | "updatedAt">;
+      Update: Partial<WorkspaceRead>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
@@ -57,7 +74,7 @@ export const WorkspaceParsers = makeParserRegistry<WorkspaceModel>().build({
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = WorkspaceModel;
+type CrudTypes = WorkspaceModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -65,7 +82,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

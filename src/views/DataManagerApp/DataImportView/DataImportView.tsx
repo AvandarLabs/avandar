@@ -1,103 +1,73 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
-import { Container, Stack, Title } from "@mantine/core";
-import { where } from "@utils/index";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
-import { APIClient } from "@/clients/APIClient";
+import { Trans } from "@lingui/react/macro";
+import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
+import { where } from "@utils";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
+import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Paper } from "@/lib/ui/Paper/Paper";
-import { Tabs } from "@/lib/ui/Tabs/Tabs";
+import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
+import css from "@/views/DataManagerApp/DataImportView/DataImportView.module.css";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
-import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
-import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
-import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
 
 export function DataImportView(): JSX.Element {
   const workspace = useCurrentWorkspace();
-
   const [allDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-
-  // we should check if the user is allowed to add more datasets based on their
-  // subscription plan
-  const [canAddDatasets] = useQuery({
-    queryKey: [
-      "subscriptionPermission",
-      workspace.subscription?.polarSubscriptionId,
-      "permissions",
-      "can_add_datasets",
-    ],
-    queryFn: async () => {
-      return await APIClient.get({
-        route: "subscriptions/:subscriptionId/permissions/:permissionType",
-        pathParams: {
-          subscriptionId: workspace.subscription?.polarSubscriptionId ?? "",
-          permissionType: "can_add_datasets",
-        },
-      });
-    },
-    enabled: !!workspace.subscription?.polarSubscriptionId,
-  });
-
+  const [canAddDatasetPermission] =
+    SubscriptionPermissionsClient.useCanAddDataset({
+      subscriptionId: workspace.subscription?.id ?? "",
+      useQueryOptions: { enabled: !!workspace.subscription?.id },
+    });
+  // Backend check when known; optimistic frontend fallback while it loads.
   const isAddAllowed =
-    canAddDatasets !== undefined ?
-      canAddDatasets.allowed
-      // if the permissions check in the backend isn't complete yet, then we do
-      // an eager frontend check. But this may be inaccurate if the user does
-      // not have permissions to view all workspace datasets, so the count will
-      // not be the real workspace dataset count.
-    : SubscriptionModule.canAddDatasets({
-        subscription: workspace.subscription,
-        numDatasetsInWorkspace: allDatasets.length,
-      });
+    canAddDatasetPermission?.allowed ??
+    SubscriptionModule.canAddDatasets({
+      subscription: workspace.subscription,
+      numDatasetsInWorkspace: allDatasets.length,
+    });
+  const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
 
   return (
-    <Container pt="xxl">
-      <Paper>
-        <Stack>
-          <Title order={2}>Import data</Title>
-          <Tabs
-            tabIds={
-              ["upload-view", "connectors-view", "open-data-catalog"] as const
-            }
-            renderTabHeader={{
-              "upload-view": "Upload",
-              "connectors-view": "Connectors",
-              "open-data-catalog": "Open data",
-            }}
-            renderTabPanel={{
-              "upload-view": () => {
-                return <ManualUploadView py="md" />;
-              },
-              "connectors-view": () => {
-                return <GoogleSheetsImportView py="md" />;
-              },
-              "open-data-catalog": () => {
-                return (
-                  <OpenDataCatalogView isAddAllowed={isAddAllowed} py="md" />
-                );
-              },
-            }}
-          />
-        </Stack>
-      </Paper>
+    <Container className={css.page} pt="xxl" px="lg">
+      <Stack gap="lg">
+        <header className={css.header}>
+          <Title order={2} fw={650}>
+            <Trans>Import data</Trans>
+          </Title>
+          <Text c="dimmed" size="sm" maw={520}>
+            <Trans>
+              Upload files, connect external sources, or browse open datasets to
+              add to your workspace.
+            </Trans>
+          </Text>
+        </header>
+
+        <Divider />
+
+        <Box className={css.panel}>
+          <DataImportTabs isAddAllowed={isAddAllowed} />
+        </Box>
+      </Stack>
 
       {
         // We did a backend check to see if the user is allowed to add more
         // datasets. If they're not, then we show a modal asking them to
-        // upgrade. If we don't show this modal, we should still do a backend
-        // check when the user tries to add a new dataset. This is to avoid
-        // race conditions where multiple users in the workspace might be
-        // adding datasets at the same time.
-        isAddAllowed ? null : (
-          <DatasetLimitReachedModal
-            subscription={workspace.subscription}
-            workspaceSlug={workspace.slug}
-            isOpened={!isAddAllowed}
-          />
-        )
+        // upgrade. The modal is dismissable so the user can continue using
+        // the workspace (and switch workspaces) — uploads are still blocked
+        // via the disabled state in DataImportTabs. We still do a backend
+        // check when the user tries to add a new dataset to avoid race
+        // conditions where multiple users in the workspace might be adding
+        // datasets at the same time.
       }
+      <DatasetLimitReachedModal
+        subscription={workspace.subscription}
+        isOpened={!isAddAllowed && !isLimitModalDismissed}
+        onClose={() => {
+          setIsLimitModalDismissed(true);
+        }}
+      />
     </Container>
   );
 }

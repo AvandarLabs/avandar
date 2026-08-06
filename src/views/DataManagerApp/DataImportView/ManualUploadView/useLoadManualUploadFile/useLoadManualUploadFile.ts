@@ -1,22 +1,19 @@
-import {
-  useMutation,
-  UseMutationResultTuple,
-} from "@hooks/useMutation/useMutation";
-import { notifyError, notifySuccess, notifyWarning } from "@ui/index";
-import { formatNumber } from "@utils/index";
+import { useMutation, UseMutationResultTuple } from "@hooks";
+import { useLingui } from "@lingui/react/macro";
+import { notifyError } from "@ui";
+import { MIMEType } from "@utils";
+import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
 import { match } from "ts-pattern";
-import * as XLSX from "xlsx";
-import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import {
+  DuckDbColumnSchema,
   DuckDbLoadCsvResult,
   DuckDbLoadXlsxResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
@@ -58,6 +55,31 @@ type UseLoadManualUploadFileResult = {
   previewRows: UnknownRow[] | undefined;
 };
 
+const EMPTY_PARQUET_PLACEHOLDER = new Blob([], {
+  type: MIMEType.APPLICATION_PARQUET,
+});
+
+/**
+ * Convert XLSX sniff preview rows (object keyed by column name with raw
+ * cell values) to the column schema shape DuckDB returns from CSV /
+ * Parquet sniffs. We can't infer DuckDB types from SheetJS values without
+ * additional logic; default to VARCHAR for everything in the sniff phase.
+ * The background parquet transcoding (the actual `read_xlsx` transcode)
+ * reconciles to the real types via `LocalDatasetClient._reconcileColumns`.
+ */
+function _xlsxColumnNamesToSchema(columnNames: string[]): DuckDbColumnSchema[] {
+  return columnNames.map((name) => {
+    return {
+      column_name: name,
+      column_type: "VARCHAR",
+      null: "YES",
+      key: null,
+      default: null,
+      extra: null,
+    };
+  });
+}
+
 function _buildDataSourceMetadataFromLoadResult({
   loadResult,
   file,
@@ -69,6 +91,10 @@ function _buildDataSourceMetadataFromLoadResult({
 }): ManualUploadDataSourceMetadata {
   return match(loadResult)
     .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
+      const csvParseRequest =
+        loadAndParseOptions?.type === "csv_file" ?
+          loadAndParseOptions
+        : undefined;
       return {
         sourceType: "csv_file",
         onlineStorageAllowed: true,
@@ -76,8 +102,10 @@ function _buildDataSourceMetadataFromLoadResult({
         datasetLoadResult: csvLoadResult,
         parseOptions: {
           type: "csv_file",
-          numRowsToSkip: csvLoadResult.csvSniff.SkipRows,
-          delimiter: csvLoadResult.csvSniff.Delimiter,
+          numRowsToSkip:
+            csvParseRequest?.numRowsToSkip ?? csvLoadResult.csvSniff.SkipRows,
+          delimiter:
+            csvParseRequest?.delimiter ?? csvLoadResult.csvSniff.Delimiter,
         },
       };
     })
@@ -111,128 +139,129 @@ function _buildDataSourceMetadataFromLoadResult({
     .exhaustive();
 }
 
-function _notifyLoadResults(loadResult: FileLoadResult): void {
-  match(loadResult)
-    .with({ type: "csv" }, (csvLoadResult) => {
-      const { numRows: numSuccessRows, numRejectedRows } = csvLoadResult;
-      if (numRejectedRows === 0) {
-        notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
-        });
-      } else if (numSuccessRows === 0) {
-        notifyError({
-          title: "File failed to load",
-          message: "No rows were read successfully",
-        });
-      } else {
-        const numRejectedStr =
-          numRejectedRows > 1000 ?
-            " over 1000 rows were rejected"
-          : ` ${numRejectedRows} rows were rejected`;
-        notifyWarning({
-          title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
-        });
-      }
-    })
-    .with({ type: "xlsx" }, (xlsxLoadResult) => {
-      const { numRows: numSuccessRows } = xlsxLoadResult;
-      notifySuccess({
-        title: "File loaded successfully",
-        message: `Parsed ${formatNumber(numSuccessRows)} rows`,
-      });
-    })
-    .exhaustive();
-}
-
 /**
- * Loads a manually uploaded file into our local storage and DuckDB and
- * returns the loaded dataset information.
+ * Loads a manually uploaded file into our local storage and DuckDB in two
+ * named phases:
  *
- * IMPORTANT: this does **not** save the dataset to the backend database. This
- * function is just about parsing and loading to memory and local storage.
+ *   - The sniff phase (awaited by this hook): a fast sniff that produces
+ *     the column schema, parse dialect, and a 200-row preview. CSV uses
+ *     DuckDB's `sniff_csv` + LIMIT-pushdown read; XLSX uses a SheetJS sniff
+ *     worker so the parse runs off the main thread.
  *
- * "Loading" a dataset means:
- * 1. Parsing
- * 2. Adding to local storage
- * 3. Loading to in-memory DuckDB
+ *   - The background parquet transcoding (fired by `startCsvImport` /
+ *     `startXlsxImport`): the full `read_csv` / `read_xlsx` → parquet
+ *     transcode. Status is tracked in IndexedDB on the LocalDataset row
+ *     (`parseStatus`) and in memory via the `ImportJobsManager`. It emits
+ *     its own completion toast and column-discrepancy warning.
  *
- * Step 1: the way we parse the file depends on the file type. E.g. CSV or
- * Excels are parsed by sending them to DuckDB which has robust and fast parsing
- * capabilities for those filetypes.
+ * Returns immediately after the sniff phase so the import form can render.
+ * The caller may save the dataset before the background parquet transcoding
+ * completes; the parquet upload to Supabase storage waits on the background
+ * parquet transcoding internally via `ImportJobsManager.waitForCompletion`.
  *
- * Step 2: After we parse and extract the necessary metadata, we convert
- * the data to parquet format. The compressed parquet gets added to local
- * storage (IndexedDB).
- *
- * Step 3: If parsing already involved loading the file to DuckDB
- * (e.g. for CSVs), we don't need to do anything further. Otherwise, we
- * load the parsed data into DuckDB so it can be in-memory and ready for
- * querying.
+ * IMPORTANT: this does **not** save the dataset to the backend database;
+ * that's `useSaveDataset`.
  */
 export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
+  const { t } = useLingui();
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [dataSourceMetadata, setDataSourceMetadata] = useState<
     ManualUploadDataSourceMetadata | undefined
   >();
+  const [previewRows, setPreviewRows] = useState<UnknownRow[] | undefined>();
+
+  // Captures the most recent sniff's preview rows so we can hand them to
+  // state in `onSuccess`. We can't widen the mutation's return type here
+  // without churning every consumer that already calls `loadFile`, so a
+  // ref carries the side channel.
+  const pendingPreviewRowsRef = useState<{ value: UnknownRow[] | undefined }>(
+    () => {
+      return { value: undefined };
+    },
+  )[0];
 
   const [loadManualUploadFile, isLoadingManualUploadFile] = useMutation({
-    mutationFn: async (options: LoadAndParseFileOptions) => {
+    mutationFn: async (
+      options: LoadAndParseFileOptions,
+    ): Promise<FileLoadResult> => {
       const { file } = options;
       return match(options)
         .with({ type: "csv_file" }, async (csvParseOptions) => {
           const { datasetId, numRowsToSkip, delimiter } = csvParseOptions;
-          const loadResult = await LocalDatasetClient.storeLocalCSV({
+          const sniff = await LocalDatasetClient.startCsvImport({
             datasetId,
             workspaceId: workspace.id,
             userId: user!.id as UserId,
-            csvParseOptions: {
-              file,
-              numRowsToSkip,
-              delimiter,
-            },
+            file,
+            parseOptions: { numRowsToSkip, delimiter },
           });
-          return { datasetId, ...loadResult };
+          // Synthesize a `DuckDbLoadCsvResult` from the sniff phase so the
+          // existing import form / save mutation can consume it
+          // unchanged. `parquetData` isn't real yet; the background parquet
+          // transcoding will write the actual parquet into the LocalDataset
+          // row independently. `numRows` is unknown at the sniff phase; the
+          // toast and save mutation don't error on a fractional value.
+          const loadResult: CsvFileLoadResult = {
+            datasetId,
+            numRows: sniff.previewRows.length,
+            id: uuid() as DuckDbLoadCsvResult["id"],
+            type: "csv",
+            tableName: datasetId,
+            csvName: datasetId,
+            columns: sniff.columns,
+            csvSniff: sniff.csvSniff,
+            errors: { rejectedScans: [], rejectedRows: [] },
+            numRejectedRows: 0,
+            parquetData: EMPTY_PARQUET_PLACEHOLDER,
+          };
+          pendingPreviewRowsRef.value = sniff.previewRows;
+          return loadResult;
         })
         .with({ type: "xlsx_file" }, async (xlsxParseOptions) => {
-          const { datasetId, sheetName: sheet, hasHeader } = xlsxParseOptions;
-          const fileBytes = await file.arrayBuffer();
-          const workbook = XLSX.read(fileBytes, { type: "array" });
-          const availableSheetNames = workbook.SheetNames;
-          const loadResult = await LocalDatasetClient.storeLocalExcel({
+          const { datasetId, sheetName, hasHeader } = xlsxParseOptions;
+          const sniff = await LocalDatasetClient.startXlsxImport({
             datasetId,
             workspaceId: workspace.id,
             userId: user!.id as UserId,
-            xlsxParseOptions: {
-              file,
-              sheet,
-              hasHeader,
-            },
+            file,
+            parseOptions: { sheet: sheetName, hasHeader },
           });
-          return { datasetId, availableSheetNames, ...loadResult };
+          const loadResult: XlsxFileLoadResult = {
+            datasetId,
+            numRows: sniff.previewRows.length,
+            id: uuid() as DuckDbLoadXlsxResult["id"],
+            type: "xlsx",
+            tableName: datasetId,
+            xlsxName: datasetId,
+            columns: _xlsxColumnNamesToSchema(sniff.columns),
+            sheet: sniff.defaultSheet,
+            parquetData: EMPTY_PARQUET_PLACEHOLDER,
+            availableSheetNames: sniff.sheets,
+          };
+          pendingPreviewRowsRef.value = sniff.previewRows as UnknownRow[];
+          return loadResult;
         })
         .exhaustive();
     },
     onSuccess: (loadResult, inputParams) => {
+      const file = inputParams.file;
       setDataSourceMetadata(
         _buildDataSourceMetadataFromLoadResult({
           loadResult,
-          file: inputParams.file,
+          file,
           loadAndParseOptions: inputParams,
         }),
       );
-      _notifyLoadResults(loadResult);
+      setPreviewRows(pendingPreviewRowsRef.value);
+      pendingPreviewRowsRef.value = undefined;
     },
-  });
-
-  const [previewRows] = DatasetQueryClient.useGetPreviewData({
-    datasetId: dataSourceMetadata?.datasetLoadResult?.datasetId,
-    numRows: AppConfig.dataManagerApp.maxPreviewRows,
-    workspaceId: workspace.id,
-    useQueryOptions: {
-      enabled: !!dataSourceMetadata?.datasetLoadResult,
+    onError: (err) => {
+      const message = err instanceof Error ? err.message : String(err);
+      notifyError({
+        title: t`Could not read file`,
+        message,
+      });
     },
   });
 

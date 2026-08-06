@@ -1,5 +1,5 @@
-import { Polar } from "@polar-sh/sdk";
 import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
+import { Polar } from "@polar-sh/sdk";
 
 export type PolarServerType = "sandbox" | "production";
 

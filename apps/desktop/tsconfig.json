@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "./build",
+    "types": ["bun"],
+    "lib": ["ES2022"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noImplicitReturns": false
+  },
+  "include": [
+    "main/**/*",
+    "preload/**/*",
+    "types/**/*",
+    "electrobun.config.ts"
+  ],
+  "exclude": ["build", "bundle", "node_modules", "**/*.test.ts"]
+}

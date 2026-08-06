@@ -1,4 +1,4 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
@@ -26,6 +26,7 @@ const DBReadSchema = z.object({
   description: z.string().nullable(),
   id: z.uuid(),
   is_public: z.boolean(),
+  is_restricted: z.boolean(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),
@@ -65,7 +66,7 @@ export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = DashboardModel;
+type CrudTypes = DashboardModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -73,7 +74,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

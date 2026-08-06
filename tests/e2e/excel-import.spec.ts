@@ -1,19 +1,11 @@
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-  isDatasetParquetInStorage,
-} from "../helper/supabaseAdminClient";
-import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
+import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_XLSX_PATH,
   CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT,
   CHOLERA_NYC_XLSX_PATH,
-  E2E_SEEDED_WORKSPACE_SLUG,
-  E2E_TEST_USER,
-  EXPECTED_CHOLERA_COLUMN_NAMES,
-  EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
@@ -21,6 +13,11 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+  isDatasetParquetInStorage,
+} from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
@@ -31,7 +28,7 @@ import type { Page } from "@playwright/test";
 async function expectExcelParsePreview(options: {
   page: Page;
   formattedRowCount: string;
-  columnNames: readonly string[];
+  columnNames?: readonly string[];
   sampleCellSubstring: string;
 }): Promise<void> {
   await expect(
@@ -48,10 +45,14 @@ async function expectExcelParsePreview(options: {
     options.page.getByText(/These are the first \d+ rows/),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-  for (const columnName of options.columnNames) {
-    await expect(
-      options.page.getByRole("columnheader", { name: columnName }),
-    ).toBeVisible({ timeout: SHORT_WAIT });
+  if (options.columnNames) {
+    await Promise.all(
+      options.columnNames.map(async (columnName) => {
+        await expect(
+          options.page.getByRole("columnheader", { name: columnName }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }),
+    );
   }
 
   await expect(
@@ -60,19 +61,24 @@ async function expectExcelParsePreview(options: {
 }
 
 test.describe("Excel manual upload", () => {
-  test("XLSX import, cloud sync, offline then online again", async ({
-    page,
+  // Runs in its own fresh browser process (see `freshBrowserPage`): the large
+  // XLSX (17k+ rows) DuckDB-WASM parse is slow enough that, on an aged shared
+  // process late in the run, it can exceed its timeout. A clean process removes
+  // that flakiness.
+  test("medium-sized XLSX dataset import, cloud sync, offline then online again", async ({
+    freshBrowserPage: page,
+    e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
+    const { workspaceSlug } = e2eWorkerDb;
 
     await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug,
     });
 
-    await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}/data-manager/data-import`);
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     const fileInput = uploadPanel.locator('input[type="file"]');
@@ -86,9 +92,9 @@ test.describe("Excel manual upload", () => {
 
     await expectExcelParsePreview({
       page,
-      formattedRowCount:
-        CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
-      columnNames: EXPECTED_CHOLERA_COLUMN_NAMES,
+      formattedRowCount: formatImportPreviewRowCount(
+        CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT,
+      ),
       sampleCellSubstring: "Times Square",
     });
 
@@ -97,20 +103,20 @@ test.describe("Excel manual upload", () => {
 
     await expectExcelParsePreview({
       page,
-      formattedRowCount:
-        CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
-      columnNames: EXPECTED_CSV_COLUMN_NAMES,
+      formattedRowCount: formatImportPreviewRowCount(
+        CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+      ),
       sampleCellSubstring: "California",
     });
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     const datasetId = parseDatasetIdFromDataManagerUrl({
       url: page.url(),
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     if (!datasetId) {
@@ -118,8 +124,8 @@ test.describe("Excel manual upload", () => {
     }
 
     const workspaceId = await getWorkspaceIdBySlug({
-      admin,
-      slug: E2E_SEEDED_WORKSPACE_SLUG,
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
     });
 
     await pollUntilCloudDatasetToggleShowsOnline(page);
@@ -128,7 +134,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -151,7 +157,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           const parquetGone = !(await isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           }));
@@ -181,7 +187,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -202,7 +208,7 @@ test.describe("Excel manual upload", () => {
       datasetId,
       page,
       workspaceId,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
   });
 });

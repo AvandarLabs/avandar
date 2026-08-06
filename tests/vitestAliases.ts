@@ -21,7 +21,8 @@ function _getSharedPackageVitestAliases(
 }
 
 /**
- * Extra Vitest aliases for `packages/web/*` (`@ui`, `@hooks`).
+ * Extra Vitest aliases for `packages/web/*` (`@ui`, `@hooks`,
+ * `@browser-utils`).
  *
  * @param rootDir Repository root directory.
  */
@@ -29,6 +30,7 @@ function _getWebPackageVitestAliases(rootDir: string): Record<string, string> {
   return {
     "@ui": resolve(rootDir, "packages/web/ui/src"),
     "@hooks": resolve(rootDir, "packages/web/hooks/src"),
+    "@browser-utils": resolve(rootDir, "packages/web/browser-utils/src"),
   };
 }
 

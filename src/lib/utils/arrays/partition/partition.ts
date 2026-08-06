@@ -12,7 +12,7 @@
 export function partition<T>(
   array: readonly T[],
   predicate: (value: T, idx: number) => boolean,
-): [T[], T[]] {
+): [trueArray: T[], falseArray: T[]] {
   const trueItems: T[] = [];
   const falseItems: T[] = [];
 

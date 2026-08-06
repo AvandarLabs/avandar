@@ -1,6 +1,7 @@
 import {
   Select as MantineSelect,
   SelectProps as MantineSelectProps,
+  useMantineTheme,
 } from "@mantine/core";
 
 export type SelectOption<T extends NonNullable<string>> = {
@@ -63,10 +64,22 @@ type Props<T extends NonNullable<string>> = {
 
 export function Select<T extends NonNullable<string>>({
   searchable = false,
+  comboboxProps,
   ...rest
 }: Props<T>): JSX.Element {
+  const theme = useMantineTheme();
+  const themeComboboxDefaults = theme.components?.Combobox?.defaultProps;
+  const resolvedComboboxDefaults =
+    typeof themeComboboxDefaults === "function" ?
+      themeComboboxDefaults(theme)
+    : themeComboboxDefaults;
+
   return (
-    <MantineSelect searchable={searchable} {...(rest as MantineSelectProps)} />
+    <MantineSelect
+      searchable={searchable}
+      comboboxProps={{ ...resolvedComboboxDefaults, ...comboboxProps }}
+      {...(rest as MantineSelectProps)}
+    />
   );
 }
 

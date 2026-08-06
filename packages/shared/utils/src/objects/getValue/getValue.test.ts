@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { getValue } from "@utils/objects/getValue/getValue.ts";
+import { describe, expect, it } from "vitest";
 
 describe("getValue", () => {
   describe("top-level keys", () => {
@@ -127,6 +127,50 @@ describe("getValue", () => {
       expect(() => {
         getValue(arr, "5" as "0");
       }).toThrow("not found in array");
+    });
+  });
+
+  describe("throwError option", () => {
+    it("throws on a missing key when throwError is undefined (default)", () => {
+      const obj = { a: 1 };
+
+      expect(() => {
+        getValue(obj, "b" as keyof typeof obj);
+      }).toThrow("not found in object");
+    });
+
+    it("throws on a missing key when throwError is true", () => {
+      const obj = { a: 1 };
+
+      expect(() => {
+        getValue(obj, "b" as keyof typeof obj, { throwError: true });
+      }).toThrow("not found in object");
+    });
+
+    it("returns undefined for a missing key when throwError is false", () => {
+      const obj = { a: 1 };
+
+      const result = getValue(obj, "b" as keyof typeof obj, {
+        throwError: false,
+      });
+
+      expect(result).toBeUndefined();
+    });
+
+    it("returns undefined for a missing nested path when throwError is false", () => {
+      const obj = { a: { b: 1 } };
+
+      const result = getValue(obj, "a.c" as "a.b", { throwError: false });
+
+      expect(result).toBeUndefined();
+    });
+
+    it("still returns the value when the path exists and throwError is false", () => {
+      const obj = { a: { b: 42 } };
+
+      const result = getValue(obj, "a.b", { throwError: false });
+
+      expect(result).toBe(42);
     });
   });
 });

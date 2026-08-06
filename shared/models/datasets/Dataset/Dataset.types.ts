@@ -2,7 +2,7 @@ import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
@@ -25,6 +25,9 @@ type DatasetRead = Model.Base<
 
     /** Unique identifier of the dataset. */
     id: DatasetId;
+
+    /** Restricted unless caller has explicit grants (RBAC). */
+    isRestricted: boolean;
 
     /** Name of the dataset. */
     name: string;
@@ -49,7 +52,7 @@ type DatasetRead = Model.Base<
 /**
  * CRUD type definitions for the Dataset model.
  */
-export type DatasetModel = SupabaseCRUDModelSpec<
+export type DatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets";
     modelName: "Dataset";
@@ -62,6 +65,7 @@ export type DatasetModel = SupabaseCRUDModelSpec<
         | "dateOfLastSync"
         | "description"
         | "id"
+        | "isRestricted"
         | "ownerId"
         | "updatedAt"
       >;

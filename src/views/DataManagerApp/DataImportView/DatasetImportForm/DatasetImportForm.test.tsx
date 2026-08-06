@@ -1,11 +1,16 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { fireEvent, render, screen } from "@/test-utils";
 import { DatasetImportForm } from "./DatasetImportForm";
-import type { DataSourceMetadata } from "./DatasetImportForm";
+import type {
+  CsvDataSourceMetadata,
+  DataSourceMetadata,
+} from "./DatasetImportForm";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 const CSV_DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
@@ -63,7 +68,7 @@ function _columnSchema(
   };
 }
 
-function _csvDataSourceMetadata(): DataSourceMetadata {
+function _csvDataSourceMetadata(): CsvDataSourceMetadata {
   const columns = [_columnSchema("city", "VARCHAR")];
   return {
     sourceType: "csv_file",
@@ -97,6 +102,7 @@ function _csvDataSourceMetadata(): DataSourceMetadata {
         table_name: "dataset_1",
       },
       datasetId: CSV_DATASET_ID,
+      parquetData: new Blob(),
     },
     parseOptions: {
       type: "csv_file",
@@ -122,6 +128,7 @@ function _xlsxDataSourceMetadata(sheetNames: string[]): DataSourceMetadata {
       sheet: sheetNames[0],
       datasetId: XLSX_DATASET_ID,
       availableSheetNames: sheetNames,
+      parquetData: new Blob(),
     },
     parseOptions: {
       type: "xlsx_file",
@@ -139,20 +146,71 @@ describe("DatasetImportForm", () => {
     saveDatasetMock.mockReset();
   });
 
+  it("reparse uses parse options edited immediately before the click", () => {
+    const onRequestDataReparse = vi.fn();
+    const initialMetadata = _csvDataSourceMetadata();
+    const metadataWithColonDelimiter: CsvDataSourceMetadata = {
+      ...initialMetadata,
+      parseOptions: {
+        type: "csv_file",
+        numRowsToSkip: 0,
+        delimiter: ":",
+      },
+    };
+
+    function ControlledMetadataHarness(): JSX.Element {
+      const [currentMetadata, setCurrentMetadata] =
+        useState<DataSourceMetadata>(metadataWithColonDelimiter);
+
+      return (
+        <DatasetImportForm
+          rows={[{ city: "LA" }]}
+          initialDatasetName="cities.csv"
+          onRequestDataReparse={onRequestDataReparse}
+          onDataSourceMetadataChange={setCurrentMetadata}
+          dataSourceMetadata={currentMetadata}
+          parseOptions={currentMetadata.parseOptions}
+        />
+      );
+    }
+
+    render(
+      <AvandarUiProvider>
+        <ControlledMetadataHarness />
+      </AvandarUiProvider>,
+    );
+
+    fireEvent.change(screen.getByLabelText("Delimiter"), {
+      target: { value: "," },
+    });
+    fireEvent.change(screen.getByLabelText("Number of rows to skip"), {
+      target: { value: "1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Process data again" }));
+
+    expect(onRequestDataReparse).toHaveBeenCalledWith({
+      type: "csv_file",
+      numRowsToSkip: 1,
+      delimiter: ",",
+    });
+  });
+
   it("renders CSV parse controls and updates metadata", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _csvDataSourceMetadata();
     render(
-      <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.csv"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={onDataSourceMetadataChange}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.csv"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={onDataSourceMetadataChange}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     fireEvent.change(screen.getByLabelText("Delimiter"), {
@@ -170,16 +228,18 @@ describe("DatasetImportForm", () => {
   it("disables sheet picker when xlsx has one sheet", () => {
     const metadata = _xlsxDataSourceMetadata(["Sheet1"]);
     render(
-      <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.xlsx"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={vi.fn()}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.xlsx"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={vi.fn()}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     expect(
@@ -191,16 +251,18 @@ describe("DatasetImportForm", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _xlsxDataSourceMetadata(["Sheet1", "Sheet2"]);
     render(
-      <AvandarUiProvider>
-        <DatasetImportForm
-          rows={[{ city: "LA" }]}
-          initialDatasetName="cities.xlsx"
-          onRequestDataReparse={vi.fn()}
-          onDataSourceMetadataChange={onDataSourceMetadataChange}
-          dataSourceMetadata={metadata}
-          parseOptions={metadata.parseOptions}
-        />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.xlsx"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={onDataSourceMetadataChange}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     expect(
@@ -240,9 +302,11 @@ describe("DatasetImportForm", () => {
     }
 
     render(
-      <AvandarUiProvider>
-        <ControlledMetadataHarness />
-      </AvandarUiProvider>,
+      <I18nProvider i18n={i18n}>
+        <AvandarUiProvider>
+          <ControlledMetadataHarness />
+        </AvandarUiProvider>
+      </I18nProvider>,
     );
 
     const warningRegex = /This dataset will no longer be stored online/i;

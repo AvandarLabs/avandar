@@ -1,8 +1,9 @@
+import { Trans } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
-import { AuthClient } from "@/clients/AuthClient";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
 
 export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
@@ -68,10 +69,14 @@ export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
 function AcceptInvitePage() {
   return (
     <Container pt="xxxl">
-      <Title order={3}>Oops!</Title>
+      <Title order={3}>
+        <Trans>Oops!</Trans>
+      </Title>
       <Text>
-        The invitation you are trying to accept is not valid. Please contact the
-        workspace owner to get a new invitation.
+        <Trans>
+          The invitation you are trying to accept is not valid. Please contact
+          the workspace owner to get a new invitation.
+        </Trans>
       </Text>
     </Container>
   );

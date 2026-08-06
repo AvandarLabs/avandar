@@ -1,6 +1,6 @@
-import { renderHook } from "@testing-library/react";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
+import { renderHook } from "@/test-utils";
 import { useImportedColumns } from "./useImportedColumns";
 import type {
   CsvFileLoadResult,
@@ -52,6 +52,7 @@ function _csvFileMetadata(columns: DuckDbColumnSchema[]): DataSourceMetadata {
       table_name: "temp_csv_table",
     },
     datasetId: DATASET_ID,
+    parquetData: new Blob(),
   };
 
   return {
@@ -74,6 +75,7 @@ function _xlsxFileMetadata(columns: DuckDbColumnSchema[]): DataSourceMetadata {
     sheet: "Sheet1",
     availableSheetNames: ["Sheet1"],
     datasetId: DATASET_ID,
+    parquetData: new Blob(),
   };
 
   return {
@@ -122,6 +124,7 @@ function _googleSheetsMetadata(
           Prompt: "",
           table_name: "temp_google_sheet_table",
         },
+        parquetData: new Blob(),
       },
     },
   };

@@ -1,0 +1,22 @@
+.pdfAnnotationCanvasFrame {
+  background: var(--mantine-color-white);
+  overflow: hidden;
+}
+
+.pdfAnnotationCanvasContainer {
+  margin: 0 auto;
+}
+
+.pdfAnnotationCanvasSnapshot {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.pdfAnnotationCanvasOverlay {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  touch-action: none;
+  width: 100%;
+}

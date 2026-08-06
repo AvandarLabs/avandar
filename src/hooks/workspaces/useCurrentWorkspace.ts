@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { propEq } from "@utils";
+import { useEffect } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";

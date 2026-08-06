@@ -1,9 +1,9 @@
 import { Text, TextInput } from "@mantine/core";
-import { Select } from "@ui/inputs/Select/Select";
 import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { isStringOrNumber } from "@ui/ObjectDescriptionList/guards";
-import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
-import type { SelectData } from "@ui/inputs/Select/Select";
+import { Select } from "../../inputs/Select/Select";
+import { isStringOrNumber } from "../guards";
+import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import type { SelectData } from "../../inputs/Select/Select";
 import type { ReactNode } from "react";
 
 type Props = {

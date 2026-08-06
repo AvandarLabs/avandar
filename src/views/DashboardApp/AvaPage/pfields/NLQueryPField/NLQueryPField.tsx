@@ -1,10 +1,14 @@
-import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
-import { useState } from "react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { Tabs } from "@ui";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
-import { mantineColorVar } from "@/lib/utils/browser/css";
+import { PromptTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel";
+import { SqlTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel";
+import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 export type NLQuery = {
   /**
@@ -40,9 +44,10 @@ export type NLQuery = {
 
 type Props = AvaPageFieldProps<NLQuery>;
 
-export function NLQueryPField({ value, onChange }: Props): JSX.Element {
+/** Edits a visualization query through prompt, structured, and SQL tabs. */
+export function NLQueryPField({ value, onChange }: Props): ReactElement {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const [isEditSQLMode, setIsEditSQLMode] = useState(false);
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
     onSuccess: (sql, mutationVars) => {
@@ -61,114 +66,69 @@ export function NLQueryPField({ value, onChange }: Props): JSX.Element {
   });
   const { prompt, rawSql } = value;
 
-  return (
-    <Stack gap="sm">
-      <TextareaForm
-        asField
-        defaultValue={prompt}
-        description="Enter your question or instructions in natural language to generate a SQL query"
-        label="Prompt"
-        minRows={4}
-        autosize
-        isSubmitting={isRunningQuery}
-        submitButtonLabel="Generate Query"
-        styles={{
-          input: {
-            fontFamily: "monospace",
-          },
-        }}
-        onSubmit={(promptStr) => {
-          const trimmedPrompt = promptStr.trim();
-          onChange({
-            ...value,
-            prompt: trimmedPrompt,
-          });
-          if (trimmedPrompt) {
-            generateAndRunQuery({ prompt: trimmedPrompt });
-          }
-        }}
-      />
+  const manualState = useDashboardManualQueryState({
+    rawSql,
+    onRawSqlChange: (nextSql) => {
+      onChange({ ...value, rawSql: nextSql });
+    },
+  });
 
-      <Fieldset
-        legend={
-          <Group justify="space-between" style={{ width: "100%" }}>
-            <span>Generated SQL</span>
-            {!isEditSQLMode && (
-              <Button
-                size="xs"
-                variant="subtle"
-                onClick={() => {
-                  setIsEditSQLMode(true);
-                }}
-              >
-                Edit query
-              </Button>
-            )}
-          </Group>
-        }
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
-      >
-        <Stack gap="sm">
-          {isEditSQLMode ?
-            <TextareaForm
-              // use the rawSQL as the key to force the textarea form to
-              // re-initialize when we re-run a query, so we can properly
-              // detect dirty state
-              key={rawSql}
-              asField
-              defaultValue={rawSql}
-              minRows={6}
-              autosize
-              showSubmitButton={true}
-              showCancelButton={true}
-              submitButtonLabel="Save and re-run query"
-              cancelButtonLabel="Cancel"
-              isSubmitting={false}
-              styles={{
-                input: {
-                  fontFamily: "monospace",
-                },
-              }}
-              validateOnChange={true}
-              required={true}
-              disabledUntilDirty={true}
-              onSubmit={(newRawSQL) => {
-                const trimmedSQL = newRawSQL.trim();
-                setIsEditSQLMode(false);
-                onChange({
-                  ...value,
-                  rawSql: trimmedSQL,
-                });
-              }}
-              onCancel={() => {
-                setIsEditSQLMode(false);
+  return (
+    <Tabs
+      indicatorVariant="floating"
+      tabIds={["prompt", "manual-query", "sql"] as const}
+      renderTabHeader={{
+        prompt: t`Prompt`,
+        "manual-query": t`Manual`,
+        sql: t`SQL`,
+      }}
+      px="xs"
+      py="sm"
+      renderTabPanel={{
+        prompt: () => {
+          return (
+            <PromptTabPanel
+              prompt={prompt}
+              isRunningQuery={isRunningQuery}
+              onSubmitPrompt={(promptStr) => {
+                onChange({ ...value, prompt: promptStr });
+                if (promptStr) {
+                  generateAndRunQuery({ prompt: promptStr });
+                }
               }}
             />
-          : <Paper
-              p="sm"
-              style={{
-                backgroundColor: mantineColorVar("gray.0"),
-                border: `1px solid ${mantineColorVar("gray.3")}`,
-              }}
-            >
-              <Textarea
-                value={rawSql}
-                readOnly
-                minRows={6}
-                autosize
-                styles={{
-                  input: {
-                    fontFamily: "monospace",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    padding: 0,
-                  },
-                }}
-              />
-            </Paper>
+          );
+        },
+        "manual-query": () => {
+          if (!manualState.isParserReady) {
+            return (
+              <Text size="sm" c="dimmed" px="sm">
+                <Trans>Loading datasets…</Trans>
+              </Text>
+            );
           }
-        </Stack>
-      </Fieldset>
-    </Stack>
+          return (
+            <ManualQueryForm
+              query={manualState.query}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              handlers={manualState.handlers}
+              withinPortal
+            />
+          );
+        },
+        sql: () => {
+          return (
+            <SqlTabPanel
+              rawSql={rawSql}
+              isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+              sqlSyncWarnings={manualState.sqlSyncWarnings}
+              onSubmitSql={(nextSql) => {
+                onChange({ ...value, rawSql: nextSql });
+              }}
+            />
+          );
+        },
+      }}
+    />
   );
 }

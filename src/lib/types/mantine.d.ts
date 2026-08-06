@@ -1,3 +1,6 @@
+import type { AnimationTheme } from "@/config/Theme/AnimationTheme/AnimationTheme";
+import type { BorderTheme } from "@/config/Theme/BorderTheme";
+import type { ElevationTheme } from "@/config/Theme/ElevationTheme";
 import type {
   DefaultMantineColor,
   DefaultMantineSize,
@@ -26,7 +29,16 @@ declare module "@mantine/core" {
   export interface MantineThemeOther {
     /** Primary color */
     primaryColor: string;
-
+    zIndex: {
+      appShellMain: number;
+      appChrome: number;
+      modal: number;
+      popover: number;
+      notifications: number;
+    };
+    elevation: typeof ElevationTheme;
+    borders: typeof BorderTheme;
+    animation: typeof AnimationTheme;
     navbar: {
       /** Navbar background color */
       backgroundColor: string;
@@ -53,3 +65,5 @@ declare module "@mantine/core" {
     colors: Record<ExtendedAppColors, MantineColorsTuple>;
   }
 }
+
+export {};

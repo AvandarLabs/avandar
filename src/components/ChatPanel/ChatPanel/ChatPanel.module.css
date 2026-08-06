@@ -1,0 +1,24 @@
+.shell {
+  /*
+   * Always opaque so the dark app shell behind us never bleeds through.
+   * The previous disabled state used `rgb(0 0 0 / 6%)`, which against a
+   * dark navbar background reads as fully transparent on iPad and on
+   * darker themed deployments (caught on the Vercel preview). Opaque
+   * background plus the existing composer text-tint communicates the
+   * disabled state without leaking the navbar through.
+   */
+  background-color: var(--mantine-color-white);
+  border-left: 1px solid var(--ava-border-default);
+}
+
+.chatPanelShellDisabled {
+  /*
+   * Subtle, opaque off-white. Distinguishable from the active state
+   * but never transparent.
+   */
+  background-color: var(--mantine-color-neutral-0);
+}
+
+.header {
+  border-bottom: 1px solid var(--ava-border-default);
+}

@@ -1,0 +1,127 @@
+import { useLingui } from "@lingui/react/macro";
+import { Box, Button, FileInput, Group } from "@mantine/core";
+import { isArray, MIMEType } from "@utils";
+import { useRef, useState } from "react";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
+import type { FileInputProps } from "@mantine/core";
+
+type Props = {
+  /**
+   * Whether the file input should be clearable
+   */
+  clearable?: boolean;
+
+  /**
+   * MIME types to accept. Passed to the file input as a comma-separated
+   * list (HTML `accept` attribute).
+   */
+  accept: MIMEType | readonly MIMEType[];
+
+  /**
+   * Callback fired when a file is submitted
+   */
+  onSubmit: (file: File | undefined) => void;
+
+  /**
+   * Whether the form is currently submitting
+   */
+  isSubmitting?: boolean;
+
+  /**
+   * Label for the submit button
+   */
+  submitButtonLabel?: string;
+
+  /**
+   * Whether the form that wraps this file input should have
+   * `width: 100%` applied to it
+   */
+  fullWidth?: boolean;
+} & Omit<FileInputProps, "clearable" | "accept" | "onSubmit">;
+
+type FileUploadForm = {
+  file: File | null;
+};
+
+/**
+ * A file upload field wrapped in a form with validation and a button
+ * to submit the file. This is useful for situations where you only
+ * need a single file upload field.
+ *
+ * If you're using multiple file upload fields, use Mantine's `useForm` hook
+ * instead of multiple FileUploadField components.
+ */
+export function FileUploadForm({
+  clearable = true,
+  accept,
+  onSubmit,
+  isSubmitting = false,
+  submitButtonLabel,
+  fullWidth,
+  ...fileInputProps
+}: Props): JSX.Element {
+  const { t } = useLingui();
+  const resolvedSubmitLabel = submitButtonLabel ?? t`Upload`;
+  const form = useForm<FileUploadForm>({
+    initialValues: {
+      file: null,
+    },
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  form.useFieldWatch("file", () => {
+    // when the file changes, reset the submitted state
+    setIsSubmitted(false);
+    // we request an animation frame because the button cannot receive focus
+    // while it is disabled, so we need to wait for the browser to first
+    // remove the button's disabled state before we can call `focus()`
+    requestAnimationFrame(() => {
+      submitBtnRef.current?.focus();
+    });
+  });
+  const submitBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  return (
+    <form
+      onSubmit={form.onSubmit((values) => {
+        onSubmit(values.file ?? undefined);
+        setIsSubmitted(true);
+      })}
+      style={{
+        width: fullWidth ? "100%" : undefined,
+        minWidth: 0,
+        maxWidth: fullWidth ? "100%" : undefined,
+      }}
+    >
+      <Group mt="md" wrap="nowrap" w="100%" align="flex-end" miw={0}>
+        <Box miw={0} style={{ flex: 1 }}>
+          <FileInput
+            w="100%"
+            key={form.key("file")}
+            {...form.getInputProps("file")}
+            clearable={clearable}
+            accept={isArray(accept) ? accept.join(",") : accept}
+            {...fileInputProps}
+            styles={{
+              input: {
+                minWidth: 0,
+                maxWidth: "100%",
+              },
+            }}
+            valueComponent={TruncatedFileInputValue}
+          />
+        </Box>
+        <Box style={{ alignSelf: "flex-end", flexShrink: 0 }}>
+          <Button
+            ref={submitBtnRef}
+            type="submit"
+            loading={isSubmitting}
+            disabled={form.getValues().file === null || isSubmitted}
+          >
+            {resolvedSubmitLabel}
+          </Button>
+        </Box>
+      </Group>
+    </form>
+  );
+}

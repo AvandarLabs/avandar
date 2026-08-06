@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures/e2e.fixture";
 import { cleanupTestUser } from "./helpers/cleanupTestUser";
 import { LONG_WAIT } from "./helpers/timeouts";
 
@@ -21,7 +21,7 @@ test.describe("account registration", () => {
 
     const uniqueSuffix = Date.now();
     const email = `e2e-register-${uniqueSuffix}@avandarlabs.com`;
-    const password = `E2e-register-pass-${uniqueSuffix}!`;
+    const password = `E2E-register-pass-${uniqueSuffix}!`;
 
     try {
       await page.goto("/register");

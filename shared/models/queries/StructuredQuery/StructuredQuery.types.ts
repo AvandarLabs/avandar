@@ -6,6 +6,11 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  NestedSubquerySource,
+  QueryJoin,
+} from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
@@ -27,6 +32,16 @@ export type StructuredQueryRead = Model.Versioned<
     /** The data source we are querying from. */
     dataSource: QueryDataSource;
 
+    /**
+     * Set when the SQL came in as `FROM (SELECT ...) AS alias` rather than
+     * `FROM <dataset>`. The string still tracks `dataSource` but the
+     * `nestedSubquery` snapshot keeps the original SQL so the SQL view can
+     * round-trip the query unchanged. When this is set the form treats the
+     * subquery as opaque (the user can edit the outer query and the inner
+     * SQL stays put).
+     */
+    nestedSubquery?: NestedSubquerySource;
+
     /** The columns that are being queried. */
     queryColumns: readonly QueryColumnRead[];
 
@@ -38,6 +53,23 @@ export type StructuredQueryRead = Model.Versioned<
 
     /** The aggregations that are being applied to the query columns */
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
+
+    /**
+     * Recursive WHERE-clause tree authored via the filter UI. Always a group
+     * at the root; an empty group means "no filters".
+     */
+    filters: QueryFilterGroup;
+
+    /**
+     * Recursive HAVING tree. Same shape as `filters`; applied after
+     * GROUP BY. Empty group means "no having clause".
+     */
+    having: QueryFilterGroup;
+
+    /**
+     * JOIN clauses, applied in array order. Empty array means "no joins".
+     */
+    joins: readonly QueryJoin[];
 
     /** The offset of the query. */
     offset: number | undefined;
@@ -53,12 +85,16 @@ type EmptyStructuredQuery = Model.Versioned<
   {
     id: StructuredQueryId;
     dataSource: undefined;
+    nestedSubquery?: NestedSubquerySource;
     queryColumns: readonly QueryColumnRead[];
-    orderByColumn: undefined;
-    orderByDirection: undefined;
+    orderByColumn: QueryColumnId | undefined;
+    orderByDirection: OrderByDirection | undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
-    offset: undefined;
-    limit: undefined;
+    filters: QueryFilterGroup;
+    having: QueryFilterGroup;
+    joins: readonly QueryJoin[];
+    offset: number | undefined;
+    limit: number | undefined;
   }
 >;
 

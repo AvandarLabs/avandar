@@ -1,4 +1,4 @@
-import type { Registry } from "@utils/types/utilities.types";
+import type { Registry } from "@utils";
 
 /**
  * Feature flags are used to enable or disable certain features in the app.
@@ -54,6 +54,19 @@ export enum FeatureFlag {
    * This requires a Featurebase account and organization setup.
    */
   EnableUserFeedback = "enable-user-feedback",
+
+  /**
+   * Disable the DuckDB-WASM spatial extension.
+   *
+   * DuckDB-WASM fetches the spatial extension binary at runtime from
+   * `extensions.duckdb.org`. In environments where outbound network access
+   * is restricted (sandboxed dev containers, offline demos) the fetch
+   * stalls DuckDB initialization. This flag skips the `LOAD spatial;`
+   * call so the rest of the database boots and CSV / XLSX / Parquet
+   * paths keep working, at the cost of any geo queries that rely on
+   * spatial functions.
+   */
+  DisableDuckDbSpatial = "disable-duckdb-spatial",
 }
 
 export const FeatureFlagConfig = {
@@ -65,6 +78,7 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableGeoExplorer]: undefined,
   [FeatureFlag.DisableProfileManager]: undefined,
   [FeatureFlag.EnableUserFeedback]: undefined,
+  [FeatureFlag.DisableDuckDbSpatial]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

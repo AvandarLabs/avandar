@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { doesRowPassFilters } from "@utils/filters/doesRowPassFilters/doesRowPassFilters.ts";
+import { describe, expect, it } from "vitest";
 
 describe("doesRowPassFilters", () => {
   it("passes when every operator succeeds", () => {

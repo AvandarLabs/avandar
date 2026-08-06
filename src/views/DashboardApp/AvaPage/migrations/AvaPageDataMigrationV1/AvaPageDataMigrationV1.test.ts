@@ -1,8 +1,8 @@
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { propEq } from "@utils";
 import { beforeAll, describe, expect, it } from "vitest";
+import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
-import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import type {
   V0_AvaPageData,
   V1_AvaPageData,
@@ -92,7 +92,7 @@ describe("AvaPageConfigMigration - v1", () => {
   });
 
   it("should upgrade the AvaPageConfig data to version 1", () => {
-    const upgradedData = AvaPageDataMigrator.upgrade(v0Data);
+    const upgradedData = AvaPageDataMigrator.upgradeOnce(v0Data);
     expect(getVersionFromAvaPageData(upgradedData)).toEqual(1);
   });
 
@@ -102,7 +102,7 @@ describe("AvaPageConfigMigration - v1", () => {
   });
 
   it("should upgrade the DataViz block to hold an `nlQuery`object", () => {
-    const upgradedData = AvaPageDataMigrator.upgrade(v0Data);
+    const upgradedData = AvaPageDataMigrator.upgradeOnce(v0Data);
     const upgradedDataViz = upgradedData.content.find(
       propEq("type", "DataViz"),
     );

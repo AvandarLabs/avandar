@@ -21,7 +21,7 @@ import { z } from "zod";
 export const UpdateSubscriptionProduct = PATCH({
   path: "/:subscriptionId/product",
   schema: {
-    // this is the subscription id in the Avandar database
+    // Polar subscription id (not the Supabase subscriptions.id row pk).
     subscriptionId: z.uuid(),
   },
 })
@@ -42,9 +42,14 @@ export const UpdateSubscriptionProduct = PATCH({
       .single()
       .throwOnError();
 
+    const polarSubscriptionId = subscription.polar_subscription_id;
+    if (!polarSubscriptionId) {
+      throw new Error("Subscription is missing Polar subscription id.");
+    }
+
     // send the update request to Polar
     const updatedSubscription = await PolarClient.updateSubscriptionProduct({
-      subscriptionId: subscription.polar_subscription_id,
+      subscriptionId: polarSubscriptionId,
       newProductId: newPolarProductId,
     });
 

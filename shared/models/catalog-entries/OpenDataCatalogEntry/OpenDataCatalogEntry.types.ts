@@ -1,5 +1,5 @@
 import type { UUID } from "@utils/types/common.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
 
@@ -57,7 +57,7 @@ export type OpenDataCatalogEntryRead = {
 /**
  * CRUD type definitions for the OpenDataCatalogEntry model.
  */
-export type OpenDataCatalogEntryModel = SupabaseCRUDModelSpec<
+export type OpenDataCatalogEntryModel = SupabaseCrudModelSpec<
   {
     tableName: "catalog_entries__open_data";
     modelName: "OpenDataCatalogEntry";

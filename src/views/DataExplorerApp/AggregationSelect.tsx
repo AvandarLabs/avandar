@@ -1,9 +1,9 @@
+import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
-import { Select } from "@ui/inputs/Select/Select";
-import { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray";
+import { Select } from "@ui";
+import { propIsInArray } from "@utils";
 import { AvaDataType as AvaDataTypeFns } from "$/models/datasets/AvaDataType/AvaDataType";
-import { useMemo } from "react";
-import type { SelectOption, SelectProps } from "@ui/inputs/Select/Select";
+import type { SelectOption, SelectProps } from "@ui";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 
@@ -18,15 +18,22 @@ type Props = {
   "value" | "defaultValue" | "onChange"
 >;
 
-const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType.T>> = [
-  { value: "none", label: "None" },
-  { value: "group_by", label: "Group by" },
-  { value: "sum", label: "Sum" },
-  { value: "avg", label: "Average" },
-  { value: "count", label: "Count" },
-  { value: "max", label: "Max" },
-  { value: "min", label: "Min" },
-];
+/**
+ * Returns the localized aggregation options. Defined as a hook so the labels
+ * can use the active translation function.
+ */
+function useAggregationOptions(): Array<SelectOption<QueryAggregationType.T>> {
+  const { t } = useLingui();
+  return [
+    { value: "none", label: t`None` },
+    { value: "group_by", label: t`Group by` },
+    { value: "sum", label: t`Sum` },
+    { value: "avg", label: t`Average` },
+    { value: "count", label: t`Count` },
+    { value: "max", label: t`Max` },
+    { value: "min", label: t`Min` },
+  ];
+}
 
 export function AggregationSelect({
   dataType,
@@ -36,14 +43,14 @@ export function AggregationSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const allAggregationOptions = useAggregationOptions();
   const validAggregations = AvaDataTypeFns.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options
-  const aggregationOptions = useMemo(() => {
-    return AGGREGATION_OPTIONS.filter(
-      propIsInArray("value", validAggregations),
-    );
-  }, [validAggregations]);
+  const aggregationOptions = allAggregationOptions.filter(
+    propIsInArray("value", validAggregations),
+  );
 
   const [currentAggregation, setCurrentAggregation] =
     useUncontrolled<QueryAggregationType.T>({
@@ -56,7 +63,7 @@ export function AggregationSelect({
   return (
     <Select
       label={label}
-      placeholder="Select aggregation"
+      placeholder={t`Select aggregation`}
       data={aggregationOptions}
       value={currentAggregation}
       onChange={(newValue) => {

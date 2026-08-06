@@ -1,15 +1,14 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { objectKeys } from "@utils/objects/objectKeys";
+import { promiseFlatMap } from "@utils/promises/promiseFlatMap/promiseFlatMap";
 import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { match } from "ts-pattern";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { promiseFlatMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type {
@@ -18,8 +17,7 @@ import type {
 } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 
 export const EntityFieldConfigClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "EntityFieldConfig",
     tableName: "entity_field_configs",
     dbTablePrimaryKey: "id",

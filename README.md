@@ -43,6 +43,14 @@ the product into something that truly serves your mission.
    `pnpm` remains the package manager for the monorepo. Some app scripts run
    with Bun, and the expected Bun version is pinned in `.bun-version`.
 
+   `pnpm install` also points your git hooks at the repo's `.githooks/`
+   directory (via the `prepare` script). A `pre-push` hook then runs
+   `prettier`, `eslint --fix`, and `stylelint --fix` on files changed on
+   the current branch before letting a push through, and blocks the push if
+   any files were reformatted so you can review and commit the changes. If
+   you ever need to bypass it for a one-off, `git push --no-verify` skips
+   the hook.
+
 2. Initiate a local instance of Supabase (you need to have installed Supabase
    CLI for this)
 
@@ -73,9 +81,9 @@ the product into something that truly serves your mission.
    pnpm db:reset
    ```
 
-   This will reset your Supabase database, apply all local migrations from
-   the `supabase/migrations` directory, and then add the seed data from
-   `seed/SeedConfig.ts`
+   This loads `.env.development` for the seed step, resets your Supabase
+   database, applies all local migrations from the `supabase/migrations`
+   directory, and then adds the seed data from `seed/SeedConfig.ts`.
 
 5. Start the development server
 
@@ -89,6 +97,21 @@ Playwright runs against the app URL in `playwright.config.ts` (default
 `http://127.0.0.1:5173`). The config can start Vite automatically unless a
 server is already running.
 
+**Install browsers once** (and again after upgrading `@playwright/test`):
+
+```bash
+pnpm exec playwright install chromium
+```
+
+Without this step, e2e tests fail with `browserType.launch: Executable doesn't
+exist`. Browsers are stored under `~/Library/Caches/ms-playwright/` on macOS
+(not in the repo).
+
+Playwright's web server enables `enable-shared-with-me` in
+`VITE_FEATURE_FLAGS`. If you reuse an existing dev server on port 5173, add
+that flag to your `.env.development` or stop the dev server so Playwright can
+start one with the correct flags.
+
 E2E tests expect a **full local Supabase stack**: `supabase start`, seeded DB
 (`pnpm db:reset` or equivalent), **Edge Functions served** (e.g. `pnpm fns:serve`
 after `pnpm fns:update-env`), and `.env.development` filled in (including
@@ -97,6 +120,7 @@ routes; they do not stub Supabase APIs.
 
 | Command                | What it does                                                                      |
 | ---------------------- | --------------------------------------------------------------------------------- |
+| `pnpm test`            | Full suite (unit + integration + e2e). Use `pnpm test -- --quick` to skip e2e. |
 | `pnpm test:e2e`        | **Headless** run: no browser window, best for CI and quick passes.                |
 | `pnpm test:e2e:headed` | Same tests with a **visible** browser; useful to watch flows and failures.        |
 | `pnpm test:e2e:ui`     | **Playwright UI mode**: pick tests, debug with time travel, live DOM, and traces. |
@@ -115,7 +139,7 @@ routes; they do not stub Supabase APIs.
 
 ## Reference documentation
 
-The [`reference/`](reference/) directory holds long-lived Markdown notes:
+The [`docs/`](docs/) directory holds long-lived Markdown notes:
 architectural decisions, design decisions, and change checklists. Start there
 when touching cross-cutting areas (for example, dataset source types).
 

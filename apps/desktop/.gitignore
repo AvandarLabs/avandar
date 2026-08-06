@@ -1,0 +1,5 @@
+build/
+bundle/
+*.app/
+*.dmg
+.electrobun-cache/

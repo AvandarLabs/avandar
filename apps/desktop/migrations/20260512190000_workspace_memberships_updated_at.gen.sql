@@ -1,0 +1,16 @@
+-- Generated from supabase/migrations/20260512190000_workspace_memberships_updated_at.sql by
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
+-- unless the matching `needs hand-edit` warning calls for it.
+-- Schema-shape statements emitted: 1
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 1
+-- FK constraints dropped (target not synced to SQLite): 0
+-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
+--
+-- HAND-EDITED: This migration is a defensive `add column if not exists
+-- updated_at` against the workspace_memberships table. The prior
+-- migration (20260512180000_role_group_membership_resolution) already
+-- added that column unconditionally to keep its own trigger usable.
+-- sqlglot's `read=postgres write=sqlite` transpile strips IF NOT EXISTS
+-- from ALTER TABLE ADD COLUMN (SQLite does not support that clause),
+-- which turns this migration into a duplicate-column error. Schema is
+-- already correct after 180000; nothing to emit here in SQLite.

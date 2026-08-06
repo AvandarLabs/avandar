@@ -1,0 +1,7 @@
+---
+description: Testing style
+globs: "**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+@docs/rules/testing.md

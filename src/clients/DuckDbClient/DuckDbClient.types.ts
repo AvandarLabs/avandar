@@ -1,4 +1,4 @@
-import type { UUID } from "@utils/types/common.types";
+import type { UUID } from "@utils";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 
@@ -114,7 +114,7 @@ export type DuckDbLoadXlsxResult = {
   type: "xlsx";
   /** Unique identifier for this load operation */
   id: UUID;
-  /** The DuckDB table holding the loaded sheet */
+  /** The DuckDB view that exposes the loaded sheet */
   tableName: string;
   /** Same as `tableName`; mirrors `DuckDbLoadCsvResult.csvName`. */
   xlsxName: string;
@@ -127,6 +127,14 @@ export type DuckDbLoadXlsxResult = {
    * sheet was loaded.
    */
   sheet: string | undefined;
+  /**
+   * The transcoded parquet bytes for the loaded sheet. Streamed directly out
+   * of `read_xlsx` without ever materializing the workbook as a DuckDB
+   * TABLE, so the peak memory cost is bounded by the output parquet size
+   * (not the workbook size). Callers persist this Blob (e.g. into
+   * IndexedDB) instead of re-running the conversion later.
+   */
+  parquetData: Blob;
 };
 
 export type DuckDbLoadCsvResult = {
@@ -149,8 +157,17 @@ export type DuckDbLoadCsvResult = {
    */
   csvSniff: DuckDbCsvSniffResult;
 
-  /** The name of the DUckDB table holding the loaded CSV data */
+  /** The name of the DuckDB view exposing the loaded CSV data */
   tableName: string;
+
+  /**
+   * The transcoded parquet bytes for the loaded CSV. Streamed directly out
+   * of `read_csv` without ever materializing the CSV as a DuckDB TABLE, so
+   * peak memory is bounded by the output parquet size (not the input CSV
+   * size). Callers persist this Blob (e.g. into IndexedDB) instead of
+   * re-running the conversion later.
+   */
+  parquetData: Blob;
 };
 
 export type DuckDbCsvSniffResult = {

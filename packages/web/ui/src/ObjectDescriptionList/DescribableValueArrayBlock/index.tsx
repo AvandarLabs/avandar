@@ -1,16 +1,17 @@
+import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, Text } from "@mantine/core";
-import { pick } from "@utils/objects/pick/pick";
+import { pick } from "@utils";
 import { useMemo } from "react";
 import {
   isDescribableObject,
   isDescribableValueArray,
   isPrimitiveDescribableValue,
   isStringOrNumber,
-} from "@ui/ObjectDescriptionList/guards";
-import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import { NestedArraysBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock";
-import { ObjectArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock";
-import { PrimitiveFieldValueArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock";
+} from "../guards";
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
+import { NestedArraysBlock } from "./NestedArraysBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
+import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
@@ -20,7 +21,7 @@ import type {
   ObjectArrayRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "../ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];
@@ -42,12 +43,14 @@ export function DescribableValueArrayBlock<
   data,
   rootData,
   onSubmitChange,
-  renderEmptyArray = "There are no values",
+  renderEmptyArray,
   renderArray,
   maxHeight,
   maxItemsCount,
   ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element {
+  const { t } = useLingui();
+  const resolvedRenderEmptyArray = renderEmptyArray ?? t`There are no values`;
   // Split between objects, arrays, and primitive values
   const [describableObjects, describableValueArrays, primitiveValues] =
     useMemo(() => {
@@ -74,14 +77,14 @@ export function DescribableValueArrayBlock<
     }, [data]);
 
   if (data.length === 0) {
-    if (isStringOrNumber(renderEmptyArray)) {
+    if (isStringOrNumber(resolvedRenderEmptyArray)) {
       return (
         <Text span fs="italic">
-          {renderEmptyArray}
+          {resolvedRenderEmptyArray}
         </Text>
       );
     }
-    return <>{renderEmptyArray}</>;
+    return <>{resolvedRenderEmptyArray}</>;
   }
 
   // compute the render options for each block

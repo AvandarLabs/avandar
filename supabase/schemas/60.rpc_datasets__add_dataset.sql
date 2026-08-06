@@ -31,6 +31,11 @@ create type public.datasets__csv_file__date_format as (
  *
  * The requesting user must be an admin of the workspace.
  *
+ * Runs as `SECURITY DEFINER` so inserts bypass RLS on `datasets` and
+ * `dataset_columns` while `util__can_manage_workspace_settings` enforces
+ * authorization. RLS `WITH CHECK` does not reliably see `auth.uid()` for
+ * `INSERT` from this PL/pgSQL body under `SECURITY INVOKER`.
+ *
  * @param p_dataset_id: The id of the dataset to add
  * @param p_workspace_id: The workspace id to add the dataset to
  * @param p_dataset_name: The name of the dataset
@@ -58,7 +63,7 @@ declare
 begin
   -- Ensure the workspace is one that the user admins
   if (
-    p_workspace_id != all(public.util__get_auth_user_workspaces_by_role('admin'))
+    not public.util__can_manage_workspace_settings (p_workspace_id)
   ) then
     raise exception 'The requesting user is not an admin of this workspace';
   end if;
@@ -127,4 +132,6 @@ begin
   end loop;
   return v_dataset;
 end;
-$$ language plpgsql security invoker;
+$$ language plpgsql security definer
+set
+  search_path = public;

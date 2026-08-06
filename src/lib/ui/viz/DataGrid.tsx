@@ -1,13 +1,11 @@
 import { Box } from "@mantine/core";
-import {
-  formatDate,
-  FormattableTimezone,
-} from "@utils/dates/formatDate/formatDate";
+import { mantineColorVar, mantineVar } from "@ui";
+import { formatDate, FormattableTimezone } from "@utils";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
-import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { UnknownDataFrame } from "@utils";
 import type {
   GridReadyEvent,
   GridSizeChangedEvent,
@@ -59,27 +57,44 @@ export function DataGrid({
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
+      const isDate = dateColumns?.has(field) ?? false;
       return {
         field: field,
         headerName: field,
         filter: true,
         valueFormatter:
-          dateColumns?.has(field) ?
+          isDate ?
             (p: { value: unknown }) => {
               return formatDate(p.value, {
                 format: dateFormat,
                 zone: timezone,
               });
             }
-          : undefined,
+          : (p: { value: unknown }) => {
+              return (
+                typeof p.value === "number" ? formatChartNumber(p.value)
+                : p.value == null ? ""
+                : String(p.value)
+              );
+            },
       };
     });
   }, [columnNames, dateColumns, dateFormat, timezone]);
 
   // AgGrid will fill the size of the parent container
   return (
-    <Box className={className} style={{ height, width: "100%", ...style }}>
+    <Box
+      className={className}
+      style={{
+        display: "flex",
+        height,
+        minHeight: 0,
+        width: "100%",
+        ...style,
+      }}
+    >
       <AgGridReact
+        containerStyle={{ flex: 1, minHeight: 0, width: "100%" }}
         defaultColDef={{ flex: 1, minWidth: 120 }}
         columnDefs={columnDefs}
         theme={avandarGridTheme}

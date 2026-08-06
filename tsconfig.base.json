@@ -31,14 +31,24 @@
       "@sbfn/*": ["./supabase/functions/*"],
 
       /* Packages */
+      "@ava-etl": ["./packages/node/ava-etl/src/index.ts"],
       "@ava-etl/*": ["./packages/node/ava-etl/src/*"],
+      "@clients": ["./packages/shared/clients/src/index.ts"],
       "@clients/*": ["./packages/shared/clients/src/*"],
+      "@logger": ["./packages/shared/logger/src/index.ts"],
       "@logger/*": ["./packages/shared/logger/src/*"],
+      "@models": ["./packages/shared/models/src/index.ts"],
       "@models/*": ["./packages/shared/models/src/*"],
+      "@modules": ["./packages/shared/modules/src/index.ts"],
       "@modules/*": ["./packages/shared/modules/src/*"],
+      "@utils": ["./packages/shared/utils/src/index.ts"],
       "@utils/*": ["./packages/shared/utils/src/*"],
+      "@ui": ["./packages/web/ui/src/index.ts"],
       "@ui/*": ["./packages/web/ui/src/*"],
+      "@hooks": ["./packages/web/hooks/src/index.ts"],
       "@hooks/*": ["./packages/web/hooks/src/*"],
+      "@browser-utils": ["./packages/web/browser-utils/src/index.ts"],
+      "@browser-utils/*": ["./packages/web/browser-utils/src/*"],
 
       /* Apps */
       "@ava-cli/*": ["./apps/ava-cli/src/*"],

@@ -1,11 +1,9 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { XlsxFileDatasetParsers } from "$/models/datasets/XlsxFileDataset/XlsxFileDatasetParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const XlsxFileDatasetClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     dbTablePrimaryKey: "id",
     modelName: "XlsxFileDataset",
     parsers: XlsxFileDatasetParsers,

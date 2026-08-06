@@ -1,12 +1,10 @@
-import { describe, expect, it } from "vitest";
 import { coerceDatesInProps } from "@utils/objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
+import { describe, expect, it } from "vitest";
 
 describe("coerceDatesInProps", () => {
   it("returns a function that coerces keys to dates", () => {
     type Item = { createdAt: string; name: string };
-    const coerce = coerceDatesInProps<Item, "createdAt">(
-      ["createdAt"],
-    );
+    const coerce = coerceDatesInProps<Item, "createdAt">(["createdAt"]);
 
     const result = coerce({
       createdAt: "2025-01-15T00:00:00.000Z",
@@ -22,9 +20,7 @@ describe("coerceDatesInProps", () => {
       date: string | undefined;
       name: string;
     };
-    const coerce = coerceDatesInProps<Item, "date">(
-      ["date"],
-    );
+    const coerce = coerceDatesInProps<Item, "date">(["date"]);
 
     const result = coerce({
       date: undefined,
@@ -41,9 +37,7 @@ describe("coerceDatesInProps", () => {
       { ts: "2025-06-01T00:00:00.000Z", label: "b" },
     ];
 
-    const result = items.map(
-      coerceDatesInProps<Item, "ts">(["ts"]),
-    );
+    const result = items.map(coerceDatesInProps<Item, "ts">(["ts"]));
 
     result.forEach((item) => {
       expect(item.ts).toBeInstanceOf(Date);

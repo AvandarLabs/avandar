@@ -14,8 +14,8 @@ create table public.datasets__csv_file (
   -- When a dataset is deleted from the Supabase storage (or has not yet
   -- finished uploading), we set this to false.
   is_in_cloud_storage boolean not null default false,
-  -- Size of the CSV in bytes
-  size_in_bytes integer not null,
+  -- Size of the CSV in bytes (we use bigint because files can exceed 2 GiB)
+  size_in_bytes bigint not null,
   -- Number of rows to skip at the start of the file
   rows_to_skip integer not null default 0,
   -- Quote character used in the CSV file
@@ -43,52 +43,46 @@ alter table public.datasets__csv_file enable row level security;
 create policy "User can select datasets__csv_file in their workspace" on public.datasets__csv_file for
 select
   to authenticated using (
-    public.datasets__csv_file.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__csv_file.dataset_id,
+      'viewer'
     )
   );
 
 create policy "User can insert datasets__csv_file in their workspace" on public.datasets__csv_file for insert to authenticated
 with
   check (
-    public.datasets__csv_file.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__csv_file.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can update datasets__csv_file in their workspace" on public.datasets__csv_file
 for update
   to authenticated using (
-    public.datasets__csv_file.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__csv_file.dataset_id,
+      'editor'
     )
   )
 with
   check (
-    -- Updated values must still be in the auth user's workspace
-    public.datasets__csv_file.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__csv_file.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can delete datasets__csv_file in their workspace" on public.datasets__csv_file for delete to authenticated using (
-  public.datasets__csv_file.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_can_access_resource (
+    'dataset',
+    public.datasets__csv_file.dataset_id,
+    'admin'
   )
 );
 

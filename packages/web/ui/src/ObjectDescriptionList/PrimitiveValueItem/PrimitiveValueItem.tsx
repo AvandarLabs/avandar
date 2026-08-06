@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { isBoolean } from "@utils/guards/isBoolean/isBoolean";
 import { isDate } from "@utils/guards/isDate/isDate";
@@ -6,17 +7,17 @@ import { isNullish } from "@utils/guards/isNullish/isNullish";
 import { isNumber } from "@utils/guards/isNumber/isNumber";
 import { isString } from "@utils/guards/isString/isString";
 import { match } from "ts-pattern";
-import { isStringOrNumber } from "@ui/ObjectDescriptionList/guards";
-import { BooleanValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/BooleanValueItem";
-import { DateValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/DateValueItem";
-import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
-import { NumberValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NumberValueItem";
-import { TextValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/TextValueItem";
+import { isStringOrNumber } from "../guards";
+import { BooleanValueItem } from "./BooleanValueItem";
+import { DateValueItem } from "./DateValueItem";
+import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import { NumberValueItem } from "./NumberValueItem";
+import { TextValueItem } from "./TextValueItem";
 import type {
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "../ObjectDescriptionList.types";
 
 type Props<
   T extends PrimitiveValue,
@@ -57,14 +58,20 @@ export function PrimitiveValueItem<
   rootData = undefined,
   renderValue = undefined,
   renderEditableValue = undefined,
-  renderEmptyString = "Empty text",
-  renderBooleanTrue = "Yes",
-  renderBooleanFalse = "No",
-  renderNullString = "No value",
-  renderUndefinedString = "No value",
+  renderEmptyString,
+  renderBooleanTrue,
+  renderBooleanFalse,
+  renderNullString,
+  renderUndefinedString,
   dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
   dateTimeZone = "local",
 }: Props<T, RootData>): JSX.Element {
+  const { t } = useLingui();
+  const resolvedRenderEmptyString = renderEmptyString ?? t`Empty text`;
+  const resolvedRenderBooleanTrue = renderBooleanTrue ?? t`Yes`;
+  const resolvedRenderBooleanFalse = renderBooleanFalse ?? t`No`;
+  const resolvedRenderNullString = renderNullString ?? t`No value`;
+  const resolvedRenderUndefinedString = renderUndefinedString ?? t`No value`;
   // if we are in display mode and there is a `renderValue` function, then
   // we use that instead
   if (!editMode && renderValue !== undefined) {
@@ -111,8 +118,8 @@ export function PrimitiveValueItem<
             onChange={(newValue) => {
               return onChange?.(newValue as T);
             }}
-            renderNullString={renderNullString}
-            renderUndefinedString={renderUndefinedString}
+            renderNullString={resolvedRenderNullString}
+            renderUndefinedString={resolvedRenderUndefinedString}
           />
         );
       })
@@ -124,10 +131,10 @@ export function PrimitiveValueItem<
             onChange={(newValue) => {
               return onChange?.(newValue as T);
             }}
-            renderNullString={renderNullString}
-            renderUndefinedString={renderUndefinedString}
-            renderBooleanTrue={renderBooleanTrue}
-            renderBooleanFalse={renderBooleanFalse}
+            renderNullString={resolvedRenderNullString}
+            renderUndefinedString={resolvedRenderUndefinedString}
+            renderBooleanTrue={resolvedRenderBooleanTrue}
+            renderBooleanFalse={resolvedRenderBooleanFalse}
           />
         );
       })
@@ -142,9 +149,9 @@ export function PrimitiveValueItem<
             choices={
               typeof typeOptions === "object" ? typeOptions.choices : undefined
             }
-            renderNullString={renderNullString}
-            renderUndefinedString={renderUndefinedString}
-            renderEmptyString={renderEmptyString}
+            renderNullString={resolvedRenderNullString}
+            renderUndefinedString={resolvedRenderUndefinedString}
+            renderEmptyString={resolvedRenderEmptyString}
           />
         );
       })
@@ -152,7 +159,7 @@ export function PrimitiveValueItem<
         if (isBoolean(value)) {
           return (
             <Text span fs="italic">
-              Invalid date
+              <Trans>Invalid date</Trans>
             </Text>
           );
         }
@@ -164,8 +171,8 @@ export function PrimitiveValueItem<
             onChange={(newValue) => {
               return onChange?.(newValue as T);
             }}
-            renderNullString={renderNullString}
-            renderUndefinedString={renderUndefinedString}
+            renderNullString={resolvedRenderNullString}
+            renderUndefinedString={resolvedRenderUndefinedString}
             dateFormat={dateFormat}
             dateTimeZone={dateTimeZone}
           />
@@ -183,8 +190,8 @@ export function PrimitiveValueItem<
     return (
       <NullOrUndefinedValueItem
         value={value}
-        renderNullString={renderNullString}
-        renderUndefinedString={renderUndefinedString}
+        renderNullString={resolvedRenderNullString}
+        renderUndefinedString={resolvedRenderUndefinedString}
       />
     );
   }
@@ -197,10 +204,10 @@ export function PrimitiveValueItem<
         onChange={(newValue) => {
           return onChange?.(newValue as T);
         }}
-        renderNullString={renderNullString}
-        renderUndefinedString={renderUndefinedString}
-        renderBooleanTrue={renderBooleanTrue}
-        renderBooleanFalse={renderBooleanFalse}
+        renderNullString={resolvedRenderNullString}
+        renderUndefinedString={resolvedRenderUndefinedString}
+        renderBooleanTrue={resolvedRenderBooleanTrue}
+        renderBooleanFalse={resolvedRenderBooleanFalse}
       />
     );
   }
@@ -213,8 +220,8 @@ export function PrimitiveValueItem<
         onChange={(newValue) => {
           return onChange?.(newValue as T);
         }}
-        renderNullString={renderNullString}
-        renderUndefinedString={renderUndefinedString}
+        renderNullString={resolvedRenderNullString}
+        renderUndefinedString={resolvedRenderUndefinedString}
         dateFormat={dateFormat}
         dateTimeZone={dateTimeZone}
       />
@@ -229,8 +236,8 @@ export function PrimitiveValueItem<
         onChange={(newValue) => {
           return onChange?.(newValue as T);
         }}
-        renderNullString={renderNullString}
-        renderUndefinedString={renderUndefinedString}
+        renderNullString={resolvedRenderNullString}
+        renderUndefinedString={resolvedRenderUndefinedString}
       />
     );
   }
@@ -243,9 +250,9 @@ export function PrimitiveValueItem<
         onChange={(newValue) => {
           return onChange?.(newValue as T);
         }}
-        renderNullString={renderNullString}
-        renderUndefinedString={renderUndefinedString}
-        renderEmptyString={renderEmptyString}
+        renderNullString={resolvedRenderNullString}
+        renderUndefinedString={resolvedRenderUndefinedString}
+        renderEmptyString={resolvedRenderEmptyString}
       />
     );
   }

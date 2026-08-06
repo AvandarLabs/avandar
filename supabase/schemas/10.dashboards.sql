@@ -22,78 +22,14 @@ create table public.dashboards (
   slug text,
   -- The dashboard's full config as a JSON blob
   config jsonb not null,
-  constraint dashboards__workspace_id_slug unique (
-    workspace_id,
-    slug
-  )
+  -- When true, tag-based app roles do not apply; shares still can
+  is_restricted boolean not null default false
 );
 
 -- Enable row level security
+-- RLS and policies: `17.rls.dashboards.sql`
+-- (after `16.utils__permissions.sql` defines resource helper functions).
 alter table public.dashboards enable row level security;
-
--- Policies
-create policy "
-  User can SELECT dashboards in their workspace
-" on public.dashboards for
-select
-  to authenticated,
-  anon using (
-    public.dashboards.is_public = true or
-    (
-      auth.uid () is not null and
-      public.dashboards.workspace_id = any (
-        array(
-          select
-            public.util__get_auth_user_workspaces ()
-        )
-      )
-    )
-  );
-
-create policy "
-  User can INSERT dashboards in their workspace
-" on public.dashboards for insert to authenticated
-with
-  check (
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "User can UPDATE dashboards in their workspace" on public.dashboards
-for update
-  to authenticated using (
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  )
-with
-  check (
-    -- Updated row must still be in the auth user's workspace
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "
-  User can DELETE dashboards in their workspace
-" on public.dashboards for delete to authenticated using (
-  public.dashboards.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
-  )
-);
 
 -- Trigger the `updated_at` update
 create trigger tr_dashboards__set_updated_at before
@@ -102,3 +38,13 @@ execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
 create index idx_dashboards__slug on public.dashboards (slug);
+
+-- Globally unique vanity slug for public dashboards. Non-public dashboards
+-- can hold any slug (or repeat one) freely; the constraint only kicks in
+-- when `is_public = true` so vanity URLs like `/d/<slug>` resolve to at
+-- most one dashboard. Publishing with a colliding slug therefore fails at
+-- the DB level if the frontend check has been bypassed.
+create unique index dashboards__slug_unique_when_public on public.dashboards (slug)
+where
+  is_public = true and
+  slug is not null;

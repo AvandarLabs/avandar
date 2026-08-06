@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
   Anchor,
@@ -9,7 +10,9 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { Tooltip } from "@ui";
+import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
+import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {
@@ -38,11 +41,13 @@ export function OpenDataCatalogEntryDetail({
   isLoadingColumnMetadata,
   onAddToWorkspace,
 }: Props): JSX.Element {
+  const { t } = useLingui();
+  const offline = useOfflineGate();
   if (!entry) {
     return (
       <Stack align="center" justify="center" mih={200} gap="xs">
         <Text c="dimmed" ta="center">
-          Select a dataset from the list to view its metadata.
+          <Trans>Select a dataset from the list to view its metadata.</Trans>
         </Text>
       </Stack>
     );
@@ -61,32 +66,54 @@ export function OpenDataCatalogEntryDetail({
             {entry.displayName}
           </Title>
 
-          <Tooltip label="Add to your workspace">
-            <ActionIcon
-              aria-label="Add dataset to workspace"
-              color="primary"
-              variant="filled"
-              size="lg"
-              loading={isAdding || isLoadingColumnMetadata}
-              disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
-              onClick={onAddToWorkspace}
+          <OfflineGated>
+            <Tooltip
+              label={t`Add to your workspace`}
+              disabled={offline.isBlocked}
             >
-              <IconPlus size={20} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                aria-label={t`Add dataset to workspace`}
+                color="primary"
+                variant="filled"
+                size="lg"
+                loading={isAdding || isLoadingColumnMetadata}
+                data-disabled={
+                  (
+                    !isAddAllowed ||
+                    isAdding ||
+                    isLoadingColumnMetadata ||
+                    offline.isBlocked
+                  ) ?
+                    true
+                  : undefined
+                }
+                aria-disabled={
+                  !isAddAllowed ||
+                  isAdding ||
+                  isLoadingColumnMetadata ||
+                  offline.isBlocked
+                }
+                onClick={offline.guard(onAddToWorkspace)}
+              >
+                <IconPlus size={20} />
+              </ActionIcon>
+            </Tooltip>
+          </OfflineGated>
         </Group>
 
         {!isAddAllowed ?
           <Text c="dimmed" size="sm">
-            You cannot add more datasets on your current plan. Upgrade to add
-            this catalog dataset.
+            <Trans>
+              You cannot add more datasets on your current plan. Upgrade to add
+              this catalog dataset.
+            </Trans>
           </Text>
         : null}
 
         {entry.description ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Description
+              <Trans>Description</Trans>
             </Text>
             <Text size="sm">{entry.description}</Text>
           </Stack>
@@ -94,7 +121,7 @@ export function OpenDataCatalogEntryDetail({
 
         <Stack gap={4}>
           <Text fw={600} size="sm">
-            Organization
+            <Trans>Organization</Trans>
           </Text>
           <Text size="sm">{entry.externalOrganizationName}</Text>
         </Stack>
@@ -102,7 +129,7 @@ export function OpenDataCatalogEntryDetail({
         {entry.externalServiceName ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Service
+              <Trans>Service</Trans>
             </Text>
             <Text size="sm">{entry.externalServiceName}</Text>
           </Stack>
@@ -110,17 +137,19 @@ export function OpenDataCatalogEntryDetail({
 
         <Stack gap={4}>
           <Text fw={600} size="sm">
-            Pipeline
+            <Trans>Pipeline</Trans>
           </Text>
           <Text size="sm">
-            {entry.pipelineName} · run {entry.pipelineRunId}
+            <Trans>
+              {entry.pipelineName} · run {entry.pipelineRunId}
+            </Trans>
           </Text>
         </Stack>
 
         {entry.sourceUrl ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Source URL
+              <Trans>Source URL</Trans>
             </Text>
             <Anchor href={entry.sourceUrl} size="sm" target="_blank">
               {entry.sourceUrl}
@@ -131,7 +160,7 @@ export function OpenDataCatalogEntryDetail({
         {entry.canonicalUrls && entry.canonicalUrls.length > 0 ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Canonical URLs
+              <Trans>Canonical URLs</Trans>
             </Text>
             <Stack gap={6}>
               {entry.canonicalUrls.map((url) => {
@@ -149,7 +178,7 @@ export function OpenDataCatalogEntryDetail({
           {entry.license ?
             <Stack gap={4}>
               <Text fw={600} size="sm">
-                License
+                <Trans>License</Trans>
               </Text>
               <Text size="sm">{entry.license}</Text>
             </Stack>
@@ -157,7 +186,7 @@ export function OpenDataCatalogEntryDetail({
           {entry.updateFrequency ?
             <Stack gap={4}>
               <Text fw={600} size="sm">
-                Update frequency
+                <Trans>Update frequency</Trans>
               </Text>
               <Text size="sm">{entry.updateFrequency}</Text>
             </Stack>
@@ -167,7 +196,7 @@ export function OpenDataCatalogEntryDetail({
         {entry.notes ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Notes
+              <Trans>Notes</Trans>
             </Text>
             <Text size="sm">{entry.notes}</Text>
           </Stack>
@@ -176,7 +205,7 @@ export function OpenDataCatalogEntryDetail({
         {metadataJson ?
           <Stack gap={4}>
             <Text fw={600} size="sm">
-              Raw metadata (JSON)
+              <Trans>Raw metadata (JSON)</Trans>
             </Text>
             <Text
               component="pre"
@@ -195,7 +224,7 @@ export function OpenDataCatalogEntryDetail({
           disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
           onClick={onAddToWorkspace}
         >
-          Add to workspace
+          <Trans>Add to workspace</Trans>
         </Button>
       </Stack>
     </ScrollArea>

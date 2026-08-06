@@ -61,6 +61,23 @@ echo -e "${CYAN}Starting Avandar Development Environment${NC}"
 echo -e "${CYAN}==========================================${NC}"
 echo ""
 
+# Stop any prior `pnpm dev` for this repo so the new one can take over.
+# Narrowly targets:
+#  - our concurrently orchestrator (matches the exact flags we pass below)
+#  - whatever is listening on the vite port (5173)
+#  - stray supabase functions serve / ngrok processes from the same script
+echo -e "${BLUE}Stopping any prior Avandar dev processes...${NC}"
+pkill -f "concurrently --names vite,functions,ngrok" 2>/dev/null || true
+vite_pids=$(lsof -ti:5173 -sTCP:LISTEN 2>/dev/null || true)
+if [ -n "$vite_pids" ]; then
+  kill $vite_pids 2>/dev/null || true
+fi
+pkill -f "supabase functions serve" 2>/dev/null || true
+pkill -f "^ngrok http " 2>/dev/null || true
+sleep 1
+echo -e "${GREEN}✓ Cleared prior dev processes${NC}"
+echo ""
+
 # Step 1: Update edge function environment variables
 echo -e "${BLUE}Step 1: Updating edge function environment variables...${NC}"
 if ! pnpm fns:update-env; then
@@ -85,19 +102,34 @@ if ! command -v concurrently &> /dev/null; then
   exit 1
 fi
 
-# Check if ngrok is available
+# Check if ngrok is available. Ngrok is only needed for webhooks
+# (Supabase edge functions called from third parties). The frontend and
+# Supabase functions run fine without it; print a warning and skip the
+# tunnel rather than blocking startup.
+NGROK_AVAILABLE=true
 if ! command -v ngrok &> /dev/null; then
-  echo -e "${RED}Error: ngrok is not installed${NC}"
-  echo -e "${YELLOW}Please install ngrok: https://ngrok.com/download${NC}"
-  exit 1
+  echo -e "${YELLOW}Warning: ngrok is not installed; skipping reverse-proxy tunnel.${NC}"
+  echo -e "${YELLOW}Webhook-driven flows (Supabase edge functions triggered by third parties) will not work locally.${NC}"
+  echo -e "${YELLOW}Install ngrok if you need them: https://ngrok.com/download${NC}"
+  NGROK_AVAILABLE=false
 fi
 
 # Run all processes concurrently with clean output
-concurrently \
-  --names "vite,functions,ngrok" \
-  --prefix-colors "blue,green,yellow" \
-  --prefix "{name}" \
-  --kill-others-on-fail \
-  "vite" \
-  "pnpm fns:serve" \
-  "$NGROK_COMMAND"
+if [ "$NGROK_AVAILABLE" = true ]; then
+  concurrently \
+    --names "vite,functions,ngrok" \
+    --prefix-colors "blue,green,yellow" \
+    --prefix "{name}" \
+    --kill-others-on-fail \
+    "vite --host 127.0.0.1 --port 5173" \
+    "pnpm fns:serve" \
+    "$NGROK_COMMAND"
+else
+  concurrently \
+    --names "vite,functions" \
+    --prefix-colors "blue,green" \
+    --prefix "{name}" \
+    --kill-others-on-fail \
+    "vite --host 127.0.0.1 --port 5173" \
+    "pnpm fns:serve"
+fi

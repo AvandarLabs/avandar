@@ -1,5 +1,5 @@
 import { Key } from "react";
-import type { LinkProps } from "@/lib/ui/links/Link";
+import type { LinkProps } from "@ui";
 
 /**
  * Configuration for a navigable link in the app.
@@ -14,6 +14,14 @@ export type AppLink<
   to: NonNullable<To>;
   params?: Params;
   label: string;
+  /**
+   * Whether this destination is usable when the browser is offline.
+   * Drive `<OfflineGated>` and similar offline-aware UI from this flag.
+   * Read-only views backed by the persisted React Query cache or local
+   * Dexie data are `true`; anything that needs a live Supabase / Postgres
+   * round-trip is `false`. Default `false` (safe).
+   */
+  isAvailableOffline: boolean;
 };
 
 type AppLinksRecord = Record<
@@ -24,17 +32,29 @@ type AppLinksRecord = Record<
 
 export const AppLinks = {
   // Root-level links
-  home: { key: "home", to: "/", label: "Home" },
-  signin: { key: "signin", to: "/signin", label: "Sign in" },
+  home: {
+    key: "home",
+    to: "/",
+    label: "Home",
+    isAvailableOffline: false,
+  },
+  signin: {
+    key: "signin",
+    to: "/signin",
+    label: "Sign in",
+    isAvailableOffline: false,
+  },
   invalidWorkspace: {
     key: "invalid-workspace",
     to: "/invalid-workspace",
     label: "Invalid workspace",
+    isAvailableOffline: false,
   },
   updatePassword: {
     key: "update-password",
     to: "/update-password",
     label: "Update password",
+    isAvailableOffline: false,
   },
 
   // Workspace root link
@@ -44,6 +64,7 @@ export const AppLinks = {
       to: "/$workspaceSlug",
       params: { workspaceSlug },
       label: "Home",
+      isAvailableOffline: true,
     };
   },
 
@@ -54,6 +75,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/profile",
       params: { workspaceSlug },
       label: "Profile",
+      isAvailableOffline: false,
     };
   },
 
@@ -64,6 +86,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/data-manager",
       params: { workspaceSlug },
       label: "Data Sources",
+      isAvailableOffline: true,
     };
   },
   dataManagerDatasetView: ({
@@ -83,6 +106,7 @@ export const AppLinks = {
         datasetId,
       },
       label: datasetName,
+      isAvailableOffline: true,
     };
   },
   dataImport: (workspaceSlug: string) => {
@@ -93,6 +117,7 @@ export const AppLinks = {
         workspaceSlug: workspaceSlug,
       },
       label: "Import data",
+      isAvailableOffline: true,
     };
   },
 
@@ -103,6 +128,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/data-explorer",
       params: { workspaceSlug },
       label: "Data Explorer",
+      isAvailableOffline: true,
     };
   },
 
@@ -113,6 +139,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/dashboards",
       params: { workspaceSlug },
       label: "Dashboards",
+      isAvailableOffline: true,
     };
   },
 
@@ -123,6 +150,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/map",
       params: { workspaceSlug },
       label: "Geo Explorer",
+      isAvailableOffline: false,
     };
   },
 
@@ -133,6 +161,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/entity-designer",
       params: { workspaceSlug },
       label: "Profile Designer",
+      isAvailableOffline: false,
     };
   },
   entityDesignerConfigView: ({
@@ -152,6 +181,7 @@ export const AppLinks = {
         entityConfigId,
       },
       label: entityConfigName,
+      isAvailableOffline: false,
     };
   },
   entityDesignerCreatorView: (workspaceSlug: string) => {
@@ -160,6 +190,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/entity-designer/entity-creator",
       params: { workspaceSlug },
       label: "Create new entity",
+      isAvailableOffline: false,
     };
   },
 
@@ -181,6 +212,7 @@ export const AppLinks = {
         entityConfigId,
       },
       label: entityConfigName,
+      isAvailableOffline: false,
     };
   },
   entityManagerEntityView: ({
@@ -203,8 +235,10 @@ export const AppLinks = {
         entityId,
       },
       label: entityName,
+      isAvailableOffline: false,
     };
   },
+
   // Settings link
   workspaceSettings: (workspaceSlug: string) => {
     return {
@@ -212,6 +246,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/settings",
       params: { workspaceSlug },
       label: "Settings",
+      isAvailableOffline: true,
     };
   },
 } as const satisfies AppLinksRecord;

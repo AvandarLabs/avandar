@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isDate } from "@utils/guards/isDate/isDate.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isDate", () => {
   it("returns true for Date instances", () => {

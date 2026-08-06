@@ -1,12 +1,10 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
-import { where } from "@utils/filters/where/where";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
+import { createServerApiClient } from "@clients";
+import { makeBucketRecord, matchLiteral, prop, where } from "@utils";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
@@ -14,10 +12,8 @@ import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/Virtual
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { FiltersByColumn } from "@utils/filters/filters";
-import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
+import type { ExcludeNullsIn, FiltersByColumn } from "@utils";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
@@ -38,9 +34,12 @@ function _escapeNullChar(str: string): string | null {
   return str === "\u0000" ? null : str;
 }
 
+// Platform-aware server API client; reads the Supabase client registered by
+// AvaSupabase for the web-backed adapter.
+const serverApi = createServerApiClient();
+
 export const DatasetClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "Dataset",
     tableName: "datasets",
     dbTablePrimaryKey: "id",
@@ -145,7 +144,7 @@ export const DatasetClient = createUsableServiceClient(
       };
     },
 
-    mutations: ({ clientLogger, dbClient, parsers }) => {
+    mutations: ({ clientLogger, parsers }) => {
       return {
         insertVirtualDataset: async (params: {
           datasetId: DatasetId;
@@ -153,22 +152,22 @@ export const DatasetClient = createUsableServiceClient(
           datasetName: string;
           datasetDescription: string;
           columns: DatasetColumnInput[];
-          rawSQL: string;
+          rawSql: string;
         }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertVirtualDataset");
           logger.log("Creating virtual dataset", params);
-          const { data: dataset } = await dbClient
-            .rpc("rpc_datasets__add_virtual_dataset", {
-              p_dataset_id: params.datasetId,
-              p_workspace_id: params.workspaceId,
-              p_dataset_name: params.datasetName,
-              p_dataset_description: params.datasetDescription,
-              p_columns: params.columns.map((col) => {
-                return { ...col, description: col.description ?? null };
-              }),
-              p_raw_sql: params.rawSQL,
-            })
-            .throwOnError();
+          const dataset = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_datasets__add_virtual_dataset", {
+            p_dataset_id: params.datasetId,
+            p_workspace_id: params.workspaceId,
+            p_dataset_name: params.datasetName,
+            p_dataset_description: params.datasetDescription,
+            p_columns: params.columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+            p_raw_sql: params.rawSql,
+          });
           logger.log("Successfully added virtual dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
         },
@@ -211,36 +210,36 @@ export const DatasetClient = createUsableServiceClient(
             datasetDescription,
             parseOptions,
           } = params;
-          const { data: dataset } = await dbClient
-            .rpc("rpc_datasets__add_csv_file_dataset", {
-              p_dataset_id: params.datasetId,
-              p_workspace_id: workspaceId,
-              p_dataset_name: datasetName,
-              p_dataset_description: datasetDescription,
-              p_columns: columns.map((col) => {
-                return { ...col, description: col.description ?? null };
-              }),
-              p_is_in_cloud_storage: isInCloudStorage,
-              p_size_in_bytes: sizeInBytes,
-              p_rows_to_skip: parseOptions.rowsToSkip,
-              p_quote_char: {
-                value: _escapeNullChar(parseOptions.quoteChar),
-              },
-              p_escape_char: {
-                value: _escapeNullChar(parseOptions.escapeChar),
-              },
-              p_delimiter: parseOptions.delimiter,
-              p_newline_delimiter: parseOptions.newlineDelimiter,
-              p_comment_char: {
-                value: _escapeNullChar(parseOptions.commentChar),
-              },
-              p_has_header: parseOptions.hasHeader,
-              p_date_format: {
-                date_format: parseOptions.dateFormat,
-                timestamp_format: parseOptions.timestampFormat,
-              },
-            })
-            .throwOnError();
+          const dataset = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_datasets__add_csv_file_dataset", {
+            p_dataset_id: params.datasetId,
+            p_workspace_id: workspaceId,
+            p_dataset_name: datasetName,
+            p_dataset_description: datasetDescription,
+            p_columns: columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+            p_is_in_cloud_storage: isInCloudStorage,
+            p_size_in_bytes: sizeInBytes,
+            p_rows_to_skip: parseOptions.rowsToSkip,
+            p_quote_char: {
+              value: _escapeNullChar(parseOptions.quoteChar),
+            },
+            p_escape_char: {
+              value: _escapeNullChar(parseOptions.escapeChar),
+            },
+            p_delimiter: parseOptions.delimiter,
+            p_newline_delimiter: parseOptions.newlineDelimiter,
+            p_comment_char: {
+              value: _escapeNullChar(parseOptions.commentChar),
+            },
+            p_has_header: parseOptions.hasHeader,
+            p_date_format: {
+              date_format: parseOptions.dateFormat,
+              timestamp_format: parseOptions.timestampFormat,
+            },
+          });
 
           logger.log("Successfully added dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
@@ -281,28 +280,28 @@ export const DatasetClient = createUsableServiceClient(
             dateFormat,
             timestampFormat,
           } = params;
-          const { data: dataset } = await dbClient
-            .rpc("rpc_datasets__add_xlsx_file_dataset", {
-              p_dataset_id: params.datasetId,
-              p_workspace_id: workspaceId,
-              p_dataset_name: datasetName,
-              p_dataset_description: datasetDescription,
-              p_columns: columns.map((col) => {
-                return { ...col, description: col.description ?? null };
-              }),
-              p_is_in_cloud_storage: isInCloudStorage,
-              p_size_in_bytes: sizeInBytes,
-              p_rows_to_skip: rowsToSkip,
-              p_sheet_name: {
-                value: params.sheetName ?? null,
-              },
-              p_has_header: hasHeader,
-              p_date_format: {
-                date_format: dateFormat,
-                timestamp_format: timestampFormat,
-              },
-            })
-            .throwOnError();
+          const dataset = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_datasets__add_xlsx_file_dataset", {
+            p_dataset_id: params.datasetId,
+            p_workspace_id: workspaceId,
+            p_dataset_name: datasetName,
+            p_dataset_description: datasetDescription,
+            p_columns: columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+            p_is_in_cloud_storage: isInCloudStorage,
+            p_size_in_bytes: sizeInBytes,
+            p_rows_to_skip: rowsToSkip,
+            p_sheet_name: {
+              value: params.sheetName ?? null,
+            },
+            p_has_header: hasHeader,
+            p_date_format: {
+              date_format: dateFormat,
+              timestamp_format: timestampFormat,
+            },
+          });
 
           logger.log("Successfully added xlsx file dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
@@ -333,18 +332,18 @@ export const DatasetClient = createUsableServiceClient(
               description: col.description ?? null,
             };
           });
-          const { data: dataset } = await dbClient
-            .rpc("rpc_datasets__add_google_sheets_dataset", {
-              p_dataset_id: params.datasetId,
-              p_workspace_id: params.workspaceId,
-              p_dataset_name: params.datasetName,
-              p_dataset_description: params.datasetDescription,
-              p_columns: columns,
-              p_google_account_id: params.googleAccountId,
-              p_google_document_id: params.googleDocumentId,
-              p_rows_to_skip: params.rowsToSkip,
-            })
-            .throwOnError();
+          const dataset = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_datasets__add_google_sheets_dataset", {
+            p_dataset_id: params.datasetId,
+            p_workspace_id: params.workspaceId,
+            p_dataset_name: params.datasetName,
+            p_dataset_description: params.datasetDescription,
+            p_columns: columns,
+            p_google_account_id: params.googleAccountId,
+            p_google_document_id: params.googleDocumentId,
+            p_rows_to_skip: params.rowsToSkip,
+          });
 
           logger.log("Successfully added dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
@@ -366,18 +365,18 @@ export const DatasetClient = createUsableServiceClient(
         }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertOpenDataDataset");
           logger.log("Creating open data dataset", params);
-          const { data: dataset } = await dbClient
-            .rpc("rpc_datasets__add_open_data_dataset", {
-              p_dataset_id: params.datasetId,
-              p_workspace_id: params.workspaceId,
-              p_dataset_name: params.datasetName,
-              p_dataset_description: params.datasetDescription,
-              p_catalog_entry_id: params.catalogEntryId,
-              p_columns: params.columns.map((col) => {
-                return { ...col, description: col.description ?? null };
-              }),
-            })
-            .throwOnError();
+          const dataset = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_datasets__add_open_data_dataset", {
+            p_dataset_id: params.datasetId,
+            p_workspace_id: params.workspaceId,
+            p_dataset_name: params.datasetName,
+            p_dataset_description: params.datasetDescription,
+            p_catalog_entry_id: params.catalogEntryId,
+            p_columns: params.columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+          });
           logger.log("Successfully added open data dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
         },

@@ -21,52 +21,46 @@ alter table public.datasets__open_data enable row level security;
 create policy "User can select datasets__open_data in their workspace" on public.datasets__open_data for
 select
   to authenticated using (
-    public.datasets__open_data.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__open_data.dataset_id,
+      'viewer'
     )
   );
 
 create policy "User can insert datasets__open_data in their workspace" on public.datasets__open_data for insert to authenticated
 with
   check (
-    public.datasets__open_data.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__open_data.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can update datasets__open_data in their workspace" on public.datasets__open_data
 for update
   to authenticated using (
-    public.datasets__open_data.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__open_data.dataset_id,
+      'editor'
     )
   )
 with
   check (
-    -- Updated values must still be in the auth user's workspace
-    public.datasets__open_data.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__open_data.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can delete datasets__open_data in their workspace" on public.datasets__open_data for delete to authenticated using (
-  public.datasets__open_data.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_can_access_resource (
+    'dataset',
+    public.datasets__open_data.dataset_id,
+    'admin'
   )
 );
 

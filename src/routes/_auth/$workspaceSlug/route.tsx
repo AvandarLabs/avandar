@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { propEq } from "@utils";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { RootLayout } from "@/components/common/layouts/RootLayout/RootLayout";
+import { RootLayout } from "@/components/layouts/RootLayout/RootLayout";
 import { AppLinks } from "@/config/AppLinks";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({

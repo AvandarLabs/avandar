@@ -1,0 +1,28 @@
+.navbar {
+  background-color: var(--mantine-navbar-background);
+  color: var(--mantine-navbar-color);
+  overflow: auto;
+  overscroll-behavior: none;
+}
+
+/*
+ * overflow-x: clip clips the 32px horizontal bleed from Main's ml/mr={-16}
+ * without creating a scroll container. Unlike overflow: hidden, clip does not
+ * absorb wheel events, so window-level vertical scroll works on pages that
+ * have no inner overflow:auto container (e.g. dashboard preview). The
+ * overflow is excluded from the document's scroll area, preventing the
+ * horizontal elastic-overscroll bounce as well.
+ */
+.root {
+  background-color: var(--mantine-navbar-background);
+  overflow-x: clip;
+}
+
+/*
+ * Keep main in normal document order below the fixed navbar/aside. Raising
+ * z-index here forced a pointer-events: none / .main > * workaround that
+ * broke nested canvas clicks (e.g. Data Explorer grid).
+ */
+.main {
+  position: relative;
+}

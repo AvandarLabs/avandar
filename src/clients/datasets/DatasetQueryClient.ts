@@ -1,19 +1,16 @@
-import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { withLogger } from "@logger/module-augmenters/withLogger";
-import { notifyDevAlert } from "@ui/index";
-import { where } from "@utils/index";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
+import { createServiceClient } from "@clients";
+import { withQueryHooks } from "@hooks";
+import { withLogger } from "@logger";
+import { notifyDevAlert } from "@ui";
+import { objectKeys, promiseReduce, sqlTemplate, where } from "@utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { promiseReduce } from "@/lib/utils/promises";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
-import type { WithLogger } from "@logger/Logger.types";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { ServiceClient } from "@clients";
+import type { WithQueryHooks } from "@hooks";
+import type { WithLogger } from "@logger";
+import type { UnknownDataFrame } from "@utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -47,7 +44,7 @@ export type ColumnSummary = {
   };
 } & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
 
-type DatasetSummary = {
+export type DatasetSummary = {
   rows: number;
   columns: number;
   columnSummaries?: readonly ColumnSummary[];
@@ -64,6 +61,37 @@ type DatasetQueryClientQueries = {
     datasetId: DatasetId;
     workspaceId: Workspace.Id;
   }) => Promise<DatasetSummary>;
+
+  /**
+   * Lightweight dataset meta — row count + column list — without
+   * computing per-column summaries. Lets the new dataset Summary view
+   * render skeleton cards immediately and fetch real per-column
+   * summaries lazily as each card scrolls into view.
+   */
+  getDatasetMeta: (params: {
+    datasetId: DatasetId;
+    workspaceId: Workspace.Id;
+  }) => Promise<{
+    rows: number;
+    columns: ReadonlyArray<{
+      name: string;
+      dataType: string;
+      columnIdx: number;
+    }>;
+  }>;
+
+  /**
+   * Compute the summary for a single column. This is the per-column
+   * unit of work that `getSummary` calls in a loop — exposing it
+   * directly lets the Summary view drive parallel, lazy per-column
+   * fetches keyed by viewport visibility.
+   */
+  getColumnSummary: (params: {
+    datasetId: DatasetId;
+    workspaceId: Workspace.Id;
+    columnName: string;
+    dataType: string;
+  }) => Promise<ColumnSummary>;
 };
 
 type IDatasetQueryClient = ServiceClient & DatasetQueryClientQueries;
@@ -88,11 +116,59 @@ function createDatasetQueryClient(): WithLogger<
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
         const { data } = await WorkspaceQETLClient.runQuery({
-          rawSQL: queryString,
+          rawSql: queryString,
           workspaceId,
         });
         return data;
       },
+      getDatasetMeta: async ({
+        datasetId,
+        workspaceId,
+      }: {
+        datasetId: DatasetId;
+        workspaceId: Workspace.Id;
+      }) => {
+        const columns = (
+          await DatasetColumnClient.getAll(where("dataset_id", "eq", datasetId))
+        ).map((col) => {
+          return {
+            name: col.name,
+            dataType: col.dataType,
+            columnIdx: col.columnIdx,
+          };
+        });
+        const numRows = Number(
+          scalar(
+            await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+              workspaceId,
+              rawSql: sqlTemplate(
+                'SELECT COUNT(*) as count FROM "$tableName$"',
+              ).parse({ tableName: datasetId }),
+            }),
+          ),
+        );
+        return { rows: numRows, columns };
+      },
+
+      getColumnSummary: async ({
+        datasetId,
+        workspaceId,
+        columnName,
+        dataType,
+      }: {
+        datasetId: DatasetId;
+        workspaceId: Workspace.Id;
+        columnName: string;
+        dataType: string;
+      }): Promise<ColumnSummary> => {
+        return computeColumnSummary({
+          datasetId,
+          workspaceId,
+          columnName,
+          dataType,
+        });
+      },
+
       getSummary: async (params: {
         datasetId: DatasetId;
         workspaceId: Workspace.Id;
@@ -116,7 +192,7 @@ function createDatasetQueryClient(): WithLogger<
               count: bigint;
             }>({
               workspaceId,
-              rawSQL: sqlTemplate(
+              rawSql: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
               ).parse({ tableName: datasetId }),
             }),
@@ -126,201 +202,12 @@ function createDatasetQueryClient(): WithLogger<
         const columnSummaries: ColumnSummary[] = await promiseReduce(
           columns,
           async (summaries, column): Promise<ColumnSummary[]> => {
-            const { name: columnName, dataType } = column;
-
-            const distinctValuesCount = Number(
-              scalar(
-                await WorkspaceQETLClient.runQuery<{
-                  count: bigint;
-                }>({
-                  workspaceId,
-                  rawSQL: sqlTemplate(
-                    'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
-                  ).parse({
-                    columnName: columnName,
-                    tableName: datasetId,
-                  }),
-                }),
-              ),
-            );
-
-            const emptyValuesCount = Number(
-              scalar(
-                await WorkspaceQETLClient.runQuery<{
-                  count: bigint;
-                }>({
-                  workspaceId,
-                  rawSQL: sqlTemplate(
-                    `SELECT COUNT("$columnName$") as count
-                    FROM "$tableName$"
-                    WHERE "$columnName$" IS NULL
-                    ${dataType === "varchar" ? `OR "$columnName$" = ''` : ""}
-                  `,
-                  ).parse({ columnName, tableName: datasetId }),
-                }),
-              ),
-            );
-
-            // Find the maximum count for the most common value(s)
-            const maxCountResult = await WorkspaceQETLClient.runQuery<{
-              max_count: bigint;
-            }>({
+            const summary = await computeColumnSummary({
+              datasetId,
               workspaceId,
-              rawSQL: sqlTemplate(
-                `SELECT MAX(cnt) as max_count FROM (
-                SELECT COUNT(*) as cnt
-                FROM "$tableName$"
-                WHERE
-                  "$columnName$" IS NOT NULL
-                  ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
-                GROUP BY "${columnName}"
-              )`,
-              ).parse({ columnName, tableName: datasetId }),
+              columnName: column.name,
+              dataType: column.dataType,
             });
-            const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
-
-            // Get all values with the maximum count
-            const mostCommonValuesQuery = await WorkspaceQETLClient.runQuery<{
-              value: unknown;
-              count: bigint;
-            }>({
-              workspaceId,
-              rawSQL: sqlTemplate(
-                `SELECT "$columnName$" AS value, COUNT(*) AS count
-               FROM "$tableName$"
-               WHERE
-                 "$columnName$" IS NOT NULL
-                 ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
-               GROUP BY "$columnName$"
-               HAVING COUNT(*) = $maxCount$
-               ORDER BY value
-               LIMIT 10`, // only get the top 10 to save memory
-              ).parse({
-                columnName,
-                tableName: datasetId,
-                maxCount,
-              }),
-            });
-            const mostCommonValue = mostCommonValuesQuery.data;
-
-            const typeSpecificSummary = await match(dataType)
-              .with("varchar", () => {
-                return {
-                  type: "text" as const,
-                };
-              })
-              .with("bigint", "double", async () => {
-                // TODO(jpsyx): implement this
-                const {
-                  max = NaN,
-                  min = NaN,
-                  avg = NaN,
-                  stdDev = NaN,
-                } = singleton(
-                  await WorkspaceQETLClient.runQuery<{
-                    max: number;
-                    min: number;
-                    avg: number;
-                    stdDev: number;
-                  }>({
-                    workspaceId,
-                    rawSQL: sqlTemplate(
-                      `SELECT
-                        MAX("$columnName$") as max,
-                        MIN("$columnName$") as min,
-                        AVG("$columnName$") as avg,
-                        STDDEV_SAMP("$columnName$") as stdDev
-                      FROM "$tableName$"`,
-                    ).parse({ columnName, tableName: datasetId }),
-                  }),
-                ) ?? {};
-                return {
-                  type: "number" as const,
-                  maxValue: max,
-                  minValue: min,
-                  averageValue: avg,
-                  stdDev: stdDev,
-                };
-              })
-              .with("date", "time", "timestamp", async () => {
-                const singleQuery =
-                  dataType === "time" ?
-                    `SELECT
-                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
-                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
-                           NULL AS days
-                         FROM "$tableName$"
-                         WHERE "$columnName$" IS NOT NULL`
-                  : `SELECT
-                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
-                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
-                           CASE
-                             WHEN MIN("$columnName$") IS NULL OR MAX("$columnName$") IS NULL THEN 0
-                             ELSE DATE_DIFF('day',
-                               CAST(MIN("$columnName$") AS DATE),
-                               CAST(MAX("$columnName$") AS DATE)
-                             ) + 1
-                           END AS days
-                         FROM "$tableName$"
-                         WHERE "$columnName$" IS NOT NULL`;
-
-                const row = singleton(
-                  await WorkspaceQETLClient.runQuery<{
-                    most_recent: string | null;
-                    oldest: string | null;
-                    days: bigint | number | null;
-                  }>({
-                    workspaceId,
-                    rawSQL: sqlTemplate(singleQuery).parse({
-                      columnName,
-                      tableName: datasetId,
-                    }),
-                  }),
-                ) ?? { most_recent: "", oldest: "", days: 0 };
-
-                const mostRecentDate = String(row.most_recent ?? "");
-                const oldestDate = String(row.oldest ?? "");
-                const datasetCoverage =
-                  row.days === null ? "Unknown"
-                  : Number(row.days) === 1 ? "1 day"
-                  : `${Number(row.days)} days`;
-
-                return {
-                  type: "date" as const,
-                  mostRecentDate,
-                  oldestDate,
-                  datasetCoverage,
-                };
-              })
-              .with("boolean", () => {
-                notifyDevAlert("Boolean field summary not implemented");
-                throw new Error(`Unsupported data type: ${dataType}`);
-              })
-              .exhaustive(() => {
-                notifyDevAlert(`Unsupported data type: ${dataType}`);
-                throw new Error(`Unsupported data type: ${dataType}`);
-              });
-
-            const summary: ColumnSummary = {
-              name: columnName,
-              distinctValuesCount,
-              emptyValuesCount,
-              percentMissingValues: emptyValuesCount / distinctValuesCount,
-              mostCommonValue:
-                !mostCommonValue || mostCommonValue.length === 0 ?
-                  {
-                    count: 0,
-                    value: [],
-                  }
-                : {
-                    count: Number(maxCount),
-                    value: mostCommonValue.map((row) => {
-                      return String(row.value);
-                    }),
-                  },
-              ...typeSpecificSummary,
-            };
-
             summaries.push(summary);
             return summaries;
           },
@@ -342,6 +229,197 @@ function createDatasetQueryClient(): WithLogger<
       },
     );
   });
+}
+
+/**
+ * Inline-extracted shared helper that computes a single
+ * `ColumnSummary` row. Called by both `getSummary` (loop) and
+ * `getColumnSummary` (single).
+ */
+async function computeColumnSummary(params: {
+  datasetId: DatasetId;
+  workspaceId: Workspace.Id;
+  columnName: string;
+  dataType: string;
+}): Promise<ColumnSummary> {
+  const { datasetId, workspaceId, columnName, dataType } = params;
+
+  const distinctValuesCount = Number(
+    scalar(
+      await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+        workspaceId,
+        rawSql: sqlTemplate(
+          'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
+        ).parse({ columnName, tableName: datasetId }),
+      }),
+    ),
+  );
+
+  const emptyValuesCount = Number(
+    scalar(
+      await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+        workspaceId,
+        rawSql: sqlTemplate(
+          `SELECT COUNT("$columnName$") as count
+            FROM "$tableName$"
+            WHERE "$columnName$" IS NULL
+            ${dataType === "varchar" ? `OR "$columnName$" = ''` : ""}
+          `,
+        ).parse({ columnName, tableName: datasetId }),
+      }),
+    ),
+  );
+
+  // Find the maximum count for the most common value(s)
+  const maxCountResult = await WorkspaceQETLClient.runQuery<{
+    max_count: bigint;
+  }>({
+    workspaceId,
+    rawSql: sqlTemplate(
+      `SELECT MAX(cnt) as max_count FROM (
+        SELECT COUNT(*) as cnt
+        FROM "$tableName$"
+        WHERE
+          "$columnName$" IS NOT NULL
+          ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
+        GROUP BY "${columnName}"
+      )`,
+    ).parse({ columnName, tableName: datasetId }),
+  });
+  const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
+
+  // Get all values with the maximum count
+  const mostCommonValuesQuery = await WorkspaceQETLClient.runQuery<{
+    value: unknown;
+    count: bigint;
+  }>({
+    workspaceId,
+    rawSql: sqlTemplate(
+      `SELECT "$columnName$" AS value, COUNT(*) AS count
+       FROM "$tableName$"
+       WHERE
+         "$columnName$" IS NOT NULL
+         ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
+       GROUP BY "$columnName$"
+       HAVING COUNT(*) = $maxCount$
+       ORDER BY value
+       LIMIT 10`,
+    ).parse({ columnName, tableName: datasetId, maxCount }),
+  });
+  const mostCommonValue = mostCommonValuesQuery.data;
+
+  const typeSpecificSummary = await match(dataType)
+    .with("varchar", () => {
+      return { type: "text" as const };
+    })
+    .with("bigint", "double", async () => {
+      const {
+        max = NaN,
+        min = NaN,
+        avg = NaN,
+        stdDev = NaN,
+      } = singleton(
+        await WorkspaceQETLClient.runQuery<{
+          max: number;
+          min: number;
+          avg: number;
+          stdDev: number;
+        }>({
+          workspaceId,
+          rawSql: sqlTemplate(
+            `SELECT
+              MAX("$columnName$") as max,
+              MIN("$columnName$") as min,
+              AVG("$columnName$") as avg,
+              STDDEV_SAMP("$columnName$") as stdDev
+            FROM "$tableName$"`,
+          ).parse({ columnName, tableName: datasetId }),
+        }),
+      ) ?? {};
+      return {
+        type: "number" as const,
+        maxValue: max,
+        minValue: min,
+        averageValue: avg,
+        stdDev: stdDev,
+      };
+    })
+    .with("date", "time", "timestamp", async () => {
+      const singleQuery =
+        dataType === "time" ?
+          `SELECT
+             COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+             COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+             NULL AS days
+           FROM "$tableName$"
+           WHERE "$columnName$" IS NOT NULL`
+        : `SELECT
+             COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+             COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+             CASE
+               WHEN MIN("$columnName$") IS NULL OR MAX("$columnName$") IS NULL THEN 0
+               ELSE DATE_DIFF('day',
+                 CAST(MIN("$columnName$") AS DATE),
+                 CAST(MAX("$columnName$") AS DATE)
+               ) + 1
+             END AS days
+           FROM "$tableName$"
+           WHERE "$columnName$" IS NOT NULL`;
+
+      const row = singleton(
+        await WorkspaceQETLClient.runQuery<{
+          most_recent: string | null;
+          oldest: string | null;
+          days: bigint | number | null;
+        }>({
+          workspaceId,
+          rawSql: sqlTemplate(singleQuery).parse({
+            columnName,
+            tableName: datasetId,
+          }),
+        }),
+      ) ?? { most_recent: "", oldest: "", days: 0 };
+
+      const mostRecentDate = String(row.most_recent ?? "");
+      const oldestDate = String(row.oldest ?? "");
+      const datasetCoverage =
+        row.days === null ? "Unknown"
+        : Number(row.days) === 1 ? "1 day"
+        : `${Number(row.days)} days`;
+
+      return {
+        type: "date" as const,
+        mostRecentDate,
+        oldestDate,
+        datasetCoverage,
+      };
+    })
+    .with("boolean", () => {
+      notifyDevAlert("Boolean field summary not implemented");
+      throw new Error(`Unsupported data type: ${dataType}`);
+    })
+    .otherwise(() => {
+      notifyDevAlert(`Unsupported data type: ${dataType}`);
+      throw new Error(`Unsupported data type: ${dataType}`);
+    });
+
+  return {
+    name: columnName,
+    distinctValuesCount,
+    emptyValuesCount,
+    percentMissingValues:
+      distinctValuesCount > 0 ? emptyValuesCount / distinctValuesCount : 0,
+    mostCommonValue:
+      !mostCommonValue || mostCommonValue.length === 0 ?
+        { count: 0, value: [] }
+      : {
+          count: Number(maxCount),
+          value: mostCommonValue.map((row) => {
+            return String(row.value);
+          }),
+        },
+    ...typeSpecificSummary,
+  };
 }
 
 /**

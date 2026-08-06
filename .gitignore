@@ -38,16 +38,26 @@ dist-ssr
 supabase/.temp
 supabase/.branches
 
+# Personal SQL queries saved by Supabase Studio. Local only, not project files.
+supabase/snippets/
+
+# Deno (local type-check only; breaks Supabase edge bundler when committed)
+deno.lock
+
 # Cursor
 .cursor/plans
 
 # Playwright
+/playwright/
 /playwright-report/
 /test-results/
 
 # Common scratch or temp files
+*.ignore.md
 todo.md
 TODO.md
+testplan*.md
+test-plan*.md
 /tmp/
 ~$*.*
 
@@ -60,3 +70,22 @@ etl-output/
 
 # Loom / task video ingest (local scripts, transcripts, downloaded videos)
 .loom-task-video-ingest/
+.playwright-mcp/
+
+# Claude Code per-session runtime state
+.claude/scheduled_tasks*
+
+# Large generated test files for memory/perf benchmarking (do not commit)
+tests/data/large/
+.claude/worktrees
+
+# Git worktrees must live under ~/projects/worktrees/<repo>/, never inside the repo.
+# These patterns are tripwires in case a tool drops a worktree directory here by mistake.
+worktrees/
+.worktrees/
+
+# Difit session comments
+.difit/
+
+# Temporary working files
+.temp/

@@ -1,0 +1,1310 @@
+{
+  "groups": [
+    {
+      "group": "Open models · DeepSeek",
+      "models": [
+        {
+          "id": "deepseek/deepseek-chat",
+          "name": "DeepSeek: DeepSeek V3",
+          "nameWithoutProvider": " DeepSeek V3",
+          "description": "DeepSeek-V3 is the latest model from the DeepSeek team, building upon the instruction following and coding abilities of the previous versions. Pre-trained on nearly 15 trillion tokens, the reported evaluations...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-chat-v3-0324",
+          "name": "DeepSeek: DeepSeek V3 0324",
+          "nameWithoutProvider": " DeepSeek V3 0324",
+          "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team. It succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-chat-v3.1",
+          "name": "DeepSeek: DeepSeek V3.1",
+          "nameWithoutProvider": " DeepSeek V3.1",
+          "description": "DeepSeek-V3.1 is a large hybrid reasoning model (671B parameters, 37B active) that supports both thinking and non-thinking modes via prompt templates. It extends the DeepSeek-V3 base with a two-phase long-context...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-v3.1-terminus",
+          "name": "DeepSeek: DeepSeek V3.1 Terminus",
+          "nameWithoutProvider": " DeepSeek V3.1 Terminus",
+          "description": "DeepSeek-V3.1 Terminus is an update to [DeepSeek V3.1](/deepseek/deepseek-chat-v3.1) that maintains the model's original capabilities while addressing issues reported by users, including language consistency and agent capabilities, further optimizing the model's...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-v3.2",
+          "name": "DeepSeek: DeepSeek V3.2",
+          "nameWithoutProvider": " DeepSeek V3.2",
+          "description": "DeepSeek-V3.2 is a large language model designed to harmonize high computational efficiency with strong reasoning and agentic tool-use performance. It introduces DeepSeek Sparse Attention (DSA), a fine-grained sparse attention mechanism...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-v3.2-exp",
+          "name": "DeepSeek: DeepSeek V3.2 Exp",
+          "nameWithoutProvider": " DeepSeek V3.2 Exp",
+          "description": "DeepSeek-V3.2-Exp is an experimental large language model released by DeepSeek as an intermediate step between V3.1 and future architectures. It introduces DeepSeek Sparse Attention (DSA), a fine-grained sparse attention mechanism...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-v4-flash:free",
+          "name": "DeepSeek: DeepSeek V4 Flash (free)",
+          "nameWithoutProvider": " DeepSeek V4 Flash (free)",
+          "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-v4-pro",
+          "name": "DeepSeek: DeepSeek V4 Pro",
+          "nameWithoutProvider": " DeepSeek V4 Pro",
+          "description": "DeepSeek V4 Pro is a large-scale Mixture-of-Experts model from DeepSeek with 1.6T total parameters and 49B activated parameters, supporting a 1M-token context window. It is designed for advanced reasoning, coding,...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-r1",
+          "name": "DeepSeek: R1",
+          "nameWithoutProvider": " R1",
+          "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass....",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        },
+        {
+          "id": "deepseek/deepseek-r1-0528",
+          "name": "DeepSeek: R1 0528",
+          "nameWithoutProvider": " R1 0528",
+          "description": "May 28th update to the [original DeepSeek R1](/deepseek/deepseek-r1) Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "deepseek"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Meta",
+      "models": [
+        {
+          "id": "meta-llama/llama-3.1-70b-instruct",
+          "name": "Meta: Llama 3.1 70B Instruct",
+          "nameWithoutProvider": " Llama 3.1 70B Instruct",
+          "description": "Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 70B instruct-tuned version is optimized for high quality dialogue usecases. It has demonstrated strong...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "meta-llama"
+        },
+        {
+          "id": "meta-llama/llama-3.1-8b-instruct",
+          "name": "Meta: Llama 3.1 8B Instruct",
+          "nameWithoutProvider": " Llama 3.1 8B Instruct",
+          "description": "Meta's latest class of model (Llama 3.1) launched with a variety of sizes & flavors. This 8B instruct-tuned version is fast and efficient. It has demonstrated strong performance compared to...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "meta-llama"
+        },
+        {
+          "id": "meta-llama/llama-3.3-70b-instruct:free",
+          "name": "Meta: Llama 3.3 70B Instruct (free)",
+          "nameWithoutProvider": " Llama 3.3 70B Instruct (free)",
+          "description": "The Meta Llama 3.3 multilingual large language model (LLM) is a pretrained and instruction tuned generative model in 70B (text in/text out). The Llama 3.3 instruction tuned text only model...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "meta-llama"
+        },
+        {
+          "id": "meta-llama/llama-4-scout",
+          "name": "Meta: Llama 4 Scout",
+          "nameWithoutProvider": " Llama 4 Scout",
+          "description": "Llama 4 Scout 17B Instruct (16E) is a mixture-of-experts (MoE) language model developed by Meta, activating 17 billion parameters out of a total of 109B. It supports native multimodal input...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "meta-llama"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Mistral",
+      "models": [
+        {
+          "id": "mistralai/magistral-small-2509",
+          "name": "Magistral Small 2509",
+          "nameWithoutProvider": "",
+          "description": "Building upon Mistral Small 3.2 (2506), with added reasoning capabilities, undergoing SFT from Magistral Medium traces and RL on top, it's a small, efficient reasoning model with 24B parameters. Magistral...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-large",
+          "name": "Mistral Large",
+          "nameWithoutProvider": "",
+          "description": "This is Mistral AI's flagship model, Mistral Large 2 (version `mistral-large-2407`). It's a proprietary weights-available model and excels at reasoning, code, JSON, chat, and more. Read the launch announcement [here](https://mistral.ai/news/mistral-large-2407/)....",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-large-2407",
+          "name": "Mistral Large 2407",
+          "nameWithoutProvider": "",
+          "description": "This is Mistral AI's flagship model, Mistral Large 2 (version mistral-large-2407). It's a proprietary weights-available model and excels at reasoning, code, JSON, chat, and more. Read the launch announcement [here](https://mistral.ai/news/mistral-large-2407/)....",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-large-2411",
+          "name": "Mistral Large 2411",
+          "nameWithoutProvider": "",
+          "description": "Mistral Large 2 2411 is an update of [Mistral Large 2](/mistralai/mistral-large) released together with [Pixtral Large 2411](/mistralai/pixtral-large-2411) It provides a significant upgrade on the previous [Mistral Large 24.07](/mistralai/mistral-large-2407), with notable...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/codestral-2508",
+          "name": "Mistral: Codestral 2508",
+          "nameWithoutProvider": " Codestral 2508",
+          "description": "Mistral's cutting-edge language model for coding released end of July 2025. Codestral specializes in low-latency, high-frequency tasks such as fill-in-the-middle (FIM), code correction and test generation.\n\n[Blog Post](https://mistral.ai/news/codestral-25-08)",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/devstral-2512",
+          "name": "Mistral: Devstral 2 2512",
+          "nameWithoutProvider": " Devstral 2 2512",
+          "description": "Devstral 2 is a state-of-the-art open-source model by Mistral AI specializing in agentic coding. It is a 123B-parameter dense transformer model supporting a 256K context window. Devstral 2 supports exploring...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/devstral-medium",
+          "name": "Mistral: Devstral Medium",
+          "nameWithoutProvider": " Devstral Medium",
+          "description": "Devstral Medium is a high-performance code generation and agentic reasoning model developed jointly by Mistral AI and All Hands AI. Positioned as a step up from Devstral Small, it achieves...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/devstral-small",
+          "name": "Mistral: Devstral Small 1.1",
+          "nameWithoutProvider": " Devstral Small 1.1",
+          "description": "Devstral Small 1.1 is a 24B parameter open-weight language model for software engineering agents, developed by Mistral AI in collaboration with All Hands AI. Finetuned from Mistral Small 3.1 and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/magistral-medium-2509",
+          "name": "Mistral: Magistral Medium 2509",
+          "nameWithoutProvider": " Magistral Medium 2509",
+          "description": "Magistral is Mistral's first reasoning model. It is ideal for general purpose use requiring longer thought processing and better accuracy than with non-reasoning LLMs. From legal research and financial forecasting...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/ministral-14b-2512",
+          "name": "Mistral: Ministral 3 14B 2512",
+          "nameWithoutProvider": " Ministral 3 14B 2512",
+          "description": "The largest model in the Ministral 3 family, Ministral 3 14B offers frontier capabilities and performance comparable to its larger Mistral Small 3.2 24B counterpart. A powerful and efficient language...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/ministral-3b-2512",
+          "name": "Mistral: Ministral 3 3B 2512",
+          "nameWithoutProvider": " Ministral 3 3B 2512",
+          "description": "The smallest model in the Ministral 3 family, Ministral 3 3B is a powerful, efficient tiny language model with vision capabilities.",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/ministral-8b-2512",
+          "name": "Mistral: Ministral 3 8B 2512",
+          "nameWithoutProvider": " Ministral 3 8B 2512",
+          "description": "A balanced model in the Ministral 3 family, Ministral 3 8B is a powerful, efficient tiny language model with vision capabilities.",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-large-2512",
+          "name": "Mistral: Mistral Large 3 2512",
+          "nameWithoutProvider": " Mistral Large 3 2512",
+          "description": "Mistral Large 3 2512 is Mistral’s most capable model to date, featuring a sparse mixture-of-experts architecture with 41B active parameters (675B total), and released under the Apache 2.0 license.",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-medium-3",
+          "name": "Mistral: Mistral Medium 3",
+          "nameWithoutProvider": " Mistral Medium 3",
+          "description": "Mistral Medium 3 is a high-performance enterprise-grade language model designed to deliver frontier-level capabilities at significantly reduced operational cost. It balances state-of-the-art reasoning and multimodal performance with 8× lower cost...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-medium-3.1",
+          "name": "Mistral: Mistral Medium 3.1",
+          "nameWithoutProvider": " Mistral Medium 3.1",
+          "description": "Mistral Medium 3.1 is an updated version of Mistral Medium 3, which is a high-performance enterprise-grade language model designed to deliver frontier-level capabilities at significantly reduced operational cost. It balances...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-medium-3-5",
+          "name": "Mistral: Mistral Medium 3.5",
+          "nameWithoutProvider": " Mistral Medium 3.5",
+          "description": "Mistral Medium 3.5 is a dense 128B instruction-following model from Mistral AI. It supports text and image inputs with text output, and is designed for agentic workflows, coding, and complex...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-nemo",
+          "name": "Mistral: Mistral Nemo",
+          "nameWithoutProvider": " Mistral Nemo",
+          "description": "A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA. The model is multilingual, supporting English, French, German, Spanish, Italian, Portuguese, Chinese, Japanese,...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-small-3.2-24b-instruct",
+          "name": "Mistral: Mistral Small 3.2 24B",
+          "nameWithoutProvider": " Mistral Small 3.2 24B",
+          "description": "Mistral-Small-3.2-24B-Instruct-2506 is an updated 24B parameter model from Mistral optimized for instruction following, repetition reduction, and improved function calling. Compared to the 3.1 release, version 3.2 significantly improves accuracy on...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-small-2603",
+          "name": "Mistral: Mistral Small 4",
+          "nameWithoutProvider": " Mistral Small 4",
+          "description": "Mistral Small 4 is the next major release in the Mistral Small family, unifying the capabilities of several flagship Mistral models into a single system. It combines strong reasoning from...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mixtral-8x22b-instruct",
+          "name": "Mistral: Mixtral 8x22B Instruct",
+          "nameWithoutProvider": " Mixtral 8x22B Instruct",
+          "description": "Mistral's official instruct fine-tuned version of [Mixtral 8x22B](/models/mistralai/mixtral-8x22b). It uses 39B active parameters out of 141B, offering unparalleled cost efficiency for its size. Its strengths include: - strong math, coding,...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/pixtral-large-2411",
+          "name": "Mistral: Pixtral Large 2411",
+          "nameWithoutProvider": " Pixtral Large 2411",
+          "description": "Pixtral Large is a 124B parameter, open-weight, multimodal model built on top of [Mistral Large 2](/mistralai/mistral-large-2411). The model is able to understand documents, charts and natural images. The model is...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/mistral-saba",
+          "name": "Mistral: Saba",
+          "nameWithoutProvider": " Saba",
+          "description": "Mistral Saba is a 24B-parameter language model specifically designed for the Middle East and South Asia, delivering accurate and contextually relevant responses while maintaining efficient performance. Trained on curated regional...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        },
+        {
+          "id": "mistralai/voxtral-small-24b-2507",
+          "name": "Mistral: Voxtral Small 24B 2507",
+          "nameWithoutProvider": " Voxtral Small 24B 2507",
+          "description": "Voxtral Small is an enhancement of Mistral Small 3, incorporating state-of-the-art audio input capabilities while retaining best-in-class text performance. It excels at speech transcription, translation and audio understanding. Input audio...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "mistralai"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Moonshot AI",
+      "models": [
+        {
+          "id": "moonshotai/kimi-k2",
+          "name": "MoonshotAI: Kimi K2 0711",
+          "nameWithoutProvider": " Kimi K2 0711",
+          "description": "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI, featuring 1 trillion total parameters with 32 billion active per forward pass. It is optimized for...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "moonshotai"
+        },
+        {
+          "id": "moonshotai/kimi-k2-0905",
+          "name": "MoonshotAI: Kimi K2 0905",
+          "nameWithoutProvider": " Kimi K2 0905",
+          "description": "Kimi K2 0905 is the September update of [Kimi K2 0711](moonshotai/kimi-k2). It is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI, featuring 1 trillion total parameters with 32...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "moonshotai"
+        },
+        {
+          "id": "moonshotai/kimi-k2-thinking",
+          "name": "MoonshotAI: Kimi K2 Thinking",
+          "nameWithoutProvider": " Kimi K2 Thinking",
+          "description": "Kimi K2 Thinking is Moonshot AI’s most advanced open reasoning model to date, extending the K2 series into agentic, long-horizon reasoning. Built on the trillion-parameter Mixture-of-Experts (MoE) architecture introduced in...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "moonshotai"
+        },
+        {
+          "id": "moonshotai/kimi-k2.5",
+          "name": "MoonshotAI: Kimi K2.5",
+          "nameWithoutProvider": " Kimi K2.5",
+          "description": "Kimi K2.5 is Moonshot AI's native multimodal model, delivering state-of-the-art visual coding capability and a self-directed agent swarm paradigm. Built on Kimi K2 with continued pretraining over approximately 15T mixed...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "moonshotai"
+        },
+        {
+          "id": "moonshotai/kimi-k2.6",
+          "name": "MoonshotAI: Kimi K2.6",
+          "nameWithoutProvider": " Kimi K2.6",
+          "description": "Kimi K2.6 is Moonshot AI's next-generation multimodal model, designed for long-horizon coding, coding-driven UI/UX generation, and multi-agent orchestration. It handles complex end-to-end coding tasks across Python, Rust, and Go, and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "moonshotai"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Nex Agi",
+      "models": [
+        {
+          "id": "nex-agi/deepseek-v3.1-nex-n1",
+          "name": "Nex AGI: DeepSeek V3.1 Nex N1",
+          "nameWithoutProvider": " DeepSeek V3.1 Nex N1",
+          "description": "DeepSeek V3.1 Nex-N1 is the flagship release of the Nex-N1 series — a post-trained model designed to highlight agent autonomy, tool use, and real-world productivity. Nex-N1 demonstrates competitive performance across...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "nex-agi"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Nvidia",
+      "models": [
+        {
+          "id": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+          "name": "NVIDIA: Llama 3.3 Nemotron Super 49B V1.5",
+          "nameWithoutProvider": " Llama 3.3 Nemotron Super 49B V1.5",
+          "description": "Llama-3.3-Nemotron-Super-49B-v1.5 is a 49B-parameter, English-centric reasoning/chat model derived from Meta’s Llama-3.3-70B-Instruct with a 128K context. It’s post-trained for agentic workflows (RAG, tool calling) via SFT across math, code, science, and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "nvidia"
+        }
+      ]
+    },
+    {
+      "group": "Open models · Qwen",
+      "models": [
+        {
+          "id": "qwen/qwen-plus-2025-07-28:thinking",
+          "name": "Qwen: Qwen Plus 0728 (thinking)",
+          "nameWithoutProvider": " Qwen Plus 0728 (thinking)",
+          "description": "Qwen Plus 0728, based on the Qwen3 foundation model, is a 1 million context hybrid reasoning model with a balanced performance, speed, and cost combination.",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen-2.5-7b-instruct",
+          "name": "Qwen: Qwen2.5 7B Instruct",
+          "nameWithoutProvider": " Qwen2.5 7B Instruct",
+          "description": "Qwen2.5 7B is the latest series of Qwen large language models. Qwen2.5 brings the following improvements upon Qwen2: - Significantly more knowledge and has greatly improved capabilities in coding and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-14b",
+          "name": "Qwen: Qwen3 14B",
+          "nameWithoutProvider": " Qwen3 14B",
+          "description": "Qwen3-14B is a dense 14.8B parameter causal language model from the Qwen3 series, designed for both complex reasoning and efficient dialogue. It supports seamless switching between a \"thinking\" mode for...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-235b-a22b",
+          "name": "Qwen: Qwen3 235B A22B",
+          "nameWithoutProvider": " Qwen3 235B A22B",
+          "description": "Qwen3-235B-A22B is a 235B parameter mixture-of-experts (MoE) model developed by Qwen, activating 22B parameters per forward pass. It supports seamless switching between a \"thinking\" mode for complex reasoning, math, and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-235b-a22b-2507",
+          "name": "Qwen: Qwen3 235B A22B Instruct 2507",
+          "nameWithoutProvider": " Qwen3 235B A22B Instruct 2507",
+          "description": "Qwen3-235B-A22B-Instruct-2507 is a multilingual, instruction-tuned mixture-of-experts language model based on the Qwen3-235B architecture, with 22B active parameters per forward pass. It is optimized for general-purpose text generation, including instruction following,...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-235b-a22b-thinking-2507",
+          "name": "Qwen: Qwen3 235B A22B Thinking 2507",
+          "nameWithoutProvider": " Qwen3 235B A22B Thinking 2507",
+          "description": "Qwen3-235B-A22B-Thinking-2507 is a high-performance, open-weight Mixture-of-Experts (MoE) language model optimized for complex reasoning tasks. It activates 22B of its 235B parameters per forward pass and natively supports up to 262,144...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-30b-a3b",
+          "name": "Qwen: Qwen3 30B A3B",
+          "nameWithoutProvider": " Qwen3 30B A3B",
+          "description": "Qwen3, the latest generation in the Qwen large language model series, features both dense and mixture-of-experts (MoE) architectures to excel in reasoning, multilingual support, and advanced agent tasks. Its unique...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-30b-a3b-instruct-2507",
+          "name": "Qwen: Qwen3 30B A3B Instruct 2507",
+          "nameWithoutProvider": " Qwen3 30B A3B Instruct 2507",
+          "description": "Qwen3-30B-A3B-Instruct-2507 is a 30.5B-parameter mixture-of-experts language model from Qwen, with 3.3B active parameters per inference. It operates in non-thinking mode and is designed for high-quality instruction following, multilingual understanding, and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-30b-a3b-thinking-2507",
+          "name": "Qwen: Qwen3 30B A3B Thinking 2507",
+          "nameWithoutProvider": " Qwen3 30B A3B Thinking 2507",
+          "description": "Qwen3-30B-A3B-Thinking-2507 is a 30B parameter Mixture-of-Experts reasoning model optimized for complex tasks requiring extended multi-step thinking. The model is designed specifically for “thinking mode,” where internal reasoning traces are separated...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-32b",
+          "name": "Qwen: Qwen3 32B",
+          "nameWithoutProvider": " Qwen3 32B",
+          "description": "Qwen3-32B is a dense 32.8B parameter causal language model from the Qwen3 series, optimized for both complex reasoning and efficient dialogue. It supports seamless switching between a \"thinking\" mode for...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-8b",
+          "name": "Qwen: Qwen3 8B",
+          "nameWithoutProvider": " Qwen3 8B",
+          "description": "Qwen3-8B is a dense 8.2B parameter causal language model from the Qwen3 series, designed for both reasoning-heavy tasks and efficient dialogue. It supports seamless switching between \"thinking\" mode for math,...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-coder-30b-a3b-instruct",
+          "name": "Qwen: Qwen3 Coder 30B A3B Instruct",
+          "nameWithoutProvider": " Qwen3 Coder 30B A3B Instruct",
+          "description": "Qwen3-Coder-30B-A3B-Instruct is a 30.5B parameter Mixture-of-Experts (MoE) model with 128 experts (8 active per forward pass), designed for advanced code generation, repository-scale understanding, and agentic tool use. Built on the...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-coder:free",
+          "name": "Qwen: Qwen3 Coder 480B A35B (free)",
+          "nameWithoutProvider": " Qwen3 Coder 480B A35B (free)",
+          "description": "Qwen3-Coder-480B-A35B-Instruct is a Mixture-of-Experts (MoE) code generation model developed by the Qwen team. It is optimized for agentic coding tasks such as function calling, tool use, and long-context reasoning over...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-coder-flash",
+          "name": "Qwen: Qwen3 Coder Flash",
+          "nameWithoutProvider": " Qwen3 Coder Flash",
+          "description": "Qwen3 Coder Flash is Alibaba's fast and cost efficient version of their proprietary Qwen3 Coder Plus. It is a powerful coding agent model specializing in autonomous programming via tool calling...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-coder-next",
+          "name": "Qwen: Qwen3 Coder Next",
+          "nameWithoutProvider": " Qwen3 Coder Next",
+          "description": "Qwen3-Coder-Next is an open-weight causal language model optimized for coding agents and local development workflows. It uses a sparse MoE design with 80B total parameters and only 3B activated per...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-coder-plus",
+          "name": "Qwen: Qwen3 Coder Plus",
+          "nameWithoutProvider": " Qwen3 Coder Plus",
+          "description": "Qwen3 Coder Plus is Alibaba's proprietary version of the Open Source Qwen3 Coder 480B A35B. It is a powerful coding agent model specializing in autonomous programming via tool calling and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-max",
+          "name": "Qwen: Qwen3 Max",
+          "nameWithoutProvider": " Qwen3 Max",
+          "description": "Qwen3-Max is an updated release built on the Qwen3 series, offering major improvements in reasoning, instruction following, multilingual support, and long-tail knowledge coverage compared to the January 2025 version. It...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-max-thinking",
+          "name": "Qwen: Qwen3 Max Thinking",
+          "nameWithoutProvider": " Qwen3 Max Thinking",
+          "description": "Qwen3-Max-Thinking is the flagship reasoning model in the Qwen3 series, designed for high-stakes cognitive tasks that require deep, multi-step reasoning. By significantly scaling model capacity and reinforcement learning compute, it...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-next-80b-a3b-instruct:free",
+          "name": "Qwen: Qwen3 Next 80B A3B Instruct (free)",
+          "nameWithoutProvider": " Qwen3 Next 80B A3B Instruct (free)",
+          "description": "Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-next-80b-a3b-thinking",
+          "name": "Qwen: Qwen3 Next 80B A3B Thinking",
+          "nameWithoutProvider": " Qwen3 Next 80B A3B Thinking",
+          "description": "Qwen3-Next-80B-A3B-Thinking is a reasoning-first chat model in the Qwen3-Next line that outputs structured “thinking” traces by default. It’s designed for hard multi-step problems; math proofs, code synthesis/debugging, logic, and agentic...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-235b-a22b-instruct",
+          "name": "Qwen: Qwen3 VL 235B A22B Instruct",
+          "nameWithoutProvider": " Qwen3 VL 235B A22B Instruct",
+          "description": "Qwen3-VL-235B-A22B Instruct is an open-weight multimodal model that unifies strong text generation with visual understanding across images and video. The Instruct model targets general vision-language use (VQA, document parsing, chart/table...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-235b-a22b-thinking",
+          "name": "Qwen: Qwen3 VL 235B A22B Thinking",
+          "nameWithoutProvider": " Qwen3 VL 235B A22B Thinking",
+          "description": "Qwen3-VL-235B-A22B Thinking is a multimodal model that unifies strong text generation with visual understanding across images and video. The Thinking model is optimized for multimodal reasoning in STEM and math....",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-30b-a3b-instruct",
+          "name": "Qwen: Qwen3 VL 30B A3B Instruct",
+          "nameWithoutProvider": " Qwen3 VL 30B A3B Instruct",
+          "description": "Qwen3-VL-30B-A3B-Instruct is a multimodal model that unifies strong text generation with visual understanding for images and videos. Its Instruct variant optimizes instruction-following for general multimodal tasks. It excels in perception...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-30b-a3b-thinking",
+          "name": "Qwen: Qwen3 VL 30B A3B Thinking",
+          "nameWithoutProvider": " Qwen3 VL 30B A3B Thinking",
+          "description": "Qwen3-VL-30B-A3B-Thinking is a multimodal model that unifies strong text generation with visual understanding for images and videos. Its Thinking variant enhances reasoning in STEM, math, and complex tasks. It excels...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-32b-instruct",
+          "name": "Qwen: Qwen3 VL 32B Instruct",
+          "nameWithoutProvider": " Qwen3 VL 32B Instruct",
+          "description": "Qwen3-VL-32B-Instruct is a large-scale multimodal vision-language model designed for high-precision understanding and reasoning across text, images, and video. With 32 billion parameters, it combines deep visual perception with advanced text...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-8b-instruct",
+          "name": "Qwen: Qwen3 VL 8B Instruct",
+          "nameWithoutProvider": " Qwen3 VL 8B Instruct",
+          "description": "Qwen3-VL-8B-Instruct is a multimodal vision-language model from the Qwen3-VL series, built for high-fidelity understanding and reasoning across text, images, and video. It features improved multimodal fusion with Interleaved-MRoPE for long-horizon...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3-vl-8b-thinking",
+          "name": "Qwen: Qwen3 VL 8B Thinking",
+          "nameWithoutProvider": " Qwen3 VL 8B Thinking",
+          "description": "Qwen3-VL-8B-Thinking is the reasoning-optimized variant of the Qwen3-VL-8B multimodal model, designed for advanced visual and textual reasoning across complex scenes, documents, and temporal sequences. It integrates enhanced multimodal alignment and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-397b-a17b",
+          "name": "Qwen: Qwen3.5 397B A17B",
+          "nameWithoutProvider": " Qwen3.5 397B A17B",
+          "description": "The Qwen3.5 series 397B-A17B native vision-language model is built on a hybrid architecture that integrates a linear attention mechanism with a sparse mixture-of-experts model, achieving higher inference efficiency. It delivers...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-plus-20260420",
+          "name": "Qwen: Qwen3.5 Plus 2026-04-20",
+          "nameWithoutProvider": " Qwen3.5 Plus 2026-04-20",
+          "description": "Qwen3.5 Plus (April 2026) is a large-scale multimodal language model from Alibaba. It accepts text, image, and video input and produces text output, with a 1M token context window. This...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-122b-a10b",
+          "name": "Qwen: Qwen3.5-122B-A10B",
+          "nameWithoutProvider": " Qwen3.5-122B-A10B",
+          "description": "The Qwen3.5 122B-A10B native vision-language model is built on a hybrid architecture that integrates a linear attention mechanism with a sparse mixture-of-experts model, achieving higher inference efficiency. In terms of...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-27b",
+          "name": "Qwen: Qwen3.5-27B",
+          "nameWithoutProvider": " Qwen3.5-27B",
+          "description": "The Qwen3.5 27B native vision-language Dense model incorporates a linear attention mechanism, delivering fast response times while balancing inference speed and performance. Its overall capabilities are comparable to those of...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-35b-a3b",
+          "name": "Qwen: Qwen3.5-35B-A3B",
+          "nameWithoutProvider": " Qwen3.5-35B-A3B",
+          "description": "The Qwen3.5 Series 35B-A3B is a native vision-language model designed with a hybrid architecture that integrates linear attention mechanisms and a sparse mixture-of-experts model, achieving higher inference efficiency. Its overall...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-9b",
+          "name": "Qwen: Qwen3.5-9B",
+          "nameWithoutProvider": " Qwen3.5-9B",
+          "description": "Qwen3.5-9B is a multimodal foundation model from the Qwen3.5 family, designed to deliver strong reasoning, coding, and visual understanding in an efficient 9B-parameter architecture. It uses a unified vision-language design...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.5-flash-02-23",
+          "name": "Qwen: Qwen3.5-Flash",
+          "nameWithoutProvider": " Qwen3.5-Flash",
+          "description": "The Qwen3.5 native vision-language Flash models are built on a hybrid architecture that integrates a linear attention mechanism with a sparse mixture-of-experts model, achieving higher inference efficiency. Compared to the...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.6-27b",
+          "name": "Qwen: Qwen3.6 27B",
+          "nameWithoutProvider": " Qwen3.6 27B",
+          "description": "Qwen3.6 27B is a dense 27-billion-parameter language model from the Qwen Team at Alibaba, released in April 2026. It features hybrid multimodal capabilities — accepting text, image, and video inputs...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.6-35b-a3b",
+          "name": "Qwen: Qwen3.6 35B A3B",
+          "nameWithoutProvider": " Qwen3.6 35B A3B",
+          "description": "Qwen3.6-35B-A3B is an open-weight multimodal model from Alibaba Cloud with 35 billion total parameters and 3 billion active parameters per token. It uses a hybrid sparse mixture-of-experts architecture combining Gated...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.6-flash",
+          "name": "Qwen: Qwen3.6 Flash",
+          "nameWithoutProvider": " Qwen3.6 Flash",
+          "description": "Qwen3.6 Flash is a fast, efficient language model from Alibaba's Qwen 3.6 series. It supports text, image, and video input with a 1M token context window. Tiered pricing kicks in...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen3.6-plus",
+          "name": "Qwen: Qwen3.6 Plus",
+          "nameWithoutProvider": " Qwen3.6 Plus",
+          "description": "Qwen 3.6 Plus builds on a hybrid architecture that combines efficient linear attention with sparse mixture-of-experts routing, enabling strong scalability and high-performance inference. Compared to the 3.5 series, it delivers...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        },
+        {
+          "id": "qwen/qwen-2.5-72b-instruct",
+          "name": "Qwen2.5 72B Instruct",
+          "nameWithoutProvider": "",
+          "description": "Qwen2.5 72B is the latest series of Qwen large language models. Qwen2.5 brings the following improvements upon Qwen2: - Significantly more knowledge and has greatly improved capabilities in coding and...",
+          "supportsTools": true,
+          "licenseTier": "open",
+          "provider": "qwen"
+        }
+      ]
+    },
+    {
+      "group": "Proprietary · Anthropic",
+      "models": [
+        {
+          "id": "anthropic/claude-3-haiku",
+          "name": "Anthropic: Claude 3 Haiku",
+          "nameWithoutProvider": " Claude 3 Haiku",
+          "description": "Claude 3 Haiku is Anthropic's fastest and most compact model for\nnear-instant responsiveness. Quick and accurate targeted performance.\n\nSee the launch announcement and benchmark results [here](https://www.anthropic.com/news/claude-3-haiku)\n\n#multimodal",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-3.5-haiku",
+          "name": "Anthropic: Claude 3.5 Haiku",
+          "nameWithoutProvider": " Claude 3.5 Haiku",
+          "description": "Claude 3.5 Haiku features offers enhanced capabilities in speed, coding accuracy, and tool use. Engineered to excel in real-time applications, it delivers quick response times that are essential for dynamic...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-haiku-4.5",
+          "name": "Anthropic: Claude Haiku 4.5",
+          "nameWithoutProvider": " Claude Haiku 4.5",
+          "description": "Claude Haiku 4.5 is Anthropic’s fastest and most efficient model, delivering near-frontier intelligence at a fraction of the cost and latency of larger Claude models. Matching Claude Sonnet 4’s performance...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4",
+          "name": "Anthropic: Claude Opus 4",
+          "nameWithoutProvider": " Claude Opus 4",
+          "description": "Claude Opus 4 is benchmarked as the world’s best coding model, at time of release, bringing sustained performance on complex, long-running tasks and agent workflows. It sets new benchmarks in...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.1",
+          "name": "Anthropic: Claude Opus 4.1",
+          "nameWithoutProvider": " Claude Opus 4.1",
+          "description": "Claude Opus 4.1 is an updated version of Anthropic’s flagship model, offering improved performance in coding, reasoning, and agentic tasks. It achieves 74.5% on SWE-bench Verified and shows notable gains...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.5",
+          "name": "Anthropic: Claude Opus 4.5",
+          "nameWithoutProvider": " Claude Opus 4.5",
+          "description": "Claude Opus 4.5 is Anthropic’s frontier reasoning model optimized for complex software engineering, agentic workflows, and long-horizon computer use. It offers strong multimodal capabilities, competitive performance across real-world coding and...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.6",
+          "name": "Anthropic: Claude Opus 4.6",
+          "nameWithoutProvider": " Claude Opus 4.6",
+          "description": "Opus 4.6 is Anthropic’s strongest model for coding and long-running professional tasks. It is built for agents that operate across entire workflows rather than single prompts, making it especially effective...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.6-fast",
+          "name": "Anthropic: Claude Opus 4.6 (Fast)",
+          "nameWithoutProvider": " Claude Opus 4.6 (Fast)",
+          "description": "Fast-mode variant of [Opus 4.6](/anthropic/claude-opus-4.6) - identical capabilities with higher output speed at premium 6x pricing.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.7",
+          "name": "Anthropic: Claude Opus 4.7",
+          "nameWithoutProvider": " Claude Opus 4.7",
+          "description": "Opus 4.7 is the next generation of Anthropic's Opus family, built for long-running, asynchronous agents. Building on the coding and agentic strengths of Opus 4.6, it delivers stronger performance on...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-opus-4.7-fast",
+          "name": "Anthropic: Claude Opus 4.7 (Fast)",
+          "nameWithoutProvider": " Claude Opus 4.7 (Fast)",
+          "description": "Fast-mode variant of [Opus 4.7](/anthropic/claude-opus-4.7) - identical capabilities with higher output speed at premium 6x pricing.\n\nLearn more in Anthropic's docs: https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-sonnet-4",
+          "name": "Anthropic: Claude Sonnet 4",
+          "nameWithoutProvider": " Claude Sonnet 4",
+          "description": "Claude Sonnet 4 significantly enhances the capabilities of its predecessor, Sonnet 3.7, excelling in both coding and reasoning tasks with improved precision and controllability. Achieving state-of-the-art performance on SWE-bench (72.7%),...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-sonnet-4.5",
+          "name": "Anthropic: Claude Sonnet 4.5",
+          "nameWithoutProvider": " Claude Sonnet 4.5",
+          "description": "Claude Sonnet 4.5 is Anthropic’s most advanced Sonnet model to date, optimized for real-world agents and coding workflows. It delivers state-of-the-art performance on coding benchmarks such as SWE-bench Verified, with...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        },
+        {
+          "id": "anthropic/claude-sonnet-4.6",
+          "name": "Anthropic: Claude Sonnet 4.6",
+          "nameWithoutProvider": " Claude Sonnet 4.6",
+          "description": "Sonnet 4.6 is Anthropic's most capable Sonnet-class model yet, with frontier performance across coding, agents, and professional work. It excels at iterative development, complex codebase navigation, end-to-end project management with...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "anthropic"
+        }
+      ]
+    },
+    {
+      "group": "Proprietary · Google",
+      "models": [
+        {
+          "id": "google/gemini-2.0-flash-001",
+          "name": "Google: Gemini 2.0 Flash",
+          "nameWithoutProvider": " Gemini 2.0 Flash",
+          "description": "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-2.0-flash-lite-001",
+          "name": "Google: Gemini 2.0 Flash Lite",
+          "nameWithoutProvider": " Gemini 2.0 Flash Lite",
+          "description": "Gemini 2.0 Flash Lite offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5),...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-2.5-flash",
+          "name": "Google: Gemini 2.5 Flash",
+          "nameWithoutProvider": " Gemini 2.5 Flash",
+          "description": "Gemini 2.5 Flash is Google's state-of-the-art workhorse model, specifically designed for advanced reasoning, coding, mathematics, and scientific tasks. It includes built-in \"thinking\" capabilities, enabling it to provide responses with greater...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-2.5-flash-lite",
+          "name": "Google: Gemini 2.5 Flash Lite",
+          "nameWithoutProvider": " Gemini 2.5 Flash Lite",
+          "description": "Gemini 2.5 Flash-Lite is a lightweight reasoning model in the Gemini 2.5 family, optimized for ultra-low latency and cost efficiency. It offers improved throughput, faster token generation, and better performance...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-2.5-pro",
+          "name": "Google: Gemini 2.5 Pro",
+          "nameWithoutProvider": " Gemini 2.5 Pro",
+          "description": "Gemini 2.5 Pro is Google’s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs “thinking” capabilities, enabling it to reason through responses with enhanced accuracy...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-3.1-flash-lite",
+          "name": "Google: Gemini 3.1 Flash Lite",
+          "nameWithoutProvider": " Gemini 3.1 Flash Lite",
+          "description": "Gemini 3.1 Flash Lite is Google’s GA high-efficiency multimodal model optimized for low-latency, high-volume workloads. It supports text, image, video, audio, and PDF inputs, and is designed for lightweight agentic...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        },
+        {
+          "id": "google/gemini-3.5-flash",
+          "name": "Google: Gemini 3.5 Flash",
+          "nameWithoutProvider": " Gemini 3.5 Flash",
+          "description": "Gemini 3.5 Flash is Google's high-efficiency multimodal model, bringing near-Pro level coding and reasoning at Flash-tier cost and speed. It is highly optimized for coding proficiency and parallel agentic execution...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "google"
+        }
+      ]
+    },
+    {
+      "group": "Proprietary · OpenAI",
+      "models": [
+        {
+          "id": "openai/gpt-4o-2024-11-20",
+          "name": "OpenAI: GPT-4o (2024-11-20)",
+          "nameWithoutProvider": " GPT-4o (2024-11-20)",
+          "description": "The 2024-11-20 version of GPT-4o offers a leveled-up creative writing ability with more natural, engaging, and tailored writing to improve relevance & readability. It’s also better at working with uploaded...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-4o-audio-preview",
+          "name": "OpenAI: GPT-4o Audio",
+          "nameWithoutProvider": " GPT-4o Audio",
+          "description": "The gpt-4o-audio-preview model adds support for audio inputs as prompts. This enhancement allows the model to detect nuances within audio recordings and add depth to generated user experiences. Audio outputs...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-4o-mini-2024-07-18",
+          "name": "OpenAI: GPT-4o-mini (2024-07-18)",
+          "nameWithoutProvider": " GPT-4o-mini (2024-07-18)",
+          "description": "GPT-4o mini is OpenAI's newest model after [GPT-4 Omni](/models/openai/gpt-4o), supporting both text and image inputs with text outputs. As their most advanced small model, it is many multiples more affordable...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5",
+          "name": "OpenAI: GPT-5",
+          "nameWithoutProvider": " GPT-5",
+          "description": "GPT-5 is OpenAI’s most advanced model, offering major improvements in reasoning, code quality, and user experience. It is optimized for complex tasks that require step-by-step reasoning, instruction following, and accuracy...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5-codex",
+          "name": "OpenAI: GPT-5 Codex",
+          "nameWithoutProvider": " GPT-5 Codex",
+          "description": "GPT-5-Codex is a specialized version of GPT-5 optimized for software engineering and coding workflows. It is designed for both interactive development sessions and long, independent execution of complex engineering tasks....",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5-mini",
+          "name": "OpenAI: GPT-5 Mini",
+          "nameWithoutProvider": " GPT-5 Mini",
+          "description": "GPT-5 Mini is a compact version of GPT-5, designed to handle lighter-weight reasoning tasks. It provides the same instruction-following and safety-tuning benefits as GPT-5, but with reduced latency and cost....",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5-nano",
+          "name": "OpenAI: GPT-5 Nano",
+          "nameWithoutProvider": " GPT-5 Nano",
+          "description": "GPT-5-Nano is the smallest and fastest variant in the GPT-5 system, optimized for developer tools, rapid interactions, and ultra-low latency environments. While limited in reasoning depth compared to its larger...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5-pro",
+          "name": "OpenAI: GPT-5 Pro",
+          "nameWithoutProvider": " GPT-5 Pro",
+          "description": "GPT-5 Pro is OpenAI’s most advanced model, offering major improvements in reasoning, code quality, and user experience. It is optimized for complex tasks that require step-by-step reasoning, instruction following, and...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.1",
+          "name": "OpenAI: GPT-5.1",
+          "nameWithoutProvider": " GPT-5.1",
+          "description": "GPT-5.1 is the latest frontier-grade model in the GPT-5 series, offering stronger general-purpose reasoning, improved instruction adherence, and a more natural conversational style compared to GPT-5. It uses adaptive reasoning...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.1-chat",
+          "name": "OpenAI: GPT-5.1 Chat",
+          "nameWithoutProvider": " GPT-5.1 Chat",
+          "description": "GPT-5.1 Chat (AKA Instant is the fast, lightweight member of the 5.1 family, optimized for low-latency chat while retaining strong general intelligence. It uses adaptive reasoning to selectively “think” on...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.1-codex",
+          "name": "OpenAI: GPT-5.1-Codex",
+          "nameWithoutProvider": " GPT-5.1-Codex",
+          "description": "GPT-5.1-Codex is a specialized version of GPT-5.1 optimized for software engineering and coding workflows. It is designed for both interactive development sessions and long, independent execution of complex engineering tasks....",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.1-codex-max",
+          "name": "OpenAI: GPT-5.1-Codex-Max",
+          "nameWithoutProvider": " GPT-5.1-Codex-Max",
+          "description": "GPT-5.1-Codex-Max is OpenAI’s latest agentic coding model, designed for long-running, high-context software development tasks. It is based on an updated version of the 5.1 reasoning stack and trained on agentic...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.1-codex-mini",
+          "name": "OpenAI: GPT-5.1-Codex-Mini",
+          "nameWithoutProvider": " GPT-5.1-Codex-Mini",
+          "description": "GPT-5.1-Codex-Mini is a smaller and faster version of GPT-5.1-Codex",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.2",
+          "name": "OpenAI: GPT-5.2",
+          "nameWithoutProvider": " GPT-5.2",
+          "description": "GPT-5.2 is the latest frontier-grade model in the GPT-5 series, offering stronger agentic and long context perfomance compared to GPT-5.1. It uses adaptive reasoning to allocate computation dynamically, responding quickly...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.2-chat",
+          "name": "OpenAI: GPT-5.2 Chat",
+          "nameWithoutProvider": " GPT-5.2 Chat",
+          "description": "GPT-5.2 Chat (AKA Instant) is the fast, lightweight member of the 5.2 family, optimized for low-latency chat while retaining strong general intelligence. It uses adaptive reasoning to selectively “think” on...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.2-pro",
+          "name": "OpenAI: GPT-5.2 Pro",
+          "nameWithoutProvider": " GPT-5.2 Pro",
+          "description": "GPT-5.2 Pro is OpenAI’s most advanced model, offering major improvements in agentic coding and long context performance over GPT-5 Pro. It is optimized for complex tasks that require step-by-step reasoning,...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.2-codex",
+          "name": "OpenAI: GPT-5.2-Codex",
+          "nameWithoutProvider": " GPT-5.2-Codex",
+          "description": "GPT-5.2-Codex is an upgraded version of GPT-5.1-Codex optimized for software engineering and coding workflows. It is designed for both interactive development sessions and long, independent execution of complex engineering tasks....",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.3-chat",
+          "name": "OpenAI: GPT-5.3 Chat",
+          "nameWithoutProvider": " GPT-5.3 Chat",
+          "description": "GPT-5.3 Chat is an update to ChatGPT's most-used model that makes everyday conversations smoother, more useful, and more directly helpful. It delivers more accurate answers with better contextualization and significantly...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.3-codex",
+          "name": "OpenAI: GPT-5.3-Codex",
+          "nameWithoutProvider": " GPT-5.3-Codex",
+          "description": "GPT-5.3-Codex is OpenAI’s most advanced agentic coding model, combining the frontier software engineering performance of GPT-5.2-Codex with the broader reasoning and professional knowledge capabilities of GPT-5.2. It achieves state-of-the-art results...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.4",
+          "name": "OpenAI: GPT-5.4",
+          "nameWithoutProvider": " GPT-5.4",
+          "description": "GPT-5.4 is OpenAI’s latest frontier model, unifying the Codex and GPT lines into a single system. It features a 1M+ token context window (922K input, 128K output) with support for...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.4-mini",
+          "name": "OpenAI: GPT-5.4 Mini",
+          "nameWithoutProvider": " GPT-5.4 Mini",
+          "description": "GPT-5.4 mini brings the core capabilities of GPT-5.4 to a faster, more efficient model optimized for high-throughput workloads. It supports text and image inputs with strong performance across reasoning, coding,...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.4-nano",
+          "name": "OpenAI: GPT-5.4 Nano",
+          "nameWithoutProvider": " GPT-5.4 Nano",
+          "description": "GPT-5.4 nano is the most lightweight and cost-efficient variant of the GPT-5.4 family, optimized for speed-critical and high-volume tasks. It supports text and image inputs and is designed for low-latency...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.4-pro",
+          "name": "OpenAI: GPT-5.4 Pro",
+          "nameWithoutProvider": " GPT-5.4 Pro",
+          "description": "GPT-5.4 Pro is OpenAI's most advanced model, building on GPT-5.4's unified architecture with enhanced reasoning capabilities for complex, high-stakes tasks. It features a 1M+ token context window (922K input, 128K...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.5",
+          "name": "OpenAI: GPT-5.5",
+          "nameWithoutProvider": " GPT-5.5",
+          "description": "GPT-5.5 is OpenAI’s frontier model designed for complex professional workloads, building on GPT-5.4 with stronger reasoning, higher reliability, and improved token efficiency on hard tasks. It features a 1M+ token...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/gpt-5.5-pro",
+          "name": "OpenAI: GPT-5.5 Pro",
+          "nameWithoutProvider": " GPT-5.5 Pro",
+          "description": "GPT-5.5 Pro is OpenAI’s high-capability model optimized for deep reasoning and accuracy on complex, high-stakes workloads. It features a 1M+ token context window (922K input, 128K output) with support for...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o1",
+          "name": "OpenAI: o1",
+          "nameWithoutProvider": " o1",
+          "description": "The latest and strongest model family from OpenAI, o1 is designed to spend more time thinking before responding. The o1 model series is trained with large-scale reinforcement learning to reason...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o3",
+          "name": "OpenAI: o3",
+          "nameWithoutProvider": " o3",
+          "description": "o3 is a well-rounded and powerful model across domains. It sets a new standard for math, science, coding, and visual reasoning tasks. It also excels at technical writing and instruction-following....",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o3-deep-research",
+          "name": "OpenAI: o3 Deep Research",
+          "nameWithoutProvider": " o3 Deep Research",
+          "description": "o3-deep-research is OpenAI's advanced model for deep research, designed to tackle complex, multi-step research tasks.\n\nNote: This model always uses the 'web_search' tool which adds additional cost.",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o3-mini",
+          "name": "OpenAI: o3 Mini",
+          "nameWithoutProvider": " o3 Mini",
+          "description": "OpenAI o3-mini is a cost-efficient language model optimized for STEM reasoning tasks, particularly excelling in science, mathematics, and coding. This model supports the `reasoning_effort` parameter, which can be set to...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o3-mini-high",
+          "name": "OpenAI: o3 Mini High",
+          "nameWithoutProvider": " o3 Mini High",
+          "description": "OpenAI o3-mini-high is the same model as [o3-mini](/openai/o3-mini) with reasoning_effort set to high. o3-mini is a cost-efficient language model optimized for STEM reasoning tasks, particularly excelling in science, mathematics, and...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o3-pro",
+          "name": "OpenAI: o3 Pro",
+          "nameWithoutProvider": " o3 Pro",
+          "description": "The o-series of models are trained with reinforcement learning to think before they answer and perform complex reasoning. The o3-pro model uses more compute to think harder and provide consistently...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o4-mini",
+          "name": "OpenAI: o4 Mini",
+          "nameWithoutProvider": " o4 Mini",
+          "description": "OpenAI o4-mini is a compact reasoning model in the o-series, optimized for fast, cost-efficient performance while retaining strong multimodal and agentic capabilities. It supports tool use and demonstrates competitive reasoning...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o4-mini-deep-research",
+          "name": "OpenAI: o4 Mini Deep Research",
+          "nameWithoutProvider": " o4 Mini Deep Research",
+          "description": "o4-mini-deep-research is OpenAI's faster, more affordable deep research model—ideal for tackling complex, multi-step research tasks.\n\nNote: This model always uses the 'web_search' tool which adds additional cost.",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        },
+        {
+          "id": "openai/o4-mini-high",
+          "name": "OpenAI: o4 Mini High",
+          "nameWithoutProvider": " o4 Mini High",
+          "description": "OpenAI o4-mini-high is the same model as [o4-mini](/openai/o4-mini) with reasoning_effort set to high. OpenAI o4-mini is a compact reasoning model in the o-series, optimized for fast, cost-efficient performance while retaining...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "openai"
+        }
+      ]
+    },
+    {
+      "group": "Proprietary · Sao10k",
+      "models": [
+        {
+          "id": "sao10k/l3-euryale-70b",
+          "name": "Sao10k: Llama 3 Euryale 70B v2.1",
+          "nameWithoutProvider": " Llama 3 Euryale 70B v2.1",
+          "description": "Euryale 70B v2.1 is a model focused on creative roleplay from [Sao10k](https://ko-fi.com/sao10k). - Better prompt adherence. - Better anatomy / spatial awareness. - Adapts much better to unique and custom...",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "sao10k"
+        },
+        {
+          "id": "sao10k/l3.1-euryale-70b",
+          "name": "Sao10K: Llama 3.1 Euryale 70B v2.2",
+          "nameWithoutProvider": " Llama 3.1 Euryale 70B v2.2",
+          "description": "Euryale L3.1 70B v2.2 is a model focused on creative roleplay from [Sao10k](https://ko-fi.com/sao10k). It is the successor of [Euryale L3 70B v2.1](/models/sao10k/l3-euryale-70b).",
+          "supportsTools": true,
+          "licenseTier": "proprietary",
+          "provider": "sao10k"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && corepack enable >/dev/null 2>&1 || true && pnpm install --frozen-lockfile && if [ ! -f apps/ava-cli/dist/main.cjs ]; then pnpm build:ava-cli; fi"
+          },
+          {
+            "type": "command",
+            "command": "if ! command -v ngrok >/dev/null 2>&1; then if command -v brew >/dev/null 2>&1; then brew install ngrok >/dev/null 2>&1 || brew install --cask ngrok >/dev/null 2>&1; else echo 'ngrok not installed and brew not available' >&2; fi; fi"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/scripts/cloudBootstrapEnv.sh\""
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/react-doctor.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

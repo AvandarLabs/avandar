@@ -1,8 +1,8 @@
 import { DefaultError, QueryClient, QueryKey } from "@hooks/core.types";
 import type {
-  CRUDModelSpec,
-  ModelCRUDClient,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+  CrudModelSpec,
+  ModelCrudClient,
+} from "@clients/ModelCrudClient/ModelCrudClient.types";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type {
   UseMutationOptions,
@@ -255,7 +255,7 @@ export const DEFAULT_QUERY_FN_NAMES = [
   "getOne",
   "getCount",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<CRUDModelSpec>>
+  FnNameReturningPromise<ModelCrudClient<CrudModelSpec>>
 >;
 export type DefaultQueryFnName = (typeof DEFAULT_QUERY_FN_NAMES)[number];
 
@@ -270,20 +270,20 @@ export const DEFAULT_MUTATION_FN_NAMES = [
   "delete",
   "bulkDelete",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<CRUDModelSpec>>
+  FnNameReturningPromise<ModelCrudClient<CrudModelSpec>>
 >;
 
 export type DefaultMutationFnName = (typeof DEFAULT_MUTATION_FN_NAMES)[number];
 
 /*
-export type UsableModelCRUDClient<
+export type UsableModelCrudClient<
   // These args should be passed explicitly
-  M extends CRUDModelSpec,
+  M extends CrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
-  FullClient extends BaseModelCRUDClient<M> &
+  FullClient extends BaseModelCrudClient<M> &
     ExtendedQueriesClient &
-    ExtendedMutationsClient = BaseModelCRUDClient<M> &
+    ExtendedMutationsClient = BaseModelCrudClient<M> &
     ExtendedQueriesClient &
     ExtendedMutationsClient,
 > = WithLogger<

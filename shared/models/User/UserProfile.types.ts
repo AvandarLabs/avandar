@@ -1,9 +1,6 @@
 import type { UUID } from "@utils/types/common.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
-import type {
-  WorkspaceId,
-  WorkspaceRole,
-} from "$/models/Workspace/Workspace.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 export type UserProfileId = UUID<"UserProfile">;
 export type MembershipId = UUID<"Membership">;
@@ -41,6 +38,16 @@ export type UserProfileRead = {
   updatedAt: Date;
 };
 
-export type UserProfileWithRole = UserProfileRead & {
-  role: WorkspaceRole;
+/**
+ * Workspace members list row including role group and tag metadata for
+ * settings UI.
+ */
+export type WorkspaceMemberProfile = UserProfileRead & {
+  roleGroupId: string | null;
+  roleGroupName: string | null;
+  roleGroupIsBuiltin: boolean | null;
+  tags: ReadonlyArray<{ id: string; name: string; color: string }>;
 };
+
+/** Alias kept for older imports; prefer `WorkspaceMemberProfile`. */
+export type UserProfileWithRole = WorkspaceMemberProfile;

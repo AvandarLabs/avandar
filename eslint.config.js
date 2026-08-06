@@ -8,17 +8,25 @@ import eslintPluginJSXA11y from "eslint-plugin-jsx-a11y";
 import eslintPluginReact from "eslint-plugin-react";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
-import eslintPluginTailwindCSS from "eslint-plugin-tailwindcss";
 import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["**/dist/**", ".agents/**"],
+    ignores: [
+      "**/dist/**",
+      ".agents/**",
+      ".claude",
+      ".claude/**",
+      "agent-skills/**",
+      "apps/desktop/build/**",
+      "apps/desktop/bundle/**",
+      "apps/desktop/.electrobun-cache/**",
+      "src/i18n/locales/**/messages.ts",
+    ],
   },
   eslintPluginImportX.flatConfigs.recommended,
-  ...eslintPluginTailwindCSS.configs["flat/recommended"],
   ...eslintPluginRouter.configs["flat/recommended"],
   ...eslintPluginQuery.configs["flat/recommended"],
   ...tseslint.config(
@@ -46,7 +54,6 @@ export default [
         "react-refresh": eslintPluginReactRefresh,
         "jsx-a11y": eslintPluginJSXA11y,
         "unused-imports": eslintPluginUnusedImports,
-        tailwindcss: eslintPluginTailwindCSS,
       },
       rules: {
         ...eslintPluginReactHooks.configs.recommended.rules,
@@ -88,6 +95,8 @@ export default [
           },
         ],
         "import-x/no-duplicates": "error",
+        // Vite virtual modules (e.g. vite-plugin-pwa's virtual:pwa-register)
+        "import-x/no-unresolved": ["error", { ignore: ["^virtual:"] }],
         "import-x/prefer-default-export": "off",
         "jsx-a11y/anchor-is-valid": [
           "error",
@@ -108,10 +117,6 @@ export default [
 
         // we use the @typescript-eslint one instead
         "no-shadow": "off",
-        "tailwindcss/no-custom-classname": "off",
-
-        // we use the prettier tailwind plugin for ordering
-        "tailwindcss/classnames-order": "off",
       },
       settings: {
         react: {
@@ -119,12 +124,26 @@ export default [
         },
         "import-x/resolver-next": [
           createTypeScriptImportResolver({
-            // use a glob pattern to find the project's tsconfig
-            project: "tsconfig.*.json",
+            // Scoped to the real monorepo layout only. Do not use a repo-wide
+            // `tsconfig.*.json` glob: `.claude/worktrees` copies add hundreds
+            // of tsconfigs and slow `pnpm lint` dramatically.
+            project: [
+              "tsconfig.json",
+              "tsconfig.app.json",
+              "tsconfig.node.json",
+              "tsconfig.base.json",
+              "shared/tsconfig.json",
+              "apps/*/tsconfig.json",
+              "apps/*/tsconfig.*.json",
+              "packages/*/*/tsconfig.json",
+            ],
 
             // always try to resolve types under `<root>@types` directory even
             // it doesn't contain any source code, like `@types/unist`
             alwaysTryTypes: true,
+
+            // we intentionally have multiple tsconfigs (per-app, per-package)
+            noWarnOnMultipleProjects: true,
           }),
         ],
       },
@@ -156,6 +175,20 @@ export default [
     },
   },
   {
+    /*
+     * The desktop shell runs on Bun in the main process. Bun built-ins
+     * like `bun:sqlite` and `bun:test` aren't resolvable by the standard
+     * TS/Node import resolver, so ignore them here. Source files use
+     * `bun:sqlite`; integration tests use `bun:test`. The native `duckdb`
+     * binding is a desktop-workspace dependency only; the repo-root ESLint
+     * resolver does not see it.
+     */
+    files: ["apps/desktop/**/*.{ts,tsx}"],
+    rules: {
+      "import-x/no-unresolved": ["error", { ignore: ["^bun:", "^duckdb$"] }],
+    },
+  },
+  {
     // we require import extensions for directories that will be used in
     // Deno runtimes (such as Supabase edge functions).
     files: ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
@@ -183,13 +216,53 @@ export default [
       "no-restricted-imports": [
         "error",
         {
+          paths: [
+            {
+              name: "@ava-etl",
+              message:
+                "Deno-allowable code: you must import an exact file under @ava-etl/ for this to work in Deno envs.",
+            },
+            {
+              name: "@clients",
+              message:
+                "Deno-allowable code: you must import an exact file under @clients/ for this to work in Deno envs.",
+            },
+            {
+              name: "@logger",
+              message:
+                "Deno-allowable code: you must import an exact file under @logger/ for this to work in Deno envs.",
+            },
+            {
+              name: "@models",
+              message:
+                "Deno-allowable code: you must import an exact file under @models/ for this to work in Deno envs.",
+            },
+            {
+              name: "@modules",
+              message:
+                "Deno-allowable code: you must import an exact file under @modules/ for this to work in Deno envs.",
+            },
+            {
+              name: "@utils",
+              message:
+                "Deno-allowable code: you must import an exact file under @utils/ for this to work in Deno envs.",
+            },
+            {
+              name: "@ui",
+              message:
+                "Deno-allowable code: you must import an exact file under @ui/ for this to work in Deno envs.",
+            },
+            {
+              name: "@hooks",
+              message:
+                "Deno-allowable code: you must import an exact file under @hooks/ for this to work in Deno envs.",
+            },
+          ],
           patterns: [
             {
               regex: "^\\.{1,2}/",
               message:
-                "This file is in a shared or Supabase directory (may run under " +
-                "Deno). Use absolute imports with path aliases instead of " +
-                "relative imports.",
+                "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../).",
             },
           ],
         },
@@ -203,6 +276,69 @@ export default [
     },
   },
   {
-    ignores: ["shared/types/database.types.ts"],
+    // Avoid false-positives in Playwright fixtures where the function `use()`
+    // is not a hook, it is part of Playwright's fixture system.
+    files: ["tests/e2e/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
+  {
+    // Playwright requires object destructuring on the first fixture argument;
+    // `{}` is valid but triggers `no-empty-pattern` without this override.
+    files: ["tests/e2e/**/*.fixture.ts"],
+    rules: {
+      "no-empty-pattern": "off",
+    },
+  },
+  {
+    ignores: [
+      "shared/types/database.types.ts",
+      // Lingui compiled catalogs — autogenerated, colocated with messages.po
+      "src/i18n/locales/*/messages.ts",
+    ],
+  },
+
+  /**
+   * Enforce that all data crossing the LLM boundary goes through
+   * `src/lib/privacy/decideIfDataCanCrossBoundary.tsx`. The ack-token issuance
+   * and the pending-acks queue are the load-bearing pieces of the consent
+   * pipeline, importing them anywhere else lets a caller forge a token
+   * or drop the queue check. This forces `decideIfDataCanCrossBoundary` as the
+   * single chokepoint for data crossing the LLM boundary.
+   *
+   * Adding a new caller for `issueAckToken` or `registerAck`? Don't. Add
+   * a new context to `CrossBoundaryContext` and route through
+   * `decideIfDataCanCrossBoundary` instead.
+   */
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/lib/privacy/decideIfDataCanCrossBoundary.tsx",
+      "src/lib/privacy/sessionSecret.ts",
+      "src/lib/privacy/pendingAcks.ts",
+      "src/lib/privacy/**/*.test.ts",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/lib/privacy/sessionSecret",
+              importNames: ["issueAckToken"],
+              message:
+                "Privacy chokepoint: ack tokens must only be minted inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
+            },
+            {
+              name: "@/lib/privacy/pendingAcks",
+              importNames: ["registerAck"],
+              message:
+                "Privacy chokepoint: pending acks must only be registered inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
+            },
+          ],
+        },
+      ],
+    },
   },
 ];

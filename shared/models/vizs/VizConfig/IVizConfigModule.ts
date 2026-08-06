@@ -1,6 +1,10 @@
-import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { AnyVizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
+import type {
+  VizConfigType,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 export interface IVizConfigModule<
   VType extends VizType,
@@ -10,6 +14,18 @@ export interface IVizConfigModule<
 
   /** The display name of the viz config type. Used for UI display purposes. */
   readonly displayName: string;
+
+  /**
+   * Descriptor registry for this viz's settings. Drives the
+   * settings-form UI: the host's `chart` descriptors are always shown,
+   * and each series's `series` descriptors are looked up from the
+   * series's `renderAs` viz module (filtered by `composable` when
+   * embedded across types).
+   *
+   * See the doc comment at the top of {@link SettingDescriptor} for
+   * the "setting vs. control" nomenclature.
+   */
+  readonly descriptors: AnyVizSettingDescriptors;
 
   /** Create an empty config with no settings applied. */
   makeEmptyConfig(): TVizConfig;

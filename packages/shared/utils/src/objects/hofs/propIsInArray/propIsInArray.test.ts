@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray.ts";
+import { describe, expect, it } from "vitest";
 
 describe("propIsInArray", () => {
   it("returns true when the property is in the array", () => {

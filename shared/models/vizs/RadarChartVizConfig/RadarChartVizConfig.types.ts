@@ -1,3 +1,11 @@
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
+import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
+
+/**
+ * Configuration for a radar (spider) chart. Each series renders as one
+ * radar polygon; multiple polygons share the categorical axis defined
+ * by `nameKey`.
+ */
 export type RadarChartVizConfig = {
   vizType: "radar";
 
@@ -7,12 +15,12 @@ export type RadarChartVizConfig = {
    */
   nameKey: string | undefined;
 
-  /**
-   * The numeric column whose values determine the magnitude on each axis.
-   * This is a column name, not an ID.
-   */
-  valueKey: string | undefined;
+  /** One polygon per entry. */
+  series: RadarSeries[];
 
-  /** Optional CSS color override for the radar polygon (e.g. `"#ff0000"`). */
-  color?: string;
+  /** Show the chart legend when `true`. */
+  withLegend?: boolean;
+
+  /** Canvas-level styling (legend position, etc.). */
+  chartStyle?: ChartStyle;
 };

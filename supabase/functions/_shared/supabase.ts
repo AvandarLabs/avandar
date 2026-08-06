@@ -12,7 +12,7 @@ export type AvaSupabaseClient = SupabaseClient<Database>;
 export function createSupabaseClient(request: Request): AvaSupabaseClient {
   return createClient<Database>(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
+    Deno.env.get("SB_PUBLISHABLE_KEY")!,
     {
       global: {
         headers: {

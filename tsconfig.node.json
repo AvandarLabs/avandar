@@ -9,8 +9,6 @@
   },
   "include": [
     "playwright.config.ts",
-    "tests/helper/**/*.ts",
-    "tests/e2e/**/*.ts",
     "vite.config.ts",
     ".ava/**/*.ts",
     "apps/dev-fanout-server/src",

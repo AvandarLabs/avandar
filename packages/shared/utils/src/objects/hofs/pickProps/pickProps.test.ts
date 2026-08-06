@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { pickProps } from "@utils/objects/hofs/pickProps/pickProps.ts";
+import { describe, expect, it } from "vitest";
 
 describe("pickProps", () => {
   it("returns a function that picks a single key", () => {
@@ -28,9 +28,7 @@ describe("pickProps", () => {
       { id: 2, name: "Bob", age: 25 },
     ];
 
-    const result = items.map(
-      pickProps<Item, "id" | "name">(["id", "name"]),
-    );
+    const result = items.map(pickProps<Item, "id" | "name">(["id", "name"]));
 
     expect(result).toEqual([
       { id: 1, name: "Alice" },
