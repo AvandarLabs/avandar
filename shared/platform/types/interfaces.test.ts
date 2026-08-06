@@ -15,13 +15,16 @@ import type {
   DatasetBlobStore,
 } from "$/platform/types/DatasetBlobStore.types.ts";
 import type { DuckDbClient } from "$/platform/types/DuckDbClient.types.ts";
+import type { Platform } from "$/platform/types/Platform.types.ts";
 import type { RdbClient, RdbFilter } from "$/platform/types/RdbClient.types.ts";
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,
 } from "$/platform/types/ServerApiClient.types.ts";
-import type { SyncEngine, SyncStatus } from "$/platform/types/SyncEngine.types.ts";
-import type { Platform } from "$/platform/types/Platform.types.ts";
+import type {
+  SyncEngine,
+  SyncStatus,
+} from "$/platform/types/SyncEngine.types.ts";
 
 test("Platform is the closed 'web' | 'desktop' union", () => {
   expectTypeOf<Platform>().toEqualTypeOf<"web" | "desktop">();
@@ -30,7 +33,9 @@ test("Platform is the closed 'web' | 'desktop' union", () => {
 test("DuckDbClient exposes required methods", () => {
   expectTypeOf<DuckDbClient>().toHaveProperty("runStructuredQuery");
   expectTypeOf<DuckDbClient>().toHaveProperty("runRawQuery");
-  expectTypeOf<DuckDbClient>().toHaveProperty("loadParquetFromDatasetBlobStore");
+  expectTypeOf<DuckDbClient>().toHaveProperty(
+    "loadParquetFromDatasetBlobStore",
+  );
   expectTypeOf<DuckDbClient>().toHaveProperty("loadFromUpload");
 });
 

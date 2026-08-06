@@ -180,9 +180,7 @@ describe("Permissions.parseAppTypeFromPermissionKey", () => {
 
   it("returns undefined for unknown prefixes", () => {
     expect(
-      Permissions.parseAppTypeFromPermissionKey(
-        "unknown__x" as PermissionKey,
-      ),
+      Permissions.parseAppTypeFromPermissionKey("unknown__x" as PermissionKey),
     ).toBe(undefined);
   });
 });

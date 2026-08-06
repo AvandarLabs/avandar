@@ -22,7 +22,10 @@ select
 create policy "Users can read dashboards they have permissions for" on public.dashboards for
 select
   to authenticated using (
-    public.dashboards.owner_id = (select auth.uid()) or
+    public.dashboards.owner_id = (
+      select
+        auth.uid ()
+    ) or
     public.util__auth_user_may_select_dashboard (
       public.dashboards.id
     )

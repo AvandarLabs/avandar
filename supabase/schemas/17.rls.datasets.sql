@@ -16,7 +16,10 @@
 create policy "User can select datasets they have permissions for" on public.datasets for
 select
   to authenticated using (
-    public.datasets.owner_id = (select auth.uid()) or
+    public.datasets.owner_id = (
+      select
+        auth.uid ()
+    ) or
     public.util__auth_user_may_select_dataset (
       public.datasets.id
     )

@@ -117,10 +117,12 @@ export async function deleteAllDashboardsForOwner(options: {
   workspaceId: string;
   ownerEmail: string;
 }): Promise<void> {
-  const { data: ownerUserIdRaw, error: lookupError } =
-    await options.admin.rpc("util__get_user_id_by_email", {
+  const { data: ownerUserIdRaw, error: lookupError } = await options.admin.rpc(
+    "util__get_user_id_by_email",
+    {
       p_email: options.ownerEmail,
-    });
+    },
+  );
   if (lookupError) {
     throw new Error(`owner lookup failed: ${lookupError.message}`);
   }

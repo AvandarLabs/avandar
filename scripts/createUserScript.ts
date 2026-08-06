@@ -3,9 +3,9 @@
  * Expected usage is through the package.json script:
  *    pnpm db:create-user <email> <password>
  */
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { z } from "zod";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 function printUsage() {
   console.log("Usage: pnpm db:create-user <email> <password>");
