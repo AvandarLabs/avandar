@@ -13,6 +13,7 @@
 
 # Agent skill bundles
 (^|/)\.agents/
+^agent-skills/
 
 # Generated Supabase types
 ^shared/types/database\.types\.ts$
