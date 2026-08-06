@@ -20,6 +20,7 @@ import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
@@ -40,6 +41,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   const [workspaceUsers = [], workspaceUsersLoading] =
     WorkspaceClient.useGetUsersForWorkspace({
       workspaceId: workspace.id,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
   const [pendingInvites = [], pendingInvitesLoading] =
     WorkspaceInviteClient.useGetPendingInvites({

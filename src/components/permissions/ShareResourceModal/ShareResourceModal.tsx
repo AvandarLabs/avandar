@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
   buildShareSummary,
@@ -34,7 +35,10 @@ type Props = {
  * Resolves the display name for the resource owner from the available
  * lookup tables. Fallback chain: `userById[ownerId]` (preferred display
  * name), then the member's `email` from the workspace members list,
- * finally the literal "Owner" string when nothing is available.
+ * finally "Unknown user" (the same last resort the other principal rows use)
+ * when the owner has no readable profile. That last resort must not read
+ * "Owner": the row already carries an Owner badge, so the two would render
+ * as a confusing "Owner Owner" pair.
  */
 function resolveOwnerDisplayName(
   ownerId: string,
@@ -47,7 +51,7 @@ function resolveOwnerDisplayName(
     members?.find((member) => {
       return member.userId === ownerId;
     })?.email ??
-    i18n._(msg`Owner`)
+    i18n._(msg`Unknown user`)
   );
 }
 
@@ -79,8 +83,14 @@ export function ShareResourceModal({
       resourceId,
     });
 
-  const [members] = WorkspaceClient.useGetUsersForWorkspace({ workspaceId });
-  const [userGroups] = PermissionsClient.useGetUserGroups({ workspaceId });
+  const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace({
+    workspaceId,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
+  const [userGroups, isLoadingUserGroups] = PermissionsClient.useGetUserGroups({
+    workspaceId,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+  });
 
   const [upsertShare, isUpserting] = ResourceShareClient.useUpsertResourceShare(
     {
@@ -121,7 +131,15 @@ export function ShareResourceModal({
     return makeObject(userGroups ?? [], { key: "id", valueKey: "name" });
   }, [userGroups]);
 
-  if (isLoadingState || !sharingState) {
+  // The principal lookups gate rendering alongside the sharing state: every
+  // row's label (the owner row included) comes from them, so rendering early
+  // would flash placeholder names and an incomplete Add list.
+  if (
+    isLoadingState ||
+    !sharingState ||
+    isLoadingMembers ||
+    isLoadingUserGroups
+  ) {
     return (
       <Stack gap="md">
         <Text>

@@ -22,7 +22,9 @@ type Props = {
   initialMatrix: UserAppRolesMatrix;
   initialTagIds: readonly string[];
   userGroups: readonly UserGroupRow[];
-  userGroupsLoading: boolean;
+
+  /** True while the user-group list is loading *or* refetching. */
+  userGroupsFetching: boolean;
   roleGroups: readonly RoleGroupWithMatrix[];
   workspaceId: WorkspaceId;
   onClose: () => void;
@@ -37,7 +39,7 @@ export function WorkspaceMemberPermissionsEditor({
   initialMatrix,
   initialTagIds,
   userGroups,
-  userGroupsLoading,
+  userGroupsFetching,
   roleGroups,
   workspaceId,
   onClose,
@@ -117,7 +119,7 @@ export function WorkspaceMemberPermissionsEditor({
         })}
         value={tagIds}
         onChange={setTagIds}
-        disabled={userGroupsLoading || isSaving}
+        disabled={userGroupsFetching || isSaving}
       />
       <Button loading={isSaving} onClick={onSave}>
         <Trans>Save changes</Trans>

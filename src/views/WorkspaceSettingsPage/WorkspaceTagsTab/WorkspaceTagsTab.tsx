@@ -16,6 +16,7 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
 
@@ -32,6 +33,7 @@ export function WorkspaceTagsTab(): JSX.Element {
 
   const [groups = [], groupsLoading] = PermissionsClient.useGetUserGroups({
     workspaceId: workspace.id,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
   });
 
   const invalidate = [

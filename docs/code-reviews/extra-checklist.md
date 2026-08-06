@@ -132,7 +132,7 @@ when the gate matches.
 
 - **Gate:** the diff modifies a file under `shared/models/` or its
   `.types.ts` counterpart. Skip otherwise.
-- **Rule:** if the change alters the *serialized shape* of any model
+- **Rule:** if the change alters the _serialized shape_ of any model
   that gets returned from a React Query `queryFn`, bump
   `CACHE_SCHEMA_VERSION` in
   `src/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister.ts`.
@@ -143,7 +143,7 @@ when the gate matches.
   **Bump required:**
   - Removing or renaming a field that downstream code now assumes is
     present.
-  - Adding a *required* field with no default.
+  - Adding a _required_ field with no default.
   - Narrowing a type (e.g. `string` → string-literal union) so old
     values become invalid.
   - Renaming an enum value (e.g. `"active"` → `"ACTIVE"`).
@@ -153,7 +153,7 @@ when the gate matches.
     throw or produce wrong output.
 
   **Bump NOT required:**
-  - Adding an *optional* field.
+  - Adding an _optional_ field.
   - Widening a type (e.g. `string` → `string | null`).
   - Adding an entirely new model (old caches just don't have it).
   - Adding new methods, parsers, or namespace helpers that don't
@@ -171,6 +171,44 @@ when the gate matches.
   invalidates every user's persisted cache on next boot, so prefer to
   bump only when actually needed.
 
+### Phase: fresh reads for permission and mutation-owned lists
+
+- **Gate:** the diff adds or changes a `use…` query call that renders a
+  permission or membership list (workspace members, user groups, role
+  groups, resource shares), or any list the same screen also mutates.
+  Skip otherwise.
+- **Rule:** that call passes `useQueryOptions: ALWAYS_REFETCH_ON_MOUNT`
+  from `src/config/queryOptions.constants.ts`. The React Query cache is persisted
+  to IndexedDB and restored on boot, and the persister throttles its
+  writes, so a reload shortly after a mutation can restore a
+  pre-mutation snapshot. That snapshot is treated as **fresh** for the
+  whole default `staleTime` window configured in
+  `src/config/AvaQueryClient.ts`, so `refetchOnMount: true` never
+  refetches it: the screen then shows the wrong access for that entire
+  window with no way for the user to force a refresh. This was a real
+  bug in the workspace user-groups screens.
+- A control whose options come from such a query gates on
+  **`isFetching`, not `isLoading`**. A restored cache renders
+  immediately with `isLoading === false` while the mount refetch is
+  still in flight, so an admin could otherwise save a member's groups
+  from a list that is about to change under them.
+- A row label resolved from such a lookup gates its render on the
+  lookup instead of falling back to a placeholder. Where a fallback is
+  genuinely needed, it must not duplicate a sibling badge or status
+  label in the same row (the share modal used to render the literal
+  "Owner" as a display name next to its Owner badge); reuse whatever
+  last resort the sibling rows already use.
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEn 'useGetUserGroups|useGetUsersForWorkspace|useGetRoleGroups' \
+    src --include="*.tsx"
+  ```
+
+  For each hit, confirm the call opts into `ALWAYS_REFETCH_ON_MOUNT`
+  and that any dependent control and label follow the two rules above.
+
 ### Phase: AvaPage schema migrations
 
 - **Gate:** the diff touches any file under
@@ -178,7 +216,7 @@ when the gate matches.
 - **Reference:** this phase's rules live in
   [`references/avapage-schema-migrations.md`](references/avapage-schema-migrations.md).
   Open it and run it as its own phase.
-- **Why it is split out:** it carries a review *method* (establish the
+- **Why it is split out:** it carries a review _method_ (establish the
   current schema version and read a module's full, adjacent header rules
   before flagging a "frozen snapshot / no live imports" violation) that a
   past review got wrong, mis-flagging the current-version migration's
@@ -208,7 +246,7 @@ when the gate matches.
   - The canonical normalization pattern lives in
     `src/clients/AuthClient.ts` — `getCurrentSession` returns
     `Promise<Session | undefined>` and does `return data.session ??
-    undefined`. New code that wraps a Supabase session call should follow
+undefined`. New code that wraps a Supabase session call should follow
     that shape rather than propagating `Session | null` outward.
   - The **one** place `null` is legitimate is the `onAuthStateChange`
     callback parameter (`(event, session: Session | null) => ...`), whose
@@ -272,8 +310,7 @@ when the gate matches.
   prefer returning structured data and translating at the display component.
   When copy is emitted imperatively from background code with no component in
   the call path (e.g. a fire-and-forget toast), use the Lingui core API
-  `i18n._(msg\`…\`)` (`i18n` from `@lingui/core`, `msg` from
-  `@lingui/core/macro`). Never the deprecated `t(i18n)\`…\`` binding.
+  `i18n._(msg\`…\`)` (`i18n`from`@lingui/core`, `msg`from`@lingui/core/macro`). Never the deprecated `t(i18n)\`…\`` binding.
 
 - **Never pass the translation function as a parameter (extraction bug).**
   `lingui extract` only sees a macro (`` t`…` ``, `` msg`…` ``, `<Trans>`) when

@@ -3,6 +3,30 @@ import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
+ * Opens one tab of the Workspace settings page. Navigates client-side because
+ * a `page.goto` would rehydrate the persisted React Query cache from
+ * IndexedDB, and since the throttled persister may not have written the newest
+ * snapshot yet, the restored entry can be a pre-mutation one that still counts
+ * as fresh. See `docs/rules/e2e-testing.md`.
+ */
+async function _openWorkspaceSettingsTab(options: {
+  page: Page;
+  workspaceSlug: string;
+  tabName: string;
+}): Promise<void> {
+  const { page, workspaceSlug, tabName } = options;
+
+  // Already on settings: switch tabs without leaving the page.
+  if (!page.url().includes(`/${workspaceSlug}/settings`)) {
+    await page.getByRole("link", { name: "Settings" }).click();
+  }
+
+  const tab = page.getByRole("tab", { name: tabName });
+  await expect(tab).toBeVisible({ timeout: LONG_WAIT });
+  await tab.click();
+}
+
+/**
  * Creates a workspace user-group tag from Settings → Tags.
  */
 export async function createWorkspaceTagViaSettings(options: {
@@ -13,8 +37,11 @@ export async function createWorkspaceTagViaSettings(options: {
 }): Promise<void> {
   const { page, workspaceSlug, tagName, tagColor = "#228be6" } = options;
 
-  await page.goto(`/${workspaceSlug}/settings`);
-  await page.getByRole("tab", { name: "User groups" }).click();
+  await _openWorkspaceSettingsTab({
+    page,
+    workspaceSlug,
+    tabName: "User groups",
+  });
   await page.getByRole("button", { name: "New user group" }).click();
 
   await page.getByRole("textbox", { name: "Name" }).fill(tagName);
@@ -24,6 +51,10 @@ export async function createWorkspaceTagViaSettings(options: {
   }
   await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
 
+  // The modal only closes once the insert succeeds, and the row only renders
+  // from the refetched list: together they prove the group is persisted
+  // before the caller navigates away.
+  await expect(page.getByRole("dialog")).toBeHidden({ timeout: MEDIUM_WAIT });
   await expect(page.getByText(tagName)).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
@@ -38,8 +69,7 @@ export async function assignWorkspaceTagToMember(options: {
 }): Promise<void> {
   const { page, workspaceSlug, memberDisplayName, tagName } = options;
 
-  await page.goto(`/${workspaceSlug}/settings`);
-  await page.getByRole("tab", { name: "Members" }).click();
+  await _openWorkspaceSettingsTab({ page, workspaceSlug, tabName: "Members" });
 
   const memberRow = page
     .getByRole("row")
@@ -49,13 +79,23 @@ export async function assignWorkspaceTagToMember(options: {
   const drawer = page.locator(".mantine-Drawer-content");
   await expect(drawer).toBeVisible({ timeout: LONG_WAIT });
 
-  const tagsField = drawer.getByLabel("User groups");
+  // The field stays disabled until the user-group list has finished fetching,
+  // so waiting for it to be enabled means waiting for a list that already
+  // includes a group created moments ago.
+  const tagsField = drawer.getByRole("combobox", { name: "User groups" });
+  await expect(tagsField).toBeEnabled({ timeout: LONG_WAIT });
+
+  const tagOption = page.getByRole("option", { name: tagName });
   await expect(async () => {
-    await tagsField.click();
-    const tagOption = page.getByRole("option", { name: tagName });
+    // Clicking a Mantine MultiSelect *toggles* its dropdown, so only click
+    // when it is collapsed: clicking on every retry would close the
+    // dropdown the previous attempt opened and halve the real retries.
+    if ((await tagsField.getAttribute("aria-expanded")) !== "true") {
+      await tagsField.click();
+    }
     await expect(tagOption).toBeVisible({ timeout: SHORT_WAIT });
-    await tagOption.click();
   }).toPass({ timeout: LONG_WAIT });
+  await tagOption.click();
   await page.keyboard.press("Escape");
   await drawer.getByRole("button", { name: "Save changes" }).click();
 

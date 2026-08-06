@@ -1,6 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { render, screen, waitFor } from "@/test-utils";
+
+const MEMBERS = [
+  {
+    userId: "user-owner",
+    displayName: "John Snow",
+    fullName: "John Snow",
+    email: "john@example.com",
+  },
+  {
+    userId: "user-1",
+    displayName: "Alice",
+    fullName: "Alice Example",
+    email: "alice@example.com",
+  },
+];
+
+/**
+ * Mutable member-query result so a test can put the lookup back into its
+ * loading state. Hoisted because the `vi.mock` factories below read it.
+ */
+const mocks = vi.hoisted(() => {
+  return {
+    membersResult: [undefined, true] as readonly [unknown, boolean],
+  };
+});
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
@@ -50,22 +75,7 @@ vi.mock("@/clients/WorkspaceClient", () => {
   return {
     WorkspaceClient: {
       useGetUsersForWorkspace: () => {
-        return [
-          [
-            {
-              userId: "user-owner",
-              displayName: "John Snow",
-              fullName: "John Snow",
-              email: "john@example.com",
-            },
-            {
-              userId: "user-1",
-              displayName: "Alice",
-              fullName: "Alice Example",
-              email: "alice@example.com",
-            },
-          ],
-        ] as const;
+        return mocks.membersResult;
       },
     },
   };
@@ -82,6 +92,10 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
 });
 
 describe("ShareResourceModal", () => {
+  beforeEach(() => {
+    mocks.membersResult = [MEMBERS, false];
+  });
+
   it("renders the Drive-style layout with general access and owner row", async () => {
     render(
       <ShareResourceModal
@@ -112,10 +126,35 @@ describe("ShareResourceModal", () => {
         return el.getAttribute("aria-label") === "Add people or user groups";
       }),
     ).toBe(true);
-    // Owner row shows as a non-removable badge.
+    // Owner row shows the owner's name plus a single non-removable badge.
+    // Scoped to the row's `Text`: the name also appears as a combobox option.
+    expect(
+      screen.getByText("John Snow", { selector: "p" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Owner")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Remove access for John Snow/ }),
     ).toBeNull();
+  });
+
+  it("waits for the member lookup before rendering the owner row", async () => {
+    // While the lookup is loading there is no name to show, and the modal
+    // must not fall back to a placeholder that duplicates the Owner badge.
+    mocks.membersResult = [undefined, true];
+
+    render(
+      <ShareResourceModal
+        resourceName="California COVID"
+        resourceType="dataset"
+        resourceId="dataset-id-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Loading sharing settings…")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("People with access")).toBeNull();
+    expect(screen.queryByText("Owner")).toBeNull();
   });
 });

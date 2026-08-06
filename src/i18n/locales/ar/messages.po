@@ -338,8 +338,8 @@ msgstr "أضف رسمًا بيانيًا خطيًا يوضح الاتجاهات 
 msgid "List"
 msgstr ""
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -2457,7 +2457,7 @@ msgstr "لا يوجد ملف محدد"
 msgid "Submit"
 msgstr "إرسال"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
@@ -2807,7 +2807,7 @@ msgstr "عرض"
 msgid "Unavailable"
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "مجموعة البيانات"
 
@@ -3186,7 +3186,6 @@ msgid "Options (comma-separated, for select modes)"
 msgstr "خيارات (مفصولة بفواصل، لوضع الاختيار)"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Owner"
 msgstr "مالك"
@@ -3847,8 +3846,8 @@ msgstr "غير متصل جزئيًا"
 msgid "Edit query"
 msgstr "تحرير الاستعلام"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -4666,7 +4665,7 @@ msgstr "رسم حر"
 msgid "Permanent link (use for QR codes)"
 msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/appLabel.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
@@ -5065,8 +5064,8 @@ msgstr "ادفع ما تريد"
 msgid "Remove {0}"
 msgstr "إزالة {0}"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx

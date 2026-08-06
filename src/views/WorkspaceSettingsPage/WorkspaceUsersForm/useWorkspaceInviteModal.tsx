@@ -10,6 +10,7 @@ import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -36,6 +37,7 @@ export function useWorkspaceInviteModal({
   const [userGroups = [], userGroupsLoading] =
     PermissionsClient.useGetUserGroups({
       workspaceId: workspace.id,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
 
   const [sendInvite] = useMutation({

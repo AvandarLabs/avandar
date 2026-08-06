@@ -344,8 +344,8 @@ msgstr "Ajoutez un graphique linéaire montrant les tendances dans {datasetName}
 msgid "List"
 msgstr ""
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -2505,7 +2505,7 @@ msgstr "Aucun fichier sélectionné"
 msgid "Submit"
 msgstr "Soumettre"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tableau de bord"
 
@@ -2859,7 +2859,7 @@ msgstr "Voir"
 msgid "Unavailable"
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "jeu de données"
 
@@ -3248,7 +3248,6 @@ msgid "Options (comma-separated, for select modes)"
 msgstr "Options (séparées par des virgules, pour les modes de sélection)"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Owner"
 msgstr "Propriétaire"
@@ -3920,8 +3919,8 @@ msgstr "Partiellement hors ligne"
 msgid "Edit query"
 msgstr "Modifier la requête"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -4754,7 +4753,7 @@ msgstr "Dessin libre"
 msgid "Permanent link (use for QR codes)"
 msgstr "Lien permanent (à utiliser pour les codes QR)"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/appLabel.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
@@ -5161,8 +5160,8 @@ msgstr "Payez ce que vous voulez"
 msgid "Remove {0}"
 msgstr "Supprimer {0}"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx

@@ -149,9 +149,18 @@ export async function expectOwnerRowReadOnly(options: {
 }): Promise<void> {
   const { page, ownerLabel } = options;
   const dialog = shareDialog(page);
-  await expect(dialog.getByText("Owner", { exact: true })).toBeVisible({
+
+  // Assert the resolved owner name first: it is the row's identity, and
+  // asserting it before the badge keeps a failure readable instead of
+  // reporting a strict-mode violation on some other "Owner" text.
+  await expect(dialog.getByText(ownerLabel, { exact: true })).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
+  // Scope the badge assertion to the Mantine badge label so it cannot also
+  // match a display name that happens to read "Owner".
+  await expect(
+    dialog.locator(".mantine-Badge-label").filter({ hasText: /^Owner$/ }),
+  ).toHaveCount(1);
   await expect(
     dialog.getByRole("button", { name: `Remove access for ${ownerLabel}` }),
   ).toHaveCount(0);

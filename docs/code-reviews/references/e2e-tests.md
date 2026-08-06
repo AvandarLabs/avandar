@@ -62,14 +62,75 @@ apply it with these repo-local specifics:
   snapshot the throttled persister has not overwritten yet) and resets in-page
   state (DuckDB tables, in-memory registrations). Both caused real flakes here:
   an empty datasource dropdown, and a `FROM "<uuid>"` "table does not exist".
+- A restored snapshot is treated as **fresh**, not merely old: it keeps the
+  `dataUpdatedAt` it was written with, and the default `staleTime` in
+  `src/config/AvaQueryClient.ts` keeps it valid for that whole window, so
+  `refetchOnMount: true` never refetches it. Nothing inside the test recovers
+  from that (no retry loop, no second reload, no raised timeout), so this flake
+  presents as a **hard failure**, not a slow pass. Writes are also throttled, so
+  a `page.goto` within roughly a second of a mutation restores the
+  *pre-mutation* snapshot. Real case: `dataset-sharing`'s tag-share spec created
+  a user group, navigated, and could not find it in the members drawer again.
 - `page.goto` is correct for the first landing after sign-in, or when the test
   deliberately exercises a cold reload. Flag a mid-flow `page.goto` whose
   success depends on state the test just created.
 
-  **Find candidates** (flag mid-flow gotos after the first navigation):
+  **Find candidates** (flag mid-flow gotos after the first navigation). Search
+  helpers as well as specs: the `page.goto` behind the flake above lived in
+  `tests/e2e/helpers/workspaceTagsFlow.ts`, invisible to a spec-only search.
 
   ```bash
-  grep -rEn 'page\.goto\(' tests/e2e/*.spec.ts
+  grep -rEn 'page\.goto\(' tests/e2e --include="*.ts"
+  ```
+
+**Locate by role and scope; never assert a bare generic label**
+
+- A strict-mode violation (a locator resolving to two or more elements) is
+  **fatal**: web-first assertions retry "element not found" but abort on
+  ambiguity. So an ambiguous locator turns a transient render state into an
+  instant hard failure, and the attached snapshot (captured after that state
+  resolved) often shows a single match, which makes the report look impossible.
+  Do not accept "the snapshot shows one element" as evidence that a strict-mode
+  failure was spurious.
+- Flag an assertion on a short generic string that another element in the same
+  scope may legitimately carry. In the permission UIs that includes `Owner`,
+  `None`, `Viewer`, `Editor`, and `Admin`. Real case: `share-modal`'s owner-row
+  spec asserted `dialog.getByText("Owner", { exact: true })`, which matched both
+  the Owner badge and a row whose display name was still the modal's loading
+  placeholder.
+- Accept instead: a role plus accessible name
+  (`getByRole("combobox", { name: "User groups" })`) scoped to its row, drawer,
+  or dialog; the row's resolved identity asserted before its label; or, for a
+  label with no role of its own, a scoped locator plus `toHaveCount(1)`, which
+  fails loudly on ambiguity rather than aborting.
+
+  **Find candidates** (bare short-text assertions):
+
+  ```bash
+  grep -rEn 'getByText\("[A-Z][a-z]+"' tests/e2e --include="*.ts"
+  ```
+
+  This recipe is deliberately broad and mostly returns data values (a cell
+  value such as `"California"`), which are fine. Only flag a hit whose string
+  is a **UI label** that a badge, role chip, status, or loading placeholder in
+  the same scope could also render.
+
+**A `toPass` body must converge, not toggle**
+
+- `toPass` re-runs its whole body, so an action that *toggles* state undoes the
+  previous attempt. Flag a retry body that clicks a dropdown, checkbox, or
+  disclosure unconditionally: it closes what the last attempt opened and halves
+  the effective retries while still reading like a normal retry loop. Real case:
+  `assignWorkspaceTagToMember` clicked a Mantine `MultiSelect` on every attempt.
+- Accept a body that reads current state and acts only when it is wrong (for
+  example gating the click on `aria-expanded`), with any exactly-once action
+  (selecting the option) hoisted outside the loop.
+
+  **Find candidates** (clicks inside a retry body):
+
+  ```bash
+  grep -rEn -A6 'expect\(async \(\) => \{' tests/e2e --include="*.ts" \
+    | grep -E '\.click\(\)'
   ```
 
 **Seed the minimum the assertion needs**

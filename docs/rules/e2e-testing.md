@@ -75,6 +75,23 @@ datasource dropdown, and a `FROM "<uuid>"` "table does not exist". Use
 `page.goto` only for the first landing after sign-in, or when you deliberately
 test a cold reload.
 
+A restored snapshot is not merely old, it is treated as **fresh**: the entry
+keeps the `dataUpdatedAt` it was written with, and the default `staleTime` in
+`src/config/AvaQueryClient.ts` keeps it valid for that whole window, so
+`refetchOnMount: true` does not refetch it. Nothing inside a test can recover
+from that state: not a retry loop, not another reload, not a raised timeout.
+That is why this flake presents as a hard failure rather than a slow pass. The
+persister also throttles its writes, so a `page.goto` within roughly a second of
+a mutation restores the _pre-mutation_ snapshot. `dataset-sharing`'s tag-share
+spec did exactly that: it created a user group, navigated, and then could not
+find the group in the members drawer for the rest of the test.
+
+This rule covers helpers under `tests/e2e/helpers/` as much as specs. The
+`page.goto` behind the flake above lived in a helper, where a spec-only search
+does not find it. Some screens now opt into `ALWAYS_REFETCH_ON_MOUNT`
+(`src/config/queryOptions.constants.ts`), which makes a reload recover on those screens,
+but that is a per-screen product decision and not a licence to reload.
+
 ## Seed the minimum the assertion needs
 
 A test that asserts _rendering_ (a chart/element appears) should seed a
@@ -82,6 +99,48 @@ constant/literal result, not build and query a real dataset — otherwise it
 inherits the data pipeline's flakiness. Query a real dataset only when the query
 itself is under test. `save-to-dashboard-renders` seeds its bar chart with a
 literal `VALUES` query, like `save-to-dashboard`'s `SELECT 1 AS mocked_column`.
+
+## Locate by role and scope; never assert a bare generic label
+
+A strict-mode violation (a locator resolving to two or more elements) is
+**fatal**: web-first assertions retry "element not found", but they abort on
+ambiguity. An ambiguous locator therefore converts a transient render state into
+an instant hard failure, and the attached snapshot (captured after that state
+resolved) often shows a single match, which makes the report look impossible.
+
+So do not assert a short generic string that another element may legitimately
+carry. `share-modal`'s owner-row spec asserted
+`dialog.getByText("Owner", { exact: true })`, which matched both the Owner badge
+and a row whose display name was still the modal's loading placeholder. `None`,
+`Viewer`, `Editor`, `Admin`, and `Owner` are all live strings in the permission
+UIs. Instead:
+
+- prefer a role plus accessible name
+  (`getByRole("combobox", { name: "User groups" })`) over raw text, and scope the
+  locator to its row, drawer, or dialog;
+- assert the row's resolved identity first (the member or group name), then its
+  label, so a failure names the real problem;
+- when a label has no role of its own, scope to the element that renders it
+  (`dialog.locator(".mantine-Badge-label")`) and assert `toHaveCount(1)`: that
+  fails loudly on ambiguity instead of aborting mid-assertion.
+
+## A `toPass` body must converge, not toggle
+
+`toPass` re-runs its entire body, so an action that _toggles_ state undoes what
+the previous attempt achieved. `assignWorkspaceTagToMember` clicked a Mantine
+`MultiSelect` on every attempt, and because that click toggles the dropdown,
+every other attempt closed the dropdown the one before it had opened, halving the
+real retries while still looking like a normal retry loop. Read the current state
+and act only when it is wrong:
+
+```ts
+if ((await tagsField.getAttribute("aria-expanded")) !== "true") {
+  await tagsField.click();
+}
+```
+
+Keep any action that must happen exactly once (selecting the option) outside the
+loop, so a late retry cannot repeat it.
 
 ## Set a controlled input resiliently when async state writes it back
 

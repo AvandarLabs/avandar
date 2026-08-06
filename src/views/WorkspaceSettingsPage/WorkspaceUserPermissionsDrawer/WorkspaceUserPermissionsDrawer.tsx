@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Center, Drawer, Loader, Title } from "@mantine/core";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceMemberPermissionsEditor } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
@@ -34,10 +35,10 @@ export function WorkspaceUserPermissionsDrawer({
       },
     });
 
-  const [userGroups = [], userGroupsLoading] =
+  const [userGroups = [], , userGroupsQuery] =
     PermissionsClient.useGetUserGroups({
       workspaceId: workspace.id,
-      useQueryOptions: { enabled: isOpen },
+      useQueryOptions: { ...ALWAYS_REFETCH_ON_MOUNT, enabled: isOpen },
     });
 
   const isEditorReady =
@@ -65,7 +66,11 @@ export function WorkspaceUserPermissionsDrawer({
               return tag.id;
             })}
             userGroups={userGroups}
-            userGroupsLoading={userGroupsLoading}
+            // `isFetching`, not `isLoading`: a restored persisted cache
+            // renders immediately while the mount refetch is still in
+            // flight, and picking from a list that is about to change
+            // would drop groups the member should keep.
+            userGroupsFetching={userGroupsQuery.isFetching}
             roleGroups={roleGroups}
             workspaceId={workspace.id}
             onClose={onClose}

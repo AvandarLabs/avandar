@@ -333,8 +333,8 @@ msgstr "添加一条显示 {datasetName} 随时间变化趋势的折线图"
 msgid "List"
 msgstr ""
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -2407,7 +2407,7 @@ msgstr "未选择文件"
 msgid "Submit"
 msgstr "提交"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "仪表板"
 
@@ -2753,7 +2753,7 @@ msgstr "查看"
 msgid "Unavailable"
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "数据集"
 
@@ -3128,7 +3128,6 @@ msgid "Options (comma-separated, for select modes)"
 msgstr "选项（逗号分隔，用于选择模式）"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Owner"
 msgstr "所有者"
@@ -3779,8 +3778,8 @@ msgstr "部分离线"
 msgid "Edit query"
 msgstr "编辑查询"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -4580,7 +4579,7 @@ msgstr "手绘"
 msgid "Permanent link (use for QR codes)"
 msgstr "永久链接（用于二维码）"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: shared/copy/appLabel.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
@@ -4974,8 +4973,8 @@ msgstr "随意支付"
 msgid "Remove {0}"
 msgstr "移除 {0}"
 
+#: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
