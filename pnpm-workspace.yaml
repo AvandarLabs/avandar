@@ -3,3 +3,21 @@ packages:
   - "packages/shared/*"
   - "packages/web/*"
   - "packages/node/*"
+
+# Supply-chain cooldown: refuse to resolve any version published less than
+# 3 days (4320 minutes) ago. Compromised releases are typically detected and
+# unpublished within hours, so waiting is the cheapest defense we have against
+# this class of attack. The TanStack "mini shai-hulud" compromise (2026-05-11,
+# GHSA-g7cv-rxg3-hmpx) published its malicious versions in a 6-minute window;
+# any cooldown at all would have made them unresolvable. pnpm makes this the
+# default in v11 at 1440; we are on 10.x, where the default is 0.
+#
+# Scope: this only affects fresh resolution (`pnpm add`, `pnpm update`, a
+# lockfile regen). `pnpm install --frozen-lockfile` replays the lockfile
+# without re-resolving, so CI is unaffected.
+#
+# Setting this also turns on `minimumReleaseAgeStrict` by default, so when
+# nothing in a requested range is old enough, resolution fails loudly instead
+# of silently falling back to a too-new version. To let one package skip the
+# wait, add its name to `minimumReleaseAgeExclude`.
+minimumReleaseAge: 4320
