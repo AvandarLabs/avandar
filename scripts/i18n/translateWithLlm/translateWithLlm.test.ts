@@ -1,4 +1,7 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
+import { LOCALES_DIR, PROJECT_ROOT, SOURCE_LOCALE } from "./config";
 import {
   CatalogTranslator,
   PoCatalog,
@@ -16,6 +19,21 @@ import type { Mock } from "vitest";
 function _createFetchMock(impl: Mock): Mock & typeof fetch {
   return impl as unknown as Mock & typeof fetch;
 }
+
+describe("config paths", () => {
+  // These paths are computed by walking up from this module's own directory,
+  // so a move or rename silently points them at the wrong tree. Assert against
+  // the real repo layout instead of recomputing the same path math here.
+  it("resolves PROJECT_ROOT to the repo root", () => {
+    expect(existsSync(path.join(PROJECT_ROOT, "lingui.config.ts"))).toBe(true);
+  });
+
+  it("resolves LOCALES_DIR to the source locale catalog", () => {
+    expect(
+      existsSync(path.join(LOCALES_DIR, SOURCE_LOCALE, "messages.po")),
+    ).toBe(true);
+  });
+});
 
 describe("parseArgs", () => {
   it("returns help=true for --help", () => {

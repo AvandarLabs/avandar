@@ -12,6 +12,7 @@ export const PROJECT_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
   "..",
+  "..",
 );
 export const LOCALES_DIR = path.join(PROJECT_ROOT, "src", "i18n", "locales");
 export const SOURCE_LOCALE = "en";
