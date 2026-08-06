@@ -16,7 +16,7 @@ msgstr ""
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Delete: {0}"
-msgstr ""
+msgstr "Supprimer : {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
@@ -47,7 +47,9 @@ msgstr "Retour en ligne pour visualiser ou rendre la page disponible hors "
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
-msgstr ""
+msgstr "Vous êtes hors ligne. Téléchargez un modèle de chat hors ligne à l’aide "
+"de l’icône de nuage à côté de la zone de rédaction avant de poser des "
+"questions sur les données."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -112,7 +114,7 @@ msgstr "Ou {0} pour être informé lorsque notre lancement public est prêt."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
-msgstr ""
+msgstr "Étendue droite"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -158,7 +160,7 @@ msgstr "URL source"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -167,7 +169,7 @@ msgstr " accès"
 #. placeholder {0}: model.minRamGb
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "{0} GB RAM"
-msgstr ""
+msgstr "{0} Go de RAM"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -209,7 +211,7 @@ msgstr "Entrez votre question ou vos instructions en langage naturel pour "
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
-msgstr ""
+msgstr "H4"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query"
@@ -245,7 +247,7 @@ msgstr "Développer"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
-msgstr ""
+msgstr "Encadré"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -261,7 +263,7 @@ msgstr "Les types de colonnes détectés pour {changedCount} colonnes dans "
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
-msgstr ""
+msgstr "Llama 3.2 1B"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -273,7 +275,7 @@ msgstr "Créer un compte"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Second point"
-msgstr ""
+msgstr "Deuxième point"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
@@ -285,7 +287,7 @@ msgstr "Les membres encore assignés à ce groupe doivent d'abord être déplac�
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar layout"
-msgstr ""
+msgstr "Mise en page avec barre latérale"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -340,7 +342,7 @@ msgstr "Ajoutez un graphique linéaire montrant les tendances dans {datasetName}
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -356,7 +358,7 @@ msgstr "Exporter le PDF annoté"
 #. placeholder {0}: failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
-msgstr ""
+msgstr "L’URL personnalisée ne peut pas dépasser {0} caractères"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -392,12 +394,12 @@ msgstr "Pour plus de contrôle sur votre abonnement, vous pouvez gérer votre "
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Extra large"
-msgstr ""
+msgstr "Très grand"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
-msgstr ""
+msgstr "Enregistrer : {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -420,7 +422,8 @@ msgstr "Titres en monospace"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
-msgstr ""
+msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
+"téléchargement le plus léger."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -448,7 +451,7 @@ msgstr " {numRejectedRows} lignes ont été rejetées"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Replying…"
-msgstr ""
+msgstr "Réponse en cours…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Re-download"
@@ -460,7 +463,7 @@ msgstr "Autoriser plusieurs valeurs"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
-msgstr ""
+msgstr "Llama 3.1 8B (hors ligne)"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -468,7 +471,7 @@ msgstr "Aucun ensemble de données ajouté pour l'instant"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
-msgstr ""
+msgstr "Correction de la requête…"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -496,7 +499,7 @@ msgstr "Moyenne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
-msgstr ""
+msgstr "Masquer la date de publication"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -513,11 +516,11 @@ msgstr "Obtenir un compte du nombre de valeurs"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Caption"
-msgstr ""
+msgstr "Légende"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Collapse at"
-msgstr ""
+msgstr "Réduire à"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
@@ -529,7 +532,7 @@ msgstr "Changement de plan vers {newPlanName} ({newPlanSubType})"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
-msgstr ""
+msgstr "Contenu"
 
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
@@ -546,7 +549,7 @@ msgstr "La feuille a une ligne d'en-tête"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
-msgstr ""
+msgstr "Tableau"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search the data catalog to add open datasets to your workspace."
@@ -565,7 +568,7 @@ msgstr "Groupe de rôle mis à jour"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Small"
-msgstr ""
+msgstr "Petit"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "No matches"
@@ -608,7 +611,7 @@ msgstr "Mise à jour du mot de passe pour {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
-msgstr ""
+msgstr "Étroit"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Column info"
@@ -793,7 +796,8 @@ msgstr "Supprimer définitivement <0>{0}</0>?"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-msgstr ""
+msgstr "Recommandé si vous disposez de 16 Go de RAM et exécutez Avandar avec "
+"d’autres applications."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
@@ -833,12 +837,13 @@ msgstr "Votre question contient un langage qui peut biaiser la réponse de l'IA.
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Vertical padding"
-msgstr ""
+msgstr "Marge intérieure verticale"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
-msgstr ""
+msgstr "L’assistant cloud est inaccessible. Utiliser votre modèle téléchargé "
+"sur l’appareil pour ce message ?"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -854,7 +859,7 @@ msgstr "Supprimer le groupe de rôles"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
-msgstr ""
+msgstr "Masquer le titre"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -933,11 +938,11 @@ msgstr "Colonne de nom"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
-msgstr ""
+msgstr "Votre session a expiré. Redirection vers la page de connexion."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
-msgstr ""
+msgstr "Colonne 12"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -970,7 +975,8 @@ msgstr "Afficher les 20 premières lignes de {datasetName}"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr ""
+msgstr "L’identifiant de l’espace de travail doit comporter moins de "
+"{SLUG_MAX_LENGTH} caractères"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -997,7 +1003,7 @@ msgstr "Content de vous revoir"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
-msgstr ""
+msgstr "Phi 3.5 Mini"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -1021,7 +1027,7 @@ msgstr "Détecté :"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
-msgstr ""
+msgstr "Colonne 3"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
@@ -1034,7 +1040,7 @@ msgstr "Filtres pour ce graphique"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Align"
-msgstr ""
+msgstr "Aligner"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
@@ -1052,7 +1058,8 @@ msgstr "Annuler"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
-msgstr ""
+msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par défaut "
+"pour la plupart des utilisateurs)."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1060,7 +1067,7 @@ msgstr "Permissions enregistrées"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Subtitle"
-msgstr ""
+msgstr "Sous-titre"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -1086,7 +1093,8 @@ msgstr "Continuer tel quel"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "What are the distinct values of {groupByColumn} in {datasetName}?"
-msgstr ""
+msgstr "Quelles sont les valeurs distinctes de {groupByColumn} dans "
+"{datasetName} ?"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
@@ -1107,7 +1115,8 @@ msgstr "Vous économisez {discount}% par rapport à la facturation mensuelle"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr ""
+msgstr "L’identifiant de l’espace de travail doit comporter au moins "
+"{SLUG_MIN_LENGTH} caractères"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
@@ -1128,7 +1137,7 @@ msgstr "Sélectionnez un jeu de données dans la liste pour voir ses métadonné
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
-msgstr ""
+msgstr "Moyen"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1171,7 +1180,7 @@ msgstr "Rôle pour chacun dans l'espace de travail"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Gap"
-msgstr ""
+msgstr "Espacement"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
@@ -1197,7 +1206,8 @@ msgstr "{0} lignes analysées"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
-msgstr ""
+msgstr "L’URL personnalisée ne peut contenir que des lettres minuscules, des "
+"chiffres et des tirets"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
@@ -1302,7 +1312,8 @@ msgstr "Modifier l'accès pour {0}"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
-msgstr ""
+msgstr "Une erreur inattendue s’est produite. Vous pouvez réessayer ou "
+"retourner à l’accueil."
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -1320,7 +1331,7 @@ msgstr "Biais détecté :"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
-msgstr ""
+msgstr "Corps"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -1344,7 +1355,7 @@ msgstr "Se déconnecter"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Section"
-msgstr ""
+msgstr "Section"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1353,7 +1364,7 @@ msgstr "Groupe inconnu"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Paragraph"
-msgstr ""
+msgstr "Paragraphe"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File was partially loaded"
@@ -1398,7 +1409,7 @@ msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Show details"
-msgstr ""
+msgstr "Afficher les détails"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1451,11 +1462,11 @@ msgstr "Manuel"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
-msgstr ""
+msgstr "Compréhension de votre question…"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot be empty"
-msgstr ""
+msgstr "L’identifiant de l’espace de travail ne peut pas être vide"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
@@ -1463,7 +1474,7 @@ msgstr "ou"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Items"
-msgstr ""
+msgstr "Éléments"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Restriction update failed"
@@ -1499,11 +1510,11 @@ msgstr "Signaler un bug"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
-msgstr ""
+msgstr "Informations"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Writing query…"
-msgstr ""
+msgstr "Génération de la requête…"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -1548,7 +1559,8 @@ msgstr "Axe des catégories"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Balanced offline model for everyday SQL questions on typical laptops."
-msgstr ""
+msgstr "Modèle hors ligne équilibré pour les questions SQL du quotidien sur les "
+"ordinateurs portables courants."
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -1600,7 +1612,7 @@ msgstr "Sélectionnez une colonne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Annotate, then export"
@@ -1625,7 +1637,7 @@ msgstr "Afficher SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
-msgstr ""
+msgstr "Grille"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Search models"
@@ -1647,7 +1659,7 @@ msgstr "Le nom du jeu de données est requis"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
-msgstr ""
+msgstr "Principal"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
@@ -1680,7 +1692,9 @@ msgstr "{usedSeats} sur {maxSeats} sièges utilisés · {remainingSeats} restant
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
 "size are not constraints."
-msgstr ""
+msgstr "Option de catalogue la plus complète. Capacité hors ligne maximale "
+"lorsque la RAM et la taille du téléchargement ne sont pas des "
+"contraintes."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -1692,7 +1706,7 @@ msgstr "Sélection personnalisée"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
-msgstr ""
+msgstr "Colonne 5"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a description for this dataset"
@@ -1744,7 +1758,7 @@ msgstr "Vous n'avez pas accès à ce tableau de bord"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
-msgstr ""
+msgstr "Colonne 8"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an "
@@ -1763,7 +1777,9 @@ msgstr "Aperçu des données"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
 "app to clear cached data and try once more."
-msgstr ""
+msgstr "Veuillez vous reconnecter pour continuer. Si la connexion ne fonctionne "
+"pas, réinitialisez l’application afin d’effacer les données mises en "
+"cache, puis réessayez."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
@@ -1925,7 +1941,7 @@ msgstr "Le formulaire manuel montre une approximation"
 #. placeholder {0}: failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
-msgstr ""
+msgstr "L’URL personnalisée doit comporter au moins {0} caractères"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
@@ -1946,16 +1962,17 @@ msgstr "Sièges supplémentaires requis"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
-msgstr ""
+msgstr "Colonne 11"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 7"
-msgstr ""
+msgstr "Colonne 7"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
-msgstr ""
+msgstr "Modèle instruct compact de Microsoft. Structure solide et bonne "
+"capacité à suivre les instructions pour les tableaux de bord."
 
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
@@ -1964,7 +1981,8 @@ msgstr "Modifier"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
-msgstr ""
+msgstr "SQL n’a pas été appliqué. Approuvez les valeurs de filtre supposées "
+"pour exécuter cette requête."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1989,7 +2007,7 @@ msgstr "Résultat"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
@@ -2058,7 +2076,7 @@ msgstr "Créer un tableau de bord et enregistrer"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
-msgstr ""
+msgstr "Marge intérieure"
 
 #: src/components/GISApp/DataMap/MapStylePicker.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -2102,7 +2120,7 @@ msgstr "Administrateur global"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Comma (,)"
-msgstr ""
+msgstr "Virgule (,)"
 
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
@@ -2130,7 +2148,7 @@ msgstr "environ une minute"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
-msgstr ""
+msgstr "Colonne 9"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
@@ -2209,7 +2227,7 @@ msgstr "Ajoutez un bloc de filtre au tableau de bord pour activer le filtrage "
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
-msgstr ""
+msgstr "Complet"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2225,7 +2243,7 @@ msgstr "Commencez votre parcours avec nous"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 7B (hors ligne)"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
@@ -2234,7 +2252,8 @@ msgstr "Code QR"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
-msgstr ""
+msgstr "Recommandé si vous disposez de 32 Go de RAM et d’une machine puissante "
+"principalement utilisée pour les tâches d’analyse."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -2259,7 +2278,7 @@ msgstr "Échec de l'enregistrement dans le tableau de bord : {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Header row"
-msgstr ""
+msgstr "Ligne d’en-tête"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Custom role groups"
@@ -2344,7 +2363,7 @@ msgstr "Aperçu :"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Background"
-msgstr ""
+msgstr "Arrière-plan"
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2359,7 +2378,7 @@ msgstr "Le nom du jeu de données doit comporter moins de {maxDatasetNameLength}
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Preparing model files…"
-msgstr ""
+msgstr "Préparation des fichiers du modèle…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -2367,7 +2386,8 @@ msgstr "Relancer la requête"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
-msgstr ""
+msgstr "Modèle de conversation hors ligne le plus compact. Moins performant "
+"pour les requêtes SQL complexes, mais rapide à télécharger."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -2430,7 +2450,7 @@ msgstr "Télécharger CSV"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
-msgstr ""
+msgstr "Image"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2493,11 +2513,12 @@ msgstr "{0} a été supprimé de ce navigateur."
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
-msgstr ""
+msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
+"Mo)."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
-msgstr ""
+msgstr "Onglet"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
@@ -2506,7 +2527,7 @@ msgstr "Certains jeux de données publiés n'ont pas pu être chargés. Veuillez
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
-msgstr ""
+msgstr "Premier point"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -2550,7 +2571,7 @@ msgstr "Créez votre premier tableau de bord pour suivre les indicateurs clés e
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
-msgstr ""
+msgstr "Barre verticale (|)"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Are you sure you want to delete this dataset? This action cannot be "
@@ -2568,7 +2589,7 @@ msgstr "Avandar (par défaut)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
-msgstr ""
+msgstr "Large"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2576,7 +2597,7 @@ msgstr "Tapez ou collez un e-mail ci-dessous."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2608,7 +2629,7 @@ msgstr "Continuez vers votre espace de travail"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot contain spaces"
-msgstr ""
+msgstr "L’URL personnalisée ne peut pas contenir d’espaces"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the maximum value"
@@ -2700,7 +2721,7 @@ msgstr "Colonne Y"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
-msgstr ""
+msgstr "Accéder à l’accueil"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -2708,7 +2729,7 @@ msgstr "Comptez combien de lignes il y a dans {datasetName}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
-msgstr ""
+msgstr "Génération de SQL…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2748,12 +2769,13 @@ msgstr "Nous ajouterons cette visualisation à votre nouveau tableau de bord."
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Repairing query…"
-msgstr ""
+msgstr "Réparation de la requête…"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
 "the 8 GB tier."
-msgstr ""
+msgstr "Un raisonnement plus avancé que le modèle 1.5B, avec un téléchargement "
+"modéré. Une bonne amélioration par rapport à la gamme de 8 Go."
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Starting…"
@@ -2770,7 +2792,7 @@ msgstr "Colonnes"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
-msgstr ""
+msgstr "Voici une requête basée sur les métadonnées de votre espace de travail."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
@@ -2820,7 +2842,8 @@ msgstr "Format de l'horodatage"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
-msgstr ""
+msgstr "Modèle instruct 7B haute qualité. Idéal pour les schémas difficiles et "
+"les requêtes SQL complexes hors ligne."
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -2852,7 +2875,7 @@ msgstr "Ouvrir le tableau de bord"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H1"
-msgstr ""
+msgstr "H1"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -2913,7 +2936,7 @@ msgstr "Nom de la colonne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
-msgstr ""
+msgstr "Grand"
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -2956,11 +2979,11 @@ msgstr "Autoriser l'édition manuelle"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
-msgstr ""
+msgstr "Intégrer"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
-msgstr ""
+msgstr "Llama 3.2 1B (hors ligne)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2987,11 +3010,12 @@ msgstr "Acheter {seatsToAdd} siège"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
-msgstr ""
+msgstr "Compter les lignes dans {datasetName} par {groupByColumn}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
-msgstr ""
+msgstr "SQL n’a pas été appliqué. Connectez-vous pour approuver les valeurs des "
+"filtres."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
@@ -3001,11 +3025,13 @@ msgstr "La page du gestionnaire de profil n'a pas pu se charger. Veuillez "
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr ""
+msgstr "L’identifiant de l’espace de travail peut uniquement contenir des "
+"lettres, des chiffres et des traits d’union"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
-msgstr ""
+msgstr "Impossible d’ouvrir le portail de facturation. Veuillez réessayer plus "
+"tard."
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
@@ -3015,7 +3041,7 @@ msgstr "Le {chartName} ne peut pas être affiché car il manque des axes ou des 
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Card"
-msgstr ""
+msgstr "Carte"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -3095,11 +3121,12 @@ msgstr "Modifier le groupe d'utilisateurs"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
 "device."
-msgstr ""
+msgstr "Recommandé si vous disposez de 24 Go de RAM et souhaitez une qualité "
+"proche du cloud, entièrement sur votre appareil."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B"
-msgstr ""
+msgstr "Qwen 2.5 1.5B"
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -3171,7 +3198,7 @@ msgstr "Les plus courants"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
-msgstr ""
+msgstr "H3"
 
 #: src/routes/register.tsx
 #: src/routes/update-password.tsx
@@ -3248,7 +3275,7 @@ msgstr "Aucune clarification pour le moment. Le journal se remplit au fur et à 
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B"
-msgstr ""
+msgstr "Llama 3.1 8B"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
@@ -3335,11 +3362,11 @@ msgstr "Sélecteur de thème"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
-msgstr ""
+msgstr "Colonne 4"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
@@ -3351,7 +3378,7 @@ msgstr "Valeur non chaîne reçue pour un champ de sélection"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left span"
-msgstr ""
+msgstr "Étendue gauche"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
@@ -3420,7 +3447,7 @@ msgstr "Date"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
-msgstr ""
+msgstr "récemment"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
@@ -3439,7 +3466,7 @@ msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Ordered"
-msgstr ""
+msgstr "Ordonnée"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
@@ -3453,7 +3480,7 @@ msgstr "Tourner"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
-msgstr ""
+msgstr "Non ordonnée"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -3528,7 +3555,7 @@ msgstr "Aucune description n'a encore été ajoutée."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B"
-msgstr ""
+msgstr "Qwen 2.5 3B"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
@@ -3553,7 +3580,7 @@ msgstr "type"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
-msgstr ""
+msgstr "you@example.com"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
@@ -3565,11 +3592,11 @@ msgstr "Esquisse"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 1"
-msgstr ""
+msgstr "Colonne 1"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Chat request failed"
-msgstr ""
+msgstr "Échec de la requête de chat"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3599,7 +3626,7 @@ msgstr "Inactif"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
-msgstr ""
+msgstr "Droite"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -3643,11 +3670,11 @@ msgstr "\"{sourceFileName}\" n'a pas pu être analysé : {message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
-msgstr ""
+msgstr "Typographie"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Something went wrong"
-msgstr ""
+msgstr "Une erreur s’est produite"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -3671,7 +3698,7 @@ msgstr "Vous n'avez ajouté aucune série"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide author"
-msgstr ""
+msgstr "Masquer l’auteur"
 
 #. placeholder {0}: userProfile.displayName
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
@@ -3738,7 +3765,7 @@ msgstr "Le nom du jeu de données doit comporter au moins 2 caractères."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Level"
-msgstr ""
+msgstr "Niveau"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
@@ -3838,7 +3865,7 @@ msgstr "Aucun tableau de bord ne correspond à “{searchQuery}”."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List item"
-msgstr ""
+msgstr "Élément de liste"
 
 #. placeholder {0}: roughness.toFixed(1)
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3866,7 +3893,7 @@ msgstr "Confirmer le mot de passe"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Attribution"
-msgstr ""
+msgstr "Attribution"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
@@ -3890,7 +3917,7 @@ msgstr "Explorateur de données"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
-msgstr ""
+msgstr "Se reconnecter"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3912,7 +3939,7 @@ msgstr "Le jeu de données est maintenant synchronisé en ligne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Height"
-msgstr ""
+msgstr "Hauteur"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
@@ -3921,7 +3948,7 @@ msgstr "Votre session a expiré"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
-msgstr ""
+msgstr "Écrivez votre paragraphe ici..."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
@@ -3959,15 +3986,15 @@ msgstr "Créer un nouvel espace de travail. Vous pouvez toujours le modifier "
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
-msgstr ""
+msgstr "Qwen 2.5 7B"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
-msgstr ""
+msgstr "Neutre"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
-msgstr ""
+msgstr "Compter les lignes de {datasetName} par {secondGroupByColumn}"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -4012,7 +4039,7 @@ msgstr "Instantané du tableau de bord"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
-msgstr ""
+msgstr "Reconnexion en cours…"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
@@ -4020,7 +4047,7 @@ msgstr "Détails de la requête"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
-msgstr ""
+msgstr "L’URL personnalisée ne peut pas être vide"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
@@ -4122,7 +4149,7 @@ msgstr "Paramètres de visualisation"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini (offline)"
-msgstr ""
+msgstr "Phi 3.5 Mini (hors ligne)"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
@@ -4179,7 +4206,7 @@ msgstr "Lorsque cette option est activée, les membres de ce groupe n'ont accès
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
-msgstr ""
+msgstr "Séparateur"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -4205,7 +4232,7 @@ msgstr "Filtres globaux"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
-msgstr ""
+msgstr "Mise en page"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
@@ -4313,7 +4340,8 @@ msgstr "Tableau de bord publié !"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
-msgstr ""
+msgstr "Je n’ai pas pu générer de SQL hors ligne. Reformulez votre demande ou "
+"reconnectez-vous pour utiliser le chat cloud."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4420,7 +4448,7 @@ msgstr "Afficher les étiquettes"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 1.5B (hors ligne)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
@@ -4538,7 +4566,7 @@ msgstr "Rien de plus à charger"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
-msgstr ""
+msgstr "Réinitialiser l’application"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -4548,7 +4576,7 @@ msgstr "Gérez votre apparence dans {0} et le compte que vous utilisez pour vous
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Extra small"
-msgstr ""
+msgstr "Très petit"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "People with access"
@@ -4585,7 +4613,7 @@ msgstr "interrogé"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 3B (hors ligne)"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -4650,7 +4678,7 @@ msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
-msgstr ""
+msgstr "Ajoutez des données tabulaires pour afficher un tableau simple."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Multi-select"
@@ -4713,7 +4741,7 @@ msgstr "Visualisations"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Alt text"
-msgstr ""
+msgstr "Texte alternatif"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -4745,7 +4773,8 @@ msgstr "Filtres (Où)"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
-msgstr ""
+msgstr "Recommandé si vous disposez de 12 Go de RAM et souhaitez obtenir des "
+"réponses SQL hors ligne sensiblement meilleures."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -4770,7 +4799,7 @@ msgstr "Votre espace de travail est sur le plan Gratuit, qui prend en charge "
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
-msgstr ""
+msgstr "Ton"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -4794,7 +4823,7 @@ msgstr "portail de facturation."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 2"
-msgstr ""
+msgstr "Colonne 2"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -4844,7 +4873,7 @@ msgstr "Nouveau groupe d'utilisateurs"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
-msgstr ""
+msgstr "Gauche"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
@@ -4878,7 +4907,7 @@ msgstr "Impossible de préparer le modèle de chat hors ligne."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
-msgstr ""
+msgstr "Cette URL personnalisée est déjà utilisée"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
@@ -4890,7 +4919,7 @@ msgstr "Ajoutez au moins une série X / Y / Taille"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar"
-msgstr ""
+msgstr "Barre latérale"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -4899,11 +4928,11 @@ msgstr "Cet ensemble de données est synchronisé en ligne. Cliquez pour le "
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Published Date"
-msgstr ""
+msgstr "Date de publication"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
-msgstr ""
+msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espaces"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4920,11 +4949,11 @@ msgstr "contient"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
-msgstr ""
+msgstr "Masquer le sous-titre"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Author"
-msgstr ""
+msgstr "Auteur"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
@@ -4932,11 +4961,11 @@ msgstr "Ajouter un filtre"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Offline models"
-msgstr ""
+msgstr "Modèles hors ligne"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
-msgstr ""
+msgstr "Version du schéma"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
@@ -4971,7 +5000,7 @@ msgstr "Aucune colonne disponible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
-msgstr ""
+msgstr "Marge intérieure horizontale"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
@@ -4979,11 +5008,11 @@ msgstr "Jeu de données prêt"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H2"
-msgstr ""
+msgstr "H2"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
-msgstr ""
+msgstr "Ajoutez une citation mise en avant..."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4991,7 +5020,7 @@ msgstr "Impossible de rendre l'ensemble de données uniquement hors ligne."
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Hide details"
-msgstr ""
+msgstr "Masquer les détails"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Enter comment"
@@ -5029,7 +5058,7 @@ msgstr "Mettre à jour et republier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
-msgstr ""
+msgstr "Centrer"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid " · downloaded"
@@ -5064,7 +5093,7 @@ msgstr "Fermer le panneau (⌘/)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
-msgstr ""
+msgstr "URL de l’image"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -5072,7 +5101,7 @@ msgstr "Régénérer avec l'erreur"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
-msgstr ""
+msgstr "Ajoutez du contexte, la méthodologie ou un point clé à retenir."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a table of the top 10 rows of {datasetName}"
@@ -5088,7 +5117,7 @@ msgstr "Impossible de lire le fichier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
-msgstr ""
+msgstr "Colonne 6"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
@@ -5185,7 +5214,7 @@ msgstr "Quel champ doit être utilisé comme nom d'un {singularEntityConfigName}
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
-msgstr ""
+msgstr "Sans titre"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
@@ -5276,7 +5305,7 @@ msgstr "Colonne de valeur sélectionnée invalide"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
-msgstr ""
+msgstr "Ligne {rowNum} / Colonne {colNum}"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "No columns have been added yet."
@@ -5328,7 +5357,7 @@ msgstr "Enregistrer l'ensemble de données"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar position"
-msgstr ""
+msgstr "Position de la barre latérale"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
@@ -5348,7 +5377,7 @@ msgstr "Document sélectionné : {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Subtle"
-msgstr ""
+msgstr "Discret"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Activity"
@@ -5356,7 +5385,7 @@ msgstr "Activité"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
-msgstr ""
+msgstr "(Message non envoyé.)"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "No workspace was found"
@@ -5407,7 +5436,9 @@ msgstr "Supprimer le groupe d'utilisateurs"
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long; you "
 "can always change these later!"
-msgstr ""
+msgstr "Il est temps de créer votre premier espace de travail. Ne réfléchissez "
+"pas trop longtemps : vous pourrez toujours modifier ces paramètres plus "
+"tard !"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -5428,7 +5459,7 @@ msgstr "Accès général"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
-msgstr ""
+msgstr "Média"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -5590,7 +5621,7 @@ msgstr "Utilisé pour se connecter à votre compte."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
-msgstr ""
+msgstr "Ajoutez l’URL d’une image pour afficher une figure."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Role & user groups"
@@ -5621,15 +5652,15 @@ msgstr "Colonne de longitude"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
-msgstr ""
+msgstr "Ajoutez une URL pour intégrer une visualisation ou du contenu externe."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar span"
-msgstr ""
+msgstr "Étendue de la barre latérale"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Max width"
-msgstr ""
+msgstr "Largeur maximale"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
@@ -5659,7 +5690,7 @@ msgstr "Date invalide"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
-msgstr ""
+msgstr "Titre de la page"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
@@ -5671,7 +5702,7 @@ msgstr "Flèche"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 10"
-msgstr ""
+msgstr "Colonne 10"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -5679,16 +5710,17 @@ msgstr "Valeurs, séparées par des virgules"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Heading"
-msgstr ""
+msgstr "Titre"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Quote"
-msgstr ""
+msgstr "Citation"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Billing portal cannot be loaded because you do not have a subscription "
 "yet."
-msgstr ""
+msgstr "Le portail de facturation ne peut pas être chargé, car vous n’avez pas "
+"encore d’abonnement."
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()

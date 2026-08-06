@@ -16,7 +16,7 @@ msgstr ""
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Delete: {0}"
-msgstr ""
+msgstr "删除：{0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
@@ -43,7 +43,7 @@ msgstr "返回在线以查看或使页面可离线使用。"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
-msgstr ""
+msgstr "您处于离线状态。在询问数据问题前，请使用编辑框旁的云图标下载离线聊天模型。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -106,7 +106,7 @@ msgstr "或 {0} 以在我们的公开发布准备好时收到通知。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
-msgstr ""
+msgstr "右跨度"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
@@ -151,7 +151,7 @@ msgstr "源 URL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -160,7 +160,7 @@ msgstr "访问"
 #. placeholder {0}: model.minRamGb
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "{0} GB RAM"
-msgstr ""
+msgstr "{0} GB 内存"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -199,7 +199,7 @@ msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
-msgstr ""
+msgstr "H4"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query"
@@ -235,7 +235,7 @@ msgstr "展开"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
-msgstr ""
+msgstr "提示框"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -249,7 +249,7 @@ msgstr "在 \"{sourceFileName}\" 中检测到 {changedCount} 列的列类型与�
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
-msgstr ""
+msgstr "Llama 3.2 1B"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -261,7 +261,7 @@ msgstr "创建账户"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Second point"
-msgstr ""
+msgstr "第二点"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
@@ -273,7 +273,7 @@ msgstr "仍然分配给此组的成员必须先被移动。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar layout"
-msgstr ""
+msgstr "侧边栏布局"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -327,7 +327,7 @@ msgstr "添加一条显示 {datasetName} 随时间变化趋势的折线图"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
-msgstr ""
+msgstr "列表"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -343,7 +343,7 @@ msgstr "导出带注释的 PDF"
 #. placeholder {0}: failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
-msgstr ""
+msgstr "自定义 URL 不能超过 {0} 个字符"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -377,12 +377,12 @@ msgstr "要更好地控制您的订阅，您可以在您的订阅中进行管理
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Extra large"
-msgstr ""
+msgstr "超大"
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
-msgstr ""
+msgstr "保存：{0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -405,7 +405,7 @@ msgstr "等宽标题"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
-msgstr ""
+msgstr "如果您的设备有 4 GB 内存，或需要最小的下载包，建议使用此选项。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -431,7 +431,7 @@ msgstr " {numRejectedRows} 行被拒绝"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Replying…"
-msgstr ""
+msgstr "正在回复…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Re-download"
@@ -443,7 +443,7 @@ msgstr "允许多个值"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
-msgstr ""
+msgstr "Llama 3.1 8B（离线）"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -451,7 +451,7 @@ msgstr "尚未添加数据集"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
-msgstr ""
+msgstr "正在修复查询…"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -474,7 +474,7 @@ msgstr "平均值"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
-msgstr ""
+msgstr "隐藏发布日期"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -491,11 +491,11 @@ msgstr "获取值的数量"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Caption"
-msgstr ""
+msgstr "标题说明"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Collapse at"
-msgstr ""
+msgstr "折叠于"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
@@ -507,7 +507,7 @@ msgstr "正在更改计划为 {newPlanName} ({newPlanSubType})"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
@@ -524,7 +524,7 @@ msgstr "该表有一个标题行"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
-msgstr ""
+msgstr "表格"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search the data catalog to add open datasets to your workspace."
@@ -541,7 +541,7 @@ msgstr "角色组已更新"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Small"
-msgstr ""
+msgstr "小"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "No matches"
@@ -584,7 +584,7 @@ msgstr "正在更新 {0} 的密码"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
-msgstr ""
+msgstr "窄"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Column info"
@@ -755,7 +755,7 @@ msgstr "永久删除 <0>{0}</0> 吗？"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-msgstr ""
+msgstr "如果您的设备有 16 GB 内存，并且会同时运行 Avandar 和其他应用，建议使用此选项。"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
@@ -794,12 +794,12 @@ msgstr "您的问题包含可能会影响 AI 回答的语言。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Vertical padding"
-msgstr ""
+msgstr "垂直内边距"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
-msgstr ""
+msgstr "无法连接云端助手。要使用已下载的设备端模型处理此消息吗？"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -815,7 +815,7 @@ msgstr "删除角色组"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
-msgstr ""
+msgstr "隐藏标题"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -894,11 +894,11 @@ msgstr "名称列"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
-msgstr ""
+msgstr "您的会话已过期。正在将您重定向到登录页面。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
-msgstr ""
+msgstr "第 12 列"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -931,7 +931,7 @@ msgstr "显示 {datasetName} 的前 20 行"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr ""
+msgstr "工作区 ID 必须少于 {SLUG_MAX_LENGTH} 个字符"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -956,7 +956,7 @@ msgstr "欢迎回来"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
-msgstr ""
+msgstr "Phi 3.5 Mini"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -979,7 +979,7 @@ msgstr "检测到："
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
-msgstr ""
+msgstr "第 3 列"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
@@ -992,7 +992,7 @@ msgstr "此图表的过滤器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Align"
-msgstr ""
+msgstr "对齐"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
@@ -1009,7 +1009,7 @@ msgstr "撤销"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
-msgstr ""
+msgstr "如果您的设备有约 8 GB 内存，建议使用此选项（大多数用户的默认选项）。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1017,7 +1017,7 @@ msgstr "权限已保存"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Subtitle"
-msgstr ""
+msgstr "副标题"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -1042,7 +1042,7 @@ msgstr "继续保持现状"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "What are the distinct values of {groupByColumn} in {datasetName}?"
-msgstr ""
+msgstr "{datasetName} 中 {groupByColumn} 的不同值有哪些？"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
@@ -1063,7 +1063,7 @@ msgstr "与按月计费相比，您节省了 {discount}%"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr ""
+msgstr "工作区 ID 必须至少包含 {SLUG_MIN_LENGTH} 个字符"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
@@ -1084,7 +1084,7 @@ msgstr "从列表中选择一个数据集以查看其元数据。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
-msgstr ""
+msgstr "中"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1123,7 +1123,7 @@ msgstr "工作区中的每个人的角色"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Gap"
-msgstr ""
+msgstr "间距"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
@@ -1149,7 +1149,7 @@ msgstr "解析了 {0} 行"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
-msgstr ""
+msgstr "自定义 URL 只能包含小写字母、数字和连字符"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
@@ -1248,7 +1248,7 @@ msgstr "编辑 {0} 的访问权限"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
-msgstr ""
+msgstr "发生意外错误。你可以重试，或返回首页。"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -1263,7 +1263,7 @@ msgstr "检测到偏见："
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
-msgstr ""
+msgstr "正文"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -1287,7 +1287,7 @@ msgstr "注销"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Section"
-msgstr ""
+msgstr "分区"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1296,7 +1296,7 @@ msgstr "未知组"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Paragraph"
-msgstr ""
+msgstr "段落"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File was partially loaded"
@@ -1337,7 +1337,7 @@ msgstr "{0} / 3"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Show details"
-msgstr ""
+msgstr "显示详细信息"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1382,11 +1382,11 @@ msgstr "手动"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
-msgstr ""
+msgstr "正在理解你的问题…"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot be empty"
-msgstr ""
+msgstr "工作区 ID 不能为空"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
@@ -1394,7 +1394,7 @@ msgstr "或"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Items"
-msgstr ""
+msgstr "项目"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Restriction update failed"
@@ -1427,11 +1427,11 @@ msgstr "报告错误"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
-msgstr ""
+msgstr "信息"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Writing query…"
-msgstr ""
+msgstr "正在编写查询…"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -1473,7 +1473,7 @@ msgstr "类别轴"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Balanced offline model for everyday SQL questions on typical laptops."
-msgstr ""
+msgstr "适用于日常 SQL 问题的均衡离线模型，可在常见笔记本电脑上运行。"
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -1525,7 +1525,7 @@ msgstr "选择一列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Normal"
-msgstr ""
+msgstr "普通"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Annotate, then export"
@@ -1549,7 +1549,7 @@ msgstr "显示 SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
-msgstr ""
+msgstr "网格"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Search models"
@@ -1571,7 +1571,7 @@ msgstr "数据集名称是必需的"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
-msgstr ""
+msgstr "主要"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
@@ -1604,7 +1604,7 @@ msgstr "{usedSeats} / {maxSeats} 个座位已使用 · {remainingSeats} 个剩�
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Largest catalog option. Maximum offline capability when RAM and download "
 "size are not constraints."
-msgstr ""
+msgstr "最大的目录选项。在 RAM 和下载大小不受限制时，提供最强的离线能力。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -1616,7 +1616,7 @@ msgstr "自定义选择"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
-msgstr ""
+msgstr "第 5 列"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a description for this dataset"
@@ -1668,7 +1668,7 @@ msgstr "您没有访问此仪表板的权限"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
-msgstr ""
+msgstr "第 8 列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an "
@@ -1686,7 +1686,7 @@ msgstr "数据预览"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
 "app to clear cached data and try once more."
-msgstr ""
+msgstr "请重新登录以继续。如果无法登录，请重置应用以清除缓存数据，然后再试一次。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "to"
@@ -1841,7 +1841,7 @@ msgstr "手动表单显示近似值"
 #. placeholder {0}: failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
-msgstr ""
+msgstr "自定义 URL 必须至少包含 {0} 个字符"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
@@ -1861,16 +1861,16 @@ msgstr "需要额外的席位"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
-msgstr ""
+msgstr "第 11 列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 7"
-msgstr ""
+msgstr "第 7 列"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
-msgstr ""
+msgstr "Microsoft 的紧凑型 instruct 模型。结构可靠，适合为仪表板执行指令。"
 
 #: packages/web/ui/src/buttons/EditButton.tsx
 msgid "Edit"
@@ -1879,7 +1879,7 @@ msgstr "编辑"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
-msgstr ""
+msgstr "SQL 未应用。请批准假定的筛选值以运行此查询。"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1904,7 +1904,7 @@ msgstr "结果"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Code"
-msgstr ""
+msgstr "代码"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig.tsx
 msgid "Local filters (viewer-editable, this chart only)"
@@ -1971,7 +1971,7 @@ msgstr "创建仪表板并保存"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
-msgstr ""
+msgstr "内边距"
 
 #: src/components/GISApp/DataMap/MapStylePicker.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -2012,7 +2012,7 @@ msgstr "全局管理员"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Comma (,)"
-msgstr ""
+msgstr "逗号 (,)"
 
 #: src/routes/register.tsx
 msgid "Registration requires an internet connection."
@@ -2040,7 +2040,7 @@ msgstr "大约一分钟"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
-msgstr ""
+msgstr "第 9 列"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 msgid "You do not have permission to open this part of the workspace."
@@ -2115,7 +2115,7 @@ msgstr "向仪表板添加过滤器块，以启用此可视化的全局过滤。
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
-msgstr ""
+msgstr "完整"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2131,7 +2131,7 @@ msgstr "与我们一起开始您的旅程"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 7B（离线）"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
@@ -2140,7 +2140,7 @@ msgstr "二维码"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
 "analytics work."
-msgstr ""
+msgstr "如果你拥有 32 GB RAM，并且主要使用高性能设备进行分析工作，推荐使用此模型。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -2165,7 +2165,7 @@ msgstr "保存到仪表板失败：{0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Header row"
-msgstr ""
+msgstr "表头行"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Custom role groups"
@@ -2246,7 +2246,7 @@ msgstr "预览："
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Background"
-msgstr ""
+msgstr "背景"
 
 #: src/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling.tsx
 msgid "Select your plan"
@@ -2260,7 +2260,7 @@ msgstr "数据集名称必须少于 {maxDatasetNameLength} 个字符（当前：
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Preparing model files…"
-msgstr ""
+msgstr "正在准备模型文件…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -2268,7 +2268,7 @@ msgstr "重新运行查询"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
-msgstr ""
+msgstr "最小的离线聊天模型。处理复杂 SQL 的能力较弱，但下载速度快。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -2330,7 +2330,7 @@ msgstr "上传 CSV"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
-msgstr ""
+msgstr "图像"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2391,11 +2391,11 @@ msgstr "{0} 已从此浏览器中删除。"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
-msgstr ""
+msgstr "{description} {recommendedIf}（约 {approxSizeMb} MB 下载）。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
-msgstr ""
+msgstr "选项卡"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
@@ -2403,7 +2403,7 @@ msgstr "某些已发布的数据集无法加载。请稍后再试。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
-msgstr ""
+msgstr "第一个点"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -2445,7 +2445,7 @@ msgstr "创建您的第一个仪表板以跟踪关键指标和洞察。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
-msgstr ""
+msgstr "管道符 (|)"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Are you sure you want to delete this dataset? This action cannot be "
@@ -2462,7 +2462,7 @@ msgstr "Avandar（默认）"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
-msgstr ""
+msgstr "宽"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2470,7 +2470,7 @@ msgstr "在下面输入或粘贴电子邮件。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2501,7 +2501,7 @@ msgstr "继续进入您的工作区"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot contain spaces"
-msgstr ""
+msgstr "自定义 URL 不能包含空格"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the maximum value"
@@ -2591,7 +2591,7 @@ msgstr "Y 列"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
-msgstr ""
+msgstr "返回首页"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -2599,7 +2599,7 @@ msgstr "计算 {datasetName} 中有多少行"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
-msgstr ""
+msgstr "正在生成 SQL…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -2639,12 +2639,12 @@ msgstr "我们将把此可视化添加到您的新仪表板。"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Repairing query…"
-msgstr ""
+msgstr "正在修复查询…"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
 "the 8 GB tier."
-msgstr ""
+msgstr "推理能力强于 1.5B，下载大小适中。相比 8 GB 级别是很好的升级选择。"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Starting…"
@@ -2661,7 +2661,7 @@ msgstr "列"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
-msgstr ""
+msgstr "这是基于您的工作区元数据生成的查询。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Overwrite SQL?"
@@ -2711,7 +2711,7 @@ msgstr "时间戳格式"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
-msgstr ""
+msgstr "高质量的 7B instruct 模型。最适合处理复杂的架构和离线运行复杂 SQL。"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -2743,7 +2743,7 @@ msgstr "打开仪表板"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H1"
-msgstr ""
+msgstr "H1"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -2803,7 +2803,7 @@ msgstr "列名称"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
-msgstr ""
+msgstr "大"
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -2845,11 +2845,11 @@ msgstr "允许手动编辑"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
-msgstr ""
+msgstr "嵌入"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
-msgstr ""
+msgstr "Llama 3.2 1B（离线）"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
@@ -2875,11 +2875,11 @@ msgstr "购买 {seatsToAdd} 个座位"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
-msgstr ""
+msgstr "按 {groupByColumn} 统计 {datasetName} 中的行数"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
-msgstr ""
+msgstr "未应用 SQL。请登录以批准筛选值。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
@@ -2888,11 +2888,11 @@ msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr ""
+msgstr "工作区 ID 只能包含字母、数字和连字符"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
-msgstr ""
+msgstr "无法打开账单门户。请稍后重试。"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
@@ -2901,7 +2901,7 @@ msgstr "由于缺少轴或系列，无法显示 {chartName}。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Card"
-msgstr ""
+msgstr "卡片"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -2978,11 +2978,11 @@ msgstr "编辑用户组"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
 "device."
-msgstr ""
+msgstr "如果您有 24 GB RAM，并希望完全在设备上运行且达到接近云端的质量，推荐使用此模型。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B"
-msgstr ""
+msgstr "Qwen 2.5 1.5B"
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -3054,7 +3054,7 @@ msgstr "最常见"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
-msgstr ""
+msgstr "H3"
 
 #: src/routes/register.tsx
 #: src/routes/update-password.tsx
@@ -3124,7 +3124,7 @@ msgstr "尚无澄清。日志会随着聊天提出澄清问题而填充。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B"
-msgstr ""
+msgstr "Llama 3.1 8B"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
@@ -3209,11 +3209,11 @@ msgstr "主题选择器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Title"
-msgstr ""
+msgstr "标题"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
-msgstr ""
+msgstr "第 4 列"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Preparing data for the visualizations…"
@@ -3225,7 +3225,7 @@ msgstr "接收到非字符串值的选择字段"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left span"
-msgstr ""
+msgstr "左侧跨度"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
@@ -3291,7 +3291,7 @@ msgstr "日期"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
-msgstr ""
+msgstr "最近"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
@@ -3308,7 +3308,7 @@ msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Ordered"
-msgstr ""
+msgstr "有序"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
@@ -3321,7 +3321,7 @@ msgstr "转动"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
-msgstr ""
+msgstr "无序"
 
 #: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
 msgid "Empty"
@@ -3392,7 +3392,7 @@ msgstr "尚未添加描述。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B"
-msgstr ""
+msgstr "Qwen 2.5 3B"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
@@ -3417,7 +3417,7 @@ msgstr "类型"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
-msgstr ""
+msgstr "you@example.com"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard share settings updated."
@@ -3429,11 +3429,11 @@ msgstr "草图"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 1"
-msgstr ""
+msgstr "第 1 列"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Chat request failed"
-msgstr ""
+msgstr "聊天请求失败"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
@@ -3463,7 +3463,7 @@ msgstr "非活动"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
-msgstr ""
+msgstr "右"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -3505,11 +3505,11 @@ msgstr "\"{sourceFileName}\" 无法解析：{message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Typography"
-msgstr ""
+msgstr "排版"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Something went wrong"
-msgstr ""
+msgstr "出了点问题"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -3533,7 +3533,7 @@ msgstr "您尚未添加任何系列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide author"
-msgstr ""
+msgstr "隐藏作者"
 
 #. placeholder {0}: userProfile.displayName
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
@@ -3598,7 +3598,7 @@ msgstr "数据集名称必须至少包含 2 个字符。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Level"
-msgstr ""
+msgstr "级别"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
@@ -3695,7 +3695,7 @@ msgstr "没有仪表板匹配 “{searchQuery}”。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List item"
-msgstr ""
+msgstr "列表项"
 
 #. placeholder {0}: roughness.toFixed(1)
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3723,7 +3723,7 @@ msgstr "确认密码"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Attribution"
-msgstr ""
+msgstr "归属"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
@@ -3747,7 +3747,7 @@ msgstr "数据探索器"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
-msgstr ""
+msgstr "再次登录"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -3768,7 +3768,7 @@ msgstr "数据集现已在线同步"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Height"
-msgstr ""
+msgstr "高度"
 
 #: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
@@ -3777,7 +3777,7 @@ msgstr "您的会话已过期"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
-msgstr ""
+msgstr "在此处输入段落内容..."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
@@ -3813,15 +3813,15 @@ msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
-msgstr ""
+msgstr "Qwen 2.5 7B"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
-msgstr ""
+msgstr "中性"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
-msgstr ""
+msgstr "按 {secondGroupByColumn} 对 {datasetName} 中的行进行计数"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -3864,7 +3864,7 @@ msgstr "仪表板快照"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
-msgstr ""
+msgstr "正在重新登录…"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
@@ -3872,7 +3872,7 @@ msgstr "查询详情"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
-msgstr ""
+msgstr "自定义 URL 不能为空"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
@@ -3970,7 +3970,7 @@ msgstr "可视化设置"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini (offline)"
-msgstr ""
+msgstr "Phi 3.5 Mini（离线）"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Data processing failed"
@@ -4023,7 +4023,7 @@ msgstr "开启时，只有在工作区中已拥有 {app} 访问权限的组成�
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
-msgstr ""
+msgstr "分隔线"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -4046,7 +4046,7 @@ msgstr "全局过滤器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
-msgstr ""
+msgstr "布局"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
@@ -4149,7 +4149,7 @@ msgstr "仪表板已发布！"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
-msgstr ""
+msgstr "离线无法生成 SQL。请尝试改写内容，或重新连接以使用云端聊天。"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4249,7 +4249,7 @@ msgstr "显示标签"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 1.5B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 1.5B（离线）"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
@@ -4365,7 +4365,7 @@ msgstr "没有更多内容可加载"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
-msgstr ""
+msgstr "重置应用"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -4374,7 +4374,7 @@ msgstr "管理您在 {0} 中的显示方式以及您用于登录的帐户。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Extra small"
-msgstr ""
+msgstr "超小"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "People with access"
@@ -4408,7 +4408,7 @@ msgstr "查询的"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
-msgstr ""
+msgstr "Qwen 2.5 3B（离线）"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -4471,7 +4471,7 @@ msgstr "选择规则（例如，最频繁）"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
-msgstr ""
+msgstr "添加表格数据以呈现简单表格。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Multi-select"
@@ -4533,7 +4533,7 @@ msgstr "可视化"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Alt text"
-msgstr ""
+msgstr "替代文本"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -4565,7 +4565,7 @@ msgstr "过滤器（位置）"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
 "offline."
-msgstr ""
+msgstr "如果您有 12 GB 内存，并希望在离线状态下获得明显更好的 SQL 答案，建议使用此模型。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Single-select"
@@ -4587,7 +4587,7 @@ msgstr "您的工作区处于免费计划，支持最多 5 个数据集。升级
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
-msgstr ""
+msgstr "语气"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -4610,7 +4610,7 @@ msgstr "账单门户。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 2"
-msgstr ""
+msgstr "第 2 列"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -4659,7 +4659,7 @@ msgstr "新用户组"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
-msgstr ""
+msgstr "左对齐"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "None of the above"
@@ -4692,7 +4692,7 @@ msgstr "无法准备离线聊天模型。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
-msgstr ""
+msgstr "此自定义 URL 已被占用"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset will be offline-only"
@@ -4704,7 +4704,7 @@ msgstr "添加至少一个 X / Y / 尺寸系列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar"
-msgstr ""
+msgstr "侧边栏"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -4712,11 +4712,11 @@ msgstr "此数据集已在线同步。点击以仅离线使用。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Published Date"
-msgstr ""
+msgstr "发布日期"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
-msgstr ""
+msgstr "工作区 ID 不能包含空格"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -4732,11 +4732,11 @@ msgstr "包含"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
-msgstr ""
+msgstr "隐藏副标题"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
@@ -4744,11 +4744,11 @@ msgstr "添加过滤器"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Offline models"
-msgstr ""
+msgstr "离线模型"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
-msgstr ""
+msgstr "架构版本"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
@@ -4780,7 +4780,7 @@ msgstr "没有可用列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
-msgstr ""
+msgstr "水平内边距"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
@@ -4788,11 +4788,11 @@ msgstr "数据集已准备好"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H2"
-msgstr ""
+msgstr "H2"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
-msgstr ""
+msgstr "添加引述…"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -4800,7 +4800,7 @@ msgstr "无法将数据集设置为仅离线使用"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Hide details"
-msgstr ""
+msgstr "隐藏详情"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Enter comment"
@@ -4837,7 +4837,7 @@ msgstr "更新并重新发布"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
-msgstr ""
+msgstr "居中"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid " · downloaded"
@@ -4872,7 +4872,7 @@ msgstr "关闭面板 (⌘/)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
-msgstr ""
+msgstr "图片 URL"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -4880,7 +4880,7 @@ msgstr "使用错误重新生成"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
-msgstr ""
+msgstr "添加上下文、方法或关键要点。"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a table of the top 10 rows of {datasetName}"
@@ -4896,7 +4896,7 @@ msgstr "无法读取文件"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
-msgstr ""
+msgstr "第 6 列"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
@@ -4986,7 +4986,7 @@ msgstr "应使用哪个字段作为 {singularEntityConfigName} 的名称？"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
-msgstr ""
+msgstr "无标题"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
@@ -5074,7 +5074,7 @@ msgstr "选择的值列无效"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
-msgstr ""
+msgstr "第 {rowNum} 行 / 第 {colNum} 列"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "No columns have been added yet."
@@ -5122,7 +5122,7 @@ msgstr "保存数据集"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar position"
-msgstr ""
+msgstr "侧边栏位置"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
@@ -5142,7 +5142,7 @@ msgstr "选定文档：{0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Subtle"
-msgstr ""
+msgstr "细微"
 
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Activity"
@@ -5150,7 +5150,7 @@ msgstr "活动"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
-msgstr ""
+msgstr "（消息未发送。）"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "No workspace was found"
@@ -5196,7 +5196,7 @@ msgstr "删除用户组"
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long; you "
 "can always change these later!"
-msgstr ""
+msgstr "是时候创建您的第一个工作区了。别想太久，之后随时可以更改这些设置！"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
@@ -5217,7 +5217,7 @@ msgstr "一般访问"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
-msgstr ""
+msgstr "媒体"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -5372,7 +5372,7 @@ msgstr "用于登录您的账户。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
-msgstr ""
+msgstr "添加图片 URL 以渲染图像。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Role & user groups"
@@ -5402,15 +5402,15 @@ msgstr "经度列"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
-msgstr ""
+msgstr "添加 URL 以嵌入可视化内容或外部内容。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar span"
-msgstr ""
+msgstr "侧边栏跨度"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Max width"
-msgstr ""
+msgstr "最大宽度"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
@@ -5440,7 +5440,7 @@ msgstr "无效日期"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
-msgstr ""
+msgstr "页面标题"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
@@ -5452,7 +5452,7 @@ msgstr "箭头"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 10"
-msgstr ""
+msgstr "第 10 列"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -5460,16 +5460,16 @@ msgstr "值，逗号分隔"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Heading"
-msgstr ""
+msgstr "标题"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Quote"
-msgstr ""
+msgstr "引用"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Billing portal cannot be loaded because you do not have a subscription "
 "yet."
-msgstr ""
+msgstr "由于您尚未订阅，无法加载账单门户。"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
