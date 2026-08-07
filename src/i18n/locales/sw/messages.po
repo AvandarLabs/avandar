@@ -1719,6 +1719,7 @@ msgstr "seti yako ya data"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1897,6 +1898,10 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} "
 "inapaswa kutokea..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Failed to delete workspace"
+msgstr "Imeshindikana kufuta eneo la kazi"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2265,6 +2270,10 @@ msgstr "Rose"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Je, uko tayari kufuta {0}?"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Type the workspace name to confirm"
+msgstr "Andika jina la eneo la kazi ili kuthibitisha"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save failed"
@@ -2599,11 +2608,6 @@ msgstr "URL maalum haiwezi kuwa na nafasi"
 msgid "Choose the maximum value"
 msgstr "Chagua thamani ya juu"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "Mahali pa kazi unajaribu kufikia halipo au huna ruhusa ya kulifikia."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Lipa kila mwaka"
@@ -2708,6 +2712,10 @@ msgstr "Lebele, mfano. Mkoa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Chagua faili"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete this workspace"
+msgstr "Futa eneo hili la kazi"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -2992,6 +3000,13 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "Kitambulisho cha nafasi ya kazi kinaweza kuwa na herufi, nambari na "
 "vistari pekee"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "Hii itafuta kabisa <0>{0}</0> na data zake zote. Hatua hii haiwezi "
+"kubadilishwa."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Imeshindikana kufungua tovuti ya malipo. Tafadhali jaribu tena baadaye."
@@ -3043,6 +3058,10 @@ msgstr "Chagua safu"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete workspace"
+msgstr "Futa eneo la kazi"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Latitude column"
@@ -3941,6 +3960,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Yasiyoegemea upande wowote"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "Inafuta kabisa eneo hili la kazi na data zake zote. Hatua hii haiwezi "
+"kubadilishwa."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Hesabu safu katika {datasetName} kwa {secondGroupByColumn}"
@@ -4611,6 +4636,12 @@ msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "Eneo hili la kazi halipo tena au ufikiaji wako umeondolewa. Ikiwa "
+"unafikiri hii ni makosa, wasiliana na mmiliki wa eneo lako la kazi."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
@@ -4673,6 +4704,10 @@ msgstr "Kiungo cha kudumu (tumia kwa QR codes)"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Mipangilio"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "Nenda nyumbani"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualizations"

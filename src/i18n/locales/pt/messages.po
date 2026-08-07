@@ -1726,6 +1726,7 @@ msgstr "seu conjunto de dados"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1903,6 +1904,10 @@ msgstr "Recebido um valor não string para um campo de texto"
 msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Conte-nos de onde os dados do {singularEntityConfigName} devem vir..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Failed to delete workspace"
+msgstr "Falha ao excluir o espaço de trabalho"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2269,6 +2274,10 @@ msgstr "Rosa"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Você tem certeza de que deseja excluir {0}?"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Type the workspace name to confirm"
+msgstr "Digite o nome do espaço de trabalho para confirmar"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save failed"
@@ -2603,12 +2612,6 @@ msgstr "A URL personalizada não pode conter espaços"
 msgid "Choose the maximum value"
 msgstr "Escolha o valor máximo"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "O espaço de trabalho que você está tentando acessar não existe ou você "
-"não tem acesso a ele."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Pague anualmente"
@@ -2714,6 +2717,10 @@ msgstr "Rótulo, por exemplo, Região"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Selecionar arquivo"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete this workspace"
+msgstr "Excluir este espaço de trabalho"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -2999,6 +3006,13 @@ msgstr "A página do gerenciador de perfis falhou ao carregar. Por favor, tente 
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "O ID do workspace pode conter apenas letras, números e hífens"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "Isso excluirá permanentemente <0>{0}</0> e todos os seus dados. Esta "
+"ação não pode ser desfeita."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Não foi possível abrir o portal de cobrança. Tente novamente mais "
@@ -3050,6 +3064,10 @@ msgstr "Selecionar colunas"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Você não pode publicar enquanto houver alterações não salvas. Salve "
 "primeiro."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete workspace"
+msgstr "Excluir espaço de trabalho"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Latitude column"
@@ -3952,6 +3970,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Neutro"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "Exclui permanentemente este espaço de trabalho e todos os seus dados. "
+"Esta ação não pode ser desfeita."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Contar linhas em {datasetName} por {secondGroupByColumn}"
@@ -4621,6 +4645,13 @@ msgstr "Você precisa de acesso de administrador a este recurso para gerenciar o
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Se houver múltiplos valores de {fieldName} para um {0}, então..."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "Este espaço de trabalho não existe mais ou seu acesso foi revogado. Se "
+"você acha que isso é um erro, entre em contato com o proprietário do "
+"seu espaço de trabalho."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Selecionar regra (por exemplo, mais frequente)"
@@ -4683,6 +4714,10 @@ msgstr "Link permanente (use para códigos QR)"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Configurações"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "Ir para a página inicial"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualizations"

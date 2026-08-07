@@ -1,10 +1,25 @@
 import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Card,
+  Container,
+  Divider,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppLinks } from "@/config/AppLinks";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -13,8 +28,10 @@ import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBil
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
+import styles from "./WorkspaceSettingsPage.module.css";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Settings tabs shown to the workspace owner (the user whose id matches
@@ -61,6 +78,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
   const isSettingsAdmin = useIsGlobalAdmin();
   const { t } = useLingui();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { tabName } = useParams({
     from: "/_auth/$workspaceSlug/settings/$tabName",
   });
@@ -82,6 +100,32 @@ export function WorkspaceSettingsPage(): JSX.Element {
       });
     },
   });
+
+  const [deleteWorkspace, isDeletingWorkspace] =
+    WorkspaceClient.useDeleteWorkspace({
+      onSuccess: () => {
+        queryClient.setQueryData<Workspace.WithSubscription[]>(
+          WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+          (prevWorkspaces) => {
+            return (
+              prevWorkspaces?.filter((w) => {
+                return w.id !== workspace.id;
+              }) ?? []
+            );
+          },
+        );
+        void navigate({ to: AppLinks.home.to });
+      },
+      onError: (error: Error) => {
+        notifyError({
+          title: t`Failed to delete workspace`,
+          message: error.message,
+        });
+      },
+    });
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
 
   const isCurrentUserTheWorkspaceOwner =
     workspace.ownerId === userProfile?.userId;
@@ -106,33 +150,111 @@ export function WorkspaceSettingsPage(): JSX.Element {
 
   const generalTabPanel = () => {
     return (
-      <AvaForm
-        fields={{
-          workspaceName: {
-            key: "workspaceName",
-            type: "text",
-            initialValue: workspace.name,
-            label: t`Workspace Name`,
-            validateFn: (value: string) => {
-              return value.trim() === "" ?
-                  t`Workspace name is required`
-                : undefined;
+      <Stack gap="xl">
+        <AvaForm
+          fields={{
+            workspaceName: {
+              key: "workspaceName",
+              type: "text",
+              initialValue: workspace.name,
+              label: t`Workspace Name`,
+              validateFn: (value: string) => {
+                return value.trim() === "" ?
+                    t`Workspace name is required`
+                  : undefined;
+              },
             },
-          },
-        }}
-        formElements={["workspaceName"]}
-        disableSubmitWhileUnchanged
-        buttonAlignment="right"
-        submitIsLoading={isWorkspaceSaving}
-        onSubmit={(values) => {
-          saveWorkspace({
-            id: workspace.id,
-            data: {
-              name: values.workspaceName,
-            },
-          });
-        }}
-      />
+          }}
+          formElements={["workspaceName"]}
+          disableSubmitWhileUnchanged
+          buttonAlignment="right"
+          submitIsLoading={isWorkspaceSaving}
+          onSubmit={(values) => {
+            saveWorkspace({
+              id: workspace.id,
+              data: {
+                name: values.workspaceName,
+              },
+            });
+          }}
+        />
+        {isCurrentUserTheWorkspaceOwner ?
+          <Box>
+            <Divider />
+            <Card withBorder mt="xl" className={styles.dangerCard}>
+              <Group justify="space-between" align="center">
+                <Box>
+                  <Text fw={500}>
+                    <Trans>Delete this workspace</Trans>
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    <Trans>
+                      Permanently deletes this workspace and all of its data.
+                      This action cannot be undone.
+                    </Trans>
+                  </Text>
+                </Box>
+                <Button
+                  color="red"
+                  variant="outline"
+                  onClick={() => {
+                    setIsDeleteModalOpen(true);
+                  }}
+                >
+                  <Trans>Delete workspace</Trans>
+                </Button>
+              </Group>
+            </Card>
+            <Modal
+              opened={isDeleteModalOpen}
+              onClose={() => {
+                setIsDeleteModalOpen(false);
+                setDeleteConfirmName("");
+              }}
+              title={t`Delete workspace`}
+            >
+              <Stack gap="md">
+                <Text size="sm">
+                  <Trans>
+                    This will permanently delete{" "}
+                    <strong>{workspace.name}</strong> and all of its data. This
+                    action cannot be undone.
+                  </Trans>
+                </Text>
+                <TextInput
+                  label={t`Type the workspace name to confirm`}
+                  placeholder={workspace.name}
+                  value={deleteConfirmName}
+                  onChange={(e) => {
+                    setDeleteConfirmName(e.currentTarget.value);
+                  }}
+                />
+                <Group justify="flex-end">
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      setIsDeleteModalOpen(false);
+                      setDeleteConfirmName("");
+                    }}
+                  >
+                    <Trans>Cancel</Trans>
+                  </Button>
+                  <Button
+                    color="red"
+                    disabled={deleteConfirmName !== workspace.name}
+                    loading={isDeletingWorkspace}
+                    onClick={() => {
+                      deleteWorkspace({ workspaceId: workspace.id });
+                    }}
+                  >
+                    <Trans>Delete workspace</Trans>
+                  </Button>
+                </Group>
+              </Stack>
+            </Modal>
+          </Box>
+        : null}
+      </Stack>
     );
   };
 

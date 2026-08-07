@@ -1700,6 +1700,7 @@ msgstr "your dataset"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1877,6 +1878,10 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Failed to delete workspace"
+msgstr "Failed to delete workspace"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2242,6 +2247,10 @@ msgstr "Rose"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Are you sure you want to delete {0}?"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Type the workspace name to confirm"
+msgstr "Type the workspace name to confirm"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save failed"
@@ -2573,12 +2582,6 @@ msgstr "The custom URL cannot contain spaces"
 msgid "Choose the maximum value"
 msgstr "Choose the maximum value"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Pay yearly"
@@ -2683,6 +2686,10 @@ msgstr "Label, e.g. Region"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Select file"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete this workspace"
+msgstr "Delete this workspace"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -2965,6 +2972,13 @@ msgstr "The profile manager page failed to load. Please try again later or "
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "The workspace ID can only contain letters, numbers, and hyphens"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "This will permanently delete <0>{0}</0> and all of its data. This "
+"action cannot be undone."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Unable to open the billing portal. Please try again later."
@@ -3014,6 +3028,10 @@ msgstr "Select columns"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "You cannot publish while there are unsaved changes. Save first."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete workspace"
+msgstr "Delete workspace"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Latitude column"
@@ -3907,6 +3925,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Neutral"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -4570,6 +4594,12 @@ msgstr "You need admin access on this resource to manage sharing."
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "If there are multiple {fieldName} values for one {0}, then..."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Select rule (e.g. most frequent)"
@@ -4632,6 +4662,10 @@ msgstr "Permanent link (use for QR codes)"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Settings"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "Go to home"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualizations"

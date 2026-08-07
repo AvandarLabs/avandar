@@ -1653,6 +1653,7 @@ msgstr "您的数据集"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1822,6 +1823,10 @@ msgstr "收到非字符串值的文本字段"
 msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Failed to delete workspace"
+msgstr "删除工作区失败"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2180,6 +2185,10 @@ msgstr "玫瑰"
 msgid "Are you sure you want to delete {0}?"
 msgstr "您确定要删除 {0} 吗？"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Type the workspace name to confirm"
+msgstr "输入工作区名称以确认"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save failed"
@@ -2504,11 +2513,6 @@ msgstr "自定义 URL 不能包含空格"
 msgid "Choose the maximum value"
 msgstr "选择最大值"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "您尝试访问的工作区不存在或您没有访问权限。"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "按年支付"
@@ -2613,6 +2617,10 @@ msgstr "标签，例如：区域"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "选择文件"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete this workspace"
+msgstr "删除此工作区"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -2891,6 +2899,12 @@ msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "工作区 ID 只能包含字母、数字和连字符"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "这将永久删除 <0>{0}</0> 及其所有数据。此操作无法撤销。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "无法打开账单门户。请稍后重试。"
@@ -2938,6 +2952,10 @@ msgstr "选择列"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在存在未保存更改时无法发布。请先保存。"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Delete workspace"
+msgstr "删除工作区"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Latitude column"
@@ -3814,6 +3832,11 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "中性"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "永久删除此工作区及其所有数据。此操作无法撤销。"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "按 {secondGroupByColumn} 对 {datasetName} 中的行进行计数"
@@ -4457,6 +4480,11 @@ msgstr "您需要对该资源具有管理员访问权限才能管理共享。"
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "此工作区不再存在或您的访问权限已被撤销。如果您认为这是一个错误，请联系您的工作区所有者。"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
@@ -4518,6 +4546,10 @@ msgstr "永久链接（用于二维码）"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "设置"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "返回首页"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualizations"
