@@ -5,16 +5,14 @@
   overscroll-behavior: none;
 }
 
-/*
- * overflow-x: clip clips the 32px horizontal bleed from Main's ml/mr={-16}
- * without creating a scroll container. Unlike overflow: hidden, clip does not
- * absorb wheel events, so window-level vertical scroll works on pages that
- * have no inner overflow:auto container (e.g. dashboard preview). The
- * overflow is excluded from the document's scroll area, preventing the
- * horizontal elastic-overscroll bounce as well.
- */
 .root {
   background-color: var(--mantine-navbar-background);
+
+  /* Set overflow-x to clip so that the horizontal bleed from AppShell.Main's
+   * negative margins is visually clipped without creating a scroll container.
+   * Otherwise wheel events are absorbed by .root before reaching the window,
+   * because overflow: hidden creates a scroll container that is always at its
+   * scroll boundary and prevents event propagation. */
   overflow-x: clip;
 }
 
