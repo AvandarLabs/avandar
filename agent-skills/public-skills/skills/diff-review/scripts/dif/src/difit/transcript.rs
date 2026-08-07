@@ -26,17 +26,48 @@ pub fn read_raw(path: &Path) -> Option<String> {
     Some(text)
 }
 
-/// Atomically write `entries` to `path` as pretty JSON (temp file + rename in
-/// the same directory so the replace is atomic on POSIX).
-pub fn write(path: &Path, entries: &[ImportEntry]) -> Result<()> {
+/// The starting transcript: a valid, empty conversation.
+pub const EMPTY: &str = "[]\n";
+
+/// Create `path` as an empty transcript when it does not exist yet, so the
+/// review has its canonical file from the moment `dif` launches.
+///
+/// `dif` starts difit immediately, before any review has been prepared, and the
+/// reviewer may comment right away. The poller needs somewhere to mirror those
+/// comments, and the `diff-review` skill needs the exact file its round-1
+/// threads belong in. An existing transcript is never touched.
+pub fn ensure_exists(path: &Path) -> Result<()> {
+    if path.is_file() {
+        return Ok(());
+    }
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).with_context(|| format!("creating {}", parent.display()))?;
     }
-    let mut serialized = serde_json::to_string_pretty(entries).context("serializing transcript")?;
-    serialized.push('\n');
+    fs::write(path, EMPTY).with_context(|| format!("writing {}", path.display()))
+}
 
+/// The exact transcript text `entries` serialize to: pretty JSON, one trailing
+/// newline. Callers that need to recognize their own write later compare
+/// against this rather than re-serializing differently.
+pub fn serialize(entries: &[ImportEntry]) -> Result<String> {
+    let mut text = serde_json::to_string_pretty(entries).context("serializing transcript")?;
+    text.push('\n');
+    Ok(text)
+}
+
+/// Atomically write `entries` to `path` as pretty JSON (temp file + rename in
+/// the same directory so the replace is atomic on POSIX).
+pub fn write(path: &Path, entries: &[ImportEntry]) -> Result<()> {
+    write_text(path, &serialize(entries)?)
+}
+
+/// Atomically replace `path` with `text`, creating its directory if needed.
+pub fn write_text(path: &Path, text: &str) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).with_context(|| format!("creating {}", parent.display()))?;
+    }
     let tmp = tmp_sibling(path);
-    fs::write(&tmp, serialized.as_bytes()).with_context(|| format!("writing {}", tmp.display()))?;
+    fs::write(&tmp, text.as_bytes()).with_context(|| format!("writing {}", tmp.display()))?;
     fs::rename(&tmp, path).with_context(|| format!("renaming into {}", path.display()))?;
     Ok(())
 }
@@ -88,6 +119,29 @@ mod tests {
         // Re-parseable as import entries.
         let parsed: serde_json::Value = serde_json::from_str(&raw).unwrap();
         assert_eq!(parsed.as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn ensure_exists_creates_an_empty_transcript() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nested").join("t.json");
+
+        ensure_exists(&path).unwrap();
+
+        assert_eq!(fs::read_to_string(&path).unwrap(), "[]\n");
+        // An empty transcript still means "launch difit without --comment".
+        assert!(read_raw(&path).is_none());
+    }
+
+    #[test]
+    fn ensure_exists_never_clobbers_an_existing_transcript() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("t.json");
+        write(&path, &sample_entries()).unwrap();
+
+        ensure_exists(&path).unwrap();
+
+        assert!(read_raw(&path).unwrap().contains("\"m1\""));
     }
 
     #[test]

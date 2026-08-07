@@ -86,10 +86,15 @@ fn draw_statusline(f: &mut Frame, area: Rect) {
 /// Draw the main diff pane: a tab strip plus the active view (log or guide).
 fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
     let focused = app.focus == Panel::Difit;
-    let title = if app.is_review_online {
+    // difit is live from launch; "preparing guide" marks the review artifacts
+    // the LLM has not written yet, not the diff.
+    let title = if app.guide_ready {
         format!(" difit · {} · :{} (alt+h) ", app.comparison_label, app.port)
     } else {
-        format!(" difit · {} · preparing (alt+h) ", app.comparison_label)
+        format!(
+            " difit · {} · :{} · preparing guide (alt+h) ",
+            app.comparison_label, app.port
+        )
     };
     let block = bordered(&title, focused);
     let inner = block.inner(area);

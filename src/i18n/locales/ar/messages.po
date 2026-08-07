@@ -1278,6 +1278,10 @@ msgstr "هذا الحقل"
 msgid "Edit access for {0}"
 msgstr "تحرير الوصول لـ {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "اسم مساحة العمل مطلوب"
+
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "

@@ -40,7 +40,7 @@ appends `claude`-authored replies. See the injection contract in
 
 | Path | Written by | Purpose |
 | --- | --- | --- |
-| `<branch>-difit-<scope>.json` | the poller | the canonical, re-injectable transcript |
+| `<branch>-difit-<scope>.json` | startup (created), the poller + the `diff-review` skill (written) | the canonical, re-injectable transcript |
 | `.claude-session-<branch>-<scope>` | startup | the Claude session id to `--resume` |
 | `.codex-session-<branch>-<scope>` | startup | optional Codex session id to `codex resume` |
 | `dif.config.json` | config CLI | repo-local `claude_cmd` and `codex_cmd` values |
@@ -54,10 +54,29 @@ appends `claude`-authored replies. See the injection contract in
 Writes to the transcript are atomic (temp file + rename). They all share the
 `<branch>-difit-<scope>` stem so one review's files sort together.
 
+### Who owns the transcript
+
+`dif` creates the transcript at launch as `[]` when the review has none, so it
+exists before the first comment can be written. From then on both sides write
+it, and the poller reconciles them:
+
+- **`dif` (the poller)** rewrites it from difit's live state whenever that
+  state changes. difit is the source of truth for the conversation.
+- **The `diff-review` skill** writes it to author a round's `claude` threads.
+  Because difit is already serving, the poller detects a write it did not make
+  and POSTs the new entries into the live server rather than overwriting them
+  (see [integrations.md](integrations.md#importing-the-skills-transcript-writes-into-the-live-server)).
+  The skill must preserve every existing entry: an entry dropped from the file
+  is restored on the next mirror, but only because difit still holds it.
+
+An empty (`[]`) transcript is therefore *not* evidence that a review exists.
+Both guide artifacts must be present too — that is exactly what
+`review_files_ready` checks.
+
 ### Live-session metadata
 
-`.session-<branch>-<scope>.json` is written even while the TUI is still waiting
-for the first review artifacts. Its shape includes:
+`.session-<branch>-<scope>.json` is written at launch, before any review
+artifacts exist. Its shape includes:
 
 ```jsonc
 {

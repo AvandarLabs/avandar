@@ -53,11 +53,18 @@ about one without the other.
   the guide markdown under `.difit/` must be regenerated so it always reflects
   the present diff. That regeneration is the skill's job; `dif` only triggers
   it (`Ctrl+G`) and renders the result.
-- **Do not start difit before a review exists.** If the transcript and guide
-  artifacts for the selected comparison are missing, `dif` starts only the LLM
-  pane with `/diff-review [comparison]`. It waits for the skill to write the
-  `.difit` transcript, `-guide.md`, and `-guide.json`, then starts difit, the
-  poller, the session metadata, and the browser shell.
+- **The diff never waits on the LLM.** difit needs only git, so `dif` always
+  starts difit, the poller, the session metadata, and the browser shell at
+  launch — even with no prepared review. It creates the transcript as `[]`
+  first, seeds the LLM pane with `/diff-review [comparison]`, and lets the
+  guide, summary, test plan, and `claude` threads fill in as the skill writes
+  them. Nothing in this crate may reintroduce a wait for review artifacts before
+  showing the diff.
+- **The transcript is a two-way channel.** The poller mirrors difit's state into
+  it, *and* imports back out of it: a write the poller did not make is the
+  skill authoring a round, so entries difit has never held are POSTed to
+  `/api/comment-imports` instead of being overwritten. difit remains the source
+  of truth for the conversation; see `docs/integrations.md`.
 
 ## The docs/ contract
 

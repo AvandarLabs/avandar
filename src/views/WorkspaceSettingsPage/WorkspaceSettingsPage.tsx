@@ -65,6 +65,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
   });
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
+    queriesToInvalidate: [
+      WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+    ],
     onSuccess: () => {
       notifySuccess({
         title: t`Workspace name updated`,
@@ -109,6 +112,11 @@ export function WorkspaceSettingsPage(): JSX.Element {
             type: "text",
             initialValue: workspace.name,
             label: t`Workspace Name`,
+            validateFn: (value: string) => {
+              return value.trim() === "" ?
+                  t`Workspace name is required`
+                : undefined;
+            },
           },
         }}
         formElements={["workspaceName"]}
