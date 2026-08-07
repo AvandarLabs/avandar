@@ -1,14 +1,16 @@
 import { Select, SelectData } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
-import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
+import { VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
+import { getVizDisplayName } from "@/utils/getVizDisplayName";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { ReactNode } from "react";
 
 type Props = {
   columns: readonly QueryResultColumn[];
@@ -37,11 +39,11 @@ export function VizSettingsForm({
   vizConfig,
   onVizConfigChange,
   onVizTypeChange,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
     return {
-      label: VizConfigs.getDisplayName(vizType),
+      label: getVizDisplayName(vizType),
       value: vizType,
     };
   });

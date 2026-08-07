@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { useEffect, useMemo, useRef } from "react";
 import { notifyWarning } from "@/utils/notifications/notify";
@@ -28,8 +29,8 @@ export function useVizDataLimit<TRow>(
     const exceeded = limit !== undefined && data.length > limit.max;
     if (exceeded && !prevExceededRef.current) {
       notifyWarning({
-        title: `${limit.name} data truncated`,
-        message: `The ${limit.name} can only render up to ${limit.max} ${limit.noun}, so only displaying the first ${limit.max}.`,
+        title: t`${limit.name} data truncated`,
+        message: t`The ${limit.name} can only render up to ${limit.max} ${limit.noun}, so only displaying the first ${limit.max}.`,
       });
     }
     prevExceededRef.current = exceeded;

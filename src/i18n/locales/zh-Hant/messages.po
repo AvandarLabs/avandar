@@ -40,6 +40,10 @@ msgstr "此資料集中的至少一個查詢使用了 <0>SELECT *</0> 或無法�
 msgid "Return online to view or make the page available offline."
 msgstr "返回線上以查看或使頁面可離線使用。"
 
+#: src/config/AppLinks.tsx
+msgid "Create new entity"
+msgstr "建立新實體"
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -98,6 +102,10 @@ msgstr "檢查您的電子郵件以獲取重設密碼的連結"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Invite member"
 msgstr "邀請成員"
+
+#: src/config/AppLinks.tsx
+msgid "Geo Explorer"
+msgstr "地理探索器"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -331,6 +339,8 @@ msgstr "清單"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
+#: src/config/NavbarLinks.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -398,6 +408,10 @@ msgstr "表格視覺化沒有額外的設置。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "關於您"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Unable to sync dataset online"
+msgstr "無法將資料集同步到線上"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -468,9 +482,17 @@ msgstr "在上面的查詢中添加欄位以開始定義過濾器。"
 msgid "Only allow one value"
 msgstr "僅允許一個值"
 
+#: src/utils/getVizDisplayName.ts
+msgid "Pie Chart"
+msgstr "圓餅圖"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "平均值"
+
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "There was an error loading Google services."
+msgstr "載入 Google 服務時發生錯誤。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -497,6 +519,10 @@ msgstr "圖說"
 msgid "Collapse at"
 msgstr "收合於"
 
+#: src/utils/getVizDisplayName.ts
+msgid "Bubble Chart"
+msgstr "氣泡圖"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "其他…"
@@ -522,6 +548,7 @@ msgstr "{0} 管理員"
 msgid "The sheet has a header row"
 msgstr "該工作表有一個標題列"
 
+#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "表格"
@@ -625,6 +652,7 @@ msgstr "要移除離線聊天模型嗎？"
 msgid "Share “{resourceName}”"
 msgstr "分享 “{resourceName}”"
 
+#: src/config/AppLinks.tsx
 #: src/routes/signin.tsx
 msgid "Sign in"
 msgstr "登入"
@@ -816,6 +844,11 @@ msgstr "刪除角色群組"
 msgid "Hide title"
 msgstr "隱藏標題"
 
+#. placeholder {0}: limit.name
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "{0} data truncated"
+msgstr "{0} 資料已截斷"
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "輸入您的電子郵件以獲取重置連結"
@@ -861,6 +894,10 @@ msgstr "確認"
 msgid "is equal to..."
 msgstr "等於..."
 
+#: src/config/AppLinks.tsx
+msgid "Profile Designer"
+msgstr "設定檔設計工具"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "某些數據應來自現有數據集"
@@ -903,6 +940,10 @@ msgstr "第 12 欄"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "默認為 \"Y 對 X\""
+
+#: src/utils/getVizDisplayName.ts
+msgid "Funnel Chart"
+msgstr "漏斗圖"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1447,11 +1488,20 @@ msgstr "未選擇任何實體"
 msgid "Tell us which open dataset you want via feedback"
 msgstr "通過反饋告訴我們您想要的開放資料集"
 
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "Please refresh and try again. If it still does not work, please contact "
+"support"
+msgstr "請重新整理頁面後再試。如果仍然無效，請聯絡支援團隊。"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
 msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持文本、箭頭和可調粗糙度的手繪（RoughJS）。"
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "Update available"
+msgstr "有可用更新"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1463,6 +1513,7 @@ msgid "Max"
 msgstr "最大"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "匯入數據"
@@ -1576,6 +1627,10 @@ msgstr "數據集名稱為必填項"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
 msgstr "主要"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Unable to publish dashboard"
+msgstr "無法發布儀表板"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
@@ -1712,6 +1767,10 @@ msgstr "添加欄位"
 msgid "Annotation text:"
 msgstr "標註文本："
 
+#: src/lib/offline/registerServiceWorker.ts
+msgid "A new version is available. Refresh to update."
+msgstr "有新版本可用。重新整理以更新。"
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
 msgstr "您尚未選擇 X 軸"
@@ -1785,6 +1844,10 @@ msgstr "前往數據探索器"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "此儀表板是 <0>公開</0> 的。任何擁有以下鏈接的人都可以查看。"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Radar Chart"
+msgstr "雷達圖"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
@@ -2442,6 +2505,10 @@ msgstr "創建"
 msgid "Create your first dashboard to track key metrics and insights."
 msgstr "建立您的第一個儀表板以追蹤關鍵指標和洞察。"
 
+#: src/config/AppLinks.tsx
+msgid "Home"
+msgstr "首頁"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
 msgstr "管道符號 (|)"
@@ -2603,10 +2670,6 @@ msgstr "正在產生 SQL…"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "離線模型下載失敗"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {formattedNumRows} rows successfully"
-msgstr "成功解析 {formattedNumRows} 行"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -2807,6 +2870,10 @@ msgstr "列名稱"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "大"
+
+#: src/config/AppLinks.tsx
+msgid "Invalid workspace"
+msgstr "無效工作區"
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3025,6 +3092,10 @@ msgstr "分享摘要"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "時間"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Bar Chart"
+msgstr "長條圖"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -3317,6 +3388,10 @@ msgstr "有序"
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選列）。"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish."
+msgstr "部分資料集尚未在線同步或發布失敗。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -3737,6 +3812,7 @@ msgstr "編輯查詢"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -3766,6 +3842,10 @@ msgstr "資料集現在已在線同步"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Height"
 msgstr "高度"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Line Chart"
+msgstr "折線圖"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -3851,6 +3931,7 @@ msgstr "請重新登錄以繼續。"
 msgid "Mean"
 msgstr "平均值"
 
+#: src/config/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
 msgstr "更新密碼"
@@ -3866,6 +3947,14 @@ msgstr "正在重新登入…"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
 msgstr "查詢詳情"
+
+#. placeholder {0}: limit.name
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: limit.max
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
+msgstr "{0} 最多只能渲染 {1} 個 {2}，因此僅顯示前 {3} 個。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4460,6 +4549,10 @@ msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "File parsed successfully"
+msgstr "檔案解析成功"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "選擇規則（例如：最常見）"
@@ -4517,6 +4610,7 @@ msgid "Permanent link (use for QR codes)"
 msgstr "永久鏈接（用於 QR 碼）"
 
 #: shared/copy/appLabel.ts
+#: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
@@ -4746,6 +4840,7 @@ msgid "Schema version"
 msgstr "結構描述版本"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
+#: src/config/AppLinks.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "個人資料"
@@ -4904,6 +4999,7 @@ msgstr "移除 {0}"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
@@ -5348,6 +5444,10 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
 
+#: src/utils/getVizDisplayName.ts
+msgid "Scatter Plot"
+msgstr "散點圖"
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
@@ -5424,6 +5524,10 @@ msgstr "分享"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "整個數據集"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Area Chart"
+msgstr "面積圖"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"

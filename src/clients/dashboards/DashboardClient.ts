@@ -5,6 +5,7 @@ import {
   prop,
   where,
 } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
@@ -260,8 +261,8 @@ export const DashboardClient = createUsableServiceClient(
                   error instanceof Error ? error.message : String(error);
 
                 notifyError({
-                  title: "Unable to publish dashboard",
-                  message: `Some datasets are not synced online yet or failed to publish. ${errorMessage}`,
+                  title: t`Unable to publish dashboard`,
+                  message: `${t`Some datasets are not synced online yet or failed to publish.`} ${errorMessage}`,
                 });
                 throw error;
               }

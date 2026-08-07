@@ -3,6 +3,7 @@ import { ComponentConfig } from "@puckeditor/core";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { useMemo } from "react";
+import { getVizDisplayName } from "@/utils/getVizDisplayName";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
@@ -67,7 +68,7 @@ export function useDataVizPBlockConfig(options: {
           type: "select",
           options: VizTypes.map((vizType) => {
             return {
-              label: VizConfigs.getDisplayName(vizType),
+              label: getVizDisplayName(vizType),
               value: vizType,
             };
           }),

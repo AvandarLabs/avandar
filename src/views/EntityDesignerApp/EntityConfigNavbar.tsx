@@ -1,7 +1,7 @@
 import { NavLinkList } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
@@ -15,7 +15,7 @@ export function EntityConfigNavbar({
   entityConfigs,
   isLoading,
   ...boxProps
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
@@ -29,12 +29,14 @@ export function EntityConfigNavbar({
   const entityLinks = useMemo(() => {
     const entityConfigLinks = [
       ...entityConfigs.map((entity) => {
+        const appLink = AppLinks.entityDesignerConfigView({
+          workspaceSlug: workspace.slug,
+          entityConfigId: entity.id,
+          entityConfigName: entity.name,
+        });
         return {
-          ...AppLinks.entityDesignerConfigView({
-            workspaceSlug: workspace.slug,
-            entityConfigId: entity.id,
-            entityConfigName: entity.name,
-          }),
+          ...appLink,
+          label: appLink.label(),
           style: borderStyle,
         };
       }),

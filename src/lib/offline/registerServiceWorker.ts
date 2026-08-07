@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { registerSW } from "virtual:pwa-register";
 import { notifyWarning } from "@/utils/notifications/notify";
 
@@ -14,8 +15,8 @@ export function registerOfflineServiceWorker(): void {
     immediate: true,
     onNeedRefresh() {
       notifyWarning({
-        title: "Update available",
-        message: "A new version is available. Refresh to update.",
+        title: t`Update available`,
+        message: t`A new version is available. Refresh to update.`,
       });
     },
   });

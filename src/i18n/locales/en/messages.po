@@ -41,6 +41,10 @@ msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 msgid "Return online to view or make the page available offline."
 msgstr "Return online to view or make the page available offline."
 
+#: src/config/AppLinks.tsx
+msgid "Create new entity"
+msgstr "Create new entity"
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -101,6 +105,10 @@ msgstr "Check your email for a password reset link"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Invite member"
 msgstr "Invite member"
+
+#: src/config/AppLinks.tsx
+msgid "Geo Explorer"
+msgstr "Geo Explorer"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -339,6 +347,8 @@ msgstr "List"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
+#: src/config/NavbarLinks.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
@@ -407,6 +417,10 @@ msgstr "The table visualization has no extra settings."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "About you"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Unable to sync dataset online"
+msgstr "Unable to sync dataset online"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -481,9 +495,17 @@ msgstr "Add columns to the query above to start defining filters."
 msgid "Only allow one value"
 msgstr "Only allow one value"
 
+#: src/utils/getVizDisplayName.ts
+msgid "Pie Chart"
+msgstr "Pie Chart"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "Average"
+
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "There was an error loading Google services."
+msgstr "There was an error loading Google services."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -510,6 +532,10 @@ msgstr "Caption"
 msgid "Collapse at"
 msgstr "Collapse at"
 
+#: src/utils/getVizDisplayName.ts
+msgid "Bubble Chart"
+msgstr "Bubble Chart"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
 msgstr "Something else…"
@@ -535,6 +561,7 @@ msgstr "{0} Manager"
 msgid "The sheet has a header row"
 msgstr "The sheet has a header row"
 
+#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "Table"
@@ -643,6 +670,7 @@ msgstr "Remove offline chat model?"
 msgid "Share “{resourceName}”"
 msgstr "Share “{resourceName}”"
 
+#: src/config/AppLinks.tsx
 #: src/routes/signin.tsx
 msgid "Sign in"
 msgstr "Sign in"
@@ -840,6 +868,11 @@ msgstr "Delete role group"
 msgid "Hide title"
 msgstr "Hide title"
 
+#. placeholder {0}: limit.name
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "{0} data truncated"
+msgstr "{0} data truncated"
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "Enter your email to get a reset link"
@@ -885,6 +918,10 @@ msgstr "Confirm"
 msgid "is equal to..."
 msgstr "is equal to..."
 
+#: src/config/AppLinks.tsx
+msgid "Profile Designer"
+msgstr "Profile Designer"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Some data should come from existing datasets"
@@ -927,6 +964,10 @@ msgstr "Column 12"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "Defaults to \"Y vs X\""
+
+#: src/utils/getVizDisplayName.ts
+msgid "Funnel Chart"
+msgstr "Funnel Chart"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1488,6 +1529,12 @@ msgstr "No entity selected"
 msgid "Tell us which open dataset you want via feedback"
 msgstr "Tell us which open dataset you want via feedback"
 
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "Please refresh and try again. If it still does not work, please contact "
+"support"
+msgstr "Please refresh and try again. If it still does not work, please contact "
+"support"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
@@ -1495,6 +1542,10 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "Update available"
+msgstr "Update available"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1506,6 +1557,7 @@ msgid "Max"
 msgstr "Max"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "Import data"
@@ -1620,6 +1672,10 @@ msgstr "Dataset name is required"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
 msgstr "Main"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Unable to publish dashboard"
+msgstr "Unable to publish dashboard"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
@@ -1759,6 +1815,10 @@ msgstr "Add Field"
 msgid "Annotation text:"
 msgstr "Annotation text:"
 
+#: src/lib/offline/registerServiceWorker.ts
+msgid "A new version is available. Refresh to update."
+msgstr "A new version is available. Refresh to update."
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
 msgstr "You haven't chosen an X axis"
@@ -1836,6 +1896,10 @@ msgstr "Go to Data Explorer"
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "This dashboard is <0>public</0>. Anyone with the link below can view "
 "it."
+
+#: src/utils/getVizDisplayName.ts
+msgid "Radar Chart"
+msgstr "Radar Chart"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
@@ -2508,6 +2572,10 @@ msgstr "Create"
 msgid "Create your first dashboard to track key metrics and insights."
 msgstr "Create your first dashboard to track key metrics and insights."
 
+#: src/config/AppLinks.tsx
+msgid "Home"
+msgstr "Home"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
 msgstr "Pipe (|)"
@@ -2671,10 +2739,6 @@ msgstr "Generating SQL…"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Offline model download failed"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {formattedNumRows} rows successfully"
-msgstr "Parsed {formattedNumRows} rows successfully"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -2877,6 +2941,10 @@ msgstr "Column Name"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "Large"
+
+#: src/config/AppLinks.tsx
+msgid "Invalid workspace"
+msgstr "Invalid workspace"
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3100,6 +3168,10 @@ msgstr "Share summary"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "Time"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Bar Chart"
+msgstr "Bar Chart"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -3400,6 +3472,10 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 "selected columns)."
 msgstr "No row filters. The slice will include every row in the dataset (for "
 "the selected columns)."
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish."
+msgstr "Some datasets are not synced online yet or failed to publish."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -3827,6 +3903,7 @@ msgstr "Edit query"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
@@ -3857,6 +3934,10 @@ msgstr "Dataset is now synced online"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Height"
 msgstr "Height"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Line Chart"
+msgstr "Line Chart"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -3943,6 +4024,7 @@ msgstr "Please log in again to continue."
 msgid "Mean"
 msgstr "Mean"
 
+#: src/config/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
 msgstr "Update password"
@@ -3958,6 +4040,15 @@ msgstr "Signing you back in…"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Query Details"
 msgstr "Query Details"
+
+#. placeholder {0}: limit.name
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: limit.max
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
+msgstr "The {0} can only render up to {1} {2}, so only displaying the first "
+"{3}."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4570,6 +4661,10 @@ msgstr "You need admin access on this resource to manage sharing."
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "If there are multiple {fieldName} values for one {0}, then..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "File parsed successfully"
+msgstr "File parsed successfully"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Select rule (e.g. most frequent)"
@@ -4628,6 +4723,7 @@ msgid "Permanent link (use for QR codes)"
 msgstr "Permanent link (use for QR codes)"
 
 #: shared/copy/appLabel.ts
+#: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
@@ -4860,6 +4956,7 @@ msgid "Schema version"
 msgstr "Schema version"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
+#: src/config/AppLinks.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "Profile"
@@ -5020,6 +5117,7 @@ msgstr "Remove {0}"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
@@ -5480,6 +5578,10 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 
+#: src/utils/getVizDisplayName.ts
+msgid "Scatter Plot"
+msgstr "Scatter Plot"
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -5557,6 +5659,10 @@ msgstr "Share"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "Whole dataset"
+
+#: src/utils/getVizDisplayName.ts
+msgid "Area Chart"
+msgstr "Area Chart"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"

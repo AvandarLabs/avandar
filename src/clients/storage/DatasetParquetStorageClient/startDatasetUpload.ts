@@ -1,4 +1,5 @@
 import { MIMEType } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
@@ -243,7 +244,7 @@ export async function startDatasetUpload(options: {
 
       DatasetUploadProgressStore.markError(datasetId, errorMessage);
       notifyError({
-        title: "Unable to sync dataset online",
+        title: t`Unable to sync dataset online`,
         message: errorMessage,
       });
       throw error;

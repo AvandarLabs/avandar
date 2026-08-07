@@ -4,7 +4,7 @@ import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import { useMemo, useRef, useState } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
@@ -180,7 +180,7 @@ export function DatasetImportForm({
   dataSourceMetadata,
   onAfterSave,
   onSaveSuccess,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const errorMessageForField = useErrorMessageForField();
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -261,7 +261,6 @@ export function DatasetImportForm({
       const {
         datasetLoadResult: { numRows },
       } = dataSourceMetadata;
-      const formattedNumRows = numRows.toLocaleString();
       if (numRows === 0) {
         return (
           <Callout
@@ -276,7 +275,7 @@ export function DatasetImportForm({
         <Callout
           title={t`Data processed successfully`}
           color="success"
-          message={t`Parsed ${formattedNumRows} rows successfully`}
+          message={t`File parsed successfully`}
         />
       );
     },
