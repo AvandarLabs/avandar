@@ -15,28 +15,47 @@ dif <branch> -cx     # short alias for --codex
 On launch `dif`:
 
 1. Resolves the repo root, branch, and comparison key.
-2. Looks for the matching `.difit/<branch>-difit-<scope>.json`,
-   `-guide.md`, and `-guide.json` artifacts.
-3. If those artifacts exist, picks a deterministic free port, starts difit on
-   the requested host (127.0.0.1 by default),
-   opens the browser web shell, seeds difit with the transcript, and starts the
-   background comments poller.
-4. If those artifacts do not exist, starts no difit server, no poller, and no
-   browser shell yet. The left pane shows a waiting status while the right pane
-   starts with a tiny first prompt: `/diff-review` plus only the comparison
-   argument the user passed to `dif` (`/diff-review .`, `/diff-review develop`,
-   etc.). If no comparison argument was passed, the prompt is just
-   `/diff-review`. A local control endpoint is written to live-session metadata
-   so the skill can tell this waiting TUI which comparison it chose.
-5. Once the LLM writes the transcript and both guide artifacts, `dif` starts
-   difit for the selected comparison, opens the browser web shell, refreshes
-   live-session metadata, and begins polling for comments automatically.
-6. Starts the right pane in the repo root. Claude is the default; `--codex` and
+2. Creates `.difit/<branch>-difit-<scope>.json` as an empty transcript (`[]`) if
+   the review has none yet. An existing transcript is never touched.
+3. Picks a deterministic free port, starts difit on the requested host
+   (127.0.0.1 by default) seeded with the transcript, starts the browser web
+   shell, and opens the browser — **without waiting for difit to answer**. The
+   shell page loads at once and its iframe retries until difit is up, so the
+   review opens as fast as the browser can be told to.
+4. Starts the background comments poller.
+5. Starts the right pane in the repo root. Claude is the default; `--codex` and
    `-cx` select Codex. When a prepared review already exists, a **fresh** session
    is launched with the normal review-orientation prompt. A resumed Claude
    session gets no such message because that orientation is already in its
    context.
-7. Focuses the **diff main view** (left), not the LLM pane.
+6. Focuses the **diff main view** (left), not the LLM pane.
+
+### Launching with no prepared review
+
+**The diff never waits on the LLM.** difit only needs git, so everything above
+happens the same whether or not a review has been prepared. When
+`-guide.md`/`-guide.json` are missing, the only differences are:
+
+- The right pane's first prompt is the tiny one that prepares the review:
+  `/diff-review` plus only the comparison argument the user passed to `dif`
+  (`/diff-review .`, `/diff-review develop`, etc.). Bare `dif` seeds just
+  `/diff-review`.
+- The left pane's title reads `preparing guide`, and a banner there says the
+  diff is live and the guide is on its way.
+- A local control endpoint is written to live-session metadata so the skill can
+  tell the running TUI which comparison it chose (see
+  [integrations.md](integrations.md#comparison-handoff)).
+
+You can review — and comment — immediately. Comments you write before the guide
+exists are mirrored into the transcript and queued to the LLM like any other, so
+they are waiting in its input the moment it finishes the round it is on.
+
+As the skill writes them, the guide, summary, test plan, and `claude` threads
+appear on their own: the browser shell polls the markdown and `-guide.json`
+every few seconds, and the poller pushes the transcript's new threads into the
+live difit server, which streams them to the browser over SSE. No relaunch, and
+no manual refresh. When the artifacts land, the pane logs
+`Diff guide ready` and the title drops `preparing guide`.
 
 ## The two halves
 

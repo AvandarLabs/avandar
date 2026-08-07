@@ -13,6 +13,12 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// The transcript's own `type` default. Only a thread root can be written
+/// without one; a reply always states it.
+fn thread_type() -> String {
+    "thread".to_owned()
+}
+
 /// The full `/api/comments-json` payload.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Snapshot {
@@ -48,23 +54,30 @@ pub struct ServerMessage {
 }
 
 /// One entry in the flat import shape (transcript / `--comment` / POST body).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+///
+/// Also deserialized: the `diff-review` skill authors this same shape straight
+/// into the transcript file, and [`importer`](super::importer) reads it back to
+/// push what difit has not seen into the live server.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportEntry {
     /// `"thread"` for a thread root, `"reply"` for a follow-up message.
-    #[serde(rename = "type")]
+    #[serde(rename = "type", default = "thread_type")]
     pub entry_type: String,
     pub id: String,
+    #[serde(default)]
     pub file_path: Option<String>,
+    #[serde(default)]
     pub position: Option<Value>,
+    #[serde(default)]
     pub body: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub author: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub code_snapshot: Option<Value>,
 }
 
