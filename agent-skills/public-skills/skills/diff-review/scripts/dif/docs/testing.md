@@ -62,10 +62,23 @@ suite with `cargo test` (it finishes in a couple of seconds).
 
 **Integration (`tests/difit_roundtrip.rs`):**
 
-Spawns a *real* difit against a throwaway git repo, POSTs a reviewer comment to
-`/api/comment-imports`, and asserts the `Poller` mirrors it into the transcript.
-This exercises the real difit contract and the live-reply path. It **skips**
-(does not fail) when `git` or `difit` are unavailable.
+Two tests, each spawning a *real* difit against a throwaway git repo, covering
+both directions of the transcript contract. They **skip** (do not fail) when
+`git` or `difit` are unavailable.
+
+- *Mirror:* a comment POSTed to `/api/comment-imports` is mirrored into the
+  transcript by the `Poller`. Exercises the real difit contract and the
+  live-reply path.
+- *Inbound:* the instant-launch path. difit starts on an empty transcript, the
+  reviewer comments, then the `diff-review` skill writes its round straight into
+  the file. Asserts the new thread reaches the *live* server (so the open
+  browser shows it) and that the transcript settles on the merged conversation
+  with the reviewer's comment intact.
+
+Also unit-tested, without difit: `difit::importer`'s decision — which entries an
+out-of-band write adds, that the poller's own mirror adds none, that a deleted
+comment is not resurrected, and that an unplaceable or half-written entry never
+poisons the batch.
 
 ## What's not unit-tested
 

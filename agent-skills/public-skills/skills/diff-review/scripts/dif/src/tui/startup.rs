@@ -1,5 +1,13 @@
-//! Bringing a review online: resolve the comparison, spawn the LLM, start
-//! difit when review artifacts exist, and assemble the [`App`].
+//! Bringing a review online: resolve the comparison, start difit and the
+//! browser shell, spawn the LLM, and assemble the [`App`].
+//!
+//! **The diff never waits on the LLM.** difit only needs git, so a launch with
+//! no prepared review still opens the browser immediately: the transcript is
+//! created empty, difit serves the diff, and the poller starts. The guide,
+//! summary, test plan, and `claude` threads land later — the browser shell
+//! polls them in, and the poller imports the skill's threads into the live
+//! server (see [`importer`](crate::difit::importer)). Comments the reviewer
+//! writes in the meantime are mirrored and queued to the LLM like any other.
 //!
 //! Claude sessions are resumable across `dif` launches: we remember the id in
 //! `.difit/.claude-session-<branch>-<scope>` and `--resume` it when its
@@ -37,10 +45,9 @@ const INITIAL_COLS: u16 = 80;
 
 struct LaunchSurface {
     difit: PtyPane,
-    poller: Option<Poller>,
+    poller: Poller,
     web_shell: Option<web::WebShell>,
-    open_url: Option<String>,
-    is_review_online: bool,
+    open_url: String,
 }
 
 struct ReviewPaths {
@@ -74,12 +81,14 @@ pub fn launch(cli: &Cli) -> Result<App> {
         &scope_slug,
     ));
     let review_control = ReviewControl::start(control_port)?;
-    let is_review_ready = review_files_ready(
+    let guide_ready = review_files_ready(
         &review_paths.transcript,
         &review_paths.guide,
         &review_paths.guide_json,
     );
-    review_control.set_accepts_updates(!is_review_ready);
+    // The skill may still retarget the comparison while it prepares the guide;
+    // once a guide exists the comparison is settled and updates are refused.
+    review_control.set_accepts_updates(!guide_ready);
     let worktree = web::meta::worktree_name(&repo_root, &branch);
     let surface = start_launch_surface(
         &repo_root,
@@ -87,20 +96,13 @@ pub fn launch(cli: &Cli) -> Result<App> {
         port,
         &cli.host,
         shell_port,
-        &review_paths.transcript,
-        &review_paths.guide,
-        review_paths.guide_json.clone(),
+        &review_paths,
         branch.clone(),
         worktree.clone(),
-        review_paths.diff_summary.clone(),
-        review_paths.test_plan.clone(),
     )?;
 
-    let initial_prompt = if surface.is_review_online {
-        None
-    } else {
-        Some(prepare_review_prompt(cli.comparison_key.as_deref()))
-    };
+    let initial_prompt =
+        (!guide_ready).then(|| prepare_review_prompt(cli.comparison_key.as_deref()));
     let llm = spawn_llm(
         &repo_root,
         &review_paths.session_id,
@@ -129,7 +131,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         review_control,
         dispatcher,
         reply_watcher: ReplyWatcher::new(),
-        poller: surface.poller,
+        poller: Some(surface.poller),
         git_watcher,
         served_sig,
         pending_change: None,
@@ -143,8 +145,8 @@ pub fn launch(cli: &Cli) -> Result<App> {
         palette: None,
         help_open: false,
         web_shell: surface.web_shell,
-        open_url: surface.open_url,
-        is_review_online: surface.is_review_online,
+        open_url: Some(surface.open_url),
+        guide_ready,
         shell_port,
         control_port,
         guide_json_path: review_paths.guide_json,
@@ -155,8 +157,22 @@ pub fn launch(cli: &Cli) -> Result<App> {
         fresh_llm_prompt: initial_prompt,
         should_quit: false,
     };
-    app.write_session_meta(open_url);
+    app.write_session_meta(Some(open_url));
+    if !guide_ready {
+        app.difit.write_to_screen(&preparing_notice(&app.comparison_label));
+    }
     Ok(app)
+}
+
+/// The banner shown in the difit pane when the diff is live but the review
+/// artifacts are not written yet. Sets the expectation that reviewing can start
+/// now and the guide will appear around it.
+fn preparing_notice(comparison_label: &str) -> String {
+    format!(
+        "\r\n\x1b[36m[dif] No prepared diff review for {comparison_label} — the diff is live anyway.\x1b[0m\r\n\
+         \x1b[36m[dif] The LLM is running /diff-review; the guide, summary, and comments fill in as it writes them.\x1b[0m\r\n\
+         \x1b[36m[dif] Comment now if you like: your comments are saved and queued to the LLM.\x1b[0m\r\n"
+    )
 }
 
 /// The initial keyboard focus for a new TUI launch.
@@ -189,6 +205,12 @@ fn review_paths(
     }
 }
 
+/// Start difit, the poller, and the browser shell, and open the review.
+///
+/// Nothing here waits on difit answering: the shell binds and serves its page
+/// straight away and its iframe retries until difit is up, so the browser opens
+/// as fast as it can be told to. The poller idles harmlessly until its first
+/// successful fetch.
 #[allow(clippy::too_many_arguments)]
 fn start_launch_surface(
     repo_root: &Path,
@@ -196,24 +218,14 @@ fn start_launch_surface(
     port: u16,
     host: &str,
     shell_port: u16,
-    transcript_path: &Path,
-    guide_path: &Path,
-    guide_json_path: PathBuf,
+    review_paths: &ReviewPaths,
     branch: String,
     worktree: String,
-    diff_summary_path: PathBuf,
-    test_plan_path: PathBuf,
 ) -> Result<LaunchSurface> {
-    if !review_files_ready(transcript_path, guide_path, &guide_json_path) {
-        return Ok(LaunchSurface {
-            difit: spawn_waiting_pane(repo_root, comparison_label(comparison).as_str())?,
-            poller: None,
-            web_shell: None,
-            open_url: None,
-            is_review_online: false,
-        });
-    }
-    let transcript_raw = transcript::read_raw(transcript_path);
+    // The transcript is the review's canonical file, and the reviewer can start
+    // commenting before any review exists, so it must exist before difit does.
+    let _ = transcript::ensure_exists(&review_paths.transcript);
+    let transcript_raw = transcript::read_raw(&review_paths.transcript);
     let difit = server::spawn(
         repo_root,
         comparison,
@@ -224,15 +236,14 @@ fn start_launch_surface(
         INITIAL_ROWS,
         INITIAL_COLS,
     )?;
-    let _ready = server::wait_until_ready(port, 50);
     let web_shell = start_web_shell(
         port,
         shell_port,
-        guide_json_path,
+        review_paths.guide_json.clone(),
         branch,
         worktree,
-        diff_summary_path,
-        test_plan_path,
+        review_paths.diff_summary.clone(),
+        review_paths.test_plan.clone(),
     );
     let open_url = web_shell
         .as_ref()
@@ -240,14 +251,13 @@ fn start_launch_surface(
     super::open_target::open_url(&open_url);
     Ok(LaunchSurface {
         difit,
-        poller: Some(Poller::start(
+        poller: Poller::start(
             port,
-            transcript_path.to_path_buf(),
+            review_paths.transcript.clone(),
             Duration::from_secs(1),
-        )),
+        ),
         web_shell,
-        open_url: Some(open_url),
-        is_review_online: true,
+        open_url,
     })
 }
 
@@ -337,25 +347,17 @@ pub(crate) fn prepare_review_prompt(comparison_arg: Option<&str>) -> String {
 }
 
 /// Whether the prepared review artifacts exist for the selected comparison.
+///
+/// This no longer gates difit — the diff is served either way — it gates the
+/// *review*: whether to seed `/diff-review` into the LLM and whether the skill
+/// may still retarget the comparison. A transcript alone is not enough: `dif`
+/// creates an empty one at launch, so both guides must be present too.
 pub(crate) fn review_files_ready(
     transcript_path: &Path,
     guide_path: &Path,
     guide_json_path: &Path,
 ) -> bool {
     transcript_path.is_file() && guide_path.is_file() && guide_json_path.is_file()
-}
-
-fn spawn_waiting_pane(repo_root: &Path, comparison_label: &str) -> Result<PtyPane> {
-    let message = format!(
-        "[dif] No prepared diff review found for {comparison_label}.\r\n\
-         [dif] Waiting for the LLM to run /diff-review and write .difit artifacts.\r\n\
-         [dif] difit and the browser shell will start automatically when ready."
-    );
-    let command = format!(
-        "printf '%s\\r\\n' {}; exec sleep 2147483647",
-        session::shell_quote(&message)
-    );
-    PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS)
 }
 
 fn start_web_shell(

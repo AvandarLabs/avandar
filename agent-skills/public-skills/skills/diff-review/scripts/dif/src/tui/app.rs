@@ -92,8 +92,8 @@ pub struct App {
     pub dispatcher: Dispatcher,
     /// Logs each new agent reply to the difit pane, once.
     pub reply_watcher: ReplyWatcher,
-    /// The background comments poller. Absent while the LLM is preparing the
-    /// first review and difit has not started yet.
+    /// The background comments poller. Momentarily absent only while a
+    /// comparison retarget swaps difit out.
     pub poller: Option<Poller>,
     /// Background watcher for code changes (so we can warn a restart is needed).
     pub git_watcher: GitWatcher,
@@ -128,10 +128,11 @@ pub struct App {
     /// Owned here so it lives for the session and shuts down on exit; `None`
     /// before difit starts or if it failed to start.
     pub web_shell: Option<crate::web::WebShell>,
-    /// URL opened for the current review, if difit has started.
+    /// URL opened for the current review.
     pub open_url: Option<String>,
-    /// Whether difit, poller, session metadata, and browser shell are live.
-    pub is_review_online: bool,
+    /// Whether the skill's review artifacts (transcript + both guides) exist.
+    /// difit runs regardless; this only tracks whether the *review* is prepared.
+    pub guide_ready: bool,
     /// Reserved browser shell port, reused when delayed startup becomes ready.
     pub shell_port: u16,
     /// Reserved control server port for live TUI coordination.
@@ -254,21 +255,36 @@ impl App {
         }
     }
 
+    /// Apply a comparison the skill selected inside this already-open TUI.
+    ///
+    /// difit now runs from launch, so honoring an update means relaunching it on
+    /// the new comparison. That is only ever safe while the review is still
+    /// being prepared: once a guide exists, or once the reviewer has commented,
+    /// a live review is never switched out from under the browser.
     fn apply_pending_comparison_update(&mut self) {
         let Some(key) = self.review_control.take_comparison_key() else {
             return;
         };
-        if self.is_review_online {
-            self.difit.write_to_screen(
-                "\r\n\x1b[33m[dif] Ignoring comparison update after difit is already online.\x1b[0m\r\n",
-            );
-            return;
-        }
         let next_comparison = ComparisonKey::parse(&key);
         if next_comparison == self.comparison {
             return;
         }
+        if self.guide_ready || self.has_comments() {
+            self.difit.write_to_screen(&format!(
+                "\r\n\x1b[33m[dif] Ignoring comparison update to {}: this review is already underway.\x1b[0m\r\n",
+                comparison_label(&next_comparison)
+            ));
+            return;
+        }
         self.retarget_pending_review(next_comparison);
+    }
+
+    /// Whether difit is holding any comment thread at all.
+    fn has_comments(&self) -> bool {
+        self.poller
+            .as_ref()
+            .and_then(Poller::latest)
+            .is_some_and(|snapshot| !snapshot.threads.is_empty())
     }
 
     fn retarget_pending_review(&mut self, comparison: ComparisonKey) {
@@ -296,10 +312,66 @@ impl App {
         self.vim.reset();
         self.comparison = comparison;
         self.difit.write_to_screen(&format!(
-            "\r\n\x1b[36m[dif] Review comparison selected: {}.\x1b[0m\r\n",
+            "\r\n\x1b[36m[dif] Review comparison selected: {}. Relaunching the diff…\x1b[0m\r\n",
             self.comparison_label
         ));
-        self.write_session_meta(None);
+        self.relaunch_review_surface();
+    }
+
+    /// Point difit, the poller, the browser shell, and the session metadata at
+    /// the current comparison's ports and paths, then reopen the browser.
+    ///
+    /// The difit pane is reused so its log stays continuous. The old poller and
+    /// shell are dropped first: they address the previous ports and must not
+    /// outlive them.
+    fn relaunch_review_surface(&mut self) {
+        self.poller = None;
+        self.web_shell = None;
+        let _ = transcript::ensure_exists(&self.transcript_path);
+        let transcript_raw = transcript::read_raw(&self.transcript_path);
+        let command = server::build_command(
+            &self.repo_root,
+            &self.comparison,
+            self.port,
+            &self.difit_host,
+            transcript_raw.as_deref(),
+            false,
+        );
+        self.difit.kill_child();
+        if let Err(e) = self
+            .difit
+            .respawn_shell_command_with_env(&command, &[], &self.repo_root)
+        {
+            self.difit.write_to_screen(&format!(
+                "\x1b[31m[dif] Failed to start difit: {e}\x1b[0m\r\n"
+            ));
+            return;
+        }
+        self.poller = Some(Poller::start(
+            self.port,
+            self.transcript_path.clone(),
+            Duration::from_secs(1),
+        ));
+        self.web_shell = web::WebShell::start(
+            self.port,
+            self.shell_port,
+            self.guide_json_path.clone(),
+            self.branch.clone(),
+            self.worktree.clone(),
+            self.diff_summary_path.clone(),
+            self.test_plan_path.clone(),
+        )
+        .ok();
+        let open_url = self.web_shell.as_ref().map_or_else(
+            || format!("http://localhost:{}/", self.port),
+            web::WebShell::url,
+        );
+        self.write_session_meta(Some(open_url.clone()));
+        self.open_url = Some(open_url.clone());
+        self.served_sig = self.git_watcher.current();
+        self.pending_change = None;
+        self.warned_sig = None;
+        super::open_target::open_url(&open_url);
     }
 
     /// Ask the LLM to regenerate the diff guide (via the `diff-review`
@@ -361,12 +433,6 @@ impl App {
     /// or quitting the shell. The LLM pane and poller are untouched (the
     /// poller simply reconnects once difit is back on the same port).
     pub fn restart_difit(&mut self) {
-        if !self.is_review_online {
-            self.difit.write_to_screen(
-                "\r\n\x1b[33m[dif] Waiting for review artifacts before starting difit.\x1b[0m\r\n",
-            );
-            return;
-        }
         let transcript_raw = transcript::read_raw(&self.transcript_path);
         let command = server::build_command(
             &self.repo_root,
@@ -412,7 +478,7 @@ impl App {
     /// re-reads the diff guide so the guide view stays current. Called each
     /// tick from the event loop.
     pub fn update_difit_log(&mut self) {
-        self.start_review_server_if_ready();
+        self.note_guide_ready();
         if let Some(snapshot) = self.poller.as_ref().and_then(Poller::latest) {
             for location in self.reply_watcher.new_reply_locations(&snapshot) {
                 self.difit.write_to_screen(&format!(
@@ -425,70 +491,25 @@ impl App {
         self.warn_if_code_changed();
     }
 
-    /// In prepare mode, wait until the LLM has written the transcript and guide
-    /// artifacts, then bring difit, the poller, session metadata, and browser
-    /// shell online.
-    fn start_review_server_if_ready(&mut self) {
-        if self.is_review_online {
+    /// Notice, once, that the LLM finished preparing the review.
+    ///
+    /// Nothing has to be started: difit and the browser shell have been serving
+    /// the diff since launch, and the shell polls the guide, summary, and test
+    /// plan in on its own. This only records that the comparison is now settled
+    /// (so the skill can no longer retarget it) and says so in the pane.
+    fn note_guide_ready(&mut self) {
+        if self.guide_ready {
             return;
         }
         let guide_path = self.guide.path().to_path_buf();
         if !review_files_ready(&self.transcript_path, &guide_path, &self.guide_json_path) {
             return;
         }
-        self.difit.write_to_screen(
-            "\r\n\x1b[36m[dif] Review artifacts are ready. Starting difit...\x1b[0m\r\n",
-        );
-        let transcript_raw = transcript::read_raw(&self.transcript_path);
-        let command = server::build_command(
-            &self.repo_root,
-            &self.comparison,
-            self.port,
-            &self.difit_host,
-            transcript_raw.as_deref(),
-            false,
-        );
-        self.difit.kill_child();
-        if let Err(e) = self
-            .difit
-            .respawn_shell_command_with_env(&command, &[], &self.repo_root)
-        {
-            self.difit.write_to_screen(&format!(
-                "\x1b[31m[dif] Failed to start difit: {e}\x1b[0m\r\n"
-            ));
-            return;
-        }
-        let _ready = server::wait_until_ready(self.port, 50);
-        self.poller = Some(Poller::start(
-            self.port,
-            self.transcript_path.clone(),
-            Duration::from_secs(1),
-        ));
-        let web_shell = web::WebShell::start(
-            self.port,
-            self.shell_port,
-            self.guide_json_path.clone(),
-            self.branch.clone(),
-            self.worktree.clone(),
-            self.diff_summary_path.clone(),
-            self.test_plan_path.clone(),
-        )
-        .ok();
-        let open_url = web_shell.as_ref().map_or_else(
-            || format!("http://localhost:{}/", self.port),
-            web::WebShell::url,
-        );
-        session_meta::write(&self.session_meta, &self.session_meta_for(open_url.clone()));
-        self.web_shell = web_shell;
-        self.open_url = Some(open_url.clone());
-        self.is_review_online = true;
+        self.guide_ready = true;
         self.review_control.set_accepts_updates(false);
-        self.served_sig = self.git_watcher.current();
-        self.pending_change = None;
-        self.warned_sig = None;
-        self.guide.refresh();
-        self.test_plan.refresh();
-        super::open_target::open_url(&open_url);
+        self.difit.write_to_screen(
+            "\r\n\x1b[36m[dif] Diff guide ready — the browser sidebar is filling in.\x1b[0m\r\n",
+        );
     }
 
     pub(crate) fn write_session_meta(&self, shell_url: Option<String>) {
