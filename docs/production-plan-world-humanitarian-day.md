@@ -403,6 +403,44 @@ engine are **independent workstreams**.
 - `[Tauri Rust shell (P9.1–P9.5) PARALLEL with sync engine (P9.6–P9.11); both
   only depend on the web build existing]`
 
+### P10. App-Wide AI Chat and Chat Sessions
+**Current state:** `ChatPanel` is already mounted app-wide in the layout, but
+the assistant is **product-scoped**: `ChatPageContext.app` is one of
+`data-explorer | data-sources | dashboards | other`, and its capabilities are
+effectively a Data Explorer SQL copilot + dashboard-block generator (online via
+`supabase/functions/chat` on OpenRouter; offline via in-browser WebLLM). There
+is a **single persisted thread** (localStorage via `ChatPanelProvider`) - no
+concept of multiple chat sessions, a "New chat" action, or chat history.
+
+#### Refactors
+- P10.1 `[REFACTOR]` Make the assistant **app-wide / product-agnostic**: turn
+  page context into an optional hint, not a hard scope. One agent that can
+  operate across any product (query any source, build dashboards, configure
+  ontology/cases, add map layers, manage connectors) rather than a
+  per-surface copilot. Broaden/replace the `ChatApp` context accordingly.
+- P10.2 `[REFACTOR]` Route the assistant through the **JSON DSL tool** (P1) and
+  the **cross-query fabric** (P2) so it can query datasets, ABoxes, and open
+  data uniformly.
+
+#### Features
+- P10.3 `[NEW]` **Chat session model**: persist chat sessions/threads
+  (server-side, workspace + user scoped) instead of a single localStorage
+  thread; store message history.
+- P10.4 `[NEW]` **Start new chat**: a "New chat" action that opens a fresh
+  session while keeping the current one in history.
+- P10.5 `[NEW]` **Chat history / session list**: list, resume, rename, and
+  delete past chats.
+- P10.6 `[NEW]` **Cross-product tool routing**: agent tools for query,
+  dashboard, ontology/TBox, case, GIS, and connector actions; the tool surface
+  grows as each product lands.
+- P10.7 `[NEW]` Maintain **online + offline parity** (OpenRouter edge fn +
+  WebLLM) for the app-wide agent and for sessions (offline sessions persisted
+  locally and synced when online).
+- P10.8 `[NEW]` **Permission-aware chat**: the agent can only read/act on
+  resources the user can access (respects P3).
+- `[Depends on: P1, P2 for full cross-product capability; the session model
+  (P10.3–P10.5) is PARALLEL and can start now]`
+
 ---
 
 ## 12. Dependency graph, critical path, and demo scope
@@ -434,6 +472,9 @@ flowchart TD
 
   P9shell[P9 Tauri shell] --> P9pkg[P9 Packaging/signing]
   P9sync[P9 Sync engine Phase 3]
+
+  P1 --> P10[P10 App-wide AI chat]
+  P2 --> P10
 ```
 
 ### 12.2 Parallelization plan (tracks)
@@ -456,6 +497,10 @@ Independent tracks that can run **concurrently** with different owners:
 - **Track G - Desktop:** Tauri shell (P9.1–P9.5) and sync engine (P9.6–P9.11)
   are two parallel sub-tracks, both independent of A–F (only need the web
   build).
+- **Track H - App-wide AI chat:** the session model + New-chat + history
+  (P10.3–P10.5) can start immediately (independent of A); the app-wide/
+  product-agnostic agent and cross-product tool routing (P10.1–P10.2, P10.6)
+  ride on Track A (P1 DSL, P2 fabric) and grow as each product lands.
 
 **Sequential bottlenecks (the real critical path):** `P0 → P1 → P2 → (P8.14 /
 P7.8 / P5c reporting)`. Everything else parallelizes around it.
@@ -518,7 +563,7 @@ priority items above.
 - **Projects (1 per product/track):** P0 QETL Engine, P1 Query DSL, P2
   Cross-Query Fabric, P3 Permissions, P4 Guests, P5 Ontology Designer, P5b
   Configurable TBox, P5c Case Management, P6 Data Connectors, P7 GIS, P8
-  Dashboards & Viz, P9 Desktop/Tauri + Offline.
+  Dashboards & Viz, P9 Desktop/Tauri + Offline, P10 App-Wide AI Chat.
 - **Tasks:** each numbered `Pn.m` item becomes a task, tagged
   `[NEW]/[FIX]/[REFACTOR]` and carrying its `Depends on` links.
 - **Milestone/label:** tag the Section 12.3 items `demo-aug19` for a filtered
