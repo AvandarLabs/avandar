@@ -54,20 +54,20 @@ We are adopting Description Logic (DL) theory and nomenclature **internally**
 
 ---
 
-## 3. Timeline reality check (read before scoping)
+## 3. Timeline and scope decision
 
-The full scope below is realistically **several engineering-months**. The demo
-is **~10 days out**. This document therefore separates:
+**Decision: full scope is committed for Aug 19.** All products and features
+below are in scope for the demo; nothing is deferred to a post-demo roadmap.
 
-1. **Full production readiness** (all products, all features) - the initiative.
-2. **Demo-critical subset for Aug 19** (Section 12.3) - the thin, honest slice
-   we can make solid and rehearse, chosen so the North Star story
-   (offline case intake → map → dashboard → open-data cross-reference) is
-   demoable end to end.
-
-We recommend committing the org to the demo subset for Aug 19 and treating the
-rest as the post-demo production hardening roadmap. Section 12 makes the
-trade-off explicit so this is a decision, not an accident.
+**Honest risk note (recorded, not a blocker):** the full scope is realistically
+**several engineering-months** and the demo is **~10 days out**. Delivering all
+of it to production quality by Aug 19 is not achievable at normal staffing; this
+plan assumes heavy parallelization across many owners/agents and accepts that
+some items will land as demo-quality rather than fully hardened. Section 12.3
+therefore keeps a **demo rehearsal priority order** - not a reduced scope, but
+the sequence in which to make the North Star story
+(offline case intake → map → dashboard → open-data cross-reference) demoable
+first, so there is always a working end-to-end path to show.
 
 ---
 
@@ -196,8 +196,10 @@ unimplemented, config delete doesn't cascade, generation is in-browser and
 re-writes all rows (no incremental sync).
 
 - P5.1 `[REFACTOR]` Rename internal domain to DL nomenclature (TBox/ABox/
-  ontology/role) across models, clients, views, routes; keep user-facing copy
-  approachable. Ship as a mechanical, well-tested rename.
+  ontology/role) across models, clients, views, routes. **Decided: internal
+  only** - keep user-facing copy approachable (cases, types, fields, statuses);
+  DL terms do not appear in end-user UI. Ship as a mechanical, well-tested
+  rename.
 - P5.2 `[NEW]` **Relations / object properties**: entity-type → entity-type
   references (e.g. Case → Patient, Case → Facility, Contact → Case). Model,
   config UI, and materialization.
@@ -365,10 +367,13 @@ one-way `SnapshotBootstrap` pull exists. Platform abstraction seam
 engine are **independent workstreams**.
 
 #### Tauri migration (shell + transport + packaging)
-- P9.1 `[REFACTOR]` **Shell decision** (see Section 12 open question): Tauri
-  Rust-native services vs Tauri hosting the existing Bun services as a
-  **sidecar**. Recommendation: sidecar first (keeps `services/`, `ipc/`,
-  migrations, future sync-engine TS) to hit the timeline; Rust-native later.
+- P9.1 `[REFACTOR]` **Full Rust-native Tauri rewrite** (decided): reimplement
+  the privileged services (`bun:sqlite` → `rusqlite`/`sqlx`, native DuckDB →
+  `duckdb-rs`, keychain → Tauri `keyring`/stronghold, filesystem blob store →
+  Rust `fs`) as Tauri Rust commands. Yields a single native binary with no Bun
+  runtime dependency and de-risks the Windows/Bun blocker. Larger effort than a
+  sidecar; the ~70 generated SQLite migrations and the transport-agnostic IPC
+  `contracts/` still carry over.
 - P9.2 `[REFACTOR]` Replace Electrobun IPC transport
   (`createElectrobunIpcTransport`, `desktopIpcBridgeScript`) with Tauri
   `invoke`/`emit`/`listen`; keep the transport-agnostic `contracts/`.
@@ -392,10 +397,11 @@ engine are **independent workstreams**.
 - P9.9 `[NEW]` **Conflict resolution** (LWW baseline) + property-based tests
   (silent data loss is the failure mode).
 - P9.10 `[NEW]` **Sync status UI** (pending/synced/error, manual retry).
-- P9.11 `[REFACTOR]` Build the sync engine as **portable TypeScript** so it
-  survives the shell choice (runs in the Bun sidecar).
-- `[Tauri shell (P9.1–P9.5) PARALLEL with sync engine (P9.6–P9.11); both only
-  depend on the web build existing]`
+- P9.11 `[NEW]` Implement the sync engine in **Rust** as Tauri commands
+  (matching the P9.1 Rust-native decision); keep the outbox/pull-loop/LWW logic
+  pure and property-tested since silent data loss is the failure mode.
+- `[Tauri Rust shell (P9.1–P9.5) PARALLEL with sync engine (P9.6–P9.11); both
+  only depend on the web build existing]`
 
 ---
 
@@ -454,12 +460,13 @@ Independent tracks that can run **concurrently** with different owners:
 **Sequential bottlenecks (the real critical path):** `P0 → P1 → P2 → (P8.14 /
 P7.8 / P5c reporting)`. Everything else parallelizes around it.
 
-### 12.3 Demo-critical subset for Aug 19 (recommended scope)
+### 12.3 Demo rehearsal priority (sequencing within full scope)
 
-Chosen so the North Star story demos end to end: **configure a case type →
-collect/enter cases (offline-capable) → map them → dashboard them → cross-
-reference open data.** Aggressively thin; each item must be *solid and
-rehearsed*, not broad.
+Full scope is committed (Section 3), so nothing here is cut. This is the
+**order** in which to land work so there is always a working end-to-end North
+Star story to show - **configure a case type → collect/enter cases
+(offline-capable) → map them → dashboard them → cross-reference open data** -
+even if later, deeper items are still stabilizing on demo day. Land these first:
 
 1. **Dashboards/filters/series usable (P8.1, P8.3, P8.4, P8.5, P8.9, P8.10)** -
    the buggy-filters/series complaints are the most visible; fixing them is
@@ -477,26 +484,31 @@ rehearsed*, not broad.
    already mostly there.
 7. **One HDX pipeline (P6.3)** - a single credible humanitarian open-data set
    in the catalog to cross-reference.
-8. **Desktop: pick ONE** - either a Tauri shell that runs online (P9.1–P9.3,
-   unsigned OK) **or** keep Electrobun for the demo. Full offline sync (P9.6+)
-   is **not** demo-achievable; do not promise it for Aug 19.
+8. **Desktop:** get the Tauri Rust shell running online first (P9.1–P9.3,
+   unsigned OK for the demo) so the app launches natively; the offline sync
+   engine (P9.6–P9.11) and signing/Windows (P9.4/P9.5) continue in parallel and
+   are the highest-risk items for the date - have the web/online path as the
+   reliable fallback for the live demo.
 
-**Explicitly deferred past the demo:** full QETL OLAP/non-OLAP rewrite (P0.3/
-P0.4), DSL-JSON LLM cutover (P1.2), full cross-query fabric (P2), Postgres
-connector (P2/P6.2), choropleth/multi-layer GIS (P7.2–P7.8), Tauri
-signing/Windows (P9.4/P9.5), and the full offline sync engine (P9.6–P9.11).
+**Nothing is cut** - the items above are the *first* to land, not the *only*
+items. The highest-risk-for-the-date pieces (full QETL OLAP/non-OLAP rewrite
+P0.3/P0.4, cross-query fabric P2, Postgres connector P6.2, choropleth/multi-
+layer GIS P7.2–P7.8, Rust offline sync engine P9.6–P9.11) proceed concurrently;
+if any is not demo-solid by the 19th, the North Star story still runs on the
+priority items above.
 
-### 12.4 Open decisions (need your call before/at Linear creation)
+### 12.4 Decisions (resolved)
 
-1. **Scope commitment:** ship the Section 12.3 demo subset for Aug 19 and treat
-   the rest as the post-demo roadmap? (Strongly recommended given ~10 days.)
-2. **Tauri shell strategy:** Bun-sidecar-under-Tauri (fast, keeps TS) vs
-   full Rust-native rewrite (slower, single binary, de-risks Windows)?
-3. **Desktop for the demo:** attempt the Tauri shell swap now, or demo on
-   Electrobun and migrate after?
-4. **DL nomenclature exposure:** internal-only, or also surfaced in user-facing
-   copy (TBox/ABox/ontology can confuse non-technical field users)?
-5. **Class hierarchy/subsumption (P5.3):** build now or defer?
+1. **Scope commitment:** ✅ **Full scope** committed for Aug 19 (no post-demo
+   deferral); Section 12.3 is a landing-order priority, not a cut list.
+2. **Tauri shell strategy:** ✅ **Full Rust-native rewrite** (P9.1) - single
+   native binary, de-risks Windows/Bun.
+3. **Desktop for the demo:** ✅ Do the Tauri Rust migration now (in scope); web/
+   online path is the live-demo fallback.
+4. **DL nomenclature exposure:** ✅ **Internal only** (P5.1) - approachable
+   user-facing copy.
+5. **Class hierarchy/subsumption (P5.3):** ✅ **In scope** (full scope) - build
+   now.
 
 ---
 
