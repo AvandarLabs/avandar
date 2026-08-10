@@ -1,4 +1,4 @@
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
+import { matchLiteral } from "@avandar/utils";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { UserId } from "$/models/User/User.types.ts";

@@ -1,8 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
 import { IconPencil } from "@tabler/icons-react";
 import { ActionIcon } from "../ActionIcon/ActionIcon";
 import type { ActionIconProps } from "@mantine/core";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
@@ -41,20 +41,20 @@ export function EditButton({
   withTooltip = true,
   ...props
 }: Props): JSX.Element {
-  const { t } = useLingui();
+  const i18n = useI18nMessages();
 
   const defaultButtonProps: ActionIconProps & HTMLButtonProps = {
     variant: "default",
     size: "md",
     color: "neutral",
-    "aria-label": t`Edit`,
+    "aria-label": i18n.edit,
   };
 
   const defaultAnchorProps: ActionIconProps & HTMLAnchorProps = {
     variant: "subtle",
     size: "md",
     color: "neutral",
-    "aria-label": t`Edit`,
+    "aria-label": i18n.edit,
   };
 
   const passThroughProps =
@@ -73,8 +73,8 @@ export function EditButton({
       tooltip={
         withTooltip ?
           props.name ?
-            t`Edit ${props.name}`
-          : t`Edit`
+            i18n.editNamed(props.name)
+          : i18n.edit
         : undefined
       }
       {...passThroughProps}

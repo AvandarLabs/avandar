@@ -5,7 +5,7 @@
 
 import { promises as fs } from "node:fs";
 import process from "node:process";
-import { prop } from "@utils";
+import { prop } from "@avandar/utils";
 import { CatalogTranslator } from "./catalogTranslator";
 import { DEFAULT_MODEL, LOCALES_DIR, SOURCE_LOCALE } from "./config";
 import { TranslationCli } from "./translationCli";

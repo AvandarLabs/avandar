@@ -1,6 +1,6 @@
 import { createWebLogger } from "@logger/createWebLogger/createWebLogger.ts";
 import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
-import type { UnknownModule } from "@modules/createModule.ts";
+import type { UnknownModule } from "@avandar/modules";
 
 // TODO(jpsyx): this should become a mixin in the @modules package
 /**

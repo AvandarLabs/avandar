@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { formatNumber } from "@avandar/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -18,7 +18,7 @@ import type {
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
-import type { UnknownObject } from "@utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
@@ -63,8 +63,9 @@ const {
   };
 });
 
-vi.mock("@ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@ui")>();
+vi.mock("@/utils/notifications/notify", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/utils/notifications/notify")>();
   return {
     ...actual,
     notifySuccess: notifySuccessMock,

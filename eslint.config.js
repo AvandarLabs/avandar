@@ -12,6 +12,37 @@ import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+/**
+ * The Deno-safe `@avandar/*` packages are exactly those mapped in every
+ * `deno.json` import map: clients, logger, models, modules, and utils. The rest
+ * are browser- or Node-only, have no Deno mapping, and will fail `deno check`
+ * if they reach Deno-allowable code.
+ */
+const DENO_UNSAFE_PACKAGES = [
+  { name: "@avandar/etl", runtime: "Node-only" },
+  { name: "@avandar/query-hooks", runtime: "browser-only" },
+  { name: "@avandar/browser-utils", runtime: "browser-only" },
+  { name: "@avandar/hooks", runtime: "browser-only" },
+  { name: "@avandar/ui", runtime: "browser-only" },
+].map(({ name, runtime }) => {
+  return {
+    name,
+    message: `Deno-allowable code: ${name} is ${runtime} and is not in the deno.json import maps.`,
+  };
+});
+
+const NO_RELATIVE_IMPORTS = {
+  regex: "^\\.{1,2}/",
+  message:
+    "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../).",
+};
+
+const NO_APP_IMPORTS = {
+  group: ["@/*", "$/*"],
+  message:
+    "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter.",
+};
+
 export default [
   {
     ignores: [
@@ -215,56 +246,37 @@ export default [
     rules: {
       "no-restricted-imports": [
         "error",
+        { paths: DENO_UNSAFE_PACKAGES, patterns: [NO_RELATIVE_IMPORTS] },
+      ],
+    },
+  },
+  {
+    // Publishable packages must not reach back into the app. `tsconfig.base.json`
+    // maps `@/*` and `$/*` for the whole repo, so these resolve from inside a
+    // package and type-check cleanly; tsup would then inline app source into the
+    // published `dist/`, and nothing downstream would notice. `verify:packages`
+    // cannot catch it either, because the resulting tarball is self-consistent.
+    // This is the only thing standing between the app and the registry.
+    //
+    // This must sit AFTER the Deno block: flat config replaces a rule's options
+    // wholesale rather than merging them, so an earlier declaration would be
+    // dropped for `packages/shared/**`. For the same reason the block below
+    // re-states the Deno restrictions, which apply to `packages/shared/**` only.
+    // Note `shared/**` and `supabase/**` are app code and may import `$/*`
+    // freely; only `packages/**` is restricted.
+    files: ["packages/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [NO_APP_IMPORTS] }],
+    },
+  },
+  {
+    files: ["packages/shared/**/*.{js,jsx,ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
         {
-          paths: [
-            {
-              name: "@ava-etl",
-              message:
-                "Deno-allowable code: you must import an exact file under @ava-etl/ for this to work in Deno envs.",
-            },
-            {
-              name: "@clients",
-              message:
-                "Deno-allowable code: you must import an exact file under @clients/ for this to work in Deno envs.",
-            },
-            {
-              name: "@logger",
-              message:
-                "Deno-allowable code: you must import an exact file under @logger/ for this to work in Deno envs.",
-            },
-            {
-              name: "@models",
-              message:
-                "Deno-allowable code: you must import an exact file under @models/ for this to work in Deno envs.",
-            },
-            {
-              name: "@modules",
-              message:
-                "Deno-allowable code: you must import an exact file under @modules/ for this to work in Deno envs.",
-            },
-            {
-              name: "@utils",
-              message:
-                "Deno-allowable code: you must import an exact file under @utils/ for this to work in Deno envs.",
-            },
-            {
-              name: "@ui",
-              message:
-                "Deno-allowable code: you must import an exact file under @ui/ for this to work in Deno envs.",
-            },
-            {
-              name: "@hooks",
-              message:
-                "Deno-allowable code: you must import an exact file under @hooks/ for this to work in Deno envs.",
-            },
-          ],
-          patterns: [
-            {
-              regex: "^\\.{1,2}/",
-              message:
-                "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../).",
-            },
-          ],
+          paths: DENO_UNSAFE_PACKAGES,
+          patterns: [NO_RELATIVE_IMPORTS, NO_APP_IMPORTS],
         },
       ],
     },

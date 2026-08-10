@@ -1,6 +1,6 @@
-import { createServiceClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { withLogger } from "@logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
 import {
   assertIsDefined,
   isDefined,
@@ -14,7 +14,7 @@ import {
   prop,
   sqlTemplate,
   where,
-} from "@utils";
+} from "@avandar/utils";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { EntityFieldValueRead } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
@@ -28,12 +28,12 @@ import { singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import type { ServiceClient } from "@clients";
-import type { WithQueryHooks } from "@hooks";
-import type { ILogger, WithLogger } from "@logger";
-import type { RegistryOfArrays } from "@utils";
+import type { WithQueryHooks } from "@avandar/query-hooks";
+import type { ServiceClient } from "@avandar/clients";
+import type { ILogger, WithLogger } from "@avandar/logger";
+import type { RegistryOfArrays } from "@avandar/utils";
 import type { EntityId } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
@@ -193,7 +193,7 @@ function createEntityFieldValueClient(): WithLogger<
                     );
 
                     const extractedValues = singleton(
-                      await WorkspaceQETLClient.runQuery<
+                      await WorkspaceQetlClient.runQuery<
                         Record<EntityFieldConfigId, unknown>
                       >({
                         workspaceId: entity.workspaceId,

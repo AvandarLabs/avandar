@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "AvandarLabs/avandar" }
+  ],
+  "commit": false,
+  "fixed": [["@avandar/etl", "@avandar/browser-utils", "@avandar/query-hooks", "@avandar/clients", "@avandar/hooks", "@avandar/logger", "@avandar/models", "@avandar/modules", "@avandar/ui", "@avandar/utils"]],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "develop",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@avandar/ava-cli"]
+}

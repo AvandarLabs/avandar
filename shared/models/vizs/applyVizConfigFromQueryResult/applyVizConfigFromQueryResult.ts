@@ -1,4 +1,4 @@
-import { isDefined } from "@utils/guards/isDefined/isDefined.ts";
+import { isDefined } from "@avandar/utils";
 import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
 import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";

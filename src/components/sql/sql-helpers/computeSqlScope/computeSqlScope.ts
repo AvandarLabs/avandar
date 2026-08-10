@@ -4,7 +4,7 @@
  * `createSqlDisplayCodeMirrorExtension`) to mark out-of-scope column
  * references as errors and to populate the column-pill dropdown.
  */
-import { prop } from "@utils";
+import { prop } from "@avandar/utils";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import type {
   SqlDisplayCatalog,

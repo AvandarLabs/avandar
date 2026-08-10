@@ -19,7 +19,7 @@ import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UnknownObject } from "@utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";

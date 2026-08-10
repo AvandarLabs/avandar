@@ -4,7 +4,7 @@ import {
   TabsProps as MantineTabsProps,
   Text,
 } from "@mantine/core";
-import { makeObject } from "@utils";
+import { makeObject } from "@avandar/utils";
 import clsx from "clsx";
 import { ReactNode, useState } from "react";
 import classes from "./Tabs.module.css";

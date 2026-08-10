@@ -1,11 +1,5 @@
-import { isFunction } from "@utils/guards/isFunction.ts";
-import { getValue } from "@utils/objects/getValue/getValue.ts";
-import { objectFilter } from "@utils/objects/objectFilter/objectFilter.ts";
-import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
-import { setValue } from "@utils/objects/setValue/setValue.ts";
-import { MergeObjects } from "@utils/types/utilities.types.ts";
-import type { PathValue } from "@utils/objects/getValue/getValue.ts";
-import type { EmptyObject, UnknownObject } from "@utils/types/common.types.ts";
+import { isFunction, getValue , objectFilter , objectValuesMap , setValue , MergeObjects  } from "@avandar/utils";
+import type { PathValue, EmptyObject, UnknownObject  } from "@avandar/utils";
 import type { Paths, Simplify } from "type-fest";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

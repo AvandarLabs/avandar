@@ -3,7 +3,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

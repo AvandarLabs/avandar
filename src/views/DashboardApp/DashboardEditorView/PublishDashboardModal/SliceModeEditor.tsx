@@ -1,6 +1,6 @@
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Radio, Stack } from "@mantine/core";
-import { prop } from "@utils";
 import { CustomSliceEditor } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor";
 import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";

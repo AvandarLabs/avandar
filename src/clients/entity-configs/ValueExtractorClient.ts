@@ -1,4 +1,4 @@
-import { makeBucketRecord, objectKeys, prop } from "@utils";
+import { makeBucketRecord, objectKeys, prop } from "@avandar/utils";
 import {
   EntityFieldValueExtractor,
   EntityFieldValueExtractorRegistry,

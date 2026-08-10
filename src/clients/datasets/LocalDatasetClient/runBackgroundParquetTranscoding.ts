@@ -1,10 +1,14 @@
+import { makeMap } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { notifyError, notifySuccess, notifyWarning } from "@ui";
-import { makeMap } from "@utils";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@/utils/notifications/notify";
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,

@@ -1,6 +1,6 @@
-import { useQuery } from "@hooks";
+import { useQuery } from "@avandar/query-hooks";
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { prop } from "@utils";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
 import { APIClient } from "@/clients/APIClient";

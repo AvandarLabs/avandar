@@ -1,3 +1,9 @@
+// provider + i18n
+export { AvaUiProvider } from "@ui/UiProvider/AvaUiProvider";
+export { I18nAvaUiProvider, useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
+export { defaultI18nMessages } from "@ui/i18n/i18nMessages";
+export type { I18nMessages } from "@ui/i18n/i18nMessages";
+
 // ActionIcon
 export { ActionIcon } from "./ActionIcon/ActionIcon";
 
@@ -28,13 +34,6 @@ export { Tooltip } from "./Tooltip/Tooltip";
 export { ObjectDescriptionList } from "./ObjectDescriptionList/ObjectDescriptionList";
 export type { ObjectKeyRenderOptionsMap } from "./ObjectDescriptionList/ObjectDescriptionList.types";
 
-// notifications
-export { notifyError } from "./notifications/notify";
-export { notifySuccess } from "./notifications/notify";
-export { notifyWarning } from "./notifications/notify";
-export { notifyExpiredSession } from "./notifications/notifyExpiredSession";
-export { notifyNotImplemented } from "./notifications/notifyNotImplemented";
-export { notifyDevAlert } from "./notifications/notifyDevAlert";
 
 // text
 export { DangerText } from "./text/DangerText";

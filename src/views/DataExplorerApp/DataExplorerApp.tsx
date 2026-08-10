@@ -1,3 +1,4 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -20,7 +21,6 @@ import {
   IconListDetails,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
@@ -31,6 +31,7 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import {
   DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
   hasDataExplorerPanelPreferencesInSessionStorage,
@@ -39,7 +40,7 @@ import {
 } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
@@ -498,7 +499,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             size="compact-sm"
             disabled={isLoadingResults || queryResultData.length === 0}
             onClick={() => {
-              downloadRowsAsCSV(queryResultData);
+              downloadRowsAsCsv(queryResultData);
             }}
           >
             <Trans>Export</Trans>

@@ -1,13 +1,13 @@
-import { ModelCrudClient } from "@clients";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
   FnNameReturningPromise,
-  withQueryHooks,
   WithQueryHooks,
-} from "@hooks";
+  withQueryHooks,
+} from "@avandar/query-hooks";
+import { ModelCrudClient } from "@avandar/clients";
 
 export function createUsableServiceClient<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

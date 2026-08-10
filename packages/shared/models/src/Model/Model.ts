@@ -7,7 +7,9 @@ import type {
 } from "@models/Model/Model.types.ts";
 import type { EmptyObject } from "type-fest";
 
-export { ModelModule as Model } from "@models/Model/ModelModule/ModelModule.ts";
+import { ModelModule } from "@models/Model/ModelModule/ModelModule.ts";
+
+export const Model = ModelModule;
 
 export namespace Model {
   export type Base<

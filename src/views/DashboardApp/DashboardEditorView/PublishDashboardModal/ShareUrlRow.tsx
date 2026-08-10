@@ -18,7 +18,7 @@ import {
   IconDownload,
   IconQrcode,
 } from "@tabler/icons-react";
-import { notifyError } from "@ui";
+import { notifyError } from "@/utils/notifications/notify";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";

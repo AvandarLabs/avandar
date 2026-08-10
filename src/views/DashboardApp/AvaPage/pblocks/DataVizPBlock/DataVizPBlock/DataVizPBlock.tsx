@@ -1,7 +1,7 @@
+import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
-import { Paper } from "@ui";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { useMemo } from "react";

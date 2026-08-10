@@ -41,6 +41,61 @@
   a header describing the suite is expected), and files that are a collection of
   same-kind exports with no single primary one (a `*.types.ts` type collection, a
   `*.constants.ts` bundle, or a group of sibling helpers).
+- Comments describe the present, never the past. Do not write what a file,
+  function, type, or module *used to* do, what it was renamed from, what an
+  earlier implementation looked like, or why it was changed. Git history already
+  records that. A reader gets no help from it and has to work out which half of
+  the comment still applies, and the claim rots as soon as the next change
+  lands. Describe only the code as it exists today.
+
+  This is bad:
+
+  ```ts
+  /**
+   * Formats a row for display.
+   *
+   * This used to take the whole table and format every row, but that was slow
+   * on large datasets, so now it only takes one row.
+   */
+  export function formatRow(row: Row): string {}
+  ```
+
+  This is good:
+
+  ```ts
+  /** Formats a single row for display. */
+  export function formatRow(row: Row): string {}
+  ```
+
+- Exception: document a superseded approach when it is the more intuitive one
+  and a future developer is likely to reach for it again. Write it as a warning
+  about the present, not as history: say not to do X because it fails in way Y.
+  Never phrase it as "we used to do X". The test is whether the sentence still
+  reads correctly to someone who has never seen the old code.
+
+  This is bad (history, and useless to a reader who never saw the old code):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * We used to read it from the session, but that broke on hard refresh.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
+  This is good (a warning that stands on its own):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * Do not read it from the session instead: the session is not yet populated
+   * on a hard refresh, so the first render would get `undefined`.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).

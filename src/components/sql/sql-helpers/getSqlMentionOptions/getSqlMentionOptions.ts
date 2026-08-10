@@ -1,4 +1,4 @@
-import { isDefined } from "@utils";
+import { isDefined } from "@avandar/utils";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 export type SqlMentionOption =

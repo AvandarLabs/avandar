@@ -1,4 +1,4 @@
-import { useQuery } from "@hooks";
+import { useQuery } from "@avandar/query-hooks";
 import { useMemo } from "react";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { LocalPublicDatasetRawDataClient } from "@/clients/datasets/LocalPublicDatasetRawDataClient";

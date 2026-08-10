@@ -5,7 +5,7 @@
  * they agree on which datasets are required.
  */
 
-import { isPlainObject, isString, traverse } from "@utils";
+import { isPlainObject, isString, traverse } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type DataVizLikeProps = {

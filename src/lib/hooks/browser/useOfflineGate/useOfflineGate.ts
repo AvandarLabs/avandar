@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { notifyError } from "@ui";
+import { notifyError } from "@/utils/notifications/notify";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 type Gate = {

@@ -1,15 +1,15 @@
-import { useBoolean } from "@hooks";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
-import { useHover } from "@mantine/hooks";
-import { IconPalette } from "@tabler/icons-react";
+import { useBoolean } from "@avandar/hooks";
 import {
   mantineColorVar,
   mantineVar,
   SegmentedControl,
   SegmentedControlItem,
   Tooltip,
-} from "@ui";
+} from "@avandar/ui";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
+import { useHover } from "@mantine/hooks";
+import { IconPalette } from "@tabler/icons-react";
 import {
   MapStyleKey,
   MapStyleKeys,

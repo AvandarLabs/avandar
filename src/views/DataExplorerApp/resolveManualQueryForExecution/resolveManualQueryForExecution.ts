@@ -1,4 +1,4 @@
-import { Model } from "@models";
+import { Model } from "@avandar/models";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   getCachedDatasetRowCount,

@@ -1,11 +1,11 @@
-import { createServiceClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { withLogger } from "@logger";
-import { objectKeys } from "@utils";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { objectKeys } from "@avandar/utils";
 import { APIClient } from "@/clients/APIClient";
-import type { ServiceClient } from "@clients";
-import type { WithQueryHooks } from "@hooks";
-import type { WithLogger } from "@logger";
+import type { WithQueryHooks } from "@avandar/query-hooks";
+import type { ServiceClient } from "@avandar/clients";
+import type { WithLogger } from "@avandar/logger";
 
 type SubscriptionPermissionQueries = {
   /**

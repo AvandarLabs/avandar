@@ -21,7 +21,7 @@ function _getSharedPackageVitestAliases(
 }
 
 /**
- * Extra Vitest aliases for `packages/web/*` (`@ui`, `@hooks`,
+ * Extra Vitest aliases for `packages/web/*` (`@ui`, `@hooks`, `@query-hooks`,
  * `@browser-utils`).
  *
  * @param rootDir Repository root directory.
@@ -30,18 +30,19 @@ function _getWebPackageVitestAliases(rootDir: string): Record<string, string> {
   return {
     "@ui": resolve(rootDir, "packages/web/ui/src"),
     "@hooks": resolve(rootDir, "packages/web/hooks/src"),
+    "@query-hooks": resolve(rootDir, "packages/web/query-hooks/src"),
     "@browser-utils": resolve(rootDir, "packages/web/browser-utils/src"),
   };
 }
 
 /**
- * Extra Vitest aliases for `packages/node/*` (`@ava-etl`).
+ * Extra Vitest aliases for `packages/node/*` (`@etl`).
  *
  * @param rootDir Repository root directory.
  */
 function _getNodePackageVitestAliases(rootDir: string): Record<string, string> {
   return {
-    "@ava-etl": resolve(rootDir, "packages/node/ava-etl/src"),
+    "@etl": resolve(rootDir, "packages/node/etl/src"),
   };
 }
 
@@ -53,7 +54,7 @@ type PackageType = "shared" | "web" | "node";
  *
  * - shared (`$`, `@clients`, …)
  * - web (`@ui`, `@hooks`)
- * - node (`@ava-etl`)
+ * - node (`@etl`)
  *
  * Plus optional `moreAliases` resolved from the repository root.
  *

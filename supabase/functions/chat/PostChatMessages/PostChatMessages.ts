@@ -1,5 +1,5 @@
-import { Model } from "@models/Model/Model.ts";
-import { AvaModelSchema } from "@models/zod/index.ts";
+import { Model } from "@avandar/models";
+import { AvaModelSchema } from "@avandar/models/zod";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";

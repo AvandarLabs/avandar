@@ -6,7 +6,7 @@ import { createDuckDbService } from "./createDuckDbService";
 
 /*
  * G2.12 — Native DuckDB happy path + parity. Runs against the real `duckdb`
- * Node binding loaded under Bun (the same one `@avandar/ava-etl` uses). The
+ * Node binding loaded under Bun (the same one `@avandar/etl` uses). The
  * golden cases pin the column-type names so BIGINT/INTEGER and TIMESTAMP_NS
  * drift between native DuckDB and the legacy duckdb-wasm path is caught here
  * rather than in a downstream UI assertion.

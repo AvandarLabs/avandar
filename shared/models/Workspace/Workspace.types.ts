@@ -1,4 +1,4 @@
-import type { UUID } from "@utils/types/common.types.ts";
+import type { UUID } from "@avandar/utils";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 

@@ -1,5 +1,5 @@
 import { Text, TextInput } from "@mantine/core";
-import { isNullish } from "@utils/guards/isNullish/isNullish";
+import { isNullish } from "@avandar/utils";
 import { Select } from "../../inputs/Select/Select";
 import { isStringOrNumber } from "../guards";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";

@@ -2,28 +2,73 @@
   "name": "@avandar/utils",
   "version": "0.1.0",
   "description": "Common helper functions with no business logic. Droppable into any project.",
-  "license": "CPAL-1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/shared/utils"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/shared/utils#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./encoding": "./src/encoding/index.ts",
-    "./sql": "./src/sql/index.ts"
+    "./sql": "./src/sql/index.ts",
+    "./zod": "./src/zod/index.ts"
   },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "ts-pattern": "^5.7.0",
-    "type-fest": "^5.4.4"
+    "ts-pattern": "catalog:",
+    "type-fest": "catalog:"
+  },
+  "peerDependencies": {
+    "zod": "^4.1.13"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vitest": "^3.2.4",
-    "zod": "^4.1.13"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./encoding": {
+        "types": "./dist/encoding.d.ts",
+        "default": "./dist/encoding.js"
+      },
+      "./sql": {
+        "types": "./dist/sql.d.ts",
+        "default": "./dist/sql.js"
+      },
+      "./zod": {
+        "types": "./dist/zod.d.ts",
+        "default": "./dist/zod.js"
+      }
+    }
   }
 }

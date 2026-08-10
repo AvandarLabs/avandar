@@ -20,7 +20,7 @@ export default defineConfig({
       "@models": "/packages/shared/models/src",
       "@modules": "/packages/shared/modules/src",
       "@utils": "/packages/shared/utils/src",
-      "@ava-etl": "/packages/node/ava-etl/src",
+      "@etl": "/packages/node/etl/src",
       "@pipeline-server": "/apps/pipeline-server/src",
     },
   },

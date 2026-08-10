@@ -1,14 +1,13 @@
-import { getIsMacPlatform } from "@browser-utils";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
+import { hasDefinedProps, isPlainObject  } from "@avandar/utils";
 import { useEffect, useRef, useState } from "react";
 import { EditButton } from "../buttons/EditButton";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type BaseProps = {
   /**
@@ -89,8 +88,8 @@ export function EditableDisplayText({
   displayTextProps,
   ...passThroughProps
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const resolvedEmptyDisplayText = emptyDisplayText ?? t`Empty`;
+  const i18n = useI18nMessages();
+  const resolvedEmptyDisplayText = emptyDisplayText ?? i18n.empty;
   const [isEditing, setIsEditing] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -266,7 +265,7 @@ export function EditableDisplayText({
             disabled={disabled || isSaveDisabled}
           >
             <Group gap="xxs" align="bottom">
-              <Trans>Save</Trans>
+              {i18n.save}
               <Text span size="xs" c="primary.6">
                 {keyboardShortcutSymbol}
               </Text>
@@ -278,10 +277,10 @@ export function EditableDisplayText({
             onClick={onCancelClick}
             disabled={disabled || isSaving}
           >
-            <Trans>Cancel</Trans>
+            {i18n.cancel}
           </Button>
           <Text size="xs" c="dimmed">
-            <Trans>{keyboardShortcut} to save</Trans>
+            {i18n.saveWithShortcut(keyboardShortcut)}
           </Text>
         </Group>
       </Box>

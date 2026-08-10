@@ -34,8 +34,8 @@ const {
   };
 });
 
-vi.mock("@ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@ui")>();
+vi.mock("@/utils/notifications/notify", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/utils/notifications/notify")>();
   return {
     ...actual,
     notifySuccess: notifySuccessMock,

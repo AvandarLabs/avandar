@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, TextInput } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { useState } from "react";
 import { UserClient } from "@/clients/UserClient";
 import type { UserProfile } from "$/models/User/UserProfile";

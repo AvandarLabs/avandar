@@ -1,9 +1,9 @@
-import { Model } from "@models";
-import { sqlTemplate } from "@utils";
+import { Model } from "@avandar/models";
+import { sqlTemplate } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 const GEOJSON_SOURCE_ID = "selected-datasource-source";
@@ -175,7 +175,7 @@ export function useSelectedMapDataSource({
         });
 
         console.log("Running GeoJSON query...");
-        const queryResult = await WorkspaceQETLClient.runQuery<{
+        const queryResult = await WorkspaceQetlClient.runQuery<{
           geometry: unknown;
           [key: string]: unknown;
         }>({

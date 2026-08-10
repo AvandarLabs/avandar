@@ -1,12 +1,15 @@
-import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
-import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+import {
+  createSqliteCrudClient,
+  createSupabaseCrudClient,
+} from "@avandar/clients";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
-import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
+import { ipcSqliteTransport } from "$/RdbCrudClient/ipcSqliteTransport.ts";
 import type {
   AnySupabaseCrudModelSpec,
+  ClientReturningOnlyPromises,
   SupabaseCrudClient,
-} from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
+} from "@avandar/clients";
 import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type { EmptyObject } from "type-fest";
 
@@ -48,6 +51,7 @@ export function createRdbCrudClient<
     >({
       ...modelSpec,
       dbClient,
+      sqliteTransport: ipcSqliteTransport,
     });
   }
   return createSupabaseCrudClient<

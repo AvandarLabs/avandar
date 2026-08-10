@@ -16,7 +16,7 @@
  *   queries to a remote model
  */
 
-import { isDefined, propEq } from "@utils";
+import { isDefined, propEq } from "@avandar/utils";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type {
   OfflineChatSchema,

@@ -1,9 +1,9 @@
 import { useAui } from "@assistant-ui/react";
+import { Tooltip } from "@avandar/ui";
+import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
-import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";

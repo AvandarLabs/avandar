@@ -19,8 +19,8 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   `Utils.ts`.
 - If a helper collection is more idiomatically called through a module, such as
   `ModuleName.utilFnName()`, do not export the individual helpers. Export only a
-  single module object or `@modules` module, and name the file exactly after
-  that exported module.
+  single module object or `@avandar/modules` module, and name the file exactly
+  after that exported module.
 
   **Find candidates** (changed `.ts` / `.tsx` files whose single main runtime
   export does not match the file base name). Count only main exports (functions,

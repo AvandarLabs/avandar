@@ -1,4 +1,4 @@
-import { createServerApiClient } from "@clients";
+import { createServerApiClient } from "$/ServerApiClient";
 import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
 import type {

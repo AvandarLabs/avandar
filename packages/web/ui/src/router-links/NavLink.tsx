@@ -7,7 +7,7 @@ import {
 } from "@mantine/core";
 import { useHover, useMergedRef } from "@mantine/hooks";
 import { createLink } from "@tanstack/react-router";
-import { noop } from "@utils";
+import { noop } from "@avandar/utils";
 import {
   AnchorHTMLAttributes,
   forwardRef,

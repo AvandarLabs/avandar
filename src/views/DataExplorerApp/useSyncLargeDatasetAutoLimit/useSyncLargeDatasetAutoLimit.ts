@@ -1,4 +1,4 @@
-import { Model } from "@models";
+import { Model } from "@avandar/models";
 import { useEffect, useRef } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {

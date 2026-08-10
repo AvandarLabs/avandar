@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
-import { notifySuccess } from "@ui";
+import { notifySuccess } from "@/utils/notifications/notify";
 import { useMemo, useState } from "react";
 import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv";
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";

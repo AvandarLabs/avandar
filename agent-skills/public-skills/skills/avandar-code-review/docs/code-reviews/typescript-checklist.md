@@ -6,12 +6,21 @@ For every **Find candidates** block below, scope the grep to the files
 under review (pass them as arguments instead of recursing the whole
 repo) so the output stays small and tied to the diff.
 
-- In Deno-reachable code, imports must include file extensions (e.g.
-  `.ts`). Repos that use Deno usually pin a few specific directories as
-  Deno-reachable. The repo-local `docs/code-reviews/extra-checklist.md`
-  should enumerate the exact directories that count as Deno-reachable for
-  that repo; check there before flagging. If the repo-local checklist does
-  not define Deno-reachable paths, skip this rule.
+- In Deno-reachable code, imports **that name a file** must include the
+  file extension (e.g. `.ts`). Repos that use Deno usually pin a few
+  specific directories as Deno-reachable. The repo-local
+  `docs/code-reviews/extra-checklist.md` should enumerate the exact
+  directories that count as Deno-reachable for that repo; check there
+  before flagging. If the repo-local checklist does not define
+  Deno-reachable paths, skip this rule.
+
+  This applies to relative imports and to directory-style aliases (an
+  alias mapped with a trailing slash, such as `@utils/` -> `src/`, where
+  the rest of the specifier is a path). It does **not** apply to bare
+  package specifiers such as `@avandar/utils` or `@avandar/utils/sql`.
+  Those name a package entry point, not a file: Node resolves them
+  through `exports`, and Deno resolves them through an exact import-map
+  entry. Adding an extension to one is wrong and will fail to resolve.
 
   **Find candidates** (replace `<deno-dir>` with each Deno-reachable
   directory from the repo-local checklist):
@@ -23,6 +32,8 @@ repo) so the output stays small and tied to the diff.
 
   Misses imports under non-relative path aliases (`@something/foo`) that
   resolve to Deno-reachable code, so still scan those imports by eye.
+  When you do, first decide whether the specifier is a package name or a
+  file path; only flag the latter.
 
 - Use JSDoc for public classes and methods.
 - Prefer functional and declarative programming.

@@ -1,4 +1,4 @@
-import { makeObject, prop, setValue } from "@utils";
+import { makeObject, prop, setValue } from "@avandar/utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";

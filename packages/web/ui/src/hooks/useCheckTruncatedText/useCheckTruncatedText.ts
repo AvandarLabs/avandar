@@ -1,5 +1,5 @@
 import { useIsomorphicEffect } from "@mantine/hooks";
-import { isArray } from "@utils/guards/isArray/isArray";
+import { isArray } from "@avandar/utils";
 import { DependencyList, useCallback, useState } from "react";
 import type { RefCallback } from "react";
 

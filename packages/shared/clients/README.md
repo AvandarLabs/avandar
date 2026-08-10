@@ -6,7 +6,7 @@ Typed CRUD client primitives. Provides:
   named module). All other client builders extend it.
 - A generic `ModelCrudClient` — a database-agnostic CRUD client for any
   data model. Defines the standard interface (`getById`, `getAll`,
-  `getPage`, `insert`, `update`, `delete`, etc.) that `@avandar/hooks`'
+  `getPage`, `insert`, `update`, `delete`, etc.) that `@avandar/query-hooks`'s
   `withQueryHooks` knows how to wrap.
 - A `SupabaseCrudClient` — a concrete Supabase implementation of the
   generic CRUD client, with table-name-aware types pulled from a registered
@@ -18,6 +18,20 @@ Typed CRUD client primitives. Provides:
 
 This package separates *what a model client does* (CRUD operations) from
 *where the data lives* (Supabase, an HTTP API, an in-memory store, etc.).
+
+ESM only. Requires Node 22+.
+
+## Install
+
+```sh
+pnpm add @avandar/clients
+pnpm add zod @supabase/supabase-js
+```
+
+`zod` and `@supabase/supabase-js` are peer dependencies. `zod` is required:
+the parser registry is built on it and its types appear throughout the public
+API. `@supabase/supabase-js` is a peer because you pass a live `SupabaseClient`
+across the API boundary, so it must be a single shared copy.
 
 ## Usage
 
@@ -158,6 +172,46 @@ without using the full CRUD machinery.
 
 ---
 
+## SQLite CRUD client
+
+`createSqliteCrudClient` mirrors the public surface of
+`createSupabaseCrudClient` so callers can be branched between the two without
+changing consumer code. It is used for local-first / desktop setups where reads
+and writes hit a local SQLite mirror.
+
+It does **not** know how to reach your database. You inject a transport, which
+keeps this package free of any particular IPC layer or driver and lets the
+client work against Electrobun IPC, better-sqlite3, a remote endpoint, or a
+fake in tests:
+
+```ts
+import type { SqliteTransport } from "@avandar/clients";
+
+const transport: SqliteTransport = {
+  query: ({ sql, params }) => runReturningRows(sql, params),
+  run: ({ sql, params }) => runReturningNothing(sql, params),
+};
+
+const WidgetClient = createSqliteCrudClient({
+  modelName: "Widget",
+  tableName: "widgets",
+  dbTablePrimaryKey: "id",
+  parsers: widgetParsers,
+  dbClient,
+  transport,
+});
+```
+
+| Type              | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `SqliteTransport` | `{ query, run }`, both taking `{ sql, params }`         |
+
+Known limitations: JSON-typed columns are stringified on write but returned as
+raw strings on read, and boolean columns come back as integer 0/1. Model
+parsers must coerce both.
+
+---
+
 ## Parser registry
 
 ### `makeParserRegistry<M>().build(config)`
@@ -205,10 +259,6 @@ flow through `createSupabaseCrudClient` automatically.
 | ---------- | ------------------------------------------------------------ |
 | `Register` | Augmentation target for registering a Supabase `Database`    |
 
-## Scripts
+## License
 
-| Command           | Description                  |
-| ----------------- | ---------------------------- |
-| `pnpm test`       | Run all tests once           |
-| `pnpm test:watch` | Run tests in watch mode      |
-| `pnpm type-check` | Run TypeScript type checking |
+MIT

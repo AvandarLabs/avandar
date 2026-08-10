@@ -101,7 +101,7 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       // id over a full page reload races DuckDB registration (a fresh reload
       // starts an empty DuckDB and rehydrates a stale-empty workspace-datasets
       // list, which gates the on-demand registration in
-      // `WorkspaceQETLClient.runQuery`).
+      // `WorkspaceQetlClient.runQuery`).
       const sql =
         `SELECT * FROM (VALUES ('Riverside', 1800), ('Orange', 1600), ` +
         `('Kern', 900), ('Fresno', 700)) AS t("Admin2", "total_cases")`;

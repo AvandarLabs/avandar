@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, MultiSelect, Stack, Text } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";

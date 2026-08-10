@@ -1,4 +1,4 @@
-import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
+import { makeArrayWithLength } from "@avandar/utils";
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
@@ -8,8 +8,9 @@ const { notifyWarningMock } = vi.hoisted(() => {
   return { notifyWarningMock: vi.fn() };
 });
 
-vi.mock("@ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@ui")>();
+vi.mock("@/utils/notifications/notify", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/utils/notifications/notify")>();
   return {
     ...actual,
     notifyWarning: notifyWarningMock,

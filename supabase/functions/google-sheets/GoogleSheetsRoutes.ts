@@ -1,8 +1,7 @@
+import { assertIsNonEmptyArray, isNonEmptyArray } from "@avandar/utils";
 import { getGoogleAuthClient } from "@sbfn/_shared/getGoogleAuthClient.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
-import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
-import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { google } from "googleapis";
 import { string } from "zod";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types.ts";

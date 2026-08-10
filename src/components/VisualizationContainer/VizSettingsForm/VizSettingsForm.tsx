@@ -1,9 +1,9 @@
+import { Select, SelectData } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
-import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
   VizConfig,

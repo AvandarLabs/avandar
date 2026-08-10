@@ -1,3 +1,6 @@
+import { Model } from "@avandar/models";
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -7,10 +10,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { Model } from "@models";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { makeSelectOptions, Select } from "@ui";
-import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useState } from "react";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
@@ -22,7 +22,7 @@ import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryF
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import classes from "./ManualQueryForm.module.css";
-import type { SelectData } from "@ui";
+import type { SelectData } from "@avandar/ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type {

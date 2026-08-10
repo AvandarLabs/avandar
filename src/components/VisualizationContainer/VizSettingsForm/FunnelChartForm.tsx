@@ -1,11 +1,11 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ColorInput, Fieldset, Stack } from "@mantine/core";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 

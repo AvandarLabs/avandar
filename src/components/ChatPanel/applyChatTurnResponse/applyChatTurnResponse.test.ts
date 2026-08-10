@@ -1,4 +1,4 @@
-import { Model } from "@models";
+import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { applyChatTurnResponse } from "./applyChatTurnResponse";
 import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";

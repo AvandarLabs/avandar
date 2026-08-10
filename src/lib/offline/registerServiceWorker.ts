@@ -1,4 +1,4 @@
-import { notifyWarning } from "@ui";
+import { notifyWarning } from "@/utils/notifications/notify";
 import { registerSW } from "virtual:pwa-register";
 
 /**

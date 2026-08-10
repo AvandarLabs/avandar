@@ -1,3 +1,5 @@
+import { Paper } from "@avandar/ui";
+import { makeArrayWithLength } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import {
   Blockquote,
@@ -10,8 +12,6 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Paper } from "@ui";
-import { makeArrayWithLength } from "@utils";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";

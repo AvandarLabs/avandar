@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import {
   Badge,
@@ -8,7 +9,6 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { prop } from "@utils";
 import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu";
 import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";

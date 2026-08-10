@@ -6,7 +6,7 @@ import {
   IconFileExport,
   IconPencil,
 } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";

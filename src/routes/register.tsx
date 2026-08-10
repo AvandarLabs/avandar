@@ -1,4 +1,6 @@
-import { useBoolean, useMutation } from "@hooks";
+import { useMutation } from "@avandar/query-hooks";
+import { useBoolean } from "@avandar/hooks";
+import { useForm } from "@avandar/ui/hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -16,7 +18,6 @@ import {
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { notifyError, notifySuccess } from "@ui";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -29,7 +30,7 @@ import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

@@ -1,7 +1,7 @@
 /*
  * Native DuckDB service for the Bun-main process.
  *
- * Wraps the `duckdb` Node binding (same package `@avandar/ava-etl` uses) so
+ * Wraps the `duckdb` Node binding (same package `@avandar/etl` uses) so
  * the desktop shell can run analytical SQL against an on-disk DuckDB file
  * without paying the duckdb-wasm tax in the webview. The IPC handlers in
  * `apps/desktop/main/ipc/duckdb.ts` are the only consumer in Phase 2; the

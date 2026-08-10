@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback, useState } from "react";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";

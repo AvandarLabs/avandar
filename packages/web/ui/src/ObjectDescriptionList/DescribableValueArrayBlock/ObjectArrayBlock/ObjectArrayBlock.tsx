@@ -1,7 +1,5 @@
-import { Trans } from "@lingui/react/macro";
 import { List, Table, Text } from "@mantine/core";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { StringKeyOf } from "@utils/types/utilities.types";
+import { objectKeys, StringKeyOf  } from "@avandar/utils";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../../CollapsibleItem";
 import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
@@ -16,6 +14,7 @@ import type {
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../../ObjectDescriptionList.types";
+import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
@@ -44,6 +43,7 @@ export function ObjectArrayBlock<
   maxItemsCount,
   ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element | null {
+  const i18n = useI18nMessages();
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -177,7 +177,7 @@ export function ObjectArrayBlock<
   const moreText =
     valuesToRender.length < values.length ?
       <Text>
-        <Trans>... and {remainingCount} more</Trans>
+        {i18n.andMore(remainingCount)}
       </Text>
     : null;
 

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -165,7 +165,7 @@ function renderModal(props: Partial<ModalProps> = {}): {
   render(
     (
       <QueryClientProvider client={queryClient}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <SaveToDashboardModal
             rawSql="SELECT 1"
             prompt="Show one"
@@ -175,7 +175,7 @@ function renderModal(props: Partial<ModalProps> = {}): {
             onClose={onClose}
             {...props}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </QueryClientProvider>
     ) as ReactElement,
   );

@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { describe, expect, it } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
 import { FunnelChartForm } from "./FunnelChartForm";
 import { PieChartForm } from "./PieChartForm";
@@ -36,14 +36,14 @@ describe("PieChartForm layout", () => {
   it("wraps the value pickers in a Series fieldset", () => {
     const { container } = render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <PieChartForm
             fields={fields}
             config={pieConfig}
             data={[]}
             onConfigChange={() => {}}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
     const legends = Array.from(container.querySelectorAll("legend")).map(
@@ -57,14 +57,14 @@ describe("PieChartForm layout", () => {
   it("groups chart-level toggles in a Chart settings fieldset", () => {
     const { container } = render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <PieChartForm
             fields={fields}
             config={pieConfig}
             data={[]}
             onConfigChange={() => {}}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
     const legends = Array.from(container.querySelectorAll("legend")).map(
@@ -80,14 +80,14 @@ describe("FunnelChartForm layout", () => {
   it("wraps the value pickers in a Series fieldset", () => {
     const { container } = render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <FunnelChartForm
             fields={fields}
             config={funnelConfig}
             data={[]}
             onConfigChange={() => {}}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
     const legends = Array.from(container.querySelectorAll("legend")).map(

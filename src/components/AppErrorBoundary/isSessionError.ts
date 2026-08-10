@@ -1,4 +1,4 @@
-import { SessionExpiredError } from "@clients";
+import { SessionExpiredError } from "$/ServerApiClient";
 
 /**
  * Signatures of an authentication/session failure that should drive the user

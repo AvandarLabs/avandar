@@ -1,3 +1,4 @@
+import { mantineColorVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -10,7 +11,6 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { mantineColorVar } from "@ui";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";

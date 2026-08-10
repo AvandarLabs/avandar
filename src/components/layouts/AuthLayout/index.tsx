@@ -1,5 +1,5 @@
+import { Paper } from "@avandar/ui";
 import { Box, Container, Stack, Text, Title } from "@mantine/core";
-import { Paper } from "@ui";
 import { CSSProperties, ReactNode } from "react";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";

@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import { notifySuccess } from "@ui";
+import { notifySuccess } from "@/utils/notifications/notify";
 import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

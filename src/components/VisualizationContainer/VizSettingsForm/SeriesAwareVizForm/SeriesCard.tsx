@@ -1,3 +1,4 @@
+import { makeBucketMap, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -9,7 +10,6 @@ import {
   Text,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { makeBucketMap, setValue } from "@utils";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";

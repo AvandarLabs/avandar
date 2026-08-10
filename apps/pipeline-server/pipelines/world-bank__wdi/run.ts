@@ -1,26 +1,26 @@
 import { mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import {
-  ETLEngine,
-  getETLOutputDir,
-  getETLPipelineInputDir,
-  NodeDuckDB,
-} from "@ava-etl";
+  EtlEngine,
+  getEtlOutputDir,
+  getEtlPipelineInputDir,
+  NodeDuckDb,
+} from "@avandar/etl";
+import { MIMEType } from "@avandar/utils";
 import {
   createSupabaseAdminClient,
   getWdiYearCoverageFromParquet,
   upsertWorldBankWdiCatalogEntry,
 } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
-import { MIMEType } from "@utils";
-import type { TransformedDataDescriptionForParquet } from "@ava-etl";
+import type { TransformedDataDescriptionForParquet } from "@avandar/etl";
 import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
 
-const worldBankWdiETL = ETLEngine.create({
+const worldBankWdiEtl = EtlEngine.create({
   name: PIPELINE_NAME,
   extract: async ({ pipelineRunId }) => {
-    const inputDir = getETLPipelineInputDir(PIPELINE_NAME);
+    const inputDir = getEtlPipelineInputDir(PIPELINE_NAME);
     await mkdir(inputDir, { recursive: true });
     const entries = await readdir(inputDir);
     const csvFilenames = entries
@@ -38,7 +38,7 @@ const worldBankWdiETL = ETLEngine.create({
     await Promise.all(
       csvFilenames.map(async (destinationBasename) => {
         const sourcePath = join(inputDir, destinationBasename);
-        await ETLEngine.storeExtractedData({
+        await EtlEngine.storeExtractedData({
           pipelineName: PIPELINE_NAME,
           pipelineRunId,
           sourcePath,
@@ -55,7 +55,7 @@ const worldBankWdiETL = ETLEngine.create({
     };
   },
   transform: async (extracted, { pipelineRunId }) => {
-    const extractDir = getETLOutputDir(PIPELINE_NAME, pipelineRunId, "extract");
+    const extractDir = getEtlOutputDir(PIPELINE_NAME, pipelineRunId, "extract");
     const csvFilenames = extracted.files
       .filter((file) => {
         return file.name.toLowerCase().endsWith(".csv");
@@ -64,13 +64,13 @@ const worldBankWdiETL = ETLEngine.create({
         return file.name;
       });
 
-    const db = new NodeDuckDB();
+    const db = new NodeDuckDb();
     try {
       const descriptions: TransformedDataDescriptionForParquet[] = [];
       for (const filename of csvFilenames) {
         const baseName = filename.replace(/\.csv$/i, "");
         const csvPath = join(extractDir, filename);
-        const columns = await db.sniffCSV({ csvPath });
+        const columns = await db.sniffCsv({ csvPath });
         descriptions.push({ name: baseName, columns });
       }
       return descriptions;
@@ -79,12 +79,12 @@ const worldBankWdiETL = ETLEngine.create({
     }
   },
   load: async ({ pipelineName, pipelineRunId, parquetTableBaseNames }) => {
-    const db = new NodeDuckDB();
+    const db = new NodeDuckDb();
     try {
       const tableSummaries: WdiTableParquetSummary[] = [];
 
       for (const tableBaseName of parquetTableBaseNames) {
-        const parquetPath = ETLEngine.getLoadParquetPathForTable({
+        const parquetPath = EtlEngine.getLoadParquetPathForTable({
           pipelineName,
           pipelineRunId,
           tableBaseName,
@@ -109,7 +109,7 @@ const worldBankWdiETL = ETLEngine.create({
         });
       }
 
-      await ETLEngine.uploadParquetToStorage({
+      await EtlEngine.uploadParquetToStorage({
         pipelineName,
         pipelineRunId,
         parquetTableBaseNames,
@@ -132,6 +132,6 @@ const worldBankWdiETL = ETLEngine.create({
  * Runs the World Bank WDI pipeline and returns the pipeline run id.
  */
 export async function run(): Promise<string> {
-  const { pipelineRunId } = await worldBankWdiETL.run();
+  const { pipelineRunId } = await worldBankWdiEtl.run();
   return pipelineRunId;
 }

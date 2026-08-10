@@ -1,3 +1,5 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -11,8 +13,6 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses, removeAtIndex } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.module.css";

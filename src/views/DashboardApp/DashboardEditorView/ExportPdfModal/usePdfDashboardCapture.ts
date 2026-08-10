@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { notifyError } from "@ui";
+import { notifyError } from "@/utils/notifications/notify";
 import { useEffect, useState } from "react";
 import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
 

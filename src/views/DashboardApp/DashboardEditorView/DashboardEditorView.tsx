@@ -2,7 +2,7 @@ import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Flex, Text } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { useCallback, useEffect, useMemo } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";

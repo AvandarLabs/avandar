@@ -1,13 +1,8 @@
-import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import {
   formatDate,
-  FormattableTimezone,
-} from "@utils/dates/formatDate/formatDate";
-import { isDate } from "@utils/guards/isDate/isDate";
-import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
-import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue";
+  FormattableTimezone, isDate , isISODateString , isNullish , isValidDateValue 
+} from "@avandar/utils";
 import { ReactNode } from "react";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 
@@ -68,9 +63,12 @@ export function DateValueItem({
     );
   }
 
+  // The value did not parse as a date. This is a developer-facing signal that
+  // the wrong renderer was chosen for this field, not user copy, so it is
+  // deliberately an untranslated literal rather than an `I18nMessages` key.
   return (
-    <div>
-      <Trans>Hello DateValueItem</Trans>
-    </div>
+    <Text span c="red">
+      Unsupported data type
+    </Text>
   );
 }

@@ -1,6 +1,6 @@
+import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Radio, SegmentedControl, Stack, Table, Text } from "@mantine/core";
-import { matchLiteral } from "@utils";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import type {

@@ -1,17 +1,26 @@
 {
   "imports": {
-    "$/": "../../../shared/",
-    "@sbfn/": "../",
+    "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
+    "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
+    "@avandar/models": "../../../packages/shared/models/src/index.ts",
+    "@avandar/models/zod": "../../../packages/shared/models/src/zod/index.ts",
+    "@avandar/modules": "../../../packages/shared/modules/src/index.ts",
+    "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
+    "@avandar/utils/encoding": "../../../packages/shared/utils/src/encoding/index.ts",
+    "@avandar/utils/sql": "../../../packages/shared/utils/src/sql/index.ts",
+    "@avandar/utils/zod": "../../../packages/shared/utils/src/zod/index.ts",
     "@clients/": "../../../packages/shared/clients/src/",
     "@logger/": "../../../packages/shared/logger/src/",
     "@models/": "../../../packages/shared/models/src/",
     "@modules/": "../../../packages/shared/modules/src/",
-    "@utils/": "../../../packages/shared/utils/src/",
     "@react-email/components": "npm:@react-email/components@0",
     "@react-email/render": "npm:@react-email/render@1",
+    "@sbfn/": "../",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
     "@upstash/redis": "npm:@upstash/redis@1",
+    "@utils/": "../../../packages/shared/utils/src/",
+    "$/": "../../../shared/",
     "react": "npm:react@19",
     "resend": "npm:resend@6",
     "ts-pattern": "npm:ts-pattern@5",
@@ -22,7 +31,11 @@
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "lib": [
+      "deno.ns",
+      "dom",
+      "dom.iterable"
+    ],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -31,6 +44,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
-    "types": ["react", "react/jsx-runtime"]
+    "types": [
+      "react",
+      "react/jsx-runtime"
+    ]
   }
 }

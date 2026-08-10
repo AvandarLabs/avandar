@@ -1,7 +1,7 @@
+import { isNonEmptyArray } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { isNonEmptyArray } from "@utils";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";

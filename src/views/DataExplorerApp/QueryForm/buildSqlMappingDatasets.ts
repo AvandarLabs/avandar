@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";

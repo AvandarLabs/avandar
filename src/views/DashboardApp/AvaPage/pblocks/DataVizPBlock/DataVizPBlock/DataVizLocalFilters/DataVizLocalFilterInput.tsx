@@ -1,6 +1,6 @@
+import { Select } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { MultiSelect, TextInput } from "@mantine/core";
-import { Select } from "@ui";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type {
   LocalFilter,

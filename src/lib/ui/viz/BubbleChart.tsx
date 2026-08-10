@@ -23,7 +23,7 @@ import {
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
