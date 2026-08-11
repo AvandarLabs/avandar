@@ -1310,6 +1310,10 @@ msgstr "Ce champ"
 msgid "Edit access for {0}"
 msgstr "Modifier l'accès pour {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "Le nom de l'espace de travail est requis"
+
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Une erreur inattendue s’est produite. Vous pouvez réessayer ou "
