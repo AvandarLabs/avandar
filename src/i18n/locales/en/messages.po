@@ -102,7 +102,7 @@ msgstr "Check your email for a password reset link"
 msgid "Invite member"
 msgstr "Invite member"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "JOIN entry at position {index} is not a plain table reference."
 
@@ -178,11 +178,11 @@ msgstr "The {chartName} cannot be displayed."
 msgid "Allow online syncing"
 msgstr "Allow online syncing"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING compares \"{columnName}\" against a non-literal expression."
 msgstr "HAVING compares \"{columnName}\" against a non-literal expression."
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT is not supported in the form."
 
@@ -317,7 +317,7 @@ msgstr "Aggregations"
 msgid "No"
 msgstr "No"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "Could not determine a base table from FROM clause."
 
@@ -580,7 +580,7 @@ msgstr "Table"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Search the data catalog to add open datasets to your workspace."
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 msgstr "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 
@@ -659,7 +659,7 @@ msgstr "Choose how much of each dataset to publish. The default: \"Only what's "
 msgid "I understand this data will be sent to the AI provider"
 msgstr "I understand this data will be sent to the AI provider"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 "true."
 msgstr "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
@@ -796,7 +796,7 @@ msgstr "These datasets are listed in your workspace, but their source data "
 msgid "Metadata"
 msgstr "Metadata"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "JOIN subquery at position {index} could not be re-serialised."
 
@@ -957,7 +957,7 @@ msgstr "Label"
 msgid "Create a dashboard"
 msgstr "Create a dashboard"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references multiple columns; the form keeps only the first."
 msgstr "ORDER BY references multiple columns; the form keeps only the first."
 
@@ -969,7 +969,7 @@ msgstr "missing"
 msgid "One standard deviation around the mean"
 msgstr "One standard deviation around the mean"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL is empty."
 msgstr "SQL is empty."
 
@@ -1396,7 +1396,7 @@ msgstr "Overwrite SQL with form changes"
 msgid "Dataset did not match the expected schema"
 msgstr "Dataset did not match the expected schema"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "FROM clause is not a plain table reference."
 msgstr "FROM clause is not a plain table reference."
 
@@ -1479,7 +1479,7 @@ msgstr "A local record of every time you approved (or cancelled) sending data "
 "to an AI provider in this workspace. Last 90 days, stored on this "
 "device only."
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 
@@ -1554,7 +1554,7 @@ msgstr "Connect to Google Sheets"
 msgid "100% stacked"
 msgstr "100% stacked"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Could not find a known dataset matching \"{tableName}\"."
 
@@ -1654,7 +1654,7 @@ msgstr "Failed to save dataset: {0}"
 msgid "Query form"
 msgstr "Query form"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
 msgstr "WHERE clause uses an expression on the left-hand side that is not a "
@@ -1732,7 +1732,7 @@ msgstr "Dataset name is required"
 msgid "Main"
 msgstr "Main"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING clause uses a left-hand side the form cannot represent."
 
@@ -1740,7 +1740,7 @@ msgstr "HAVING clause uses a left-hand side the form cannot represent."
 msgid "Allow new {pluralEntityConfigName} to be created manually"
 msgstr "Allow new {pluralEntityConfigName} to be created manually"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
 msgstr "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -1930,7 +1930,7 @@ msgstr "Empty text"
 msgid "Ocean"
 msgstr "Ocean"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
 "represent."
 msgstr "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -2343,7 +2343,7 @@ msgstr "Legend position"
 msgid "CSVs"
 msgstr "CSVs"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
@@ -2365,7 +2365,7 @@ msgstr "Qwen 2.5 7B (offline)"
 msgid "QR code"
 msgstr "QR code"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL contains multiple statements; the form maps only the first."
 
@@ -2569,7 +2569,7 @@ msgstr "Go to billing portal"
 msgid "Clear log"
 msgstr "Clear log"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
 msgstr "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -2673,10 +2673,6 @@ msgstr "Send invite"
 msgid "Open {0}"
 msgstr "Open {0}"
 
-#: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
-#~ msgid "Manual Query"
-#~ msgstr "Manual Query"
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
 msgstr "Dataset is now offline-only"
@@ -2733,11 +2729,11 @@ msgstr "Type or paste an email below."
 msgid "URL"
 msgstr "URL"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY uses a non-column expression."
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
 msgstr "The form only supports SELECT queries."
 
@@ -2946,7 +2942,7 @@ msgstr "Here is a query based on your workspace metadata."
 msgid "Overwrite SQL?"
 msgstr "Overwrite SQL?"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause compares \"{columnName}\" against a non-literal expression."
 msgstr "WHERE clause compares \"{columnName}\" against a non-literal "
 "expression."
@@ -3006,7 +3002,7 @@ msgstr "View"
 msgid "Area layout"
 msgstr "Area layout"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "CTEs (WITH clauses) are not supported in the form."
 
@@ -3014,7 +3010,7 @@ msgstr "CTEs (WITH clauses) are not supported in the form."
 msgid "Unavailable"
 msgstr "Unavailable"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 "raw SQL."
 msgstr "JOIN ON clause uses a non-column reference; the form will keep it via "
@@ -3064,7 +3060,7 @@ msgstr "No datasets match your search."
 msgid "in"
 msgstr "in"
 
-#: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes/SqlSyncWarningNotes.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
 msgstr "Parts of this SQL could not be represented in the Manual form. The form "
@@ -3362,10 +3358,6 @@ msgstr "App"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "/month (paid yearly)"
 msgstr "/month (paid yearly)"
-
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Close {title}"
-#~ msgstr "Close {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -3933,10 +3925,6 @@ msgstr "Process data again"
 msgid "Export as PDF"
 msgstr "Export as PDF"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Collapse panel"
-#~ msgstr "Collapse panel"
-
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter"
@@ -4025,7 +4013,7 @@ msgstr "This {resource} is shared with: "
 msgid "Upload"
 msgstr "Upload"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
 msgstr "Unrecognised SELECT item; skipped."
 
@@ -4099,7 +4087,7 @@ msgid "Partially offline"
 msgstr "Partially offline"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock/SqlReadOnlyBlock.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
 msgid "Edit query"
 msgstr "Edit query"
 
@@ -4221,7 +4209,7 @@ msgstr "Send <0>{0}</0> value{1} to the AI?"
 msgid "Custom URL path"
 msgstr "Custom URL path"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses operator \"{operator}\" which the form does not "
 "support."
 msgstr "WHERE clause uses operator \"{operator}\" which the form does not "
@@ -4246,10 +4234,6 @@ msgstr "Dashboard snapshot"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "Signing you back in…"
-
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Query Details"
-#~ msgstr "Query Details"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4340,7 +4324,7 @@ msgstr "File failed to load"
 msgid "There was an error on update: {0}"
 msgstr "There was an error on update: {0}"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate function \"{funcName}\" uses a complex argument; skipped."
 msgstr "Aggregate function \"{funcName}\" uses a complex argument; skipped."
 
@@ -4544,7 +4528,7 @@ msgstr "Publishing makes this dashboard viewable by anyone with the link, no "
 msgid "Please choose a password to complete your registration"
 msgstr "Please choose a password to complete your registration"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -4671,7 +4655,7 @@ msgstr "Qwen 2.5 1.5B (offline)"
 msgid "X axis"
 msgstr "X axis"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate references column \"{columnName}\" not present in the dataset."
 msgstr "Aggregate references column \"{columnName}\" not present in the "
 "dataset."
@@ -5060,10 +5044,6 @@ msgstr "Text contains"
 msgid "Role for new share"
 msgstr "Role for new share"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Expand panel"
-#~ msgstr "Expand panel"
-
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
 msgstr "Send to AI?"
@@ -5167,7 +5147,7 @@ msgstr "We should join data into the same {entityConfigName} when…"
 msgid "contains"
 msgstr "contains"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Unnamed column expression in SELECT; skipped."
 
@@ -5245,7 +5225,7 @@ msgstr "H2"
 msgid "Add a pull quote..."
 msgstr "Add a pull quote..."
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "DISTINCT is not supported in the form."
 msgstr "DISTINCT is not supported in the form."
 
@@ -5315,7 +5295,7 @@ msgstr "Role group created"
 msgid "Failed to update display name"
 msgstr "Failed to update display name"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not parse SQL: {message}"
 msgstr "Could not parse SQL: {message}"
 
@@ -5590,7 +5570,7 @@ msgstr "Select sort order"
 msgid "Import this file?"
 msgstr "Import this file?"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the "
 "predicate as a label."
 msgstr "HAVING uses aggregate {funcName} on a complex argument; mapping kept "
@@ -5774,7 +5754,7 @@ msgstr "Dataset limit reached"
 msgid "Distinct values"
 msgstr "Distinct values"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING uses operator \"{operator}\" which the form does not support."
 
@@ -5825,7 +5805,7 @@ msgstr "The values you selected may contain personal information. The AI "
 msgid "CSV or Excel file"
 msgstr "CSV or Excel file"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT references column \"{columnName}\" not present in the dataset."
 
@@ -5862,7 +5842,7 @@ msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgid "Scatter Plot"
 msgstr "Scatter Plot"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form "
 "cannot represent."
 msgstr "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the "
@@ -6009,7 +5989,7 @@ msgstr "Processing, {remainingLabel} remaining"
 msgid "Loose"
 msgstr "Loose"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY references column \"{columnName}\" not in the SELECT list."
 
@@ -6017,7 +5997,7 @@ msgstr "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
 msgstr "Upgrading plan to {newPlanName} ({newPlanSubType})"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "SELECT expression of type \"{exprType}\" is not supported by the form."
 

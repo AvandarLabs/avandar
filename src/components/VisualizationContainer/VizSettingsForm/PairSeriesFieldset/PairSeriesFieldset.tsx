@@ -17,6 +17,7 @@ import { useCallback, useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.module.css";
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
+import { useStableRowIds } from "@/components/VisualizationContainer/VizSettingsForm/useStableRowIds";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -83,6 +84,8 @@ export function PairSeriesFieldset({
     [series, onChange],
   );
 
+  const seriesRowIds = useStableRowIds(series);
+
   const seriesGroup = (
     <Stack gap="md">
       <Group justify="space-between">
@@ -114,7 +117,7 @@ export function PairSeriesFieldset({
         {series.map((scatterSeries, idx) => {
           return (
             <Card
-              key={`${scatterSeries.key}-${scatterSeries.xKey}-${idx}`}
+              key={seriesRowIds[idx]}
               withBorder
               shadow="none"
               padding="sm"

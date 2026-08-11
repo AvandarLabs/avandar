@@ -99,9 +99,9 @@ msgstr "检查您的电子邮件以获取密码重置链接"
 msgid "Invite member"
 msgstr "邀请成员"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
-msgstr ""
+msgstr "位置 {index} 的 JOIN 条目不是简单表引用。"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -174,13 +174,13 @@ msgstr "无法显示 {chartName}。"
 msgid "Allow online syncing"
 msgstr "允许在线同步"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING compares \"{columnName}\" against a non-literal expression."
-msgstr ""
+msgstr "HAVING 将“{columnName}”与非字面量表达式进行比较。"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
-msgstr ""
+msgstr "表单不支持 UNION/INTERSECT/EXCEPT。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
@@ -251,7 +251,7 @@ msgstr "提示框"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Style"
-msgstr ""
+msgstr "样式"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -309,9 +309,9 @@ msgstr "聚合"
 msgid "No"
 msgstr "否"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
-msgstr ""
+msgstr "无法从 FROM 子句中确定基础表。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
@@ -347,7 +347,7 @@ msgstr "添加一条显示 {datasetName} 随时间变化趋势的折线图"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show legend"
-msgstr ""
+msgstr "显示图例"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
@@ -362,7 +362,7 @@ msgstr "数据源"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
-msgstr ""
+msgstr "展开抽屉"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
@@ -498,7 +498,7 @@ msgstr "仅允许一个值"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
-msgstr ""
+msgstr "饼图"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
@@ -531,7 +531,7 @@ msgstr "折叠于"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Bubble Chart"
-msgstr ""
+msgstr "气泡图"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
@@ -567,9 +567,9 @@ msgstr "表格"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜索数据目录以将开放数据集添加到您的工作区。"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
-msgstr ""
+msgstr "JOIN ON 子句使用“{operator}”：仅映射等值连接。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
@@ -643,10 +643,10 @@ msgstr "选择要发布的每个数据集的数量。默认选项：\"仅查询�
 msgid "I understand this data will be sent to the AI provider"
 msgstr "我理解这些数据将发送给 AI 提供者"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 "true."
-msgstr ""
+msgstr "逗号连接的表不会被映射；请将其视为 ON true 的 INNER JOIN。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -773,9 +773,9 @@ msgstr "这些数据集在您的工作区中列出，但其源数据在您的本
 msgid "Metadata"
 msgstr "元数据"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN subquery at position {index} could not be re-serialised."
-msgstr ""
+msgstr "无法重新序列化位置 {index} 的 JOIN 子查询。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -860,7 +860,7 @@ msgstr "创建失败"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
-msgstr ""
+msgstr "自然"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -932,9 +932,9 @@ msgstr "标签"
 msgid "Create a dashboard"
 msgstr "创建仪表板"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references multiple columns; the form keeps only the first."
-msgstr ""
+msgstr "ORDER BY 引用了多个列；表单仅保留第一个。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
@@ -944,9 +944,9 @@ msgstr "缺失"
 msgid "One standard deviation around the mean"
 msgstr "均值周围的一个标准差"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL is empty."
-msgstr ""
+msgstr "SQL 为空。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -968,7 +968,7 @@ msgstr "默认为 \"Y 对 X\""
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Funnel Chart"
-msgstr ""
+msgstr "漏斗图"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1124,7 +1124,7 @@ msgstr "在计费门户中管理席位 →"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
-msgstr ""
+msgstr "表格视图没有图表设置。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
@@ -1205,7 +1205,7 @@ msgstr "开放数据"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort & limit"
-msgstr ""
+msgstr "排序和限制"
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
@@ -1230,7 +1230,7 @@ msgstr "电子邮件地址"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Smooth"
-msgstr ""
+msgstr "平滑"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Enter a name for the field"
@@ -1361,9 +1361,9 @@ msgstr "用表单更改覆盖 SQL"
 msgid "Dataset did not match the expected schema"
 msgstr "数据集与预期模式不匹配"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "FROM clause is not a plain table reference."
-msgstr ""
+msgstr "FROM 子句不是简单表引用。"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
@@ -1436,9 +1436,9 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 "only."
 msgstr "您批准（或取消）向此工作区的 AI 提供者发送数据的每次记录。过去 90 天，仅存储在此设备上。"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
-msgstr ""
+msgstr "SELECT 中不支持聚合函数“{funcName}”；已跳过。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -1479,7 +1479,7 @@ msgstr "工作区 ID 不能为空"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
-msgstr ""
+msgstr "隐藏 Y 轴"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
@@ -1508,11 +1508,11 @@ msgstr "连接到 Google Sheets"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
-msgstr ""
+msgstr "100% 堆叠"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
-msgstr ""
+msgstr "找不到与“{tableName}”匹配的已知数据集。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1556,7 +1556,7 @@ msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>�
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
-msgstr ""
+msgstr "阶梯"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -1608,10 +1608,10 @@ msgstr "保存数据集失败：{0}"
 msgid "Query form"
 msgstr "查询表单"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
-msgstr ""
+msgstr "WHERE 子句左侧使用了不是列引用的表达式。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
@@ -1684,18 +1684,18 @@ msgstr "数据集名称是必需的"
 msgid "Main"
 msgstr "主要"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
-msgstr ""
+msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
 msgstr "允许手动创建新的 {pluralEntityConfigName}"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
-msgstr ""
+msgstr "WHERE 子句对非空右侧使用了“{operator}”；仅映射 IS NULL / IS NOT NULL。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid ", and "
@@ -1801,11 +1801,11 @@ msgstr "数据预览"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
-msgstr ""
+msgstr "网格线颜色"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
-msgstr ""
+msgstr "请在上方选择图表类型进行配置。"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -1877,10 +1877,10 @@ msgstr "文本为空"
 msgid "Ocean"
 msgstr "海洋"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
 "represent."
-msgstr ""
+msgstr "HAVING 子句包含表单无法表示的“{nodeType}”节点。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "You are about to change your subscription plan to:"
@@ -1917,7 +1917,7 @@ msgstr "此仪表板是 <0>公开</0> 的。任何拥有以下链接的人都可
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
-msgstr ""
+msgstr "雷达图"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
@@ -2002,7 +2002,7 @@ msgstr "第 7 列"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
-msgstr ""
+msgstr "显示数据点"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
@@ -2020,7 +2020,7 @@ msgstr "SQL 未应用。请批准假定的筛选值以运行此查询。"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
-msgstr ""
+msgstr "恒等"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -2088,7 +2088,7 @@ msgstr "文本"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
-msgstr ""
+msgstr "拆分（+/-）"
 
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
@@ -2185,7 +2185,7 @@ msgstr "大约一分钟"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Y axis"
-msgstr ""
+msgstr "Y 轴"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
@@ -2255,7 +2255,7 @@ msgstr "值"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
-msgstr ""
+msgstr "Y 轴标签颜色"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2272,16 +2272,16 @@ msgstr "完整"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
-msgstr ""
+msgstr "图例位置"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
 msgstr "CSV 文件"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
-msgstr ""
+msgstr "WHERE 子句对“{columnName}”使用了“{operator}”，但列表不是字面量。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2299,9 +2299,9 @@ msgstr "Qwen 2.5 7B（离线）"
 msgid "QR code"
 msgstr "二维码"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL contains multiple statements; the form maps only the first."
-msgstr ""
+msgstr "SQL 包含多个语句；表单仅映射第一个。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
@@ -2384,7 +2384,7 @@ msgstr "已回答"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
-msgstr ""
+msgstr "直线"
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
@@ -2467,7 +2467,7 @@ msgstr "按月支付"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
-msgstr ""
+msgstr "垂直网格线"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2498,10 +2498,10 @@ msgstr "前往账单门户"
 msgid "Clear log"
 msgstr "清除日志"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
-msgstr ""
+msgstr "无法重新序列化 FROM 中的嵌套子查询；映射已作为占位符保留。"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -2513,7 +2513,7 @@ msgstr "图像"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
-msgstr ""
+msgstr "隐藏 X 轴"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2600,10 +2600,6 @@ msgstr "发送邀请"
 msgid "Open {0}"
 msgstr "打开 {0}"
 
-#: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
-#~ msgid "Manual Query"
-#~ msgstr "手动查询"
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
 msgstr "数据集现在仅限离线使用"
@@ -2623,7 +2619,7 @@ msgstr "创建"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
-msgstr ""
+msgstr "描边宽度"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -2658,13 +2654,13 @@ msgstr "在下面输入或粘贴电子邮件。"
 msgid "URL"
 msgstr "URL"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
-msgstr ""
+msgstr "GROUP BY 使用了非列表达式。"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
-msgstr ""
+msgstr "此表单仅支持 SELECT 查询。"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2841,7 +2837,7 @@ msgstr "正在修复查询…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
-msgstr ""
+msgstr "水平网格线"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
@@ -2869,9 +2865,9 @@ msgstr "这是基于您的工作区元数据生成的查询。"
 msgid "Overwrite SQL?"
 msgstr "覆盖 SQL 吗？"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause compares \"{columnName}\" against a non-literal expression."
-msgstr ""
+msgstr "WHERE 子句将“{columnName}”与非字面量表达式进行比较。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
@@ -2925,20 +2921,20 @@ msgstr "查看"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
-msgstr ""
+msgstr "面积布局"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "CTEs (WITH clauses) are not supported in the form."
-msgstr ""
+msgstr "表单不支持 CTE（WITH 子句）。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "不可用"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 "raw SQL."
-msgstr ""
+msgstr "JOIN ON 子句使用了非列引用；表单将通过原始 SQL 保留该引用。"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -2984,10 +2980,10 @@ msgstr "没有数据集与您的搜索匹配。"
 msgid "in"
 msgstr "在"
 
-#: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes/SqlSyncWarningNotes.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
-msgstr ""
+msgstr "此 SQL 的部分内容无法在手动表单中表示。表单显示的是尽力而为的近似结果；实际运行的是该 SQL。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
@@ -3011,7 +3007,7 @@ msgstr "颜色"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
-msgstr ""
+msgstr "Y 轴标签"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -3036,7 +3032,7 @@ msgstr "大"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
-msgstr ""
+msgstr "线宽"
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3258,7 +3254,7 @@ msgstr "时间"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
-msgstr ""
+msgstr "柱状图"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -3276,10 +3272,6 @@ msgstr "应用"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "/month (paid yearly)"
 msgstr "/月（按年支付）"
-
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Close {title}"
-#~ msgstr "关闭 {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -3450,7 +3442,7 @@ msgstr "标题"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
-msgstr ""
+msgstr "曲线"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -3478,7 +3470,7 @@ msgstr "无法移除离线聊天模型"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
-msgstr ""
+msgstr "图例"
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -3540,7 +3532,7 @@ msgstr "最近"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
-msgstr ""
+msgstr "重叠"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
@@ -3570,7 +3562,7 @@ msgstr "转动"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
-msgstr ""
+msgstr "X 轴标签"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -3644,7 +3636,7 @@ msgstr "Qwen 2.5 3B"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
-msgstr ""
+msgstr "收起抽屉"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
@@ -3819,7 +3811,7 @@ msgstr "电子邮件"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
-msgstr ""
+msgstr "Y 轴刻度颜色"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
@@ -3834,10 +3826,6 @@ msgstr "重新处理数据"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export as PDF"
 msgstr "导出为 PDF"
-
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Collapse panel"
-#~ msgstr "折叠面板"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
@@ -3905,7 +3893,7 @@ msgstr "通过探索您的工作区或上传您的第一个数据集开始。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
-msgstr ""
+msgstr "堆叠"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
@@ -3924,9 +3912,9 @@ msgstr "此 {resource} 与以下人员共享："
 msgid "Upload"
 msgstr "上传"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
-msgstr ""
+msgstr "无法识别的 SELECT 项；已跳过。"
 
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -3998,7 +3986,7 @@ msgid "Partially offline"
 msgstr "部分离线"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock/SqlReadOnlyBlock.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
 msgid "Edit query"
 msgstr "编辑查询"
 
@@ -4036,7 +4024,7 @@ msgstr "高度"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Line Chart"
-msgstr ""
+msgstr "折线图"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 #: src/utils/notifications/notifyExpiredSession.ts
@@ -4097,7 +4085,7 @@ msgstr "您的结账成功！"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Parts of the SQL cannot be represented in the manual form."
-msgstr ""
+msgstr "SQL 的部分内容无法在手动表单中表示。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
@@ -4118,10 +4106,10 @@ msgstr "将 <0>{0}</0> 值{1} 发送给 AI 吗？"
 msgid "Custom URL path"
 msgstr "自定义 URL 路径"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses operator \"{operator}\" which the form does not "
 "support."
-msgstr ""
+msgstr "WHERE 子句使用了表单不支持的运算符“{operator}”。"
 
 #: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
@@ -4142,10 +4130,6 @@ msgstr "仪表板快照"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "正在重新登录…"
-
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Query Details"
-#~ msgstr "查询详情"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4235,9 +4219,9 @@ msgstr "文件加载失败"
 msgid "There was an error on update: {0}"
 msgstr "更新时发生错误：{0}"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate function \"{funcName}\" uses a complex argument; skipped."
-msgstr ""
+msgstr "聚合函数“{funcName}”使用了复杂参数；已跳过。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -4369,7 +4353,7 @@ msgstr "规范 URL"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
-msgstr ""
+msgstr "查询返回一些列后，图表设置才会显示。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
@@ -4399,7 +4383,7 @@ msgstr "行数"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Form is an approximation"
-msgstr ""
+msgstr "表单为近似结果"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Restricted"
@@ -4431,10 +4415,10 @@ msgstr "发布后，任何拥有链接的人都可以查看此仪表板，无需
 msgid "Please choose a password to complete your registration"
 msgstr "请选一个密码以完成注册"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
-msgstr ""
+msgstr "WHERE 子句包含表单不支持的“{nodeType}”节点。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
@@ -4505,7 +4489,7 @@ msgstr "随意支付"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
-msgstr ""
+msgstr "柱状图布局"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
@@ -4553,9 +4537,9 @@ msgstr "Qwen 2.5 1.5B（离线）"
 msgid "X axis"
 msgstr "X 轴"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate references column \"{columnName}\" not present in the dataset."
-msgstr ""
+msgstr "聚合引用了数据集中不存在的列“{columnName}”。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "User group deleted"
@@ -4757,7 +4741,7 @@ msgstr "您尚未选择名称列"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
-msgstr ""
+msgstr "分组"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "You need admin access on this resource to manage sharing."
@@ -4770,7 +4754,7 @@ msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
-msgstr ""
+msgstr "堆叠组"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -4931,10 +4915,6 @@ msgstr "文本包含"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
-#~ msgid "Expand panel"
-#~ msgstr "展开面板"
-
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
 msgstr "发送给 AI 吗？"
@@ -5038,9 +5018,9 @@ msgstr "当…时，我们应该将数据连接到同一个 {entityConfigName}"
 msgid "contains"
 msgstr "包含"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
-msgstr ""
+msgstr "SELECT 中的列表达式未命名；已跳过。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
@@ -5064,7 +5044,7 @@ msgstr "架构版本"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Query editor mode"
-msgstr ""
+msgstr "查询编辑器模式"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
@@ -5096,7 +5076,7 @@ msgstr "没有可用列"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Resize drawer"
-msgstr ""
+msgstr "调整抽屉大小"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -5114,9 +5094,9 @@ msgstr "H2"
 msgid "Add a pull quote..."
 msgstr "添加引述…"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "DISTINCT is not supported in the form."
-msgstr ""
+msgstr "表单不支持 DISTINCT。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -5184,9 +5164,9 @@ msgstr "角色组已创建"
 msgid "Failed to update display name"
 msgstr "更新显示名称失败"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not parse SQL: {message}"
-msgstr ""
+msgstr "无法解析 SQL：{message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
@@ -5289,7 +5269,7 @@ msgstr "感谢您的关注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Source"
-msgstr ""
+msgstr "来源"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
@@ -5381,7 +5361,7 @@ msgstr "这将从使用该用户组的成员和资源中移除该用户组。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
-msgstr ""
+msgstr "顶部"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
@@ -5452,10 +5432,10 @@ msgstr "选择排序顺序"
 msgid "Import this file?"
 msgstr "导入此文件？"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the "
 "predicate as a label."
-msgstr ""
+msgstr "HAVING 使用了复杂参数上的聚合函数 {funcName}；映射将该谓词保留为标签。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
@@ -5467,7 +5447,7 @@ msgstr "侧边栏位置"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
-msgstr ""
+msgstr "X 轴刻度颜色"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
@@ -5510,7 +5490,7 @@ msgstr "{0} 列已被检测到。请查看下面的列信息以确保其正确�
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
-msgstr ""
+msgstr "X 轴标签颜色"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
@@ -5630,9 +5610,9 @@ msgstr "数据集限制已达到"
 msgid "Distinct values"
 msgstr "唯一值"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
-msgstr ""
+msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -5678,9 +5658,9 @@ msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信
 msgid "CSV or Excel file"
 msgstr "CSV 或 Excel 文件"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
-msgstr ""
+msgstr "SELECT 引用了数据集中不存在的列“{columnName}”。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
@@ -5712,16 +5692,16 @@ msgstr "最适合口碑分享。访问下面的永久链接也会重定向到此
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
-msgstr ""
+msgstr "散点图"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form "
 "cannot represent."
-msgstr ""
+msgstr "WHERE 子句对“{columnName}”使用了 BETWEEN，但其值无法由表单表示。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
-msgstr ""
+msgstr "填充不透明度"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -5767,7 +5747,7 @@ msgstr "经度列"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Run a query to configure a chart."
-msgstr ""
+msgstr "运行查询以配置图表。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
@@ -5805,7 +5785,7 @@ msgstr "整个数据集"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"
-msgstr ""
+msgstr "面积图"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
@@ -5858,17 +5838,17 @@ msgstr "处理中，剩余 {remainingLabel}"
 msgid "Loose"
 msgstr "松散"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
-msgstr ""
+msgstr "ORDER BY 引用了不在 SELECT 列表中的列“{columnName}”。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
 msgstr "升级计划至 {newPlanName} ({newPlanSubType})"
 
-#: shared/copy/sqlMappingReasonLabel.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
-msgstr ""
+msgstr "表单不支持类型为“{exprType}”的 SELECT 表达式。"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "No models match your search"
@@ -5884,7 +5864,7 @@ msgstr "来自列：<0>{columnName}</0>"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
-msgstr ""
+msgstr "底部"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
