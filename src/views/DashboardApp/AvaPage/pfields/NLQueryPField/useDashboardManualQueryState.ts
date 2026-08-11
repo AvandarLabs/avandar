@@ -1,4 +1,3 @@
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { makeObject, prop } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
@@ -9,6 +8,7 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 export type DashboardManualQueryState = {

@@ -8,12 +8,12 @@
 /*
  * In the columns layout the owning fieldset is the only group, so the cards
  * themselves spread across the available width instead of leaving it empty.
- * The track floor matches SettingsColumns' own column floor.
+ * The track floor is the same theme variable SettingsColumns lays out with.
  */
 .seriesListColumns {
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(var(--settings-columns-min-width, 220px), 1fr)
+    minmax(var(--settings-columns-min-width), 1fr)
   );
 }

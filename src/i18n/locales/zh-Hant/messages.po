@@ -345,7 +345,7 @@ msgstr "未知錯誤"
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show legend"
 msgstr ""
 
@@ -858,7 +858,7 @@ msgstr "關閉聊天 (⌘/)"
 msgid "Create failed"
 msgstr "創建失敗"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr ""
 
@@ -1229,7 +1229,7 @@ msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
 msgid "Email address"
 msgstr "電子郵件地址"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Smooth"
 msgstr ""
 
@@ -1479,7 +1479,7 @@ msgstr "正在了解您的問題…"
 msgid "The workspace ID cannot be empty"
 msgstr "工作區 ID 不得為空"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
 msgstr ""
 
@@ -1508,7 +1508,7 @@ msgstr "角色與權限"
 msgid "Connect to Google Sheets"
 msgstr "連接到 Google Sheets"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr ""
 
@@ -1556,7 +1556,7 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr ""
 
@@ -1801,7 +1801,7 @@ msgstr "數據範圍"
 msgid "Data preview"
 msgstr "數據預覽"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
 msgstr ""
 
@@ -2002,7 +2002,7 @@ msgstr "第 11 欄"
 msgid "Column 7"
 msgstr "第 7 欄"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr ""
 
@@ -2088,7 +2088,7 @@ msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確�
 msgid "text"
 msgstr "文本"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
 msgstr ""
 
@@ -2255,7 +2255,7 @@ msgstr "大小列"
 msgid "Values"
 msgstr "值"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr ""
 
@@ -2272,7 +2272,7 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 msgid "Full"
 msgstr "完整"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
 msgstr ""
 
@@ -2384,7 +2384,7 @@ msgstr "結帳成功！"
 msgid "Answered"
 msgstr "已回答"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr ""
 
@@ -2467,7 +2467,7 @@ msgstr "在此瀏覽器上下載"
 msgid "Pay monthly"
 msgstr "每月付款"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
 msgstr ""
 
@@ -2513,7 +2513,7 @@ msgstr "上傳 CSV"
 msgid "Image"
 msgstr "圖片"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr ""
 
@@ -2623,7 +2623,7 @@ msgstr "這是您選擇應該添加到此 {entityConfigName} 的數據集中的�
 msgid "Create"
 msgstr "創建"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr ""
 
@@ -2841,7 +2841,7 @@ msgstr "我們將把這個視覺化添加到您的新儀表板。"
 msgid "Repairing query…"
 msgstr "正在修復查詢…"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr ""
 
@@ -2925,7 +2925,7 @@ msgstr "高品質 7B 指令模型。最適合處理困難的結構描述，以�
 msgid "View"
 msgstr "查看"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
 msgstr ""
 
@@ -3003,7 +3003,7 @@ msgstr "此 Excel 工作表中只有一個工作表。"
 msgid "Make dataset offline-only?"
 msgstr "將資料集設為離線專用？"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3011,7 +3011,7 @@ msgstr "將資料集設為離線專用？"
 msgid "Color"
 msgstr "顏色"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr ""
 
@@ -3036,7 +3036,7 @@ msgstr "列名稱"
 msgid "Large"
 msgstr "大"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
 msgstr ""
 
@@ -3450,7 +3450,7 @@ msgstr "主題選擇器"
 msgid "Title"
 msgstr "標題"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr ""
 
@@ -3540,7 +3540,7 @@ msgstr "日期"
 msgid "recently"
 msgstr "最近"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
 msgstr ""
 
@@ -3570,7 +3570,7 @@ msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選
 msgid "Turn"
 msgstr "轉換"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr ""
 
@@ -3596,7 +3596,7 @@ msgstr "{fieldName} 必須至少 {minLength} 個字符長"
 msgid "System sans"
 msgstr "系統無襯線"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3715,7 +3715,7 @@ msgstr "之間"
 msgid "Inactive"
 msgstr "不活躍"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "右"
@@ -3819,7 +3819,7 @@ msgstr "正在查找 {column} 中的值…"
 msgid "Email"
 msgstr "電子郵件"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr ""
 
@@ -3905,7 +3905,7 @@ msgstr "這些數據似乎包含健康或病人信息。將其發送給 AI 提�
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "通過探索您的工作區或上傳您的第一個數據集開始。"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr ""
 
@@ -4506,7 +4506,7 @@ msgstr "要新增的座位數"
 msgid "Pay What You Want"
 msgstr "隨意支付"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
 msgstr ""
 
@@ -4758,7 +4758,7 @@ msgstr "沒有可添加到此系列的數值欄位。"
 msgid "You haven't chosen a name column"
 msgstr "您尚未選擇名稱欄位"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
 msgstr ""
 
@@ -4771,7 +4771,7 @@ msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr ""
 
@@ -4967,7 +4967,7 @@ msgstr "未成功讀取任何行"
 msgid "New user group"
 msgstr "新使用者群組"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "靠左"
@@ -5382,7 +5382,7 @@ msgstr "移除本地篩選器"
 msgid "This removes the user group from members and resources that use it."
 msgstr "這將從使用該用戶群組的成員和資源中移除該用戶群組。"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr ""
 
@@ -5468,7 +5468,7 @@ msgstr "儲存資料集"
 msgid "Sidebar position"
 msgstr "側邊欄位置"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
 msgstr ""
 
@@ -5511,7 +5511,7 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 "click Upload again."
 msgstr "{0} 列已被檢測到。請檢查下面的列資訊以確保其正確。如果不正確，請更改上面的匯入選項並再次點擊上傳。"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
 msgstr ""
 
@@ -5722,7 +5722,7 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr ""
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
 msgstr ""
 
@@ -5885,7 +5885,7 @@ msgstr "推薦的下一步"
 msgid "From column: <0>{columnName}</0>"
 msgstr "來自欄位：<0>{columnName}</0>"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr ""
 

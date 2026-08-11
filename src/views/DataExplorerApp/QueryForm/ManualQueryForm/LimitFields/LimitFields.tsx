@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Group, NumberInput } from "@mantine/core";
 import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
-import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
 import css from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.module.css";
+import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
 import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";

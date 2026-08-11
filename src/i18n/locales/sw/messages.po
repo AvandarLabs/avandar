@@ -355,7 +355,7 @@ msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {datasetName} kwa "
 "muda"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show legend"
 msgstr ""
 
@@ -890,7 +890,7 @@ msgstr "Funga mazungumzo (⌘/)"
 msgid "Create failed"
 msgstr "Kuunda kumeshindikana"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr ""
 
@@ -1268,7 +1268,7 @@ msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
 msgid "Email address"
 msgstr "Anwani ya barua pepe"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Smooth"
 msgstr ""
 
@@ -1534,7 +1534,7 @@ msgstr "Inaelewa swali lako…"
 msgid "The workspace ID cannot be empty"
 msgstr "Kitambulisho cha workspace hakiwezi kuwa tupu"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
 msgstr ""
 
@@ -1564,7 +1564,7 @@ msgstr "Majukumu & Ruhusa"
 msgid "Connect to Google Sheets"
 msgstr "Unganisha na Google Sheets"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr ""
 
@@ -1616,7 +1616,7 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
 "wa mapema."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr ""
 
@@ -1866,7 +1866,7 @@ msgstr "Muktadha wa data"
 msgid "Data preview"
 msgstr "Mapitio ya data"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
 msgstr ""
 
@@ -2075,7 +2075,7 @@ msgstr "Safu wima ya 11"
 msgid "Column 7"
 msgstr "Safu wima ya 7"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr ""
 
@@ -2165,7 +2165,7 @@ msgstr "{0} safu zimebainishwa. Angalia taarifa za safu hapa chini ili "
 msgid "text"
 msgstr "maandishi"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
 msgstr ""
 
@@ -2336,7 +2336,7 @@ msgstr "Safu ya ukubwa"
 msgid "Values"
 msgstr "Thamani"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr ""
 
@@ -2354,7 +2354,7 @@ msgstr "Ongeza block ya Kichujio kwenye dashibodi ili kuwezesha uchujaji wa "
 msgid "Full"
 msgstr "Kamili"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
 msgstr ""
 
@@ -2467,7 +2467,7 @@ msgstr "Malipo Yamefanikiwa!"
 msgid "Answered"
 msgstr "Jibu"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr ""
 
@@ -2555,7 +2555,7 @@ msgstr "Imepakuliwa kwenye kivinjari hiki"
 msgid "Pay monthly"
 msgstr "Lipa kila mwezi"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
 msgstr ""
 
@@ -2601,7 +2601,7 @@ msgstr "Pakia CSV"
 msgid "Image"
 msgstr "Picha"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr ""
 
@@ -2714,7 +2714,7 @@ msgstr "Hapa ndipo unachagua ni safu zipi kutoka kwenye seti zipi za data "
 msgid "Create"
 msgstr "Unda"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr ""
 
@@ -2935,7 +2935,7 @@ msgstr "Tutongeza picha hii kwenye dashibodi yako mpya."
 msgid "Repairing query…"
 msgstr "Inarekebisha hoja…"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr ""
 
@@ -3021,7 +3021,7 @@ msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya 
 msgid "View"
 msgstr "Tazama"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
 msgstr ""
 
@@ -3099,7 +3099,7 @@ msgstr "Kuna karatasi moja tu katika karatasi hii ya excel."
 msgid "Make dataset offline-only?"
 msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3107,7 +3107,7 @@ msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 msgid "Color"
 msgstr "Rangi"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr ""
 
@@ -3132,7 +3132,7 @@ msgstr "Jina la Safu"
 msgid "Large"
 msgstr "Kubwa"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
 msgstr ""
 
@@ -3560,7 +3560,7 @@ msgstr "Chaguo la mandhari"
 msgid "Title"
 msgstr "Kichwa"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr ""
 
@@ -3652,7 +3652,7 @@ msgstr "Tarehe"
 msgid "recently"
 msgstr "hivi karibuni"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
 msgstr ""
 
@@ -3684,7 +3684,7 @@ msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 msgid "Turn"
 msgstr "Geuza"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr ""
 
@@ -3710,7 +3710,7 @@ msgstr "{fieldName} lazima iwe na urefu wa angalau {minLength} wahusika"
 msgid "System sans"
 msgstr "Mfumo sans"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3832,7 +3832,7 @@ msgstr "katika"
 msgid "Inactive"
 msgstr "Haifanyi kazi"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Kulia"
@@ -3939,7 +3939,7 @@ msgstr "Inatafuta thamani katika {column}…"
 msgid "Email"
 msgstr "Barua pepe"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr ""
 
@@ -4028,7 +4028,7 @@ msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Anza kwa kuchunguza eneo lako la kazi au kupakia dataset yako ya "
 "kwanza."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr ""
 
@@ -4649,7 +4649,7 @@ msgstr "Idadi ya viti vya kuongeza"
 msgid "Pay What You Want"
 msgstr "Lipa Unachotaka"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
 msgstr ""
 
@@ -4908,7 +4908,7 @@ msgstr "Hakuna safu za nambari zinazopatikana kuongezwa kwenye mfululizo huu."
 msgid "You haven't chosen a name column"
 msgstr "Hujachagua safu ya jina"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
 msgstr ""
 
@@ -4922,7 +4922,7 @@ msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr ""
 
@@ -5125,7 +5125,7 @@ msgstr "Hakuna safu zilizosomeka kwa mafanikio"
 msgid "New user group"
 msgstr "Kikundi kipya cha mtumiaji"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Kushoto"
@@ -5551,7 +5551,7 @@ msgid "This removes the user group from members and resources that use it."
 msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 "zinazotumia hiyo."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr ""
 
@@ -5640,7 +5640,7 @@ msgstr "Hifadhi Dataset"
 msgid "Sidebar position"
 msgstr "Msimamo wa upau wa pembeni"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
 msgstr ""
 
@@ -5685,7 +5685,7 @@ msgstr "{0} safu zimegundulika. Angalia taarifa za safu hapa chini ili "
 "kuhakikisha ni sahihi. Ikiwa si sahihi, badilisha chaguzi za kuagiza "
 "hapo juu na bonyeza Pakia tena."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
 msgstr ""
 
@@ -5903,7 +5903,7 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr ""
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
 msgstr ""
 
@@ -6067,7 +6067,7 @@ msgstr "Hatua zinazopendekezwa zifuatazo"
 msgid "From column: <0>{columnName}</0>"
 msgstr "Kutoka safu: <0>{columnName}</0>"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr ""
 

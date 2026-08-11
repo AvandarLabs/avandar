@@ -6,7 +6,7 @@ import {
   Switch,
   TextInput,
 } from "@mantine/core";
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

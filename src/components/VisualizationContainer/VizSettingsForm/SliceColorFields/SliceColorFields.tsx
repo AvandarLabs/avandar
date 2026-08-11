@@ -40,9 +40,9 @@ export function SliceColorFields({
               const { [sliceName]: _clearedColor, ...keptColors } =
                 seriesColors ?? {};
               onSeriesColorsChange(
-                nextColor === "" ?
-                  keptColors
-                : { ...keptColors, [sliceName]: nextColor },
+                nextColor === "" ? keptColors : (
+                  { ...keptColors, [sliceName]: nextColor }
+                ),
               );
             }}
           />

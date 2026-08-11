@@ -101,3 +101,13 @@
   gap: var(--mantine-spacing-xs);
   margin-left: auto;
 }
+
+/*
+ * The `sm` scale. The floating indicator measures itself against the active
+ * tab, so tightening the tab is what tightens the indicator with it. The label
+ * font size is set on the label itself, because Mantine's `Text` declares its
+ * own `font-size` and would not inherit one from here.
+ */
+.tabSm {
+  padding: var(--mantine-spacing-xxs) var(--mantine-spacing-xs);
+}

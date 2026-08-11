@@ -4,9 +4,9 @@
  * renamed label must gain a catalog entry or it renders untranslated in every
  * non-English locale.
  */
-import { describe, expect, it } from "vitest";
-import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel.ts";
+import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
+import { describe, expect, it } from "vitest";
 
 function collectRegistryLabels(): string[] {
   return VizTypes.flatMap((vizType) => {

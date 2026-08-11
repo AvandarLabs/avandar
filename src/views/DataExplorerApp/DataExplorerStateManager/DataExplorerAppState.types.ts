@@ -1,9 +1,9 @@
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 

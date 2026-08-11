@@ -352,7 +352,7 @@ msgstr "خطأ غير معروف"
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "أضف رسمًا بيانيًا خطيًا يوضح الاتجاهات في {datasetName} على مر الزمن"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show legend"
 msgstr ""
 
@@ -882,7 +882,7 @@ msgstr "إغلاق الدردشة (⌘/)"
 msgid "Create failed"
 msgstr "فشل الإنشاء"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr ""
 
@@ -1257,7 +1257,7 @@ msgstr "يمكن أن يحتوي عنوان URL المخصص على أحرف ص�
 msgid "Email address"
 msgstr "عنوان البريد الإلكتروني"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Smooth"
 msgstr ""
 
@@ -1518,7 +1518,7 @@ msgstr "جارٍ فهم سؤالك…"
 msgid "The workspace ID cannot be empty"
 msgstr "لا يمكن أن يكون معرّف مساحة العمل فارغًا"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
 msgstr ""
 
@@ -1548,7 +1548,7 @@ msgstr "الأدوار والأذونات"
 msgid "Connect to Google Sheets"
 msgstr "الاتصال بـ Google Sheets"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr ""
 
@@ -1599,7 +1599,7 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
 "المبكر."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr ""
 
@@ -1848,7 +1848,7 @@ msgstr "نطاق البيانات"
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
 msgstr ""
 
@@ -2053,7 +2053,7 @@ msgstr "العمود 11"
 msgid "Column 7"
 msgstr "العمود 7"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr ""
 
@@ -2141,7 +2141,7 @@ msgstr "{0} أعمدة تم الكشف عنها. راجع معلومات الأ�
 msgid "text"
 msgstr "نص"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
 msgstr ""
 
@@ -2309,7 +2309,7 @@ msgstr "عمود الحجم"
 msgid "Values"
 msgstr "القيم"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr ""
 
@@ -2326,7 +2326,7 @@ msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية
 msgid "Full"
 msgstr "كامل"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
 msgstr ""
 
@@ -2439,7 +2439,7 @@ msgstr "تمت عملية الدفع بنجاح!"
 msgid "Answered"
 msgstr "تم الرد"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr ""
 
@@ -2525,7 +2525,7 @@ msgstr "تم التنزيل على هذا المتصفح"
 msgid "Pay monthly"
 msgstr "الدفع شهريًا"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
 msgstr ""
 
@@ -2571,7 +2571,7 @@ msgstr "تحميل CSV"
 msgid "Image"
 msgstr "صورة"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr ""
 
@@ -2684,7 +2684,7 @@ msgstr "هنا تختار الأعمدة من مجموعات البيانات ا
 msgid "Create"
 msgstr "إنشاء"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr ""
 
@@ -2904,7 +2904,7 @@ msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديد
 msgid "Repairing query…"
 msgstr "جارٍ إصلاح الاستعلام…"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr ""
 
@@ -2990,7 +2990,7 @@ msgstr "نموذج instruct عالي الجودة بحجم 7B. الأفضل لل
 msgid "View"
 msgstr "عرض"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
 msgstr ""
 
@@ -3068,7 +3068,7 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3076,7 +3076,7 @@ msgstr "جعل مجموعة البيانات متاحة فقط في وضع عد�
 msgid "Color"
 msgstr "لون"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr ""
 
@@ -3101,7 +3101,7 @@ msgstr "اسم العمود"
 msgid "Large"
 msgstr "كبير"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
 msgstr ""
 
@@ -3522,7 +3522,7 @@ msgstr "اختيار السمة"
 msgid "Title"
 msgstr "العنوان"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr ""
 
@@ -3613,7 +3613,7 @@ msgstr "التاريخ"
 msgid "recently"
 msgstr "مؤخرًا"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
 msgstr ""
 
@@ -3645,7 +3645,7 @@ msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف
 msgid "Turn"
 msgstr "تحويل"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr ""
 
@@ -3671,7 +3671,7 @@ msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} 
 msgid "System sans"
 msgstr "نظام بدون"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3792,7 +3792,7 @@ msgstr "بين"
 msgid "Inactive"
 msgstr "غير نشط"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "يمين"
@@ -3897,7 +3897,7 @@ msgstr "جارٍ البحث عن القيم في {column}…"
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr ""
 
@@ -3985,7 +3985,7 @@ msgstr "يبدو أن هذه البيانات تحتوي على معلومات �
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو رفع أول مجموعة بيانات لك."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr ""
 
@@ -4600,7 +4600,7 @@ msgstr "عدد المقاعد للإضافة"
 msgid "Pay What You Want"
 msgstr "ادفع ما تريد"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
 msgstr ""
 
@@ -4856,7 +4856,7 @@ msgstr "لا توجد أعمدة رقمية متاحة لإضافتها إلى �
 msgid "You haven't chosen a name column"
 msgstr "لم تختار عمود الاسم"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
 msgstr ""
 
@@ -4869,7 +4869,7 @@ msgstr "تحتاج إلى وصول إداري على هذا المورد لإد�
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد {0}، فـ..."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr ""
 
@@ -5070,7 +5070,7 @@ msgstr "لم تتم قراءة أي صفوف بنجاح"
 msgid "New user group"
 msgstr "مجموعة مستخدمين جديدة"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "اليسار"
@@ -5492,7 +5492,7 @@ msgstr "إزالة الفلتر المحلي"
 msgid "This removes the user group from members and resources that use it."
 msgstr "هذا يزيل مجموعة المستخدمين من الأعضاء والموارد التي تستخدمها."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr ""
 
@@ -5580,7 +5580,7 @@ msgstr "حفظ مجموعة البيانات"
 msgid "Sidebar position"
 msgstr "موضع الشريط الجانبي"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
 msgstr ""
 
@@ -5625,7 +5625,7 @@ msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعم
 "لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة "
 "أخرى."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
 msgstr ""
 
@@ -5842,7 +5842,7 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr ""
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
 msgstr ""
 
@@ -6006,7 +6006,7 @@ msgstr "الخطوات التالية الموصى بها"
 msgid "From column: <0>{columnName}</0>"
 msgstr "من العمود: <0>{columnName}</0>"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr ""
 

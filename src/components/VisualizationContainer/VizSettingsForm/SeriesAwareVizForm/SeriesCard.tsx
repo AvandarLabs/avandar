@@ -10,7 +10,7 @@ import {
   Text,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
@@ -185,11 +185,11 @@ export function SeriesCard({
         {Array.from(groupedDescriptors.entries()).map(([group, descs]) => {
           return (
             <Box key={group}>
-              {group === "" ? null
-              : <Text fw={500} size="xs" c="dimmed" mt="xs" mb={4}>
+              {group === "" ? null : (
+                <Text fw={500} size="xs" c="dimmed" mt="xs" mb={4}>
                   {vizSettingGroupLabel(group)}
                 </Text>
-              }
+              )}
               <Stack gap="xs">
                 {descs.map((desc) => {
                   return (

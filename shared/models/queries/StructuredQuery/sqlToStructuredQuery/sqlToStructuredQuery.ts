@@ -37,6 +37,7 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
 import type {
   SqlMappingInput,
   SqlMappingResult,
@@ -45,7 +46,6 @@ import type {
   PartialStructuredQuery,
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
 
 export type {
   SqlMappingInput,
@@ -125,9 +125,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   // a single SELECT.
   if (Array.isArray(parsedAst)) {
     if (parsedAst.length !== 1) {
-      unmappedReasons.push(
-        { code: "multipleStatements" },
-      );
+      unmappedReasons.push({ code: "multipleStatements" });
     }
     parsedAst = parsedAst[0];
   }
@@ -152,9 +150,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     unmappedReasons.push({ code: "distinctUnsupported" });
   }
   if (ast._next || ast.set_op) {
-    unmappedReasons.push(
-      { code: "setOperationUnsupported" },
-    );
+    unmappedReasons.push({ code: "setOperationUnsupported" });
   }
 
   // Resolve FROM clause (base + joins + optional nested subquery)
@@ -206,9 +202,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         }
         const matched = _matchColumn(columnName, dataset.columns);
         if (!matched) {
-          unmappedReasons.push(
-            { code: "selectUnknownColumn", columnName },
-          );
+          unmappedReasons.push({ code: "selectUnknownColumn", columnName });
           return;
         }
         queryColumns.push(_makeQueryColumn(matched, undefined));
@@ -223,22 +217,22 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         const inner = args?.expr;
         const colName = columnRefName(inner);
         if (!agg) {
-          unmappedReasons.push(
-            { code: "selectUnsupportedAggregate", funcName },
-          );
+          unmappedReasons.push({
+            code: "selectUnsupportedAggregate",
+            funcName,
+          });
           return;
         }
         if (!colName) {
-          unmappedReasons.push(
-            { code: "aggregateComplexArgument", funcName },
-          );
+          unmappedReasons.push({ code: "aggregateComplexArgument", funcName });
           return;
         }
         const matched = _matchColumn(colName, dataset.columns);
         if (!matched) {
-          unmappedReasons.push(
-            { code: "aggregateUnknownColumn", columnName: colName },
-          );
+          unmappedReasons.push({
+            code: "aggregateUnknownColumn",
+            columnName: colName,
+          });
           return;
         }
         const queryColumn = _makeQueryColumn(matched, agg);
@@ -247,9 +241,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         return;
       }
 
-      unmappedReasons.push(
-        { code: "selectUnsupportedExpression", exprType: String(exprType) },
-      );
+      unmappedReasons.push({
+        code: "selectUnsupportedExpression",
+        exprType: String(exprType),
+      });
     });
   }
 
@@ -285,9 +280,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const orderbyClause = ast.orderby;
   if (Array.isArray(orderbyClause) && orderbyClause.length > 0) {
     if (orderbyClause.length > 1) {
-      unmappedReasons.push(
-        { code: "orderByMultipleColumns" },
-      );
+      unmappedReasons.push({ code: "orderByMultipleColumns" });
     }
     const first = orderbyClause[0] as { type?: string; expr?: unknown };
     const colName = columnRefName(first.expr);
@@ -298,9 +291,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         const dir = String(first.type ?? "").toLowerCase();
         orderByDirection = dir === "desc" ? "desc" : "asc";
       } else {
-        unmappedReasons.push(
-          { code: "orderByColumnNotSelected", columnName: colName },
-        );
+        unmappedReasons.push({
+          code: "orderByColumnNotSelected",
+          columnName: colName,
+        });
       }
     }
   }

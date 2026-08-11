@@ -358,7 +358,7 @@ msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "Adicione um gráfico de linhas mostrando tendências em {datasetName} ao "
 "longo do tempo"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show legend"
 msgstr ""
 
@@ -894,7 +894,7 @@ msgstr "Fechar chat (⌘/)"
 msgid "Create failed"
 msgstr "Falha ao criar"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr ""
 
@@ -1271,7 +1271,7 @@ msgstr "O URL personalizado pode conter apenas letras minúsculas, números e "
 msgid "Email address"
 msgstr "Endereço de e-mail"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Smooth"
 msgstr ""
 
@@ -1541,7 +1541,7 @@ msgstr "Entendendo sua pergunta…"
 msgid "The workspace ID cannot be empty"
 msgstr "O ID do workspace não pode estar vazio"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
 msgstr ""
 
@@ -1571,7 +1571,7 @@ msgstr "Funções e Permissões"
 msgid "Connect to Google Sheets"
 msgstr "Conectar ao Google Sheets"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr ""
 
@@ -1623,7 +1623,7 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "Por favor, <0>nos envie um e-mail</0> se você gostaria de acesso "
 "antecipado."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr ""
 
@@ -1873,7 +1873,7 @@ msgstr "Escopo de dados"
 msgid "Data preview"
 msgstr "Pré-visualização de dados"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
 msgstr ""
 
@@ -2081,7 +2081,7 @@ msgstr "Coluna 11"
 msgid "Column 7"
 msgstr "Coluna 7"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr ""
 
@@ -2170,7 +2170,7 @@ msgstr "{0} colunas foram detectadas. Revise as informações das colunas abaixo
 msgid "text"
 msgstr "texto"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
 msgstr ""
 
@@ -2340,7 +2340,7 @@ msgstr "Coluna de tamanho"
 msgid "Values"
 msgstr "Valores"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr ""
 
@@ -2358,7 +2358,7 @@ msgstr "Adicione um bloco de Filtro ao painel para habilitar filtragem global "
 msgid "Full"
 msgstr "Completo"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
 msgstr ""
 
@@ -2471,7 +2471,7 @@ msgstr "Checkout bem-sucedido!"
 msgid "Answered"
 msgstr "Respondido"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr ""
 
@@ -2559,7 +2559,7 @@ msgstr "Baixado neste navegador"
 msgid "Pay monthly"
 msgstr "Pagar mensalmente"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
 msgstr ""
 
@@ -2605,7 +2605,7 @@ msgstr "Carregar CSV"
 msgid "Image"
 msgstr "Imagem"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr ""
 
@@ -2718,7 +2718,7 @@ msgstr "É aqui que você seleciona quais colunas de quais conjuntos de dados "
 msgid "Create"
 msgstr "Criar"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr ""
 
@@ -2940,7 +2940,7 @@ msgstr "Adicionaremos esta visualização ao seu novo painel."
 msgid "Repairing query…"
 msgstr "Reparando a consulta…"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr ""
 
@@ -3026,7 +3026,7 @@ msgstr "Modelo instruct 7B de alta qualidade. Ideal para esquemas difíceis e "
 msgid "View"
 msgstr "Ver"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
 msgstr ""
 
@@ -3105,7 +3105,7 @@ msgstr "Há apenas uma planilha neste arquivo do Excel."
 msgid "Make dataset offline-only?"
 msgstr "Tornar o conjunto de dados apenas offline?"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -3113,7 +3113,7 @@ msgstr "Tornar o conjunto de dados apenas offline?"
 msgid "Color"
 msgstr "Cor"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label"
 msgstr ""
 
@@ -3138,7 +3138,7 @@ msgstr "Nome da coluna"
 msgid "Large"
 msgstr "Grande"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
 msgstr ""
 
@@ -3569,7 +3569,7 @@ msgstr "Seletor de tema"
 msgid "Title"
 msgstr "Título"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr ""
 
@@ -3661,7 +3661,7 @@ msgstr "Data"
 msgid "recently"
 msgstr "recentemente"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
 msgstr ""
 
@@ -3693,7 +3693,7 @@ msgstr "Sem filtros de linha. A fatia incluirá todas as linhas no conjunto de "
 msgid "Turn"
 msgstr "Virar"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr ""
 
@@ -3719,7 +3719,7 @@ msgstr "{fieldName} deve ter pelo menos {minLength} caracteres"
 msgid "System sans"
 msgstr "Sistema sans"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3841,7 +3841,7 @@ msgstr "entre"
 msgid "Inactive"
 msgstr "Inativo"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Direita"
@@ -3949,7 +3949,7 @@ msgstr "Buscando valores em {column}…"
 msgid "Email"
 msgstr "E-mail"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick color"
 msgstr ""
 
@@ -4038,7 +4038,7 @@ msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Comece explorando seu espaço de trabalho ou carregando seu primeiro "
 "conjunto de dados."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr ""
 
@@ -4659,7 +4659,7 @@ msgstr "Número de assentos a adicionar"
 msgid "Pay What You Want"
 msgstr "Pague o que quiser"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
 msgstr ""
 
@@ -4918,7 +4918,7 @@ msgstr "Nenhuma coluna numérica disponível para adicionar a esta série."
 msgid "You haven't chosen a name column"
 msgstr "Você não escolheu uma coluna de nome"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
 msgstr ""
 
@@ -4932,7 +4932,7 @@ msgstr "Você precisa de acesso de administrador a este recurso para gerenciar o
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Se houver múltiplos valores de {fieldName} para um {0}, então..."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr ""
 
@@ -5135,7 +5135,7 @@ msgstr "Nenhuma linha foi lida com sucesso"
 msgid "New user group"
 msgstr "Novo grupo de usuários"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Esquerda"
@@ -5561,7 +5561,7 @@ msgstr "Remover filtro local"
 msgid "This removes the user group from members and resources that use it."
 msgstr "Isso remove o grupo de usuários de membros e recursos que o utilizam."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr ""
 
@@ -5651,7 +5651,7 @@ msgstr "Salvar Conjunto de Dados"
 msgid "Sidebar position"
 msgstr "Posição da barra lateral"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
 msgstr ""
 
@@ -5696,7 +5696,7 @@ msgstr "{0} colunas foram detectadas. Revise as informações das colunas abaixo
 "para garantir que estão corretas. Se não estiverem, altere as opções de "
 "importação acima e clique em Carregar novamente."
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
 msgstr ""
 
@@ -5915,7 +5915,7 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr ""
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
 msgstr ""
 
@@ -6080,7 +6080,7 @@ msgstr "Próximos passos recomendados"
 msgid "From column: <0>{columnName}</0>"
 msgstr "Da coluna: <0>{columnName}</0>"
 
-#: shared/copy/vizSettingControlLabel.ts
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr ""
 

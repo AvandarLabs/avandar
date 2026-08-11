@@ -27,16 +27,14 @@ export type SettingsColumnGroup = {
  */
 export type SettingsColumnsLayout = "columns" | "stacked";
 
-/** Narrowest a column may get before the grid drops to fewer columns. */
-const DEFAULT_MIN_COLUMN_WIDTH = 220;
-
 type Props = {
   groups: readonly SettingsColumnGroup[];
   layout: SettingsColumnsLayout;
 
   /**
    * Narrowest a column may shrink to, in pixels, before the grid reflows to
-   * fewer columns. Only applies to the `columns` layout.
+   * fewer columns. Only applies to the `columns` layout. Defaults to
+   * `--settings-columns-min-width` from the theme.
    */
   minColumnWidth?: number;
 
@@ -56,12 +54,15 @@ type Props = {
 export function SettingsColumns({
   groups,
   layout,
-  minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
+  minColumnWidth,
   className,
 }: Props): ReactNode {
-  const gridStyle: CSSProperties = {
-    ["--settings-columns-min-width" as string]: `${minColumnWidth}px`,
-  };
+  // Left undefined so the grid falls through to the theme's floor; only a
+  // caller that wants a different one writes the property.
+  const gridStyle: CSSProperties | undefined =
+    minColumnWidth === undefined ? undefined : (
+      { ["--settings-columns-min-width" as string]: `${minColumnWidth}px` }
+    );
 
   return matchLiteral(layout, {
     stacked: () => {

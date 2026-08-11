@@ -6,6 +6,7 @@ import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.m
 import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
 import { DrawerHeight } from "@/views/DataExplorerApp/DataExplorerDrawer/DrawerHeight/DrawerHeight";
 import { QueryTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel/QueryTabPanel";
+import { useDrawerDisclosure } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerDisclosure/useDrawerDisclosure";
 import { useDrawerResize } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerResize/useDrawerResize";
 import { VizTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -21,6 +22,9 @@ const DRAWER_TAB_IDS = ["query", "visualizations"] as const;
 
 /** Duration of the collapse and expand animation, in milliseconds. */
 const COLLAPSE_DURATION_MS = 240;
+
+/** Ties the chevron's `aria-expanded` to the region it reveals. */
+const DRAWER_REGION_ID = "data-explorer-drawer-region";
 
 type Props = {
   /** Columns of the current query result, used by the chart settings. */
@@ -40,9 +44,10 @@ type Props = {
  * Collapsible drawer docked to the bottom of the Data Explorer canvas, holding
  * the query editor and the chart settings as two tabs.
  *
- * The tab rail stays visible while collapsed, so selecting a tab also expands
- * the drawer. None of the drawer's state (active tab, collapsed, height) is
- * persisted: it resets with the view.
+ * Opens shut, so the chart has the whole canvas until the user asks for the
+ * controls. The tab labels stay visible while shut and are a second way in
+ * alongside the chevron; `useDrawerDisclosure` owns which one lands on which
+ * tab.
  */
 export function DataExplorerDrawer({
   columns,
@@ -52,37 +57,13 @@ export function DataExplorerDrawer({
   const { t } = useLingui();
   const [{ vizConfig, isStructuredQueryInSync }, dispatch] =
     DataExplorerStateManager.useContext();
-  const [activeTab, setActiveTab] = useState<DrawerTab>("query");
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { activeTab, isCollapsed, hasOpened, onTabChange, onToggleCollapsed } =
+    useDrawerDisclosure();
   const [queryEditorMode, setQueryEditorMode] =
     useState<QueryEditorMode>("manual");
 
   const { height, maxHeight, onResizePointerDown, onResizeKeyDown } =
     useDrawerResize({ chartRef });
-
-  const onTabChange = (nextTab: DrawerTab): void => {
-    setActiveTab(nextTab);
-    setIsCollapsed(false);
-  };
-
-  /**
-   * Wraps a tab's content in the collapsible, resizable body. Only the active
-   * tab's panel is mounted, so one wrapper per panel still yields a single live
-   * `Collapse`, whose animation is driven by the chevron rather than by tab
-   * changes.
-   */
-  const renderDrawerBody = (content: ReactNode): ReactNode => {
-    return (
-      <Collapse
-        expanded={!isCollapsed}
-        transitionDuration={COLLAPSE_DURATION_MS}
-      >
-        <Box className={css.drawerBody} style={{ height }}>
-          {content}
-        </Box>
-      </Collapse>
-    );
-  };
 
   return (
     <div className={css.root}>
@@ -102,43 +83,66 @@ export function DataExplorerDrawer({
       )}
 
       <Tabs
+        size="sm"
         keepMounted={false}
         tabIds={DRAWER_TAB_IDS}
         value={activeTab}
         onTabChange={onTabChange}
+        withActiveIndicator={!isCollapsed}
         classNames={{ list: css.drawerRail }}
         listRightSection={
           <DataExplorerDrawerRail
             activeTab={activeTab}
             isCollapsed={isCollapsed}
+            regionId={DRAWER_REGION_ID}
             queryEditorMode={queryEditorMode}
             vizType={vizConfig.vizType}
             isStructuredQueryInSync={isStructuredQueryInSync}
             onQueryEditorModeChange={setQueryEditorMode}
             onVizTypeChange={dispatch.setActiveVizType}
-            onToggleCollapsed={() => {
-              setIsCollapsed((wasCollapsed) => {
-                return !wasCollapsed;
-              });
-            }}
+            onToggleCollapsed={onToggleCollapsed}
           />
         }
         renderTabHeader={{
           query: t`Query`,
           visualizations: t`Visualizations`,
         }}
+        wrapPanels={(panels) => {
+          return (
+            // One long-lived `Collapse` around every panel is what makes the
+            // chevron and a tab label animate alike; a per-panel one would
+            // remount on the tab change and skip its transition. The panels
+            // themselves are still swapped per tab, since `keepMounted` is off.
+            //
+            // Under `prefers-reduced-motion` Mantine drops the transition and
+            // renders the children only while expanded, so those users get a
+            // remount on each open instead. There is no animation to preserve
+            // for them, and the editors' queries are already cached.
+            <Collapse
+              id={DRAWER_REGION_ID}
+              expanded={!isCollapsed}
+              transitionDuration={COLLAPSE_DURATION_MS}
+            >
+              <Box className={css.drawerBody} style={{ height }}>
+                {/* Deferring the first mount keeps a shut drawer from running
+                    the editors' data fetching at all. */}
+                {hasOpened ? panels : null}
+              </Box>
+            </Collapse>
+          );
+        }}
         renderTabPanel={{
           query: () => {
-            return renderDrawerBody(<QueryTabPanel mode={queryEditorMode} />);
+            return <QueryTabPanel mode={queryEditorMode} />;
           },
           visualizations: () => {
-            return renderDrawerBody(
+            return (
               <VizTabPanel
                 columns={columns}
                 data={data}
                 vizConfig={vizConfig}
                 onVizConfigChange={dispatch.setVizConfig}
-              />,
+              />
             );
           },
         }}

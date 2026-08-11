@@ -8,8 +8,8 @@ import type {
   QueryJoinKind,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
-import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
+import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
 export type FromResolution = {
   base?: DatasetWithColumns;
@@ -78,9 +78,7 @@ function _parseJoinOn(
     };
   }
   if (operator !== "=") {
-    unmappedReasons.push(
-      { code: "joinNonEqualityOperator", operator },
-    );
+    unmappedReasons.push({ code: "joinNonEqualityOperator", operator });
     return undefined;
   }
   const leftCol = columnRefName(obj.left);
@@ -88,9 +86,7 @@ function _parseJoinOn(
   const leftTable = (obj.left as { table?: string | null } | null)?.table;
   const rightTable = (obj.right as { table?: string | null } | null)?.table;
   if (!leftCol || !rightCol) {
-    unmappedReasons.push(
-      { code: "joinNonColumnReference" },
-    );
+    unmappedReasons.push({ code: "joinNonColumnReference" });
     return undefined;
   }
   return {
@@ -168,17 +164,13 @@ export function resolveFrom(
         };
         if (!sql) {
           nestedSubquery.parseFailed = true;
-          unmappedReasons.push(
-            { code: "fromNestedSubqueryUnserializable" },
-          );
+          unmappedReasons.push({ code: "fromNestedSubqueryUnserializable" });
         }
       } else if (tableName) {
         base = _resolveDataset(tableName, datasets);
         baseAlias = alias;
         if (!base) {
-          unmappedReasons.push(
-            { code: "fromUnknownDataset", tableName },
-          );
+          unmappedReasons.push({ code: "fromUnknownDataset", tableName });
         }
       } else {
         unmappedReasons.push({ code: "fromNotPlainTable" });
@@ -188,9 +180,7 @@ export function resolveFrom(
 
     // Subsequent entries: either a JOIN or a comma-separated cross product
     if (!joinKeyword) {
-      unmappedReasons.push(
-        { code: "fromCommaJoin" },
-      );
+      unmappedReasons.push({ code: "fromCommaJoin" });
       return;
     }
 
@@ -211,16 +201,15 @@ export function resolveFrom(
         combinator: onParsed?.combinator ?? "AND",
       });
       if (!sql) {
-        unmappedReasons.push(
-          { code: "joinSubqueryUnserializable", index: idx },
-        );
+        unmappedReasons.push({
+          code: "joinSubqueryUnserializable",
+          index: idx,
+        });
       }
       return;
     }
     if (!tableName) {
-      unmappedReasons.push(
-        { code: "joinNotPlainTable", index: idx },
-      );
+      unmappedReasons.push({ code: "joinNotPlainTable", index: idx });
       return;
     }
     joins.push({

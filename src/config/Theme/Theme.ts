@@ -499,6 +499,16 @@ export const cssVariablesResolver: CSSVariablesResolver = (
   const { elevation, borders: borderTheme } = theme.other;
 
   const sharedVariables = {
+    /*
+     * Narrowest a settings column may get before its grid drops to fewer
+     * columns, and so the width every column is guaranteed at any count. With
+     * the grid's 1px gaps, N columns appear once the container reaches
+     * `N * this + (N - 1)` pixels. The floor is what the widest control in a
+     * column needs to stay readable: a filter row (column + operator + value +
+     * remove), not a lone Select. `SettingsColumns` reads this unless a caller
+     * passes its own floor.
+     */
+    "--settings-columns-min-width": "280px",
     "--mantine-navbar-background": theme.other.navbar.backgroundColor,
     "--mantine-navbar-color": theme.other.navbar.textColor,
     "--mantine-navbar-hover-background":

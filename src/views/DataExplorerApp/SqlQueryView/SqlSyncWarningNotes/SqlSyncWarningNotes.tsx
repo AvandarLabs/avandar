@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
+import { List, Stack, Text } from "@mantine/core";
 import { sqlMappingReasonLabel } from "$/copy/sqlMappingReasonLabel";
 import { sqlMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
-import { List, Stack, Text } from "@mantine/core";
 import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import type { ReactNode } from "react";
 

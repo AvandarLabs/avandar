@@ -3,8 +3,15 @@ import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryFo
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
 import type { ReactNode } from "react";
 
+/**
+ * The editors the Query tab can show, in rail order. Exported so the rail's
+ * control options and its narrowing of Mantine's bare string come from one
+ * list.
+ */
+export const QUERY_EDITOR_MODES = ["manual", "sql"] as const;
+
 /** Which editor the Query tab is showing. */
-export type QueryEditorMode = "manual" | "sql";
+export type QueryEditorMode = (typeof QUERY_EDITOR_MODES)[number];
 
 type Props = {
   mode: QueryEditorMode;

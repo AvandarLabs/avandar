@@ -30,20 +30,31 @@ async function _goToDataExplorerWithSeededSQL(options: {
 }
 
 /**
- * Collapses the drawer, then reopens it by clicking the Query tab. Exercises
- * the real transition: the tab rail stays mounted while collapsed, so picking a
- * tab both selects it and expands the drawer.
+ * Opens the drawer on the Query tab by clicking that tab's label.
+ *
+ * Waits for the shut drawer first, via the chevron rather than the panel: the
+ * panel locator matches nothing both while shut and before the drawer has
+ * rendered at all, so asserting on it cannot tell a collapsed drawer from an
+ * absent one.
+ *
+ * Query is already the selected tab, so this exercises Mantine re-firing
+ * `onChange` for the active tab, which the drawer treats as a request to open.
  */
-async function _reopenQueryTabFromCollapsed(
+async function _openQueryTab(
   page: import("@playwright/test").Page,
 ): Promise<void> {
-  const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
-
-  await page.getByRole("button", { name: /collapse drawer/i }).click();
-  await expect(queryPanel).toBeHidden({ timeout: SHORT_WAIT });
+  const drawerToggle = page.getByRole("button", { name: /drawer$/i });
+  await expect(drawerToggle).toHaveAttribute("aria-expanded", "false", {
+    timeout: MEDIUM_WAIT,
+  });
 
   await page.getByRole("tab", { name: /^query$/i }).click();
-  await expect(queryPanel).toBeVisible({ timeout: SHORT_WAIT });
+  await expect(drawerToggle).toHaveAttribute("aria-expanded", "true", {
+    timeout: SHORT_WAIT,
+  });
+  await expect(page.getByRole("tabpanel", { name: /^query$/i })).toBeVisible({
+    timeout: SHORT_WAIT,
+  });
 }
 
 /**
@@ -83,20 +94,18 @@ test.describe("Data Explorer query drawer", () => {
 
     const beforeUrl = page.url();
 
-    await _reopenQueryTabFromCollapsed(page);
+    await _openQueryTab(page);
 
-    await expect
-      .poll(() => {
-        return page.url();
-      })
-      .toBe(beforeUrl);
-
+    // Settle on the freshly mounted panel having parsed the seeded SQL before
+    // judging the URL: the parse is what could have rewritten either one.
     await _selectQueryEditorMode(page, "SQL");
     await expect(
       page.getByRole("tabpanel", { name: /^query$/i }).getByRole("code"),
     ).toContainText(/SELECT 1 AS [`"]?mocked_column[`"]? LIMIT 20/, {
       timeout: SHORT_WAIT,
     });
+
+    expect(page.url()).toBe(beforeUrl);
   });
 
   test("the datasource dropdown lists a dataset saved earlier in the session", async ({
@@ -159,9 +168,9 @@ test.describe("Data Explorer query drawer", () => {
       );
       await dismissBlockingOverlays(page);
 
-      const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
-      await expect(queryPanel).toBeVisible({ timeout: SHORT_WAIT });
+      await _openQueryTab(page);
 
+      const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
       const dataSourceInput = queryPanel.getByLabel("Data source");
       await dataSourceInput.click();
 

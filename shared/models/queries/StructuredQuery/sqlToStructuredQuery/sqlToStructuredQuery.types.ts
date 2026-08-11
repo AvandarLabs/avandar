@@ -1,6 +1,6 @@
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 /** Outcome of parsing a SQL string into a partial structured query. */

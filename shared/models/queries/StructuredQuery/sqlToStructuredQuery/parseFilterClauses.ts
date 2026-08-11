@@ -21,9 +21,10 @@ export function parseWhereNode(
   }
   const obj = node as Record<string, unknown>;
   if (obj.type !== "binary_expr") {
-    unmappedReasons.push(
-      { code: "whereUnsupportedNode", nodeType: String(obj.type) },
-    );
+    unmappedReasons.push({
+      code: "whereUnsupportedNode",
+      nodeType: String(obj.type),
+    });
     return undefined;
   }
 
@@ -64,9 +65,7 @@ export function parseWhereNode(
   // Leaf comparison
   const columnName = columnRefName(obj.left);
   if (!columnName) {
-    unmappedReasons.push(
-      { code: "whereNonColumnLeftSide" },
-    );
+    unmappedReasons.push({ code: "whereNonColumnLeftSide" });
     return undefined;
   }
 
@@ -82,18 +81,14 @@ export function parseWhereNode(
       };
       return rule;
     }
-    unmappedReasons.push(
-      { code: "whereNonNullRightSide", operator },
-    );
+    unmappedReasons.push({ code: "whereNonNullRightSide", operator });
     return undefined;
   }
 
   if (operator === "BETWEEN") {
     const valueList = extractValueList(obj.right);
     if (!valueList || valueList.length !== 2) {
-      unmappedReasons.push(
-        { code: "whereBetweenUnrepresentable", columnName },
-      );
+      unmappedReasons.push({ code: "whereBetweenUnrepresentable", columnName });
       return undefined;
     }
     const rule: QueryFilterRule = {
@@ -108,9 +103,11 @@ export function parseWhereNode(
   if (operator === "IN" || operator === "NOT IN") {
     const valueList = extractValueList(obj.right);
     if (!valueList) {
-      unmappedReasons.push(
-        { code: "whereNonLiteralList", operator, columnName },
-      );
+      unmappedReasons.push({
+        code: "whereNonLiteralList",
+        operator,
+        columnName,
+      });
       return undefined;
     }
     const rule: QueryFilterRule = {
@@ -124,17 +121,13 @@ export function parseWhereNode(
 
   const filterOp = toFilterOperator(operator);
   if (!filterOp) {
-    unmappedReasons.push(
-      { code: "whereUnsupportedOperator", operator },
-    );
+    unmappedReasons.push({ code: "whereUnsupportedOperator", operator });
     return undefined;
   }
 
   const literal = literalValue(obj.right);
   if (literal === undefined) {
-    unmappedReasons.push(
-      { code: "whereNonLiteralComparison", columnName },
-    );
+    unmappedReasons.push({ code: "whereNonLiteralComparison", columnName });
     return undefined;
   }
 
@@ -162,9 +155,10 @@ export function parseHavingNode(
   }
   const obj = node as Record<string, unknown>;
   if (obj.type !== "binary_expr") {
-    unmappedReasons.push(
-      { code: "havingUnsupportedNode", nodeType: String(obj.type) },
-    );
+    unmappedReasons.push({
+      code: "havingUnsupportedNode",
+      nodeType: String(obj.type),
+    });
     return undefined;
   }
   const operator = String(obj.operator ?? "").toUpperCase();
@@ -198,33 +192,28 @@ export function parseHavingNode(
     if (innerCol) {
       columnName = `${funcName.toLowerCase()}(${innerCol})`;
     } else {
-      unmappedReasons.push(
-        { code: "havingComplexAggregateArgument", funcName },
-      );
+      unmappedReasons.push({
+        code: "havingComplexAggregateArgument",
+        funcName,
+      });
       columnName = funcName.toLowerCase();
     }
   } else if (left?.type === "column_ref") {
     columnName = columnRefName(left);
   }
   if (!columnName) {
-    unmappedReasons.push(
-      { code: "havingUnrepresentableLeftSide" },
-    );
+    unmappedReasons.push({ code: "havingUnrepresentableLeftSide" });
     return undefined;
   }
 
   const filterOp = toFilterOperator(operator);
   if (!filterOp) {
-    unmappedReasons.push(
-      { code: "havingUnsupportedOperator", operator },
-    );
+    unmappedReasons.push({ code: "havingUnsupportedOperator", operator });
     return undefined;
   }
   const literal = literalValue(obj.right);
   if (literal === undefined) {
-    unmappedReasons.push(
-      { code: "havingNonLiteralComparison", columnName },
-    );
+    unmappedReasons.push({ code: "havingNonLiteralComparison", columnName });
     return undefined;
   }
   const rule: QueryFilterRule = {

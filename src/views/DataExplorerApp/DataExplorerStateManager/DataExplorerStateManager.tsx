@@ -1,4 +1,3 @@
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { makeObject, prop, setValue } from "@avandar/utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
@@ -20,6 +19,7 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import type {
   OrderByDirection,
   PartialStructuredQuery,

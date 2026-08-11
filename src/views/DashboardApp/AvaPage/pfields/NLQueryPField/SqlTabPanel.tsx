@@ -1,5 +1,3 @@
-import { sqlMappingReasonLabel } from "$/copy/sqlMappingReasonLabel";
-import { sqlMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { mantineColorVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -13,6 +11,8 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { sqlMappingReasonLabel } from "$/copy/sqlMappingReasonLabel";
+import { sqlMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";

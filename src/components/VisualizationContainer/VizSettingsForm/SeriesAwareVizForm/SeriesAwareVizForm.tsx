@@ -7,7 +7,7 @@ import {
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
