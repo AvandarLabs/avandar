@@ -1,5 +1,6 @@
 {
   "imports": {
+    "$/": "../../../shared/",
     "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
     "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
     "@avandar/models": "../../../packages/shared/models/src/index.ts",
@@ -16,15 +17,20 @@
     "@sbfn/": "../",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@utils/": "../../../packages/shared/utils/src/",
-    "$/": "../../../shared/",
     "googleapis": "npm:googleapis@154",
+    "ts-pattern": "npm:ts-pattern@5",
+    "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "lib": [
+      "deno.ns",
+      "dom",
+      "dom.iterable"
+    ],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -33,6 +39,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
-    "types": ["react", "react/jsx-runtime"]
+    "types": [
+      "react",
+      "react/jsx-runtime"
+    ]
   }
 }

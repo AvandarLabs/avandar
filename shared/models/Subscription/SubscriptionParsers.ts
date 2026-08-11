@@ -12,7 +12,7 @@ import {
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type {
   PolarCustomerId,
   PolarProductId,

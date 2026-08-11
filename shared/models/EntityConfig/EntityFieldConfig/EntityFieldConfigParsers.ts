@@ -17,7 +17,7 @@ import {
 import { Workspace } from "$/models/Workspace/Workspace.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean(),

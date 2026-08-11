@@ -1,5 +1,6 @@
 {
   "imports": {
+    "$/": "../../../shared/",
     "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
     "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
     "@avandar/models": "../../../packages/shared/models/src/index.ts",
@@ -16,11 +17,11 @@
     "@react-email/components": "npm:@react-email/components@0",
     "@react-email/render": "npm:@react-email/render@1",
     "@sbfn/": "../",
+    "@supabase/postgrest-js": "npm:@supabase/postgrest-js@2",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
     "@upstash/redis": "npm:@upstash/redis@1",
     "@utils/": "../../../packages/shared/utils/src/",
-    "$/": "../../../shared/",
     "react": "npm:react@19",
     "resend": "npm:resend@6",
     "ts-pattern": "npm:ts-pattern@5",
@@ -31,7 +32,11 @@
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "lib": [
+      "deno.ns",
+      "dom",
+      "dom.iterable"
+    ],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -40,6 +45,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
-    "types": ["react", "react/jsx-runtime"]
+    "types": [
+      "react",
+      "react/jsx-runtime"
+    ]
   }
 }
