@@ -116,12 +116,7 @@ export function PairSeriesFieldset({
       <SeriesList layout={layout}>
         {series.map((scatterSeries, idx) => {
           return (
-            <Card
-              key={seriesRowIds[idx]}
-              withBorder
-              shadow="none"
-              padding="sm"
-            >
+            <Card key={seriesRowIds[idx]} withBorder shadow="none" padding="sm">
               <Stack gap="xs">
                 <Group justify="space-between" wrap="nowrap" align="flex-start">
                   <Stack gap="xs" className={css.flexFillMinW0}>
