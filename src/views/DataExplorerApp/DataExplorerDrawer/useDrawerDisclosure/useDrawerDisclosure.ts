@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 
 /**
@@ -40,19 +40,26 @@ export function useDrawerDisclosure(): DrawerDisclosure {
 
   const isCollapsed = openState !== "open";
 
+  const onTabChange = useCallback((nextTab: DrawerTab) => {
+    setActiveTab(nextTab);
+    // Picking a tab is also a request to open.
+    setOpenState("open");
+  }, []);
+
+  // Reads the current state through the updater rather than closing over
+  // `isCollapsed`, so the empty dependency list stays honest: capturing that
+  // derived boolean would freeze the toggle on its first-render value.
+  const onToggleCollapsed = useCallback(() => {
+    setOpenState((currentState) => {
+      return currentState === "open" ? "collapsed" : "open";
+    });
+  }, []);
+
   return {
     activeTab,
     isCollapsed,
     hasOpened: openState !== "unopened",
-
-    onTabChange: (nextTab) => {
-      setActiveTab(nextTab);
-      // Picking a tab is also a request to open.
-      setOpenState("open");
-    },
-
-    onToggleCollapsed: () => {
-      setOpenState(isCollapsed ? "open" : "collapsed");
-    },
+    onTabChange,
+    onToggleCollapsed,
   };
 }
