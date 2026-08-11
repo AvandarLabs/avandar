@@ -147,6 +147,13 @@ a brand-new review. Then:
 
 Never use em dashes. Keep comments direct and concise.
 
+Before writing any PR finding or review summary, read
+[`references/comment-style.md`](references/comment-style.md) and follow it. It
+governs the prose of a review comment: how to lead, how long to be, when to ask
+instead of assert, and what never to write. If
+`~/.diff-review/comment-style.md` exists, read that too and let it win on any
+conflict.
+
 For explainers on the agent's own diff, comment only when the reviewer benefits
 from context the diff does not state: why an abstraction exists, how data moves,
 which domain rule or invariant applies, or why a fallback or integration works
@@ -157,7 +164,8 @@ For replies to change requests, use exactly `Done.` unless the reviewer asked a
 question or needs a non-obvious trade-off, behavior change, or out-of-scope
 follow-up. Never cite commits or restate code visible in the diff.
 
-For PR findings, write text a human can paste into GitHub unchanged:
+For PR findings, write text a human can paste into GitHub unchanged, in the
+voice `references/comment-style.md` describes:
 
 - Nit: state the correction only.
 - Documented rule violation: state the fix and cite the rule.
@@ -405,7 +413,9 @@ files, commit, push, or merge in Initial mode.
    and remain in the current worktree.
 2. Load project instructions, contributing guidance, lint configuration, and
    applicable code-review skills. This skill defines the workflow, not the
-   project's review rules.
+   project's review rules. Also load
+   [`references/comment-style.md`](references/comment-style.md), plus
+   `~/.diff-review/comment-style.md` when it exists, before writing any finding.
 3. Review the PR with `git diff <baseRefName>...HEAD`; for a local critique,
    review the selected comparison. Check correctness, edge cases, architecture,
    data modeling, documented conventions, and useful nits.
