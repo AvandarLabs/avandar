@@ -5,7 +5,7 @@ import { Stack } from "@mantine/core";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields/SliceColorFields";
+import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,

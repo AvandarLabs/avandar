@@ -397,6 +397,38 @@
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
   couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
+- The converse also holds: a module with no co-named sibling must NOT get a
+  directory of its own. A directory exists to group siblings, so
+  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
+  nothing, and it costs a redundant path segment on every import
+  (`.../MyFile/MyFile`). Leave the lone file next to its parent
+  (`.../MyFile.tsx`) and create the directory at the moment a second
+  co-named file appears. This applies to every kind of module: components,
+  hooks, and plain `.ts` modules alike.
+
+  This is bad (each directory holds exactly one file):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize/
+      useDrawerResize.ts
+    QueryTabPanel/
+      QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that
+  really has siblings keeps a directory):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize.ts
+    QueryTabPanel.tsx
+    DrawerHeight/
+      DrawerHeight.ts
+      DrawerHeight.test.ts
+  ```
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.

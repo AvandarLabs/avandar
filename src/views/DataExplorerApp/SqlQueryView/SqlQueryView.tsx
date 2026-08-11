@@ -8,8 +8,8 @@ import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDi
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import { SqlReadOnlyBlock } from "@/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock/SqlReadOnlyBlock";
-import { SqlSyncWarningNotes } from "@/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes/SqlSyncWarningNotes";
+import { SqlReadOnlyBlock } from "@/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock";
+import { SqlSyncWarningNotes } from "@/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes";
 import css from "./SqlQueryView.module.css";
 import type {
   SettingsColumnGroup,

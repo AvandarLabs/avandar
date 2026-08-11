@@ -29,7 +29,7 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
-import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys/DataExplorerSessionKeys";
+import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
