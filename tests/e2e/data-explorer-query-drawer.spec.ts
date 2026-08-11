@@ -14,7 +14,6 @@ import {
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 const SEEDED_SQL = "SELECT 1 AS mocked_column LIMIT 20";
-const PANEL_PREFERENCES_STORAGE_KEY = "ava.data-explorer.panel-preferences";
 
 async function _goToDataExplorerWithSeededSQL(options: {
   page: import("@playwright/test").Page;
@@ -30,19 +29,18 @@ async function _goToDataExplorerWithSeededSQL(options: {
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-async function _ensureQueryPanelOpen(
+async function _openQueryTab(
   page: import("@playwright/test").Page,
 ): Promise<void> {
-  const queryDetailsPanel = page.locator('div[aria-label="Query Details"]');
-  if (await queryDetailsPanel.isVisible()) {
-    return;
-  }
-
-  await page.getByRole("button", { name: /^query$/i }).click();
-  await expect(queryDetailsPanel).toBeVisible({ timeout: SHORT_WAIT });
+  // The drawer's tab rail is always mounted, and clicking a tab also expands
+  // the drawer when it happens to be collapsed.
+  await page.getByRole("tab", { name: /^query$/i }).click();
+  await expect(page.getByRole("tabpanel", { name: /^query$/i })).toBeVisible({
+    timeout: SHORT_WAIT,
+  });
 }
 
-test.describe("Data Explorer query details", () => {
+test.describe("Data Explorer query drawer", () => {
   test("opening query details does not replace the current SQL or URL", async ({
     page,
     e2eWorkerDb,
@@ -60,7 +58,7 @@ test.describe("Data Explorer query details", () => {
 
     const beforeUrl = page.url();
 
-    await _ensureQueryPanelOpen(page);
+    await _openQueryTab(page);
 
     await expect
       .poll(() => {
@@ -68,15 +66,15 @@ test.describe("Data Explorer query details", () => {
       })
       .toBe(beforeUrl);
 
-    await page.getByRole("tab", { name: /^sql$/i }).click();
+    await page.getByRole("radio", { name: /^sql$/i }).click();
     await expect(
-      page.getByRole("tabpanel", { name: /^sql$/i }).getByRole("code"),
+      page.getByRole("tabpanel", { name: /^query$/i }).getByRole("code"),
     ).toContainText(/SELECT 1 AS [`"]?mocked_column[`"]? LIMIT 20/, {
       timeout: SHORT_WAIT,
     });
   });
 
-  test("first visit opens Query on the manual form and shows available datasets in the datasource dropdown", async ({
+  test("first visit opens the drawer on Query with the manual form and shows available datasets in the datasource dropdown", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -120,13 +118,6 @@ test.describe("Data Explorer query details", () => {
     });
 
     try {
-      await page.evaluate(
-        ({ storageKey }) => {
-          window.sessionStorage.removeItem(storageKey);
-        },
-        { storageKey: PANEL_PREFERENCES_STORAGE_KEY },
-      );
-
       // Navigate to the Data Explorer client-side (via the sidebar link)
       // rather than a hard `page.goto`. A full reload rehydrates React Query
       // from the throttled IndexedDB persister, which can still hold a stale,
@@ -143,15 +134,15 @@ test.describe("Data Explorer query details", () => {
       );
       await dismissBlockingOverlays(page);
 
-      const queryDetailsPanel = page.getByRole("dialog", {
-        name: "Query Details",
-      });
-      await expect(queryDetailsPanel).toBeVisible({ timeout: SHORT_WAIT });
-      await expect(
-        page.getByRole("tab", { name: /^manual query$/i }),
-      ).toHaveAttribute("aria-selected", "true");
+      const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
+      await expect(queryPanel).toBeVisible({ timeout: SHORT_WAIT });
+      await expect(page.getByRole("tab", { name: /^query$/i })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+      await expect(page.getByRole("radio", { name: /^manual$/i })).toBeChecked();
 
-      const dataSourceInput = queryDetailsPanel.getByLabel("Data source");
+      const dataSourceInput = queryPanel.getByLabel("Data source");
       await dataSourceInput.click();
 
       await expect(

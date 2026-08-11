@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
-import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
+import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
+import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import {
   getMantineSelectDropdown,
@@ -44,13 +45,15 @@ function renderForm({
   const typeMock = onVizTypeChange as ReturnType<typeof vi.fn>;
   const result = render(
     <AvandarUiProvider>
-      <VizSettingsForm
-        columns={COLUMNS}
-        data={DATA}
-        vizConfig={vizConfig}
-        onVizConfigChange={cfgMock}
-        onVizTypeChange={typeMock}
-      />
+      <>
+        <VizTypeSelect value={vizConfig.vizType} onChange={typeMock} />
+        <VizSettingsFormBody
+          columns={COLUMNS}
+          data={DATA}
+          vizConfig={vizConfig}
+          onVizConfigChange={cfgMock}
+        />
+      </>
     </AvandarUiProvider>,
   );
   return {
@@ -59,20 +62,22 @@ function renderForm({
     rerenderWith: (nextConfig) => {
       result.rerender(
         <AvandarUiProvider>
-          <VizSettingsForm
-            columns={COLUMNS}
-            data={DATA}
-            vizConfig={nextConfig}
-            onVizConfigChange={cfgMock}
-            onVizTypeChange={typeMock}
-          />
+          <>
+            <VizTypeSelect value={nextConfig.vizType} onChange={typeMock} />
+            <VizSettingsFormBody
+              columns={COLUMNS}
+              data={DATA}
+              vizConfig={nextConfig}
+              onVizConfigChange={cfgMock}
+            />
+          </>
         </AvandarUiProvider>,
       );
     },
   };
 }
 
-describe("VizSettingsForm — top-level type picker", () => {
+describe("VizSettingsFormBody — top-level type picker", () => {
   it("invokes onVizTypeChange when a new viz type is picked", () => {
     const { onVizTypeChange } = renderForm({ vizConfig: { vizType: "table" } });
     pickMantineSelectOption(/Visualization Type/i, "Bar Chart");
@@ -86,7 +91,7 @@ describe("VizSettingsForm — top-level type picker", () => {
   });
 });
 
-describe("VizSettingsForm — bar chart smoke test", () => {
+describe("VizSettingsFormBody — bar chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
@@ -117,7 +122,7 @@ describe("VizSettingsForm — bar chart smoke test", () => {
   });
 });
 
-describe("VizSettingsForm — line chart smoke test", () => {
+describe("VizSettingsFormBody — line chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "line",
     xAxisKey: undefined,
@@ -135,7 +140,7 @@ describe("VizSettingsForm — line chart smoke test", () => {
   });
 });
 
-describe("VizSettingsForm — area chart smoke test", () => {
+describe("VizSettingsFormBody — area chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "area",
     xAxisKey: undefined,
@@ -154,7 +159,7 @@ describe("VizSettingsForm — area chart smoke test", () => {
   });
 });
 
-describe("VizSettingsForm — scatter chart controls", () => {
+describe("VizSettingsFormBody — scatter chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "scatter",
     series: [{ xKey: "value", key: "score" }],
@@ -184,7 +189,7 @@ describe("VizSettingsForm — scatter chart controls", () => {
   });
 });
 
-describe("VizSettingsForm — pie chart controls", () => {
+describe("VizSettingsFormBody — pie chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "pie",
     nameKey: undefined,
@@ -238,7 +243,7 @@ describe("VizSettingsForm — pie chart controls", () => {
   });
 });
 
-describe("VizSettingsForm — funnel chart controls", () => {
+describe("VizSettingsFormBody — funnel chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "funnel",
     nameKey: undefined,
@@ -266,7 +271,7 @@ describe("VizSettingsForm — funnel chart controls", () => {
   });
 });
 
-describe("VizSettingsForm — radar chart smoke test", () => {
+describe("VizSettingsFormBody — radar chart smoke test", () => {
   const baseConfig: VizConfig = {
     vizType: "radar",
     nameKey: undefined,
@@ -284,7 +289,7 @@ describe("VizSettingsForm — radar chart smoke test", () => {
   });
 });
 
-describe("VizSettingsForm — bubble chart controls", () => {
+describe("VizSettingsFormBody — bubble chart controls", () => {
   const baseConfig: VizConfig = {
     vizType: "bubble",
     series: [{ xKey: "value", key: "score", sizeKey: "value" }],

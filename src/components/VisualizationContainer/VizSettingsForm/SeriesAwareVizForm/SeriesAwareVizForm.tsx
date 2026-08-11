@@ -1,14 +1,19 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Fieldset, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import { makeBucketMap, propPasses, removeAtIndex, setValue } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -25,6 +30,9 @@ type Props<TConfig extends HostConfig> = {
   fields: readonly QueryResultColumn[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -45,6 +53,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   fields,
   config,
   onConfigChange,
+  layout = "stacked",
 }: Props<TConfig>): ReactNode {
   const { t } = useLingui();
   const isRadar = config.vizType === "radar";
@@ -157,9 +166,11 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     return group !== axisLegend;
   });
 
-  return (
-    <Stack gap="md">
-      <Fieldset legend={t`Series`}>
+  const groups: SettingsColumnGroup[] = [
+    {
+      id: "series",
+      title: t`Series`,
+      content: (
         <Stack gap="sm">
           <Group justify="space-between">
             <Group gap={6} align="center">
@@ -223,9 +234,12 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             );
           })}
         </Stack>
-      </Fieldset>
-
-      <Fieldset legend={axisLegend}>
+      ),
+    },
+    {
+      id: "axis",
+      title: axisLegend,
+      content: (
         <Stack gap="xs">
           <Control
             label={axisLegend}
@@ -252,30 +266,33 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             );
           })}
         </Stack>
-      </Fieldset>
+      ),
+    },
+    ...otherGroupedDescriptors.map(([group, descs]) => {
+      const legend = group === "" ? t`Chart settings` : group;
+      return {
+        id: legend,
+        title: legend,
+        content: (
+          <Stack gap="xs">
+            {descs.map((desc) => {
+              return (
+                <Control
+                  key={desc.key}
+                  label={desc.label}
+                  spec={desc.control}
+                  value={readSetting(config, desc.key)}
+                  onChange={(nextValue) => {
+                    updateChartPath(desc.key, nextValue);
+                  }}
+                />
+              );
+            })}
+          </Stack>
+        ),
+      };
+    }),
+  ];
 
-      {otherGroupedDescriptors.map(([group, descs]) => {
-        const legend = group === "" ? t`Chart settings` : group;
-        return (
-          <Fieldset key={legend} legend={legend}>
-            <Stack gap="xs">
-              {descs.map((desc) => {
-                return (
-                  <Control
-                    key={desc.key}
-                    label={desc.label}
-                    spec={desc.control}
-                    value={readSetting(config, desc.key)}
-                    onChange={(nextValue) => {
-                      updateChartPath(desc.key, nextValue);
-                    }}
-                  />
-                );
-              })}
-            </Stack>
-          </Fieldset>
-        );
-      })}
-    </Stack>
-  );
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

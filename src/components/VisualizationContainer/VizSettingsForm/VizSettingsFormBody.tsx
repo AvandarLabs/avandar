@@ -4,6 +4,7 @@ import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettings
 import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
@@ -17,6 +18,12 @@ type Props = {
 
   /** Called when the user edits any control inside a per-type subform. */
   onVizConfigChange: (vizConfig: VizConfig) => void;
+
+  /**
+   * How each subform arranges its setting groups. Defaults to a vertical
+   * stack, which suits narrow hosts like the dashboard settings panel.
+   */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -35,6 +42,7 @@ export function VizSettingsFormBody({
   data,
   vizConfig,
   onVizConfigChange,
+  layout = "stacked",
 }: Props): JSX.Element | null {
   return match(vizConfig)
     .with({ vizType: "table" }, () => {
@@ -45,6 +53,7 @@ export function VizSettingsFormBody({
         <SeriesAwareVizForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={onVizConfigChange}
         />
       );
@@ -54,6 +63,7 @@ export function VizSettingsFormBody({
         <SeriesAwareVizForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={onVizConfigChange}
         />
       );
@@ -63,6 +73,7 @@ export function VizSettingsFormBody({
         <SeriesAwareVizForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={onVizConfigChange}
         />
       );
@@ -72,6 +83,7 @@ export function VizSettingsFormBody({
         <SeriesAwareVizForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={onVizConfigChange}
         />
       );
@@ -81,6 +93,7 @@ export function VizSettingsFormBody({
         <ScatterChartForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={(newConfig) => {
             onVizConfigChange({ ...config, ...newConfig });
           }}
@@ -93,6 +106,7 @@ export function VizSettingsFormBody({
           fields={columns}
           config={config}
           data={data}
+          layout={layout}
           onConfigChange={(newConfig) => {
             onVizConfigChange({ ...config, ...newConfig });
           }}
@@ -105,6 +119,7 @@ export function VizSettingsFormBody({
           fields={columns}
           config={config}
           data={data}
+          layout={layout}
           onConfigChange={(newConfig) => {
             onVizConfigChange({ ...config, ...newConfig });
           }}
@@ -116,6 +131,7 @@ export function VizSettingsFormBody({
         <BubbleChartForm
           fields={columns}
           config={config}
+          layout={layout}
           onConfigChange={(newConfig) => {
             onVizConfigChange({ ...config, ...newConfig });
           }}

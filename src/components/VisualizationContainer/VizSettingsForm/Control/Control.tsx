@@ -60,7 +60,6 @@ export function Control({
           swatches={[...(spec.swatches ?? CHART_COLOR_SWATCHES)]}
           withEyeDropper={false}
           format="hex"
-          popoverProps={{ withinPortal: false }}
           onChange={(next) => {
             onChange(next === "" ? undefined : next);
           }}

@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   ColorInput,
-  Fieldset,
   Group,
   Stack,
   TextInput,
@@ -14,9 +13,12 @@ import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses, removeAtIndex } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import clsx from "clsx";
 import { useCallback, useMemo } from "react";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.module.css";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
@@ -24,6 +26,9 @@ type Props = {
   fields: readonly QueryResultColumn[];
   series: readonly ScatterSeries[];
   onChange: (next: ScatterSeries[]) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -36,6 +41,7 @@ export function PairSeriesFieldset({
   fields,
   series,
   onChange,
+  layout = "stacked",
 }: Props): JSX.Element {
   const { t } = useLingui();
 
@@ -77,10 +83,9 @@ export function PairSeriesFieldset({
     [series, onChange],
   );
 
-  return (
-    <Fieldset legend={t`Series`}>
-      <Stack gap="md">
-        <Group justify="space-between">
+  const seriesGroup = (
+    <Stack gap="md">
+      <Group justify="space-between">
           <Group gap={6} align="center">
             <Tooltip
               multiline
@@ -105,7 +110,12 @@ export function PairSeriesFieldset({
           </Button>
         </Group>
 
-        <Stack gap="sm">
+        <div
+          className={clsx(
+            css.seriesList,
+            layout === "columns" && css.seriesListColumns,
+          )}
+        >
           {series.map((s, idx) => {
             return (
               <Card
@@ -200,8 +210,14 @@ export function PairSeriesFieldset({
               </Card>
             );
           })}
-        </Stack>
-      </Stack>
-    </Fieldset>
+        </div>
+    </Stack>
+  );
+
+  return (
+    <SettingsColumns
+      layout={layout}
+      groups={[{ id: "series", title: t`Series`, content: seriesGroup }]}
+    />
   );
 }

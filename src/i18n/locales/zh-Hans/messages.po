@@ -201,7 +201,7 @@ msgstr "以自然语言输入您的问题或指令以生成 SQL 查询"
 msgid "H4"
 msgstr "H4"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Query"
 msgstr "查询"
 
@@ -229,7 +229,7 @@ msgstr "Avandar"
 msgid "Please check your email for a confirmation link."
 msgstr "请检查您的电子邮件以获取确认链接。"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Expand"
 msgstr "展开"
 
@@ -335,6 +335,10 @@ msgstr "列表"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "数据源"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Expand drawer"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
@@ -547,7 +551,7 @@ msgstr "小"
 msgid "No matches"
 msgstr "没有匹配项"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Keep SQL as-is"
 msgstr "保持 SQL 不变"
 
@@ -1057,6 +1061,10 @@ msgstr "全球编辑器"
 msgid "Manage seats in billing portal →"
 msgstr "在计费门户中管理席位 →"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Table view has no chart settings."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
 msgstr "与按月计费相比，您节省了 {discount}%"
@@ -1133,6 +1141,10 @@ msgstr "选择数据源"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
 msgstr "开放数据"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Sort & limit"
+msgstr ""
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
@@ -1222,7 +1234,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
 msgstr "配置此过滤器：在侧边面板中设置其 ID、标签和列名。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1273,7 +1285,7 @@ msgstr "{workspaceName} 中其他成员看到的名称。"
 msgid "Suggested:"
 msgstr "建议："
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "用表单更改覆盖 SQL"
 
@@ -1377,6 +1389,7 @@ msgid "\"{sourceFileName}\" finished processing and is ready to use."
 msgstr "\"{sourceFileName}\" 处理完成，准备使用。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Manual"
 msgstr "手动"
 
@@ -1463,7 +1476,7 @@ msgstr "最大"
 msgid "Import data"
 msgstr "导入数据"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Descending"
 msgstr "降序"
 
@@ -1682,6 +1695,10 @@ msgstr "数据范围"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "数据预览"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Pick a chart type above to configure one."
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -2308,7 +2325,7 @@ msgstr "检测到个人数据"
 msgid "Apply every global filter on the dashboard."
 msgstr "在仪表板上应用每个全局过滤器。"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Collapse"
 msgstr "折叠"
 
@@ -2419,8 +2436,8 @@ msgid "Open {0}"
 msgstr "打开 {0}"
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
-msgid "Manual Query"
-msgstr "手动查询"
+#~ msgid "Manual Query"
+#~ msgstr "手动查询"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
@@ -2530,7 +2547,7 @@ msgstr "澄清答案"
 msgid "Generated SQL"
 msgstr "生成的 SQL"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Maximum rows to return"
 msgstr "最大返回行数"
 
@@ -2663,7 +2680,7 @@ msgstr "列"
 msgid "Here is a query based on your workspace metadata."
 msgstr "这是基于您的工作区元数据生成的查询。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Overwrite SQL?"
 msgstr "覆盖 SQL 吗？"
 
@@ -2765,6 +2782,11 @@ msgstr "没有数据集与您的搜索匹配。"
 msgid "in"
 msgstr "在"
 
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL is what actually runs."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "导出 PDF"
@@ -2809,7 +2831,7 @@ msgstr "大"
 msgid "Sent password reset email"
 msgstr "已发送密码重置电子邮件"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select column to sort by"
 msgstr "选择排序列"
 
@@ -2930,7 +2952,7 @@ msgstr "澄清"
 msgid "Entity deleted"
 msgstr "实体已删除"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select columns"
 msgstr "选择列"
 
@@ -3041,8 +3063,8 @@ msgid "/month (paid yearly)"
 msgstr "/月（按年支付）"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Close {title}"
-msgstr "关闭 {title}"
+#~ msgid "Close {title}"
+#~ msgstr "关闭 {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -3239,7 +3261,7 @@ msgstr "无法移除离线聊天模型"
 msgid "Create a new account"
 msgstr "创建新账户"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Direction"
 msgstr "方向"
 
@@ -3394,6 +3416,10 @@ msgstr "尚未添加描述。"
 msgid "Qwen 2.5 3B"
 msgstr "Qwen 2.5 3B"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Collapse drawer"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "分享失败"
@@ -3515,7 +3541,7 @@ msgstr "出了点问题"
 msgid "Allow syncing"
 msgstr "允许同步"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Ascending"
 msgstr "升序"
 
@@ -3545,7 +3571,6 @@ msgid "Change"
 msgstr "更改"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分内容无法以手动形式表示。该表单显示了最佳努力的近似值；上面的 SQL 是实际运行的内容。"
@@ -3580,8 +3605,8 @@ msgid "Export as PDF"
 msgstr "导出为 PDF"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Collapse panel"
-msgstr "折叠面板"
+#~ msgid "Collapse panel"
+#~ msgstr "折叠面板"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
@@ -3669,7 +3694,7 @@ msgstr "上传"
 msgid "about {0} minutes"
 msgstr "大约 {0} 分钟"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select columns to query"
 msgstr "选择要查询的列"
 
@@ -3827,6 +3852,10 @@ msgstr "按 {secondGroupByColumn} 对 {datasetName} 中的行进行计数"
 msgid "Your checkout was successful!"
 msgstr "您的结账成功！"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Parts of the SQL cannot be represented in the manual form."
+msgstr ""
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
 "sources to start analyzing your information."
@@ -3867,8 +3896,8 @@ msgid "Signing you back in…"
 msgstr "正在重新登录…"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Query Details"
-msgstr "查询详情"
+#~ msgid "Query Details"
+#~ msgstr "查询详情"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -3964,7 +3993,6 @@ msgid "Privacy log"
 msgstr "隐私日志"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "可视化设置"
 
@@ -3998,7 +4026,7 @@ msgstr "账单"
 msgid "Profile Name"
 msgstr "配置文件名称"
 
-#: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "可视化类型"
@@ -4086,6 +4114,10 @@ msgstr "复制共享链接"
 msgid "Canonical URLs"
 msgstr "规范 URL"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Chart settings appear once the query returns some columns."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "渲染为"
@@ -4111,6 +4143,10 @@ msgstr "自定义 URL 可用"
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
 msgstr "行数"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Form is an approximation"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Restricted"
@@ -4527,7 +4563,7 @@ msgstr "永久链接（用于二维码）"
 msgid "Settings"
 msgstr "设置"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"
 msgstr "可视化"
 
@@ -4625,8 +4661,8 @@ msgid "Role for new share"
 msgstr "新共享的角色"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Expand panel"
-msgstr "展开面板"
+#~ msgid "Expand panel"
+#~ msgstr "展开面板"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
@@ -4750,6 +4786,10 @@ msgstr "离线模型"
 msgid "Schema version"
 msgstr "架构版本"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Query editor mode"
+msgstr ""
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
@@ -4777,6 +4817,10 @@ msgstr "过滤器 ID（稳定）"
 #: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "没有可用列"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Resize drawer"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -4959,6 +5003,10 @@ msgstr "Avandar 仍在测试阶段。某些功能可能无法按预期工作，�
 msgid "Thank you for your interest!"
 msgstr "感谢您的关注！"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Source"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
 msgstr "常规"
@@ -5035,7 +5083,7 @@ msgid "Add a series to choose which numeric column drives the chart."
 msgstr "添加一个系列以选择哪个数值列驱动图表。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Column"
 msgstr "列"
 
@@ -5108,7 +5156,7 @@ msgstr "文本"
 msgid "Role group deleted"
 msgstr "角色组已删除"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select sort order"
 msgstr "选择排序顺序"
 
@@ -5340,7 +5388,7 @@ msgstr "编辑 serif"
 msgid "Untitled dashboard"
 msgstr "未命名仪表板"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Limit"
 msgstr "限制"
 
@@ -5382,7 +5430,6 @@ msgstr "角色和用户组"
 msgid "Clear all"
 msgstr "清除所有"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Close"
 msgstr "关闭"
@@ -5399,6 +5446,10 @@ msgstr "与您共享"
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Longitude column"
 msgstr "经度列"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Run a query to configure a chart."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."

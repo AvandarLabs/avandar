@@ -207,7 +207,7 @@ msgstr "Enter your question or instructions in natural language to generate a "
 msgid "H4"
 msgstr "H4"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Query"
 msgstr "Query"
 
@@ -235,7 +235,7 @@ msgstr "Avandar"
 msgid "Please check your email for a confirmation link."
 msgstr "Please check your email for a confirmation link."
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Expand"
 msgstr "Expand"
 
@@ -343,6 +343,10 @@ msgstr "List"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "Data Sources"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Expand drawer"
+msgstr "Expand drawer"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
@@ -561,7 +565,7 @@ msgstr "Small"
 msgid "No matches"
 msgstr "No matches"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Keep SQL as-is"
 msgstr "Keep SQL as-is"
 
@@ -1083,6 +1087,10 @@ msgstr "Global Editor"
 msgid "Manage seats in billing portal →"
 msgstr "Manage seats in billing portal →"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Table view has no chart settings."
+msgstr "Table view has no chart settings."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
 msgstr "You save {discount}% compared to monthly billing"
@@ -1161,6 +1169,10 @@ msgstr "Select a data source"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
 msgstr "Open Data"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Sort & limit"
+msgstr "Sort & limit"
 
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
@@ -1252,7 +1264,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 msgstr "Configure this filter: set its id, label, and column name in the side "
 "panel."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1307,7 +1319,7 @@ msgstr "The name other members see in {workspaceName}."
 msgid "Suggested:"
 msgstr "Suggested:"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "Overwrite SQL with form changes"
 
@@ -1419,6 +1431,7 @@ msgid "\"{sourceFileName}\" finished processing and is ready to use."
 msgstr "\"{sourceFileName}\" finished processing and is ready to use."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Manual"
 msgstr "Manual"
 
@@ -1508,7 +1521,7 @@ msgstr "Max"
 msgid "Import data"
 msgstr "Import data"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Descending"
 msgstr "Descending"
 
@@ -1730,6 +1743,10 @@ msgstr "Data scope"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Data preview"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Pick a chart type above to configure one."
+msgstr "Pick a chart type above to configure one."
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -2374,7 +2391,7 @@ msgstr "Personal data detected"
 msgid "Apply every global filter on the dashboard."
 msgstr "Apply every global filter on the dashboard."
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Collapse"
 msgstr "Collapse"
 
@@ -2486,8 +2503,8 @@ msgid "Open {0}"
 msgstr "Open {0}"
 
 #: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
-msgid "Manual Query"
-msgstr "Manual Query"
+#~ msgid "Manual Query"
+#~ msgstr "Manual Query"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
@@ -2600,7 +2617,7 @@ msgstr "Clarification answer"
 msgid "Generated SQL"
 msgstr "Generated SQL"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Maximum rows to return"
 msgstr "Maximum rows to return"
 
@@ -2734,7 +2751,7 @@ msgstr "Columns"
 msgid "Here is a query based on your workspace metadata."
 msgstr "Here is a query based on your workspace metadata."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Overwrite SQL?"
 msgstr "Overwrite SQL?"
 
@@ -2837,6 +2854,12 @@ msgstr "No datasets match your search."
 msgid "in"
 msgstr "in"
 
+#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL is what actually runs."
+msgstr "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL is what actually runs."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "Export PDF"
@@ -2881,7 +2904,7 @@ msgstr "Large"
 msgid "Sent password reset email"
 msgstr "Sent password reset email"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select column to sort by"
 msgstr "Select column to sort by"
 
@@ -3006,7 +3029,7 @@ msgstr "Clarifications"
 msgid "Entity deleted"
 msgstr "Entity deleted"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select columns"
 msgstr "Select columns"
 
@@ -3118,8 +3141,8 @@ msgid "/month (paid yearly)"
 msgstr "/month (paid yearly)"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Close {title}"
-msgstr "Close {title}"
+#~ msgid "Close {title}"
+#~ msgstr "Close {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -3321,7 +3344,7 @@ msgstr "Could not remove offline chat model"
 msgid "Create a new account"
 msgstr "Create a new account"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Direction"
 msgstr "Direction"
 
@@ -3481,6 +3504,10 @@ msgstr "No description has been added yet."
 msgid "Qwen 2.5 3B"
 msgstr "Qwen 2.5 3B"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Collapse drawer"
+msgstr "Collapse drawer"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Share failed"
@@ -3603,7 +3630,7 @@ msgstr "Something went wrong"
 msgid "Allow syncing"
 msgstr "Allow syncing"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Ascending"
 msgstr "Ascending"
 
@@ -3633,7 +3660,6 @@ msgid "Change"
 msgstr "Change"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "Parts of this SQL could not be represented in the Manual form. The form "
@@ -3669,8 +3695,8 @@ msgid "Export as PDF"
 msgstr "Export as PDF"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Collapse panel"
-msgstr "Collapse panel"
+#~ msgid "Collapse panel"
+#~ msgstr "Collapse panel"
 
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
@@ -3761,7 +3787,7 @@ msgstr "Upload"
 msgid "about {0} minutes"
 msgstr "about {0} minutes"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select columns to query"
 msgstr "Select columns to query"
 
@@ -3920,6 +3946,10 @@ msgstr "Count rows in {datasetName} by {secondGroupByColumn}"
 msgid "Your checkout was successful!"
 msgstr "Your checkout was successful!"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Parts of the SQL cannot be represented in the manual form."
+msgstr "Parts of the SQL cannot be represented in the manual form."
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
 "sources to start analyzing your information."
@@ -3961,8 +3991,8 @@ msgid "Signing you back in…"
 msgstr "Signing you back in…"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Query Details"
-msgstr "Query Details"
+#~ msgid "Query Details"
+#~ msgstr "Query Details"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4059,7 +4089,6 @@ msgid "Privacy log"
 msgstr "Privacy log"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "Visualization Settings"
 
@@ -4094,7 +4123,7 @@ msgstr "Billing"
 msgid "Profile Name"
 msgstr "Profile Name"
 
-#: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "Visualization Type"
@@ -4187,6 +4216,10 @@ msgstr "Copy share link"
 msgid "Canonical URLs"
 msgstr "Canonical URLs"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Chart settings appear once the query returns some columns."
+msgstr "Chart settings appear once the query returns some columns."
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "Render as"
@@ -4212,6 +4245,10 @@ msgstr "Custom URL is available"
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
 msgstr "Number of rows"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Form is an approximation"
+msgstr "Form is an approximation"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Restricted"
@@ -4641,7 +4678,7 @@ msgstr "Permanent link (use for QR codes)"
 msgid "Settings"
 msgstr "Settings"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"
 msgstr "Visualizations"
 
@@ -4742,8 +4779,8 @@ msgid "Role for new share"
 msgstr "Role for new share"
 
 #: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Expand panel"
-msgstr "Expand panel"
+#~ msgid "Expand panel"
+#~ msgstr "Expand panel"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
@@ -4867,6 +4904,10 @@ msgstr "Offline models"
 msgid "Schema version"
 msgstr "Schema version"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Query editor mode"
+msgstr "Query editor mode"
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
@@ -4896,6 +4937,10 @@ msgstr "Filter id (stable)"
 #: src/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl.tsx
 msgid "No columns available"
 msgstr "No columns available"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Resize drawer"
+msgstr "Resize drawer"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -5082,6 +5127,10 @@ msgstr "Avandar is still in beta. Some features may not work as expected and "
 msgid "Thank you for your interest!"
 msgstr "Thank you for your interest!"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Source"
+msgstr "Source"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
 msgstr "General"
@@ -5159,7 +5208,7 @@ msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Add a series to choose which numeric column drives the chart."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Column"
 msgstr "Column"
 
@@ -5234,7 +5283,7 @@ msgstr "Text"
 msgid "Role group deleted"
 msgstr "Role group deleted"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Select sort order"
 msgstr "Select sort order"
 
@@ -5474,7 +5523,7 @@ msgstr "Editorial serif"
 msgid "Untitled dashboard"
 msgstr "Untitled dashboard"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields.tsx
 msgid "Limit"
 msgstr "Limit"
 
@@ -5517,7 +5566,6 @@ msgstr "Role & user groups"
 msgid "Clear all"
 msgstr "Clear all"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Close"
 msgstr "Close"
@@ -5535,6 +5583,10 @@ msgstr "Shared with you"
 #: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 msgid "Longitude column"
 msgstr "Longitude column"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Run a query to configure a chart."
+msgstr "Run a query to configure a chart."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."

@@ -1,10 +1,15 @@
 import { useLingui } from "@lingui/react/macro";
-import { ColorInput, Fieldset, Stack } from "@mantine/core";
+import { ColorInput, Stack } from "@mantine/core";
 import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
@@ -14,6 +19,9 @@ type Props = {
   config: FunnelChartVizConfig;
   data: UnknownDataFrame;
   onConfigChange: (newConfig: FunnelChartVizConfig) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -26,6 +34,7 @@ export function FunnelChartForm({
   config,
   data,
   onConfigChange,
+  layout = "stacked",
 }: Props): JSX.Element {
   const { t } = useLingui();
   const fieldOptions = useMemo(() => {
@@ -55,9 +64,11 @@ export function FunnelChartForm({
 
   const { nameKey, valueKey } = config;
 
-  return (
-    <Stack gap="md">
-      <Fieldset legend={t`Series`}>
+  const groups: SettingsColumnGroup[] = [
+    {
+      id: "series",
+      title: t`Series`,
+      content: (
         <Stack gap="sm">
           <Select
             allowDeselect
@@ -91,36 +102,42 @@ export function FunnelChartForm({
             }}
           />
         </Stack>
-      </Fieldset>
+      ),
+    },
+    ...(sliceNames.length > 0 ?
+      [
+        {
+          id: "slice-colors",
+          title: t`Slice colors`,
+          content: (
+            <Stack gap="xs">
+              {sliceNames.map((name) => {
+                return (
+                  <ColorInput
+                    key={name}
+                    label={name}
+                    value={config.seriesColors?.[name] ?? ""}
+                    swatches={CHART_COLOR_SWATCHES}
+                    withEyeDropper={false}
+                    format="hex"
+                    onChange={(value) => {
+                      onConfigChange({
+                        ...config,
+                        seriesColors: {
+                          ...config.seriesColors,
+                          [name]: value || undefined,
+                        } as Record<string, string>,
+                      });
+                    }}
+                  />
+                );
+              })}
+            </Stack>
+          ),
+        },
+      ]
+    : []),
+  ];
 
-      {sliceNames.length > 0 ?
-        <Fieldset legend={t`Slice colors`}>
-          <Stack gap="xs">
-            {sliceNames.map((name) => {
-              return (
-                <ColorInput
-                  key={name}
-                  label={name}
-                  value={config.seriesColors?.[name] ?? ""}
-                  swatches={CHART_COLOR_SWATCHES}
-                  withEyeDropper={false}
-                  format="hex"
-                  popoverProps={{ withinPortal: false }}
-                  onChange={(value) => {
-                    onConfigChange({
-                      ...config,
-                      seriesColors: {
-                        ...config.seriesColors,
-                        [name]: value || undefined,
-                      } as Record<string, string>,
-                    });
-                  }}
-                />
-              );
-            })}
-          </Stack>
-        </Fieldset>
-      : null}
-    </Stack>
-  );
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

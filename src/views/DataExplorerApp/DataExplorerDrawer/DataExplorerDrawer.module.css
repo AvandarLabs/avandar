@@ -1,0 +1,123 @@
+.root {
+  background: var(--ava-surface-raised, var(--mantine-color-white));
+  border-top: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/*
+ * Sits over the top border so the whole hairline is grabbable. The visible
+ * pill only appears on hover or keyboard focus, so the resting state stays a
+ * plain edge rather than yet another piece of chrome.
+ */
+.resizeHandle {
+  background: transparent;
+  border: 0;
+  cursor: ns-resize;
+  flex: 0 0 auto;
+  height: 7px;
+  margin-top: -4px;
+  padding: 0;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  z-index: 1;
+}
+
+.resizeHandle::after {
+  background: var(--mantine-color-neutral-4);
+  border-radius: 2px;
+  content: "";
+  height: 3px;
+  left: 50%;
+  opacity: 0;
+  position: absolute;
+  top: 2px;
+  transform: translateX(-50%);
+  transition: opacity var(--ava-animation-duration-fast, 120ms) ease-out;
+  width: 48px;
+}
+
+.resizeHandle:hover::after,
+.resizeHandle:focus-visible::after {
+  opacity: 1;
+}
+
+.rail {
+  flex: 0 0 auto;
+  min-height: 40px;
+}
+
+/*
+ * Mirrors the floating-pill treatment of the shared `@ui` Tabs: neutral text,
+ * with the active tab reading as a raised surface. Rebuilt locally because the
+ * rail also carries the tab-scoped controls, which the shared component has no
+ * slot for.
+ */
+.railTabs {
+  border: 0;
+  gap: 2px;
+  min-width: 0;
+}
+
+.railTab {
+  border: 0;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+  padding: 6px 12px;
+  transition: var(--ava-transition-colors);
+}
+
+:global([data-mantine-color-scheme="dark"]) .railTab {
+  color: var(--mantine-color-neutral-3);
+}
+
+.railTab:hover:not([data-active]) {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neutral-9) 6%,
+    transparent
+  );
+  color: var(--mantine-color-neutral-8);
+}
+
+.railTab[data-active] {
+  background-color: var(--ava-surface-body, var(--mantine-color-neutral-0));
+  box-shadow: inset 0 0 0 1px
+    var(--ava-border-default, var(--mantine-color-neutral-2));
+  color: var(--mantine-color-neutral-9);
+  font-weight: 600;
+}
+
+:global([data-mantine-color-scheme="dark"]) .railTab:hover:not([data-active]) {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neutral-0) 8%,
+    transparent
+  );
+  color: var(--mantine-color-neutral-1);
+}
+
+:global([data-mantine-color-scheme="dark"]) .railTab[data-active] {
+  color: var(--mantine-color-neutral-0);
+}
+
+.railControls {
+  flex: 0 0 auto;
+}
+
+.body {
+  border-top: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.emptyState {
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
+}

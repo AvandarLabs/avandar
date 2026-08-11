@@ -19,3 +19,19 @@
 .helpCursor {
   cursor: help;
 }
+
+/* Series cards stack vertically by default. */
+.seriesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+}
+
+/*
+ * In the columns layout this fieldset is the only group, so the cards
+ * themselves spread across the available width instead of leaving it empty.
+ */
+.seriesListColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}

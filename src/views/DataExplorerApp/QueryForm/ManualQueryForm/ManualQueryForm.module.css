@@ -2,6 +2,10 @@
   background-color: rgb(255 255 255 / 40%);
 }
 
+.flexFill {
+  flex: 1;
+}
+
 .unstyledButton {
   background: none;
   border: none;

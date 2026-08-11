@@ -1,8 +1,8 @@
 /**
- * Whether keyboard focus is on a field that should keep Escape for its own UX
- * (blur, clear, close dropdown, etc.) instead of dismissing the floating panel.
+ * Whether keyboard focus is on a field that owns keystrokes for its own UX
+ * (typing, blur, clearing, closing a dropdown), and so should not be stolen.
  */
-export function isFloatingPanelTypingTarget(element: Element | null): boolean {
+export function isTypingTarget(element: Element | null): boolean {
   if (!(element instanceof HTMLElement)) {
     return false;
   }

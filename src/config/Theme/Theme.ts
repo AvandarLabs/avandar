@@ -91,7 +91,6 @@ export const DEFAULT_MODAL_PROPS = {
  * Mantine's default popover/combobox z-index (300) so that dropdowns
  * opened inside a floating panel render on top of it.
  */
-export const FLOATING_PANEL_Z_INDEX = 250;
 
 /**
  * Overlay dropdown z-index for popovers, comboboxes, menus, and tooltips.
