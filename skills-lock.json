@@ -55,23 +55,11 @@
       "skillPath": ".agents/skills/impeccable/SKILL.md",
       "computedHash": "79e7b12409d169bc2f11ac39ad9eaede31bd8a061517809173ca6325363c350c"
     },
-    "init": {
-      "source": "mcollina/skills",
-      "sourceType": "github",
-      "skillPath": "skills/init/SKILL.md",
-      "computedHash": "3a30628fcb5d80a3e06df0fd749bd08c27054114f545a570e49ea3d888634abe"
-    },
     "install-duckdb": {
       "source": "duckdb/duckdb-skills",
       "sourceType": "github",
       "skillPath": "skills/install-duckdb/SKILL.md",
       "computedHash": "ce264b48e369a23adbda39804fc65c7e9fdffe182f6dfbc9f4e2fdf88b027b9e"
-    },
-    "linting-neostandard-eslint9": {
-      "source": "mcollina/skills",
-      "sourceType": "github",
-      "skillPath": "skills/linting-neostandard-eslint9/SKILL.md",
-      "computedHash": "752557ba728543623393c86a4190ce2f4dd712222c72c5d22796fb961a2567a3"
     },
     "mantine-combobox": {
       "source": "mantinedev/skills",
