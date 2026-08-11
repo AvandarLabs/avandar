@@ -1,7 +1,7 @@
 # E2E tests (Playwright) — review ruleset
 
 Repo-local rules for reviewing files under `tests/e2e/`. Run this as its own
-phase (gate: the diff touches any spec, fixture, or helper under `tests/e2e/`).
+phase (gate: the diff touches any test, fixture, or helper under `tests/e2e/`).
 The engineer-facing version of these rules lives in
 [`docs/rules/e2e-testing.md`](../../rules/e2e-testing.md).
 
@@ -13,16 +13,16 @@ settle), or a degraded environment. Name it and fix that one. Do **not** mask a
 race or a missing wait with `freshBrowserPage` or a raised timeout — those are
 the wrong tool for a race and can make a cold-start flake worse.
 
-## Running E2E specs at the end of a review
+## Running E2E tests at the end of a review
 
 - Never run the whole E2E suite for a code review. Run only the exact
   `*.spec.ts` files that exercise the changed behavior.
-- Run specs one at a time, sequentially, each in its own invocation
+- Run tests one at a time, sequentially, each in its own invocation
   (`pnpm test:e2e <spec>.spec.ts`), so each result is visible without waiting
   for the full set.
 - Do not loop the full suite back-to-back: that has crashed the local Supabase
   edge runtime (surfacing as `validate-slug` HTTP 500 and billing failures).
-  Run once, let the environment settle, and judge heavy-route specs only
+  Run once, let the environment settle, and judge heavy-route tests only
   against a warm dev server (a cold Vite can fail a heavy editor route on its
   first load).
 
@@ -33,7 +33,7 @@ the wrong tool for a race and can make a cold-start flake worse.
 The rule itself (seed preconditions before the first page load, drive the
 behavior under test through the UI, the flag trigger, and the two failure modes)
 is generic and already covered by `tests-checklist.md`'s "E2E only" section,
-which loads whenever the diff changes a spec. Do not restate it in a finding;
+which loads whenever the diff changes a test. Do not restate it in a finding;
 apply it with these repo-local specifics:
 
 - Direct writes in this repo go through `createSupabaseAdminClient()`. Concrete
@@ -42,7 +42,7 @@ apply it with these repo-local specifics:
 - The running client's stale-cache failure mode here is a React Query desync,
   which made `save-to-dashboard-renders` flaky before its rewrite.
 
-  **Find candidates** (admin DB writes inside spec files):
+  **Find candidates** (admin DB writes inside test files):
 
   ```bash
   grep -rEn '\b(admin|supabaseAdmin)\.(from|rpc|auth)\b' \
@@ -69,15 +69,15 @@ apply it with these repo-local specifics:
   from that (no retry loop, no second reload, no raised timeout), so this flake
   presents as a **hard failure**, not a slow pass. Writes are also throttled, so
   a `page.goto` within roughly a second of a mutation restores the
-  *pre-mutation* snapshot. Real case: `dataset-sharing`'s tag-share spec created
+  *pre-mutation* snapshot. Real case: `dataset-sharing`'s tag-share test created
   a user group, navigated, and could not find it in the members drawer again.
 - `page.goto` is correct for the first landing after sign-in, or when the test
   deliberately exercises a cold reload. Flag a mid-flow `page.goto` whose
   success depends on state the test just created.
 
   **Find candidates** (flag mid-flow gotos after the first navigation). Search
-  helpers as well as specs: the `page.goto` behind the flake above lived in
-  `tests/e2e/helpers/workspaceTagsFlow.ts`, invisible to a spec-only search.
+  helpers as well as tests: the `page.goto` behind the flake above lived in
+  `tests/e2e/helpers/workspaceTagsFlow.ts`, invisible to a test-only search.
 
   ```bash
   grep -rEn 'page\.goto\(' tests/e2e --include="*.ts"
@@ -95,7 +95,7 @@ apply it with these repo-local specifics:
 - Flag an assertion on a short generic string that another element in the same
   scope may legitimately carry. In the permission UIs that includes `Owner`,
   `None`, `Viewer`, `Editor`, and `Admin`. Real case: `share-modal`'s owner-row
-  spec asserted `dialog.getByText("Owner", { exact: true })`, which matched both
+  test asserted `dialog.getByText("Owner", { exact: true })`, which matched both
   the Owner badge and a row whose display name was still the modal's loading
   placeholder.
 - Accept instead: a role plus accessible name
@@ -172,12 +172,12 @@ apply it with these repo-local specifics:
 
 ## Large-file parses run in a fresh browser process
 
-- E2E runs single-worker (`workers: 1`), so specs run one at a time but share
+- E2E runs single-worker (`workers: 1`), so tests run one at a time but share
   **one long-lived Chromium process** whose heap/allocator pressure grows across
   the run. A large DuckDB-WASM parse that is fast on a clean process can slow
   enough late in the run to trip its timeout — the failure lands on a different
-  heavy-parse spec each run while each passes in isolation.
-- A spec that **flakes because a large data-file parse (~10,000 rows or larger)
+  heavy-parse test each run while each passes in isolation.
+- A test that **flakes because a large data-file parse (~10,000 rows or larger)
   slows down late in the run** must use the `freshBrowserPage` fixture from
   `tests/e2e/fixtures/e2e.fixture.ts`, aliased to `page`:
   `async ({ freshBrowserPage: page, e2eWorkerDb }) => { … }`. The row count is a
@@ -190,13 +190,13 @@ apply it with these repo-local specifics:
   dashboard-editor iframe with recharts) fails **harder** on a freshly launched
   browser. `dashboard-chat-block` (~14.7k-row upload) is that counter-example —
   it clears the row-count bar but its flake is cold-render, so it uses `page`.
-  Flag a diff that puts such a spec on `freshBrowserPage`, and confirm a
+  Flag a diff that puts such a test on `freshBrowserPage`, and confirm a
   candidate's flake is parse-slowness-on-an-aged-process before opting it in.
-- Below the threshold, keep the shared `page`. Do not put small-fixture specs
+- Below the threshold, keep the shared `page`. Do not put small-fixture tests
   (including ones that only seed a ~100-row file as a precondition) on the fresh
   browser — the ~200-500ms relaunch is wasted there.
 
-  **Find candidates** (specs that parse a large fixture on the shared `page`):
+  **Find candidates** (tests that parse a large fixture on the shared `page`):
 
   ```bash
   # Large fixtures (~10k+ rows); adjust the fixture list to the repo.
@@ -208,13 +208,13 @@ apply it with these repo-local specifics:
 
 ## Cleanup
 
-- Every E2E spec must leave the database in the same shape it was in before the
+- Every E2E test must leave the database in the same shape it was in before the
   test ran. Resources created **during** the test (datasets, dashboards, virtual
   datasets, resource_shares, role groups, profiles, etc.) and state the test
   **mutated** on existing resources (membership role-group reassignments,
   permission matrix overrides, feature-flag overrides, etc.) must both be
-  cleaned up before the spec returns.
-- Cleanup must run even when the spec fails or throws. Use one of the two
+  cleaned up before the test returns.
+- Cleanup must run even when the test fails or throws. Use one of the two
   supported patterns:
   1. **`try { … } finally { … }` around the test body**, calling the repo's
      admin cleanup helpers (`deleteDashboardsByIds`, `deleteDatasetAndShares`,
@@ -227,10 +227,10 @@ apply it with these repo-local specifics:
      than recreated when a new shared resource needs the same lifecycle.
 - Setup-only `await admin.from(...).insert(...)` blocks with no matching delete
   in `finally` (or in a fixture teardown) are a finding, even if the seed data is
-  "small" or "harmless". Cross-spec leakage causes flake that is expensive to
+  "small" or "harmless". Cross-test leakage causes flake that is expensive to
   diagnose later.
-- When a spec mutates state on a seeded user / membership / role group that other
-  specs will later read (the secondary user's role group is the canonical
+- When a test mutates state on a seeded user / membership / role group that other
+  tests will later read (the secondary user's role group is the canonical
   example), the restore call belongs in `finally` so a thrown assertion never
   leaves the user in a half-modified state.
 - Do not rely on `afterEach` / `afterAll` for resource cleanup set up inside the
@@ -238,10 +238,10 @@ apply it with these repo-local specifics:
   resource id, leaving cleanup with nothing to delete. `try { … } finally { … }`
   pairs the cleanup with the capture and is what the rest of the suite uses.
 
-  **Find candidates** (specs that create resources but never use `finally`):
+  **Find candidates** (tests that create resources but never use `finally`):
 
   ```bash
-  # Specs that look like they create resources but have no try/finally block.
+  # Tests that look like they create resources but have no try/finally block.
   for f in <files-in-diff-under-tests/e2e-ending-in-.spec.ts>; do
     if grep -Eq '\b(admin|supabaseAdmin)\.(from|rpc)\b|createSupabaseAdminClient' "$f" \
        && ! grep -q '\bfinally\b' "$f"; then
@@ -249,12 +249,12 @@ apply it with these repo-local specifics:
     fi
   done
 
-  # Specs that import a delete helper but never call it inside a finally.
+  # Tests that import a delete helper but never call it inside a finally.
   grep -rEn 'import .*(delete[A-Z][a-zA-Z]+|restoreE2E[A-Z][a-zA-Z]+)' \
     tests/e2e/*.spec.ts
   ```
 
-  False positives: specs that delegate all setup + teardown to a fixture (e.g.
+  False positives: tests that delegate all setup + teardown to a fixture (e.g.
   `e2eWithGlobalViewerMembership`) won't have `finally`, and that is correct.
   Check for such a fixture before flagging.
 
@@ -265,7 +265,7 @@ apply it with these repo-local specifics:
     const admin = createSupabaseAdminClient();
     // ...
     await page.getByRole("button", { name: "Create a dashboard" }).click();
-    // no try/finally, no fixture, no cleanup — the row leaks into the next spec
+    // no try/finally, no fixture, no cleanup — the row leaks into the next test
   });
   ```
 
@@ -290,12 +290,12 @@ apply it with these repo-local specifics:
 
 ## Test timeouts
 
-- Do not change the default test-level timeout from inside a spec: no
+- Do not change the default test-level timeout from inside a test: no
   `test.setTimeout(...)`, and no `timeout` option on `test(...)`,
   `test.describe(...)`, or `test.beforeAll/Each(...)`. Test-level timeouts are
   configured globally in `playwright.config.ts` so the suite stays consistent
   and a flaky test cannot mask the underlying issue by raising its own ceiling.
-- If a spec is genuinely too slow, investigate the root cause (a real bug, a
+- If a test is genuinely too slow, investigate the root cause (a real bug, a
   missing wait, a costly fixture); only the global config should change, and only
   after the cause is understood.
 
