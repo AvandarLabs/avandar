@@ -1,16 +1,16 @@
-import { createServiceClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { withLogger } from "@logger";
-import { notifyDevAlert } from "@ui";
-import { objectKeys, promiseReduce, sqlTemplate, where } from "@utils";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { objectKeys, promiseReduce, sqlTemplate, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import type { ServiceClient } from "@clients";
-import type { WithQueryHooks } from "@hooks";
-import type { WithLogger } from "@logger";
-import type { UnknownDataFrame } from "@utils";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
+import type { ServiceClient } from "@avandar/clients";
+import type { WithLogger } from "@avandar/logger";
+import type { WithQueryHooks } from "@avandar/query-hooks";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -115,7 +115,7 @@ function createDatasetQueryClient(): WithLogger<
         const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
-        const { data } = await WorkspaceQETLClient.runQuery({
+        const { data } = await WorkspaceQetlClient.runQuery({
           rawSql: queryString,
           workspaceId,
         });
@@ -139,7 +139,7 @@ function createDatasetQueryClient(): WithLogger<
         });
         const numRows = Number(
           scalar(
-            await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+            await WorkspaceQetlClient.runQuery<{ count: bigint }>({
               workspaceId,
               rawSql: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
@@ -188,7 +188,7 @@ function createDatasetQueryClient(): WithLogger<
 
         const numRows = Number(
           scalar(
-            await WorkspaceQETLClient.runQuery<{
+            await WorkspaceQetlClient.runQuery<{
               count: bigint;
             }>({
               workspaceId,
@@ -246,7 +246,7 @@ async function computeColumnSummary(params: {
 
   const distinctValuesCount = Number(
     scalar(
-      await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+      await WorkspaceQetlClient.runQuery<{ count: bigint }>({
         workspaceId,
         rawSql: sqlTemplate(
           'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
@@ -257,7 +257,7 @@ async function computeColumnSummary(params: {
 
   const emptyValuesCount = Number(
     scalar(
-      await WorkspaceQETLClient.runQuery<{ count: bigint }>({
+      await WorkspaceQetlClient.runQuery<{ count: bigint }>({
         workspaceId,
         rawSql: sqlTemplate(
           `SELECT COUNT("$columnName$") as count
@@ -271,7 +271,7 @@ async function computeColumnSummary(params: {
   );
 
   // Find the maximum count for the most common value(s)
-  const maxCountResult = await WorkspaceQETLClient.runQuery<{
+  const maxCountResult = await WorkspaceQetlClient.runQuery<{
     max_count: bigint;
   }>({
     workspaceId,
@@ -289,7 +289,7 @@ async function computeColumnSummary(params: {
   const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
   // Get all values with the maximum count
-  const mostCommonValuesQuery = await WorkspaceQETLClient.runQuery<{
+  const mostCommonValuesQuery = await WorkspaceQetlClient.runQuery<{
     value: unknown;
     count: bigint;
   }>({
@@ -319,7 +319,7 @@ async function computeColumnSummary(params: {
         avg = NaN,
         stdDev = NaN,
       } = singleton(
-        await WorkspaceQETLClient.runQuery<{
+        await WorkspaceQetlClient.runQuery<{
           max: number;
           min: number;
           avg: number;
@@ -367,7 +367,7 @@ async function computeColumnSummary(params: {
            WHERE "$columnName$" IS NOT NULL`;
 
       const row = singleton(
-        await WorkspaceQETLClient.runQuery<{
+        await WorkspaceQetlClient.runQuery<{
           most_recent: string | null;
           oldest: string | null;
           days: bigint | number | null;
@@ -426,6 +426,6 @@ async function computeColumnSummary(params: {
  * Creates a client to run predefinedqueries on a dataset.
  *
  * If you want to run a custom raw query, then just call
- * WorkspaceQETLClient.runQuery() directly.
+ * WorkspaceQetlClient.runQuery() directly.
  */
 export const DatasetQueryClient = createDatasetQueryClient();

@@ -1,4 +1,4 @@
-import { DuckDBSpatialExtensionDocumentation } from "@sbfn/queries/DuckDBSpatialExtensionDocumentation.ts";
+import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
 
 const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
@@ -68,7 +68,7 @@ ${
   isSpatialPrompt(prompt) ?
     `Reference documentation:
 If the query requires any geospatial operations, refer to the following document:
-${DuckDBSpatialExtensionDocumentation}`
+${DuckDbSpatialExtensionDocumentation}`
   : ""
 }`;
 }

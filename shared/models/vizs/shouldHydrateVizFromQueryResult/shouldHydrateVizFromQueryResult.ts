@@ -1,5 +1,4 @@
-import { isDefined } from "@utils/guards/isDefined/isDefined.ts";
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
+import { isDefined, prop } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { match } from "ts-pattern";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";

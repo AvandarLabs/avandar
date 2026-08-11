@@ -6,19 +6,19 @@ import {
   propEq,
   sqlTemplate,
   where,
-} from "@utils";
+} from "@avandar/utils";
 import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { Logger } from "@/utils/Logger";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { BuildableEntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 /**
- * Run a basic QETL pipeline to generate entities.
+ * Run a basic Qetl pipeline to generate entities.
  */
 export async function generateEntities(
   entityConfig: BuildableEntityConfig,
@@ -79,7 +79,7 @@ export async function generateEntities(
       primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
-  await WorkspaceQETLClient.runQuery({
+  await WorkspaceQetlClient.runQuery({
     rawSql: sqlTemplate(`
       DROP TABLE IF EXISTS "$entityConfigId$";
 

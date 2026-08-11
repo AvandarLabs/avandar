@@ -1,9 +1,9 @@
-import { getIsMacPlatform } from "@browser-utils";
-import { useLingui } from "@lingui/react/macro";
+import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
+import { useForm } from "@ui/hooks/useForm/useForm";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useId, useRef } from "react";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import type { TextareaProps } from "@mantine/core";
 
 type Props = {
@@ -92,9 +92,9 @@ export function TextareaForm({
   disabledUntilDirty = false,
   ...moreTextareaProps
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const resolvedSubmitLabel = submitButtonLabel ?? t`Submit`;
-  const resolvedCancelLabel = cancelButtonLabel ?? t`Cancel`;
+  const i18n = useI18nMessages();
+  const resolvedSubmitLabel = submitButtonLabel ?? i18n.submit;
+  const resolvedCancelLabel = cancelButtonLabel ?? i18n.cancel;
   const formId = useId();
   const form = useForm<SingleInputForm>({
     mode: "uncontrolled",
@@ -107,12 +107,12 @@ export function TextareaForm({
       value: (value) => {
         if (required && value.trim().length === 0) {
           // prevent a value that is only empty spaces
-          return t`This field cannot be empty`;
+          return i18n.fieldCannotBeEmpty;
         }
 
         if (minLength && value.length < minLength) {
-          const fieldName = hideLabel || !label ? t`This field` : label;
-          return t`${fieldName} must be at least ${minLength} characters long`;
+          const fieldName = hideLabel || !label ? i18n.thisField : label;
+          return i18n.fieldMinLength({ fieldName, minLength });
         }
         return null;
       },

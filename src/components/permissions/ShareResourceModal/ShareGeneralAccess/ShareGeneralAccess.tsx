@@ -1,7 +1,7 @@
+import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { appForResource, useShareCopy } from "../shareCopy";

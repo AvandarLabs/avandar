@@ -8,10 +8,10 @@
  * value. This is the safety net behind the "every setting actually
  * changes the viz" guarantee.
  */
-import { getValue } from "@utils";
+import { getValue } from "@avandar/utils";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
@@ -107,25 +107,25 @@ function renderForm<
 } {
   const onConfigChange = vi.fn();
   const result = render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <SeriesAwareVizForm
         fields={COLUMNS}
         config={config}
         onConfigChange={onConfigChange}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
   return {
     onConfigChange,
     rerender: (next) => {
       result.rerender(
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <SeriesAwareVizForm
             fields={COLUMNS}
             config={next}
             onConfigChange={onConfigChange}
           />
-        </AvandarUiProvider>,
+        </AvandarAppProvider>,
       );
     },
   };

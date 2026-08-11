@@ -5,11 +5,11 @@
  */
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
+import { fireEvent, render, screen } from "@/test-utils";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { fireEvent, render, screen } from "@/test-utils";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 // The query editors need the router and dataset clients, and both are covered
@@ -49,7 +49,7 @@ function renderDrawer(
 ): void {
   const { columns = COLUMNS } = options;
   render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <DataExplorerStateManager.Provider>
         <DataExplorerDrawer
           columns={columns}
@@ -57,7 +57,7 @@ function renderDrawer(
           canvasRef={createRef<HTMLDivElement>()}
         />
       </DataExplorerStateManager.Provider>
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
 }
 

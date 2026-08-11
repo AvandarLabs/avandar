@@ -1,3 +1,5 @@
+import { NavLinkList } from "@avandar/ui";
+import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import {
   Badge,
@@ -11,8 +13,6 @@ import {
   Tooltip,
   useMantineTheme,
 } from "@mantine/core";
-import { NavLinkList } from "@ui";
-import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";

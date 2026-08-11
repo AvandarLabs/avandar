@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
@@ -65,14 +65,14 @@ function renderField(props: { value: VizConfig.T }): {
   });
   render(
     <QueryClientProvider client={queryClient}>
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <VizConfigPField
           value={props.value}
           onChange={onChange}
           workspaceId={TEST_WORKSPACE_ID}
           dashboardId={TEST_DASHBOARD_ID}
         />
-      </AvandarUiProvider>
+      </AvandarAppProvider>
     </QueryClientProvider>,
   );
   return { onChange };

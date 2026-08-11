@@ -1,6 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
-import type { SwapDeep } from "@utils/types/utilities.types.ts";
+import type { Model } from "@avandar/models";
+import type { SwapDeep, UUID } from "@avandar/utils";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {

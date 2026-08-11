@@ -1,14 +1,14 @@
+import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
-import { notifyError, notifySuccess } from "@ui";
-import { matchLiteral } from "@utils";
 import { useEffect, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
 import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/toVanitySlug/toVanitySlug";

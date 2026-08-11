@@ -1,4 +1,4 @@
-import { hasDefinedProps } from "@utils";
+import { hasDefinedProps } from "@avandar/utils";
 import { useEffect, useRef, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

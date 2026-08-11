@@ -1,3 +1,4 @@
+import { Select } from "@avandar/ui";
 import {
   ColorInput,
   NumberInput,
@@ -5,7 +6,6 @@ import {
   Switch,
   TextInput,
 } from "@mantine/core";
-import { Select } from "@ui";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { OfflineChatDownloadIndicator } from "./OfflineChatDownloadIndicator";
 import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
@@ -25,9 +25,9 @@ describe("OfflineChatDownloadIndicator", () => {
     mockStatus = { kind: "idle" };
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <OfflineChatDownloadIndicator />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
@@ -41,9 +41,9 @@ describe("OfflineChatDownloadIndicator", () => {
     };
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <OfflineChatDownloadIndicator />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
 

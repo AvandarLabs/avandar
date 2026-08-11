@@ -1,4 +1,4 @@
-import { isDefined } from "@utils";
+import { isDefined } from "@avandar/utils";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";

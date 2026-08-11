@@ -288,7 +288,7 @@ msgstr "打開"
 msgid "Aggregations"
 msgstr "聚合"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "No"
 msgstr "否"
@@ -658,8 +658,7 @@ msgid "These are the first {0} rows of your dataset. Check to see if the data "
 msgstr "這是您的數據集的前 {0} 行。檢查數據是否正確。如果不正確，可能是您的數據集沒有從第一行開始，或 CSV "
 "使用了不同的分隔符。請嘗試在這裡調整這些設置。"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
 msgstr "此欄位不能為空"
 
@@ -856,8 +855,8 @@ msgstr "新角色群組"
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "確認"
@@ -1204,7 +1203,7 @@ msgstr "平均"
 msgid "Generating…"
 msgstr "生成中…"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "您確定要繼續此操作嗎？此操作無法撤銷。"
@@ -1249,8 +1248,7 @@ msgstr "選擇您想在此 {entityConfigName} 中的欄位"
 msgid "Formal"
 msgstr "正式"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field"
 msgstr "此欄位"
 
@@ -1258,6 +1256,10 @@ msgstr "此欄位"
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
 msgid "Edit access for {0}"
 msgstr "編輯 {0} 的訪問權限"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "工作區名稱是必填的"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
@@ -1374,7 +1376,7 @@ msgstr "掃描至："
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "請求我將圖表添加到此儀表板..."
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "尚未實現"
 
@@ -1494,7 +1496,7 @@ msgstr "適合日常 SQL 問題的平衡離線模型，可在一般筆記型電�
 msgid "Nothing found..."
 msgstr "未找到任何內容..."
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} 以保存"
 
@@ -1645,15 +1647,11 @@ msgstr "需要手動輸入的欄位"
 msgid "your dataset"
 msgstr "您的數據集"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1764,7 +1762,7 @@ msgstr "升級到「隨您所願付費」計劃只能通過計費入口網站進
 msgid "Delete entity"
 msgstr "刪除實體"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "空文本"
 
@@ -1891,7 +1889,7 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
 msgstr "Microsoft 的精簡指令模型。具備穩固的結構和指令遵循能力，適合儀表板。"
 
-#: packages/web/ui/src/buttons/EditButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "編輯"
 
@@ -1937,7 +1935,7 @@ msgstr "選擇了無效的 X 軸"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "集合 {collectionNumber}"
 
@@ -1972,7 +1970,7 @@ msgstr "活躍"
 msgid "Default values, comma-separated or JSON array"
 msgstr "預設值，以逗號分隔或 JSON 陣列"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "確認操作"
 
@@ -2037,7 +2035,7 @@ msgstr "逗號 (,)"
 msgid "Registration requires an internet connection."
 msgstr "註冊需要連接到互聯網。"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "There are no values"
 msgstr "沒有值"
 
@@ -2392,9 +2390,8 @@ msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
 msgid "No file selected"
 msgstr "未選擇任何檔案"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
@@ -2635,6 +2632,10 @@ msgstr "標籤，例如：區域"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "選擇檔案"
+
+#: src/components/providers/AvandarAppProvider.tsx
+msgid "Edit {name}"
+msgstr "編輯 {name}"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
@@ -2982,7 +2983,7 @@ msgstr "輸入您的答案..."
 msgid "Import"
 msgstr "匯入"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Yes"
 msgstr "是"
@@ -3347,7 +3348,7 @@ msgstr "轉換"
 msgid "Unordered"
 msgstr "無序"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty"
 msgstr "空的"
 
@@ -3357,8 +3358,7 @@ msgstr "空的"
 msgid "All"
 msgstr "全部"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} 必須至少 {minLength} 個字符長"
 
@@ -3370,11 +3370,6 @@ msgstr "系統無襯線"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "系列標籤"
-
-#. placeholder {0}: props.name
-#: packages/web/ui/src/buttons/EditButton.tsx
-msgid "Edit {0}"
-msgstr "編輯 {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3686,7 +3681,7 @@ msgstr "選擇緯度列"
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 與以下人員共享："
 
-#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上傳"
@@ -3797,8 +3792,8 @@ msgstr "資料集現在已在線同步"
 msgid "Height"
 msgstr "高度"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "您的會話已過期"
 
@@ -3877,7 +3872,7 @@ msgstr "將 <0>{0}</0> 值{1} 發送到 AI 嗎？"
 msgid "Custom URL path"
 msgstr "自訂 URL 路徑"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
 msgstr "請重新登錄以繼續。"
 
@@ -4006,7 +4001,7 @@ msgstr "Phi 3.5 Mini（離線）"
 msgid "Data processing failed"
 msgstr "資料處理失敗"
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "此功能尚未實現。"
 
@@ -4040,7 +4035,7 @@ msgstr "視覺化類型"
 msgid "Delete dataset"
 msgstr "刪除資料集"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "警告"
@@ -4314,7 +4309,7 @@ msgstr "數據集加載失敗"
 msgid "Decimal"
 msgstr "小數"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "錯誤"
 
@@ -4322,9 +4317,7 @@ msgstr "錯誤"
 msgid "Send answer"
 msgstr "發送答案"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... 和 {remainingCount} 個更多"
 
@@ -4457,8 +4450,7 @@ msgstr "聊天訊息"
 msgid "Error saving dataset"
 msgstr "保存數據集時出錯"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -5043,7 +5035,7 @@ msgstr "未命名"
 msgid "Previewing this dashboard"
 msgstr "預覽此儀表板"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
 msgstr "無值"
 
@@ -5179,8 +5171,8 @@ msgstr "側邊欄位置"
 msgid "Search dashboards"
 msgstr "搜尋儀表板"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -5404,10 +5396,6 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-msgid "Hello DateValueItem"
-msgstr "Hello DateValueItem"
-
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
@@ -5488,7 +5476,7 @@ msgstr "分享"
 msgid "Whole dataset"
 msgstr "整個數據集"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "無效的日期"
 
@@ -5584,7 +5572,7 @@ msgstr "選擇最小值"
 msgid "Mode"
 msgstr "模式"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Success"
 msgstr "成功"
 

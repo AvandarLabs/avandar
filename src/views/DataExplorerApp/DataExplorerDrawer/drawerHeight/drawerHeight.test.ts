@@ -11,9 +11,9 @@ import {
 
 describe("clampDrawerHeight", () => {
   it("keeps a height that already fits inside the canvas", () => {
-    expect(
-      clampDrawerHeight({ requestedHeight: 300, canvasHeight: 900 }),
-    ).toBe(300);
+    expect(clampDrawerHeight({ requestedHeight: 300, canvasHeight: 900 })).toBe(
+      300,
+    );
   });
 
   it("raises a height below the minimum up to the minimum", () => {

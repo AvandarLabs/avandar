@@ -71,3 +71,24 @@ jobs:
             test-results
           retention-days: 30
           if-no-files-found: warn
+
+  # Validates the publishable libraries the way a consumer sees them: build,
+  # pack, then publint + attw against the real tarball. Runs on every PR so
+  # packaging breakage surfaces here rather than at release time, when the
+  # published `exports` path is exercised for the first time.
+  #
+  # Independent of the job above (no Supabase, no Playwright), so it stays fast.
+  verify-packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter "./packages/**" test
+      - run: pnpm verify:packages

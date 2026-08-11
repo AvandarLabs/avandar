@@ -295,7 +295,7 @@ msgstr "فتح"
 msgid "Aggregations"
 msgstr "التجميعات"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "No"
 msgstr "لا"
@@ -676,8 +676,7 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة بيانات
 "لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن "
 "CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
 msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
 
@@ -880,8 +879,8 @@ msgstr "مجموعة أدوار جديدة"
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "تأكيد"
@@ -1232,7 +1231,7 @@ msgstr "متوسط"
 msgid "Generating…"
 msgstr "يتم الإنشاء…"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
@@ -1280,8 +1279,7 @@ msgstr "اختر الأعمدة التي تريدها في هذا {entityConfigN
 msgid "Formal"
 msgstr "رسمي"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field"
 msgstr "هذا الحقل"
 
@@ -1289,6 +1287,10 @@ msgstr "هذا الحقل"
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
 msgid "Edit access for {0}"
 msgstr "تحرير الوصول لـ {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "اسم مساحة العمل مطلوب"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
@@ -1412,7 +1414,7 @@ msgstr "المسح إلى:"
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "اطلب مني إضافة مخطط إلى هذه اللوحة..."
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "لم يتم تنفيذه بعد"
 
@@ -1538,7 +1540,7 @@ msgstr "نموذج متوازن يعمل دون اتصال لأسئلة SQL ال
 msgid "Nothing found..."
 msgstr "لم يتم العثور على شيء..."
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} للحفظ"
 
@@ -1691,15 +1693,11 @@ msgstr "حقول يجب إدخالها يدويًا"
 msgid "your dataset"
 msgstr "مجموعة البيانات الخاصة بك"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1813,7 +1811,7 @@ msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط 
 msgid "Delete entity"
 msgstr "حذف الكيان"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "نص فارغ"
 
@@ -1943,7 +1941,7 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "نموذج Microsoft المدمج للتعليمات. يتميز ببنية متينة واتباع جيد "
 "للتعليمات الخاصة بلوحات المعلومات."
 
-#: packages/web/ui/src/buttons/EditButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "تعديل"
 
@@ -1990,7 +1988,7 @@ msgstr "تم اختيار محور X غير صالح"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "المجموعة {collectionNumber}"
 
@@ -2025,7 +2023,7 @@ msgstr "نشط"
 msgid "Default values, comma-separated or JSON array"
 msgstr "القيم الافتراضية، مفصولة بفواصل أو مصفوفة JSON"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "تأكيد الإجراء"
 
@@ -2091,7 +2089,7 @@ msgstr "فاصلة (,)"
 msgid "Registration requires an internet connection."
 msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "There are no values"
 msgstr "لا توجد قيم"
 
@@ -2451,9 +2449,8 @@ msgstr "أضف رسمًا بيانيًا عموديًا لعدد الصفوف ف
 msgid "No file selected"
 msgstr "لا يوجد ملف محدد"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "إرسال"
@@ -2698,6 +2695,10 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "اختر ملف"
+
+#: src/components/providers/AvandarAppProvider.tsx
+msgid "Edit {name}"
+msgstr "تعديل {name}"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
@@ -3049,7 +3050,7 @@ msgstr "اكتب إجابتك..."
 msgid "Import"
 msgstr "استيراد"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Yes"
 msgstr "نعم"
@@ -3422,7 +3423,7 @@ msgstr "تحويل"
 msgid "Unordered"
 msgstr "غير مرتّب"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty"
 msgstr "فارغ"
 
@@ -3432,8 +3433,7 @@ msgstr "فارغ"
 msgid "All"
 msgstr "الكل"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} حرفًا"
 
@@ -3445,11 +3445,6 @@ msgstr "نظام بدون"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "تسمية السلسلة"
-
-#. placeholder {0}: props.name
-#: packages/web/ui/src/buttons/EditButton.tsx
-msgid "Edit {0}"
-msgstr "تعديل {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3766,7 +3761,7 @@ msgstr "حدد عمود خط العرض"
 msgid "This {resource} is shared with: "
 msgstr "هذا {resource} مشترك مع: "
 
-#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
@@ -3877,8 +3872,8 @@ msgstr "تم مزامنة مجموعة البيانات الآن عبر الإن
 msgid "Height"
 msgstr "الارتفاع"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "انتهت جلستك"
 
@@ -3958,7 +3953,7 @@ msgstr "هل تريد إرسال قيمة <0>{0}</0> {1} إلى الذكاء ا�
 msgid "Custom URL path"
 msgstr "مسار URL مخصص"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
 msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
 
@@ -4088,7 +4083,7 @@ msgstr "Phi 3.5 Mini (دون اتصال)"
 msgid "Data processing failed"
 msgstr "فشل معالجة البيانات"
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "لم يتم تنفيذ هذه الميزة بعد."
 
@@ -4123,7 +4118,7 @@ msgstr "نوع التصويرية"
 msgid "Delete dataset"
 msgstr "حذف مجموعة البيانات"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "تحذير"
@@ -4410,7 +4405,7 @@ msgstr "فشل تحميل مجموعة البيانات"
 msgid "Decimal"
 msgstr "عشري"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "خطأ"
 
@@ -4418,9 +4413,7 @@ msgstr "خطأ"
 msgid "Send answer"
 msgstr "إرسال الإجابة"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
@@ -4555,8 +4548,7 @@ msgstr "رسالة الدردشة"
 msgid "Error saving dataset"
 msgstr "خطأ في حفظ مجموعة البيانات"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -5152,7 +5144,7 @@ msgstr "بلا عنوان"
 msgid "Previewing this dashboard"
 msgstr "معاينة لوحة المعلومات هذه"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
 msgstr "لا قيمة"
 
@@ -5291,8 +5283,8 @@ msgstr "موضع الشريط الجانبي"
 msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -5524,10 +5516,6 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا "
 "أيضًا."
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-msgid "Hello DateValueItem"
-msgstr "مرحبًا DateValueItem"
-
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
@@ -5609,7 +5597,7 @@ msgstr "مشاركة"
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
@@ -5706,7 +5694,7 @@ msgstr "اختر القيمة الدنيا"
 msgid "Mode"
 msgstr "وضع"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Success"
 msgstr "نجاح"
 

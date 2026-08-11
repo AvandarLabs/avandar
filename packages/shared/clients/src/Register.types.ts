@@ -1,13 +1,22 @@
 /**
  * Consumer-facing registry interface. Augment this via declaration
  * merging to register your Supabase database type with
- * `@clients`.
+ * `@avandar/clients`.
+ *
+ * Augment the package name, not an internal file path: `@clients/*` is an
+ * internal alias that does not exist for consumers. This works because the
+ * published declarations are bundled into a single `dist/index.d.ts`, so
+ * `Register` is genuinely *declared* in the `@avandar/clients` module rather
+ * than re-exported from another one, and the augmentation merges with it.
+ *
+ * The augmenting file must itself be a module, i.e. contain at least one
+ * top-level `import` or `export`.
  *
  * @example
  * ```ts
- * import type { Database } from "$/types/database.types.ts";
+ * import type { Database } from "./types/database.types.ts";
  *
- * declare module "@clients/Register.types.ts" {
+ * declare module "@avandar/clients" {
  *   interface Register {
  *     supabaseDatabase: Database;
  *   }
@@ -15,7 +24,7 @@
  * ```
  */
 
-import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { UnknownObject } from "@avandar/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Register {}

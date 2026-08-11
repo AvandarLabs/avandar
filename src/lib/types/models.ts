@@ -1,4 +1,4 @@
-import type { UUID } from "@utils";
+import type { UUID } from "@avandar/utils";
 
 export type BaseModel<T extends string> = {
   id: UUID<T>;

@@ -1,18 +1,18 @@
-import { useQuery } from "@hooks";
+import { Model } from "@avandar/models";
+import { useQuery } from "@avandar/query-hooks";
+import { makeObjectFromEntries, prop, sortObjList } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Model } from "@models";
-import { makeObjectFromEntries, prop, sortObjList } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { UseQueryResultTuple } from "@hooks";
+import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type {
   QueryResult,
   QueryResultColumn,
@@ -100,13 +100,13 @@ export function useDataQuery(
       if (sqlToRun) {
         if (auth === "public") {
           // if no workspace id then this is a public query
-          return await PublicQETLClient.runQuery({
+          return await PublicQetlClient.runQuery({
             rawSql: sqlToRun,
             dashboardId: options.publicAvaPageId,
           });
         }
 
-        return await WorkspaceQETLClient.runQuery({
+        return await WorkspaceQetlClient.runQuery({
           rawSql: sqlToRun,
           workspaceId: options.workspaceId,
         });
@@ -127,8 +127,8 @@ export function useDataQuery(
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
           Dataset: async (): Promise<QueryResult<UnknownRow>> => {
-            return await WorkspaceQETLClient.runQuery({
-              rawSql: StructuredQuery.toRawDuckDBQuery(
+            return await WorkspaceQetlClient.runQuery({
+              rawSql: StructuredQuery.toRawDuckDbQuery(
                 executionQueryWithSource,
               ),
               workspaceId: options.workspaceId,

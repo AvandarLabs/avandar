@@ -45,7 +45,7 @@ done
 pnpm test:frontend
 pnpm test:utils
 pnpm test:ava-cli
-pnpm test:ava-etl
+pnpm test:etl
 pnpm test:dev-fanout-server
 pnpm test:pipeline-server
 pnpm test:logger

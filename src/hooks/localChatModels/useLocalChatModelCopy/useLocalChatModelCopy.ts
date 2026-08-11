@@ -1,5 +1,5 @@
+import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { matchLiteral } from "@utils";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback } from "react";
 

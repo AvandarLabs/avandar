@@ -1,4 +1,4 @@
-import { makeSet, propIsDefined, sortObjList } from "@utils";
+import { makeSet, propIsDefined, sortObjList } from "@avandar/utils";
 import { AvaDataTypeModule } from "$/models/datasets/AvaDataType/AvaDataTypeModule";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

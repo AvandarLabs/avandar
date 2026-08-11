@@ -5,7 +5,7 @@ import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsFor
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 

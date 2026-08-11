@@ -1,9 +1,5 @@
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
-import { objectKeys } from "@utils/objects/objectKeys.ts";
-import type {
-  AnyFunction,
-  AnyFunctionWithArguments,
-} from "@utils/types/utilities.types.ts";
+import { assertIsDefined, objectKeys } from "@avandar/utils";
+import type { AnyFunction, AnyFunctionWithArguments } from "@avandar/utils";
 import type { BuildableEntityConfig } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";

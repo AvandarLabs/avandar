@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
 /**

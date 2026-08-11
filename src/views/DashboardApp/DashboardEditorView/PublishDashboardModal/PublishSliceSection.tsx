@@ -1,7 +1,7 @@
+import { isNonEmptyArray, prop, where } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Accordion, Badge, Group, Stack, Text, Title } from "@mantine/core";
 import { IconDatabase, IconShieldLock } from "@tabler/icons-react";
-import { isNonEmptyArray, prop, where } from "@utils";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useMemo } from "react";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";

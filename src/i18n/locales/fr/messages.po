@@ -302,7 +302,7 @@ msgstr "Ouvrir"
 msgid "Aggregations"
 msgstr "Agrégations"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "No"
 msgstr "Non"
@@ -695,8 +695,7 @@ msgstr "Voici les premières {0} lignes de votre ensemble de données. Vérifiez
 "que le CSV utilise un délimiteur différent. Essayez d'ajuster ces "
 "paramètres ici."
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
 msgstr "Ce champ ne peut pas être vide"
 
@@ -900,8 +899,8 @@ msgstr "Nouveau groupe de rôles"
 msgid "Column name in SQL"
 msgstr "Nom de la colonne en SQL"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "Confirmer"
@@ -1261,7 +1260,7 @@ msgstr "moyenne"
 msgid "Generating…"
 msgstr "Génération…"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "Êtes-vous sûr de vouloir procéder à cette action ? Cela ne peut pas "
@@ -1312,8 +1311,7 @@ msgstr "Sélectionnez les colonnes que vous souhaitez dans ce {entityConfigName}
 msgid "Formal"
 msgstr "Formel"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field"
 msgstr "Ce champ"
 
@@ -1321,6 +1319,10 @@ msgstr "Ce champ"
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
 msgid "Edit access for {0}"
 msgstr "Modifier l'accès pour {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "Le nom de l'espace de travail est requis"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
@@ -1450,7 +1452,7 @@ msgstr "Scans vers :"
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "Demandez-moi d'ajouter un graphique à ce tableau de bord..."
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "Pas encore implémenté"
 
@@ -1579,7 +1581,7 @@ msgstr "Modèle hors ligne équilibré pour les questions SQL du quotidien sur l
 msgid "Nothing found..."
 msgstr "Rien trouvé..."
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} pour enregistrer"
 
@@ -1733,15 +1735,11 @@ msgstr "Champs à saisir manuellement"
 msgid "your dataset"
 msgstr "votre ensemble de données"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1857,7 +1855,7 @@ msgstr "La mise à niveau vers un plan \"Payez ce que vous voulez\" ne peut se "
 msgid "Delete entity"
 msgstr "Supprimer l'entité"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "Texte vide"
 
@@ -1991,7 +1989,7 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "Modèle instruct compact de Microsoft. Structure solide et bonne "
 "capacité à suivre les instructions pour les tableaux de bord."
 
-#: packages/web/ui/src/buttons/EditButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "Modifier"
 
@@ -2038,7 +2036,7 @@ msgstr "Axe X invalide sélectionné"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "par exemple cholera-outbreak-2024"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "Collection {collectionNumber}"
 
@@ -2075,7 +2073,7 @@ msgstr "Actif"
 msgid "Default values, comma-separated or JSON array"
 msgstr "Valeurs par défaut, séparées par des virgules ou tableau JSON"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "Confirmer l'action"
 
@@ -2143,7 +2141,7 @@ msgstr "Virgule (,)"
 msgid "Registration requires an internet connection."
 msgstr "L'inscription nécessite une connexion Internet."
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "There are no values"
 msgstr "Il n'y a pas de valeurs"
 
@@ -2512,9 +2510,8 @@ msgstr "Ajoutez un graphique à barres des comptes de lignes dans {datasetName}"
 msgid "No file selected"
 msgstr "Aucun fichier sélectionné"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Soumettre"
@@ -2763,6 +2760,10 @@ msgstr "Étiquette, par exemple, Région"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Sélectionner un fichier"
+
+#: src/components/providers/AvandarAppProvider.tsx
+msgid "Edit {name}"
+msgstr "Modifier {name}"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
@@ -3123,7 +3124,7 @@ msgstr "Tapez votre réponse..."
 msgid "Import"
 msgstr "Importer"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Yes"
 msgstr "Oui"
@@ -3504,7 +3505,7 @@ msgstr "Tourner"
 msgid "Unordered"
 msgstr "Non ordonnée"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty"
 msgstr "Vide"
 
@@ -3514,8 +3515,7 @@ msgstr "Vide"
 msgid "All"
 msgstr "Tous"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} doit comporter au moins {minLength} caractères"
 
@@ -3527,11 +3527,6 @@ msgstr "Système sans"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "Étiquette de série"
-
-#. placeholder {0}: props.name
-#: packages/web/ui/src/buttons/EditButton.tsx
-msgid "Edit {0}"
-msgstr "Modifier {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3854,7 +3849,7 @@ msgstr "Sélectionner la colonne de latitude"
 msgid "This {resource} is shared with: "
 msgstr "Cette {resource} est partagée avec : "
 
-#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Télécharger"
@@ -3966,8 +3961,8 @@ msgstr "Le jeu de données est maintenant synchronisé en ligne"
 msgid "Height"
 msgstr "Hauteur"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "Votre session a expiré"
 
@@ -4050,7 +4045,7 @@ msgstr "Envoyer la valeur <0>{0}</0> {1} à l'IA ?"
 msgid "Custom URL path"
 msgstr "Chemin d'URL personnalisé"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
 msgstr "Veuillez vous reconnecter pour continuer."
 
@@ -4183,7 +4178,7 @@ msgstr "Phi 3.5 Mini (hors ligne)"
 msgid "Data processing failed"
 msgstr "Le traitement des données a échoué"
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "Cette fonctionnalité n'est pas encore implémentée."
 
@@ -4218,7 +4213,7 @@ msgstr "Type de visualisation"
 msgid "Delete dataset"
 msgstr "Supprimer le jeu de données"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "Avertissement"
@@ -4510,7 +4505,7 @@ msgstr "Échec du chargement de l'ensemble de données"
 msgid "Decimal"
 msgstr "Décimal"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Erreur"
 
@@ -4518,9 +4513,7 @@ msgstr "Erreur"
 msgid "Send answer"
 msgstr "Envoyer la réponse"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... et {remainingCount} de plus"
 
@@ -4659,8 +4652,7 @@ msgstr "Message de chat"
 msgid "Error saving dataset"
 msgstr "Erreur lors de l'enregistrement de l'ensemble de données"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -5268,7 +5260,7 @@ msgstr "Sans titre"
 msgid "Previewing this dashboard"
 msgstr "Aperçu de ce tableau de bord"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
 msgstr "Aucune valeur"
 
@@ -5411,8 +5403,8 @@ msgstr "Position de la barre latérale"
 msgid "Search dashboards"
 msgstr "Rechercher des tableaux de bord"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -5650,10 +5642,6 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "Idéal pour le partage de bouche à oreille. Visiter le lien permanent "
 "ci-dessous redirige également ici."
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-msgid "Hello DateValueItem"
-msgstr "Bonjour DateValueItem"
-
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Pour confirmer, tapez <0>{confirmationTarget}</0> ci-dessous :"
@@ -5735,7 +5723,7 @@ msgstr "Partager"
 msgid "Whole dataset"
 msgstr "Ensemble de données complet"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "Date invalide"
 
@@ -5833,7 +5821,7 @@ msgstr "Choisissez la valeur minimale"
 msgid "Mode"
 msgstr "Mode"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Success"
 msgstr "Succès"
 

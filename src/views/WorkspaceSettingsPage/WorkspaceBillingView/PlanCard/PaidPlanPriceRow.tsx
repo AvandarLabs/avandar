@@ -1,6 +1,6 @@
+import { formatNumber } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
-import { formatNumber } from "@utils";
 import type {
   AnnualPaidSeatsPlan,
   MonthlyPaidSeatsPlan,

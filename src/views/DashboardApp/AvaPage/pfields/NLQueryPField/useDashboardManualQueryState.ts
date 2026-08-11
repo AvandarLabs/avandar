@@ -1,4 +1,4 @@
-import { makeObject, prop } from "@utils";
+import { makeObject, prop } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { useCallback, useMemo } from "react";

@@ -1,8 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
+import { isArray, MIMEType } from "@avandar/utils";
 import { Box, Button, FileInput, Group } from "@mantine/core";
-import { isArray, MIMEType } from "@utils";
+import { useForm } from "@ui/hooks/useForm/useForm";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useRef, useState } from "react";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
 import type { FileInputProps } from "@mantine/core";
 
@@ -61,8 +61,8 @@ export function FileUploadForm({
   fullWidth,
   ...fileInputProps
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const resolvedSubmitLabel = submitButtonLabel ?? t`Upload`;
+  const i18n = useI18nMessages();
+  const resolvedSubmitLabel = submitButtonLabel ?? i18n.upload;
   const form = useForm<FileUploadForm>({
     initialValues: {
       file: null,

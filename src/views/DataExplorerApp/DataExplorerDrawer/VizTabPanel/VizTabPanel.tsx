@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { ReactNode } from "react";

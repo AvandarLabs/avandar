@@ -140,7 +140,9 @@ test.describe("Data Explorer query drawer", () => {
         "aria-selected",
         "true",
       );
-      await expect(page.getByRole("radio", { name: /^manual$/i })).toBeChecked();
+      await expect(
+        page.getByRole("radio", { name: /^manual$/i }),
+      ).toBeChecked();
 
       const dataSourceInput = queryPanel.getByLabel("Data source");
       await dataSourceInput.click();

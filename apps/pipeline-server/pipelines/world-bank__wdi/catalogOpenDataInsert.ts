@@ -1,7 +1,7 @@
-import { duckDBDescribeColumnTypeToSniffable } from "@ava-etl";
+import { duckDbDescribeColumnTypeToSniffable } from "@avandar/etl";
 import { getWdiCatalogDatasetPresentation } from "@pipelines/world-bank__wdi/wdiCatalogDatasetConfig";
 import { createClient } from "@supabase/supabase-js";
-import type { NodeDuckDB } from "@ava-etl";
+import type { NodeDuckDb } from "@avandar/etl";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const OPENDATA_BUCKET_DEFAULT = "opendata";
@@ -33,8 +33,8 @@ export type WdiTableParquetSummary = Readonly<{
  */
 function mapDescribeColumnTypeToCastDataType(
   columnType: string,
-): ReturnType<typeof duckDBDescribeColumnTypeToSniffable> {
-  return duckDBDescribeColumnTypeToSniffable(columnType);
+): ReturnType<typeof duckDbDescribeColumnTypeToSniffable> {
+  return duckDbDescribeColumnTypeToSniffable(columnType);
 }
 
 /**
@@ -71,7 +71,7 @@ function _quoteIdentifier(identifier: string): string {
  * Handles numeric years and World Bank string codes such as `YR1960`.
  */
 export async function getWdiYearCoverageFromParquet(options: {
-  db: NodeDuckDB;
+  db: NodeDuckDb;
   parquetPath: string;
   columnNames: readonly string[];
 }): Promise<WdiYearCoverage | undefined> {

@@ -6,7 +6,7 @@ import type {
   ConsentDecisionKinds,
 } from "./ConsentAuditEntry.constants";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
-import type { UUID } from "@utils/types/common.types";
+import type { UUID } from "@avandar/utils";
 
 /** Branded identifier for a local consent audit record. */
 export type ConsentAuditEntryId = UUID<"ConsentAuditEntry">;

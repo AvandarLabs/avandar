@@ -1,6 +1,6 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Checkbox, NumberInput, Select, Text, TextInput } from "@mantine/core";
-import { Tooltip } from "@ui";
 import { match } from "ts-pattern";
 import { DataSourceMetadata } from "./DatasetImportForm";
 

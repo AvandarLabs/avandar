@@ -1,9 +1,10 @@
-import { makeParserRegistry } from "@clients";
-import { identity } from "@utils";
+import { makeParserRegistry } from "@avandar/clients";
+import { identity } from "@avandar/utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
-import type { Expect, ZodSchemaEqualsTypes } from "@utils";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const DBReadSchema = z.object({

@@ -1,6 +1,6 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

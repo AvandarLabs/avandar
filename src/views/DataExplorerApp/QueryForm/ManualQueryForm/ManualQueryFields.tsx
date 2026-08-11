@@ -3,20 +3,20 @@
  * can render them either as a vertical stack of fieldsets or as reflowing
  * columns without duplicating any control markup.
  */
+import { Model } from "@avandar/models";
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Group, NumberInput, Stack, Text } from "@mantine/core";
-import { Model } from "@models";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { makeSelectOptions, Select } from "@ui";
-import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { getManualQueryLimitValue } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { ManualQueryLargeDatasetLimitHint } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
-import { useOrderDirectionOptions } from "@/views/DataExplorerApp/QueryForm/useOrderDirectionOptions";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
+import { useOrderDirectionOptions } from "@/views/DataExplorerApp/QueryForm/useOrderDirectionOptions";
 import classes from "./ManualQueryForm.module.css";
 import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
@@ -137,23 +137,27 @@ export function AggregationFields({
   onSetColumnAggregation,
   withinPortal,
 }: AggregationFieldsProps): ReactNode {
-  return queryColumns.map((column) => {
-    return (
-      <AggregationSelect
-        key={column.id}
-        label={column.baseColumn.name}
-        dataType={column.baseColumn.dataType}
-        value={aggregations[column.id] ?? "none"}
-        onChange={(newAggregation: QueryAggregationType.T) => {
-          onSetColumnAggregation({
-            columnId: column.id,
-            aggregation: newAggregation,
-          });
-        }}
-        comboboxProps={{ withinPortal }}
-      />
-    );
-  });
+  return (
+    <>
+      {queryColumns.map((column) => {
+        return (
+          <AggregationSelect
+            key={column.id}
+            label={column.baseColumn.name}
+            dataType={column.baseColumn.dataType}
+            value={aggregations[column.id] ?? "none"}
+            onChange={(newAggregation: QueryAggregationType.T) => {
+              onSetColumnAggregation({
+                columnId: column.id,
+                aggregation: newAggregation,
+              });
+            }}
+            comboboxProps={{ withinPortal }}
+          />
+        );
+      })}
+    </>
+  );
 }
 
 type SortFieldsProps = {

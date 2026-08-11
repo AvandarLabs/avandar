@@ -1,4 +1,4 @@
-import { camelToTitleCase } from "$/lib/strings/transformations";
+import { camelToTitleCase } from "@avandar/utils";
 import type {
   BaseFormFieldSchema,
   ValidBaseValueType,

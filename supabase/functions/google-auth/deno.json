@@ -1,13 +1,22 @@
 {
   "imports": {
-    "$/": "../../../shared/",
-    "@sbfn/": "../",
+    "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
+    "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
+    "@avandar/models": "../../../packages/shared/models/src/index.ts",
+    "@avandar/models/zod": "../../../packages/shared/models/src/zod/index.ts",
+    "@avandar/modules": "../../../packages/shared/modules/src/index.ts",
+    "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
+    "@avandar/utils/encoding": "../../../packages/shared/utils/src/encoding/index.ts",
+    "@avandar/utils/sql": "../../../packages/shared/utils/src/sql/index.ts",
+    "@avandar/utils/zod": "../../../packages/shared/utils/src/zod/index.ts",
     "@clients/": "../../../packages/shared/clients/src/",
     "@logger/": "../../../packages/shared/logger/src/",
     "@models/": "../../../packages/shared/models/src/",
     "@modules/": "../../../packages/shared/modules/src/",
-    "@utils/": "../../../packages/shared/utils/src/",
+    "@sbfn/": "../",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "@utils/": "../../../packages/shared/utils/src/",
+    "$/": "../../../shared/",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {

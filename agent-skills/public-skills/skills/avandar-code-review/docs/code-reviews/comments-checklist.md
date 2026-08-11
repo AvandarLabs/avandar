@@ -147,6 +147,68 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   the intellisense source; the docstrings belong there, not on the object keys
   or the functions. Do not flag missing key docstrings in that case.
 
+- Comments must describe the present, never the past. Flag any comment that
+  narrates what the code *used to* do: a former implementation, a rename, a
+  previous location, or the reason it changed. Git history already records that,
+  and the comment forces every future reader to work out which half still
+  applies. Rewrite it to describe only the code as it exists today.
+
+  This is bad:
+
+  ```ts
+  /**
+   * Formats a row for display.
+   *
+   * This used to take the whole table and format every row, but that was slow
+   * on large datasets, so now it only takes one row.
+   */
+  export function formatRow(row: Row): string {}
+  ```
+
+  This is good:
+
+  ```ts
+  /** Formats a single row for display. */
+  export function formatRow(row: Row): string {}
+  ```
+
+  Exception: a superseded approach may be documented when it is the more
+  intuitive one and a future developer is likely to reach for it again. It must
+  be written as a warning about the present, not as history: not to do X because
+  it fails in way Y. Do not accept "we used to do X" phrasing even when the
+  underlying warning is legitimate; ask for the warning form instead. Test: does
+  the sentence still read correctly to someone who has never seen the old code?
+  If it only makes sense to someone who remembers the change, flag it.
+
+  This is bad (history, and useless to a reader who never saw the old code):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * We used to read it from the session, but that broke on hard refresh.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
+  This is good (a warning that stands on its own):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * Do not read it from the session instead: the session is not yet populated
+   * on a hard refresh, so the first render would get `undefined`.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
+  **Find candidates:**
+
+  ```bash
+  grep -rEin '(//|\*).*(used to|use to|previously|formerly|originally|no longer|used to be|instead of what|before this|in the past|we changed|was renamed|has been (moved|renamed|replaced))' <files-under-review>
+  ```
+
 - Comments must describe the code as it exists today, not the external plan
   that produced it. Flag any comment that references planning artifacts a
   reader cannot resolve from the codebase: roadmap phase numbers ("Phase 3"),

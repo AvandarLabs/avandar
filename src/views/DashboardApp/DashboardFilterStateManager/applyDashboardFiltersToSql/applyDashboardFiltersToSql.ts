@@ -1,5 +1,5 @@
-import { isDefined, matchLiteral } from "@utils";
-import { quoteSqlIdentifier } from "@utils/sql";
+import { isDefined, matchLiteral } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type {
   DashboardFilterRecord,
   DashboardFilterValue,

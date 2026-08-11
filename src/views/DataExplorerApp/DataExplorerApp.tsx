@@ -1,3 +1,4 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -18,7 +19,6 @@ import {
   IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
@@ -27,11 +27,12 @@ import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerSessionKeys/dataExplorerSessionKeys";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
+import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerSessionKeys/dataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
@@ -363,7 +364,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             size="compact-sm"
             disabled={isLoadingResults || queryResultData.length === 0}
             onClick={() => {
-              downloadRowsAsCSV(queryResultData);
+              downloadRowsAsCsv(queryResultData);
             }}
           >
             <Trans>Export</Trans>

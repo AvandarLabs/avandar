@@ -1,4 +1,4 @@
-import { splitArray } from "@utils/arrays/splitArray/splitArray";
+import { splitArray } from "@avandar/utils";
 
 const REST_KEY = "...";
 

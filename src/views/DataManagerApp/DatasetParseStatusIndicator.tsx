@@ -1,7 +1,7 @@
+import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import {
   estimateRemainingTimeFromJob,
   useImportJob,

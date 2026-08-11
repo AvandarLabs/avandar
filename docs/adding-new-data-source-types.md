@@ -94,7 +94,7 @@ For each new source type, you typically add:
    - **Mutations:** add `insert<YourType>Dataset` calling the matching
      `rpc_datasets__add_*` and register it in `mutationFns`.
 
-4. **QETL / query execution** — `src/clients/qetl/QETLClient.ts`:
+4. **Qetl / query execution** — `src/clients/qetl/QetlClient.ts`:
    - `match`/`matchLiteral` on `sourceType` for building **Dice extractors**
      and loading data paths. Any new type that participates in workspace SQL must
      be wired here (follow `csv_file`, `xlsx_file`, `google_sheets`,
@@ -112,7 +112,7 @@ For each new source type, you typically add:
 
 7. **Local / IndexedDB** — `src/clients/datasets/LocalDatasetClient.ts`:
    - If the type stores raw bytes in the browser (CSV/XLSX pattern), add
-     load helpers (see `storeLocalCSV`, `storeLocalExcel`) and any new DuckDB
+     load helpers (see `storeLocalCsv`, `storeLocalExcel`) and any new DuckDB
      loaders in `DuckDbClient` if the file format is new.
 
 ---
@@ -160,13 +160,13 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 | `src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts` | End-to-end upload; relies on `SourceDatasetClient.update` for `isInCloudStorage`. |
 | Per-type `datasets__*` columns                                          | e.g. `is_in_cloud_storage` where applicable.                                      |
 
-### Querying (workspace Data Explorer, QETL)
+### Querying (workspace Data Explorer, Qetl)
 
 | File / area                                                       | Why                                                                              |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `src/clients/qetl/QETLClient.ts`                                  | **Required** for extractor + dataset hydration behavior.                         |
-| `src/clients/qetl/WorkspaceQETLClient.ts`                         | Mostly generic; ensure factory still receives correct dataset IDs from SQL.      |
-| `src/views/DataExplorerApp/useDataQuery.tsx`                      | Dataset queries go through QETL; usually no per-type branch if QETL is complete. |
+| `src/clients/qetl/QetlClient.ts`                                  | **Required** for extractor + dataset hydration behavior.                         |
+| `src/clients/qetl/WorkspaceQetlClient.ts`                         | Mostly generic; ensure factory still receives correct dataset IDs from SQL.      |
+| `src/views/DataExplorerApp/useDataQuery.tsx`                      | Dataset queries go through Qetl; usually no per-type branch if Qetl is complete. |
 | `src/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal.tsx` | Example: filters `virtual` for some flows — adjust if new type should appear.    |
 
 ### Data Explorer: labels & grouping

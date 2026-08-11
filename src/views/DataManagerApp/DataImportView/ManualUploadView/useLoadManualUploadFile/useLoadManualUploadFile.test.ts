@@ -1,5 +1,5 @@
+import { Expect, IsEqual } from "@avandar/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Expect, IsEqual } from "@utils";
 import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
@@ -8,7 +8,7 @@ import {
   useLoadManualUploadFile,
 } from "./useLoadManualUploadFile";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UnknownObject } from "@utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
@@ -60,7 +60,7 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-vi.mock("@ui", () => {
+vi.mock("@/utils/notifications/notify", () => {
   return {
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),

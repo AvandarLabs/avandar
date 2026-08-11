@@ -7,8 +7,26 @@ The only export is `Model`, a small bundle of helpers built around the
 A model is just an object with a `__type` string and arbitrary additional
 properties. The value of this library isn't in enforcing any clever
 representation — it's the shared convention that lets the rest of the
-Avandar packages (`@avandar/clients`, `@avandar/react-query`) auto-generate
+Avandar packages (`@avandar/clients`, `@avandar/query-hooks`) auto-generate
 parsers, CRUD clients, and React Query hooks against any model.
+
+ESM only. Requires Node 22+.
+
+## Install
+
+```sh
+pnpm add @avandar/models
+```
+
+`zod` is an optional peer dependency, needed only if you import
+`@avandar/models/zod`.
+
+## Entry points
+
+| Entry                 | Contents                                           |
+| --------------------- | -------------------------------------------------- |
+| `@avandar/models`     | `Model` — the value helpers and the type namespace   |
+| `@avandar/models/zod` | Zod schema builders for models                      |
 
 ## Usage
 
@@ -83,13 +101,6 @@ every other property. Useful for keying lookups or passing references.
 | `Model.Type<M>`   | Utility type: extracts the `__type` string literal from a model              |
 | `Model.TypedId<M>`| Utility type: `{ __type, id }` picked from a model with an `id` property     |
 
-## Scripts
-
-| Command           | Description                  |
-| ----------------- | ---------------------------- |
-| `pnpm test`       | Run all tests once           |
-| `pnpm test:watch` | Run tests in watch mode      |
-| `pnpm type-check` | Run TypeScript type checking |
 
 ## Dependencies
 
@@ -101,3 +112,7 @@ every other property. Useful for keying lookups or passing references.
 
 - **vitest** &mdash; test runner
 - **typescript** &mdash; type checking
+
+## License
+
+MIT

@@ -1,4 +1,4 @@
-import { isNonNullish, propEq, where } from "@utils";
+import { isNonNullish, propEq, where } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";

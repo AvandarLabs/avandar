@@ -1,4 +1,4 @@
-import { registry } from "@utils/objects/registry/registry.ts";
+import { registry } from "@avandar/utils";
 
 export type DuckDbDataType =
   | "BOOLEAN"

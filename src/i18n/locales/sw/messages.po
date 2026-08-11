@@ -297,7 +297,7 @@ msgstr "Fungua"
 msgid "Aggregations"
 msgstr "Mkusanyiko"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "No"
 msgstr "Hapana"
@@ -683,8 +683,7 @@ msgstr "Hizi ni safu za kwanza {0} za seti yako ya data. Angalia kama data ni "
 "safu ya kwanza au CSV inatumia delimiter tofauti. Jaribu kurekebisha "
 "mipangilio hiyo hapa."
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
 msgstr "Uwanja huu hauwezi kuwa tupu"
 
@@ -888,8 +887,8 @@ msgstr "Kundi jipya la jukumu"
 msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "Thibitisha"
@@ -1243,7 +1242,7 @@ msgstr "avg"
 msgid "Generating…"
 msgstr "Inaundwa…"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "Je, uko tayari kuendelea na hatua hii? Hii haiwezi kubadilishwa."
@@ -1291,8 +1290,7 @@ msgstr "Chagua safu unazotaka katika {entityConfigName}"
 msgid "Formal"
 msgstr "Rasmi"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field"
 msgstr "Uwanja huu"
 
@@ -1300,6 +1298,10 @@ msgstr "Uwanja huu"
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
 msgid "Edit access for {0}"
 msgstr "Hariri ufikiaji kwa {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "Jina la eneo la kazi linahitajika"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
@@ -1428,7 +1430,7 @@ msgstr "Inasoma hadi:"
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "Nijulishe kuongeza chati kwenye dashibodi hii..."
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "Haijatekelezwa bado"
 
@@ -1555,7 +1557,7 @@ msgstr "Modeli ya offline yenye uwiano kwa maswali ya kila siku ya SQL kwenye "
 msgid "Nothing found..."
 msgstr "Hakuna kilichopatikana..."
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} kuhifadhi"
 
@@ -1709,15 +1711,11 @@ msgstr "Sehemu za kuingizwa kwa mikono"
 msgid "your dataset"
 msgstr "seti yako ya data"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1832,7 +1830,7 @@ msgstr "Kuinua mpango wa \"Lipa Kile Unachotaka\" kunaweza kufanywa tu kupitia "
 msgid "Delete entity"
 msgstr "Futa kitu"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "Maandishi tupu"
 
@@ -1965,7 +1963,7 @@ msgid "Microsoft's compact instruct model. Solid structure and instruction "
 msgstr "Modeli ya Microsoft yenye maagizo mafupi. Muundo thabiti na ufuataji "
 "mzuri wa maagizo kwa dashibodi."
 
-#: packages/web/ui/src/buttons/EditButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "Hariri"
 
@@ -2012,7 +2010,7 @@ msgstr "X axis isiyo sahihi imechaguliwa"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "mfano. cholera-outbreak-2024"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "Kukusanya {collectionNumber}"
 
@@ -2049,7 +2047,7 @@ msgstr "Hai"
 msgid "Default values, comma-separated or JSON array"
 msgstr "Thamani za chaguo-msingi, zilizotengwa kwa koma au orodha ya JSON"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "Thibitisha Kitendo"
 
@@ -2116,7 +2114,7 @@ msgstr "Koma (,)"
 msgid "Registration requires an internet connection."
 msgstr "Usajili unahitaji muunganisho wa intaneti."
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "There are no values"
 msgstr "Hakuna thamani"
 
@@ -2481,9 +2479,8 @@ msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
 msgid "No file selected"
 msgstr "Hakuna faili iliyochaguliwa"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Wasilisha"
@@ -2728,6 +2725,10 @@ msgstr "Lebele, mfano. Mkoa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Chagua faili"
+
+#: src/components/providers/AvandarAppProvider.tsx
+msgid "Edit {name}"
+msgstr "Hariri {name}"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
@@ -3085,7 +3086,7 @@ msgstr "Andika jibu lako..."
 msgid "Import"
 msgstr "Ingiza"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Yes"
 msgstr "Ndio"
@@ -3461,7 +3462,7 @@ msgstr "Geuza"
 msgid "Unordered"
 msgstr "Isiyo na mpangilio"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty"
 msgstr "Tupu"
 
@@ -3471,8 +3472,7 @@ msgstr "Tupu"
 msgid "All"
 msgstr "Yote"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} lazima iwe na urefu wa angalau {minLength} wahusika"
 
@@ -3484,11 +3484,6 @@ msgstr "Mfumo sans"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "Lebo ya series"
-
-#. placeholder {0}: props.name
-#: packages/web/ui/src/buttons/EditButton.tsx
-msgid "Edit {0}"
-msgstr "Hariri {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3809,7 +3804,7 @@ msgstr "Chagua safu ya latitudo"
 msgid "This {resource} is shared with: "
 msgstr "Hii {resource} inashirikiwa na: "
 
-#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Pakia"
@@ -3921,8 +3916,8 @@ msgstr "Dataset sasa imeunganishwa mtandaoni"
 msgid "Height"
 msgstr "Urefu"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "Kikao chako kimeisha"
 
@@ -4003,7 +3998,7 @@ msgstr "Tuma <0>{0}</0> thamani{1} kwa AI?"
 msgid "Custom URL path"
 msgstr "Njia ya URL ya Kawaida"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
 msgstr "Tafadhali ingia tena ili kuendelea."
 
@@ -4135,7 +4130,7 @@ msgstr "Phi 3.5 Mini (nje ya mtandao)"
 msgid "Data processing failed"
 msgstr "Usindikaji wa data umeshindwa"
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "Kipengele hiki hakijatekelezwa bado."
 
@@ -4170,7 +4165,7 @@ msgstr "Aina ya Uonyeshaji"
 msgid "Delete dataset"
 msgstr "Futa seti ya data"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "Onyo"
@@ -4460,7 +4455,7 @@ msgstr "Dataset ilishindwa kupakia"
 msgid "Decimal"
 msgstr "Decimal"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Kosa"
 
@@ -4468,9 +4463,7 @@ msgstr "Kosa"
 msgid "Send answer"
 msgstr "Tuma jibu"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... na {remainingCount} zaidi"
 
@@ -4607,8 +4600,7 @@ msgstr "Ujumbe wa gumzo"
 msgid "Error saving dataset"
 msgstr "Hitilafu katika kuhifadhi seti ya data"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -5210,7 +5202,7 @@ msgstr "Bila kichwa"
 msgid "Previewing this dashboard"
 msgstr "Kuangalia dashibodi hii"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
 msgstr "Hakuna thamani"
 
@@ -5351,8 +5343,8 @@ msgstr "Msimamo wa upau wa pembeni"
 msgid "Search dashboards"
 msgstr "Tafuta dashibodi"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -5585,10 +5577,6 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa "
 "chini pia kunarudisha hapa."
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-msgid "Hello DateValueItem"
-msgstr "Habari DateValueItem"
-
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
@@ -5670,7 +5658,7 @@ msgstr "Shiriki"
 msgid "Whole dataset"
 msgstr "Dataset nzima"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "Tarehe isiyo sahihi"
 
@@ -5767,7 +5755,7 @@ msgstr "Chagua thamani ya chini"
 msgid "Mode"
 msgstr "Hali"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Success"
 msgstr "Mafanikio"
 

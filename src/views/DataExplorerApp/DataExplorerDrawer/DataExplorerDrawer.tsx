@@ -1,3 +1,4 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -13,7 +14,6 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import { useState } from "react";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
@@ -23,7 +23,7 @@ import { useDrawerResize } from "@/views/DataExplorerApp/DataExplorerDrawer/useD
 import { VizTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel/QueryTabPanel";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
@@ -86,8 +86,8 @@ export function DataExplorerDrawer({
       className={css.root}
       keepMounted={false}
     >
-      {isCollapsed ? null
-      : <div
+      {isCollapsed ? null : (
+        <div
           className={css.resizeHandle}
           role="separator"
           aria-orientation="horizontal"
@@ -99,7 +99,7 @@ export function DataExplorerDrawer({
           onPointerDown={onResizePointerDown}
           onKeyDown={onResizeKeyDown}
         />
-      }
+      )}
 
       <Group
         className={css.rail}

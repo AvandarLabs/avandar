@@ -1,5 +1,5 @@
 import { Key } from "react";
-import type { LinkProps } from "@ui";
+import type { LinkProps } from "@avandar/ui";
 
 /**
  * Configuration for a navigable link in the app.

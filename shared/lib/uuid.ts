@@ -1,6 +1,6 @@
 import { uuidType } from "$/lib/zodHelpers.ts";
 import { v4 as uuidv4 } from "uuid";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { UUID } from "@avandar/utils";
 
 // TODO(jpsyx): improve this implementation. use a builtin? and improve types
 /**

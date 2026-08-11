@@ -5,13 +5,13 @@ import {
   isEmptyFiltersObject,
   isFiltersByOperatorObject,
   objectKeys,
-} from "@utils";
+} from "@avandar/utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import type {
   FilterOperatorRecord,
   FiltersByColumn,
   UnknownObject,
-} from "@utils";
+} from "@avandar/utils";
 import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
 
 /**

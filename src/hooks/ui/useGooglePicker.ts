@@ -1,5 +1,5 @@
-import { useQuery } from "@hooks";
-import { isNonEmptyArray, MIMEType, noop } from "@utils";
+import { useQuery } from "@avandar/query-hooks";
+import { isNonEmptyArray, MIMEType, noop } from "@avandar/utils";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";

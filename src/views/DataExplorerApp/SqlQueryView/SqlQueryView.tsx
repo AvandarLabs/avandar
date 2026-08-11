@@ -79,8 +79,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
       <Text size="xs">
         <Trans>
           Parts of this SQL could not be represented in the Manual form. The
-          form shows a best-effort approximation; the SQL is what actually
-          runs.
+          form shows a best-effort approximation; the SQL is what actually runs.
         </Trans>
       </Text>
       <List size="xs" spacing={2}>

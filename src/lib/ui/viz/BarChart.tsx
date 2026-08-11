@@ -1,5 +1,5 @@
+import { formatDate, propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
-import { formatDate, propEq } from "@utils";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";

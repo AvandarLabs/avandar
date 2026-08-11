@@ -1,4 +1,4 @@
-import { where } from "@utils";
+import { where } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";

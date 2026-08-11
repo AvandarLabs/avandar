@@ -1,5 +1,5 @@
-import { isArray } from "@utils";
-import type { UnknownObject } from "@utils";
+import { isArray } from "@avandar/utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { SetRequired } from "type-fest";
 
 /**

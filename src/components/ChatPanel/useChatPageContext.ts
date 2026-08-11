@@ -1,5 +1,5 @@
+import { pickProps } from "@avandar/utils";
 import { useRouterState } from "@tanstack/react-router";
-import { pickProps } from "@utils";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { useMemo } from "react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";

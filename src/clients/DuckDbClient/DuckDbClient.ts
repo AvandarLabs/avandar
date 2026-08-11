@@ -1,5 +1,4 @@
-import * as duckdb from "@duckdb/duckdb-wasm";
-import { ILogger } from "@logger";
+import { ILogger } from "@avandar/logger";
 import {
   isNonEmptyArray,
   MIMEType,
@@ -7,11 +6,12 @@ import {
   objectKeys,
   objectValuesMap,
   prop,
-} from "@utils";
-import { quoteSqlIdentifier } from "@utils/sql";
+} from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import * as duckdb from "@duckdb/duckdb-wasm";
 import { uuid } from "$/lib/uuid";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import knex from "knex";
@@ -515,7 +515,7 @@ class DuckDbClientImpl {
    * @param options.fileText The raw CSV text string to register. If a `file`
    * is provided, this option will be ignored.
    */
-  async #registerCSVFile(
+  async #registerCsvFile(
     options:
       | { tableName: string; file: File }
       | { tableName: string; fileText: string },
@@ -739,7 +739,7 @@ class DuckDbClientImpl {
       await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
       await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
 
-      await this.#registerCSVFile({
+      await this.#registerCsvFile({
         tableName: stagingFile,
         file: options.file,
       });
@@ -810,7 +810,7 @@ class DuckDbClientImpl {
     try {
       await this.dropTableViewAndFile(tableName);
 
-      await this.#registerCSVFile(
+      await this.#registerCsvFile(
         "file" in options ?
           { tableName: csvStagingFile, file: options.file }
         : { tableName: csvStagingFile, fileText: options.fileText },
@@ -1534,7 +1534,7 @@ SET enable_external_file_cache = true;
     query = objectEntries(aggregations).reduce(
       (newQuery, [columnName, aggType]) => {
         const aggregationColumnName =
-          DuckDBQueryAggregations.getAggregationColumnName(aggType, columnName);
+          DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
         const quotedColumnName = quoteSqlIdentifier(columnName);
         const quotedAggregationColumnName = quoteSqlIdentifier(
           aggregationColumnName,
@@ -1577,7 +1577,7 @@ SET enable_external_file_cache = true;
             );
           })
           .exhaustive(() => {
-            throw new Error(`Invalid DuckDBQueryAggregationType: "${aggType}"`);
+            throw new Error(`Invalid DuckDbQueryAggregationType: "${aggType}"`);
           });
       },
       query,

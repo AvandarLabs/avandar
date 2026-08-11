@@ -1,6 +1,7 @@
 .root {
   background: var(--ava-surface-raised, var(--mantine-color-white));
-  border-top: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-top: 1px solid
+    var(--ava-border-default, var(--mantine-color-neutral-2));
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
@@ -111,7 +112,8 @@
 }
 
 .body {
-  border-top: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-top: 1px solid
+    var(--ava-border-default, var(--mantine-color-neutral-2));
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;

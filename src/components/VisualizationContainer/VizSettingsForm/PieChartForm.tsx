@@ -1,7 +1,7 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ColorInput, Stack, Switch } from "@mantine/core";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
@@ -10,7 +10,7 @@ import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
 

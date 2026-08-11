@@ -1,4 +1,4 @@
-import { template } from "@utils";
+import { template } from "@avandar/utils";
 
 export type TemplateParams = Readonly<Record<string, string>>;
 

@@ -1,8 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
+import { noop } from "@avandar/utils";
 import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
-import { noop } from "@utils";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 
 type Props = {
   label: string;
@@ -32,13 +32,13 @@ export function DangerousActionButton({
   confirmModalProps,
   loading = false,
 }: Props): JSX.Element {
-  const { t } = useLingui();
+  const i18n = useI18nMessages();
 
   const defaultConfirmProps = {
-    title: t`Confirm Action`,
-    message: t`Are you sure you want to proceed with this action? This cannot be undone.`,
-    confirmLabel: t`Confirm`,
-    cancelLabel: t`Cancel`,
+    title: i18n.confirmActionTitle,
+    message: i18n.confirmActionMessage,
+    confirmLabel: i18n.confirm,
+    cancelLabel: i18n.cancel,
     onConfirm: noop,
   };
 

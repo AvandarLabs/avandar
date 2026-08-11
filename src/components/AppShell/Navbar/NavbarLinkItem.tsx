@@ -1,5 +1,5 @@
+import { Link } from "@avandar/ui";
 import { Box, Flex, Group, Text } from "@mantine/core";
-import { Link } from "@ui";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline/isAppLinkAvailableOffline";

@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { ensureOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/ensureOfflineChatSchema/ensureOfflineChatSchema";

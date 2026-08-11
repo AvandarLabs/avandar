@@ -1,6 +1,6 @@
+import { where } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
-import { where } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

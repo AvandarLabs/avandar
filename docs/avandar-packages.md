@@ -14,7 +14,7 @@ within each package use the `@<package>/...` alias (e.g. `@utils/...`,
 ```
 packages/
 ├── node/
-│   └── ava-etl/      # Node-only: ETL pipelines + DuckDB wrapper
+│   └── etl/      # Node-only: ETL pipelines + DuckDB wrapper
 ├── shared/
 │   ├── clients/      # Typed CRUD client primitives (Supabase + generic)
 │   ├── logger/       # Browser logger + module mixin
@@ -49,7 +49,7 @@ layers.
                                    │         │
                               shared/utils ──┘
 
-                            node/ava-etl ── shared/modules, shared/utils
+                            node/etl ── shared/modules, shared/utils
 ```
 
 ---
@@ -179,24 +179,24 @@ See [`packages/web/ui/README.md`](../packages/web/ui/README.md).
 
 ---
 
-## `@avandar/ava-etl` — `packages/node/ava-etl`
+## `@avandar/etl` — `packages/node/etl`
 
 Node.js ETL toolkit. Two units:
 
-- `ETLEngine` — module factory for 3-step Extract → Transform → Load
+- `EtlEngine` — module factory for 3-step Extract → Transform → Load
   pipelines whose intermediate output is CSV on disk under
   `etl-output/<pipeline>/<runId>/{extract,transform,load}/`. The engine
   handles CSV-to-ZSTD-Parquet conversion between transform and load.
   Static helpers (`storeExtractedData`, `getLoadParquetPathForTable`,
   `uploadParquetToStorage`) cover common pipeline operations including
   upload to Supabase Storage.
-- `NodeDuckDB` — thin wrapper around the `duckdb` native bindings for raw
+- `NodeDuckDb` — thin wrapper around the `duckdb` native bindings for raw
   SQL, CSV sniffing, view creation, Parquet export, and Parquet
   summarisation. The ETL engine uses it internally; you can use it
   directly outside the pipeline.
 
-Also exports the supported `DuckDBSniffableDataType` union and the
+Also exports the supported `DuckDbSniffableDataType` union and the
 `ETL_PATHS_ROOT_ENV` / path-helper utilities used to control where pipeline
 data is materialised.
 
-See [`packages/node/ava-etl/README.md`](../packages/node/ava-etl/README.md).
+See [`packages/node/etl/README.md`](../packages/node/etl/README.md).

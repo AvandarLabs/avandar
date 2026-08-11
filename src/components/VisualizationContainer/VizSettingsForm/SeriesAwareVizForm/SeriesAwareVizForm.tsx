@@ -1,7 +1,12 @@
+import {
+  makeBucketMap,
+  propPasses,
+  removeAtIndex,
+  setValue,
+} from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import { makeBucketMap, propPasses, removeAtIndex, setValue } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";

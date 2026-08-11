@@ -1,4 +1,4 @@
-import { makeBucketMap, prop, propEq } from "@utils";
+import { makeBucketMap, prop, propEq } from "@avandar/utils";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,

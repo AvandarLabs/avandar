@@ -1,5 +1,5 @@
+import { Select, SelectData } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { ReactNode } from "react";

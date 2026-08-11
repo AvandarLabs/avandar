@@ -1,10 +1,11 @@
-import { useBoolean, useQuery } from "@hooks";
-import { notifyError } from "@ui";
+import { useBoolean } from "@avandar/hooks";
+import { useQuery } from "@avandar/query-hooks";
 import { useEffect } from "react";
 import { Logger } from "@/utils/Logger";
+import { notifyError } from "@/utils/notifications/notify";
 import type { GooglePickerAPI } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
-import type { UseQueryResult } from "@hooks";
+import type { UseQueryResult } from "@avandar/query-hooks";
 
 const GOOGLE_API_JS_URL = "https://apis.google.com/js/api.js";
 const scriptSelector = `script[src="${GOOGLE_API_JS_URL}"]`;

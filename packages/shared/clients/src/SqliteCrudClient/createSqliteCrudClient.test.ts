@@ -1,78 +1,34 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
-import { __setIpcBridgeForTests } from "$/platform/ipc/client.ts";
-import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-  ReplyEnvelope,
-  RequestEnvelope,
-} from "$/platform/ipc/envelopes.ts";
 
 /*
- * A fake IPC bridge for unit testing. Each `send` looks up the
- * registered handler for the channel, computes a reply, and delivers
- * it to the `once` callback in a microtask so the call stays async.
+ * A fake SQLite transport. `createSqliteCrudClient` takes its database access
+ * as an injected dependency, so a test hands it a pair of spies rather than
+ * standing up an IPC bridge or patching a module-level global.
  */
-function makeFakeBridge() {
-  const handlers = new Map<
-    string,
-    (payload: unknown) => unknown | Promise<unknown>
-  >();
-  const onceCallbacks = new Map<string, (msg: unknown) => void>();
+type FakeQueryResult = { rows: Array<Record<string, unknown>> };
+type FakeRunResult = { changes: number; lastInsertRowid: number };
+type FakeRequest = { sql: string; params: unknown[] };
 
-  const bridge = {
-    send: vi.fn((channel: string, message: unknown) => {
-      const envelope = message as RequestEnvelope;
-      const handler = handlers.get(channel);
-      const replyChannel = `${channel}.reply`;
-      Promise.resolve()
-        .then(() => {
-          if (!handler) {
-            throw new Error(`no fake handler registered for ${channel}`);
-          }
-          return handler(envelope.payload);
-        })
-        .then((result) => {
-          const reply: ReplyEnvelope = {
-            id: envelope.id,
-            ok: true,
-            result,
-          };
-          const cb = onceCallbacks.get(replyChannel);
-          if (cb) {
-            onceCallbacks.delete(replyChannel);
-            cb(reply);
-          }
-        })
-        .catch((err: unknown) => {
-          const reply: ReplyEnvelope = {
-            id: envelope.id,
-            ok: false,
-            error: err instanceof Error ? err.message : String(err),
-          };
-          const cb = onceCallbacks.get(replyChannel);
-          if (cb) {
-            onceCallbacks.delete(replyChannel);
-            cb(reply);
-          }
-        });
-    }),
-    once: vi.fn((channel: string, callback: (msg: unknown) => void) => {
-      onceCallbacks.set(channel, callback);
-    }),
-  };
-
+function makeFakeTransport() {
   return {
-    bridge,
-    on(
-      channel: string,
-      handler: (payload: unknown) => unknown | Promise<unknown>,
-    ) {
-      handlers.set(channel, handler);
-    },
+    // Return types allow a plain value as well as a promise so individual
+    // tests can `mockImplementation(() => ({ rows: [...] }))` without the
+    // `async` ceremony. The client awaits the result either way.
+    query: vi.fn<
+      (request: FakeRequest) => FakeQueryResult | Promise<FakeQueryResult>
+    >(() => {
+      return { rows: [] };
+    }),
+    run: vi.fn<
+      (request: FakeRequest) => FakeRunResult | Promise<FakeRunResult>
+    >(() => {
+      return { changes: 0, lastInsertRowid: 0 };
+    }),
   };
 }
 
@@ -113,15 +69,13 @@ const widgetParsers: ModelCrudParserRegistry<WidgetModelSpec> =
 const fakeSupabase = {} as SupabaseClient;
 
 describe("createSqliteCrudClient", () => {
-  let fake = makeFakeBridge();
+  let sqliteTransport = makeFakeTransport();
 
   beforeEach(() => {
-    fake = makeFakeBridge();
-    __setIpcBridgeForTests(fake.bridge);
+    sqliteTransport = makeFakeTransport();
   });
 
   afterEach(() => {
-    __setIpcBridgeForTests(undefined);
     vi.clearAllMocks();
   });
 
@@ -139,11 +93,12 @@ describe("createSqliteCrudClient", () => {
       dbTablePrimaryKey: "id" as never,
       parsers: widgetParsers as never,
       dbClient: fakeSupabase,
+      sqliteTransport,
     } as never);
   }
 
   it("getById issues an rdb.query with parameterised SQL", async () => {
-    fake.on(RdbContracts.query.name, () => {
+    sqliteTransport.query.mockImplementation(() => {
       return { rows: [{ id: "x1", name: "test", color: "red" }] };
     });
 
@@ -151,13 +106,10 @@ describe("createSqliteCrudClient", () => {
     const result = await client.getById({ id: "x1" });
 
     expect(result).toEqual({ id: "x1", name: "test", color: "red" });
-    expect(fake.bridge.send).toHaveBeenCalledWith(
-      RdbContracts.query.name,
+    expect(sqliteTransport.query).toHaveBeenCalledWith(
       expect.objectContaining({
-        payload: expect.objectContaining({
-          sql: expect.stringContaining('from "widgets"'),
-          params: ["x1"],
-        }),
+        sql: expect.stringContaining('from "widgets"'),
+        params: ["x1"],
       }),
     );
   });
@@ -166,11 +118,12 @@ describe("createSqliteCrudClient", () => {
     const client = makeClient();
     const result = await client.getById({ id: null });
     expect(result).toBeUndefined();
-    expect(fake.bridge.send).not.toHaveBeenCalled();
+    expect(sqliteTransport.query).not.toHaveBeenCalled();
+    expect(sqliteTransport.run).not.toHaveBeenCalled();
   });
 
   it("getCount issues a count query and returns the integer", async () => {
-    fake.on(RdbContracts.query.name, () => {
+    sqliteTransport.query.mockImplementation(() => {
       return { rows: [{ _count: 42 }] };
     });
     const client = makeClient();
@@ -182,7 +135,7 @@ describe("createSqliteCrudClient", () => {
     // The model-level getPage may also call getCount when the first
     // page is full; capture only the page-data call.
     let pageCall: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       const req = payload as Record<string, unknown>;
       const sql = String(req.sql ?? "");
       if (sql.includes("count(*)")) {
@@ -199,7 +152,7 @@ describe("createSqliteCrudClient", () => {
 
   it("getPage applies WHERE filters with eq", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [] };
     });
@@ -215,7 +168,7 @@ describe("createSqliteCrudClient", () => {
 
   it("getPage applies WHERE filters with in", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [] };
     });
@@ -231,7 +184,7 @@ describe("createSqliteCrudClient", () => {
 
   it("getPage degrades an empty IN to a contradiction so no rows return", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [] };
     });
@@ -246,7 +199,7 @@ describe("createSqliteCrudClient", () => {
 
   it("insert emits an INSERT ... RETURNING and returns the parsed model", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return {
         rows: [{ id: "x1", name: "fresh", color: "green" }],
@@ -263,7 +216,7 @@ describe("createSqliteCrudClient", () => {
 
   it("insert with upsert emits ON CONFLICT DO UPDATE", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [{ id: "x1", name: "fresh", color: null }] };
     });
@@ -278,7 +231,7 @@ describe("createSqliteCrudClient", () => {
 
   it("insert with upsert + ignoreDuplicates emits ON CONFLICT DO NOTHING", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [{ id: "x1", name: "fresh", color: null }] };
     });
@@ -332,7 +285,7 @@ describe("createSqliteCrudClient", () => {
       });
 
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [{ id: "x1", config: '{"theme":"dark"}' }] };
     });
@@ -343,6 +296,7 @@ describe("createSqliteCrudClient", () => {
       dbTablePrimaryKey: "id" as never,
       parsers: jsonParsers as never,
       dbClient: fakeSupabase,
+      sqliteTransport,
     } as never);
 
     await client.insert({
@@ -354,7 +308,7 @@ describe("createSqliteCrudClient", () => {
 
   it("bulkInsert flattens row bindings and emits multi-row VALUES", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return {
         rows: [
@@ -378,12 +332,13 @@ describe("createSqliteCrudClient", () => {
     const client = makeClient();
     const result = await client.bulkInsert({ data: [] });
     expect(result).toEqual([]);
-    expect(fake.bridge.send).not.toHaveBeenCalled();
+    expect(sqliteTransport.query).not.toHaveBeenCalled();
+    expect(sqliteTransport.run).not.toHaveBeenCalled();
   });
 
   it("update emits UPDATE ... SET ... WHERE pk = ? RETURNING *", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.query.name, (payload) => {
+    sqliteTransport.query.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { rows: [{ id: "x1", name: "renamed", color: "red" }] };
     });
@@ -401,7 +356,7 @@ describe("createSqliteCrudClient", () => {
 
   it("delete emits a DELETE through rdb.run", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.run.name, (payload) => {
+    sqliteTransport.run.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { changes: 1, lastInsertRowid: 0 };
     });
@@ -413,7 +368,7 @@ describe("createSqliteCrudClient", () => {
 
   it("bulkDelete emits DELETE ... WHERE pk IN (?, ?, ...) through rdb.run", async () => {
     let received: Record<string, unknown> | undefined;
-    fake.on(RdbContracts.run.name, (payload) => {
+    sqliteTransport.run.mockImplementation((payload) => {
       received = payload as Record<string, unknown>;
       return { changes: 3, lastInsertRowid: 0 };
     });
@@ -426,7 +381,8 @@ describe("createSqliteCrudClient", () => {
   it("bulkDelete with empty input does not call IPC", async () => {
     const client = makeClient();
     await client.bulkDelete({ ids: [] });
-    expect(fake.bridge.send).not.toHaveBeenCalled();
+    expect(sqliteTransport.query).not.toHaveBeenCalled();
+    expect(sqliteTransport.run).not.toHaveBeenCalled();
   });
 
   it("exposes .getDb() returning the same Supabase client", () => {

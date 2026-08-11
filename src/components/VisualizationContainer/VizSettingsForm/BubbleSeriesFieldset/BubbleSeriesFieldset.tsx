@@ -1,3 +1,5 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -10,8 +12,6 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses, removeAtIndex } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
@@ -91,148 +91,144 @@ export function BubbleSeriesFieldset({
   const seriesGroup = (
     <Stack gap="md">
       <Group justify="space-between">
-          <Group gap={6} align="center">
-            <Tooltip
-              multiline
-              w={280}
-              label={t`Each series is one cloud of bubbles. The size column determines bubble radius.`}
-            >
-              <IconInfoCircle
-                size={14}
-                aria-label={t`What is a series?`}
-                className={css.helpCursor}
-              />
-            </Tooltip>
-          </Group>
-          <Button
-            size="xs"
-            variant="light"
-            leftSection={<IconPlus size={14} />}
-            onClick={addSeries}
-            disabled={numericFields.length === 0}
+        <Group gap={6} align="center">
+          <Tooltip
+            multiline
+            w={280}
+            label={t`Each series is one cloud of bubbles. The size column determines bubble radius.`}
           >
-            <Trans>Add series</Trans>
-          </Button>
+            <IconInfoCircle
+              size={14}
+              aria-label={t`What is a series?`}
+              className={css.helpCursor}
+            />
+          </Tooltip>
         </Group>
-
-        <div
-          className={clsx(
-            css.seriesList,
-            layout === "columns" && css.seriesListColumns,
-          )}
+        <Button
+          size="xs"
+          variant="light"
+          leftSection={<IconPlus size={14} />}
+          onClick={addSeries}
+          disabled={numericFields.length === 0}
         >
-          {series.map((s, idx) => {
-            return (
-              <Card
-                key={`${s.key}-${s.xKey}-${s.sizeKey}-${idx}`}
-                withBorder
-                shadow="none"
-                padding="sm"
-              >
-                <Stack gap="xs">
-                  <Group
-                    justify="space-between"
-                    wrap="nowrap"
-                    align="flex-start"
-                  >
-                    <Stack gap="xs" className={css.flexFillMinW0}>
-                      <Select
-                        allowDeselect={false}
-                        label={t`X column`}
-                        data={numericOptions}
-                        value={s.xKey}
-                        disabled={numericOptions.length === 0}
-                        placeholder={
-                          numericOptions.length === 0 ?
-                            t`No numeric columns`
-                          : t`Select a column`
-                        }
-                        onChange={(next) => {
-                          if (next !== null) {
-                            updateAt(idx, { xKey: next });
-                          }
-                        }}
-                      />
-                      <Select
-                        allowDeselect={false}
-                        label={t`Y column`}
-                        data={numericOptions}
-                        value={s.key}
-                        disabled={numericOptions.length === 0}
-                        placeholder={
-                          numericOptions.length === 0 ?
-                            t`No numeric columns`
-                          : t`Select a column`
-                        }
-                        onChange={(next) => {
-                          if (next !== null) {
-                            updateAt(idx, { key: next });
-                          }
-                        }}
-                      />
-                      <Select
-                        allowDeselect={false}
-                        label={t`Size column`}
-                        data={numericOptions}
-                        value={s.sizeKey}
-                        disabled={numericOptions.length === 0}
-                        placeholder={
-                          numericOptions.length === 0 ?
-                            t`No numeric columns`
-                          : t`Select a column`
-                        }
-                        onChange={(next) => {
-                          if (next !== null) {
-                            updateAt(idx, { sizeKey: next });
-                          }
-                        }}
-                      />
-                    </Stack>
-                    <ActionIcon
-                      aria-label={t`Remove series`}
-                      variant="subtle"
-                      color="red"
-                      onClick={() => {
-                        removeAt(idx);
-                      }}
-                      mt="lg"
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  </Group>
+          <Trans>Add series</Trans>
+        </Button>
+      </Group>
 
-                  <Group gap="xs">
-                    <TextInput
-                      label={t`Series label`}
-                      value={s.label ?? ""}
-                      placeholder={t`Defaults to "Y vs X"`}
-                      onChange={(event) => {
-                        const labelText = event.currentTarget.value;
-                        updateAt(idx, {
-                          label: labelText === "" ? undefined : labelText,
-                        });
-                      }}
-                      className={css.flexFill}
-                    />
-                    <ColorInput
-                      label={t`Color`}
-                      value={s.color ?? ""}
-                      swatches={[...CHART_COLOR_SWATCHES]}
-                      withEyeDropper={false}
-                      format="hex"
+      <div
+        className={clsx(
+          css.seriesList,
+          layout === "columns" && css.seriesListColumns,
+        )}
+      >
+        {series.map((s, idx) => {
+          return (
+            <Card
+              key={`${s.key}-${s.xKey}-${s.sizeKey}-${idx}`}
+              withBorder
+              shadow="none"
+              padding="sm"
+            >
+              <Stack gap="xs">
+                <Group justify="space-between" wrap="nowrap" align="flex-start">
+                  <Stack gap="xs" className={css.flexFillMinW0}>
+                    <Select
+                      allowDeselect={false}
+                      label={t`X column`}
+                      data={numericOptions}
+                      value={s.xKey}
+                      disabled={numericOptions.length === 0}
+                      placeholder={
+                        numericOptions.length === 0 ?
+                          t`No numeric columns`
+                        : t`Select a column`
+                      }
                       onChange={(next) => {
-                        updateAt(idx, {
-                          color: next === "" ? undefined : next,
-                        });
+                        if (next !== null) {
+                          updateAt(idx, { xKey: next });
+                        }
                       }}
-                      className={css.flexFill}
                     />
-                  </Group>
-                </Stack>
-              </Card>
-            );
-          })}
-        </div>
+                    <Select
+                      allowDeselect={false}
+                      label={t`Y column`}
+                      data={numericOptions}
+                      value={s.key}
+                      disabled={numericOptions.length === 0}
+                      placeholder={
+                        numericOptions.length === 0 ?
+                          t`No numeric columns`
+                        : t`Select a column`
+                      }
+                      onChange={(next) => {
+                        if (next !== null) {
+                          updateAt(idx, { key: next });
+                        }
+                      }}
+                    />
+                    <Select
+                      allowDeselect={false}
+                      label={t`Size column`}
+                      data={numericOptions}
+                      value={s.sizeKey}
+                      disabled={numericOptions.length === 0}
+                      placeholder={
+                        numericOptions.length === 0 ?
+                          t`No numeric columns`
+                        : t`Select a column`
+                      }
+                      onChange={(next) => {
+                        if (next !== null) {
+                          updateAt(idx, { sizeKey: next });
+                        }
+                      }}
+                    />
+                  </Stack>
+                  <ActionIcon
+                    aria-label={t`Remove series`}
+                    variant="subtle"
+                    color="red"
+                    onClick={() => {
+                      removeAt(idx);
+                    }}
+                    mt="lg"
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Group>
+
+                <Group gap="xs">
+                  <TextInput
+                    label={t`Series label`}
+                    value={s.label ?? ""}
+                    placeholder={t`Defaults to "Y vs X"`}
+                    onChange={(event) => {
+                      const labelText = event.currentTarget.value;
+                      updateAt(idx, {
+                        label: labelText === "" ? undefined : labelText,
+                      });
+                    }}
+                    className={css.flexFill}
+                  />
+                  <ColorInput
+                    label={t`Color`}
+                    value={s.color ?? ""}
+                    swatches={[...CHART_COLOR_SWATCHES]}
+                    withEyeDropper={false}
+                    format="hex"
+                    onChange={(next) => {
+                      updateAt(idx, {
+                        color: next === "" ? undefined : next,
+                      });
+                    }}
+                    className={css.flexFill}
+                  />
+                </Group>
+              </Stack>
+            </Card>
+          );
+        })}
+      </div>
     </Stack>
   );
 
