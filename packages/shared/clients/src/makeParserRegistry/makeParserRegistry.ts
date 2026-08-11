@@ -1,4 +1,5 @@
 import { excludeUndefinedDeep, objectKeys, pick } from "@avandar/utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { z } from "zod";
 
@@ -71,6 +72,64 @@ type ParserRegistryBuilderFn<M extends CrudModelSpec> = (
 ) => ModelCrudParserRegistry<M>;
 
 /**
+ * The keys of an object DBRead schema whose field schema accepts `undefined`.
+ *
+ * Returns `undefined` for any non-object schema (e.g. a discriminated union),
+ * because a union's keys belong to individual branches: adding another
+ * branch's key would make a `strictObject` branch reject the row.
+ *
+ * @param DBReadSchema The DBRead schema to inspect.
+ * @returns The undefinable keys, or `undefined` for a non-object schema.
+ */
+function _getUndefinableKeys(DBReadSchema: unknown): string[] | undefined {
+  const { shape } = DBReadSchema as {
+    shape?: Record<string, z.ZodType> | undefined;
+  };
+  if (!shape || typeof shape !== "object") {
+    return undefined;
+  }
+  return objectKeys(shape).filter((key) => {
+    return shape[key]!.safeParse(undefined).success;
+  });
+}
+
+/**
+ * Re-adds any `undefinableKeys` that are absent from `data`, with an explicit
+ * `undefined` value.
+ *
+ * Document stores hold sparse rows, so an `X | undefined` field can come back
+ * as an *absent* key rather than a present-and-undefined one. IndexedDB gets
+ * there two ways: `fromModelInsertToDBInsert` strips `undefined` values before
+ * writing, and Dexie's `Table.update` deletes a property whose new value is
+ * `undefined`. A Zod object schema treats the absent key as a missing required
+ * key, so without this the row fails to parse even though its value is exactly
+ * what the model type allows.
+ *
+ * @param data The row read out of the database.
+ * @param undefinableKeys The schema keys that accept `undefined`, if known.
+ * @returns The row, with every absent undefinable key filled in.
+ */
+function _withAbsentUndefinableKeys<T>(
+  data: T,
+  undefinableKeys: string[] | undefined,
+): T {
+  if (!undefinableKeys || typeof data !== "object" || data === null) {
+    return data;
+  }
+  const absentKeys = undefinableKeys.filter((key) => {
+    return !(key in data);
+  });
+  if (absentKeys.length === 0) {
+    return data;
+  }
+  const filledData = { ...data } as UnknownObject;
+  absentKeys.forEach((key) => {
+    filledData[key] = undefined;
+  });
+  return filledData as T;
+}
+
+/**
  * Appends the model name and schema name to the Zod error message.
  *
  * @param modelName The name of the model.
@@ -115,6 +174,7 @@ export function makeParserRegistry<M extends CrudModelSpec = never>(): {
         (objectKeys(
           (config.DBReadSchema as ObjectDBReadSchema<M>).shape,
         ) as unknown as Array<DBReadKey<M>>);
+      const undefinableKeys = _getUndefinableKeys(config.DBReadSchema);
 
       return {
         ...config,
@@ -122,12 +182,15 @@ export function makeParserRegistry<M extends CrudModelSpec = never>(): {
           return config.fromDBReadToModelRead(
             // run the DBReadSchema parser to be extra sure we are receiving
             // a valid DBRead model
-            config.DBReadSchema.parse(data, {
-              error: getErrorMap({
-                modelName: config.modelName,
-                schemaName: "DBReadSchema",
-              }),
-            }),
+            config.DBReadSchema.parse(
+              _withAbsentUndefinableKeys(data, undefinableKeys),
+              {
+                error: getErrorMap({
+                  modelName: config.modelName,
+                  schemaName: "DBReadSchema",
+                }),
+              },
+            ),
           );
         },
 
