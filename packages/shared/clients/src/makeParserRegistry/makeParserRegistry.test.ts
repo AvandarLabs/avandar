@@ -6,6 +6,47 @@ type UnionRow =
   | { id: string; kind: "text"; text: string }
   | { id: string; kind: "point"; x: number; y: number };
 
+type SparseRow = {
+  id: string;
+  label: string;
+  note: string | undefined;
+  count: number | undefined;
+};
+
+type SparseModelSpec = {
+  modelName: "SparseModel";
+  modelPrimaryKeyType: string;
+  DBRead: SparseRow;
+  DBInsert: SparseRow;
+  DBUpdate: Partial<SparseRow>;
+  Read: SparseRow;
+  Insert: SparseRow;
+  Update: Partial<SparseRow>;
+};
+
+const SparseDBReadSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  note: z.union([z.string(), z.undefined()]),
+  count: z.union([z.number(), z.undefined()]),
+});
+
+function _makeSparseParsers() {
+  return makeParserRegistry<SparseModelSpec>().build({
+    modelName: "SparseModel",
+    DBReadSchema: SparseDBReadSchema,
+    fromDBReadToModelRead: (row) => {
+      return row;
+    },
+    fromModelInsertToDBInsert: (row) => {
+      return row;
+    },
+    fromModelUpdateToDBUpdate: (update) => {
+      return update;
+    },
+  });
+}
+
 type UnionModelSpec = {
   modelName: "UnionModel";
   modelPrimaryKeyType: string;
@@ -85,6 +126,30 @@ describe("makeParserRegistry", () => {
         text: "hello",
         x: 10,
       } as UnionRow);
+    }).toThrow();
+  });
+
+  it("reads a row whose undefinable keys are absent", () => {
+    const parsers = _makeSparseParsers();
+
+    // Document stores hold sparse rows: `fromModelInsertToDBInsert` strips
+    // `undefined` values on the way in, and Dexie's `Table.update` deletes a
+    // property whose new value is `undefined`. Either way the key is gone.
+    expect(
+      parsers.fromDBReadToModelRead({ id: "a", label: "A" } as SparseRow),
+    ).toEqual({
+      id: "a",
+      label: "A",
+      note: undefined,
+      count: undefined,
+    });
+  });
+
+  it("still rejects a row missing a required key", () => {
+    const parsers = _makeSparseParsers();
+
+    expect(() => {
+      parsers.fromDBReadToModelRead({ id: "a" } as SparseRow);
     }).toThrow();
   });
 });
