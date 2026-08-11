@@ -4,7 +4,7 @@ import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DatasetImportForm } from "./DatasetImportForm";
 import type {
@@ -175,9 +175,9 @@ describe("DatasetImportForm", () => {
     }
 
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <ControlledMetadataHarness />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     fireEvent.change(screen.getByLabelText("Delimiter"), {
@@ -200,7 +200,7 @@ describe("DatasetImportForm", () => {
     const metadata = _csvDataSourceMetadata();
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <DatasetImportForm
             rows={[{ city: "LA" }]}
             initialDatasetName="cities.csv"
@@ -209,7 +209,7 @@ describe("DatasetImportForm", () => {
             dataSourceMetadata={metadata}
             parseOptions={metadata.parseOptions}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
 
@@ -229,7 +229,7 @@ describe("DatasetImportForm", () => {
     const metadata = _xlsxDataSourceMetadata(["Sheet1"]);
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <DatasetImportForm
             rows={[{ city: "LA" }]}
             initialDatasetName="cities.xlsx"
@@ -238,7 +238,7 @@ describe("DatasetImportForm", () => {
             dataSourceMetadata={metadata}
             parseOptions={metadata.parseOptions}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
 
@@ -252,7 +252,7 @@ describe("DatasetImportForm", () => {
     const metadata = _xlsxDataSourceMetadata(["Sheet1", "Sheet2"]);
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <DatasetImportForm
             rows={[{ city: "LA" }]}
             initialDatasetName="cities.xlsx"
@@ -261,7 +261,7 @@ describe("DatasetImportForm", () => {
             dataSourceMetadata={metadata}
             parseOptions={metadata.parseOptions}
           />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
 
@@ -303,9 +303,9 @@ describe("DatasetImportForm", () => {
 
     render(
       <I18nProvider i18n={i18n}>
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <ControlledMetadataHarness />
-        </AvandarUiProvider>
+        </AvandarAppProvider>
       </I18nProvider>,
     );
 

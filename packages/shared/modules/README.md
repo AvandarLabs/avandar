@@ -8,6 +8,16 @@ incrementally extended via `mixin()`.
 State is immutable: every setter call returns a new module instance, leaving
 the original untouched.
 
+ESM only. Requires Node 22+.
+
+## Install
+
+```sh
+pnpm add @avandar/modules
+```
+
+No peer dependencies.
+
 ## Usage
 
 ```ts
@@ -119,10 +129,6 @@ state or accessors.
 | `ModuleFactory<Child>`   | The factory module type produced by `createModuleFactory`                              |
 | `EmptyObject`            | Re-export from `@avandar/utils`; the default state/members shape                        |
 
-## Scripts
+## License
 
-| Command           | Description                  |
-| ----------------- | ---------------------------- |
-| `pnpm test`       | Run all tests once           |
-| `pnpm test:watch` | Run tests in watch mode      |
-| `pnpm type-check` | Run TypeScript type checking |
+MIT

@@ -1,3 +1,4 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -10,7 +11,6 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";

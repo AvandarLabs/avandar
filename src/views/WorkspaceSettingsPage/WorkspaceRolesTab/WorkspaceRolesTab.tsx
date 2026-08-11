@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
@@ -12,14 +13,13 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
-import { propEq } from "@utils";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { partition } from "@/lib/utils/arrays/partition/partition";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type {

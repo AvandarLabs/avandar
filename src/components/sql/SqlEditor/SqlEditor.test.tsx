@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { SqlEditor } from "./SqlEditor";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
@@ -21,7 +21,7 @@ describe("SqlEditor", () => {
   it("renders dataset names as pills while keeping ids in the document", () => {
     const sql = `SELECT * FROM "${DS_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <SqlEditor
           value={sql}
           onChange={() => {}}
@@ -29,7 +29,7 @@ describe("SqlEditor", () => {
           readOnly={true}
           data-testid="sql-editor"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     expect(screen.getByTestId("sql-editor")).toBeInTheDocument();
@@ -39,9 +39,9 @@ describe("SqlEditor", () => {
   it("renders column names as pills in read-only mode", () => {
     const sql = `SELECT "Admin2" FROM "${DS_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <SqlEditor value={sql} onChange={() => {}} catalog={catalog} readOnly />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(screen.getAllByText("Admin2").length).toBeGreaterThan(0);
   });

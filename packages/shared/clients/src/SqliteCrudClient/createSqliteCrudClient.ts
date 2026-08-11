@@ -1,26 +1,24 @@
+import {
+  assertIsDefined,
+  objectEntries,
+  objectKeys,
+  objectValuesMap,
+} from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
-import { objectEntries } from "@utils/objects/objectEntries.ts";
-import { objectKeys } from "@utils/objects/objectKeys.ts";
-import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
-import { callIpc } from "$/platform/ipc/client.ts";
-import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
+import type { ILogger } from "@avandar/logger";
+import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
+import type { SqliteTransport } from "@clients/SqliteCrudClient/SqliteTransport.types.ts";
 import type {
   AnySupabaseCrudModelSpec,
   SupabaseCrudClient,
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
-import type { ILogger } from "@logger/Logger.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-  FilterOperator,
-  FiltersByColumn,
-} from "@utils/filters/filters.ts";
 
 /**
  * SQLite-backed CRUD client for the Electrobun desktop shell. Mirrors
@@ -42,9 +40,9 @@ import type {
  * - Boolean-typed columns come back from bun:sqlite as integer 0/1.
  *
  * @param options - Same shape as `createSupabaseCrudClient`'s options.
- *   `dbClient` is kept because the escape hatches still expect a
- *   Supabase handle and because consumers reach `.getDb()` for ad-hoc
- *   Supabase calls.
+ *   `dbClient` is required because the escape hatches expect a Supabase
+ *   handle and because consumers reach `.getDb()` for ad-hoc Supabase
+ *   calls.
  */
 export function createSqliteCrudClient<
   M extends AnySupabaseCrudModelSpec,
@@ -66,6 +64,12 @@ export function createSqliteCrudClient<
     parsers: ModelCrudParserRegistry<M>;
   }) => ExtendedMutationsClient;
   dbClient: SupabaseClient<RegisteredSupabaseDatabase>;
+
+  /**
+   * How to reach the SQLite database. Injected so this package carries no
+   * dependency on any particular IPC or driver.
+   */
+  sqliteTransport: SqliteTransport;
 }): SupabaseCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const {
     modelName,
@@ -75,6 +79,7 @@ export function createSqliteCrudClient<
     queries,
     mutations,
     dbClient,
+    sqliteTransport,
   } = options;
 
   const pk = String(dbTablePrimaryKey);
@@ -97,7 +102,7 @@ export function createSqliteCrudClient<
         if (params.id === undefined || params.id === null) {
           return undefined;
         }
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
           params: [params.id as unknown],
         });
@@ -106,7 +111,7 @@ export function createSqliteCrudClient<
 
       getCount: async (params) => {
         const { where, params: bindings } = _buildWhereClause(params.where);
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql: `select count(*) as _count from ${table}${where}`,
           params: bindings,
         });
@@ -118,7 +123,7 @@ export function createSqliteCrudClient<
         const { where, params: bindings } = _buildWhereClause(params.where);
         const offset = params.pageNum * params.pageSize;
         const sql = `select * from ${table}${where} limit ? offset ?`;
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql,
           params: [...bindings, params.pageSize, offset],
         });
@@ -135,7 +140,7 @@ export function createSqliteCrudClient<
           upsert: params.upsert ?? false,
           onConflict: params.onConflict,
         });
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql,
           params: cols.map((col) => {
             return row[col];
@@ -183,7 +188,7 @@ export function createSqliteCrudClient<
             return row[col];
           });
         });
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql,
           params: bindings,
         });
@@ -195,7 +200,7 @@ export function createSqliteCrudClient<
         const cols = objectKeys(row);
         if (cols.length === 0) {
           // No-op update; just read the current row back.
-          const { rows } = await callIpc(RdbContracts.query, {
+          const { rows } = await sqliteTransport.query({
             sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
             params: [params.id as unknown],
           });
@@ -209,7 +214,7 @@ export function createSqliteCrudClient<
           })
           .join(", ");
         const sql = `update ${table} set ${setClause} where ${_ident(pk)} = ? returning *`;
-        const { rows } = await callIpc(RdbContracts.query, {
+        const { rows } = await sqliteTransport.query({
           sql,
           params: [
             ...cols.map((col) => {
@@ -224,7 +229,7 @@ export function createSqliteCrudClient<
       },
 
       delete: async (params) => {
-        await callIpc(RdbContracts.run, {
+        await sqliteTransport.run({
           sql: `delete from ${table} where ${_ident(pk)} = ?`,
           params: [params.id as unknown],
         });
@@ -239,7 +244,7 @@ export function createSqliteCrudClient<
             return "?";
           })
           .join(", ");
-        await callIpc(RdbContracts.run, {
+        await sqliteTransport.run({
           sql: `delete from ${table} where ${_ident(pk)} in (${placeholders})`,
           params: params.ids as unknown as unknown[],
         });

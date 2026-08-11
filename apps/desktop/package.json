@@ -13,13 +13,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.98.0",
+    "@supabase/supabase-js": "catalog:",
     "duckdb": "^1.4.4",
     "electrobun": "latest"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vitest": "^3.2.4"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "bun": ">=1.1.0",

@@ -1,5 +1,5 @@
-import type { Module } from "@modules/createModule.ts";
-import type { EmptyObject, UnknownObject } from "@utils/types/common.types.ts";
+import type { Module } from "@avandar/modules";
+import type { EmptyObject, UnknownObject } from "@avandar/utils";
 
 /**
  * The base module type for a client that is used to access a service.

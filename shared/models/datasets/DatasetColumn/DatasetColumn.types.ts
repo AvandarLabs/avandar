@@ -1,5 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";

@@ -1,13 +1,13 @@
+import { Model } from "@avandar/models";
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { makeIdLookupMap, prop, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
-import { Model } from "@models";
-import { makeSelectOptions, Select } from "@ui";
-import { makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import type { SelectProps } from "@ui";
+import type { SelectProps } from "@avandar/ui";
 import type {
   QueryColumnId,
   QueryColumnRead,

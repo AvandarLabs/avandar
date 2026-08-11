@@ -1,0 +1,77 @@
+name: Release @avandar packages
+
+# Publishes the libraries under `packages/` to npm. This does NOT release the
+# Avandar app: the root `package.json` is private and its version is still
+# bumped by hand.
+#
+# Flow:
+#   1. A PR merges to `develop` carrying one or more changesets.
+#   2. This workflow opens (or updates) a "Version Packages" PR that applies
+#      them, bumping every `@avandar/*` package together and writing changelogs.
+#   3. Merging that PR runs this workflow again, finds no pending changesets,
+#      and publishes.
+#
+# Nothing publishes without a human merging the version PR.
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+concurrency:
+  group: release-packages
+  cancel-in-progress: false
+
+env:
+  # Matches the other workflows. See pr-develop.yaml for why this is pinned.
+  NODE_VERSION: 24.15.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write # create the version PR branch and tags
+      pull-requests: write # open the version PR
+      id-token: write # npm provenance attestation
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Changesets needs history to work out what changed.
+          fetch-depth: 0
+
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+          registry-url: "https://registry.npmjs.org"
+
+      - run: pnpm install --frozen-lockfile
+
+      # Gate: never publish something that does not type-check, test, build,
+      # and validate as a real tarball.
+      - run: pnpm type-check
+      - run: pnpm --filter "./packages/**" test
+      - name: Verify publishable packages
+        run: pnpm verify:packages
+
+      - name: Create version PR or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # Applies pending changesets and opens the version PR.
+          version: pnpm changeset:version
+          # Runs only when no changesets are pending, i.e. the version PR has
+          # been merged. Builds every package, then publishes.
+          publish: pnpm release
+          title: "Release: @avandar packages"
+          commit: "Release: @avandar packages [skip deploy]"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Signs published tarballs so npm shows a verified provenance link
+          # back to this workflow run.
+          NPM_CONFIG_PROVENANCE: "true"

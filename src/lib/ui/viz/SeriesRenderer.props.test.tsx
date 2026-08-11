@@ -9,7 +9,7 @@
  * "changing a config setting updates what the chart renders".
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
@@ -69,7 +69,7 @@ beforeEach(() => {
 
 function renderBar(config: BarChartVizConfig): void {
   render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <BarChart
         data={DATA}
         height={400}
@@ -79,13 +79,13 @@ function renderBar(config: BarChartVizConfig): void {
         withLegend={config.withLegend}
         chartStyle={config.chartStyle}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
 }
 
 function renderLine(config: LineChartVizConfig): void {
   render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <LineChart
         data={DATA}
         height={400}
@@ -94,13 +94,13 @@ function renderLine(config: LineChartVizConfig): void {
         withLegend={config.withLegend}
         chartStyle={config.chartStyle}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
 }
 
 function renderRadar(config: RadarChartVizConfig): void {
   render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <RadarChart
         data={DATA}
         nameKey={config.nameKey ?? "x"}
@@ -108,7 +108,7 @@ function renderRadar(config: RadarChartVizConfig): void {
         withLegend={config.withLegend}
         chartStyle={config.chartStyle}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
 }
 

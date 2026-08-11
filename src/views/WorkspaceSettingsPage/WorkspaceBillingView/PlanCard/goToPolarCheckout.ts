@@ -1,4 +1,4 @@
-import { navigateToExternalUrl } from "@browser-utils";
+import { navigateToExternalUrl } from "@avandar/browser-utils";
 import { APIClient } from "@/clients/APIClient";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";

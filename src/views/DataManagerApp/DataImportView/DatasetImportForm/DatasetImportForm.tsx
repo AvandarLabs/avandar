@@ -1,7 +1,7 @@
+import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
-import { Callout, notifyError } from "@ui";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPre
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppConfig } from "@/config/AppConfig";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { notifyError } from "@/utils/notifications/notify";
 import {
   CsvFileLoadResult,
   XlsxFileLoadResult,
@@ -23,7 +24,7 @@ import {
   useSaveDataset,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
-import type { UnknownObject } from "@utils";
+import type { UnknownObject } from "@avandar/utils";
 
 export type DatasetImportFormValues = {
   name: string;

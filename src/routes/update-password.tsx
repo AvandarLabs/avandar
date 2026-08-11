@@ -1,4 +1,4 @@
-import { useMutation } from "@hooks";
+import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Loader, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";

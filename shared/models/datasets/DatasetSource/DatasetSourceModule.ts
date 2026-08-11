@@ -1,5 +1,5 @@
-import { Model } from "@models/Model/Model.ts";
-import { registry } from "@utils/objects/registry/registry.ts";
+import { Model } from "@avandar/models";
+import { registry } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type {
   CanBeOfflineOnlyDatasetSourceModel,

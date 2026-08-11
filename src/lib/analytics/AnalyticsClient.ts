@@ -1,16 +1,16 @@
-import { createServiceClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { withLogger } from "@logger";
-import { objectKeys } from "@utils";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { objectKeys } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type {
   AnalyticsApp,
   AnalyticsEventName,
   AnalyticsEventPayload,
 } from "@/lib/analytics/analyticsEventTypes";
-import type { ServiceClient } from "@clients";
-import type { WithQueryHooks } from "@hooks";
-import type { WithLogger } from "@logger";
+import type { ServiceClient } from "@avandar/clients";
+import type { WithLogger } from "@avandar/logger";
+import type { WithQueryHooks } from "@avandar/query-hooks";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type LogEventOptions = {

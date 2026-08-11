@@ -7,6 +7,30 @@ into any project.
 Runtime dependencies are kept minimal — small, well-maintained libraries
 are used only when reimplementing them would be impractical.
 
+ESM only. Requires Node 22+.
+
+## Install
+
+```sh
+pnpm add @avandar/utils
+```
+
+`zod` is an optional peer dependency, needed only if you import
+`@avandar/utils/zod`.
+
+## Entry points
+
+| Entry                    | Contents                                        |
+| ------------------------ | ----------------------------------------------- |
+| `@avandar/utils`         | The general-purpose utilities                    |
+| `@avandar/utils/encoding`| Base64 / byte-array helpers                      |
+| `@avandar/utils/sql`     | SQL identifier and literal helpers               |
+| `@avandar/utils/zod`     | `ZodSchemaEqualsTypes`, a zod schema type-test    |
+
+The zod helper lives behind its own entry so the core entry carries no zod
+dependency: a top-level zod import in the published types would break every
+consumer that does not use zod.
+
 ## Usage
 
 All utilities are exported from the package root:
@@ -295,13 +319,6 @@ Re-exported for use in `*.test-d.ts` / `*.types.test.ts` files.
 | `Expect<T extends true>`| Type-level assertion                                     |
 | `ZodSchemaEqualsTypes`  | Asserts a Zod schema matches the given input/output types |
 
-## Scripts
-
-| Command           | Description                  |
-| ----------------- | ---------------------------- |
-| `pnpm test`       | Run all tests once           |
-| `pnpm test:watch` | Run tests in watch mode      |
-| `pnpm type-check` | Run TypeScript type checking |
 
 ## Dependencies
 
@@ -316,3 +333,7 @@ Re-exported for use in `*.test-d.ts` / `*.types.test.ts` files.
 - **vitest** &mdash; test runner
 - **typescript** &mdash; type checking
 - **zod** &mdash; used only in type-level test utilities
+
+## License
+
+MIT

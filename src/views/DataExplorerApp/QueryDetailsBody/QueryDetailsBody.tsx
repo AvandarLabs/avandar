@@ -1,5 +1,5 @@
+import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Tabs } from "@ui";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
 import css from "./QueryDetailsBody.module.css";

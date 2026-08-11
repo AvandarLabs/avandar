@@ -1,11 +1,13 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  isBoolean,
+  isDate,
+  isISODateString,
+  isNullish,
+  isNumber,
+  isString,
+} from "@avandar/utils";
 import { Text } from "@mantine/core";
-import { isBoolean } from "@utils/guards/isBoolean/isBoolean";
-import { isDate } from "@utils/guards/isDate/isDate";
-import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
-import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { isNumber } from "@utils/guards/isNumber/isNumber";
-import { isString } from "@utils/guards/isString/isString";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { match } from "ts-pattern";
 import { isStringOrNumber } from "../guards";
 import { BooleanValueItem } from "./BooleanValueItem";
@@ -66,12 +68,12 @@ export function PrimitiveValueItem<
   dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
   dateTimeZone = "local",
 }: Props<T, RootData>): JSX.Element {
-  const { t } = useLingui();
-  const resolvedRenderEmptyString = renderEmptyString ?? t`Empty text`;
-  const resolvedRenderBooleanTrue = renderBooleanTrue ?? t`Yes`;
-  const resolvedRenderBooleanFalse = renderBooleanFalse ?? t`No`;
-  const resolvedRenderNullString = renderNullString ?? t`No value`;
-  const resolvedRenderUndefinedString = renderUndefinedString ?? t`No value`;
+  const i18n = useI18nMessages();
+  const resolvedRenderEmptyString = renderEmptyString ?? i18n.emptyText;
+  const resolvedRenderBooleanTrue = renderBooleanTrue ?? i18n.yes;
+  const resolvedRenderBooleanFalse = renderBooleanFalse ?? i18n.no;
+  const resolvedRenderNullString = renderNullString ?? i18n.noValue;
+  const resolvedRenderUndefinedString = renderUndefinedString ?? i18n.noValue;
   // if we are in display mode and there is a `renderValue` function, then
   // we use that instead
   if (!editMode && renderValue !== undefined) {
@@ -159,7 +161,7 @@ export function PrimitiveValueItem<
         if (isBoolean(value)) {
           return (
             <Text span fs="italic">
-              <Trans>Invalid date</Trans>
+              {i18n.invalidDate}
             </Text>
           );
         }

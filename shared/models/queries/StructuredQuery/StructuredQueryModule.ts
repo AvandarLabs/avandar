@@ -1,7 +1,7 @@
-import { Model } from "@models/Model/Model.ts";
+import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import { toRawDuckDBQuery } from "$/models/queries/StructuredQuery/toRawDuckDBQuery.ts";
+import { toRawDuckDbQuery } from "$/models/queries/StructuredQuery/toRawDuckDbQuery.ts";
 import type {
   PartialStructuredQuery,
   StructuredQueryId,
@@ -26,7 +26,7 @@ export const StructuredQueryModule = {
     } as const);
   },
 
-  toRawDuckDBQuery: (query: StructuredQueryRead): string => {
-    return toRawDuckDBQuery(query);
+  toRawDuckDbQuery: (query: StructuredQueryRead): string => {
+    return toRawDuckDbQuery(query);
   },
 };

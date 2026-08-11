@@ -1,7 +1,7 @@
 import { useLocalRuntime } from "@assistant-ui/react";
+import { Model } from "@avandar/models";
+import { isNotNull, matchLiteral, prop, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Model } from "@models";
-import { isNotNull, matchLiteral, prop, propEq } from "@utils";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useEffect, useMemo, useRef } from "react";
 import { APIClient } from "@/clients/APIClient";

@@ -1,8 +1,8 @@
+import { MIMEType } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
-import { MIMEType } from "@utils";
 import classes from "./AppDropzone.module.css";
 import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 import type { ReactNode } from "react";

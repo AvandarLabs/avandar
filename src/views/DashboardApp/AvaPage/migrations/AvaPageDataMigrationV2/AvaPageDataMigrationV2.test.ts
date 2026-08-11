@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import { beforeAll, describe, expect, it } from "vitest";
 import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";

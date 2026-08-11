@@ -1,6 +1,12 @@
-import { useQuery } from "@hooks";
+import { useQuery } from "@avandar/query-hooks";
+import {
+  assertIsDefined,
+  isNullish,
+  promiseMap,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import { modals } from "@mantine/modals";
-import { assertIsDefined, isNullish, promiseMap, prop, propEq } from "@utils";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

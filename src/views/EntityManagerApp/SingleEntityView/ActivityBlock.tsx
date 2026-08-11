@@ -10,7 +10,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { notifyNotImplemented } from "@ui";
+import { notifyNotImplemented } from "@/utils/notifications/notifyNotImplemented";
 
 export function ActivityBlock(): JSX.Element {
   const { t } = useLingui();

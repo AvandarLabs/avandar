@@ -1,4 +1,9 @@
-import { isNonNullish, makeObjectFromEntries, prop, propEq } from "@utils";
+import {
+  isNonNullish,
+  makeObjectFromEntries,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { z } from "zod";
 import type {

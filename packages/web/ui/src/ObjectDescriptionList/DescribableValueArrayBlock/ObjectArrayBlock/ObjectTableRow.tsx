@@ -1,7 +1,7 @@
-import { useBoolean } from "@hooks/useBoolean/useBoolean";
-import { Trans } from "@lingui/react/macro";
+import { useBoolean } from "@avandar/hooks";
+import { StringKeyOf } from "@avandar/utils";
 import { Button, Group, Table } from "@mantine/core";
-import { StringKeyOf } from "@utils/types/utilities.types";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useState } from "react";
 import { EditButton } from "../../../buttons/EditButton";
 import { ValueItemContainer } from "../../ValueItemContainer";
@@ -39,6 +39,7 @@ export function ObjectTableRow<
   itemRenderOptions,
   onSubmitChange,
 }: Props<T, RootData>): JSX.Element {
+  const i18n = useI18nMessages();
   const [isEditing, startEditMode, endEditMode] = useBoolean(false);
   const [editedObjectValue, setEditedObjectValue] = useState<T>(rowObject);
 
@@ -60,7 +61,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    <Trans>Save</Trans>
+                    {i18n.save}
                   </Button>
                   <Button
                     size="compact-sm"
@@ -71,7 +72,7 @@ export function ObjectTableRow<
                       endEditMode();
                     }}
                   >
-                    <Trans>Cancel</Trans>
+                    {i18n.cancel}
                   </Button>
                 </Group>
               </Table.Td>

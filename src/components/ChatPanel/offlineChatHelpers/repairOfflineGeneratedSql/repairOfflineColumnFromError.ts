@@ -1,4 +1,4 @@
-import { isDefined } from "@utils";
+import { isDefined } from "@avandar/utils";
 import Fuse from "fuse.js";
 import type {
   OfflineChatSchema,

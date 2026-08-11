@@ -3,7 +3,7 @@ import type {
   ClarificationResponseShapeLabels,
 } from "./ClarificationAuditEntry.constants";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
-import type { UUID } from "@utils/types/common.types";
+import type { UUID } from "@avandar/utils";
 
 /** Branded identifier for a local clarification audit record. */
 export type ClarificationAuditEntryId = UUID<"ClarificationAuditEntry">;

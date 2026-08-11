@@ -2,12 +2,26 @@
   "name": "@avandar/hooks",
   "version": "0.1.0",
   "description": "React hooks for the Avandar web app",
-  "license": "CPAL-1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/web/hooks"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/web/hooks#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
@@ -18,12 +32,22 @@
   "devDependencies": {
     "@testing-library/react": "^16.3.0",
     "jsdom": "^26.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typescript": "~5.9.3",
-    "vitest": "^3.2.4"
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   }
 }

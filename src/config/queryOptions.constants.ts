@@ -1,4 +1,4 @@
-import type { UseQueryOptions } from "@hooks";
+import type { UseQueryOptions } from "@avandar/query-hooks";
 
 /**
  * A `useQuery` option preset, refining the global policy in `AvaQueryClient`:

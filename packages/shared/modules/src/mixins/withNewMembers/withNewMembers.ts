@@ -1,4 +1,4 @@
-import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { UnknownObject } from "@avandar/utils";
 
 /**
  * A mixin to add new members to a module.

@@ -14,8 +14,8 @@
  * (FROM/JOIN), and `parseFilterClauses` (WHERE/HAVING), plus a few small
  * private column/result helpers below.
  */
-import { Model } from "@models/Model/Model.ts";
-import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
+import { Model } from "@avandar/models";
+import { propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import {

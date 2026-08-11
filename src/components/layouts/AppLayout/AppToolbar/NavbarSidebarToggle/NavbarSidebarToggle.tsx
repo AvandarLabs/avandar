@@ -1,10 +1,10 @@
+import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 
 /**

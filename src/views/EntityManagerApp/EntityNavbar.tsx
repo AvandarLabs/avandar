@@ -1,3 +1,5 @@
+import { NavLinkList } from "@avandar/ui";
+import { constant, prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   BoxProps,
@@ -9,8 +11,6 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { NavLinkList } from "@ui";
-import { constant, prop, where } from "@utils";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";

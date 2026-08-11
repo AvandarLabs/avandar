@@ -1,6 +1,6 @@
+import { Modal, Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
-import { Modal, Tabs } from "@ui";
 import { useState } from "react";
 import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";

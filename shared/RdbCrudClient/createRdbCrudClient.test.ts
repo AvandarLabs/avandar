@@ -1,5 +1,7 @@
-import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
-import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+import {
+  createSqliteCrudClient,
+  createSupabaseCrudClient,
+} from "@avandar/clients";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -32,16 +34,16 @@ vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   };
 });
 
-vi.mock("@clients/SupabaseCrudClient/createSupabaseCrudClient.ts", () => {
+vi.mock("@avandar/clients", async () => {
+  const actual =
+    await vi.importActual<typeof import("@avandar/clients")>(
+      "@avandar/clients",
+    );
   return {
+    ...actual,
     createSupabaseCrudClient: vi.fn(() => {
       return { __backend: "supabase" };
     }),
-  };
-});
-
-vi.mock("@clients/SqliteCrudClient/createSqliteCrudClient.ts", () => {
-  return {
     createSqliteCrudClient: vi.fn(() => {
       return { __backend: "sqlite" };
     }),

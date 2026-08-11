@@ -1,5 +1,5 @@
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { DuckDBSpatialExtensionDocumentation } from "@sbfn/queries/DuckDBSpatialExtensionDocumentation.ts";
+import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
 import { z } from "zod";
 import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types.ts";
@@ -91,7 +91,7 @@ ${
   isSpatialPrompt ?
     `Reference documentation:
 If the query requires any geospatial operations, refer to the following document:
-${DuckDBSpatialExtensionDocumentation}`
+${DuckDbSpatialExtensionDocumentation}`
   : ""
 }`;
 

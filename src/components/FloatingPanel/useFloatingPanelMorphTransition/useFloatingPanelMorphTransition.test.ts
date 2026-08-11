@@ -1,4 +1,4 @@
-import { makeArrayWithLength } from "@utils/arrays/makeArrayWithLength/makeArrayWithLength";
+import { makeArrayWithLength } from "@avandar/utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { useFloatingPanelMorphTransition } from "./useFloatingPanelMorphTransition";

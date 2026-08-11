@@ -1,4 +1,4 @@
-import { Model } from "@models/Model/Model.ts";
+import { Model } from "@avandar/models";
 import { AppConfig } from "$/config/AppConfig.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 

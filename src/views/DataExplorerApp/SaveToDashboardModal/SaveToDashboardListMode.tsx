@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
@@ -13,7 +14,6 @@ import {
   IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
-import { propEq } from "@utils";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";

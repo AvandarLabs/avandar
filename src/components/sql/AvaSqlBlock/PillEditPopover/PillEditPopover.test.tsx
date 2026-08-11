@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { PillEditPopover } from "./PillEditPopover";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
@@ -41,7 +41,7 @@ describe("PillEditPopover", () => {
     };
     const onSelect = vi.fn();
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <PillEditPopover
           pill={pill}
           catalog={catalog}
@@ -49,7 +49,7 @@ describe("PillEditPopover", () => {
           onClose={() => {}}
           onSelect={onSelect}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     expect(screen.getByText("Cases")).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("PillEditPopover", () => {
     };
     const onSelect = vi.fn();
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <PillEditPopover
           pill={pill}
           catalog={catalog}
@@ -76,7 +76,7 @@ describe("PillEditPopover", () => {
           onClose={() => {}}
           onSelect={onSelect}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     fireEvent.click(screen.getByText("Orders"));
@@ -95,7 +95,7 @@ describe("PillEditPopover", () => {
       anchorRect: makeRect(),
     };
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <PillEditPopover
           pill={pill}
           catalog={catalog}
@@ -103,7 +103,7 @@ describe("PillEditPopover", () => {
           onClose={() => {}}
           onSelect={() => {}}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     // Cases columns are in-scope.
     expect(screen.getByText("Admin2")).toBeInTheDocument();
@@ -126,7 +126,7 @@ describe("PillEditPopover", () => {
     };
     const onSelect = vi.fn();
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <PillEditPopover
           pill={pill}
           catalog={catalog}
@@ -134,7 +134,7 @@ describe("PillEditPopover", () => {
           onClose={() => {}}
           onSelect={onSelect}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     fireEvent.click(screen.getByText("count"));
@@ -143,7 +143,7 @@ describe("PillEditPopover", () => {
 
   it("returns null when there is no active pill", () => {
     const { container } = render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <PillEditPopover
           pill={null}
           catalog={catalog}
@@ -151,7 +151,7 @@ describe("PillEditPopover", () => {
           onClose={() => {}}
           onSelect={() => {}}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(
       container.querySelector("[data-testid='ava-sql-pill-popover-anchor']"),

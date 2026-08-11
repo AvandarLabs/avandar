@@ -1,4 +1,4 @@
-import { constant } from "@utils/misc/constant/constant.ts";
+import { constant } from "@avandar/utils";
 import { QUERY_AGGREGATION_TYPES } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import { match } from "ts-pattern";
 import type {

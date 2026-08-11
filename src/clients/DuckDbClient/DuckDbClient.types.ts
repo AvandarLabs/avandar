@@ -1,4 +1,4 @@
-import type { UUID } from "@utils";
+import type { UUID } from "@avandar/utils";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 

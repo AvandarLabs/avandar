@@ -1,6 +1,6 @@
-import { isEpochMs, isISODateString, prop } from "@utils";
+import { isEpochMs, isISODateString, prop } from "@avandar/utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 /**

@@ -1,4 +1,4 @@
-import { useToggleBoolean } from "@hooks";
+import { useToggleBoolean } from "@avandar/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";

@@ -1,4 +1,4 @@
-import { ensureLocalStoragePersistence } from "@browser-utils";
+import { ensureLocalStoragePersistence } from "@avandar/browser-utils";
 import { useEffect } from "react";
 
 /**

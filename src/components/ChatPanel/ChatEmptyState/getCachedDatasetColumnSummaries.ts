@@ -1,4 +1,4 @@
-import { isDefined, makeMap } from "@utils";
+import { isDefined, makeMap } from "@avandar/utils";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import type {

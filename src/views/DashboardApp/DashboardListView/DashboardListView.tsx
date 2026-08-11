@@ -1,3 +1,6 @@
+import { Model } from "@avandar/models";
+import { Paper } from "@avandar/ui";
+import { prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
@@ -7,11 +10,8 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { Model } from "@models";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert, Paper } from "@ui";
-import { prop, where } from "@utils";
 import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo } from "react";
@@ -22,6 +22,7 @@ import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
+import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { UserId } from "$/models/User/User.types";

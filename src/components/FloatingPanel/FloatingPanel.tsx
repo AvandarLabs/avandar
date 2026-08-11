@@ -1,3 +1,4 @@
+import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -14,7 +15,6 @@ import {
   IconGripVertical,
   IconX,
 } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { useCallback, useRef } from "react";
 import { ANIMATION_PRESET, FLOATING_PANEL_Z_INDEX } from "@/config/Theme";

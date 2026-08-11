@@ -1,7 +1,7 @@
+import { Paper } from "@avandar/ui";
+import { formatNumber } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Divider, Stack, Text } from "@mantine/core";
-import { Paper } from "@ui";
-import { formatNumber } from "@utils";
 import { match } from "ts-pattern";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";

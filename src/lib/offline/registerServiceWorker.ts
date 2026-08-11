@@ -1,5 +1,5 @@
-import { notifyWarning } from "@ui";
 import { registerSW } from "virtual:pwa-register";
+import { notifyWarning } from "@/utils/notifications/notify";
 
 /**
  * Registers the PWA service worker in production builds and notifies the

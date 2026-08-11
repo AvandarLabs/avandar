@@ -1,5 +1,5 @@
+import { isDefined, propEq } from "@avandar/utils";
 import { Combobox, useCombobox } from "@mantine/core";
-import { isDefined, propEq } from "@utils";
 import { useEffect, useRef } from "react";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import css from "./PillEditPopover.module.css";

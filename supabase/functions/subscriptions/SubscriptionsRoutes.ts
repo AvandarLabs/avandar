@@ -1,3 +1,4 @@
+import { assertIsNonNullish } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -7,7 +8,6 @@ import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].se
 import { CreateFreeSubscription } from "@sbfn/subscriptions/create-free.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
-import { assertIsNonNullish } from "@utils/asserts/assertIsNonNullish/assertIsNonNullish.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";

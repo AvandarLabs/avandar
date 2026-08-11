@@ -1,4 +1,4 @@
-import type { FormattableTimezone, UnknownDataFrame } from "@utils";
+import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
 

@@ -2,14 +2,14 @@ import {
   createModelCrudClient,
   ModelCrudParserRegistry,
   UpsertOptions,
-} from "@clients";
+} from "@avandar/clients";
 import {
   assertIsDefined,
   isDefined,
   isEmptyFiltersObject,
   promiseMapSequential,
   promiseReduce,
-} from "@utils";
+} from "@avandar/utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import {
@@ -17,9 +17,12 @@ import {
   findFirstConflictingRowByIndexedColumns,
 } from "@/clients/dexie/dexieFilteredCollection";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
-import type { ClientReturningOnlyPromises, ModelCrudClient } from "@clients";
-import type { ILogger } from "@logger";
-import type { EmptyObject, FiltersByColumn } from "@utils";
+import type {
+  ClientReturningOnlyPromises,
+  ModelCrudClient,
+} from "@avandar/clients";
+import type { ILogger } from "@avandar/logger";
+import type { EmptyObject, FiltersByColumn } from "@avandar/utils";
 import type {
   IDType,
   IndexableType,

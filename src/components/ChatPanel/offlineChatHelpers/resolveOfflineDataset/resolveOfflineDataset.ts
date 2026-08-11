@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import { fuzzyMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
 import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offlineChatHelpers/OfflineDatasetLabelMatch";

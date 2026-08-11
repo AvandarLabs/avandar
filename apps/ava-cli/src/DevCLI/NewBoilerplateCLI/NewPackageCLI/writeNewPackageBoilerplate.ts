@@ -79,6 +79,7 @@ export function writeNewPackageBoilerplate(options: {
   });
 
   const alias = `@${packageName}`;
+  const packageImportName = `@avandar/${packageName}`;
   const pkgSrcDir = `packages/${packageType}/${packageName}/src`;
   const packageDir = `./packages/${packageType}/${packageName}`;
 
@@ -89,14 +90,26 @@ export function writeNewPackageBoilerplate(options: {
   _addTsconfigAppInclude(`./${pkgSrcDir}`);
 
   if (packageType === "shared") {
+    // Two Deno mappings per package. The `@name/` prefix resolves the
+    // package's own internal deep imports; the bare `@avandar/name` resolves
+    // the published package name that consumers outside the package use.
+    // Deno has no pnpm workspace links, so both must point at source.
     _addDenoImportAlias({
       alias: `${alias}/`,
       aliasTarget: `./${pkgSrcDir}/`,
+    });
+    _addDenoImportAlias({
+      alias: packageImportName,
+      aliasTarget: `./${pkgSrcDir}/index.ts`,
     });
     _addDenoWorkspaceEntry(packageDir);
     _addEdgeFunctionTemplateImportAlias({
       alias: `${alias}/`,
       aliasTarget: `../../../${pkgSrcDir}/`,
+    });
+    _addEdgeFunctionTemplateImportAlias({
+      alias: packageImportName,
+      aliasTarget: `../../../${pkgSrcDir}/index.ts`,
     });
     _addVscodeDenoEnablePath(packageDir);
   }

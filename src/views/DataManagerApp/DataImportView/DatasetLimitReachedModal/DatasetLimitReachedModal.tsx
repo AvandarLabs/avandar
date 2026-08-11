@@ -1,6 +1,6 @@
+import { matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Modal, Stack, Text } from "@mantine/core";
-import { matchLiteral } from "@utils";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 

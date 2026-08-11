@@ -1,6 +1,6 @@
 import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig";
 

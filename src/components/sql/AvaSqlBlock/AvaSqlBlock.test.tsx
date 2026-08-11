@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { AvaSqlBlock } from "./AvaSqlBlock";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
@@ -22,14 +22,14 @@ describe("AvaSqlBlock readOnly", () => {
     const sql = `SELECT "Admin2", "count" FROM "${DATASET_ID}"`;
 
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={catalog}
           readOnly
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     const root = screen.getByTestId("block");
@@ -48,14 +48,14 @@ describe("AvaSqlBlock readOnly", () => {
   it("renders plain text segments between pills", () => {
     const sql = `SELECT "count" FROM "${DATASET_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={catalog}
           readOnly
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     const root = screen.getByTestId("block");
@@ -66,7 +66,7 @@ describe("AvaSqlBlock readOnly", () => {
   it("renders out-of-scope column pills as errors with an inline notice", () => {
     const sql = `SELECT "count" FROM "${DATASET_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={catalog}
@@ -74,7 +74,7 @@ describe("AvaSqlBlock readOnly", () => {
           outOfScopeColumns={["count"]}
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     const root = screen.getByTestId("block");
     expect(root.querySelectorAll(".sqlPill--error").length).toBe(1);
@@ -83,9 +83,9 @@ describe("AvaSqlBlock readOnly", () => {
 
   it("renders empty SQL without crashing", () => {
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock value="" catalog={catalog} readOnly data-testid="block" />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(screen.getByTestId("block")).toBeInTheDocument();
   });
@@ -96,14 +96,14 @@ describe("AvaSqlBlock editable", () => {
     const sql = `SELECT "Admin2" FROM "${DATASET_ID}"`;
 
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={catalog}
           onChange={() => {}}
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     const root = screen.getByTestId("block");
@@ -113,14 +113,14 @@ describe("AvaSqlBlock editable", () => {
   it("renders pills with the editable modifier and a chevron in edit mode", () => {
     const sql = `SELECT "Admin2" FROM "${DATASET_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={catalog}
           onChange={() => {}}
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     const editablePills = document.querySelectorAll(".sqlPill--editable");
     expect(editablePills.length).toBeGreaterThanOrEqual(2);
@@ -142,14 +142,14 @@ describe("AvaSqlBlock editable", () => {
     };
     const sql = `SELECT "order_id" FROM "${DATASET_ID}"`;
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <AvaSqlBlock
           value={sql}
           catalog={broadCatalog}
           onChange={() => {}}
           data-testid="block"
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(screen.getByTestId("ava-sql-out-of-scope")).toBeInTheDocument();
   });

@@ -1,5 +1,5 @@
 import type { SegmentedControlItem } from "./SegmentedControl";
-import type { UnknownObject } from "@utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { ReactNode } from "react";
 
 /**

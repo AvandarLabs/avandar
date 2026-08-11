@@ -1,4 +1,4 @@
-import { isNonNullish } from "@utils";
+import { isNonNullish } from "@avandar/utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**

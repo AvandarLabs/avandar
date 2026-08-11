@@ -1,0 +1,53 @@
+{
+  "name": "@avandar/etl",
+  "version": "0.1.0",
+  "description": "Avandar ETL library",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/node/etl"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/node/etl#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@avandar/modules": "workspace:*",
+    "@avandar/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "catalog:",
+    "duckdb": "^1.4.4",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "duckdb": "^1.4.4"
+  }
+}

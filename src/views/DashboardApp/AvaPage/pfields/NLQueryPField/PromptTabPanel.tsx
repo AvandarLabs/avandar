@@ -1,6 +1,6 @@
+import { TextareaForm } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-import { TextareaForm } from "@ui";
 import type { ReactElement } from "react";
 
 type Props = {

@@ -31,8 +31,8 @@
       "@sbfn/*": ["./supabase/functions/*"],
 
       /* Packages */
-      "@ava-etl": ["./packages/node/ava-etl/src/index.ts"],
-      "@ava-etl/*": ["./packages/node/ava-etl/src/*"],
+      "@etl": ["./packages/node/etl/src/index.ts"],
+      "@etl/*": ["./packages/node/etl/src/*"],
       "@clients": ["./packages/shared/clients/src/index.ts"],
       "@clients/*": ["./packages/shared/clients/src/*"],
       "@logger": ["./packages/shared/logger/src/index.ts"],
@@ -47,6 +47,8 @@
       "@ui/*": ["./packages/web/ui/src/*"],
       "@hooks": ["./packages/web/hooks/src/index.ts"],
       "@hooks/*": ["./packages/web/hooks/src/*"],
+      "@query-hooks": ["./packages/web/query-hooks/src/index.ts"],
+      "@query-hooks/*": ["./packages/web/query-hooks/src/*"],
       "@browser-utils": ["./packages/web/browser-utils/src/index.ts"],
       "@browser-utils/*": ["./packages/web/browser-utils/src/*"],
 

@@ -1,4 +1,4 @@
-import { where } from "@utils";
+import { where } from "@avandar/utils";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useCallback } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

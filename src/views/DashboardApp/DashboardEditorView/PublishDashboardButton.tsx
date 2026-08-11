@@ -1,10 +1,11 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
-import { notifyError, Tooltip } from "@ui";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { notifyError } from "@/utils/notifications/notify";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

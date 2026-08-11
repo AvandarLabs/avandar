@@ -1,6 +1,6 @@
+import { propNotEq } from "@avandar/utils";
 import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { validateDashboardSlug } from "@sbfn/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts";
-import { propNotEq } from "@utils/index.ts";
 import { z } from "zod";
 import type { DashboardsApi } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts";
 

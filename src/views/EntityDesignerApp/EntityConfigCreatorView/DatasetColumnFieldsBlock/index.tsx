@@ -1,3 +1,9 @@
+import {
+  Callout,
+  makeSegmentedControlItems,
+  SegmentedControl,
+} from "@avandar/ui";
+import { identity, makeObject, prop, propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -15,8 +21,6 @@ import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
-import { Callout, makeSegmentedControlItems, SegmentedControl } from "@ui";
-import { identity, makeObject, prop, propEq } from "@utils";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

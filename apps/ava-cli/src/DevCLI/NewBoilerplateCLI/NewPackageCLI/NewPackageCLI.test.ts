@@ -215,16 +215,29 @@ describe("writeNewPackageBoilerplate", () => {
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
-    const denoWrite = writeMock.mock.calls.find((c: unknown[]) => {
+    const denoWrites = writeMock.mock.calls.filter((c: unknown[]) => {
       return typeof c[0] === "string" && c[0].endsWith("deno.json");
-    }) as [string, string, string] | undefined;
+    }) as Array<[string, string, string]>;
 
-    expect(denoWrite).toBeDefined();
+    expect(denoWrites.length).toBeGreaterThan(0);
 
-    const written = JSON.parse(denoWrite![1]) as {
-      imports: Record<string, string>;
-    };
-    expect(written.imports["@my-lib/"]).toBe("./packages/shared/my-lib/src/");
+    // Each writer re-reads the same fixture, so no single write holds every
+    // edit. Merge the imports across all of them to see the net result.
+    const imports = Object.assign(
+      {},
+      ...denoWrites.map((c) => {
+        return (JSON.parse(c[1]) as { imports?: Record<string, string> })
+          .imports;
+      }),
+    ) as Record<string, string>;
+
+    expect(imports["@my-lib/"]).toBe("./packages/shared/my-lib/src/");
+
+    // The published package name must resolve too, so edge functions can
+    // import the barrel the same way the rest of the repo does.
+    expect(imports["@avandar/my-lib"]).toBe(
+      "./packages/shared/my-lib/src/index.ts",
+    );
   });
 
   it(
@@ -297,19 +310,25 @@ describe("writeNewPackageBoilerplate", () => {
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
-    const templateWrite = writeMock.mock.calls.find((c: unknown[]) => {
+    const templateWrites = writeMock.mock.calls.filter((c: unknown[]) => {
       return (
         typeof c[0] === "string" && c[0].endsWith("deno.json.template.txt")
       );
-    }) as [string, string, string] | undefined;
+    }) as Array<[string, string, string]>;
 
-    expect(templateWrite).toBeDefined();
+    expect(templateWrites.length).toBeGreaterThan(0);
 
-    const written = JSON.parse(templateWrite![1]) as {
-      imports: Record<string, string>;
-    };
-    expect(written.imports["@my-lib/"]).toBe(
-      "../../../packages/shared/my-lib/src/",
+    const imports = Object.assign(
+      {},
+      ...templateWrites.map((c) => {
+        return (JSON.parse(c[1]) as { imports?: Record<string, string> })
+          .imports;
+      }),
+    ) as Record<string, string>;
+
+    expect(imports["@my-lib/"]).toBe("../../../packages/shared/my-lib/src/");
+    expect(imports["@avandar/my-lib"]).toBe(
+      "../../../packages/shared/my-lib/src/index.ts",
     );
   });
 

@@ -1,6 +1,6 @@
+import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-import { propEq } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { FilterableColumn } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";

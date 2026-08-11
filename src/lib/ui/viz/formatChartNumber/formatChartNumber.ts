@@ -1,4 +1,4 @@
-import { formatNumber } from "@utils";
+import { formatNumber } from "@avandar/utils";
 
 /**
  * Format a numeric value for display in a chart. The rules:

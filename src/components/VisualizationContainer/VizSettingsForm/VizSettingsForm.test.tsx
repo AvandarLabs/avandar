@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
 } from "@/test-utils/pickMantineSelectOption";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
   VizConfig,
@@ -43,7 +43,7 @@ function renderForm({
   const cfgMock = onVizConfigChange as ReturnType<typeof vi.fn>;
   const typeMock = onVizTypeChange as ReturnType<typeof vi.fn>;
   const result = render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <VizSettingsForm
         columns={COLUMNS}
         data={DATA}
@@ -51,14 +51,14 @@ function renderForm({
         onVizConfigChange={cfgMock}
         onVizTypeChange={typeMock}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
   return {
     onVizConfigChange: cfgMock,
     onVizTypeChange: typeMock,
     rerenderWith: (nextConfig) => {
       result.rerender(
-        <AvandarUiProvider>
+        <AvandarAppProvider>
           <VizSettingsForm
             columns={COLUMNS}
             data={DATA}
@@ -66,7 +66,7 @@ function renderForm({
             onVizConfigChange={cfgMock}
             onVizTypeChange={typeMock}
           />
-        </AvandarUiProvider>,
+        </AvandarAppProvider>,
       );
     },
   };

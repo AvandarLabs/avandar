@@ -5,7 +5,7 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { makeObjectFromEntries } from "@utils";
+import { makeObjectFromEntries } from "@avandar/utils";
 import {
   DEFAULT_REASONING_EFFORT,
   LOCALES_DIR,

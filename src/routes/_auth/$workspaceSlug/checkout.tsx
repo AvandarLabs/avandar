@@ -1,4 +1,4 @@
-import { useQuery } from "@hooks";
+import { useQuery } from "@avandar/query-hooks";
 import { Trans } from "@lingui/react/macro";
 import {
   Button,
