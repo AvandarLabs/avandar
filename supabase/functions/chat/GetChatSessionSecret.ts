@@ -1,4 +1,4 @@
-import { uint8ToBase64 } from "@avandar/utils/encoding";
+import { uint8ToBase64 } from "@utils/encoding/index.ts";
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
 import { z } from "zod";

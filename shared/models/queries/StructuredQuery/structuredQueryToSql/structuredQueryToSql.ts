@@ -18,7 +18,7 @@ import {
   sortObjList,
   valNotEq,
 } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";

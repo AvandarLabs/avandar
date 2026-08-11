@@ -11,7 +11,7 @@ import {
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
