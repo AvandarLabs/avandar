@@ -51,6 +51,13 @@ type Props<TabId extends string> = {
    * against the active tab (e.g. after a parent modal open animation).
    */
   indicatorRemountKey?: number;
+
+  /**
+   * Content rendered on the trailing edge of the tab list row, beside the
+   * tabs. For hosts whose tab strip doubles as a toolbar, such as a drawer
+   * rail that carries controls scoped to the active tab.
+   */
+  listRightSection?: ReactNode;
 } & Omit<MantineTabsProps, "variant" | "children" | "value" | "onChange">;
 
 /**
@@ -65,6 +72,7 @@ export function Tabs<TabId extends string>({
   value,
   onTabChange,
   indicatorRemountKey = 0,
+  listRightSection,
   classNames: tabsClassNames,
   ...props
 }: Props<TabId>): JSX.Element {
@@ -110,7 +118,11 @@ export function Tabs<TabId extends string>({
         mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        className={clsx(isFloating && classes.list, tabsClassNamesObj?.list)}
+        className={clsx(
+          isFloating && classes.list,
+          listRightSection !== undefined && classes.listWithRightSection,
+          tabsClassNamesObj?.list,
+        )}
         style={
           isFloating ? undefined : (
             {
@@ -154,6 +166,10 @@ export function Tabs<TabId extends string>({
             )
           }
         />
+
+        {listRightSection !== undefined ?
+          <div className={classes.listRightSection}>{listRightSection}</div>
+        : null}
       </MantineTabs.List>
 
       {tabIds.map((tabId) => {

@@ -1,3 +1,4 @@
+import { matchLiteral } from "@avandar/utils";
 import { Fieldset, Stack } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/components/SettingsColumns/SettingsColumns.module.css";
@@ -58,42 +59,48 @@ export function SettingsColumns({
   minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
   className,
 }: Props): ReactNode {
-  if (layout === "stacked") {
-    return (
-      <Stack gap="md" className={className}>
-        {groups.map((group) => {
-          return (
-            <Fieldset key={group.id} legend={group.title}>
-              {group.content}
-            </Fieldset>
-          );
-        })}
-      </Stack>
-    );
-  }
+  const gridStyle: CSSProperties = {
+    ["--settings-columns-min-width" as string]: `${minColumnWidth}px`,
+  };
 
-  const gridStyle = {
-    "--settings-columns-min-width": `${minColumnWidth}px`,
-  } as CSSProperties;
-
-  return (
-    <div className={clsx(css.grid, className)} style={gridStyle}>
-      {groups.map((group) => {
-        return (
-          <div key={group.id} className={css.column}>
-            <Fieldset
-              variant="unstyled"
-              legend={group.title}
-              classNames={{
-                root: css.columnFieldset,
-                legend: css.columnLegend,
-              }}
-            >
-              {group.content}
-            </Fieldset>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return matchLiteral(layout, {
+    stacked: () => {
+      return (
+        <Stack gap="md" className={className}>
+          {groups.map((group) => {
+            return (
+              <Fieldset key={group.id} legend={group.title}>
+                {group.content}
+              </Fieldset>
+            );
+          })}
+        </Stack>
+      );
+    },
+    columns: () => {
+      return (
+        <div
+          className={clsx(css.settingsColumnsGrid, className)}
+          style={gridStyle}
+        >
+          {groups.map((group) => {
+            return (
+              <div key={group.id} className={css.settingsColumnsColumn}>
+                <Fieldset
+                  variant="unstyled"
+                  legend={group.title}
+                  classNames={{
+                    root: css.columnFieldset,
+                    legend: css.columnLegend,
+                  }}
+                >
+                  {group.content}
+                </Fieldset>
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+  });
 }

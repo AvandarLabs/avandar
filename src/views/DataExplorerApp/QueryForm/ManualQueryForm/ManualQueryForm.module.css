@@ -1,15 +1,3 @@
 .fieldsetTranslucent {
   background-color: rgb(255 255 255 / 40%);
 }
-
-.flexFill {
-  flex: 1;
-}
-
-.unstyledButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  text-align: left;
-}

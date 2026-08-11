@@ -1,11 +1,11 @@
 import { makeSelectOptions, Select } from "@avandar/ui";
-import { propPasses } from "@avandar/utils";
+import { isDefined, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { ColorInput, Stack, Switch } from "@mantine/core";
+import { Stack, Switch } from "@mantine/core";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields/SliceColorFields";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
@@ -153,40 +153,24 @@ export function PieChartForm({
         </Stack>
       ),
     },
-    ...(sliceNames.length > 0 ?
-      [
-        {
-          id: "slice-colors",
-          title: t`Slice colors`,
-          content: (
-            <Stack gap="xs">
-              {sliceNames.map((name) => {
-                return (
-                  <ColorInput
-                    key={name}
-                    label={name}
-                    value={config.seriesColors?.[name] ?? ""}
-                    swatches={CHART_COLOR_SWATCHES}
-                    withEyeDropper={false}
-                    format="hex"
-                    onChange={(value) => {
-                      onConfigChange({
-                        ...config,
-                        seriesColors: {
-                          ...config.seriesColors,
-                          [name]: value || undefined,
-                        } as Record<string, string>,
-                      });
-                    }}
-                  />
-                );
-              })}
-            </Stack>
-          ),
-        },
-      ]
-    : []),
-  ];
+    sliceNames.length > 0 ?
+      {
+        id: "slice-colors",
+        title: t`Slice colors`,
+        content: (
+          <SliceColorFields
+            sliceNames={sliceNames}
+            seriesColors={config.seriesColors}
+            onSeriesColorsChange={(
+              nextSeriesColors: Record<string, string>,
+            ) => {
+              onConfigChange({ ...config, seriesColors: nextSeriesColors });
+            }}
+          />
+        ),
+      }
+    : undefined,
+  ].filter(isDefined);
 
   return <SettingsColumns groups={groups} layout={layout} />;
 }

@@ -7,6 +7,8 @@ import {
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
@@ -25,6 +27,7 @@ import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChart
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig";
+import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
@@ -154,7 +157,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
-  const axisLegend = isRadar ? t`Category axis` : t`X axis`;
+  const axisGroup: VizSettingGroup = isRadar ? "Category axis" : "X axis";
+  const axisLegend = vizSettingGroupLabel(axisGroup);
 
   const groupedChartDescriptors = useMemo(() => {
     return makeBucketMap(chartDescriptors, {
@@ -164,11 +168,11 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     });
   }, [chartDescriptors]);
 
-  const axisGroupDescriptors = groupedChartDescriptors.get(axisLegend) ?? [];
+  const axisGroupDescriptors = groupedChartDescriptors.get(axisGroup) ?? [];
   const otherGroupedDescriptors = Array.from(
     groupedChartDescriptors.entries(),
   ).filter(([group]) => {
-    return group !== axisLegend;
+    return group !== axisGroup;
   });
 
   const groups: SettingsColumnGroup[] = [
@@ -257,15 +261,15 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             }}
             fields={fields}
           />
-          {axisGroupDescriptors.map((desc) => {
+          {axisGroupDescriptors.map((descriptor) => {
             return (
               <Control
-                key={desc.key}
-                label={desc.label}
-                spec={desc.control}
-                value={readSetting(config, desc.key)}
+                key={descriptor.key}
+                label={vizSettingControlLabel(descriptor.label)}
+                spec={descriptor.control}
+                value={readSetting(config, descriptor.key)}
                 onChange={(nextValue) => {
-                  updateChartPath(desc.key, nextValue);
+                  updateChartPath(descriptor.key, nextValue);
                 }}
               />
             );
@@ -273,22 +277,23 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
         </Stack>
       ),
     },
-    ...otherGroupedDescriptors.map(([group, descs]) => {
-      const legend = group === "" ? t`Chart settings` : group;
+    ...otherGroupedDescriptors.map(([group, groupDescriptors]) => {
       return {
-        id: legend,
-        title: legend,
+        // The descriptor group is the stable identity; the title is display
+        // copy, so keying on it would remount every column on a locale change.
+        id: group === "" ? "chart-settings" : group,
+        title: group === "" ? t`Chart settings` : vizSettingGroupLabel(group),
         content: (
           <Stack gap="xs">
-            {descs.map((desc) => {
+            {groupDescriptors.map((descriptor) => {
               return (
                 <Control
-                  key={desc.key}
-                  label={desc.label}
-                  spec={desc.control}
-                  value={readSetting(config, desc.key)}
+                  key={descriptor.key}
+                  label={vizSettingControlLabel(descriptor.label)}
+                  spec={descriptor.control}
+                  value={readSetting(config, descriptor.key)}
                   onChange={(nextValue) => {
-                    updateChartPath(desc.key, nextValue);
+                    updateChartPath(descriptor.key, nextValue);
                   }}
                 />
               );

@@ -1,3 +1,4 @@
+import { matchLiteral } from "@avandar/utils";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
 import type { ReactNode } from "react";
@@ -16,8 +17,12 @@ type Props = {
  * whichever AI prompt produced the SQL.
  */
 export function QueryTabPanel({ mode }: Props): ReactNode {
-  if (mode === "sql") {
-    return <SqlQueryView layout="columns" />;
-  }
-  return <ManualQueryForm withinPortal layout="columns" />;
+  return matchLiteral(mode, {
+    sql: () => {
+      return <SqlQueryView layout="columns" />;
+    },
+    manual: () => {
+      return <ManualQueryForm withinPortal layout="columns" />;
+    },
+  });
 }

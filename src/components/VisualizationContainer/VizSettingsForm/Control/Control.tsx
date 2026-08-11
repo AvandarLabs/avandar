@@ -6,6 +6,7 @@ import {
   Switch,
   TextInput,
 } from "@mantine/core";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -71,8 +72,11 @@ export function Control({
         <SegmentedControl
           aria-label={label}
           fullWidth
-          data={spec.options.map((o) => {
-            return { value: o.value, label: o.label };
+          data={spec.options.map((option) => {
+            return {
+              value: option.value,
+              label: vizSettingControlLabel(option.label),
+            };
           })}
           value={typeof value === "string" ? value : ""}
           onChange={(next) => {
@@ -85,8 +89,11 @@ export function Control({
       return (
         <Select
           label={label}
-          data={spec.options.map((o) => {
-            return { value: o.value, label: o.label };
+          data={spec.options.map((option) => {
+            return {
+              value: option.value,
+              label: vizSettingControlLabel(option.label),
+            };
           })}
           value={typeof value === "string" ? value : null}
           onChange={(next) => {

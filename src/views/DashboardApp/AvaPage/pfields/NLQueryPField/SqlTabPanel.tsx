@@ -1,3 +1,5 @@
+import { sqlMappingReasonLabel } from "$/copy/sqlMappingReasonLabel";
+import { sqlMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { mantineColorVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -14,12 +16,13 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import type { ReactElement } from "react";
 
 type Props = {
   rawSql: string;
   isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly string[];
+  sqlSyncWarnings: readonly SqlMappingReason[];
   onSubmitSql: (nextSql: string) => void;
 };
 
@@ -52,7 +55,11 @@ export function SqlTabPanel({
           </Text>
           <List size="xs" spacing={2}>
             {sqlSyncWarnings.map((reason) => {
-              return <List.Item key={reason}>{reason}</List.Item>;
+              return (
+                <List.Item key={sqlMappingReasonKey(reason)}>
+                  {sqlMappingReasonLabel(reason)}
+                </List.Item>
+              );
             })}
           </List>
         </Alert>

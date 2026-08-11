@@ -1,3 +1,4 @@
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { makeObject, prop, setValue } from "@avandar/utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
@@ -213,7 +214,7 @@ export const DataExplorerStateManager = createAppStateManager({
       payload: {
         query: PartialStructuredQuery;
         isFullyMapped: boolean;
-        unmappedReasons: readonly string[];
+        unmappedReasons: readonly SqlMappingReason[];
       },
     ): DataExplorerAppState => {
       return {
@@ -322,7 +323,7 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       payload: {
         isStructuredQueryInSync: boolean;
-        sqlSyncWarnings: readonly string[];
+        sqlSyncWarnings: readonly SqlMappingReason[];
       },
     ): DataExplorerAppState => {
       return {

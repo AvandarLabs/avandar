@@ -1,19 +1,21 @@
+import { isDefined, matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack } from "@mantine/core";
 import { useState } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import {
-  AggregationFields,
-  FilterFields,
-  LimitFields,
-  OverwriteSqlAlert,
-  SortFields,
-  SourceFields,
-} from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFields";
+import { AggregationFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields";
+import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields";
+import { OverwriteSqlAlert } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert";
+import { SortFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields";
+import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields";
+import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import classes from "./ManualQueryForm.module.css";
-import type { SettingsColumnGroup } from "@/components/SettingsColumns/SettingsColumns";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type {
@@ -55,13 +57,6 @@ export type ManualQueryFormHandlers = {
   onSetFilters: (filters: QueryFilterGroup) => void;
 };
 
-/**
- * How the form arranges its field groups. `stacked` is the vertical fieldset
- * layout used by the dashboard editor's narrow settings panel; `columns` lays
- * the groups out side by side for the Data Explorer drawer.
- */
-export type ManualQueryFormLayout = "columns" | "stacked";
-
 type ControlledProps = {
   /**
    * Controlled mode: when omitted, the form reads from the global
@@ -71,7 +66,7 @@ type ControlledProps = {
   isStructuredQueryInSync: boolean;
   handlers: ManualQueryFormHandlers;
   withinPortal?: boolean;
-  layout?: ManualQueryFormLayout;
+  layout?: SettingsColumnsLayout;
 };
 
 type LegacyProps = {
@@ -79,7 +74,7 @@ type LegacyProps = {
   isStructuredQueryInSync?: undefined;
   handlers?: undefined;
   withinPortal?: boolean;
-  layout?: ManualQueryFormLayout;
+  layout?: SettingsColumnsLayout;
 };
 
 type Props = ControlledProps | LegacyProps;
@@ -116,7 +111,7 @@ function DataExplorerManualQueryForm({
   layout,
 }: {
   withinPortal: boolean;
-  layout: ManualQueryFormLayout;
+  layout: SettingsColumnsLayout;
 }): ReactNode {
   const [{ query, isStructuredQueryInSync }, dispatch] =
     DataExplorerStateManager.useContext();
@@ -144,19 +139,21 @@ function DataExplorerManualQueryForm({
   );
 }
 
+type ViewProps = {
+  query: PartialStructuredQuery;
+  isStructuredQueryInSync: boolean;
+  handlers: ManualQueryFormHandlers;
+  withinPortal: boolean;
+  layout: SettingsColumnsLayout;
+};
+
 function ManualQueryFormView({
   query,
   isStructuredQueryInSync,
   handlers,
   withinPortal,
   layout,
-}: {
-  query: PartialStructuredQuery;
-  isStructuredQueryInSync: boolean;
-  handlers: ManualQueryFormHandlers;
-  withinPortal: boolean;
-  layout: ManualQueryFormLayout;
-}): ReactNode {
+}: ViewProps): ReactNode {
   const { t } = useLingui();
   const {
     dataSource,
@@ -175,11 +172,11 @@ function ManualQueryFormView({
   } = useManualQueryDataSourceChange({ query, handlers });
 
   const onFiltersChange = (nextFilters: QueryFilterGroup): void => {
-    if (!isStructuredQueryInSync) {
+    if (isStructuredQueryInSync) {
+      handlers.onSetFilters(nextFilters);
+    } else {
       setPendingChange({ kind: "filter", nextFilter: nextFilters });
-      return;
     }
-    handlers.onSetFilters(nextFilters);
   };
 
   const overwriteAlert =
@@ -219,10 +216,10 @@ function ManualQueryFormView({
   );
 
   const filterFields = (
-    <FilterFields
-      queryColumns={queryColumns}
-      filters={filters}
-      onFiltersChange={onFiltersChange}
+    <QueryFiltersField
+      columns={queryColumns}
+      value={filters}
+      onChange={onFiltersChange}
     />
   );
 
@@ -246,72 +243,76 @@ function ManualQueryFormView({
     />
   );
 
-  if (layout === "columns") {
-    const groups: SettingsColumnGroup[] = [
-      { id: "source", title: t`Source`, content: sourceFields },
-      ...(queryColumns.length > 0 ?
-        [
-          {
-            id: "aggregations",
-            title: t`Aggregations`,
-            content: aggregationFields,
-          },
-        ]
-      : []),
-      { id: "filters", title: t`Filters (Where)`, content: filterFields },
+  const groups: SettingsColumnGroup[] = [
+    { id: "source", title: t`Source`, content: sourceFields },
+    queryColumns.length > 0 ?
       {
-        id: "sort-limit",
-        title: t`Sort & limit`,
-        content: (
-          <>
-            {sortFields}
-            {limitFields}
-          </>
-        ),
-      },
-    ];
-
-    return (
-      <Stack gap={0}>
-        {overwriteAlert}
-        <SettingsColumns groups={groups} layout="columns" />
-      </Stack>
-    );
-  }
-
-  return (
-    <div>
-      <Stack px="sm">
-        {overwriteAlert}
-        {sourceFields}
-
-        {queryColumns.length > 0 ?
-          <Fieldset
-            legend={t`Aggregations`}
-            className={classes.fieldsetTranslucent}
-          >
-            {aggregationFields}
-          </Fieldset>
-        : null}
-
-        <Fieldset
-          legend={t`Filters (Where)`}
-          className={classes.fieldsetTranslucent}
-        >
-          {filterFields}
-        </Fieldset>
-
-        <Fieldset legend={t`Sort by`} className={classes.fieldsetTranslucent}>
+        id: "aggregations",
+        title: t`Aggregations`,
+        content: aggregationFields,
+      }
+    : undefined,
+    { id: "filters", title: t`Filters (Where)`, content: filterFields },
+    {
+      id: "sort-limit",
+      title: t`Sort & limit`,
+      content: (
+        <>
           {sortFields}
-        </Fieldset>
-
-        <Fieldset
-          legend={t`Result size`}
-          className={classes.fieldsetTranslucent}
-        >
           {limitFields}
-        </Fieldset>
-      </Stack>
-    </div>
-  );
+        </>
+      ),
+    },
+  ].filter(isDefined);
+
+  return matchLiteral(layout, {
+    columns: () => {
+      return (
+        <Stack gap={0}>
+          {overwriteAlert}
+          <SettingsColumns groups={groups} layout="columns" />
+        </Stack>
+      );
+    },
+    stacked: () => {
+      return (
+        <div>
+          <Stack px="sm">
+            {overwriteAlert}
+            {sourceFields}
+
+            {queryColumns.length > 0 ?
+              <Fieldset
+                legend={t`Aggregations`}
+                className={classes.fieldsetTranslucent}
+              >
+                {aggregationFields}
+              </Fieldset>
+            : null}
+
+            <Fieldset
+              legend={t`Filters (Where)`}
+              className={classes.fieldsetTranslucent}
+            >
+              {filterFields}
+            </Fieldset>
+
+            <Fieldset
+              legend={t`Sort by`}
+              className={classes.fieldsetTranslucent}
+            >
+              {sortFields}
+            </Fieldset>
+
+            <Fieldset
+              legend={t`Result size`}
+              className={classes.fieldsetTranslucent}
+            >
+              {limitFields}
+            </Fieldset>
+          </Stack>
+        </div>
+      );
+    },
+  });
 }

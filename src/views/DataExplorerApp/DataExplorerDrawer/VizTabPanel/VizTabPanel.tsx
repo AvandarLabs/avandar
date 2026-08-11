@@ -1,17 +1,17 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
-import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
+import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
+import css from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.module.css";
 import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactNode } from "react";
 
 type Props = {
-  columns: readonly QueryResultColumn[];
+  columns: readonly QueryResult.Column[];
   data: UnknownDataFrame;
-  vizConfig: VizConfig;
-  onVizConfigChange: (vizConfig: VizConfig) => void;
+  vizConfig: VizConfig.T;
+  onVizConfigChange: (vizConfig: VizConfig.T) => void;
 };
 
 /**

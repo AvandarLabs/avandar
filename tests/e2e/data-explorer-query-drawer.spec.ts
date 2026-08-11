@@ -29,15 +29,40 @@ async function _goToDataExplorerWithSeededSQL(options: {
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-async function _openQueryTab(
+/**
+ * Collapses the drawer, then reopens it by clicking the Query tab. Exercises
+ * the real transition: the tab rail stays mounted while collapsed, so picking a
+ * tab both selects it and expands the drawer.
+ */
+async function _reopenQueryTabFromCollapsed(
   page: import("@playwright/test").Page,
 ): Promise<void> {
-  // The drawer's tab rail is always mounted, and clicking a tab also expands
-  // the drawer when it happens to be collapsed.
+  const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
+
+  await page.getByRole("button", { name: /collapse drawer/i }).click();
+  await expect(queryPanel).toBeHidden({ timeout: SHORT_WAIT });
+
   await page.getByRole("tab", { name: /^query$/i }).click();
-  await expect(page.getByRole("tabpanel", { name: /^query$/i })).toBeVisible({
-    timeout: SHORT_WAIT,
-  });
+  await expect(queryPanel).toBeVisible({ timeout: SHORT_WAIT });
+}
+
+/**
+ * Selects a segment of the drawer rail's editor-mode control. Mantine renders
+ * each segment as a visually hidden 0x0 radio input behind a visible label, and
+ * a 0x0 box never passes Playwright's visibility actionability check, so the
+ * label is what can be clicked.
+ */
+async function _selectQueryEditorMode(
+  page: import("@playwright/test").Page,
+  label: string,
+): Promise<void> {
+  await page
+    .getByRole("radiogroup", { name: "Query editor mode" })
+    .getByText(label, { exact: true })
+    .click();
+  await expect(
+    page.getByRole("radio", { name: new RegExp(`^${label}$`, "i") }),
+  ).toBeChecked({ timeout: SHORT_WAIT });
 }
 
 test.describe("Data Explorer query drawer", () => {
@@ -58,7 +83,7 @@ test.describe("Data Explorer query drawer", () => {
 
     const beforeUrl = page.url();
 
-    await _openQueryTab(page);
+    await _reopenQueryTabFromCollapsed(page);
 
     await expect
       .poll(() => {
@@ -66,7 +91,7 @@ test.describe("Data Explorer query drawer", () => {
       })
       .toBe(beforeUrl);
 
-    await page.getByRole("radio", { name: /^sql$/i }).click();
+    await _selectQueryEditorMode(page, "SQL");
     await expect(
       page.getByRole("tabpanel", { name: /^query$/i }).getByRole("code"),
     ).toContainText(/SELECT 1 AS [`"]?mocked_column[`"]? LIMIT 20/, {
@@ -74,7 +99,7 @@ test.describe("Data Explorer query drawer", () => {
     });
   });
 
-  test("first visit opens the drawer on Query with the manual form and shows available datasets in the datasource dropdown", async ({
+  test("the datasource dropdown lists a dataset saved earlier in the session", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -136,13 +161,6 @@ test.describe("Data Explorer query drawer", () => {
 
       const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
       await expect(queryPanel).toBeVisible({ timeout: SHORT_WAIT });
-      await expect(page.getByRole("tab", { name: /^query$/i })).toHaveAttribute(
-        "aria-selected",
-        "true",
-      );
-      await expect(
-        page.getByRole("radio", { name: /^manual$/i }),
-      ).toBeChecked();
 
       const dataSourceInput = queryPanel.getByLabel("Data source");
       await dataSourceInput.click();

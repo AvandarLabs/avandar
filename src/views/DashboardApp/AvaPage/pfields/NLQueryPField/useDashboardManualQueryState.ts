@@ -1,3 +1,4 @@
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { makeObject, prop } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
@@ -13,7 +14,7 @@ import type { OrderByDirection } from "$/models/queries/StructuredQuery/Structur
 export type DashboardManualQueryState = {
   query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly string[];
+  sqlSyncWarnings: readonly SqlMappingReason[];
   /** Whether the SQL parser is ready (dataset metadata loaded). */
   isParserReady: boolean;
   handlers: ManualQueryFormHandlers;
@@ -40,7 +41,7 @@ export function useDashboardManualQueryState(
       return {
         query: StructuredQuery.makeEmpty(),
         isFullyMapped: true,
-        unmappedReasons: [] as readonly string[],
+        unmappedReasons: [] as readonly SqlMappingReason[],
       };
     }
     return parseSql(rawSql);

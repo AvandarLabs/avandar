@@ -79,3 +79,25 @@
 :global([data-mantine-color-scheme="dark"]) .tab[data-active] {
   color: var(--mantine-color-neutral-0);
 }
+
+/*
+ * Layout for a tab list that doubles as a toolbar: the tabs keep their
+ * intrinsic width on the leading edge and `listRightSection` is pushed to the
+ * trailing edge. The floating indicator measures against the tab elements, so
+ * it is unaffected by the trailing section sharing the row.
+ */
+.listWithRightSection {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mantine-spacing-sm);
+  justify-content: space-between;
+}
+
+.listRightSection {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--mantine-spacing-xs);
+  margin-left: auto;
+}

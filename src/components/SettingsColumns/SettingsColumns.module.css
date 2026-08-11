@@ -1,21 +1,21 @@
-/**
+/*
  * Hairlines between columns come from a 1px grid gap over the border color:
  * the grid paints the border color, each column paints the surface on top, and
  * the gaps left over read as dividers. That works for any column count and any
  * number of wrapped rows without nth-child math.
  */
-.grid {
-  background: var(--ava-border-default, var(--mantine-color-neutral-2));
+.settingsColumnsGrid {
+  background: var(--ava-border-default);
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(var(--settings-columns-min-width), 1fr)
+    minmax(var(--settings-columns-min-width, 220px), 1fr)
   );
 }
 
-.column {
-  background: var(--ava-surface-raised, var(--mantine-color-white));
+.settingsColumnsColumn {
+  background: var(--ava-surface-raised);
   display: flex;
   flex-direction: column;
   gap: var(--mantine-spacing-xs);
@@ -24,7 +24,7 @@
     var(--mantine-spacing-sm);
 }
 
-/**
+/*
  * `Fieldset variant="unstyled"` keeps the real fieldset/legend semantics but
  * drops the border, because the grid divider already separates the group.
  */

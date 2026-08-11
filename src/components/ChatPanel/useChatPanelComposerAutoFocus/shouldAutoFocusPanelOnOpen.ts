@@ -6,13 +6,8 @@ import { isTypingTarget } from "./isTypingTarget";
  */
 export function shouldAutoFocusPanelOnOpen(panel: HTMLElement): boolean {
   const activeElement = document.activeElement;
-  if (!(activeElement instanceof HTMLElement)) {
-    return true;
-  }
-
-  if (panel.contains(activeElement)) {
-    return false;
-  }
-
-  return !isTypingTarget(activeElement);
+  return (
+    !(activeElement instanceof HTMLElement) ||
+    (!panel.contains(activeElement) && !isTypingTarget(activeElement))
+  );
 }

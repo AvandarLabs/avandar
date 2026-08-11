@@ -1,25 +1,27 @@
-import { useCallback, useRef, useState } from "react";
 import {
-  clampDrawerHeight,
-  DRAWER_DEFAULT_HEIGHT,
-  DRAWER_MIN_HEIGHT,
-  resolveDrawerHeightForKey,
-} from "@/views/DataExplorerApp/DataExplorerDrawer/drawerHeight/drawerHeight";
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { DrawerHeight } from "@/views/DataExplorerApp/DataExplorerDrawer/DrawerHeight/DrawerHeight";
 import type { KeyboardEvent, PointerEvent, RefObject } from "react";
 
 type Options = {
   /**
-   * The canvas the drawer sits in. Its height caps how tall the drawer may
-   * grow, so the chart always keeps a usable share of the space.
+   * The chart area the drawer is docked beneath. It is the drawer's flex
+   * sibling, so its height plus the drawer's own height is the region the two
+   * share.
    */
-  canvasRef: RefObject<HTMLElement | null>;
+  chartRef: RefObject<HTMLElement | null>;
 };
 
 type DrawerResize = {
   /** Current expanded height, in pixels. */
   height: number;
 
-  /** Largest height currently allowed, for the separator's ARIA range. */
+  /** Tallest height currently allowed, for the separator's ARIA range. */
   maxHeight: number;
 
   /** Pointer-drag handler for the resize separator. */
@@ -29,89 +31,144 @@ type DrawerResize = {
   onResizeKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
 };
 
+type DragState = {
+  pointerId: number;
+  startClientY: number;
+  startHeight: number;
+  availableHeight: number;
+};
+
 /**
  * Owns the expanded height of the Data Explorer drawer and the drag plus
  * keyboard interactions that change it. The height is deliberately not
- * persisted: it resets with the view, the same as the drawer's collapsed
- * state and active tab.
+ * persisted: it resets with the view, the same as the drawer's collapsed state
+ * and active tab.
+ *
+ * The chart area is measured into state rather than read during render, so the
+ * separator's ARIA range is correct on the first paint and follows the chart as
+ * the window or the AI chat panel resizes it.
  */
-export function useDrawerResize({ canvasRef }: Options): DrawerResize {
-  const [height, setHeight] = useState(DRAWER_DEFAULT_HEIGHT);
+export function useDrawerResize({ chartRef }: Options): DrawerResize {
+  const [height, setHeight] = useState<number>(DrawerHeight.DEFAULT_HEIGHT);
+  const [chartHeight, setChartHeight] = useState(0);
 
-  const readCanvasHeight = useCallback((): number => {
-    return canvasRef.current?.getBoundingClientRect().height ?? 0;
-  }, [canvasRef]);
+  useLayoutEffect(
+    function measureChartArea() {
+      const chart = chartRef.current;
+      if (!chart) {
+        return undefined;
+      }
 
-  const dragStateRef = useRef<
-    { startClientY: number; startHeight: number } | undefined
-  >(undefined);
+      const measure = (): void => {
+        setChartHeight(chart.getBoundingClientRect().height);
+      };
+      measure();
+
+      const observer = new ResizeObserver(measure);
+      observer.observe(chart);
+      return () => {
+        observer.disconnect();
+      };
+    },
+    [chartRef],
+  );
+
+  // The chart shrinks by exactly what the drawer takes, so the sum is the
+  // region they split and stays constant while dragging.
+  const availableHeight = chartHeight > 0 ? chartHeight + height : 0;
+
+  // Mirrored into refs so the drag and keyboard handlers can read the latest
+  // values without being re-created on every frame of a drag. Synced in an
+  // effect rather than during render, which would mutate a ref mid-render.
+  const availableHeightRef = useRef(availableHeight);
+  const heightRef = useRef(height);
+  useEffect(
+    function syncLatestHeights() {
+      heightRef.current = height;
+      availableHeightRef.current = availableHeight;
+    },
+    [height, availableHeight],
+  );
+
+  const dragStateRef = useRef<DragState | undefined>(undefined);
 
   const onResizePointerDown = useCallback(
     (event: PointerEvent<HTMLElement>): void => {
-      const handle = event.currentTarget;
+      // A drag already in flight owns the pointer; a second one would register
+      // a competing set of listeners.
+      if (dragStateRef.current) {
+        return;
+      }
+
       dragStateRef.current = {
+        pointerId: event.pointerId,
         startClientY: event.clientY,
-        startHeight: height,
+        startHeight: heightRef.current,
+        availableHeight: availableHeightRef.current,
       };
-      handle.setPointerCapture(event.pointerId);
 
       const onPointerMove = (moveEvent: globalThis.PointerEvent): void => {
         const dragState = dragStateRef.current;
-        if (!dragState) {
-          return;
+        if (dragState && moveEvent.pointerId === dragState.pointerId) {
+          // The drawer is anchored to the bottom, so dragging up (a smaller
+          // clientY) makes it taller.
+          const requestedHeight =
+            dragState.startHeight -
+            (moveEvent.clientY - dragState.startClientY);
+          setHeight(
+            DrawerHeight.clamp({
+              requestedHeight,
+              availableHeight: dragState.availableHeight,
+            }),
+          );
         }
-        // The drawer is anchored to the bottom, so dragging up (a smaller
-        // clientY) makes it taller.
-        const requestedHeight =
-          dragState.startHeight - (moveEvent.clientY - dragState.startClientY);
-        setHeight(
-          clampDrawerHeight({
-            requestedHeight,
-            canvasHeight: readCanvasHeight(),
-          }),
-        );
       };
 
-      const onPointerUp = (): void => {
+      const onDragEnd = (): void => {
         dragStateRef.current = undefined;
-        handle.removeEventListener("pointermove", onPointerMove);
-        handle.removeEventListener("pointerup", onPointerUp);
-        handle.removeEventListener("pointercancel", onPointerUp);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onDragEnd);
+        window.removeEventListener("pointercancel", onDragEnd);
+        window.removeEventListener("lostpointercapture", onDragEnd);
       };
 
-      handle.addEventListener("pointermove", onPointerMove);
-      handle.addEventListener("pointerup", onPointerUp);
-      handle.addEventListener("pointercancel", onPointerUp);
+      // Listening on the window rather than the separator means the drag still
+      // ends when the pointer is released elsewhere, or when the separator
+      // unmounts because the drawer collapsed mid-drag.
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onDragEnd);
+      window.addEventListener("pointercancel", onDragEnd);
+      window.addEventListener("lostpointercapture", onDragEnd);
       event.preventDefault();
     },
-    [height, readCanvasHeight],
+    [],
   );
 
   const onResizeKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>): void => {
-      const nextHeight = resolveDrawerHeightForKey({
+      const nextHeight = DrawerHeight.resolveHeightForKey({
         key: event.key,
         isShiftPressed: event.shiftKey,
-        currentHeight: height,
-        canvasHeight: readCanvasHeight(),
+        currentHeight: heightRef.current,
+        availableHeight: availableHeightRef.current,
       });
-      if (nextHeight === undefined) {
-        return;
+      if (nextHeight !== undefined) {
+        event.preventDefault();
+        setHeight(nextHeight);
       }
-      event.preventDefault();
-      setHeight(nextHeight);
     },
-    [height, readCanvasHeight],
+    [],
   );
 
-  const canvasHeight = readCanvasHeight();
-  const maxHeight =
-    canvasHeight > 0 ?
-      clampDrawerHeight({
-        requestedHeight: Number.MAX_SAFE_INTEGER,
-        canvasHeight,
-      })
-    : DRAWER_MIN_HEIGHT;
+  useEffect(function endDragOnUnmount() {
+    return () => {
+      dragStateRef.current = undefined;
+    };
+  }, []);
+
+  // Before the chart is measured there is no cap to report, so the current
+  // height is the honest maximum: never below `aria-valuenow`.
+  const maxHeight = DrawerHeight.resolveMaxHeight(availableHeight) ?? height;
 
   return { height, maxHeight, onResizePointerDown, onResizeKeyDown };
 }

@@ -29,7 +29,7 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
-import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerSessionKeys/dataExplorerSessionKeys";
+import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
@@ -61,7 +61,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     isOpenDatasetModalOpen,
     { open: openOpenDatasetModal, close: closeOpenDatasetModal },
   ] = useDisclosure(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useDataExplorerUrlSync({ urlSearch, navigate });
 
@@ -170,11 +170,14 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   useEffect(
     function openChatPanelOnMount() {
       const alreadyOpened = sessionStorage.getItem(
-        DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
+        DataExplorerSessionKeys.aiPanelAutoOpened,
       );
       if (!alreadyOpened) {
         chatPanelDispatch.open();
-        sessionStorage.setItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY, "true");
+        sessionStorage.setItem(
+          DataExplorerSessionKeys.aiPanelAutoOpened,
+          "true",
+        );
       }
     },
     [chatPanelDispatch],
@@ -371,14 +374,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
-        <Box
-          ref={canvasRef}
-          flex={1}
-          pos="relative"
-          w="100%"
-          mih={0}
-          bg="white"
-        >
+        <Box ref={chartRef} flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer
             columns={queryResultColumns}
@@ -390,7 +386,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
         <DataExplorerDrawer
           columns={queryResultColumns}
           data={queryResultData}
-          canvasRef={canvasRef}
+          chartRef={chartRef}
         />
       </Stack>
       <OpenDatasetModal

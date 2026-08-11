@@ -10,10 +10,11 @@ import type {
   QueryFilterGroup,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
 
 export function parseWhereNode(
   node: unknown,
-  unmappedReasons: string[],
+  unmappedReasons: SqlMappingReason[],
 ): QueryFilter | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;
@@ -21,7 +22,7 @@ export function parseWhereNode(
   const obj = node as Record<string, unknown>;
   if (obj.type !== "binary_expr") {
     unmappedReasons.push(
-      `WHERE clause contains a "${String(obj.type)}" node that the form does not support.`,
+      { code: "whereUnsupportedNode", nodeType: String(obj.type) },
     );
     return undefined;
   }
@@ -64,7 +65,7 @@ export function parseWhereNode(
   const columnName = columnRefName(obj.left);
   if (!columnName) {
     unmappedReasons.push(
-      "WHERE clause uses an expression on the left-hand side that is not a column reference.",
+      { code: "whereNonColumnLeftSide" },
     );
     return undefined;
   }
@@ -82,7 +83,7 @@ export function parseWhereNode(
       return rule;
     }
     unmappedReasons.push(
-      `WHERE clause uses "${operator}" with a non-null right-hand side; only IS NULL / IS NOT NULL are mapped.`,
+      { code: "whereNonNullRightSide", operator },
     );
     return undefined;
   }
@@ -91,7 +92,7 @@ export function parseWhereNode(
     const valueList = extractValueList(obj.right);
     if (!valueList || valueList.length !== 2) {
       unmappedReasons.push(
-        `WHERE clause uses BETWEEN on "${columnName}" with a value that the form cannot represent.`,
+        { code: "whereBetweenUnrepresentable", columnName },
       );
       return undefined;
     }
@@ -108,7 +109,7 @@ export function parseWhereNode(
     const valueList = extractValueList(obj.right);
     if (!valueList) {
       unmappedReasons.push(
-        `WHERE clause uses "${operator}" on "${columnName}" with a non-literal list.`,
+        { code: "whereNonLiteralList", operator, columnName },
       );
       return undefined;
     }
@@ -124,7 +125,7 @@ export function parseWhereNode(
   const filterOp = toFilterOperator(operator);
   if (!filterOp) {
     unmappedReasons.push(
-      `WHERE clause uses operator "${operator}" which the form does not support.`,
+      { code: "whereUnsupportedOperator", operator },
     );
     return undefined;
   }
@@ -132,7 +133,7 @@ export function parseWhereNode(
   const literal = literalValue(obj.right);
   if (literal === undefined) {
     unmappedReasons.push(
-      `WHERE clause compares "${columnName}" against a non-literal expression.`,
+      { code: "whereNonLiteralComparison", columnName },
     );
     return undefined;
   }
@@ -154,7 +155,7 @@ export function parseWhereNode(
  */
 export function parseHavingNode(
   node: unknown,
-  unmappedReasons: string[],
+  unmappedReasons: SqlMappingReason[],
 ): QueryFilter | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;
@@ -162,7 +163,7 @@ export function parseHavingNode(
   const obj = node as Record<string, unknown>;
   if (obj.type !== "binary_expr") {
     unmappedReasons.push(
-      `HAVING clause contains a "${String(obj.type)}" node that the form cannot represent.`,
+      { code: "havingUnsupportedNode", nodeType: String(obj.type) },
     );
     return undefined;
   }
@@ -198,7 +199,7 @@ export function parseHavingNode(
       columnName = `${funcName.toLowerCase()}(${innerCol})`;
     } else {
       unmappedReasons.push(
-        `HAVING uses aggregate ${funcName} on a complex argument; mapping kept the predicate as a label.`,
+        { code: "havingComplexAggregateArgument", funcName },
       );
       columnName = funcName.toLowerCase();
     }
@@ -207,7 +208,7 @@ export function parseHavingNode(
   }
   if (!columnName) {
     unmappedReasons.push(
-      "HAVING clause uses a left-hand side the form cannot represent.",
+      { code: "havingUnrepresentableLeftSide" },
     );
     return undefined;
   }
@@ -215,14 +216,14 @@ export function parseHavingNode(
   const filterOp = toFilterOperator(operator);
   if (!filterOp) {
     unmappedReasons.push(
-      `HAVING uses operator "${operator}" which the form does not support.`,
+      { code: "havingUnsupportedOperator", operator },
     );
     return undefined;
   }
   const literal = literalValue(obj.right);
   if (literal === undefined) {
     unmappedReasons.push(
-      `HAVING compares "${columnName}" against a non-literal expression.`,
+      { code: "havingNonLiteralComparison", columnName },
     );
     return undefined;
   }

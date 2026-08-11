@@ -1,15 +1,17 @@
-import { Select, SelectData } from "@avandar/ui";
+import { Select } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
-import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
+import { vizTypeLabel } from "$/copy/vizTypeLabel";
+import { VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
+import type { SelectData } from "@avandar/ui";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Currently selected visualization type. */
-  value: VizType;
+  value: VizConfig.Type;
 
   /** Called when the user picks a different visualization type. */
-  onChange: (vizType: VizType) => void;
+  onChange: (vizType: VizConfig.Type) => void;
 
   /** Mantine input size. Defaults to the theme default. */
   size?: string;
@@ -21,7 +23,7 @@ type Props = {
 };
 
 /**
- * Visualization type picker. Split out from the settings subforms because the
+ * Visualization type picker. Lives outside the settings subforms because the
  * type choice reconfigures every other control, so hosts place it in their own
  * chrome (the Data Explorer drawer rail) rather than inside the form body.
  */
@@ -33,9 +35,9 @@ export function VizTypeSelect({
   className,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
+  const vizTypeOptions: SelectData<VizConfig.Type> = VizTypes.map((vizType) => {
     return {
-      label: VizConfigs.getDisplayName(vizType),
+      label: vizTypeLabel(vizType),
       value: vizType,
     };
   });

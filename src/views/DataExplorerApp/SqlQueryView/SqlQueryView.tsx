@@ -1,13 +1,15 @@
+import { isDefined, matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Alert, Button, Group, List, Paper, Stack, Text } from "@mantine/core";
+import { Alert, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay/formatSqlForDisplay";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import { SqlReadOnlyBlock } from "@/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock/SqlReadOnlyBlock";
+import { SqlSyncWarningNotes } from "@/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes/SqlSyncWarningNotes";
 import css from "./SqlQueryView.module.css";
 import type {
   SettingsColumnGroup,
@@ -75,19 +77,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     !isStructuredQueryInSync && sqlSyncWarnings.length > 0;
 
   const syncWarningNotes = (
-    <Stack gap="xs" data-testid="sql-sync-warning">
-      <Text size="xs">
-        <Trans>
-          Parts of this SQL could not be represented in the Manual form. The
-          form shows a best-effort approximation; the SQL is what actually runs.
-        </Trans>
-      </Text>
-      <List size="xs" spacing={2}>
-        {sqlSyncWarnings.map((reason) => {
-          return <List.Item key={reason}>{reason}</List.Item>;
-        })}
-      </List>
-    </Stack>
+    <SqlSyncWarningNotes syncWarnings={sqlSyncWarnings} />
   );
 
   const editor =
@@ -102,64 +92,51 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
           setIsEditMode(false);
         }}
       />
-    : <Stack gap="xs">
-        <Paper p="sm" className={css.sqlPaper}>
-          <AvaSqlBlock
-            value={displaySql}
-            readOnly
-            minRows={SQL_EDITOR_MIN_ROWS}
-            data-testid="sql-query-view-editor"
-          />
-        </Paper>
-        <Group justify="flex-end" className={css.editQueryRow}>
-          <Button
-            size="xs"
-            variant="subtle"
-            onClick={() => {
-              setIsEditMode(true);
-            }}
-          >
-            <Trans>Edit query</Trans>
-          </Button>
-        </Group>
-      </Stack>;
+    : <SqlReadOnlyBlock
+        displaySql={displaySql}
+        minRows={SQL_EDITOR_MIN_ROWS}
+        onEdit={() => {
+          setIsEditMode(true);
+        }}
+      />;
 
-  if (layout === "columns") {
-    const groups: SettingsColumnGroup[] = [
-      { id: "sql", title: "SQL", content: editor },
-      ...(hasSyncWarnings ?
-        [
-          {
-            id: "sync-notes",
-            title: t`Manual form shows an approximation`,
-            content: syncWarningNotes,
-          },
-        ]
-      : []),
-    ];
+  const groups: SettingsColumnGroup[] = [
+    { id: "sql", title: "SQL", content: editor },
+    hasSyncWarnings ?
+      {
+        id: "sync-notes",
+        title: t`Manual form shows an approximation`,
+        content: syncWarningNotes,
+      }
+    : undefined,
+  ].filter(isDefined);
 
-    return (
-      <SettingsColumns
-        groups={groups}
-        layout="columns"
-        minColumnWidth={SQL_COLUMN_MIN_WIDTH}
-      />
-    );
-  }
-
-  return (
-    <Stack gap="xs" px="sm" className={css.root}>
-      {hasSyncWarnings ?
-        <Alert
-          icon={<IconAlertTriangle size={16} />}
-          color="yellow"
-          variant="light"
-          title={t`Manual form shows an approximation`}
-        >
-          {syncWarningNotes}
-        </Alert>
-      : null}
-      {editor}
-    </Stack>
-  );
+  return matchLiteral(layout, {
+    columns: () => {
+      return (
+        <SettingsColumns
+          groups={groups}
+          layout="columns"
+          minColumnWidth={SQL_COLUMN_MIN_WIDTH}
+        />
+      );
+    },
+    stacked: () => {
+      return (
+        <Stack gap="xs" px="sm" className={css.root}>
+          {hasSyncWarnings ?
+            <Alert
+              icon={<IconAlertTriangle size={16} />}
+              color="yellow"
+              variant="light"
+              title={t`Manual form shows an approximation`}
+            >
+              {syncWarningNotes}
+            </Alert>
+          : null}
+          {editor}
+        </Stack>
+      );
+    },
+  });
 }

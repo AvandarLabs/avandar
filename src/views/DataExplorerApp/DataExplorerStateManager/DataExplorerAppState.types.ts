@@ -1,3 +1,4 @@
+import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -68,7 +69,7 @@ export type DataExplorerAppState = {
    * Human-readable reasons describing what part of `rawSql` could not be
    * represented in the manual form. Empty when the two are in sync.
    */
-  sqlSyncWarnings: readonly string[];
+  sqlSyncWarnings: readonly SqlMappingReason[];
 
   /**
    * Columns from the most recent successful query result. Stored in state

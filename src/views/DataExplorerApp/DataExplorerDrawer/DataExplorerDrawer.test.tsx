@@ -10,7 +10,7 @@ import { fireEvent, render, screen } from "@/test-utils";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 // The query editors need the router and dataset clients, and both are covered
 // by their own tests. Stub them so these tests stay about the drawer: which
@@ -34,7 +34,7 @@ vi.mock("@/views/DataExplorerApp/SqlQueryView/SqlQueryView", () => {
   };
 });
 
-const COLUMNS: readonly QueryResultColumn[] = [
+const COLUMNS: readonly QueryResult.Column[] = [
   { name: "county", dataType: "varchar" },
   { name: "population", dataType: "bigint" },
 ];
@@ -45,7 +45,7 @@ const DATA: UnknownDataFrame = [
 ];
 
 function renderDrawer(
-  options: { columns?: readonly QueryResultColumn[] } = {},
+  options: { columns?: readonly QueryResult.Column[] } = {},
 ): void {
   const { columns = COLUMNS } = options;
   render(
@@ -54,7 +54,7 @@ function renderDrawer(
         <DataExplorerDrawer
           columns={columns}
           data={DATA}
-          canvasRef={createRef<HTMLDivElement>()}
+          chartRef={createRef<HTMLDivElement>()}
         />
       </DataExplorerStateManager.Provider>
     </AvandarAppProvider>,
@@ -102,25 +102,17 @@ describe("DataExplorerDrawer", () => {
   it("hides the body when collapsed and shows it again when expanded", () => {
     renderDrawer();
 
-    const collapseButton = screen.getByRole("button", {
-      name: /collapse drawer/i,
-    });
-    expect(collapseButton).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("manual-query-form")).toBeVisible();
 
-    fireEvent.click(collapseButton);
+    fireEvent.click(screen.getByRole("button", { name: /collapse drawer/i }));
 
-    const expandButton = screen.getByRole("button", {
-      name: /expand drawer/i,
-    });
-    expect(expandButton).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("manual-query-form")).not.toBeVisible();
     // The tab rail survives collapsing so a tab click can reopen the drawer.
-    expect(getTab(/^query$/i)).toBeInTheDocument();
+    expect(getTab(/^query$/i)).toBeVisible();
 
-    fireEvent.click(expandButton);
+    fireEvent.click(screen.getByRole("button", { name: /expand drawer/i }));
 
-    expect(
-      screen.getByRole("button", { name: /collapse drawer/i }),
-    ).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("manual-query-form")).toBeVisible();
   });
 
   it("expands the drawer when a tab is picked while collapsed", () => {
@@ -129,10 +121,12 @@ describe("DataExplorerDrawer", () => {
     fireEvent.click(screen.getByRole("button", { name: /collapse drawer/i }));
     fireEvent.click(getTab(/visualizations/i));
 
-    expect(
-      screen.getByRole("button", { name: /collapse drawer/i }),
-    ).toHaveAttribute("aria-expanded", "true");
     expect(getTab(/visualizations/i)).toHaveAttribute("aria-selected", "true");
+    // The resize separator only renders while expanded, so its return proves
+    // the tab click reopened the drawer rather than just switching tabs.
+    expect(
+      screen.getByRole("separator", { name: /resize drawer/i }),
+    ).toBeVisible();
   });
 
   it("hides the resize separator while collapsed", () => {

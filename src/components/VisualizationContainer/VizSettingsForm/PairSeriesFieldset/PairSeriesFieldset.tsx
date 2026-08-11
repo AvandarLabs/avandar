@@ -13,10 +13,10 @@ import {
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.module.css";
+import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -110,16 +110,11 @@ export function PairSeriesFieldset({
         </Button>
       </Group>
 
-      <div
-        className={clsx(
-          css.seriesList,
-          layout === "columns" && css.seriesListColumns,
-        )}
-      >
-        {series.map((s, idx) => {
+      <SeriesList layout={layout}>
+        {series.map((scatterSeries, idx) => {
           return (
             <Card
-              key={`${s.key}-${s.xKey}-${idx}`}
+              key={`${scatterSeries.key}-${scatterSeries.xKey}-${idx}`}
               withBorder
               shadow="none"
               padding="sm"
@@ -131,7 +126,7 @@ export function PairSeriesFieldset({
                       allowDeselect={false}
                       label={t`X column`}
                       data={numericOptions}
-                      value={s.xKey}
+                      value={scatterSeries.xKey}
                       disabled={numericOptions.length === 0}
                       placeholder={
                         numericOptions.length === 0 ?
@@ -148,7 +143,7 @@ export function PairSeriesFieldset({
                       allowDeselect={false}
                       label={t`Y column`}
                       data={numericOptions}
-                      value={s.key}
+                      value={scatterSeries.key}
                       disabled={numericOptions.length === 0}
                       placeholder={
                         numericOptions.length === 0 ?
@@ -178,7 +173,7 @@ export function PairSeriesFieldset({
                 <Group gap="xs">
                   <TextInput
                     label={t`Series label`}
-                    value={s.label ?? ""}
+                    value={scatterSeries.label ?? ""}
                     placeholder={t`Defaults to "Y vs X"`}
                     onChange={(event) => {
                       const labelText = event.currentTarget.value;
@@ -190,7 +185,7 @@ export function PairSeriesFieldset({
                   />
                   <ColorInput
                     label={t`Color`}
-                    value={s.color ?? ""}
+                    value={scatterSeries.color ?? ""}
                     swatches={[...CHART_COLOR_SWATCHES]}
                     withEyeDropper={false}
                     format="hex"
@@ -206,7 +201,7 @@ export function PairSeriesFieldset({
             </Card>
           );
         })}
-      </div>
+      </SeriesList>
     </Stack>
   );
 
