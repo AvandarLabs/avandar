@@ -1,5 +1,5 @@
-import { useQuery } from "@avandar/query-hooks";
 import { Model } from "@avandar/models";
+import { useQuery } from "@avandar/query-hooks";
 import { makeObjectFromEntries, prop, sortObjList } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { uuid } from "$/lib/uuid";

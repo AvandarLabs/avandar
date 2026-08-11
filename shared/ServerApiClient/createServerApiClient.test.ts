@@ -1,5 +1,5 @@
-import { createServerApiClient } from "$/ServerApiClient/createServerApiClient.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
+import { createServerApiClient } from "$/ServerApiClient/createServerApiClient.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fakeCallIpc, fakeDbClient } = vi.hoisted(() => {

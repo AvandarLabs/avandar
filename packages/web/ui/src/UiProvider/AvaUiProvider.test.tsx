@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
 import { AvaUiProvider } from "@ui/UiProvider/AvaUiProvider";
+import { describe, expect, it, vi } from "vitest";
 import type { NotificationsProps } from "@mantine/notifications";
 
 /**

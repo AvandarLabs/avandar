@@ -2,12 +2,12 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import { notifySuccess } from "@/utils/notifications/notify";
 import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLinks } from "@/config/AppLinks";
+import { notifySuccess } from "@/utils/notifications/notify";
 import type { I18n } from "@lingui/core";
 
 type Props = {

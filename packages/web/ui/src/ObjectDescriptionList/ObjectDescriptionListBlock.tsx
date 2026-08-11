@@ -1,5 +1,5 @@
+import { objectKeys, pick } from "@avandar/utils";
 import { ScrollArea } from "@mantine/core";
-import { objectKeys, pick  } from "@avandar/utils";
 import { DescriptionList } from "../DescriptionList/index";
 import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
 import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";

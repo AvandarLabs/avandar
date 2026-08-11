@@ -26,11 +26,9 @@ function makeFakeTransport() {
     }),
     run: vi.fn<
       (request: FakeRequest) => FakeRunResult | Promise<FakeRunResult>
-    >(
-      () => {
-        return { changes: 0, lastInsertRowid: 0 };
-      },
-    ),
+    >(() => {
+      return { changes: 0, lastInsertRowid: 0 };
+    }),
   };
 }
 

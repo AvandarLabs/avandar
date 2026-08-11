@@ -1,4 +1,3 @@
-import { ServerApiSessionRefresher } from "$/ServerApiClient";
 import {
   AuthChangeEvent,
   Session,
@@ -6,10 +5,11 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
-import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { isDesktop } from "$/platform/isDesktop";
+import { ServerApiSessionRefresher } from "$/ServerApiClient";
 import { PlatformRegistry } from "@/config/platform/PlatformRegistry/PlatformRegistry";
+import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
 import type { Session as PlatformSession } from "$/platform/types/AuthProvider.types";
 
 /**

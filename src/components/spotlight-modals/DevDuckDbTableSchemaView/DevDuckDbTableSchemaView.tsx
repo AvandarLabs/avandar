@@ -8,8 +8,9 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
+import type { ReactNode } from "react";
 
-export function DevDuckDbTableSchemaView(): JSX.Element {
+export function DevDuckDbTableSchemaView(): ReactNode {
   const workspace = useCurrentWorkspace();
   const [datasets = [], isLoadingDatasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),

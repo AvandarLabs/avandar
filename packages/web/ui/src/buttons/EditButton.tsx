@@ -1,8 +1,8 @@
 import { IconPencil } from "@tabler/icons-react";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { ActionIcon } from "../ActionIcon/ActionIcon";
 import type { ActionIconProps } from "@mantine/core";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;

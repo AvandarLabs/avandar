@@ -1,9 +1,9 @@
+import { FunctionsHttpError } from "@supabase/supabase-js";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import {
   ServerApiSessionRefresher,
   SessionExpiredError,
 } from "$/ServerApiClient/ServerApiSessionRefresher.ts";
-import { FunctionsHttpError } from "@supabase/supabase-js";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,

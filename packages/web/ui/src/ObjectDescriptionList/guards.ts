@@ -1,4 +1,4 @@
-import { isArray, isPlainObject  } from "@avandar/utils";
+import { isArray, isPlainObject } from "@avandar/utils";
 import type {
   DescribableObject,
   PrimitiveValue,

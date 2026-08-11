@@ -1,6 +1,6 @@
+import { objectEntries } from "@avandar/utils";
 import { Box, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import { objectEntries } from "@avandar/utils";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { TruncatedText } from "../text/TruncatedText";

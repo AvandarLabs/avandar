@@ -34,38 +34,37 @@ export async function transformedCsvsToParquetBlobs(options: {
   const db = new NodeDuckDb();
   try {
     const blobs: Blob[] = [];
+
+    // Sequential on purpose, so the `await`s below are not a mistake. Every
+    // iteration issues statements against the one `NodeDuckDb` handle opened
+    // above, and each export materialises a whole Parquet buffer in memory.
+    // Running these concurrently would interleave statements on a single
+    // connection and hold every table in memory at once, which is exactly what
+    // this pipeline cannot afford on bulk CSVs.
     for (const description of descriptions) {
       const csvPath = resolve(transformOutputDir, `${description.name}.csv`);
       const viewName = `etl_${randomUUID().replace(/-/g, "_")}`;
       const { columns } = description;
 
-      if (columns.length === 0) {
-        await db.readCsvIntoView({
-          csvPath,
-          viewName,
-          autoDetect: true,
-          header: true,
-        });
-        const bytes = await db.exportTableOrViewAsZSTDParquetBlob(viewName);
-        blobs.push(
-          new Blob([Buffer.from(bytes)], { type: "application/octet-stream" }),
-        );
-        continue;
-      }
+      // No declared columns means the transform is happy for DuckDB to infer
+      // the schema. Otherwise every column type is pinned, so the Parquet
+      // matches the transform's contract rather than whatever the CSV suggests.
+      const readOptions =
+        columns.length === 0 ?
+          { csvPath, viewName, header: true, autoDetect: true }
+        : {
+            csvPath,
+            viewName,
+            header: true,
+            autoDetect: false,
+            columns: columns.map((column) => {
+              return { name: column.name, type: column.type };
+            }),
+          };
 
-      const duckColumns = columns.map((column) => {
-        return {
-          name: column.name,
-          type: column.type,
-        };
-      });
-      await db.readCsvIntoView({
-        csvPath,
-        viewName,
-        columns: duckColumns,
-        autoDetect: false,
-        header: true,
-      });
+      // react-doctor-disable-next-line
+      await db.readCsvIntoView(readOptions);
+      // react-doctor-disable-next-line
       const bytes = await db.exportTableOrViewAsZSTDParquetBlob(viewName);
       blobs.push(
         new Blob([Buffer.from(bytes)], { type: "application/octet-stream" }),

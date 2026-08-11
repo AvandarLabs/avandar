@@ -1,4 +1,5 @@
 import { Stack, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import { PrimitiveValueItem } from "../PrimitiveValueItem/PrimitiveValueItem";
 import type {
@@ -6,7 +7,6 @@ import type {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
   values: readonly T[];
@@ -37,9 +37,7 @@ export function PrimitiveFieldValueArrayBlock<
   const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>
-        {i18n.andMore(remainingCount)}
-      </Text>
+      <Text>{i18n.andMore(remainingCount)}</Text>
     : null;
 
   // TODO(jpsyx): use a stable key

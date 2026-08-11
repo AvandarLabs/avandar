@@ -1,5 +1,6 @@
+import { objectKeys, StringKeyOf } from "@avandar/utils";
 import { List, Table, Text } from "@mantine/core";
-import { objectKeys, StringKeyOf  } from "@avandar/utils";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../../CollapsibleItem";
 import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
@@ -14,7 +15,6 @@ import type {
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
@@ -176,9 +176,7 @@ export function ObjectArrayBlock<
   const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>
-        {i18n.andMore(remainingCount)}
-      </Text>
+      <Text>{i18n.andMore(remainingCount)}</Text>
     : null;
 
   return (

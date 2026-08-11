@@ -35,11 +35,7 @@
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": [
-      "deno.ns",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["deno.ns", "dom", "dom.iterable"],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -48,10 +44,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strict": true,
-    "types": [
-      "react",
-      "react/jsx-runtime"
-    ]
+    "types": ["react", "react/jsx-runtime"]
   },
   "lock": false
 }

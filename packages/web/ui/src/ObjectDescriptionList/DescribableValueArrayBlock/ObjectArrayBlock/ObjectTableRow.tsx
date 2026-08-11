@@ -1,6 +1,7 @@
 import { useBoolean } from "@avandar/hooks";
-import { Button, Group, Table } from "@mantine/core";
 import { StringKeyOf } from "@avandar/utils";
+import { Button, Group, Table } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useState } from "react";
 import { EditButton } from "../../../buttons/EditButton";
 import { ValueItemContainer } from "../../ValueItemContainer";
@@ -11,7 +12,6 @@ import type {
   GetChildObjects,
   ObjectRowRenderOptions,
 } from "../../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 

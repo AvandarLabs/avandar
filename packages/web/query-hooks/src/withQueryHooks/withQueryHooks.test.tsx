@@ -1,9 +1,9 @@
+import { createServiceClient } from "@avandar/clients";
+import { withQueryHooks } from "@query-hooks/withQueryHooks/withQueryHooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createServiceClient } from "@avandar/clients";
-import { withQueryHooks } from "@query-hooks/withQueryHooks/withQueryHooks";
 import type { ReactElement, ReactNode } from "react";
 
 let queryClient: QueryClient;
@@ -97,10 +97,7 @@ describe("withQueryHooks", () => {
         queryFns: ["getAll"],
       });
 
-      expect(client.QueryKeys.getAll()).toEqual([
-        "WidgetClient",
-        "getAll",
-      ]);
+      expect(client.QueryKeys.getAll()).toEqual(["WidgetClient", "getAll"]);
     });
 
     it("appends the params to the key when params are given", () => {
@@ -121,9 +118,9 @@ describe("withQueryHooks", () => {
       });
 
       // an empty object is a runtime shape the types do not permit, so cast
-      expect(
-        client.QueryKeys.getById({} as unknown as { id: number }),
-      ).toEqual(["WidgetClient", "getById"]);
+      expect(client.QueryKeys.getById({} as unknown as { id: number })).toEqual(
+        ["WidgetClient", "getById"],
+      );
     });
 
     it("strips functions out of the params so keys stay serializable", () => {

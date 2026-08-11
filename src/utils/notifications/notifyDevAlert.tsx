@@ -20,7 +20,9 @@ export function notifyDevAlert(...messages: unknown[]): void {
       title: "Alert",
       message: (
         <Stack gap="xs">
-          {messages.map((message) => {
+          {/* the index is a stable key here and below: both lists are pure
+              functions of the arguments, rendered once, never reordered */}
+          {messages.map((message, messageIndex) => {
             const strMsg = unknownToString(message, {
               prettifyObject: true,
             });
@@ -28,10 +30,8 @@ export function notifyDevAlert(...messages: unknown[]): void {
             // if the string contains newlines, then split them into multiple
             // separate Text components, and wrap in a Stack
             return strMsg.includes("\n") ?
-                <Stack gap="xxs">
+                <Stack key={messageIndex} gap="xxs">
                   {strMsg.split("\n").map((line, lineIndex) => {
-                    // the index is a stable key here: the list is a pure
-                    // function of `strMsg` and is never reordered or mutated
                     return (
                       <Text key={lineIndex} span>
                         {expandTabsForHTML(line)}
@@ -39,7 +39,9 @@ export function notifyDevAlert(...messages: unknown[]): void {
                     );
                   })}
                 </Stack>
-              : <Text span>{expandTabsForHTML(strMsg)}</Text>;
+              : <Text key={messageIndex} span>
+                  {expandTabsForHTML(strMsg)}
+                </Text>;
           })}
         </Stack>
       ),

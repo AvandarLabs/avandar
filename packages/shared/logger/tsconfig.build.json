@@ -2,17 +2,10 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "../../../",
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "noEmit": false,
     "declaration": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
-  ]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

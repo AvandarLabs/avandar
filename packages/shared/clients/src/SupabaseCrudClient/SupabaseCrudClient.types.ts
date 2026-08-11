@@ -1,3 +1,4 @@
+import type { UnknownObject } from "@avandar/utils";
 import type {
   ClientReturningOnlyPromises,
   ModelCrudClient,
@@ -10,7 +11,6 @@ import type {
   RegisteredSupabaseTableUpdate,
 } from "@clients/Register.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { UnknownObject } from "@avandar/utils";
 
 type DefaultModelTypes = {
   tableName: RegisteredSupabaseDatabaseTableNames;

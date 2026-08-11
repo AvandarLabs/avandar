@@ -1,11 +1,8 @@
-import { createContext, useContext, useMemo } from "react";
-import {
-  defaultI18nMessages,
-  type I18nMessages,
-} from "@ui/i18n/i18nMessages";
+import { defaultI18nMessages } from "@ui/i18n/i18nMessages";
+import { I18nMessagesContext } from "@ui/i18n/I18nMessagesContext";
+import { useMemo } from "react";
+import type { I18nMessages } from "@ui/i18n/i18nMessages";
 import type { ReactElement, ReactNode } from "react";
-
-const I18nMessagesContext = createContext<I18nMessages>(defaultI18nMessages);
 
 /**
  * Supplies translated strings to AvaUI components.
@@ -43,12 +40,4 @@ export function I18nAvaUiProvider(props: {
       {children}
     </I18nMessagesContext.Provider>
   );
-}
-
-/**
- * Returns the translated strings for `@avandar/ui` components, falling back to
- * the English defaults when no `I18nAvaUiProvider` is mounted.
- */
-export function useI18nMessages(): I18nMessages {
-  return useContext(I18nMessagesContext);
 }

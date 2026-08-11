@@ -1,6 +1,6 @@
 import { withNewMembers } from "@avandar/modules";
-import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type { UnknownModule } from "@avandar/modules";
+import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type WithSupabaseClient<M extends UnknownModule = UnknownModule> = M & {

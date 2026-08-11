@@ -1,3 +1,5 @@
+import { isDevBuild } from "@query-hooks/isDevBuild";
+import { useAvaQueryErrorReporter } from "@query-hooks/useAvaQueryErrorReporter";
 import {
   DefaultError,
   QueryFunction,
@@ -7,8 +9,6 @@ import {
   UseQueryOptions as TanstackUseQueryOptions,
   UseQueryResult as TanstackUseQueryResult,
 } from "@tanstack/react-query";
-import { useAvaQueryErrorReporter } from "@query-hooks/AvaQueryProvider";
-import { isDevBuild } from "@query-hooks/isDevBuild";
 import { Merge } from "type-fest";
 
 export type UseQueryResult<TData> = TanstackUseQueryResult<TData, DefaultError>;

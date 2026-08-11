@@ -67,9 +67,14 @@ const worldBankWdiEtl = EtlEngine.create({
     const db = new NodeDuckDb();
     try {
       const descriptions: TransformedDataDescriptionForParquet[] = [];
+      // Sequential on purpose: every iteration issues statements against the
+      // one `NodeDuckDb` handle opened above. Running these concurrently would
+      // interleave statements on a single connection for no real gain, since
+      // sniffing is IO-bound on the same disk.
       for (const filename of csvFilenames) {
         const baseName = filename.replace(/\.csv$/i, "");
         const csvPath = join(extractDir, filename);
+        // react-doctor-disable-next-line
         const columns = await db.sniffCsv({ csvPath });
         descriptions.push({ name: baseName, columns });
       }

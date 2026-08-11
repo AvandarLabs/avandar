@@ -1,8 +1,10 @@
+import { assertIsDefined, objectEntries, objectKeys } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import { assertIsDefined, objectEntries , objectKeys  } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
+import type { ILogger } from "@avandar/logger";
+import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
@@ -13,13 +15,8 @@ import type {
   AnySupabaseCrudModelSpec,
   SupabaseCrudClient,
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
-import type { ILogger } from "@avandar/logger";
 import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type {
-  FilterOperator,
-  FiltersByColumn,
-} from "@avandar/utils";
 
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;

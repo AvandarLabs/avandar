@@ -1,5 +1,6 @@
-import { ScrollArea, Stack, Text } from "@mantine/core";
 import { pick } from "@avandar/utils";
+import { ScrollArea, Stack, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import {
   isDescribableObject,
@@ -21,7 +22,6 @@ import type {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];

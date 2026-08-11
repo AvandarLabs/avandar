@@ -1,7 +1,7 @@
 import { Button, Group, Loader, TextInput } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { useForm } from "@ui/hooks/useForm/useForm";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 
 type Props = {
   defaultValue: string;

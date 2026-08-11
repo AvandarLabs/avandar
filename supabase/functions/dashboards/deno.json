@@ -23,11 +23,7 @@
   },
   "compilerOptions": {
     "experimentalDecorators": true,
-    "lib": [
-      "deno.ns",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["deno.ns", "dom", "dom.iterable"],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,

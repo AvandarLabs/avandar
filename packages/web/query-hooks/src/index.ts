@@ -1,6 +1,7 @@
 // provider
-export { AvaQueryProvider, useAvaQueryErrorReporter } from "@query-hooks/AvaQueryProvider";
-export type { AvaQueryErrorReporter } from "@query-hooks/AvaQueryProvider";
+export { AvaQueryProvider } from "@query-hooks/AvaQueryProvider";
+export { useAvaQueryErrorReporter } from "@query-hooks/useAvaQueryErrorReporter";
+export type { AvaQueryErrorReporter } from "@query-hooks/ErrorReporterContext";
 
 // use query
 export { useQuery } from "@query-hooks/useQuery/useQuery";
@@ -33,4 +34,8 @@ export type {
 } from "@query-hooks/withQueryHooks/withQueryHooks.types";
 
 // other core types we are forwarding from the tanstack react-query package
-export type { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
+export type {
+  DefaultError,
+  QueryClient,
+  QueryKey,
+} from "@query-hooks/core.types";

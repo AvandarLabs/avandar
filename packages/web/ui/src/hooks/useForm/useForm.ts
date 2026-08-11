@@ -1,11 +1,11 @@
 import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
 import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
-import type { FormType } from "@ui/hooks/useForm/useForm.types";
+import type { UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
-import type { UnknownObject } from "@avandar/utils";
+import type { FormType } from "@ui/hooks/useForm/useForm.types";
 import type { Merge, Paths } from "type-fest";
 
 // Improved type safety for `path` argument in a Rule function

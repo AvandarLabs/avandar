@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   // One entry per declared `exports` subpath.
   entry: {
-      "index": "src/index.ts"
+    index: "src/index.ts",
   },
   tsconfig: "tsconfig.build.json",
   format: ["esm"],

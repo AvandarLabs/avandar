@@ -1,13 +1,13 @@
 import { getIsMacPlatform } from "@avandar/browser-utils";
+import { hasDefinedProps, isPlainObject } from "@avandar/utils";
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { hasDefinedProps, isPlainObject  } from "@avandar/utils";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useEffect, useRef, useState } from "react";
 import { EditButton } from "../buttons/EditButton";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type BaseProps = {
   /**

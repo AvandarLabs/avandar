@@ -1,4 +1,5 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import { ValueItemContainer } from "../ValueItemContainer";
 import type {
@@ -7,7 +8,6 @@ import type {
   GetChildObjects,
   NestedArrayRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type Props<T, RootData extends GenericRootData> = {
   /** Array of arrays of field values */
@@ -41,9 +41,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
   const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>
-        {i18n.andMore(remainingCount)}
-      </Text>
+      <Text>{i18n.andMore(remainingCount)}</Text>
     : null;
 
   const arrayItemRenderOptions = {

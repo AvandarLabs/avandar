@@ -1,5 +1,5 @@
+import { formatNumber, isNullish } from "@avandar/utils";
 import { NumberInput, Text } from "@mantine/core";
-import { isNullish, formatNumber  } from "@avandar/utils";
 import { ReactNode } from "react";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 

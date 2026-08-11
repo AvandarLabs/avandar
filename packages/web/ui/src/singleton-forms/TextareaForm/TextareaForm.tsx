@@ -1,10 +1,10 @@
 import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { useId, useRef } from "react";
 import { useForm } from "@ui/hooks/useForm/useForm";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+import { useId, useRef } from "react";
 import type { TextareaProps } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type Props = {
   /**

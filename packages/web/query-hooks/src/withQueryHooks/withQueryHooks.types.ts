@@ -1,8 +1,14 @@
 import { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 import type {
   CrudModelSpec,
-  ModelCrudClient, ServiceClient 
+  ModelCrudClient,
+  ServiceClient,
 } from "@avandar/clients";
+import type {
+  AnyFunction,
+  AnyFunctionWithReturn,
+  AnyFunctionWithSignature,
+} from "@avandar/utils";
 import type {
   UseMutationOptions,
   UseMutationResultTuple,
@@ -11,11 +17,6 @@ import type {
   UseQueryOptions,
   UseQueryResultTuple,
 } from "@query-hooks/useQuery/useQuery";
-import type {
-  AnyFunction,
-  AnyFunctionWithReturn,
-  AnyFunctionWithSignature,
-} from "@avandar/utils";
 import type { ConditionalKeys, Simplify } from "type-fest";
 
 /**

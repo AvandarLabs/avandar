@@ -1,5 +1,13 @@
+import {
+  isBoolean,
+  isDate,
+  isISODateString,
+  isNullish,
+  isNumber,
+  isString,
+} from "@avandar/utils";
 import { Text } from "@mantine/core";
-import { isBoolean, isDate , isISODateString , isNullish , isNumber , isString  } from "@avandar/utils";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { match } from "ts-pattern";
 import { isStringOrNumber } from "../guards";
 import { BooleanValueItem } from "./BooleanValueItem";
@@ -12,7 +20,6 @@ import type {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
 
 type Props<
   T extends PrimitiveValue,

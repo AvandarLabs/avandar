@@ -1,4 +1,4 @@
-import { identity, camelToTitleCase  } from "@avandar/utils";
+import { camelToTitleCase, identity } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { ObjectKeyTransformationType } from "./ObjectDescriptionList.types";
 

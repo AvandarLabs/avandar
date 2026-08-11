@@ -29,7 +29,6 @@ export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makePa
 export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 
-
 // Supabase database registration
 export type {
   RegisteredSupabaseDatabase,

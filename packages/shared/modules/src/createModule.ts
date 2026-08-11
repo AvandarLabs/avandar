@@ -1,5 +1,12 @@
-import { isFunction, getValue , objectFilter , objectValuesMap , setValue , MergeObjects  } from "@avandar/utils";
-import type { PathValue, EmptyObject, UnknownObject  } from "@avandar/utils";
+import {
+  getValue,
+  isFunction,
+  MergeObjects,
+  objectFilter,
+  objectValuesMap,
+  setValue,
+} from "@avandar/utils";
+import type { EmptyObject, PathValue, UnknownObject } from "@avandar/utils";
 import type { Paths, Simplify } from "type-fest";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

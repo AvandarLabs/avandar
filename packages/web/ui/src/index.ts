@@ -1,6 +1,7 @@
 // provider + i18n
 export { AvaUiProvider } from "@ui/UiProvider/AvaUiProvider";
-export { I18nAvaUiProvider, useI18nMessages } from "@ui/i18n/I18nAvaUiProvider";
+export { I18nAvaUiProvider } from "@ui/i18n/I18nAvaUiProvider";
+export { useI18nMessages } from "@ui/i18n/useI18nMessages";
 export { defaultI18nMessages } from "@ui/i18n/i18nMessages";
 export type { I18nMessages } from "@ui/i18n/i18nMessages";
 
@@ -33,7 +34,6 @@ export { Tooltip } from "./Tooltip/Tooltip";
 // ObjectDescriptionList
 export { ObjectDescriptionList } from "./ObjectDescriptionList/ObjectDescriptionList";
 export type { ObjectKeyRenderOptionsMap } from "./ObjectDescriptionList/ObjectDescriptionList.types";
-
 
 // text
 export { DangerText } from "./text/DangerText";

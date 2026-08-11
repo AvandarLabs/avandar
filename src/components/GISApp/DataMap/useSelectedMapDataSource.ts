@@ -47,7 +47,18 @@ export function useSelectedMapDataSource({
   const dataLoadedRef = useRef(false);
   const previousDataSourceIdRef = useRef<string | undefined>(undefined);
 
+  // Disables `react-doctor/effect-needs-cleanup`. Every listener this effect
+  // registers is removed in the cleanup below, but the `map.on` calls happen
+  // inside the nested async `loadData`, which the rule cannot trace back to
+  // the returned cleanup. Verified by hand rather than statically.
+  // react-doctor-disable-next-line
   useEffect(() => {
+    // `addSourceAndLayer` is created inside the async `loadData` below, so the
+    // cleanup cannot name it directly. Capturing it here is what lets the
+    // "load" listener be removed at all; before this it was registered and
+    // never taken off.
+    let pendingLoadHandler: (() => void) | undefined;
+
     if (!map) {
       return;
     }
@@ -388,6 +399,7 @@ export function useSelectedMapDataSource({
           // Otherwise wait for map to load
           console.log("waiting to add map layer");
           map.on("load", addSourceAndLayer);
+          pendingLoadHandler = addSourceAndLayer;
         }
       } catch (error) {
         console.error("Error loading selected data source:", error);
@@ -460,18 +472,27 @@ export function useSelectedMapDataSource({
 
     return () => {
       try {
-        // Only cleanup if data source changed
+        // Listeners always come off, whether or not the data source changed.
+        // The effect re-registers them on its next run, so leaving them
+        // attached stacks duplicate handlers, and on unmount they would
+        // outlive the hook entirely.
+        map.off("click", GEOJSON_LAYER_ID, handleClick);
+        map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
+        map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
+        map.off("style.load", handleStyleData);
+        if (pendingLoadHandler) {
+          map.off("load", pendingLoadHandler);
+          pendingLoadHandler = undefined;
+        }
+
+        // Layers and source only come down when the data source changed, so
+        // an unrelated dep change does not make the map flicker.
         const shouldCleanup =
           !selectedDataSource ||
           previousDataSourceIdRef.current !== selectedDataSource?.id;
 
         if (shouldCleanup) {
           console.log("doing the cleanup - data source changed");
-          // Cleanup: remove event listeners
-          map.off("click", GEOJSON_LAYER_ID, handleClick);
-          map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
-          map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
-          map.off("style.load", handleStyleData);
 
           // Cleanup: remove layers and source
           if (map.getLayer(HIGHLIGHT_LAYER_ID)) {

@@ -80,7 +80,7 @@ function useAvandarUIMessages(): I18nMessages {
  * The data layer stays here: `AvaQueryProvider` is passed through as a child so
  * AvaUI keeps no opinion about how data is fetched.
  */
-export function AvandarAppProvider({ children }: Props): JSX.Element {
+export function AvandarAppProvider({ children }: Props): ReactNode {
   const i18nMessages = useAvandarUIMessages();
 
   return (
