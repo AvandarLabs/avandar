@@ -1,7 +1,5 @@
-/** Shortest usable expanded drawer height, in pixels. */
 const MIN_HEIGHT = 180;
 
-/** Expanded height the drawer opens at before the user resizes it. */
 const DEFAULT_HEIGHT = 292;
 
 /**
@@ -41,22 +39,12 @@ type KeyResizeOptions = AvailableHeightOptions & {
   currentHeight: number;
 };
 
-/**
- * The tallest the drawer may be inside a region of `availableHeight`, or
- * `undefined` when that region has not been measured and so imposes no cap.
- */
 function _resolveMaxHeight(availableHeight: number): number | undefined {
   return availableHeight <= 0 ? undefined : (
       Math.max(MIN_HEIGHT, Math.round(availableHeight * MAX_AVAILABLE_FRACTION))
     );
 }
 
-/**
- * Constrains a requested expanded drawer height to a whole number of pixels
- * between `MIN_HEIGHT` and the share of the region the drawer is allowed to
- * take. When the region is too short to honor that share the minimum wins, so
- * the drawer never shrinks to an unusable sliver.
- */
 function _clamp({ requestedHeight, availableHeight }: ClampOptions): number {
   const maxHeight = _resolveMaxHeight(availableHeight);
   const flooredHeight = Math.max(MIN_HEIGHT, Math.round(requestedHeight));
@@ -65,11 +53,6 @@ function _clamp({ requestedHeight, availableHeight }: ClampOptions): number {
     );
 }
 
-/**
- * Maps a key press on the drawer's resize separator to the height the drawer
- * should take, or `undefined` when the key does not resize. `ArrowUp` grows
- * the drawer because it extends upward from the bottom of the region.
- */
 function _resolveHeightForKey({
   key,
   isShiftPressed,
@@ -104,9 +87,31 @@ function _resolveHeightForKey({
  * and settle far below the intended share.
  */
 export const DrawerHeight = {
+  /** Shortest usable expanded drawer height, in pixels. */
   MIN_HEIGHT,
+
+  /** Expanded height the drawer opens at before the user resizes it. */
   DEFAULT_HEIGHT,
+
+  /**
+   * Constrains a requested expanded drawer height to a whole number of pixels
+   * between `MIN_HEIGHT` and the share of the region the drawer is allowed to
+   * take. When the region is too short to honor that share the minimum wins,
+   * so the drawer never shrinks to an unusable sliver.
+   */
   clamp: _clamp,
+
+  /**
+   * The tallest the drawer may be inside a region of `availableHeight`, or
+   * `undefined` when that region has not been measured and so imposes no cap.
+   */
   resolveMaxHeight: _resolveMaxHeight,
+
+  /**
+   * Maps a key press on the drawer's resize separator to the height the
+   * drawer should take, or `undefined` when the key does not resize.
+   * `ArrowUp` grows the drawer because it extends upward from the bottom of
+   * the region.
+   */
   resolveHeightForKey: _resolveHeightForKey,
 } as const;

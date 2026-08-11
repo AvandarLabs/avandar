@@ -431,33 +431,46 @@
   ```
 
 - Put the docstring on the module's exported key, not on the underlying
-  function, when a non-exported function is defined in the same file as the
-  module that exports it. TypeScript intellisense does not carry a function's
-  docstring across the assignment into a module object: it can see the type of
-  `MyModule.myFunc` but does not know it is the same function as `_myFunc`, so a
-  docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
+  declaration, when a non-exported declaration is defined in the same file as
+  the module that exports it. TypeScript intellisense does not carry a
+  declaration's docstring across the assignment into a module object: it can see
+  the type of `MyModule.myFunc` but does not know it is the same function as
+  `_myFunc`, so a docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
 
-  This is bad (the docstring on `_myFunc` is invisible at the call site):
+  This covers every kind of key, not just methods. A constant loses its
+  docstring the same way, and a shorthand key (`{ MY_LIMIT }`) hides it exactly
+  as an explicit one does.
+
+  This is bad (neither docstring is visible at the call site):
 
   ```ts
+  /** Smallest allowed value. */
+  const MY_LIMIT = 10;
+
   /** What myFunc does. */
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    MY_LIMIT,
     myFunc: _myFunc,
   };
   ```
 
-  This is good (hovering `MyModule.myFunc` shows the docstring):
+  This is good (hovering either member shows its docstring):
 
   ```ts
+  const MY_LIMIT = 10;
+
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    /** Smallest allowed value. */
+    MY_LIMIT,
+
     /** What myFunc does. */
     myFunc: _myFunc,
   };
