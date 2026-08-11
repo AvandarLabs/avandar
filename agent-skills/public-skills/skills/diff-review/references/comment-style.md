@@ -42,6 +42,18 @@ standard belongs to the team, not to the reviewer: "We should avoid default
 exports, use named exports instead", "Let's use `useQuery` instead", "we don't
 need this actually".
 
+Name what the verb acts on, do not leave it implied: "Log before swallowing the
+error", not "Log before swallowing".
+
+Keep the ask to one sentence. Other locations that need the same fix go in a
+follow-on sentence, not glued onto the ask:
+
+> Log before swallowing the error though. Here and in the storage catch at line
+> 500.
+
+A conversational connective ("though", "actually", "here") is welcome. It reads
+as a colleague talking, and it costs nothing.
+
 ## Match length to stakes
 
 - **A change with an obvious fix: one line.** "Remove empty line". "Add a
@@ -65,6 +77,20 @@ Apply that to the review comment itself. Say what breaks, for whom, and when:
 > `scheduleFallback` overwrites `fallbackTimeoutRef.current = setTimeout(...)`
 > without clearing the previous timer. A rapid enter then exit (or vice versa)
 > leaks the prior timeout and both fire in order, which can mess with the state.
+
+State the stake plainly in team voice once the mechanism is explained, rather
+than trusting the reader to draw the conclusion: "We do not want to fail
+silently here."
+
+Sell the fix by what it concretely buys us, not by a dramatic contrast:
+
+> A `console.error` carrying `subscriptionRead.polarSubscriptionId` would let us
+> look this up in the future in our logs.
+
+not
+
+> A `console.error` carrying `subscriptionRead.polarSubscriptionId` is the
+> difference between an actionable ticket and a silent billing leak.
 
 When the rule is a style convention, justify it by future maintenance cost
 rather than taste:
@@ -99,6 +125,15 @@ read it: "look at how `SomeReactComponent` uses the mantine `useUncontrolled`
 hook", "Check out `SomeDetailView` or `AnotherDetailView`", "Use
 `makeObjectFromList` instead". Link the upstream docs when the fix is a library
 feature.
+
+Phrase the pointer as a directive, so the sentence is an instruction to go look
+rather than an assertion about the codebase:
+
+> See `supabase/functions/google-auth/getGoogleTokens.ts:74` for precedent on
+> logging this way in an edge function.
+
+not "`supabase/functions/google-auth/getGoogleTokens.ts:74` is the existing
+precedent for logging this way from an edge function".
 
 If the fix is more than a couple of words, write the replacement in a fenced
 code block rather than describing it. Do not annotate the block line by line;
