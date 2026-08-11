@@ -20,10 +20,10 @@ export type SettingsColumnGroup = {
  * How {@link SettingsColumns} arranges its groups.
  *
  * - `columns`: groups sit side by side, dropping to fewer columns (and finally
- *   a single column) as the container narrows. For bounded-height hosts like
- *   the Data Explorer drawer.
- * - `stacked`: groups stack vertically in bordered fieldsets. For narrow hosts
- *   like the dashboard editor's settings panel.
+ *   a single column) as the container narrows. For hosts with width to spend
+ *   and a bounded height, such as a drawer or a full page.
+ * - `stacked`: groups stack vertically in bordered fieldsets. For hosts that
+ *   are narrow but free to grow tall, such as a side panel or a modal.
  */
 export type SettingsColumnsLayout = "columns" | "stacked";
 

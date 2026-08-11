@@ -8,9 +8,15 @@
   background: var(--ava-border-default);
   display: grid;
   gap: 1px;
+
+  /*
+   * `min(floor, 100%)` so a host narrower than the floor still gets one column
+   * that fits, instead of a floor-width track overflowing it. Without it a
+   * cramped host (a small modal, a collapsed side panel) scrolls sideways.
+   */
   grid-template-columns: repeat(
     auto-fit,
-    minmax(var(--settings-columns-min-width), 1fr)
+    minmax(min(var(--settings-columns-min-width), 100%), 1fr)
   );
 }
 
