@@ -1245,6 +1245,10 @@ msgstr "此欄位"
 msgid "Edit access for {0}"
 msgstr "編輯 {0} 的訪問權限"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "工作區名稱是必填的"
+
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"

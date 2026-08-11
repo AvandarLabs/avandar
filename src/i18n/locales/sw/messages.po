@@ -1287,6 +1287,10 @@ msgstr "Uwanja huu"
 msgid "Edit access for {0}"
 msgstr "Hariri ufikiaji kwa {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+msgid "Workspace name is required"
+msgstr "Jina la eneo la kazi linahitajika"
+
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
