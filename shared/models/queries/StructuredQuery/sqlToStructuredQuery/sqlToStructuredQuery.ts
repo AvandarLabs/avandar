@@ -37,7 +37,7 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type {
   SqlMappingInput,
   SqlMappingResult,
@@ -57,7 +57,7 @@ export type {
  * useful from the SQL.
  */
 function _makeUnmappedResult(
-  reasons: readonly SqlMappingReason[],
+  reasons: readonly SqlFailedMappingReason[],
 ): SqlMappingResult {
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
@@ -106,7 +106,7 @@ function _makeQueryColumn(
  * was dropped.
  */
 export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
-  const unmappedReasons: SqlMappingReason[] = [];
+  const unmappedReasons: SqlFailedMappingReason[] = [];
   const trimmed = input.sql.trim();
   if (trimmed.length === 0) {
     return _makeUnmappedResult([{ code: "sqlEmpty" }]);

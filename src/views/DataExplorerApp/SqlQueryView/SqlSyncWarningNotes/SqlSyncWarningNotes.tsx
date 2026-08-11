@@ -1,13 +1,13 @@
 import { Trans } from "@lingui/react/macro";
 import { List, Stack, Text } from "@mantine/core";
-import { sqlMappingReasonLabel } from "$/copy/sqlMappingReasonLabel";
-import { sqlMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
+import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
+import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Reasons the manual form could not represent the current SQL. */
-  syncWarnings: readonly SqlMappingReason[];
+  syncWarnings: readonly SqlFailedMappingReason[];
 };
 
 /**
@@ -26,8 +26,8 @@ export function SqlSyncWarningNotes({ syncWarnings }: Props): ReactNode {
       <List size="xs" spacing={2}>
         {syncWarnings.map((reason) => {
           return (
-            <List.Item key={sqlMappingReasonKey(reason)}>
-              {sqlMappingReasonLabel(reason)}
+            <List.Item key={sqlFailedMappingReasonKey(reason)}>
+              {sqlFailedMappingReasonLabel(reason)}
             </List.Item>
           );
         })}

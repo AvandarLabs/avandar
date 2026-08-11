@@ -19,7 +19,7 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
   OrderByDirection,
   PartialStructuredQuery,
@@ -214,7 +214,7 @@ export const DataExplorerStateManager = createAppStateManager({
       payload: {
         query: PartialStructuredQuery;
         isFullyMapped: boolean;
-        unmappedReasons: readonly SqlMappingReason[];
+        unmappedReasons: readonly SqlFailedMappingReason[];
       },
     ): DataExplorerAppState => {
       return {
@@ -323,7 +323,7 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       payload: {
         isStructuredQueryInSync: boolean;
-        sqlSyncWarnings: readonly SqlMappingReason[];
+        sqlSyncWarnings: readonly SqlFailedMappingReason[];
       },
     ): DataExplorerAppState => {
       return {

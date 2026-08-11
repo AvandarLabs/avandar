@@ -8,13 +8,13 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 export type DashboardManualQueryState = {
   query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly SqlMappingReason[];
+  sqlSyncWarnings: readonly SqlFailedMappingReason[];
   /** Whether the SQL parser is ready (dataset metadata loaded). */
   isParserReady: boolean;
   handlers: ManualQueryFormHandlers;
@@ -41,7 +41,7 @@ export function useDashboardManualQueryState(
       return {
         query: StructuredQuery.makeEmpty(),
         isFullyMapped: true,
-        unmappedReasons: [] as readonly SqlMappingReason[],
+        unmappedReasons: [] as readonly SqlFailedMappingReason[],
       };
     }
     return parseSql(rawSql);

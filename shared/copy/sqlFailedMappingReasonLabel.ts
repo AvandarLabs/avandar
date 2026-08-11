@@ -1,15 +1,17 @@
 import { t } from "@lingui/core/macro";
 import { match } from "ts-pattern";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 /**
- * Returns the human-readable explanation for a {@link SqlMappingReason}.
+ * Returns the human-readable explanation for a {@link SqlFailedMappingReason}.
  *
  * Shared copy resolved at call time so it follows the active locale. The
  * exhaustive match means a new reason code cannot be added without giving it a
  * message here.
  */
-export function sqlMappingReasonLabel(reason: SqlMappingReason): string {
+export function sqlFailedMappingReasonLabel(
+  reason: SqlFailedMappingReason,
+): string {
   return match(reason)
     .with({ code: "sqlEmpty" }, () => {
       return t`SQL is empty.`;

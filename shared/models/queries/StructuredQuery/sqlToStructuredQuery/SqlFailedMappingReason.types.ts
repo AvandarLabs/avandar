@@ -1,13 +1,15 @@
+import { objectEntries } from "@avandar/utils";
+
 /**
  * Why a part of a SQL statement could not be represented in the structured
  * query form.
  *
  * These are structured codes rather than sentences: the parser runs in shared
  * code with no access to the active locale, so it reports what happened and the
- * display component renders it through `sqlMappingReasonLabel` from
- * `$/copy/sqlMappingReasonLabel.ts`.
+ * display component renders it through `sqlFailedMappingReasonLabel` from
+ * `$/copy/sqlFailedMappingReasonLabel.ts`.
  */
-export type SqlMappingReason =
+export type SqlFailedMappingReason =
   // Statement level
   | { code: "sqlEmpty" }
   | { code: "sqlUnparseable"; message: string }
@@ -59,8 +61,10 @@ export type SqlMappingReason =
   | { code: "havingNonLiteralComparison"; columnName: string };
 
 /** Stable identity for a reason, for use as a list key. */
-export function sqlMappingReasonKey(reason: SqlMappingReason): string {
-  const params = Object.entries(reason)
+export function sqlFailedMappingReasonKey(
+  reason: SqlFailedMappingReason,
+): string {
+  const params = objectEntries(reason)
     .filter(([key]) => {
       return key !== "code";
     })

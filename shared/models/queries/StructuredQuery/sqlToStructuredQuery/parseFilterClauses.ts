@@ -10,11 +10,11 @@ import type {
   QueryFilterGroup,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 export function parseWhereNode(
   node: unknown,
-  unmappedReasons: SqlMappingReason[],
+  unmappedReasons: SqlFailedMappingReason[],
 ): QueryFilter | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;
@@ -148,7 +148,7 @@ export function parseWhereNode(
  */
 export function parseHavingNode(
   node: unknown,
-  unmappedReasons: SqlMappingReason[],
+  unmappedReasons: SqlFailedMappingReason[],
 ): QueryFilter | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;

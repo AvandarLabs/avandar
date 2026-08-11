@@ -8,7 +8,7 @@ import type {
   QueryJoinKind,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
-import type { SqlMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlMappingReason.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
 export type FromResolution = {
@@ -54,7 +54,7 @@ function _joinKindFromKeyword(keyword: string): QueryJoinKind {
 
 function _parseJoinOn(
   onNode: unknown,
-  unmappedReasons: SqlMappingReason[],
+  unmappedReasons: SqlFailedMappingReason[],
 ):
   | { predicates: QueryJoinOnEquality[]; combinator: QueryFilterCombinator }
   | undefined {
@@ -123,7 +123,7 @@ function _stringifyNodeSqlParserSelect(node: unknown): string {
 export function resolveFrom(
   fromList: unknown,
   datasets: readonly DatasetWithColumns[],
-  unmappedReasons: SqlMappingReason[],
+  unmappedReasons: SqlFailedMappingReason[],
 ): FromResolution | undefined {
   if (!Array.isArray(fromList) || fromList.length === 0) {
     unmappedReasons.push({ code: "fromNoBaseTable" });
