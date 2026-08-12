@@ -511,7 +511,6 @@ msgid "Only allow one value"
 msgstr "僅允許一個值"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Pie Chart"
 msgstr "圓餅圖"
 
@@ -549,7 +548,6 @@ msgid "Collapse at"
 msgstr "收合於"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bubble Chart"
 msgstr "泡泡圖"
 
@@ -579,7 +577,6 @@ msgid "The sheet has a header row"
 msgstr "該工作表有一個標題列"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "表格"
@@ -892,7 +889,7 @@ msgstr "刪除角色群組"
 msgid "Hide title"
 msgstr "隱藏標題"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "{0} 資料已截斷"
@@ -998,7 +995,6 @@ msgid "Defaults to \"Y vs X\""
 msgstr "默認為 \"Y 對 X\""
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Funnel Chart"
 msgstr "漏斗圖"
 
@@ -1968,7 +1964,6 @@ msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "此儀表板是 <0>公開</0> 的。任何擁有以下鏈接的人都可以查看。"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Radar Chart"
 msgstr "雷達圖"
 
@@ -3314,7 +3309,6 @@ msgid "Time"
 msgstr "時間"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bar Chart"
 msgstr "長條圖"
 
@@ -4090,7 +4084,6 @@ msgid "Height"
 msgstr "高度"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Line Chart"
 msgstr "折線圖"
 
@@ -4200,7 +4193,7 @@ msgstr "儀表板快照"
 msgid "Signing you back in…"
 msgstr "正在重新登入…"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
 #. placeholder {3}: limit.max
@@ -5776,7 +5769,6 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Scatter Plot"
 msgstr "散佈圖"
 
@@ -5870,7 +5862,6 @@ msgid "Whole dataset"
 msgstr "整個數據集"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Area Chart"
 msgstr "面積圖"
 

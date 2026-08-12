@@ -537,7 +537,6 @@ msgid "Only allow one value"
 msgstr "Autoriser une seule valeur"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Pie Chart"
 msgstr "Graphique en secteurs"
 
@@ -575,7 +574,6 @@ msgid "Collapse at"
 msgstr "Réduire à"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bubble Chart"
 msgstr "Graphique à bulles"
 
@@ -605,7 +603,6 @@ msgid "The sheet has a header row"
 msgstr "La feuille a une ligne d'en-tête"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "Tableau"
@@ -940,7 +937,7 @@ msgstr "Supprimer le groupe de rôles"
 msgid "Hide title"
 msgstr "Masquer le titre"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "Données {0} tronquées"
@@ -1047,7 +1044,6 @@ msgid "Defaults to \"Y vs X\""
 msgstr "Par défaut, \"Y contre X\""
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Funnel Chart"
 msgstr "Graphique en entonnoir"
 
@@ -2076,7 +2072,6 @@ msgstr "Ce tableau de bord est <0>public</0>. Quiconque possède le lien "
 "ci-dessous peut le consulter."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Radar Chart"
 msgstr "Graphique radar"
 
@@ -3475,7 +3470,6 @@ msgid "Time"
 msgstr "Temps"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bar Chart"
 msgstr "Graphique à barres"
 
@@ -4279,7 +4273,6 @@ msgid "Height"
 msgstr "Hauteur"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Line Chart"
 msgstr "Graphique en courbes"
 
@@ -4395,7 +4388,7 @@ msgstr "Instantané du tableau de bord"
 msgid "Signing you back in…"
 msgstr "Reconnexion en cours…"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
 #. placeholder {3}: limit.max
@@ -6052,7 +6045,6 @@ msgstr "Idéal pour le partage de bouche à oreille. Visiter le lien permanent "
 "ci-dessous redirige également ici."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Scatter Plot"
 msgstr "Nuage de points"
 
@@ -6148,7 +6140,6 @@ msgid "Whole dataset"
 msgstr "Ensemble de données complet"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Area Chart"
 msgstr "Graphique en aires"
 

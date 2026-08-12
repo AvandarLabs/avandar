@@ -522,7 +522,6 @@ msgid "Only allow one value"
 msgstr "السماح بقيمة واحدة فقط"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Pie Chart"
 msgstr "مخطط دائري"
 
@@ -560,7 +559,6 @@ msgid "Collapse at"
 msgstr "طي عند"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bubble Chart"
 msgstr "مخطط فقاعي"
 
@@ -590,7 +588,6 @@ msgid "The sheet has a header row"
 msgstr "تحتوي الورقة على صف رأس"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "جدول"
@@ -918,7 +915,7 @@ msgstr "حذف مجموعة الأدوار"
 msgid "Hide title"
 msgstr "إخفاء العنوان"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "تم اقتطاع بيانات {0}"
@@ -1024,7 +1021,6 @@ msgid "Defaults to \"Y vs X\""
 msgstr "يتم الافتراض على \"Y مقابل X\""
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Funnel Chart"
 msgstr "مخطط قمعي"
 
@@ -2023,7 +2019,6 @@ msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "هذه اللوحة <0>عامة</0>. يمكن لأي شخص لديه الرابط أدناه مشاهدتها."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Radar Chart"
 msgstr "مخطط راداري"
 
@@ -3391,7 +3386,6 @@ msgid "Time"
 msgstr "الوقت"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bar Chart"
 msgstr "مخطط شريطي"
 
@@ -4179,7 +4173,6 @@ msgid "Height"
 msgstr "الارتفاع"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Line Chart"
 msgstr "مخطط خطي"
 
@@ -4290,7 +4283,7 @@ msgstr "لقطة لوحة التحكم"
 msgid "Signing you back in…"
 msgstr "جارٍ تسجيل دخولك مرة أخرى…"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
 #. placeholder {3}: limit.max
@@ -5907,7 +5900,6 @@ msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الد
 "أيضًا."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Scatter Plot"
 msgstr "مخطط مبعثر"
 
@@ -6003,7 +5995,6 @@ msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Area Chart"
 msgstr "مخطط مساحي"
 

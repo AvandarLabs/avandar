@@ -524,7 +524,6 @@ msgid "Only allow one value"
 msgstr "Only allow one value"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Pie Chart"
 msgstr "Pie Chart"
 
@@ -562,7 +561,6 @@ msgid "Collapse at"
 msgstr "Collapse at"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bubble Chart"
 msgstr "Bubble Chart"
 
@@ -592,7 +590,6 @@ msgid "The sheet has a header row"
 msgstr "The sheet has a header row"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "Table"
@@ -917,7 +914,7 @@ msgstr "Delete role group"
 msgid "Hide title"
 msgstr "Hide title"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "{0} data truncated"
@@ -1023,7 +1020,6 @@ msgid "Defaults to \"Y vs X\""
 msgstr "Defaults to \"Y vs X\""
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Funnel Chart"
 msgstr "Funnel Chart"
 
@@ -2024,7 +2020,6 @@ msgstr "This dashboard is <0>public</0>. Anyone with the link below can view "
 "it."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Radar Chart"
 msgstr "Radar Chart"
 
@@ -3399,7 +3394,6 @@ msgid "Time"
 msgstr "Time"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bar Chart"
 msgstr "Bar Chart"
 
@@ -4191,7 +4185,6 @@ msgid "Height"
 msgstr "Height"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Line Chart"
 msgstr "Line Chart"
 
@@ -4303,7 +4296,7 @@ msgstr "Dashboard snapshot"
 msgid "Signing you back in…"
 msgstr "Signing you back in…"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
 #. placeholder {3}: limit.max
@@ -5923,7 +5916,6 @@ msgstr "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Scatter Plot"
 msgstr "Scatter Plot"
 
@@ -6019,7 +6011,6 @@ msgid "Whole dataset"
 msgstr "Whole dataset"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Area Chart"
 msgstr "Area Chart"
 

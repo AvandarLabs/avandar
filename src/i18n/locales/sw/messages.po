@@ -528,7 +528,6 @@ msgid "Only allow one value"
 msgstr "Ruhusu thamani moja tu"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Pie Chart"
 msgstr "Chati ya Pai"
 
@@ -566,7 +565,6 @@ msgid "Collapse at"
 msgstr "Kunja katika"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bubble Chart"
 msgstr "Chati ya Viputo"
 
@@ -596,7 +594,6 @@ msgid "The sheet has a header row"
 msgstr "Karatasi ina safu ya kichwa"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "Jedwali"
@@ -928,7 +925,7 @@ msgstr "Futa kundi la jukumu"
 msgid "Hide title"
 msgstr "Ficha kichwa"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "Data ya {0} imekatwa"
@@ -1034,7 +1031,6 @@ msgid "Defaults to \"Y vs X\""
 msgstr "Inarudiwa kwa \"Y dhidi ya X\""
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Funnel Chart"
 msgstr "Chati ya Funnel"
 
@@ -2049,7 +2045,6 @@ msgstr "Dashboard hii ni <0>ya umma</0>. Mtu yeyote mwenye kiungo kilicho hapa "
 "chini anaweza kuiona."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Radar Chart"
 msgstr "Chati ya Rada"
 
@@ -3434,7 +3429,6 @@ msgid "Time"
 msgstr "Wakati"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Bar Chart"
 msgstr "Chati ya pau"
 
@@ -4231,7 +4225,6 @@ msgid "Height"
 msgstr "Urefu"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Line Chart"
 msgstr "Chati ya mistari"
 
@@ -4344,7 +4337,7 @@ msgstr "Picha ya dashibodi"
 msgid "Signing you back in…"
 msgstr "Inakuingiza tena…"
 
-#. placeholder {0}: limit.name
+#. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
 #. placeholder {3}: limit.max
@@ -5980,7 +5973,6 @@ msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa 
 "chini pia kunarudisha hapa."
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Scatter Plot"
 msgstr "Chati ya Vitawanyiko"
 
@@ -6076,7 +6068,6 @@ msgid "Whole dataset"
 msgstr "Dataset nzima"
 
 #: shared/copy/vizTypeLabel.ts
-#: src/utils/getVizDisplayName.ts
 msgid "Area Chart"
 msgstr "Chati ya Eneo"
 
