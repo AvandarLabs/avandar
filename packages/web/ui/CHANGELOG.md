@@ -1,5 +1,14 @@
 # @avandar/ui
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @avandar/browser-utils@0.1.2
+  - @avandar/hooks@0.1.2
+  - @avandar/utils@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
