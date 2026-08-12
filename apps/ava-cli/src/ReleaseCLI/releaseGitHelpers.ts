@@ -107,6 +107,19 @@ export function findWorktreeForBranch(
   return undefined;
 }
 
+/**
+ * `owner/repo` for the `origin` remote, or `undefined` when origin is not a
+ * GitHub remote (a local bare remote in a test, for instance).
+ */
+export function getGitHubRepoSlug(git: ReleaseCommands): string | undefined {
+  const remoteUrl = git.readGit(["remote", "get-url", "origin"]) ?? "";
+  const repoSlug = remoteUrl
+    .replace(/^git@github\.com:/, "")
+    .replace(/^https:\/\/github\.com\//, "")
+    .replace(/\.git$/, "");
+  return /^[\w.-]+\/[\w.-]+$/.test(repoSlug) ? repoSlug : undefined;
+}
+
 /** Reads the root package.json version at a git revision, without checkout. */
 export function readVersionAtRevision(
   git: ReleaseCommands,

@@ -2,7 +2,7 @@ import { toDevVersion } from "@ava-cli/ReleaseCLI/releaseVersionUtils/releaseVer
 import {
   RELEASE_SOURCE_BRANCH,
   RELEASE_TARGET_BRANCH,
-} from "@ava-cli/ReleaseCLI/runPreflight";
+} from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 import { Acclimate } from "@avandar/acclimate";
 import { isDefined } from "@avandar/utils";
 

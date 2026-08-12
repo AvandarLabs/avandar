@@ -1,3 +1,4 @@
+import { describeCommandFailure } from "@ava-cli/ReleaseCLI/describeCommandFailure/describeCommandFailure";
 import { propEq } from "@avandar/utils";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
@@ -75,7 +76,7 @@ export function checkDevelopCI(
 ): CIStatus {
   const { commitSha, branch } = options;
 
-  const result = git.mutateQuietly("gh", [
+  const result = git.readCommand("gh", [
     "run",
     "list",
     "--branch",
@@ -91,10 +92,10 @@ export function checkDevelopCI(
   if (!result.ok) {
     return {
       kind: "unknown",
-      reason:
-        result.stderr.length > 0 ?
-          (result.stderr.split("\n")[0] ?? result.stderr)
-        : "the gh CLI could not list workflow runs",
+      reason: describeCommandFailure(
+        result,
+        "the gh CLI could not list workflow runs",
+      ),
     };
   }
 

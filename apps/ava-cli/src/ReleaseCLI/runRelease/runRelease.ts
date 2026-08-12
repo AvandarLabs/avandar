@@ -8,7 +8,7 @@ import {
 import {
   RELEASE_SOURCE_BRANCH,
   runPreflight,
-} from "@ava-cli/ReleaseCLI/runPreflight";
+} from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 import {
   printHeading,
   printVersionReference,
@@ -30,7 +30,7 @@ import {
 import { printSuccess, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
-import type { PreflightResult } from "@ava-cli/ReleaseCLI/runPreflight";
+import type { PreflightResult } from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 import type { ReleasePlan } from "@ava-cli/ReleaseCLI/runRelease/releaseStageHelpers";
 
 /** Everything `ava release` accepts, already parsed. */

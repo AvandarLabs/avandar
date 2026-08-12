@@ -3,6 +3,7 @@ import { describeCIStatus } from "@ava-cli/ReleaseCLI/describeCIStatus";
 import {
   createReleaseCommit,
   findWorktreeForBranch,
+  getGitHubRepoSlug,
   localTagExists,
   readTreeSha,
   remoteTagExists,
@@ -14,7 +15,7 @@ import { toDevVersion } from "@ava-cli/ReleaseCLI/releaseVersionUtils/releaseVer
 import {
   RELEASE_SOURCE_BRANCH,
   RELEASE_TARGET_BRANCH,
-} from "@ava-cli/ReleaseCLI/runPreflight";
+} from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 import {
   printDetail,
   printDetails,
@@ -313,7 +314,7 @@ export function printReleaseSummary(
   );
   printSuccess(`${RELEASE_SOURCE_BRANCH} = ${toDevVersion(nextVersion)}`);
 
-  const repoSlug = _githubRepoSlug(git);
+  const repoSlug = getGitHubRepoSlug(git);
   if (repoSlug === undefined) {
     return;
   }
@@ -407,14 +408,4 @@ function _releaseCommitMessage(
   return `Release ${releaseVersion}
 
 Sets ${RELEASE_TARGET_BRANCH} to ${RELEASE_SOURCE_BRANCH}'s tree at ${releaseSha} verbatim. Written with git commit-tree, so this is a two-parent merge carrying develop's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCLI.`;
-}
-
-/** `owner/repo` for the origin remote, or `undefined` when it is not GitHub. */
-function _githubRepoSlug(git: ReleaseCommands): string | undefined {
-  const remoteUrl = git.readGit(["remote", "get-url", "origin"]) ?? "";
-  const repoSlug = remoteUrl
-    .replace(/^git@github\.com:/, "")
-    .replace(/^https:\/\/github\.com\//, "")
-    .replace(/\.git$/, "");
-  return /^[\w.-]+\/[\w.-]+$/.test(repoSlug) ? repoSlug : undefined;
 }
