@@ -1,6 +1,6 @@
 {
   "name": "@avandar/utils",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Common helper functions with no business logic. Droppable into any project.",
   "license": "MIT",
   "repository": {
