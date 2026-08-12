@@ -19,7 +19,7 @@ Global (work from either pane):
 | `Ctrl+R` | restart the difit server (the palette's "Restart diff server") |
 | `Ctrl+G` | regenerate the diff guide (the palette's "Regenerate diff guide") |
 | `Ctrl+O` | open the difit server URL in the default browser (the palette's "Open diff in browser") |
-| `Ctrl+N` | start a fresh LLM session (interrupts: kills the running LLM and respawns it on a new session that auto-submits the review prompt; the palette's "New LLM session") |
+| `Ctrl+N` | start a fresh LLM session (interrupts: kills the running LLM and respawns it on a new session that auto-submits the review-orientation prompt; the palette's "New LLM session") |
 | `Ctrl+Q` | quit `dif` (tears down difit, the LLM, and the poller) |
 | `Alt+S` | show the keyboard-shortcuts help modal (also pinned at the right of the bottom statusline) |
 
@@ -47,6 +47,25 @@ While the palette is open it captures all keys:
 | `Esc` / `Ctrl+C` | close the palette |
 
 See [config.md](config.md#command-registry) for the command list.
+
+## Start-review modal
+
+Raised at launch when no prepared review exists for the comparison (see
+[features.md](features.md#launching-with-no-prepared-review)). It captures every
+key while open, so a stray keystroke can neither leak into the LLM pane nor be
+read as an answer:
+
+| Key | Action |
+| --- | --- |
+| `y` | start the review (types `/diff-review [comparison]` into the LLM pane) |
+| `n` / `Esc` / `Ctrl+C` | dismiss: close the modal and start nothing |
+| `Enter` | answer with the selected button (it opens on **Yes**) |
+| `←` / `→`, `h` / `l` | select No / Yes without answering |
+| `Tab` / `Shift+Tab` | move the selection to the other button |
+| anything else | swallowed |
+
+Nothing else in `dif` ever starts a review on its own. After dismissing, the way
+to start one is to type `/diff-review` in the LLM pane yourself.
 
 When the **main** (diff) view is focused (read-only). Keys common to both views:
 

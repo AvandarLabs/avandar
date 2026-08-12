@@ -66,6 +66,12 @@ pub fn run_event_loop(
 }
 
 fn handle_key(app: &mut App, k: &KeyEvent) {
+    // The start-review question is asked at launch and answered before anything
+    // else, so it captures all keys while open.
+    if app.start_review_open() {
+        handle_start_review_key(app, k);
+        return;
+    }
     // The help modal is a read-only overlay: while open it captures all keys and
     // only closes.
     if app.help_open {
@@ -164,6 +170,63 @@ const fn alt_scroll_action(k: &KeyEvent) -> Option<AltScroll> {
     }
 }
 
+/// Drive the "no diff review found — start one?" modal.
+///
+/// `y` / `n` answer outright, `Enter` takes the selected button, `←`/`→` (and
+/// `h`/`l`, `Tab`) move the selection, and `Esc` / `Ctrl+C` dismiss. Dismissing
+/// starts nothing: the diff stays open exactly as it is. Every other key is
+/// swallowed so a stray keystroke cannot leak into the LLM pane and read as an
+/// answer.
+fn handle_start_review_key(app: &mut App, k: &KeyEvent) {
+    match start_review_action(k) {
+        StartReviewKey::Accept => app.accept_start_review(),
+        StartReviewKey::Dismiss => app.dismiss_start_review(),
+        StartReviewKey::Confirm => app.confirm_start_review(),
+        StartReviewKey::SelectYes => app.select_start_review_yes(),
+        StartReviewKey::SelectNo => app.select_start_review_no(),
+        StartReviewKey::Toggle => app.toggle_start_review_choice(),
+        StartReviewKey::Ignore => {}
+    }
+}
+
+/// What a keystroke means to the start-review modal. Pure, so the key map is
+/// unit-tested without a terminal or a spawned pane.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum StartReviewKey {
+    /// Answer Yes outright.
+    Accept,
+    /// Answer No: close and do nothing.
+    Dismiss,
+    /// Answer with whichever button is selected.
+    Confirm,
+    /// Move the selection to Yes without answering.
+    SelectYes,
+    /// Move the selection to No without answering.
+    SelectNo,
+    /// Move the selection to the other button.
+    Toggle,
+    /// Swallowed, so it cannot leak into the LLM pane.
+    Ignore,
+}
+
+const fn start_review_action(k: &KeyEvent) -> StartReviewKey {
+    if k.modifiers.contains(KeyModifiers::CONTROL) {
+        return match k.code {
+            KeyCode::Char('c' | 'C') => StartReviewKey::Dismiss,
+            _ => StartReviewKey::Ignore,
+        };
+    }
+    match k.code {
+        KeyCode::Char('y' | 'Y') => StartReviewKey::Accept,
+        KeyCode::Esc | KeyCode::Char('n' | 'N') => StartReviewKey::Dismiss,
+        KeyCode::Enter => StartReviewKey::Confirm,
+        KeyCode::Left | KeyCode::Char('h' | 'H') => StartReviewKey::SelectNo,
+        KeyCode::Right | KeyCode::Char('l' | 'L') => StartReviewKey::SelectYes,
+        KeyCode::Tab | KeyCode::BackTab => StartReviewKey::Toggle,
+        _ => StartReviewKey::Ignore,
+    }
+}
+
 /// Drive the open help modal: `Esc`, `Alt+S`, or `Ctrl+C` close it; every other
 /// key is swallowed (the modal is read-only).
 const fn handle_help_key(app: &mut App, k: &KeyEvent) {
@@ -240,7 +303,7 @@ fn forward_to_llm(app: &App, k: &KeyEvent) {
 mod tests {
     use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-    use super::{AltScroll, alt_scroll_action};
+    use super::{AltScroll, StartReviewKey, alt_scroll_action, start_review_action};
 
     fn alt_key(c: char) -> KeyEvent {
         KeyEvent::new(KeyCode::Char(c), KeyModifiers::ALT)
@@ -262,5 +325,79 @@ mod tests {
     fn bare_j_and_k_are_not_global_scrolls() {
         assert_eq!(alt_scroll_action(&plain_key('j')), None);
         assert_eq!(alt_scroll_action(&plain_key('k')), None);
+    }
+
+    fn bare(code: KeyCode) -> KeyEvent {
+        KeyEvent::new(code, KeyModifiers::NONE)
+    }
+
+    #[test]
+    fn y_and_n_answer_the_start_review_modal_outright() {
+        assert_eq!(
+            start_review_action(&plain_key('y')),
+            StartReviewKey::Accept
+        );
+        assert_eq!(
+            start_review_action(&plain_key('Y')),
+            StartReviewKey::Accept
+        );
+        assert_eq!(
+            start_review_action(&plain_key('n')),
+            StartReviewKey::Dismiss
+        );
+        assert_eq!(
+            start_review_action(&plain_key('N')),
+            StartReviewKey::Dismiss
+        );
+    }
+
+    #[test]
+    fn esc_and_ctrl_c_dismiss_without_starting_a_review() {
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Esc)),
+            StartReviewKey::Dismiss
+        );
+        assert_eq!(
+            start_review_action(&KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)),
+            StartReviewKey::Dismiss
+        );
+    }
+
+    #[test]
+    fn arrows_move_the_selection_and_enter_answers_it() {
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Left)),
+            StartReviewKey::SelectNo
+        );
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Right)),
+            StartReviewKey::SelectYes
+        );
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Tab)),
+            StartReviewKey::Toggle
+        );
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Enter)),
+            StartReviewKey::Confirm
+        );
+    }
+
+    #[test]
+    fn other_keys_are_swallowed_so_they_cannot_reach_the_llm() {
+        // Notably including a stray Ctrl chord and ordinary typing: while the
+        // modal is open the only thing it can do is answer the question.
+        assert_eq!(
+            start_review_action(&plain_key('q')),
+            StartReviewKey::Ignore
+        );
+        assert_eq!(
+            start_review_action(&KeyEvent::new(KeyCode::Char('r'), KeyModifiers::CONTROL)),
+            StartReviewKey::Ignore
+        );
+        assert_eq!(
+            start_review_action(&bare(KeyCode::Backspace)),
+            StartReviewKey::Ignore
+        );
     }
 }

@@ -7,6 +7,7 @@ pub mod control;
 pub mod draw;
 pub mod draw_help;
 pub mod draw_palette;
+pub mod draw_start_review;
 pub mod event_loop;
 pub mod guide;
 pub mod keymap;
@@ -16,6 +17,7 @@ pub mod open_target;
 pub mod palette;
 pub mod session_meta;
 pub mod shortcuts;
+pub mod start_review;
 pub mod startup;
 pub mod vim;
 

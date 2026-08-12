@@ -23,11 +23,10 @@ On launch `dif`:
    shell page loads at once and its iframe retries until difit is up, so the
    review opens as fast as the browser can be told to.
 4. Starts the background comments poller.
-5. Starts the right pane in the repo root. Claude is the default; `--codex` and
-   `-cx` select Codex. When a prepared review already exists, a **fresh** session
-   is launched with the normal review-orientation prompt. A resumed Claude
-   session gets no such message because that orientation is already in its
-   context.
+5. Starts the right pane in the repo root, **idle**. Claude is the default;
+   `--codex` and `-cx` select Codex. Nothing is typed into it: a launch shows the
+   diff, it does not commission a review. A resumed Claude session simply comes
+   back with the context it already had.
 6. Focuses the **diff main view** (left), not the LLM pane.
 
 ### Launching with no prepared review
@@ -36,12 +35,15 @@ On launch `dif`:
 happens the same whether or not a review has been prepared. When
 `-guide.md`/`-guide.json` are missing, the only differences are:
 
-- The right pane's first prompt is the tiny one that prepares the review:
-  `/diff-review` plus only the comparison argument the user passed to `dif`
-  (`/diff-review .`, `/diff-review develop`, etc.). Bare `dif` seeds just
-  `/diff-review`.
-- The left pane's title reads `preparing guide`, and a banner there says the
-  diff is live and the guide is on its way.
+- A modal asks: **"No diff review found"** — start one? `y` / `Enter` starts it,
+  `n` / `Esc` dismisses. Nothing is generated unless you say Yes; dismissing
+  leaves the diff open and changes nothing. Answering Yes types the tiny prepare
+  command into the LLM pane: `/diff-review` plus only the comparison argument you
+  passed to `dif` (`/diff-review .`, `/diff-review develop`, etc.). Bare `dif`
+  runs just `/diff-review`. You can also type `/diff-review` in the LLM pane
+  yourself at any time, which is the only route left after dismissing.
+- The left pane's title reads `preparing guide`, and a banner there says the diff
+  is live and that nothing is generating a review.
 - A local control endpoint is written to live-session metadata so the skill can
   tell the running TUI which comparison it chose (see
   [integrations.md](integrations.md#comparison-handoff)).
@@ -50,8 +52,8 @@ You can review — and comment — immediately. Comments you write before the gu
 exists are mirrored into the transcript and queued to the LLM like any other, so
 they are waiting in its input the moment it finishes the round it is on.
 
-As the skill writes them, the guide, summary, test plan, and `claude` threads
-appear on their own: the browser shell polls the markdown and `-guide.json`
+Once a review is under way, the guide, summary, test plan, and `claude` threads
+appear on their own as the skill writes them: the browser shell polls the markdown and `-guide.json`
 every few seconds, and the poller pushes the transcript's new threads into the
 live difit server, which streams them to the browser over SSE. No relaunch, and
 no manual refresh. When the artifacts land, the pane logs
@@ -170,8 +172,9 @@ closed the tab difit opened on launch).
 "New LLM session", the palette command, or its direct **`Ctrl+N`** shortcut
 (shown dimmed as `[^N]` on the palette row), starts a fresh LLM session. It
 is an **interrupt**, not a queued message: `dif` kills the running LLM child
-and respawns the pane on a brand-new session that auto-submits the review prompt
-on startup, exactly as the pane's first launch does. This is deliberate: typing
+and respawns the pane on a brand-new session that auto-submits the
+review-orientation prompt on startup. (The pane's *own* first launch submits
+nothing — see [Launching with no prepared review](#launching-with-no-prepared-review).) This is deliberate: typing
 `/new` would merely land in the LLM's input queue and, if it were mid-thought,
 could sit unsent for minutes (and the follow-up prompt with it). Respawning
 reuses the pane, so its size and scrollback log carry over; the difit server and

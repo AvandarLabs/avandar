@@ -32,7 +32,7 @@ export const RELEASE_FLAGS = [
 export function findUnknownReleaseFlags(
   argv: readonly string[],
 ): readonly string[] {
-  const known: readonly string[] = RELEASE_FLAGS;
+  const known = new Set<string>(RELEASE_FLAGS);
 
   return argv.filter((token) => {
     if (!token.startsWith("-")) {
@@ -41,7 +41,7 @@ export function findUnknownReleaseFlags(
     // `--flag=value` is not Acclimate's syntax, but reject the flag part rather
     // than the whole token so the message names something recognisable.
     const [flag] = token.split("=");
-    return !known.includes(flag ?? token);
+    return !known.has(flag ?? token);
   });
 }
 
