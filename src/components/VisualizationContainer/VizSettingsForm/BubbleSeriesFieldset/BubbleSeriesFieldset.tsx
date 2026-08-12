@@ -17,7 +17,7 @@ import { useCallback, useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import css from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.module.css";
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
-import { useStableRowIds } from "@/components/VisualizationContainer/VizSettingsForm/useStableRowIds";
+import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -89,7 +89,12 @@ export function BubbleSeriesFieldset({
     [series, onChange],
   );
 
-  const seriesRowIds = useStableRowIds(series);
+  const seriesIdentities = useMemo(() => {
+    return series.map((s) => {
+      return `${s.key}-${s.xKey}-${s.sizeKey}`;
+    });
+  }, [series]);
+  const seriesRowKeys = useUniqueRowKeys(seriesIdentities);
 
   const seriesGroup = (
     <Stack gap="md">
@@ -121,7 +126,7 @@ export function BubbleSeriesFieldset({
       <SeriesList layout={layout}>
         {series.map((bubbleSeries, idx) => {
           return (
-            <Card key={seriesRowIds[idx]} withBorder shadow="none" padding="sm">
+            <Card key={seriesRowKeys[idx]} withBorder shadow="none" padding="sm">
               <Stack gap="xs">
                 <Group justify="space-between" wrap="nowrap" align="flex-start">
                   <Stack gap="xs" className={css.flexFillMinW0}>
