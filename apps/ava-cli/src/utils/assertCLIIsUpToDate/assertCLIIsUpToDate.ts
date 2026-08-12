@@ -1,7 +1,7 @@
-import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate";
+import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
 import { getBuiltCLIVersion } from "@ava-cli/utils/assertCLIIsUpToDate/getBuiltCLIVersion";
 import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
-import { findRepoRoot } from "@ava-cli/utils/findRepoRoot/findRepoRoot";
+import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 
 /** The command that rebuilds `ava` and repoints the symlink on `$PATH`. */
 const REBUILD_COMMAND = "pnpm build:ava-cli";
@@ -15,7 +15,7 @@ const REBUILD_COMMAND = "pnpm build:ava-cli";
  * directly (tests), in which case the caller falls back to the expected bundle
  * location.
  */
-function getRunningBundlePath(): string | undefined {
+function _getRunningBundlePath(): string | undefined {
   return typeof __filename === "string" ? __filename : undefined;
 }
 
@@ -31,7 +31,7 @@ export function assertCLIIsUpToDate(): boolean {
   const result = checkCLIIsUpToDate({
     repoRoot: findRepoRoot(),
     builtVersion: getBuiltCLIVersion(),
-    bundlePath: getRunningBundlePath(),
+    bundlePath: _getRunningBundlePath(),
   });
 
   if (result.upToDate) {

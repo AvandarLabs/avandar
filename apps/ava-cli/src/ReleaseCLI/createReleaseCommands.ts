@@ -1,19 +1,12 @@
 import { spawnSync } from "node:child_process";
 import { Acclimate } from "@avandar/acclimate";
 
-/**
- * The command layer for `ava release`.
- *
- * Every read of repository state and every mutation of it goes through here, so
- * that `--dry-run` is enforced in exactly one place: `mutate()` prints the
- * command and refuses to run it, while reads always run (they change nothing).
- */
-
-export type CommandResult = Readonly<{
+/** The outcome of one command: whether it succeeded, and what it printed. */
+export type CommandResult = {
   ok: boolean;
   stdout: string;
   stderr: string;
-}>;
+};
 
 export type ReleaseCommands = Readonly<{
   /** Absolute path to the repo the release operates on. */
@@ -30,7 +23,7 @@ export type ReleaseCommands = Readonly<{
   mutateQuietly: (command: string, args: readonly string[]) => CommandResult;
 }>;
 
-function runCommand(
+function _runCommand(
   command: string,
   args: readonly string[],
   cwd: string,
@@ -50,10 +43,17 @@ function runCommand(
   };
 }
 
-export function createReleaseCommands(options: {
-  repoRoot: string;
-  dryRun: boolean;
-}): ReleaseCommands {
+/**
+ * The command layer for `ava release`, bound to one repo.
+ *
+ * Every read of repository state and every mutation of it goes through the
+ * returned object, so `--dry-run` is enforced in exactly one place: `mutate`
+ * prints the command and refuses to run it, while reads always run because they
+ * change nothing.
+ */
+export function createReleaseCommands(
+  options: Readonly<{ repoRoot: string; dryRun: boolean }>,
+): ReleaseCommands {
   const { repoRoot, dryRun } = options;
 
   return {
@@ -61,12 +61,12 @@ export function createReleaseCommands(options: {
     dryRun,
 
     readGit: (args: readonly string[]): string | undefined => {
-      const result = runCommand("git", args, repoRoot);
+      const result = _runCommand("git", args, repoRoot);
       return result.ok ? result.stdout : undefined;
     },
 
     tryGit: (args: readonly string[]): CommandResult => {
-      return runCommand("git", args, repoRoot);
+      return _runCommand("git", args, repoRoot);
     },
 
     mutate: (command: string, args: readonly string[]): CommandResult => {
@@ -78,7 +78,7 @@ export function createReleaseCommands(options: {
       if (dryRun) {
         return { ok: true, stdout: "", stderr: "" };
       }
-      return runCommand(command, args, repoRoot);
+      return _runCommand(command, args, repoRoot);
     },
 
     mutateQuietly: (
@@ -88,7 +88,7 @@ export function createReleaseCommands(options: {
       if (dryRun) {
         return { ok: true, stdout: "", stderr: "" };
       }
-      return runCommand(command, args, repoRoot);
+      return _runCommand(command, args, repoRoot);
     },
   };
 }

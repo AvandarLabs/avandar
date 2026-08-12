@@ -60,7 +60,7 @@ about one without the other.
   wait for review artifacts before showing the diff.
 - **A launch never starts a review.** The LLM pane comes up **idle**: nothing is
   typed into it at launch, fresh or resumed. With no prepared review, `dif` asks
-  in the start-review modal (`tui/start_review.rs`), and *only* an explicit Yes
+  in the start-review modal (`tui/start_review/`), and *only* an explicit Yes
   injects `/diff-review [comparison]`; a No starts nothing. Generating a review
   costs the user real tokens and time, so it is always their call. Nothing in
   this crate may reintroduce an automatic kickoff — if you find yourself passing

@@ -37,8 +37,12 @@ src/
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
-    ├── start_review.rs  pure state + wording for the "no diff review found — start one?" modal
-    ├── draw_start_review.rs  that modal's renderer (Yes / No buttons)
+    ├── start_review/   the "no diff review found, start one?" modal
+    │   ├── modal.rs    pure state + wording (Choice, Outcome, StartReviewModal)
+    │   ├── control.rs  the `impl App` surface that answers it
+    │   ├── keys.rs     its key map (pure key -> intent) + handler
+    │   └── draw.rs     its renderer (Yes / No buttons)
+    ├── modal_layout.rs  shared centred-rect geometry for every modal overlay
     ├── palette.rs     command registry (PALETTE_COMMANDS) + PaletteState
     ├── main_diff_view.rs  the MainDiffView cycle (log view ↔ test plan ↔ diff guide)
     ├── guide.rs       markdown view state: styled markdown (re-read on change) + a cursor overlay (cursor is source of truth; scroll derived to keep it visible)

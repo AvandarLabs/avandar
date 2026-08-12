@@ -1,4 +1,5 @@
-//! The launch-time "no diff review found — start one?" modal.
+//! State and wording for the launch-time "no diff review found, start one?"
+//! modal.
 //!
 //! `dif` never generates a review on its own. Launching only ever shows the
 //! diff: difit, the browser shell, and the poller come up immediately, and the
@@ -7,10 +8,9 @@
 //! an explicit Yes injects the `/diff-review [comparison]` command. Declining
 //! closes the modal and leaves the diff exactly as it is.
 //!
-//! The state is pure (a choice plus the prompt to inject) so the whole decision
-//! is unit-testable without a terminal; rendering lives in
-//! [`draw_start_review`](super::draw_start_review) and key handling in
-//! `event_loop`.
+//! The state here is pure (a choice plus the prompt to inject) so the whole
+//! decision is unit-testable without a terminal. Rendering lives in
+//! [`draw`](super::draw) and key handling in [`keys`](super::keys).
 
 /// Which button the modal has selected.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,7 +21,7 @@ pub enum Choice {
     No,
 }
 
-/// What the event loop should do once the modal resolves.
+/// What the caller should do once the modal resolves.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Outcome {
     /// Inject this prompt into the LLM pane, then close.
@@ -41,9 +41,9 @@ pub struct StartReviewModal {
 impl StartReviewModal {
     /// Open the modal for `comparison_label`, offering to run `prompt`.
     ///
-    /// Starts on [`Choice::Yes`]: the reviewer opened `dif` to review something,
-    /// so it is the answer they most often want, and No is one keystroke away
-    /// (`n`, `Esc`, or `←`).
+    /// Starts on [`Choice::Yes`]: the reviewer opened `dif` to review
+    /// something, so it is the answer they most often want, and No is one
+    /// keystroke away (`n`, `Esc`, or `left`).
     #[must_use]
     pub const fn new(prompt: String, comparison_label: String) -> Self {
         Self {
@@ -65,17 +65,17 @@ impl StartReviewModal {
         &self.comparison_label
     }
 
-    /// Select Yes (`→`, `l`, `Tab`).
+    /// Select Yes (`right`, `l`).
     pub const fn select_yes(&mut self) {
         self.choice = Choice::Yes;
     }
 
-    /// Select No (`←`, `h`, `Tab`).
+    /// Select No (`left`, `h`).
     pub const fn select_no(&mut self) {
         self.choice = Choice::No;
     }
 
-    /// Move the selection to the other button.
+    /// Move the selection to the other button (`Tab`).
     pub const fn toggle(&mut self) {
         self.choice = match self.choice {
             Choice::Yes => Choice::No,
@@ -105,20 +105,24 @@ pub const fn title() -> &'static str {
     "No diff review found"
 }
 
-/// The modal's body lines, in display order.
+/// The modal's body paragraphs, in display order.
 ///
 /// States what is missing, what is already usable without it, and what a Yes
-/// would do — so declining is an informed choice rather than a shot in the dark.
+/// would do, so declining is an informed choice rather than a shot in the dark.
+/// The renderer wraps these to the modal width, so they are written as whole
+/// sentences rather than pre-wrapped lines.
 #[must_use]
 pub fn body_lines(comparison_label: &str) -> Vec<String> {
     vec![
         format!("No prepared diff review exists for {comparison_label}."),
         String::new(),
-        "The diff is already live in your browser, and any comment you".to_owned(),
-        "leave is saved and queued to the LLM either way.".to_owned(),
+        "The diff is already live in your browser, and any comment you leave is \
+         saved and queued to the LLM either way."
+            .to_owned(),
         String::new(),
-        "Start a diff review now? Yes runs /diff-review in the LLM pane;".to_owned(),
-        "No just closes this and changes nothing.".to_owned(),
+        "Start a diff review now? Yes runs /diff-review in the LLM pane; No just \
+         closes this and changes nothing."
+            .to_owned(),
     ]
 }
 
@@ -131,12 +135,9 @@ mod tests {
     }
 
     #[test]
-    fn opens_on_yes() {
-        assert_eq!(modal().choice(), Choice::Yes);
-    }
-
-    #[test]
-    fn confirming_yes_injects_the_prepare_prompt() {
+    fn confirming_the_opening_selection_starts_the_review() {
+        // Also pins the opening selection: a modal that opened on No would
+        // dismiss here instead.
         assert_eq!(
             modal().confirm(),
             Outcome::StartReview("/diff-review develop".to_owned())
@@ -145,41 +146,30 @@ mod tests {
 
     #[test]
     fn confirming_no_dismisses_without_a_prompt() {
-        let mut m = modal();
-        m.select_no();
+        let mut start_review_modal = modal();
+        start_review_modal.select_no();
 
-        assert_eq!(m.confirm(), Outcome::Dismiss);
+        assert_eq!(start_review_modal.confirm(), Outcome::Dismiss);
     }
 
     #[test]
     fn toggle_moves_between_the_two_buttons() {
-        let mut m = modal();
+        let mut start_review_modal = modal();
 
-        m.toggle();
-        assert_eq!(m.choice(), Choice::No);
-        m.toggle();
-        assert_eq!(m.choice(), Choice::Yes);
-    }
-
-    #[test]
-    fn select_is_idempotent() {
-        let mut m = modal();
-        m.select_no();
-        m.select_no();
-        assert_eq!(m.choice(), Choice::No);
-        m.select_yes();
-        m.select_yes();
-        assert_eq!(m.choice(), Choice::Yes);
+        start_review_modal.toggle();
+        assert_eq!(start_review_modal.choice(), Choice::No);
+        start_review_modal.toggle();
+        assert_eq!(start_review_modal.choice(), Choice::Yes);
     }
 
     #[test]
     fn accept_starts_the_review_even_when_no_is_selected() {
-        let mut m = modal();
-        m.select_no();
+        let mut start_review_modal = modal();
+        start_review_modal.select_no();
 
         // `y` is an explicit answer, not a cursor move.
         assert_eq!(
-            m.accept(),
+            start_review_modal.accept(),
             Outcome::StartReview("/diff-review develop".to_owned())
         );
     }

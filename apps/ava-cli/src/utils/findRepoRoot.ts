@@ -2,15 +2,12 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 /**
- * Walks up from `process.cwd()` until a directory looks like the Avandar
- * monorepo root, i.e. it holds both `pnpm-workspace.yaml` and
- * `apps/ava-cli/package.json`.
+ * The Avandar monorepo root containing `startDir`, or `undefined` when that
+ * directory is not inside the monorepo.
  *
  * `ava` is installed as a symlink on `$PATH`, so it can be invoked from
  * anywhere. Commands that operate on the repository need the repository the
  * user is standing in, not the one the CLI happened to be built from.
- *
- * @returns The absolute repo root, or undefined when not inside the monorepo.
  */
 export function findRepoRoot(
   startDir: string = process.cwd(),
@@ -18,6 +15,7 @@ export function findRepoRoot(
   let dir = startDir;
 
   while (true) {
+    // The monorepo root is the directory holding both markers.
     const hasWorkspaceFile = existsSync(join(dir, "pnpm-workspace.yaml"));
     const hasAvaCLI = existsSync(join(dir, "apps/ava-cli/package.json"));
     if (hasWorkspaceFile && hasAvaCLI) {

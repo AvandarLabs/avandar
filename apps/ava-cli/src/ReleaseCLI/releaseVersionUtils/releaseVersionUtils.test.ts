@@ -4,7 +4,7 @@ import {
   toReleaseTag,
   toReleaseVersion,
   validateReleaseVersion,
-} from "@ava-cli/ReleaseCLI/releaseVersions";
+} from "@ava-cli/ReleaseCLI/releaseVersionUtils/releaseVersionUtils";
 import { describe, expect, it } from "vitest";
 
 describe("validateReleaseVersion", () => {

@@ -40,7 +40,7 @@ pub fn draw(f: &mut Frame, app: &mut App) {
     // The start-review question owns the screen while it is open: it is asked at
     // launch and captures every key, so it draws above the other overlays.
     if let Some(modal) = app.start_review.as_ref() {
-        super::draw_start_review::draw_start_review(f, modal, f.area());
+        super::start_review::draw_start_review(f, modal, f.area());
     }
 }
 

@@ -1,8 +1,8 @@
 import {
   findUnknownReleaseFlags,
   wantsHelp,
-} from "@ava-cli/ReleaseCLI/releaseFlags";
-import { runRelease } from "@ava-cli/ReleaseCLI/runRelease";
+} from "@ava-cli/ReleaseCLI/releaseFlagUtils/releaseFlagUtils";
+import { runRelease } from "@ava-cli/ReleaseCLI/runRelease/runRelease";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
@@ -26,13 +26,22 @@ Options
   --skip-ci-check  Do not check develop's staging CI.
   --help, -h     This text.`;
 
+/** The parsed `ava release` options, as Acclimate hands them to the action. */
+type ReleaseCLIArgs = {
+  version?: string;
+  next?: string;
+  yes: boolean;
+  dryRun: boolean;
+  skipCiCheck: boolean;
+};
+
 /**
- * `ava release` — publish a new release of the Avandar app.
+ * `ava release`: publish a new release of the Avandar app.
  *
  * `--version` and `--next` are optional on purpose: when either is missing the
  * command prints the versions that currently exist and asks. See
- * `releasePrompts.ts` for why the asking happens inside the action rather than
- * through `askIfEmpty`.
+ * `releasePromptHelpers.ts` for why the asking happens inside the action rather
+ * than through `askIfEmpty`.
  */
 export const ReleaseCLI = Acclimate.createCLI("release")
   .description(
@@ -85,45 +94,35 @@ export const ReleaseCLI = Acclimate.createCLI("release")
       "Do not check whether develop's staging CI passed for the commit being " +
       "released.",
   })
-  .action(
-    (
-      args: Readonly<{
-        version?: string;
-        next?: string;
-        yes: boolean;
-        dryRun: boolean;
-        skipCiCheck: boolean;
-      }>,
-    ) => {
-      // Acclimate neither implements --help nor rejects unknown options, and
-      // this command is far too consequential to run on a mistyped flag.
-      const argv = process.argv.slice(2);
-      if (wantsHelp(argv)) {
-        printInfo(USAGE);
-        return undefined;
-      }
-      const unknownFlags = findUnknownReleaseFlags(argv);
-      if (unknownFlags.length > 0) {
-        printError(
-          `Unknown option${unknownFlags.length > 1 ? "s" : ""}: ` +
-            `${unknownFlags.join(", ")}. Nothing was released; ` +
-            "run `ava release --help`.",
-        );
-        process.exitCode = 1;
-        return undefined;
-      }
+  .action((args: Readonly<ReleaseCLIArgs>) => {
+    // Acclimate neither implements --help nor rejects unknown options, and
+    // this command is far too consequential to run on a mistyped flag.
+    const argv = process.argv.slice(2);
+    if (wantsHelp(argv)) {
+      printInfo(USAGE);
+      return undefined;
+    }
+    const unknownFlags = findUnknownReleaseFlags(argv);
+    if (unknownFlags.length > 0) {
+      printError(
+        `Unknown option${unknownFlags.length > 1 ? "s" : ""}: ` +
+          `${unknownFlags.join(", ")}. Nothing was released; ` +
+          "run `ava release --help`.",
+      );
+      process.exitCode = 1;
+      return undefined;
+    }
 
-      // Acclimate does not await actions, so failures are reported and the exit
-      // code is set here rather than surfacing as an unhandled rejection.
-      return runRelease({
-        version: args.version,
-        next: args.next,
-        yes: args.yes,
-        dryRun: args.dryRun,
-        skipCICheck: args.skipCiCheck,
-      }).catch((error: unknown) => {
-        printError(error instanceof Error ? error.message : String(error));
-        process.exitCode = 1;
-      });
-    },
-  );
+    // Acclimate does not await actions, so failures are reported and the exit
+    // code is set here rather than surfacing as an unhandled rejection.
+    return runRelease({
+      version: args.version,
+      nextVersion: args.next,
+      yes: args.yes,
+      dryRun: args.dryRun,
+      skipCICheck: args.skipCiCheck,
+    }).catch((error: unknown) => {
+      printError(error instanceof Error ? error.message : String(error));
+      process.exitCode = 1;
+    });
+  });

@@ -64,6 +64,9 @@ read as an answer:
 | `Tab` / `Shift+Tab` | move the selection to the other button |
 | anything else | swallowed |
 
+The key map is a pure `key -> intent` function in `tui/start_review/keys.rs`, so
+every row above is unit-tested without a terminal.
+
 Nothing else in `dif` ever starts a review on its own. After dismissing, the way
 to start one is to type `/diff-review` in the LLM pane yourself.
 

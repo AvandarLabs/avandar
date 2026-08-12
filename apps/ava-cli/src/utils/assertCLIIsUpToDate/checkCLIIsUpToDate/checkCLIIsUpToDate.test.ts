@@ -1,14 +1,20 @@
-import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  utimesSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate";
+import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
 import { afterEach, describe, expect, it } from "vitest";
 
 /**
  * Builds a throwaway repo that looks enough like the monorepo for the check:
  * `apps/ava-cli` with a package.json, a source file, and optionally a bundle.
  */
-function createFakeRepo(options: {
+function _createFakeRepo(options: {
   sourceVersion: string;
   withBundle: boolean;
 }): string {
@@ -34,23 +40,28 @@ function createFakeRepo(options: {
 }
 
 /** Backdates a file so mtime comparisons are deterministic. */
-function backdate(path: string, secondsAgo: number): void {
+function _backdate(path: string, secondsAgo: number): void {
   const when = new Date(Date.now() - secondsAgo * 1000);
   utimesSync(path, when, when);
 }
 
 const createdRepos: string[] = [];
 
-function createRepo(options: {
+function _createRepo(options: {
   sourceVersion: string;
   withBundle: boolean;
 }): string {
-  const repoRoot = createFakeRepo(options);
+  const repoRoot = _createFakeRepo(options);
   createdRepos.push(repoRoot);
   return repoRoot;
 }
 
 afterEach(() => {
+  // Every case makes its own temp repo, so they are removed rather than left
+  // behind in the OS temp dir.
+  createdRepos.forEach((repoRoot) => {
+    rmSync(repoRoot, { recursive: true, force: true });
+  });
   createdRepos.length = 0;
 });
 
@@ -66,7 +77,7 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("reports a version mismatch between the running bundle and the source", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.2.0", withBundle: true });
+    const repoRoot = _createRepo({ sourceVersion: "0.2.0", withBundle: true });
 
     const result = checkCLIIsUpToDate({
       repoRoot,
@@ -80,7 +91,7 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("reports a missing bundle", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.0.0", withBundle: false });
+    const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: false });
 
     const result = checkCLIIsUpToDate({
       repoRoot,
@@ -93,8 +104,8 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("reports source changes newer than the bundle", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.0.0", withBundle: true });
-    backdate(join(repoRoot, "apps/ava-cli/dist/main.cjs"), 120);
+    const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: true });
+    _backdate(join(repoRoot, "apps/ava-cli/dist/main.cjs"), 120);
 
     const result = checkCLIIsUpToDate({
       repoRoot,
@@ -107,10 +118,10 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("is up to date when the bundle is newer than every source file", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.0.0", withBundle: true });
+    const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: true });
     const cliDir = join(repoRoot, "apps/ava-cli");
-    backdate(join(cliDir, "src/main.ts"), 300);
-    backdate(join(cliDir, "package.json"), 300);
+    _backdate(join(cliDir, "src/main.ts"), 300);
+    _backdate(join(cliDir, "package.json"), 300);
 
     const result = checkCLIIsUpToDate({
       repoRoot,
@@ -122,14 +133,14 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("skips the mtime comparison for a bundle built from another checkout", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.0.0", withBundle: true });
-    const otherRepoRoot = createRepo({
+    const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: true });
+    const otherRepoRoot = _createRepo({
       sourceVersion: "0.0.0",
       withBundle: true,
     });
     // The other checkout's bundle is old, but comparing mtimes across checkouts
     // says nothing about whether the code differs.
-    backdate(join(otherRepoRoot, "apps/ava-cli/dist/main.cjs"), 600);
+    _backdate(join(otherRepoRoot, "apps/ava-cli/dist/main.cjs"), 600);
 
     const result = checkCLIIsUpToDate({
       repoRoot,
@@ -141,8 +152,8 @@ describe("checkCLIIsUpToDate", () => {
   });
 
   it("still reports a version mismatch for a bundle from another checkout", () => {
-    const repoRoot = createRepo({ sourceVersion: "0.3.0", withBundle: true });
-    const otherRepoRoot = createRepo({
+    const repoRoot = _createRepo({ sourceVersion: "0.3.0", withBundle: true });
+    const otherRepoRoot = _createRepo({
       sourceVersion: "0.1.0",
       withBundle: true,
     });

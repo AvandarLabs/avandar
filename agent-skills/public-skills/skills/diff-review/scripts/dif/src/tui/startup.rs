@@ -170,7 +170,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
 /// if the modal was dismissed (nothing runs one automatically).
 fn preparing_notice(comparison_label: &str) -> String {
     format!(
-        "\r\n\x1b[36m[dif] No prepared diff review for {comparison_label} — the diff is live anyway.\x1b[0m\r\n\
+        "\r\n\x1b[36m[dif] No prepared diff review for {comparison_label}: the diff is live anyway.\x1b[0m\r\n\
          \x1b[36m[dif] Nothing is generating a review: answer Yes in the prompt, or run /diff-review in the LLM pane yourself.\x1b[0m\r\n\
          \x1b[36m[dif] Comment now if you like: your comments are saved and queued to the LLM.\x1b[0m\r\n"
     )
@@ -274,26 +274,43 @@ fn spawn_llm(
     agent_kind: AgentKind,
     llm_cmd: &str,
 ) -> Option<PtyPane> {
-    let resume_id = resume_candidate(repo_root, session_id_path, agent_kind);
-    let command = resume_id.map_or_else(
-        || {
-            fresh_llm_command_with_prompt(repo_root, session_id_path, agent_kind, llm_cmd, None)
-        },
-        |id| {
-            session::build_llm_command(repo_root, agent_kind, llm_cmd, &Plan::Resume(id), None)
-        },
+    let command = launch_llm_command(
+        repo_root,
+        session_id_path,
+        agent_kind,
+        llm_cmd,
+        resume_candidate(repo_root, session_id_path, agent_kind),
     );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS).ok()
+}
+
+/// The shell command a launch uses for the LLM pane: `resume_id`'s session when
+/// there is one to resume, otherwise a fresh session, and in both cases with no
+/// prompt submitted on startup.
+///
+/// Split from [`spawn_llm`] so the choice is testable without a PTY. Passing a
+/// prompt here would make `dif` commission a review merely by being launched,
+/// which is the reviewer's decision to make.
+pub(crate) fn launch_llm_command(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+    resume_id: Option<String>,
+) -> String {
+    resume_id.map_or_else(
+        || fresh_llm_command_with_prompt(repo_root, session_id_path, agent_kind, llm_cmd, None),
+        |id| session::build_llm_command(repo_root, agent_kind, llm_cmd, &Plan::Resume(id), None),
+    )
 }
 
 /// Mint a fresh LLM session and return the shell command that launches it.
 ///
 /// Generates a new session id, persists it to `session_id_path` (so a later
-/// `dif` launch can `--resume` this session), and builds the launch command
-/// with the initial review prompt auto-submitted on startup. Shared by the
-/// pane's first launch ([`spawn_llm`]) and the `Ctrl+N` respawn
-/// ([`App::new_llm_session`](super::app::App::new_llm_session)) so both
-/// start a fresh session identically.
+/// `dif` launch can `--resume` this session), and builds the launch command with
+/// the review-orientation prompt auto-submitted on startup. This is the `Ctrl+N`
+/// respawn path ([`App::new_llm_session`](super::app::App::new_llm_session)); a
+/// first launch goes through [`launch_llm_command`] instead and submits nothing.
 pub(crate) fn fresh_llm_command(
     repo_root: &Path,
     session_id_path: &Path,
@@ -457,32 +474,41 @@ mod tests {
 
         assert!(notice.contains("@ develop"), "names the comparison");
         assert!(notice.contains("the diff is live"));
-        // Nothing runs a review on its own any more, so the banner must not say
-        // one is under way; it must say how to start one instead.
-        assert!(!notice.contains("The LLM is running"));
-        assert!(notice.contains("Nothing is generating a review"));
+        // Nothing runs a review on its own, so the banner must not claim one is
+        // under way; it must say how to start one instead.
+        // The contract, not the wording: the notice must tell the reviewer how
+        // to start a review, since nothing starts one for them.
         assert!(notice.contains("/diff-review"));
     }
 
     #[test]
-    fn a_launched_fresh_session_is_seeded_with_nothing() {
+    fn a_launch_seeds_no_prompt_whether_it_resumes_or_starts_fresh() {
         let dir = tempfile::tempdir().expect("tempdir");
         let path = dir.path().join("session-id");
 
-        // What `spawn_llm` builds when there is no session to resume: a fresh
-        // session with no prompt at all. A launch must never start a review.
-        let command =
-            fresh_llm_command_with_prompt(dir.path(), &path, AgentKind::Claude, "claude", None);
+        let fresh = launch_llm_command(dir.path(), &path, AgentKind::Claude, "claude", None);
+        let resumed = launch_llm_command(
+            dir.path(),
+            &path,
+            AgentKind::Claude,
+            "claude",
+            Some("session-to-resume".to_owned()),
+        );
 
-        assert!(command.contains("--session-id"), "still a fresh session");
-        assert!(
-            !command.contains("/diff-review"),
-            "a launch must not kick off a review: {command}"
-        );
-        assert!(
-            !command.contains(session::INITIAL_REVIEW_PROMPT),
-            "a launch must not inject the orientation prompt either: {command}"
-        );
+        assert!(fresh.contains("--session-id"), "fresh: {fresh}");
+        assert!(resumed.contains("--resume"), "resumed: {resumed}");
+        // Neither branch may commission a review: that is the reviewer's call,
+        // made in the start-review modal.
+        for command in [&fresh, &resumed] {
+            assert!(
+                !command.contains("/diff-review"),
+                "a launch must not kick off a review: {command}"
+            );
+            assert!(
+                !command.contains(session::INITIAL_REVIEW_PROMPT),
+                "a launch must not inject the orientation prompt either: {command}"
+            );
+        }
     }
 
     #[test]

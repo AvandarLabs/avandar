@@ -1,7 +1,7 @@
 import {
   findUnknownReleaseFlags,
   wantsHelp,
-} from "@ava-cli/ReleaseCLI/releaseFlags";
+} from "@ava-cli/ReleaseCLI/releaseFlagUtils/releaseFlagUtils";
 import { describe, expect, it } from "vitest";
 
 describe("findUnknownReleaseFlags", () => {

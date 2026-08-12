@@ -1,4 +1,4 @@
-import { validateReleaseVersion } from "@ava-cli/ReleaseCLI/releaseVersions";
+import { validateReleaseVersion } from "@ava-cli/ReleaseCLI/releaseVersionUtils/releaseVersionUtils";
 import { printError } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
@@ -15,7 +15,7 @@ import { Acclimate } from "@avandar/acclimate";
  */
 
 /** Refuses rather than hangs when there is no one there to answer. */
-function assertInteractive(what: string): void {
+function _assertInteractive(what: string): void {
   if (process.stdin.isTTY !== true) {
     throw new Error(
       `${what} was not provided and there is no terminal to ask on. ` +
@@ -36,7 +36,7 @@ export async function promptForVersion(options: {
   label: string;
 }): Promise<string> {
   const { message, defaultValue, label } = options;
-  assertInteractive(label);
+  _assertInteractive(label);
 
   while (true) {
     const answer = await Acclimate.requestInput({
@@ -62,7 +62,7 @@ export async function promptForVersion(options: {
  * Asks a yes/no question. Returns the answer; `--yes` never reaches here.
  */
 export async function promptToConfirm(message: string): Promise<boolean> {
-  assertInteractive("A confirmation");
+  _assertInteractive("A confirmation");
 
   const answer = await Acclimate.requestInput({
     message: `|bright_cyan|${message}|reset|`,

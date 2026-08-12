@@ -12,6 +12,7 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Paragraph},
 };
 
+use super::modal_layout::centered_rect;
 use super::shortcuts::{self, Group};
 
 /// Render the shortcuts help modal centered over `area`.
@@ -71,16 +72,4 @@ fn build_lines() -> Vec<Line<'static>> {
         }
     }
     lines
-}
-
-/// A `width`×`height` rect centered within `area` (both clamped to `area`).
-fn centered_rect(width: u16, height: u16, area: Rect) -> Rect {
-    let w = width.min(area.width);
-    let h = height.min(area.height);
-    Rect {
-        x: area.x + (area.width.saturating_sub(w)) / 2,
-        y: area.y + (area.height.saturating_sub(h)) / 2,
-        width: w,
-        height: h,
-    }
 }

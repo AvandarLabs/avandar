@@ -1,4 +1,4 @@
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/releaseCommands";
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /**
  * Git operations `ava release` needs, expressed in terms of what the release
@@ -6,7 +6,7 @@ import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/releaseCommands";
  */
 
 /** Short form used in output. Full SHAs are printed only where they matter. */
-export function shortSHA(sha: string): string {
+export function shortSha(sha: string): string {
   return sha.slice(0, 8);
 }
 
@@ -29,6 +29,7 @@ export function getTrackedChanges(git: ReleaseCommands): string | undefined {
   return changes !== undefined && changes.length > 0 ? changes : undefined;
 }
 
+/** Resolve a revision to its full SHA, or undefined when it does not exist. */
 export function revParse(
   git: ReleaseCommands,
   revision: string,
@@ -41,10 +42,12 @@ export function refExists(git: ReleaseCommands, ref: string): boolean {
   return git.tryGit(["rev-parse", "--verify", "--quiet", ref]).ok;
 }
 
+/** Whether the tag exists in this checkout. */
 export function localTagExists(git: ReleaseCommands, tag: string): boolean {
   return refExists(git, `refs/tags/${tag}`);
 }
 
+/** Whether the tag exists on origin, i.e. the version is already published. */
 export function remoteTagExists(git: ReleaseCommands, tag: string): boolean {
   const output = git.readGit([
     "ls-remote",
@@ -60,7 +63,7 @@ export function getDivergence(
   git: ReleaseCommands,
   localRef: string,
   remoteRef: string,
-): Readonly<{ ahead: number; behind: number }> {
+): { ahead: number; behind: number } {
   const ahead = git.readGit([
     "rev-list",
     "--count",
@@ -123,7 +126,7 @@ export function readVersionAtRevision(
 }
 
 /** The tree object a revision points at. Two equal trees mean equal content. */
-export function readTreeSHA(
+export function readTreeSha(
   git: ReleaseCommands,
   revision: string,
 ): string | undefined {
@@ -137,35 +140,35 @@ export function readTreeSHA(
  * This is the heart of the command, and the reason it cannot conflict. A
  * release is not a content merge; `main` is only ever a published snapshot of
  * `develop`, so the answer is always "take develop's tree, whole". Handing that
- * tree straight to `commit-tree` means no merge algorithm runs at all, so there
- * is nothing that can report a conflict, and no `-X theirs` or `git clean` is
- * needed to force the outcome.
+ * tree straight to `commit-tree` means no merge algorithm runs at all, so
+ * nothing can report a conflict and nothing has to be forced.
  *
  * Because the commit still records `develop` as a parent, `develop` becomes a
- * true ancestor of `main` and the merge base advances every release. That is
- * what the old squash-based flow never did, and why it re-derived conflicts
- * from an ancient merge base on every single release.
+ * true ancestor of `main` and the merge base advances every release. Do not
+ * rebuild this as a content merge or a squash: without that second parent the
+ * merge base never advances, and every release re-derives conflicts from an
+ * ancient one.
  *
  * Returns the new commit SHA, or undefined on a dry run (nothing was written).
  */
 export function createReleaseCommit(
   git: ReleaseCommands,
   options: {
-    releaseTreeSHA: string;
-    mainParentSHA: string;
-    developParentSHA: string;
+    releaseTreeSha: string;
+    mainParentSha: string;
+    developParentSha: string;
     message: string;
   },
 ): string | undefined {
-  const { releaseTreeSHA, mainParentSHA, developParentSHA, message } = options;
+  const { releaseTreeSha, mainParentSha, developParentSha, message } = options;
 
   const result = git.mutate("git", [
     "commit-tree",
-    releaseTreeSHA,
+    releaseTreeSha,
     "-p",
-    mainParentSHA,
+    mainParentSha,
     "-p",
-    developParentSHA,
+    developParentSha,
     "-m",
     message,
   ]);

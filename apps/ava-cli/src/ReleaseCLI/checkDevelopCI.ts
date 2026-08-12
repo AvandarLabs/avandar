@@ -1,58 +1,79 @@
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/releaseCommands";
-
-/**
- * The staging CI verdict for the commit about to be released.
- *
- * Pushing `main` deploys production and pushes migrations to the production
- * database, so the last chance to notice a red build is before the release, not
- * after it.
- */
+import { propEq } from "@avandar/utils";
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /** The workflow that gates develop. See .github/workflows/staging.yaml. */
 const STAGING_WORKFLOW = "staging.yaml";
 
+/** The staging CI verdict for one commit. */
 export type CIStatus =
   /** The run for this exact commit finished successfully. */
-  | Readonly<{ kind: "passed"; url: string }>
+  | { kind: "passed"; url: string }
   /** The run for this exact commit finished, but not successfully. */
-  | Readonly<{ kind: "failed"; conclusion: string; url: string }>
+  | { kind: "failed"; conclusion: string; url: string }
   /** A run exists for this commit but has not finished. */
-  | Readonly<{ kind: "pending"; status: string; url: string }>
+  | { kind: "pending"; status: string; url: string }
   /** No run exists for this commit yet. */
-  | Readonly<{ kind: "missing" }>
+  | { kind: "missing" }
   /** The check could not be performed (no `gh`, not logged in, offline). */
-  | Readonly<{ kind: "unknown"; reason: string }>;
+  | { kind: "unknown"; reason: string };
 
-type WorkflowRun = Readonly<{
+/** One row of `gh run list --json headSha,status,conclusion,url`. */
+type WorkflowRun = {
+  /** Spelled as the `gh` JSON field is, so the mapping stays obvious. */
   headSha: string;
   status: string;
   conclusion: string;
   url: string;
-}>;
+};
 
-function parseRuns(json: string): readonly WorkflowRun[] | undefined {
+/** Whether an unknown value carries every field this module reads. */
+function _isWorkflowRun(value: unknown): value is WorkflowRun {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const candidate = value as Partial<Record<keyof WorkflowRun, unknown>>;
+  return (
+    typeof candidate.headSha === "string" &&
+    typeof candidate.status === "string" &&
+    typeof candidate.conclusion === "string" &&
+    typeof candidate.url === "string"
+  );
+}
+
+/**
+ * The workflow runs in a `gh` JSON response, or `undefined` when the response
+ * is not a list of runs shaped the way this module reads them.
+ *
+ * Every element is checked rather than asserted: an unrecognised shape has to
+ * surface as an honest "unknown" verdict, never as a wrong one.
+ */
+function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
   try {
     const parsed: unknown = JSON.parse(json);
-    return Array.isArray(parsed) ?
-        (parsed as readonly WorkflowRun[])
-      : undefined;
+    if (!Array.isArray(parsed) || !parsed.every(_isWorkflowRun)) {
+      return undefined;
+    }
+    return parsed;
   } catch {
     return undefined;
   }
 }
 
 /**
- * Asks the GitHub CLI about the staging run for `commitSHA`.
+ * Asks the GitHub CLI for the staging CI verdict on `commitSha`, the commit
+ * about to be released.
  *
- * A missing or unusable `gh` is reported as "unknown" rather than treated as a
+ * Pushing `main` deploys production and pushes migrations to the production
+ * database, so the last chance to notice a red build is before the release. A
+ * missing or unusable `gh` is reported as "unknown" rather than treated as a
  * failure: it is a gap in our information, and the caller decides whether to
  * proceed. It is never reported as a pass.
  */
 export function checkDevelopCI(
   git: ReleaseCommands,
-  options: { commitSHA: string; branch: string },
+  options: Readonly<{ commitSha: string; branch: string }>,
 ): CIStatus {
-  const { commitSHA, branch } = options;
+  const { commitSha, branch } = options;
 
   const result = git.mutateQuietly("gh", [
     "run",
@@ -77,38 +98,17 @@ export function checkDevelopCI(
     };
   }
 
-  const runs = parseRuns(result.stdout);
+  const runs = _parseRuns(result.stdout);
   if (runs === undefined) {
     return { kind: "unknown", reason: "could not parse the gh CLI response" };
   }
 
-  const run = runs.find((candidate) => {
-    return candidate.headSha === commitSHA;
-  });
-  if (run === undefined) {
-    return { kind: "missing" };
-  }
-  if (run.status !== "completed") {
-    return { kind: "pending", status: run.status, url: run.url };
-  }
-  if (run.conclusion === "success") {
-    return { kind: "passed", url: run.url };
-  }
-  return { kind: "failed", conclusion: run.conclusion, url: run.url };
-}
-
-/** A one-line description of a CI status, for printing. */
-export function describeCIStatus(status: CIStatus): string {
-  switch (status.kind) {
-    case "passed":
-      return "Staging CI passed.";
-    case "failed":
-      return `Staging CI did not pass (${status.conclusion}): ${status.url}`;
-    case "pending":
-      return `Staging CI has not finished (${status.status}): ${status.url}`;
-    case "missing":
-      return "No staging CI run was found for this commit.";
-    case "unknown":
-      return `Could not check staging CI: ${status.reason}`;
-  }
+  const run = runs.find(propEq("headSha", commitSha));
+  return (
+    run === undefined ? { kind: "missing" }
+    : run.status !== "completed" ?
+      { kind: "pending", status: run.status, url: run.url }
+    : run.conclusion === "success" ? { kind: "passed", url: run.url }
+    : { kind: "failed", conclusion: run.conclusion, url: run.url }
+  );
 }
