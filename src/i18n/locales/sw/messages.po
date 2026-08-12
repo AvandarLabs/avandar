@@ -2952,10 +2952,6 @@ msgstr "Inazalisha SQL…"
 msgid "Offline model download failed"
 msgstr "Kupakua mfano wa mtandaoni kumeshindikana"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "Imepangwa {formattedNumRows} mistari kwa mafanikio"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "Lebele, mfano. Mkoa"

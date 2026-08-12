@@ -2967,10 +2967,6 @@ msgstr "Generando SQL…"
 msgid "Offline model download failed"
 msgstr "La descarga del modelo offline falló"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "Se procesaron {formattedNumRows} filas con éxito"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "Etiqueta, por ejemplo, Región"

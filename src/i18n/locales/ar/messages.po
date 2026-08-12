@@ -2917,10 +2917,6 @@ msgstr "جارٍ إنشاء SQL…"
 msgid "Offline model download failed"
 msgstr "فشل تحميل النموذج غير المتصل"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "تم تحليل {formattedNumRows} صفوف بنجاح"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "التسمية، على سبيل المثال: المنطقة"
