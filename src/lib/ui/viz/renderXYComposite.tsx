@@ -1,8 +1,8 @@
+import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
-import { propEq } from "@utils";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";
-import type { UnknownDataFrame } from "@utils";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {

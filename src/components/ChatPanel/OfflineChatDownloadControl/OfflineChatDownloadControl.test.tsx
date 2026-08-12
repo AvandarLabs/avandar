@@ -2,7 +2,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
@@ -34,11 +34,11 @@ vi.mock("@/stores/OfflineChatEngineStore/OfflineChatEngineStore", () => {
 function renderControl() {
   return render(
     <I18nProvider i18n={i18n}>
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
           <OfflineChatDownloadControl />
         </ModalsProvider>
-      </AvandarUiProvider>
+      </AvandarAppProvider>
     </I18nProvider>,
   );
 }

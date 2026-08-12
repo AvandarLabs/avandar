@@ -1,5 +1,5 @@
+import { capitalize, propEq } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import { capitalize, propEq } from "@utils";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { appForResource } from "../shareCopy";

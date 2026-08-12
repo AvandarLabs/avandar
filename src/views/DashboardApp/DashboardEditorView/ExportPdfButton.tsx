@@ -1,9 +1,10 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
-import { notifyError, Tooltip } from "@ui";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { notifyError } from "@/utils/notifications/notify";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
 import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

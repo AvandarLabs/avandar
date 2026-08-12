@@ -43,7 +43,7 @@ If a required tool is missing, stop and give the user the exact remediation.
 | Regenerate guide, mark reviewed, or report reviewed state | Diff guide |
 | Open reviewer comments | Continue |
 | Ask the agent to critique a PR or local diff, including `pr`, `pre`, `pre-review`, or `/diff-review auto <PR-number>` | PR review |
-| No transcript, or an explicit new round with no open reviewer comments | Initial |
+| No prepared review (missing or empty transcript, or either guide absent), or an explicit new round with no open reviewer comments | Initial |
 | Explicit cleanup request | Cleanup |
 
 An unreplied non-`claude` comment always selects Continue. Summary is
@@ -83,6 +83,12 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 The skill writes these artifacts. The TUI reads them and owns live session
 metadata and transcript mirroring.
 
+`dif` starts difit as soon as it launches, before any of these exist, and
+creates the transcript as `[]` so the reviewer can comment immediately. Treat an
+empty transcript as a new transcript, and never treat the transcript's presence
+alone as proof that a review exists: that requires `-guide.md` and `-guide.json`
+too.
+
 ## Transcript contract
 
 Every entry must include stable identity, authorship, and timestamps:
@@ -119,9 +125,34 @@ Validate every complete transcript before reporting success:
 python3 <skill-dir>/scripts/validate.py <transcript-path>
 ```
 
+### Writing the transcript while a session is live
+
+A live `.session-<branch-slug>-<scope-slug>.json` means difit is already serving
+this comparison in the reviewer's browser, which is now the normal case even for
+a brand-new review. Then:
+
+- Re-read the transcript immediately before writing it. The reviewer may have
+  commented while you worked, and the TUI poller mirrors those comments into the
+  file continuously.
+- Preserve every existing entry and append only new `claude` entries. Dropping
+  an entry is a bug, not a way to remove a comment.
+- Writing the file is enough to reach the open browser: the TUI detects a write
+  it did not make and imports the new entries into the live difit server, which
+  pushes them over SSE. Do not restart `dif`.
+- POSTing the new entries yourself is also fine and is idempotent with that
+  import. Continue mode still POSTs, because a single reply should appear at
+  once.
+
 ### Comment style
 
 Never use em dashes. Keep comments direct and concise.
+
+Before writing any PR finding or review summary, read
+[`references/comment-style.md`](references/comment-style.md) and follow it. It
+governs the prose of a review comment: how to lead, how long to be, when to ask
+instead of assert, and what never to write. If
+`~/.diff-review/comment-style.md` exists, read that too and let it win on any
+conflict.
 
 For explainers on the agent's own diff, comment only when the reviewer benefits
 from context the diff does not state: why an abstraction exists, how data moves,
@@ -133,7 +164,8 @@ For replies to change requests, use exactly `Done.` unless the reviewer asked a
 question or needs a non-obvious trade-off, behavior change, or out-of-scope
 follow-up. Never cite commits or restate code visible in the diff.
 
-For PR findings, write text a human can paste into GitHub unchanged:
+For PR findings, write text a human can paste into GitHub unchanged, in the
+voice `references/comment-style.md` describes:
 
 - Nit: state the correction only.
 - Documented rule violation: state the fix and cite the rule.
@@ -165,8 +197,20 @@ Format the final line from their output and the selected comparison:
 If a live session for the current branch has `comparison_update_url`, notify it
 before reporting the run command. Prefer the matching comparison or the sole
 unambiguous session. POST `{"comparisonKey":"<selected-key>"}` to that URL.
-HTTP 202 means accepted; 409 means the server is already online. Missing,
-ambiguous, or failed handoff is non-fatal.
+HTTP 202 means accepted; 409 means the review is already prepared and its
+comparison is settled. Missing, ambiguous, or failed handoff is non-fatal.
+
+Do this handoff early, before writing any artifact. `dif` honors it only while
+no guide exists and the reviewer has not commented yet; after that it keeps the
+comparison the reviewer is already looking at.
+
+When a live session already covers the selected comparison, the reviewer's
+browser is open on this diff, so a run command is noise. Replace the final
+`→ Run:` line with:
+
+```text
+→ Review is live · no relaunch needed
+```
 
 ## Diff guide contract
 
@@ -306,6 +350,9 @@ headings.
 → Run: `<repository command>`
 ```
 
+When a live session already covers this comparison, end with
+`→ Review is live · no relaunch needed` instead of the run command.
+
 A manual Continue summary also includes Addressed, New, and Open counts, plus
 commits made in that round. End it with
 `→ Reply posted live · no relaunch needed` instead of a run command.
@@ -314,20 +361,34 @@ commits made in that round. End it with
 
 ### Initial
 
-1. Resolve the repo root, branch, comparison, stem, and artifacts.
+The reviewer is very likely already looking at this diff: `dif` opens difit
+immediately and only then asks for the review. Write artifacts as you finish
+them rather than batching everything to the end, so the browser fills in
+progressively. The guides are what the reviewer is waiting on; write them before
+polishing explainer threads.
+
+1. Resolve the repo root, branch, comparison, stem, and artifacts. Do the
+   comparison handoff now if a live session needs it.
 2. If `.difit/<exact-branch-name>_explanations.md` exists, use it as a candidate
    list but verify each entry against the current diff. Otherwise inspect:
    - `.`: `git diff HEAD`, plus untracked files
    - `staged`: `git diff --staged`
    - `working`: `git diff`, plus untracked files
    - branch: `git diff <base>...HEAD`
-3. For a new transcript, write helpful explainer threads or `[]`. For a new
-   round on an existing transcript, preserve every entry and append only new
-   `claude` threads; never replace the conversation with the new round alone.
+3. For a new transcript — absent, or the `[]` one `dif` created — write helpful
+   explainer threads or leave it `[]`. For a new round on an existing
+   transcript, preserve every entry and append only new `claude` threads; never
+   replace the conversation with the new round alone. With a live session,
+   follow [Writing the transcript while a session is
+   live](#writing-the-transcript-while-a-session-is-live).
 4. Validate the transcript.
 5. Write all guide artifacts. Initialize reviewed state only when it is absent;
    otherwise preserve and reconcile it. Pass the coverage gate.
 6. Send the Initial chat summary.
+
+A reviewer comment may arrive mid-round: `dif` types it into your input as soon
+as it is written, so it lands as a queued message while you work. Finish the
+Initial round first, then address it as a Continue round.
 
 Except for the package script added by `ensure-command.py`, do not change source
 files, commit, push, or merge in Initial mode.
@@ -352,7 +413,9 @@ files, commit, push, or merge in Initial mode.
    and remain in the current worktree.
 2. Load project instructions, contributing guidance, lint configuration, and
    applicable code-review skills. This skill defines the workflow, not the
-   project's review rules.
+   project's review rules. Also load
+   [`references/comment-style.md`](references/comment-style.md), plus
+   `~/.diff-review/comment-style.md` when it exists, before writing any finding.
 3. Review the PR with `git diff <baseRefName>...HEAD`; for a local critique,
    review the selected comparison. Check correctness, edge cases, architecture,
    data modeling, documented conventions, and useful nits.
@@ -423,9 +486,11 @@ Do not change source files, commit, push, or post comments in Diff guide mode.
 Summary mode is read-only and explicit-only.
 
 1. Resolve the transcript and guides from the requested or default comparison.
-2. If the transcript is absent, report that no review exists and offer Initial
-   mode. A zero-thread transcript is valid only when both guide artifacts exist;
-   if either is missing, report the review as incomplete and offer regeneration.
+2. If the transcript is absent or empty with no guides, report that no review
+   exists and offer Initial mode: `dif` creates an empty transcript at launch,
+   so its presence proves nothing. A zero-thread transcript is valid only when
+   both guide artifacts exist; if either is missing, report the review as
+   incomplete and offer regeneration.
 3. Otherwise reconstruct the navigation summary from the transcript and guide.
    Use the highest `claude-r<N>-*` id as the round, or round 1 when no such id
    exists. Include the repository run command, even for a transcript containing
@@ -444,6 +509,10 @@ Do not write artifacts, source files, commits, or comments in Summary mode.
    to the current branch stem, moving all six artifacts together.
 4. Delete remaining stale artifacts, sessions for deleted branches, and retired
    `.watcher-*.log` files. Never delete a session for an existing branch.
-5. Report every rename and deletion.
+5. Delete an empty (`[]`) transcript that has no guide artifacts and no live
+   session: it is the stub `dif` creates at launch, left by a run that never
+   produced a review. Keep an empty transcript whose guides exist — that is a
+   real zero-thread review.
+6. Report every rename and deletion.
 
 Never touch files outside `.difit/` in Cleanup mode.

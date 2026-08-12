@@ -1,6 +1,6 @@
-import { createServiceClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { Registry, where } from "@utils";
+import { createServiceClient } from "@avandar/clients";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { Registry, where } from "@avandar/utils";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { CsvFileDatasetClient } from "./source-datasets/CsvFileDatasetClient";

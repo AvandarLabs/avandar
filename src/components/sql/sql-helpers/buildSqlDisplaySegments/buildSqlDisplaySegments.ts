@@ -3,7 +3,7 @@
  * name) and known column identifiers. The concatenation of each segment's
  * `value` or `raw` reproduces the original SQL string.
  */
-import { prop } from "@utils";
+import { prop } from "@avandar/utils";
 import { Parser } from "node-sql-parser";
 import type {
   SqlDisplayCatalog,

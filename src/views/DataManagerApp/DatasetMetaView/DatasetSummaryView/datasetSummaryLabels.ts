@@ -1,5 +1,5 @@
+import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
-import { matchLiteral } from "@utils";
 import type { I18n } from "@lingui/core";
 
 /** Builds the compact data-type label used by the column outline. */

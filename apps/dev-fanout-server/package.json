@@ -9,6 +9,7 @@
     "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
+    "@avandar/utils": "workspace:*",
     "fastify": "^5.6.0"
   }
 }

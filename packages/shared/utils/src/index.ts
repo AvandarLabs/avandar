@@ -114,6 +114,7 @@ export { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/exclud
 export { excludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
 export { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 export { objectEntries } from "@utils/objects/objectEntries.ts";
+export { objectFilter } from "@utils/objects/objectFilter/objectFilter.ts";
 export { objectKeys } from "@utils/objects/objectKeys.ts";
 export { objectToPrettyString } from "@utils/objects/objectToPrettyString/objectToPrettyString.ts";
 export { objectValues } from "@utils/objects/objectValues.ts";
@@ -148,6 +149,7 @@ export { setPropValue } from "@utils/objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "@utils/strings/capitalize/capitalize.ts";
+export { camelToTitleCase } from "@utils/strings/camelToTitleCase/camelToTitleCase.ts";
 export {
   sortStrings,
   stringComparator,
@@ -184,8 +186,7 @@ export type {
   Expect,
   IsArray,
   Not,
-  ZodSchemaEqualsTypes,
-} from "@utils/types/test-utilities.types.ts";
+} from "@utils/types/testUtilities.types.ts";
 export type {
   StringKeyOf,
   CamelCase,

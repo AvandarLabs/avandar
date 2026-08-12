@@ -1,7 +1,7 @@
-import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Loader, TextInput } from "@mantine/core";
 import { isEmail } from "@mantine/form";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import { useForm } from "@ui/hooks/useForm/useForm";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 
 type Props = {
   defaultValue: string;
@@ -74,9 +74,9 @@ export function InputTextForm({
   submitButtonLabel,
   cancelButtonLabel,
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const resolvedSubmitLabel = submitButtonLabel ?? t`Submit`;
-  const resolvedCancelLabel = cancelButtonLabel ?? t`Cancel`;
+  const i18n = useI18nMessages();
+  const resolvedSubmitLabel = submitButtonLabel ?? i18n.submit;
+  const resolvedCancelLabel = cancelButtonLabel ?? i18n.cancel;
   const form = useForm<SingleInputForm>({
     mode: "uncontrolled",
     initialValues: {
@@ -89,15 +89,16 @@ export function InputTextForm({
       value: (value) => {
         if (value.trim().length === 0) {
           // prevent a value that is only empty spaces
-          return t`This field cannot be empty`;
+          return i18n.fieldCannotBeEmpty;
         }
 
         if (minLength && value.length < minLength) {
-          const fieldName = hideLabel ? t`This field` : label;
-          return t`${fieldName} must be at least ${minLength} characters long`;
+          const fieldName =
+            hideLabel || label === undefined ? i18n.thisField : label;
+          return i18n.fieldMinLength({ fieldName, minLength });
         }
         if (type === "email") {
-          return isEmail(t`Invalid email address`)(value);
+          return isEmail(i18n.invalidEmail)(value);
         }
         return null;
       },

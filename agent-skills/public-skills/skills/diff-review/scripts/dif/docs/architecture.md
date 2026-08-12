@@ -21,9 +21,10 @@ src/
 ├── pty_pane.rs        PTY-backed pane parsed through vt100 (reused by both panes)
 ├── difit/
 │   ├── imports.rs     server↔import comment shapes + conversion
-│   ├── transcript.rs  atomic read/write of the .difit transcript
+│   ├── transcript.rs  atomic read/write/create of the .difit transcript
+│   ├── importer.rs    entries an out-of-band transcript write adds → POST to difit (pure + POST)
 │   ├── server.rs      build the difit command, pick a free port, spawn, wait-ready
-│   └── poller.rs      background thread: poll comments-json → publish + mirror
+│   └── poller.rs      background thread: poll comments-json → import inbound, publish + mirror
 ├── inject/
 │   ├── dispatch.rs    open-comment detection + line/location labels (pure)
 │   ├── prompt.rs      minimal per-comment prompt text (pure)
@@ -31,11 +32,17 @@ src/
 │   └── reply_watcher.rs  baseline-then-log-once detector for new agent replies (pure)
 └── tui/
     ├── mod.rs         terminal setup/teardown, run()
-    ├── startup.rs     spawn LLM, start difit now or wait for review artifacts, assemble App
-    ├── app.rs         App state + delayed difit startup + focus + main-view switching + inject + scroll + palette/restart
-    ├── control.rs     local POST /comparison endpoint for live comparison retargeting while the TUI is waiting
+    ├── startup.rs     create the transcript, start difit + shell + poller, spawn LLM, assemble App
+    ├── app.rs         App state + guide-ready transition + comparison retarget + focus + main-view switching + inject + scroll + palette/restart
+    ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
+    ├── start_review/   the "no diff review found, start one?" modal
+    │   ├── modal.rs    pure state + wording (Choice, Outcome, StartReviewModal)
+    │   ├── control.rs  the `impl App` surface that answers it
+    │   ├── keys.rs     its key map (pure key -> intent) + handler
+    │   └── draw.rs     its renderer (Yes / No buttons)
+    ├── modal_layout.rs  shared centred-rect geometry for every modal overlay
     ├── palette.rs     command registry (PALETTE_COMMANDS) + PaletteState
     ├── main_diff_view.rs  the MainDiffView cycle (log view ↔ test plan ↔ diff guide)
     ├── guide.rs       markdown view state: styled markdown (re-read on change) + a cursor overlay (cursor is source of truth; scroll derived to keep it visible)
@@ -52,8 +59,10 @@ No file exceeds 400 lines; modules are single-purpose. The main diff pane shows
 one `MainDiffView` at a time: the **log view** (difit's `vt100` screen, or a
 waiting status before difit starts), the **test plan view**, or the **diff guide
 view** (`guide.rs` markdown rendered by `markdown/`). `dif` starts focused on
-this pane (in the log view), with the LLM pane already working from its
-auto-submitted initial prompt (see [integrations.md](integrations.md)).
+this pane (in the log view). The LLM pane starts **idle**: nothing is typed into
+it at launch. When no prepared review exists, the start-review modal asks whether
+to generate one, and only an explicit Yes injects `/diff-review [comparison]`
+(see [integrations.md](integrations.md)).
 
 ## Markdown navigation
 
@@ -101,8 +110,11 @@ cursor instead).
   parser.
 - **Poller thread** — polls difit's `/api/comments-json` once a second,
   publishes the latest snapshot under a lock, and mirrors it to the transcript.
-  It is absent while the LLM is preparing the first review; `App` starts it only
-  after the transcript and guide artifacts exist and difit has been spawned.
+  It also runs the *inbound* half of that contract: when the transcript on disk
+  is not the text the poller last wrote, the entries difit has never held are
+  POSTed to `/api/comment-imports` and the mirror is skipped for that tick. It
+  starts with difit at launch, and is momentarily absent only while a comparison
+  retarget swaps difit out.
 - **Git-watcher thread** — recomputes the repo's diff signature once a second
   (`git rev-parse HEAD` + `status` + `diff HEAD`, hashed) and publishes it under
   a lock, so the UI loop can notice stale-diff state without spawning git itself.
@@ -125,23 +137,34 @@ difit server (PtyPane, left)  ──poll /api/comments-json──►  Poller thr
         └──────────── LLM pane (PtyPane, right) ◄── typed prompt
 ```
 
-When no prepared review exists yet, the data flow has a short prepare state
-before this loop starts:
+When no prepared review exists yet, that loop is already running — difit needs
+only git — and a second flow runs *alongside* it while the LLM catches up:
 
 ```
-LLM pane starts with /diff-review [comparison]
+transcript created as []  →  difit + browser shell + poller start, browser opens
+        │
+        ▼
+LLM pane starts idle  →  "No diff review found — start one?" modal
+        │                         │
+        │                         └── No → nothing runs; the diff stays open
+        ▼
+Yes → /diff-review [comparison] injected into the LLM pane
         │
         ▼
 diff-review skill may POST selected comparison to control.rs
+   (honored only while no guide exists and difit holds no comment)
         │
         ▼
 diff-review skill writes .difit transcript + guide.md + guide.json + summary.md + test-plan.md
         │
-        ▼
-App::update_difit_log sees review_files_ready()
+        ├─ transcript ─► Poller sees a write it did not make ─► POST /api/comment-imports
+        │                                                        ─► SSE ─► open browser
+        │
+        └─ guide.json / summary.md / test-plan.md ─► web shell's 3s poll ─► sidebar
         │
         ▼
-same left PtyPane respawns as difit, poller starts, browser shell opens
+App::update_difit_log sees review_files_ready() → logs "Diff guide ready",
+the comparison is settled (control endpoint stops accepting updates)
 ```
 
 The reviewer never has to ask the agent to "address the comments": the poller
@@ -189,8 +212,10 @@ for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the LLM pane; the skill writes the guide
 file and the diff guide view picks it up on its next refresh. "New LLM
 session" is an interrupt: it kills the running LLM child and respawns the
-pane on a fresh session (via `startup::fresh_llm_command`, shared with the
-pane's first launch) that auto-submits the review prompt. This is chosen over
+pane on a fresh session (via `startup::fresh_llm_command`) that auto-submits the
+review-orientation prompt. That is the one place a prompt is submitted on a
+session's startup: the pane's *own* first launch deliberately submits nothing
+(see [integrations.md](integrations.md)). This is chosen over
 typing `/new` so it takes effect immediately even when the LLM is mid-thought. The
 palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.

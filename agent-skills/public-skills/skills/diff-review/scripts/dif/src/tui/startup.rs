@@ -1,5 +1,13 @@
-//! Bringing a review online: resolve the comparison, spawn the LLM, start
-//! difit when review artifacts exist, and assemble the [`App`].
+//! Bringing a review online: resolve the comparison, start difit and the
+//! browser shell, spawn the LLM, and assemble the [`App`].
+//!
+//! **The diff never waits on the LLM.** difit only needs git, so a launch with
+//! no prepared review still opens the browser immediately: the transcript is
+//! created empty, difit serves the diff, and the poller starts. The guide,
+//! summary, test plan, and `claude` threads land later — the browser shell
+//! polls them in, and the poller imports the skill's threads into the live
+//! server (see [`importer`](crate::difit::importer)). Comments the reviewer
+//! writes in the meantime are mirrored and queued to the LLM like any other.
 //!
 //! Claude sessions are resumable across `dif` launches: we remember the id in
 //! `.difit/.claude-session-<branch>-<scope>` and `--resume` it when its
@@ -29,6 +37,7 @@ use crate::web;
 
 use super::app::{App, Panel};
 use super::control::ReviewControl;
+use super::start_review::StartReviewModal;
 
 /// Placeholder PTY size; the first draw resizes both panes to the real layout.
 const INITIAL_ROWS: u16 = 24;
@@ -37,10 +46,9 @@ const INITIAL_COLS: u16 = 80;
 
 struct LaunchSurface {
     difit: PtyPane,
-    poller: Option<Poller>,
+    poller: Poller,
     web_shell: Option<web::WebShell>,
-    open_url: Option<String>,
-    is_review_online: bool,
+    open_url: String,
 }
 
 struct ReviewPaths {
@@ -74,12 +82,14 @@ pub fn launch(cli: &Cli) -> Result<App> {
         &scope_slug,
     ));
     let review_control = ReviewControl::start(control_port)?;
-    let is_review_ready = review_files_ready(
+    let guide_ready = review_files_ready(
         &review_paths.transcript,
         &review_paths.guide,
         &review_paths.guide_json,
     );
-    review_control.set_accepts_updates(!is_review_ready);
+    // The skill may still retarget the comparison while it prepares the guide;
+    // once a guide exists the comparison is settled and updates are refused.
+    review_control.set_accepts_updates(!guide_ready);
     let worktree = web::meta::worktree_name(&repo_root, &branch);
     let surface = start_launch_surface(
         &repo_root,
@@ -87,27 +97,20 @@ pub fn launch(cli: &Cli) -> Result<App> {
         port,
         &cli.host,
         shell_port,
-        &review_paths.transcript,
-        &review_paths.guide,
-        review_paths.guide_json.clone(),
+        &review_paths,
         branch.clone(),
         worktree.clone(),
-        review_paths.diff_summary.clone(),
-        review_paths.test_plan.clone(),
     )?;
 
-    let initial_prompt = if surface.is_review_online {
-        None
-    } else {
-        Some(prepare_review_prompt(cli.comparison_key.as_deref()))
-    };
-    let llm = spawn_llm(
-        &repo_root,
-        &review_paths.session_id,
-        agent_kind,
-        &llm_cmd,
-        initial_prompt.as_deref(),
-    );
+    // `dif` never starts a review by itself. The LLM pane opens idle; when no
+    // review is prepared, the modal below asks, and only a Yes injects anything.
+    let start_review = (!guide_ready).then(|| {
+        StartReviewModal::new(
+            prepare_review_prompt(cli.comparison_key.as_deref()),
+            comparison_label(&comparison),
+        )
+    });
+    let llm = spawn_llm(&repo_root, &review_paths.session_id, agent_kind, &llm_cmd);
     let git_watcher = GitWatcher::start(repo_root.clone(), Duration::from_secs(1));
     let served_sig = git::diff_signature(&repo_root);
     let dispatcher = Dispatcher::new();
@@ -129,7 +132,7 @@ pub fn launch(cli: &Cli) -> Result<App> {
         review_control,
         dispatcher,
         reply_watcher: ReplyWatcher::new(),
-        poller: surface.poller,
+        poller: Some(surface.poller),
         git_watcher,
         served_sig,
         pending_change: None,
@@ -143,8 +146,8 @@ pub fn launch(cli: &Cli) -> Result<App> {
         palette: None,
         help_open: false,
         web_shell: surface.web_shell,
-        open_url: surface.open_url,
-        is_review_online: surface.is_review_online,
+        open_url: Some(surface.open_url),
+        guide_ready,
         shell_port,
         control_port,
         guide_json_path: review_paths.guide_json,
@@ -152,11 +155,25 @@ pub fn launch(cli: &Cli) -> Result<App> {
         test_plan_path: review_paths.test_plan,
         branch,
         worktree,
-        fresh_llm_prompt: initial_prompt,
+        start_review,
         should_quit: false,
     };
-    app.write_session_meta(open_url);
+    app.write_session_meta(Some(open_url));
+    if !guide_ready {
+        app.difit.write_to_screen(&preparing_notice(&app.comparison_label));
+    }
     Ok(app)
+}
+
+/// The banner shown in the difit pane when the diff is live but no review has
+/// been prepared. Says the diff is fully usable as-is, and how to start a review
+/// if the modal was dismissed (nothing runs one automatically).
+fn preparing_notice(comparison_label: &str) -> String {
+    format!(
+        "\r\n\x1b[36m[dif] No prepared diff review for {comparison_label}: the diff is live anyway.\x1b[0m\r\n\
+         \x1b[36m[dif] Nothing is generating a review: answer Yes in the prompt, or run /diff-review in the LLM pane yourself.\x1b[0m\r\n\
+         \x1b[36m[dif] Comment now if you like: your comments are saved and queued to the LLM.\x1b[0m\r\n"
+    )
 }
 
 /// The initial keyboard focus for a new TUI launch.
@@ -189,6 +206,12 @@ fn review_paths(
     }
 }
 
+/// Start difit, the poller, and the browser shell, and open the review.
+///
+/// Nothing here waits on difit answering: the shell binds and serves its page
+/// straight away and its iframe retries until difit is up, so the browser opens
+/// as fast as it can be told to. The poller idles harmlessly until its first
+/// successful fetch.
 #[allow(clippy::too_many_arguments)]
 fn start_launch_surface(
     repo_root: &Path,
@@ -196,24 +219,14 @@ fn start_launch_surface(
     port: u16,
     host: &str,
     shell_port: u16,
-    transcript_path: &Path,
-    guide_path: &Path,
-    guide_json_path: PathBuf,
+    review_paths: &ReviewPaths,
     branch: String,
     worktree: String,
-    diff_summary_path: PathBuf,
-    test_plan_path: PathBuf,
 ) -> Result<LaunchSurface> {
-    if !review_files_ready(transcript_path, guide_path, &guide_json_path) {
-        return Ok(LaunchSurface {
-            difit: spawn_waiting_pane(repo_root, comparison_label(comparison).as_str())?,
-            poller: None,
-            web_shell: None,
-            open_url: None,
-            is_review_online: false,
-        });
-    }
-    let transcript_raw = transcript::read_raw(transcript_path);
+    // The transcript is the review's canonical file, and the reviewer can start
+    // commenting before any review exists, so it must exist before difit does.
+    let _ = transcript::ensure_exists(&review_paths.transcript);
+    let transcript_raw = transcript::read_raw(&review_paths.transcript);
     let difit = server::spawn(
         repo_root,
         comparison,
@@ -224,15 +237,14 @@ fn start_launch_surface(
         INITIAL_ROWS,
         INITIAL_COLS,
     )?;
-    let _ready = server::wait_until_ready(port, 50);
     let web_shell = start_web_shell(
         port,
         shell_port,
-        guide_json_path,
+        review_paths.guide_json.clone(),
         branch,
         worktree,
-        diff_summary_path,
-        test_plan_path,
+        review_paths.diff_summary.clone(),
+        review_paths.test_plan.clone(),
     );
     let open_url = web_shell
         .as_ref()
@@ -240,63 +252,65 @@ fn start_launch_surface(
     super::open_target::open_url(&open_url);
     Ok(LaunchSurface {
         difit,
-        poller: Some(Poller::start(
+        poller: Poller::start(
             port,
-            transcript_path.to_path_buf(),
+            review_paths.transcript.clone(),
             Duration::from_secs(1),
-        )),
+        ),
         web_shell,
-        open_url: Some(open_url),
-        is_review_online: true,
+        open_url,
     })
 }
 
 /// Spawn the LLM pane, resuming the saved session when possible.
+///
+/// Nothing is typed into it either way. A launch is not a request to review:
+/// `dif`'s job on startup is to show the diff, and a review only begins when the
+/// reviewer asks for one (the start-review modal, or `/diff-review` typed by
+/// hand). A resumed session keeps whatever context it already had.
 fn spawn_llm(
     repo_root: &Path,
     session_id_path: &Path,
     agent_kind: AgentKind,
     llm_cmd: &str,
-    fresh_prompt_override: Option<&str>,
 ) -> Option<PtyPane> {
-    let resume_id = if fresh_prompt_override.is_some() {
-        None
-    } else {
-        resume_candidate(repo_root, session_id_path, agent_kind)
-    };
-    let command = resume_id.map_or_else(
-        || {
-            fresh_llm_command_with_prompt(
-                repo_root,
-                session_id_path,
-                agent_kind,
-                llm_cmd,
-                fresh_prompt_override,
-            )
-        },
-        |id| {
-            // A resumed session already carries the review context.
-            let plan = Plan::Resume(id);
-            session::build_llm_command(
-                repo_root,
-                agent_kind,
-                llm_cmd,
-                &plan,
-                session::initial_prompt(&plan),
-            )
-        },
+    let command = launch_llm_command(
+        repo_root,
+        session_id_path,
+        agent_kind,
+        llm_cmd,
+        resume_candidate(repo_root, session_id_path, agent_kind),
     );
     PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS).ok()
+}
+
+/// The shell command a launch uses for the LLM pane: `resume_id`'s session when
+/// there is one to resume, otherwise a fresh session, and in both cases with no
+/// prompt submitted on startup.
+///
+/// Split from [`spawn_llm`] so the choice is testable without a PTY. Passing a
+/// prompt here would make `dif` commission a review merely by being launched,
+/// which is the reviewer's decision to make.
+pub(crate) fn launch_llm_command(
+    repo_root: &Path,
+    session_id_path: &Path,
+    agent_kind: AgentKind,
+    llm_cmd: &str,
+    resume_id: Option<String>,
+) -> String {
+    resume_id.map_or_else(
+        || fresh_llm_command_with_prompt(repo_root, session_id_path, agent_kind, llm_cmd, None),
+        |id| session::build_llm_command(repo_root, agent_kind, llm_cmd, &Plan::Resume(id), None),
+    )
 }
 
 /// Mint a fresh LLM session and return the shell command that launches it.
 ///
 /// Generates a new session id, persists it to `session_id_path` (so a later
-/// `dif` launch can `--resume` this session), and builds the launch command
-/// with the initial review prompt auto-submitted on startup. Shared by the
-/// pane's first launch ([`spawn_llm`]) and the `Ctrl+N` respawn
-/// ([`App::new_llm_session`](super::app::App::new_llm_session)) so both
-/// start a fresh session identically.
+/// `dif` launch can `--resume` this session), and builds the launch command with
+/// the review-orientation prompt auto-submitted on startup. This is the `Ctrl+N`
+/// respawn path ([`App::new_llm_session`](super::app::App::new_llm_session)); a
+/// first launch goes through [`launch_llm_command`] instead and submits nothing.
 pub(crate) fn fresh_llm_command(
     repo_root: &Path,
     session_id_path: &Path,
@@ -337,25 +351,17 @@ pub(crate) fn prepare_review_prompt(comparison_arg: Option<&str>) -> String {
 }
 
 /// Whether the prepared review artifacts exist for the selected comparison.
+///
+/// This no longer gates difit — the diff is served either way — it gates the
+/// *review*: whether to seed `/diff-review` into the LLM and whether the skill
+/// may still retarget the comparison. A transcript alone is not enough: `dif`
+/// creates an empty one at launch, so both guides must be present too.
 pub(crate) fn review_files_ready(
     transcript_path: &Path,
     guide_path: &Path,
     guide_json_path: &Path,
 ) -> bool {
     transcript_path.is_file() && guide_path.is_file() && guide_json_path.is_file()
-}
-
-fn spawn_waiting_pane(repo_root: &Path, comparison_label: &str) -> Result<PtyPane> {
-    let message = format!(
-        "[dif] No prepared diff review found for {comparison_label}.\r\n\
-         [dif] Waiting for the LLM to run /diff-review and write .difit artifacts.\r\n\
-         [dif] difit and the browser shell will start automatically when ready."
-    );
-    let command = format!(
-        "printf '%s\\r\\n' {}; exec sleep 2147483647",
-        session::shell_quote(&message)
-    );
-    PtyPane::spawn_shell_command_with_env(&command, &[], repo_root, INITIAL_ROWS, INITIAL_COLS)
 }
 
 fn start_web_shell(
@@ -460,6 +466,49 @@ mod tests {
         assert!(command.contains("codex"));
         assert!(command.contains("/diff-review"));
         assert!(!command.contains("--session-id"));
+    }
+
+    #[test]
+    fn preparing_notice_does_not_claim_a_review_is_running() {
+        let notice = preparing_notice("@ develop");
+
+        assert!(notice.contains("@ develop"), "names the comparison");
+        assert!(notice.contains("the diff is live"));
+        // Nothing runs a review on its own, so the banner must not claim one is
+        // under way; it must say how to start one instead.
+        // The contract, not the wording: the notice must tell the reviewer how
+        // to start a review, since nothing starts one for them.
+        assert!(notice.contains("/diff-review"));
+    }
+
+    #[test]
+    fn a_launch_seeds_no_prompt_whether_it_resumes_or_starts_fresh() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("session-id");
+
+        let fresh = launch_llm_command(dir.path(), &path, AgentKind::Claude, "claude", None);
+        let resumed = launch_llm_command(
+            dir.path(),
+            &path,
+            AgentKind::Claude,
+            "claude",
+            Some("session-to-resume".to_owned()),
+        );
+
+        assert!(fresh.contains("--session-id"), "fresh: {fresh}");
+        assert!(resumed.contains("--resume"), "resumed: {resumed}");
+        // Neither branch may commission a review: that is the reviewer's call,
+        // made in the start-review modal.
+        for command in [&fresh, &resumed] {
+            assert!(
+                !command.contains("/diff-review"),
+                "a launch must not kick off a review: {command}"
+            );
+            assert!(
+                !command.contains(session::INITIAL_REVIEW_PROMPT),
+                "a launch must not inject the orientation prompt either: {command}"
+            );
+        }
     }
 
     #[test]

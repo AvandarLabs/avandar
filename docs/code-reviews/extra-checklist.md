@@ -85,7 +85,7 @@ Approved packages:
 - `@avandar/utils` — `packages/shared/utils/`
 - `@avandar/models` — `packages/shared/models/`
 - `@avandar/modules` — `packages/shared/modules/`
-- `@avandar/ava-etl` — `packages/node/ava-etl/`
+- `@avandar/etl` — `packages/node/etl/`
 
 ## Phases
 

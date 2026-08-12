@@ -25,7 +25,8 @@ jobs:
       VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
       UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
       UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_SENDING_API_KEY: ${{ secrets.RESEND_SENDING_API_KEY }}
+      RESEND_FULL_ACCESS_API_KEY: ${{ secrets.RESEND_FULL_ACCESS_API_KEY }}
       RESEND_LOCAL_TEST_SEGMENT_ID: ${{ secrets.RESEND_LOCAL_TEST_SEGMENT_ID }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
@@ -71,3 +72,24 @@ jobs:
             test-results
           retention-days: 30
           if-no-files-found: warn
+
+  # Validates the publishable libraries the way a consumer sees them: build,
+  # pack, then publint + attw against the real tarball. Runs on every PR so
+  # packaging breakage surfaces here rather than at release time, when the
+  # published `exports` path is exercised for the first time.
+  #
+  # Independent of the job above (no Supabase, no Playwright), so it stays fast.
+  verify-packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter "./packages/**" test
+      - run: pnpm verify:packages

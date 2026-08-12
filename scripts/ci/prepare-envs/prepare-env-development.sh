@@ -35,7 +35,8 @@ declare -A _development_env=(
   [UPSTASH_REDIS_REST_API_TOKEN]="$UPSTASH_REDIS_REST_API_TOKEN"
 
   # Email
-  [RESEND_API_KEY]="$RESEND_API_KEY"
+  [RESEND_SENDING_API_KEY]="$RESEND_SENDING_API_KEY"
+  [RESEND_FULL_ACCESS_API_KEY]="$RESEND_FULL_ACCESS_API_KEY"
   [RESEND_SITE_IMG_URL]="https://avandarlabs.com"
 
   # Email local testing

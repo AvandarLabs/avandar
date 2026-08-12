@@ -2,8 +2,8 @@ import {
   assertIsNonEmptyArray,
   assertIsSingletonArray,
   objectKeys,
-} from "@utils";
-import type { UnknownObject } from "@utils";
+} from "@avandar/utils";
+import type { UnknownObject } from "@avandar/utils";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 /**

@@ -1,5 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";

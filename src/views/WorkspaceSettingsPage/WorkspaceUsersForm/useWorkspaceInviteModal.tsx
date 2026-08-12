@@ -1,8 +1,7 @@
-import { useMutation } from "@hooks";
+import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifySuccess } from "@ui";
 import { buildWorkspaceInviteRolePayload } from "$/models/Permissions/inviteRolePayload";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { Workspace } from "$/models/Workspace/Workspace";
@@ -14,6 +13,7 @@ import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PurchaseSeatsModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
 import { WorkspaceInviteModalFields } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";

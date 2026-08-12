@@ -1,5 +1,4 @@
-import { isArray } from "@utils/guards/isArray/isArray";
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
+import { isArray, isPlainObject } from "@avandar/utils";
 import type {
   DescribableObject,
   PrimitiveValue,

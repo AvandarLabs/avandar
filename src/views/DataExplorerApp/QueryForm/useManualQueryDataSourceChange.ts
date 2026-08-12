@@ -1,4 +1,4 @@
-import { Model } from "@models";
+import { Model } from "@avandar/models";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";

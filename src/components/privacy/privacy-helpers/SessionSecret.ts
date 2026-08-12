@@ -1,4 +1,4 @@
-import { base64ToUint8 } from "@utils/encoding";
+import { base64ToUint8 } from "@avandar/utils/encoding";
 import {
   base64UrlEncode,
   hashTextPayload,

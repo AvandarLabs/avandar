@@ -1,14 +1,14 @@
+import { Model } from "@avandar/models";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Model } from "@models";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyError } from "@ui";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError } from "@/utils/notifications/notify";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";

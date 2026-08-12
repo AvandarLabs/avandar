@@ -1,3 +1,4 @@
+import { promiseMap } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -6,7 +7,6 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
-import { promiseMap } from "@utils/promises/promiseMap/promiseMap.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 import type { Tables } from "$/types/database.types.ts";

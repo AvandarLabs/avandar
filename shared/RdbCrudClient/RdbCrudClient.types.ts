@@ -1,11 +1,11 @@
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
-import type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
-import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type {
   AnySupabaseCrudModelSpec,
+  ClientReturningOnlyPromises,
+  ModelCrudParserRegistry,
+  RegisteredSupabaseDatabase,
   SupabaseCrudClient,
-} from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
-import type { ILogger } from "@logger/Logger.types.ts";
+} from "@avandar/clients";
+import type { ILogger } from "@avandar/logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EmptyObject } from "type-fest";
 

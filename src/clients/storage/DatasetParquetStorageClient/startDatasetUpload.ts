@@ -1,7 +1,6 @@
-import { notifyError } from "@ui";
+import { MIMEType } from "@avandar/utils";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-import { MIMEType } from "@utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -15,6 +14,7 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { notifyError } from "@/utils/notifications/notify";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";

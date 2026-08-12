@@ -1,11 +1,16 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { isDefined, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { ColorInput, Fieldset, Stack, Switch } from "@mantine/core";
-import { makeSelectOptions, Select } from "@ui";
-import { propPasses } from "@utils";
+import { Stack, Switch } from "@mantine/core";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { UnknownDataFrame } from "@utils";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
 
@@ -14,6 +19,9 @@ type Props = {
   config: PieChartVizConfig;
   data: UnknownDataFrame;
   onConfigChange: (newConfig: PieChartVizConfig) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -27,6 +35,7 @@ export function PieChartForm({
   config,
   data,
   onConfigChange,
+  layout = "stacked",
 }: Props): JSX.Element {
   const { t } = useLingui();
   const fieldOptions = useMemo(() => {
@@ -61,9 +70,11 @@ export function PieChartForm({
 
   const { nameKey, valueKey, isDonut, withLabels, labelsType } = config;
 
-  return (
-    <Stack gap="md">
-      <Fieldset legend={t`Series`}>
+  const groups: SettingsColumnGroup[] = [
+    {
+      id: "series",
+      title: t`Series`,
+      content: (
         <Stack gap="sm">
           <Select
             allowDeselect
@@ -97,9 +108,12 @@ export function PieChartForm({
             }}
           />
         </Stack>
-      </Fieldset>
-
-      <Fieldset legend={t`Chart settings`}>
+      ),
+    },
+    {
+      id: "chart-settings",
+      title: t`Chart settings`,
+      content: (
         <Stack gap="xs">
           <Switch
             label={t`Donut style`}
@@ -137,36 +151,26 @@ export function PieChartForm({
             />
           : null}
         </Stack>
-      </Fieldset>
+      ),
+    },
+    sliceNames.length > 0 ?
+      {
+        id: "slice-colors",
+        title: t`Slice colors`,
+        content: (
+          <SliceColorFields
+            sliceNames={sliceNames}
+            seriesColors={config.seriesColors}
+            onSeriesColorsChange={(
+              nextSeriesColors: Record<string, string>,
+            ) => {
+              onConfigChange({ ...config, seriesColors: nextSeriesColors });
+            }}
+          />
+        ),
+      }
+    : undefined,
+  ].filter(isDefined);
 
-      {sliceNames.length > 0 ?
-        <Fieldset legend={t`Slice colors`}>
-          <Stack gap="xs">
-            {sliceNames.map((name) => {
-              return (
-                <ColorInput
-                  key={name}
-                  label={name}
-                  value={config.seriesColors?.[name] ?? ""}
-                  swatches={CHART_COLOR_SWATCHES}
-                  withEyeDropper={false}
-                  format="hex"
-                  popoverProps={{ withinPortal: false }}
-                  onChange={(value) => {
-                    onConfigChange({
-                      ...config,
-                      seriesColors: {
-                        ...config.seriesColors,
-                        [name]: value || undefined,
-                      } as Record<string, string>,
-                    });
-                  }}
-                />
-              );
-            })}
-          </Stack>
-        </Fieldset>
-      : null}
-    </Stack>
-  );
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

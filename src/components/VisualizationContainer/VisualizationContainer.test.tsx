@@ -1,17 +1,18 @@
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { render, screen } from "@/test-utils";
-import type { UnknownDataFrame } from "@utils";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 const { notifyWarningMock } = vi.hoisted(() => {
   return { notifyWarningMock: vi.fn() };
 });
 
-vi.mock("@ui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@ui")>();
+vi.mock("@/utils/notifications/notify", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/utils/notifications/notify")>();
   return {
     ...actual,
     notifyWarning: notifyWarningMock,
@@ -185,14 +186,14 @@ function renderViz(
   data: UnknownDataFrame = DATA,
 ): ReturnType<typeof render> {
   return render(
-    <AvandarUiProvider>
+    <AvandarAppProvider>
       <VisualizationContainer
         columns={COLUMNS}
         data={data}
         dateColumns={EMPTY_DATE_COLUMNS}
         vizConfig={vizConfig}
       />
-    </AvandarUiProvider>,
+    </AvandarAppProvider>,
   );
 }
 

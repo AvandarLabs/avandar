@@ -1,4 +1,4 @@
-import { makeArrayWithLength } from "@utils";
+import { makeArrayWithLength } from "@avandar/utils";
 import { toCanvas } from "html-to-image";
 import jsPDF from "jspdf";
 

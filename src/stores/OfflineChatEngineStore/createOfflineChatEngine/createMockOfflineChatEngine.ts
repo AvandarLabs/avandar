@@ -1,4 +1,4 @@
-import { prop } from "@utils";
+import { prop } from "@avandar/utils";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,

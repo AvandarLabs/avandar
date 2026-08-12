@@ -1,7 +1,7 @@
+import { hasDefinedProps } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Menu } from "@mantine/core";
 import { IconBug, IconSparkles } from "@tabler/icons-react";
-import { hasDefinedProps } from "@utils";
 import { useState } from "react";
 import { Route as RootRoute } from "@/routes/__root";
 import {

@@ -1,6 +1,7 @@
 {
   "name": "@avandar/ava-cli",
   "version": "0.0.0",
+  "private": true,
   "description": "Avandar CLI",
   "license": "CPAL-1.0",
   "type": "module",
@@ -18,8 +19,10 @@
     "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
-    "@avandar/utils": "workspace:*",
     "@avandar/acclimate": "^0.4.0",
+    "@avandar/clients": "workspace:*",
+    "@avandar/models": "workspace:*",
+    "@avandar/utils": "workspace:*",
     "pg": "^8.18.0",
     "prettier": "^3.5.3"
   },

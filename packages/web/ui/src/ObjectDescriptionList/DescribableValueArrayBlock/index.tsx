@@ -1,6 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
+import { pick } from "@avandar/utils";
 import { ScrollArea, Stack, Text } from "@mantine/core";
-import { pick } from "@utils";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import {
   isDescribableObject,
@@ -49,8 +49,8 @@ export function DescribableValueArrayBlock<
   maxItemsCount,
   ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element {
-  const { t } = useLingui();
-  const resolvedRenderEmptyArray = renderEmptyArray ?? t`There are no values`;
+  const i18n = useI18nMessages();
+  const resolvedRenderEmptyArray = renderEmptyArray ?? i18n.noValues;
   // Split between objects, arrays, and primitive values
   const [describableObjects, describableValueArrays, primitiveValues] =
     useMemo(() => {

@@ -45,35 +45,85 @@ cd <repo> && exec <difit> <args…> --port <P> --host <H> --keep-alive --include
 
 difit dies with the TUI: dropping the `PtyPane` kills the child.
 
-### Delayed startup when no prepared review exists
+### Launching with no prepared review
 
-If the selected branch and comparison do not yet have the three startup-critical
-prepared files under `.difit/` (the transcript, `-guide.md`, and `-guide.json`), `dif` does
-not start difit, does not start the poller, and does not open the browser
-shell. The left pane is only a status pane in this mode. It does write
-`.session-<branch>-<scope>.json` with a local `comparison_update_url` so the
-skill can update the waiting TUI if it chooses a different comparison.
+**difit never waits on the LLM.** The diff comes from git alone, so a launch
+with no prepared review starts difit, the poller, and the browser shell exactly
+as a prepared one does. Two things differ:
 
-The LLM pane starts with the minimal slash command that prepares the review:
-`/diff-review` plus the comparison argument the user explicitly passed to the
-TUI. Examples: `dif .` seeds `/diff-review .`, `dif develop` seeds
-`/diff-review develop`, and bare `dif` seeds `/diff-review`. Flags such as
-`--codex` / `-cx` are never included in that prompt.
+1. The transcript is created first, as `[]`
+   (`transcript::ensure_exists`), so the review has its canonical file from the
+   first moment and the poller has somewhere to mirror. An existing transcript
+   is never touched.
+2. The LLM pane starts idle and the TUI asks, in a modal, whether to start a
+   review. Nothing is injected unless the reviewer answers Yes; a No closes the
+   modal and starts nothing. A Yes types the minimal slash command that prepares
+   the review: `/diff-review` plus the comparison argument the user explicitly
+   passed to the TUI. Examples: `dif .` runs `/diff-review .`, `dif develop` runs
+   `/diff-review develop`, and bare `dif` runs `/diff-review`. Flags such as
+   `--codex` / `-cx` are never included in that prompt. If the pane has died by
+   then, the answer respawns it on a fresh session seeded with that command.
 
-Each UI tick calls `review_files_ready` through `App::update_difit_log`. Once
-the transcript and both guide files exist, the same left `PtyPane` is respawned
-with the difit command, the poller starts, live-session metadata is written,
-and the browser shell opens. From that point forward the normal live comment
-flow applies.
+Nothing blocks on difit answering, either: the shell binds and serves its page
+immediately and its iframe silently retries the proxied difit document (see
+[web-shell.md](web-shell.md)), so the browser is opened as soon as the URL
+exists rather than after a readiness probe.
 
-If the skill chooses a comparison inside that already-open TUI (for example the
+The reviewer can comment straight away. Those comments are mirrored to the
+transcript and dispatched to the LLM pane like any other, which means they queue
+in the agent's own input while it is still writing the round.
+
+Each UI tick calls `review_files_ready` through `App::update_difit_log`. When
+the transcript and both guide files exist, `App::note_guide_ready` records it,
+logs a line in the pane, and stops accepting comparison updates. Nothing is
+started — everything already is.
+
+### Importing the skill's transcript writes into the live server
+
+Because difit is already running when the skill writes its round, the transcript
+is a two-way channel, not just a mirror:
+
+- **Outbound (mirror).** Each tick the poller rewrites the transcript from
+  difit's `/api/comments-json`, remembering the exact text it wrote.
+- **Inbound (import).** If the file on disk is *not* that text, the skill (or
+  anything else) wrote it. `difit::importer::inbound_entries` returns the
+  entries difit has never held, the poller POSTs them to
+  `/api/comment-imports`, and it skips the mirror for that tick so the write is
+  not clobbered before difit ingests it. difit pushes them to the browser over
+  SSE; the next poll mirrors the merged conversation back to disk.
+
+Guards on the inbound path:
+
+- An entry with no id or no `filePath` is skipped — difit cannot place it, and
+  one bad entry must not fail the batch.
+- Every id difit has held this session (plus everything already imported) is
+  remembered, so an id is never POSTed twice and a comment the reviewer just
+  deleted is never resurrected by a slightly stale file.
+- A malformed or half-written file is ignored until it parses.
+- A failed POST leaves the ids unimported so the next tick retries; the
+  transcript keeps the skill's entries either way.
+
+The skill may still POST its entries itself (Continue mode does). That is
+idempotent with this path: entries already in difit are, by definition, not
+inbound.
+
+### Comparison handoff
+
+If the skill chooses a comparison inside an already-open TUI (for example the
 user launched bare `pnpm diff-review`, then the final summary says
 `Run: pnpm diff-review .`), it POSTs `{ "comparisonKey": "." }` to the metadata
-file's `comparison_update_url`. While offline, `App` accepts that update and
-retargets the in-memory comparison, transcript path, guide paths, summary path,
-test-plan path, difit port, and shell port before checking `review_files_ready`.
-Once difit is online, the control endpoint returns `409` and comparison changes
-are ignored; a live review is never switched out from under the browser.
+file's `comparison_update_url`.
+
+`App` honors that only while the review is still being prepared: no guide
+artifacts yet **and** no comment in difit. It then retargets the in-memory
+comparison, transcript path, guide paths, summary path, test-plan path, difit
+port, and shell port, and relaunches difit, the poller, and the browser shell on
+the new target (`App::relaunch_review_surface`), reusing the left pane so its log
+stays continuous.
+
+Once a guide exists the control endpoint returns `409`, and a retarget that
+arrives after the reviewer has started commenting is logged and ignored: a
+review that is underway is never switched out from under the browser.
 
 ### Restarting difit in place ("Restart diff server")
 
@@ -155,14 +205,19 @@ cd <repo> && <codex_cmd> [prompt]
 cd <repo> && <codex_cmd> resume <id> [prompt]
 ```
 
-A **fresh** session is launched with a prompt appended as a final argument so the
-frontend submits it on startup and stays interactive (the `prompt` parameter of
-`session::build_llm_command`). Prepared reviews use the normal orientation
-message from `session::initial_prompt`: it states the conversation is about the
-current diff review and to load the `/diff-review` skill. Unprepared reviews use
-the minimal `/diff-review [comparison]` preparation command described above. A
-**resumed** session gets no such message because that orientation is already in
-the resumed conversation's context, so re-injecting it would just repeat work.
+A session *can* be launched with a prompt appended as a final argument, which the
+frontend submits on startup while staying interactive (the `prompt` parameter of
+`session::build_llm_command`). **Launching `dif` never uses it**: the pane comes
+up idle, fresh or resumed, because a launch is a request to see the diff, not to
+commission a review. Two paths still pass a prompt:
+
+- **The start-review modal answered Yes**, when the LLM pane has already died. It
+  respawns on a fresh session seeded with `/diff-review [comparison]`. While the
+  pane is alive, the same answer is typed into it instead.
+- **`Ctrl+N` / "New LLM session"**, which mints a fresh session seeded with the
+  orientation message from `session::initial_prompt` (it states the conversation
+  is about the current diff review and to load the `/diff-review` skill). That is
+  an explicit user action, not a launch.
 
 For Claude, the session id is remembered in
 `.difit/.claude-session-<branch>-<scope>`; a relaunch resumes it when its

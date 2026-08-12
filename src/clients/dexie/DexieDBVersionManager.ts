@@ -1,4 +1,4 @@
-import { assertIsDefined, identity, objectKeys } from "@utils";
+import { assertIsDefined, identity, objectKeys } from "@avandar/utils";
 import Dexie, { EntityTable, Transaction } from "dexie";
 import { UnionToIntersection } from "type-fest";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";

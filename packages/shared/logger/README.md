@@ -5,6 +5,16 @@ caller tracing, immutable configuration, and a `withLogger` mixin for
 attaching scoped loggers to `@avandar/modules` modules. A Node.js logger
 will be added in the future.
 
+ESM only. Requires Node 22+.
+
+## Install
+
+```sh
+pnpm add @avandar/logger
+```
+
+No peer dependencies.
+
 ## Usage
 
 ```ts
@@ -83,10 +93,6 @@ return a new logger instance.
 Wraps a module type `M` with a `withLogger(callerNameOverride?)` method that
 returns a new module instance with its scoped logger enabled.
 
-## Scripts
+## License
 
-| Command           | Description                  |
-| ----------------- | ---------------------------- |
-| `pnpm test`       | Run all tests once           |
-| `pnpm test:watch` | Run tests in watch mode      |
-| `pnpm type-check` | Run TypeScript type checking |
+MIT

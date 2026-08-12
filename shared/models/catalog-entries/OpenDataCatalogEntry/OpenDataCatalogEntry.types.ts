@@ -1,4 +1,4 @@
-import type { UUID } from "@utils/types/common.types.ts";
+import type { UUID } from "@avandar/utils";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";

@@ -1,5 +1,5 @@
 import { useThreadRuntime } from "@assistant-ui/react";
-import { Model } from "@models";
+import { Model } from "@avandar/models";
 import { act } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";

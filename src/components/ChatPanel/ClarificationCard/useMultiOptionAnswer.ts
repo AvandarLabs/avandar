@@ -1,4 +1,4 @@
-import { valNotEq } from "@utils";
+import { valNotEq } from "@avandar/utils";
 import { useState } from "react";
 import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";

@@ -1,7 +1,7 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
-import type { UUID } from "@utils/types/common.types";
+import type { UUID } from "@avandar/utils";
 import type { UserId } from "$/models/User/User.types";
 
 /**

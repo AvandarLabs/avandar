@@ -1,5 +1,5 @@
 import { I18nProvider } from "@lingui/react";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { i18n } from "@/i18n/i18n";
 import type { ReactNode } from "react";
 
@@ -12,11 +12,11 @@ type Props = {
  * from in production:
  * - `I18nProvider` so any `<Trans>` / `useLingui()` resolves without
  *   throwing "rendered without I18nProvider"
- * - `AvandarUiProvider` (Mantine theme, modals, notifications)
+ * - `AvandarAppProvider` (Mantine theme, modals, notifications)
  *
- * `I18nProvider` is mounted *outside* `AvandarUiProvider` to mirror the real
- * app tree (`AvandarI18nProvider` wraps `AvandarUiProvider`). This ordering
- * matters because `AvandarUiProvider` owns the `ModalsProvider`: imperatively
+ * `I18nProvider` is mounted *outside* `AvandarAppProvider` to mirror the real
+ * app tree (`AvandarI18nProvider` wraps `AvandarAppProvider`). This ordering
+ * matters because `AvandarAppProvider` owns the `ModalsProvider`: imperatively
  * opened modals (e.g. the app-wide dropzone confirm dialog) must render inside
  * the Lingui context so their `<Trans>` content resolves.
  *
@@ -26,7 +26,7 @@ type Props = {
 export function TestProviders({ children }: Props): JSX.Element {
   return (
     <I18nProvider i18n={i18n}>
-      <AvandarUiProvider>{children}</AvandarUiProvider>
+      <AvandarAppProvider>{children}</AvandarAppProvider>
     </I18nProvider>
   );
 }

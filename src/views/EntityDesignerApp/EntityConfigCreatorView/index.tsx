@@ -1,3 +1,6 @@
+import { makeSelectOptions, Paper, Select } from "@avandar/ui";
+import { useForm } from "@avandar/ui/hooks";
+import { isDefined, prop, propEq, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -11,13 +14,10 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { makeSelectOptions, Paper, Select } from "@ui";
-import { isDefined, prop, propEq, setValue } from "@utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DatasetColumnFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
 import { EntityConfigCreatorStore } from "@/views/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import {

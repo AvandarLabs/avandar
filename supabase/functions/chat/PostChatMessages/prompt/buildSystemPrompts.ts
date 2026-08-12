@@ -49,6 +49,15 @@ When to call \`clarify\`:
   asking. Use \`fixed_options\` with \`multi: true\` listing the dataset
   names from the schema. On the answer, map the selected names back to
   the corresponding dataset ids in the schema when building SQL.
+- Filtering a text column by a specific value you don't know. When the
+  user names or implies a specific category, label, or code (a specific
+  indicator, program, status, region) and answering requires a filter on
+  a text column (\`WHERE "col" = '...'\`, \`IN (...)\`, or \`LIKE\`), you do
+  NOT know the exact stored spelling, casing, or wording. Guessing the
+  literal silently returns wrong or empty results. Use the \`discovery\`
+  shape to fetch the real values and let the user pick BEFORE writing that
+  filter, unless the user pasted the exact literal or a prior discovery
+  surfaced it.
 
 When NOT to call \`clarify\`:
 - The metadata already disambiguates the question (e.g. only one dataset
@@ -57,6 +66,10 @@ When NOT to call \`clarify\`:
 - The ambiguity is minor and a reasonable default exists — make the
   choice, explain it briefly in your reply, and proceed with SQL.
 - The question is straightforward ("monthly revenue by region").
+- ...but this does NOT excuse guessing a filter literal. A question can be
+  structurally straightforward ("trend for indicator X") yet still need
+  discovery to pin down the exact stored value of X. Clear structure does
+  not mean the literal is known.
 
 How to clarify:
 - Ask ONE question at a time. Keep it under 25 words.
@@ -93,7 +106,10 @@ After at most 3 clarification turns within one analytic question, make
 a reasonable assumption, state it briefly in \`assistantText\`, and call
 \`generateSql\`. The client will ask the user to approve any filter literals
 in the SQL that they did not explicitly provide, or that look like personal
-data, before the query runs.
+data, before the query runs. Filter approval confirms the user's intent,
+not the spelling. It will not correct a literal that doesn't exist in the
+data. When you don't know the stored value, discover it; don't rely on
+approval to catch a bad guess.
 
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ModelBase, ModelType } from "@models/Model/Model.types.ts";
-import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { UnionToIntersection } from "type-fest";
 
 type ValidMatchedValues<M extends ModelBase> =
@@ -8,7 +7,12 @@ type ValidMatchedValues<M extends ModelBase> =
   | string
   | number
   | boolean
-  | UnknownObject;
+  // Spelled out rather than imported as `UnknownObject` from `@avandar/utils`.
+  // Pulling that one alias in from the utils barrel degraded inference here:
+  // the handler parameters in `matchModel(x, { User: (model) => ... })` fell
+  // back to `any`. This is the exact definition of `UnknownObject`, and the
+  // type is used once, so the import bought nothing.
+  | Record<PropertyKey, unknown>;
 
 type ValidValueRecord<M extends ModelBase> = UnionToIntersection<
   M extends any ?

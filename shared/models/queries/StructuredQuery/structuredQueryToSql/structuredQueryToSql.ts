@@ -5,17 +5,19 @@
  * calls it whenever the manual query form changes so that the textual SQL
  * stays in sync with the form.
  *
- * Extracted from {@link toRawDuckDBQuery} so it can be reused outside the
+ * Extracted from {@link toRawDuckDbQuery} so it can be reused outside the
  * DuckDB-specific code path and so callers can override identifier quoting
  * or knex options independently.
  */
-import { Model } from "@models/Model/Model.ts";
-import { valNotEq } from "@utils/guards/hofs/valNotEq.ts";
-import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap.ts";
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
-import { objectEntries } from "@utils/objects/objectEntries.ts";
-import { objectValues } from "@utils/objects/objectValues.ts";
-import { sortObjList } from "@utils/objects/sortObjList/sortObjList.ts";
+import { Model } from "@avandar/models";
+import {
+  makeIdLookupMap,
+  objectEntries,
+  objectValues,
+  prop,
+  sortObjList,
+  valNotEq,
+} from "@avandar/utils";
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
@@ -75,13 +77,13 @@ export function structuredQueryToSql(
     valNotEq("none"),
   );
 
-  const duckDBAggregations = {} as Record<string, DuckDbQueryAggregationTypeT>;
+  const duckDbAggregations = {} as Record<string, DuckDbQueryAggregationTypeT>;
   objectEntries(aggregations).forEach(([columnId, aggregation]) => {
     const column = queryColumnLookup.get(columnId);
 
     if (Model.isOfModelType(column?.baseColumn, "DatasetColumn")) {
       if (aggregation !== "group_by" && aggregation !== "none") {
-        duckDBAggregations[column.baseColumn.name] = aggregation;
+        duckDbAggregations[column.baseColumn.name] = aggregation;
       } else {
         if (atLeastOneColumnHasAggregation || aggregation === "group_by") {
           groupByColumnNames.push(column.baseColumn.name);
@@ -103,7 +105,7 @@ export function structuredQueryToSql(
     .map(prop("baseColumn.name"));
 
   const columnNamesWithoutAggregations = selectColumnNames.filter((colName) => {
-    return duckDBAggregations[colName] === undefined;
+    return duckDbAggregations[colName] === undefined;
   });
 
   const adjustedColumnNames = columnNamesWithoutAggregations.map((colName) => {
@@ -158,7 +160,7 @@ export function structuredQueryToSql(
     );
   }
 
-  sqlQuery = objectEntries(duckDBAggregations).reduce(
+  sqlQuery = objectEntries(duckDbAggregations).reduce(
     (newQuery, [columnName, aggType]) => {
       const aggregationColumnName =
         DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
@@ -204,7 +206,7 @@ export function structuredQueryToSql(
           );
         })
         .exhaustive(() => {
-          throw new Error(`Invalid DuckDBQueryAggregationType: "${aggType}"`);
+          throw new Error(`Invalid DuckDbQueryAggregationType: "${aggType}"`);
         });
     },
     sqlQuery,

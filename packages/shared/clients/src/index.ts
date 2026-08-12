@@ -14,6 +14,8 @@ export type { UpsertOptions } from "@clients/ModelCrudClient/ModelCrudClient.typ
 
 // Supabase client
 export { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+export type { AnySupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
+export type { SupabaseCrudClient } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 export type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 
 // SQLite client (desktop)
@@ -27,13 +29,10 @@ export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makePa
 export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 
-// Server-side API client (Postgres RPCs + Edge Functions)
-export { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
+// Supabase database registration
 export type {
-  ServerApiClient,
-  ServerApiFunctionRequest,
-} from "@clients/ServerApiClient/ServerApiClient.types.ts";
-export {
-  ServerApiSessionRefresher,
-  SessionExpiredError,
-} from "@clients/ServerApiClient/ServerApiSessionRefresher.ts";
+  RegisteredSupabaseDatabase,
+  RegisteredSupabaseDatabaseTableNames,
+} from "@clients/Register.types.ts";
+
+export type { SqliteTransport } from "@clients/SqliteCrudClient/SqliteTransport.types.ts";

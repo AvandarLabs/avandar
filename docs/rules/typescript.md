@@ -41,6 +41,61 @@
   a header describing the suite is expected), and files that are a collection of
   same-kind exports with no single primary one (a `*.types.ts` type collection, a
   `*.constants.ts` bundle, or a group of sibling helpers).
+- Comments describe the present, never the past. Do not write what a file,
+  function, type, or module *used to* do, what it was renamed from, what an
+  earlier implementation looked like, or why it was changed. Git history already
+  records that. A reader gets no help from it and has to work out which half of
+  the comment still applies, and the claim rots as soon as the next change
+  lands. Describe only the code as it exists today.
+
+  This is bad:
+
+  ```ts
+  /**
+   * Formats a row for display.
+   *
+   * This used to take the whole table and format every row, but that was slow
+   * on large datasets, so now it only takes one row.
+   */
+  export function formatRow(row: Row): string {}
+  ```
+
+  This is good:
+
+  ```ts
+  /** Formats a single row for display. */
+  export function formatRow(row: Row): string {}
+  ```
+
+- Exception: document a superseded approach when it is the more intuitive one
+  and a future developer is likely to reach for it again. Write it as a warning
+  about the present, not as history: say not to do X because it fails in way Y.
+  Never phrase it as "we used to do X". The test is whether the sentence still
+  reads correctly to someone who has never seen the old code.
+
+  This is bad (history, and useless to a reader who never saw the old code):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * We used to read it from the session, but that broke on hard refresh.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
+  This is good (a warning that stands on its own):
+
+  ```ts
+  /**
+   * Reads the workspace id from the route.
+   *
+   * Do not read it from the session instead: the session is not yet populated
+   * on a hard refresh, so the first render would get `undefined`.
+   */
+  export function useWorkspaceId(): string {}
+  ```
+
 - **Use functional and declarative programming patterns.**
   - Avoid classes or imperative programming patterns.
   - Use higher-order functions (map, filter, reduce).
@@ -342,6 +397,38 @@
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
   couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
+- The converse also holds: a module with no co-named sibling must NOT get a
+  directory of its own. A directory exists to group siblings, so
+  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
+  nothing, and it costs a redundant path segment on every import
+  (`.../MyFile/MyFile`). Leave the lone file next to its parent
+  (`.../MyFile.tsx`) and create the directory at the moment a second
+  co-named file appears. This applies to every kind of module: components,
+  hooks, and plain `.ts` modules alike.
+
+  This is bad (each directory holds exactly one file):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize/
+      useDrawerResize.ts
+    QueryTabPanel/
+      QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that
+  really has siblings keeps a directory):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize.ts
+    QueryTabPanel.tsx
+    DrawerHeight/
+      DrawerHeight.ts
+      DrawerHeight.test.ts
+  ```
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.
@@ -376,33 +463,46 @@
   ```
 
 - Put the docstring on the module's exported key, not on the underlying
-  function, when a non-exported function is defined in the same file as the
-  module that exports it. TypeScript intellisense does not carry a function's
-  docstring across the assignment into a module object: it can see the type of
-  `MyModule.myFunc` but does not know it is the same function as `_myFunc`, so a
-  docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
+  declaration, when a non-exported declaration is defined in the same file as
+  the module that exports it. TypeScript intellisense does not carry a
+  declaration's docstring across the assignment into a module object: it can see
+  the type of `MyModule.myFunc` but does not know it is the same function as
+  `_myFunc`, so a docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
 
-  This is bad (the docstring on `_myFunc` is invisible at the call site):
+  This covers every kind of key, not just methods. A constant loses its
+  docstring the same way, and a shorthand key (`{ MY_LIMIT }`) hides it exactly
+  as an explicit one does.
+
+  This is bad (neither docstring is visible at the call site):
 
   ```ts
+  /** Smallest allowed value. */
+  const MY_LIMIT = 10;
+
   /** What myFunc does. */
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    MY_LIMIT,
     myFunc: _myFunc,
   };
   ```
 
-  This is good (hovering `MyModule.myFunc` shows the docstring):
+  This is good (hovering either member shows its docstring):
 
   ```ts
+  const MY_LIMIT = 10;
+
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    /** Smallest allowed value. */
+    MY_LIMIT,
+
     /** What myFunc does. */
     myFunc: _myFunc,
   };

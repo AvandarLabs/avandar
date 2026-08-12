@@ -1,14 +1,14 @@
+import { makeObject, propEq, propNotEq } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
-import { notifyError } from "@ui";
-import { makeObject, propEq, propNotEq } from "@utils";
 import { useMemo } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError } from "@/utils/notifications/notify";
 import {
   buildShareSummary,
   hasPrincipalId,

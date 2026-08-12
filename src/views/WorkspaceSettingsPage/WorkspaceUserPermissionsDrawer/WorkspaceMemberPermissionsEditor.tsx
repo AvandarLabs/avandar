@@ -1,10 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, MultiSelect, Stack, Text } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type {
   RoleGroupWithMatrix,

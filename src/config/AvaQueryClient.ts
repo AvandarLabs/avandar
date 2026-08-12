@@ -1,6 +1,6 @@
-import { getIsOnline } from "@browser-utils";
-import { SessionExpiredError } from "@clients";
+import { getIsOnline } from "@avandar/browser-utils";
 import { QueryClient } from "@tanstack/react-query";
+import { SessionExpiredError } from "$/ServerApiClient";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;

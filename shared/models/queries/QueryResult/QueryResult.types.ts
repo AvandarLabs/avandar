@@ -1,4 +1,4 @@
-import type { UnknownObject, UUID } from "@utils/types/common.types.ts";
+import type { UnknownObject, UUID } from "@avandar/utils";
 import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
 
 export type QueryResultId = UUID<"QueryResult">;

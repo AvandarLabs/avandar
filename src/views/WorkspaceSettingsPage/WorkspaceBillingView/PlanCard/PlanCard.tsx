@@ -1,4 +1,4 @@
-import { getCurrentUrl } from "@browser-utils";
+import { getCurrentUrl } from "@avandar/browser-utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -11,7 +11,6 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
-import { notifyError, notifyExpiredSession, notifySuccess } from "@ui";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
@@ -19,6 +18,8 @@ import { match } from "ts-pattern";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";

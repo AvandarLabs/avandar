@@ -1,4 +1,4 @@
-import { promiseMap, promiseMapSequential } from "@utils";
+import { promiseMap, promiseMapSequential } from "@avandar/utils";
 import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
 import { Database } from "$/types/database.types";
 import { ScriptsUtil } from "scripts/ScriptsUtil";

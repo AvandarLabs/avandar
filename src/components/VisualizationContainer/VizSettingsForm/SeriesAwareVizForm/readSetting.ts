@@ -1,4 +1,4 @@
-import { getValue } from "@utils";
+import { getValue } from "@avandar/utils";
 
 /**
  * Read a descriptor's value out of a config/series by dotted path, returning

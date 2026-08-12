@@ -1,27 +1,60 @@
 {
   "name": "@avandar/clients",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Typed CRUD client primitives and database-specific CRUD type helpers",
-  "license": "CPAL-1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/shared/clients"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/shared/clients#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@avandar/logger": "workspace:*",
+    "@avandar/modules": "workspace:*",
+    "@avandar/utils": "workspace:*",
     "@supabase/postgrest-js": "^2.99.0",
+    "ts-pattern": "catalog:",
+    "type-fest": "catalog:"
+  },
+  "peerDependencies": {
     "@supabase/supabase-js": "^2.98.0",
-    "type-fest": "^5.4.4"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vitest": "^3.2.4"
+    "@supabase/supabase-js": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
   }
 }

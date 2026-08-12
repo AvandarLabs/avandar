@@ -16,8 +16,8 @@
  * `CompositeChart` since composite mode triggers different rendering
  * logic internally.
  */
+import { formatDate, propEq } from "@avandar/utils";
 import { Box } from "@mantine/core";
-import { formatDate, propEq } from "@utils";
 import { Fragment, useId, useMemo } from "react";
 import {
   Area,

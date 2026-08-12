@@ -1,3 +1,4 @@
+import { capitalize } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -12,8 +13,6 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
-import { capitalize } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
@@ -24,6 +23,7 @@ import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";

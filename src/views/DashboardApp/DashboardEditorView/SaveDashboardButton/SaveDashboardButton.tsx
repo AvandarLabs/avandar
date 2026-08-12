@@ -1,4 +1,4 @@
-import { getIsMacPlatform } from "@browser-utils";
+import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Kbd } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";

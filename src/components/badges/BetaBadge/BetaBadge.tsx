@@ -1,6 +1,6 @@
+import { mantineVar, Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Badge, BadgeProps } from "@mantine/core";
-import { mantineVar, Tooltip } from "@ui";
 
 type Props = BadgeProps & {
   /**

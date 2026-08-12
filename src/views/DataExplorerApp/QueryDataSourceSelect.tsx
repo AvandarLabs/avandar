@@ -1,8 +1,8 @@
+import { makeSelectOptions, Select, Tooltip } from "@avandar/ui";
+import { makeBucketMap, prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { makeSelectOptions, Select, Tooltip } from "@ui";
-import { makeBucketMap, prop, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -13,7 +13,7 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
+import type { SelectData, SelectOptionGroup, SelectProps } from "@avandar/ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   QueryDataSource,

@@ -1,6 +1,9 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { ErrorResponse, Resend } from "resend";
+import { getResendFullAccessAPIKey } from "$/env/getResendFullAccessAPIKey.ts";
+import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
+import { Resend } from "resend";
+import type { ErrorResponse } from "resend";
 
 type IResendClient = {
   sendEmail: Resend["emails"]["send"];
@@ -46,10 +49,6 @@ function _getResendRateLimiterSingleton(): Ratelimit {
 }
 
 function createResendClient(): IResendClient {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not set");
-  }
-
   // Fail fast if upstash redis env vars are missing
   if (!process.env.UPSTASH_REDIS_API_URL) {
     throw new Error("UPSTASH_REDIS_API_URL is not set");
@@ -59,7 +58,18 @@ function createResendClient(): IResendClient {
     throw new Error("UPSTASH_REDIS_REST_API_TOKEN is not set");
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY!);
+  let sendingResend: Resend | undefined;
+  let fullAccessResend: Resend | undefined;
+
+  const _getSendingResend = (): Resend => {
+    sendingResend ??= new Resend(getResendSendingAPIKey());
+    return sendingResend;
+  };
+
+  const _getFullAccessResend = (): Resend => {
+    fullAccessResend ??= new Resend(getResendFullAccessAPIKey());
+    return fullAccessResend;
+  };
 
   const _withRateLimiter = async <
     T extends { data: unknown; error: ErrorResponse | null },
@@ -97,6 +107,7 @@ function createResendClient(): IResendClient {
 
   return {
     sendEmail: async (...params: Parameters<Resend["emails"]["send"]>) => {
+      const resend = _getSendingResend();
       return await _withRateLimiter(async () => {
         return await resend.emails.send(...params);
       });
@@ -104,6 +115,7 @@ function createResendClient(): IResendClient {
     createContact: async (
       ...params: Parameters<Resend["contacts"]["create"]>
     ) => {
+      const resend = _getFullAccessResend();
       return await _withRateLimiter(async () => {
         return await resend.contacts.create(...params);
       });
@@ -111,11 +123,13 @@ function createResendClient(): IResendClient {
     updateContact: async (
       ...params: Parameters<Resend["contacts"]["update"]>
     ) => {
+      const resend = _getFullAccessResend();
       return await _withRateLimiter(async () => {
         return await resend.contacts.update(...params);
       });
     },
     getContact: async (...params: Parameters<Resend["contacts"]["get"]>) => {
+      const resend = _getFullAccessResend();
       return await _withRateLimiter(async () => {
         return await resend.contacts.get(...params);
       });
@@ -123,6 +137,7 @@ function createResendClient(): IResendClient {
     createBroadcast: async (
       ...params: Parameters<Resend["broadcasts"]["create"]>
     ) => {
+      const resend = _getFullAccessResend();
       return await _withRateLimiter(async () => {
         return await resend.broadcasts.create(...params);
       });
@@ -130,11 +145,13 @@ function createResendClient(): IResendClient {
     sendBroadcast: async (
       ...params: Parameters<Resend["broadcasts"]["send"]>
     ) => {
+      const resend = _getSendingResend();
       return await _withRateLimiter(async () => {
         return await resend.broadcasts.send(...params);
       });
     },
     listTopics: async (...params: Parameters<Resend["topics"]["list"]>) => {
+      const resend = _getFullAccessResend();
       return await _withRateLimiter(async () => {
         return await resend.topics.list(...params);
       });

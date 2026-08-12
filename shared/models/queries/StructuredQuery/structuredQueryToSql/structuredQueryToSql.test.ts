@@ -1,4 +1,4 @@
-import { Model } from "@models/Model/Model.ts";
+import { Model } from "@avandar/models";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts";
 import { describe, expect, it } from "vitest";

@@ -1,11 +1,10 @@
-import { notifyError } from "@ui";
 import {
   assertIsDefined,
   makeBucketRecord,
   promiseMap,
   prop,
   where,
-} from "@utils";
+} from "@avandar/utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
@@ -17,12 +16,13 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import { notifyError } from "@/utils/notifications/notify";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -153,7 +153,7 @@ export const DashboardClient = createUsableServiceClient(
                     treatAsAllColumns,
                   });
 
-                  const parquetBlob = await WorkspaceQETLClient.runQuery({
+                  const parquetBlob = await WorkspaceQetlClient.runQuery({
                     rawSql: materializedSql,
                     workspaceId: dashboard.workspaceId,
                     returnType: "parquet",
@@ -189,7 +189,7 @@ export const DashboardClient = createUsableServiceClient(
                     treatAsAllColumns,
                   });
 
-                  const parquetBlob = await WorkspaceQETLClient.runQuery({
+                  const parquetBlob = await WorkspaceQetlClient.runQuery({
                     rawSql: materializedSql,
                     workspaceId: dashboard.workspaceId,
                     returnType: "parquet",

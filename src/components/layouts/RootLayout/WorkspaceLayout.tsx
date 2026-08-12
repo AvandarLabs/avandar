@@ -1,5 +1,5 @@
+import { where } from "@avandar/utils";
 import { Outlet } from "@tanstack/react-router";
-import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";

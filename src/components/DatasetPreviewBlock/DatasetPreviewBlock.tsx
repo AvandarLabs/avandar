@@ -1,7 +1,7 @@
+import { Callout, ObjectDescriptionList } from "@avandar/ui";
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { Callout, ObjectDescriptionList } from "@ui";
-import { prop } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

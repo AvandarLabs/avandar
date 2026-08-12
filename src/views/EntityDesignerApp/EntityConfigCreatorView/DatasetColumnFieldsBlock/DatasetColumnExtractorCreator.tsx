@@ -1,10 +1,10 @@
+import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
-import { matchLiteral } from "@utils";
 import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors";
 import { EntityConfigCreatorStore } from "@/views/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
-import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type { EntityConfigFormValues } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
+import type { FormType } from "@avandar/ui/hooks";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigFormValues>;

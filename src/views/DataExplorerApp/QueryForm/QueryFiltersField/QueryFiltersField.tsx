@@ -1,3 +1,4 @@
+import { isDefined } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import {
@@ -5,7 +6,6 @@ import {
   MantineValueEditor,
   QueryBuilderMantine,
 } from "@react-querybuilder/mantine";
-import { isDefined } from "@utils";
 import { useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
 import type { ReactNode } from "react";
