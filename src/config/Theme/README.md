@@ -125,7 +125,8 @@ import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
 />;
 ```
 
-Reference: `FloatingPanel` + `useFloatingPanelMorphTransition`.
+These presets currently have no callers in the app. They remain available for
+any surface that should grow from the control that opened it.
 
 Overlay components (Menu, Combobox, Modal, etc.) get `transitionProps` from `MANTINE_TRANSITION_PROPS` in `AnimationTheme.ts`.
 

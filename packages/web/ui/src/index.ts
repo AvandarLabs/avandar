@@ -26,7 +26,7 @@ export { EditButton as EditIconButton } from "./buttons/EditButton";
 
 // Tabs
 export { Tabs } from "./Tabs/Tabs";
-export type { TabsIndicatorVariant } from "./Tabs/Tabs";
+export type { TabsIndicatorVariant, TabsSize } from "./Tabs/Tabs";
 
 // Tooltip
 export { Tooltip } from "./Tooltip/Tooltip";

@@ -29,6 +29,23 @@
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { Paths } from "type-fest";
 
+/**
+ * The groups a setting can be clustered under in a settings form.
+ *
+ * These are stable identifiers, not display copy: forms group and compare on
+ * them, so they must not change with the active locale. Render them through
+ * `vizSettingGroupLabel` from `$/copy/vizSettingGroupLabel.ts`.
+ */
+export type VizSettingGroup =
+  | "X axis"
+  | "Y axis"
+  | "Category axis"
+  | "Legend"
+  | "Style"
+  | "Layout"
+  | "Grid"
+  | "Identity";
+
 // ---------------------------------------------------------------------
 // Control specifications
 // ---------------------------------------------------------------------
@@ -108,8 +125,8 @@ export type ChartSettingDescriptor<TConfig> = {
   key: Paths<TConfig> & string;
   /** Label shown next to the control in the form. */
   label: string;
-  /** Optional group header used to cluster related settings. */
-  group?: string;
+  /** Optional group used to cluster related settings. */
+  group?: VizSettingGroup;
   /** Which UI widget renders this setting. */
   control: ControlSpec;
 };
@@ -125,8 +142,8 @@ export type SeriesSettingDescriptor<TSeries> = {
   key: Paths<TSeries> & string;
   /** Label shown next to the control in the form. */
   label: string;
-  /** Optional group header used to cluster related settings. */
-  group?: string;
+  /** Optional group used to cluster related settings. */
+  group?: VizSettingGroup;
   /** Which UI widget renders this setting. */
   control: ControlSpec;
   /**
@@ -166,14 +183,14 @@ export type VizSettingDescriptors<TConfig, TSeries> = {
 export type AnyChartSettingDescriptor = {
   key: string;
   label: string;
-  group?: string;
+  group?: VizSettingGroup;
   control: ControlSpec;
 };
 
 export type AnySeriesSettingDescriptor = {
   key: string;
   label: string;
-  group?: string;
+  group?: VizSettingGroup;
   control: ControlSpec;
   composable: boolean;
   appliesTo: RenderAs | "radar";

@@ -397,6 +397,38 @@
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
   couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
+- The converse also holds: a module with no co-named sibling must NOT get a
+  directory of its own. A directory exists to group siblings, so
+  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
+  nothing, and it costs a redundant path segment on every import
+  (`.../MyFile/MyFile`). Leave the lone file next to its parent
+  (`.../MyFile.tsx`) and create the directory at the moment a second
+  co-named file appears. This applies to every kind of module: components,
+  hooks, and plain `.ts` modules alike.
+
+  This is bad (each directory holds exactly one file):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize/
+      useDrawerResize.ts
+    QueryTabPanel/
+      QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that
+  really has siblings keeps a directory):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize.ts
+    QueryTabPanel.tsx
+    DrawerHeight/
+      DrawerHeight.ts
+      DrawerHeight.test.ts
+  ```
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.
@@ -431,33 +463,46 @@
   ```
 
 - Put the docstring on the module's exported key, not on the underlying
-  function, when a non-exported function is defined in the same file as the
-  module that exports it. TypeScript intellisense does not carry a function's
-  docstring across the assignment into a module object: it can see the type of
-  `MyModule.myFunc` but does not know it is the same function as `_myFunc`, so a
-  docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
+  declaration, when a non-exported declaration is defined in the same file as
+  the module that exports it. TypeScript intellisense does not carry a
+  declaration's docstring across the assignment into a module object: it can see
+  the type of `MyModule.myFunc` but does not know it is the same function as
+  `_myFunc`, so a docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
 
-  This is bad (the docstring on `_myFunc` is invisible at the call site):
+  This covers every kind of key, not just methods. A constant loses its
+  docstring the same way, and a shorthand key (`{ MY_LIMIT }`) hides it exactly
+  as an explicit one does.
+
+  This is bad (neither docstring is visible at the call site):
 
   ```ts
+  /** Smallest allowed value. */
+  const MY_LIMIT = 10;
+
   /** What myFunc does. */
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    MY_LIMIT,
     myFunc: _myFunc,
   };
   ```
 
-  This is good (hovering `MyModule.myFunc` shows the docstring):
+  This is good (hovering either member shows its docstring):
 
   ```ts
+  const MY_LIMIT = 10;
+
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    /** Smallest allowed value. */
+    MY_LIMIT,
+
     /** What myFunc does. */
     myFunc: _myFunc,
   };

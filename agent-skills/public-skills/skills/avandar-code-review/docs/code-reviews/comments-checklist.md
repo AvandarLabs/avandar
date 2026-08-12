@@ -114,29 +114,40 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   export function isReadOnlyDiscoveryQuery(query: string): boolean {}
   ```
 
-- Put a method's docstring on the module's exported key, not on the underlying
-  function, when a non-exported function is defined in the same file as the
-  module that exports it. TypeScript intellisense does not carry a function's
-  docstring across the assignment into a module object: hovering
-  `MyModule.myFunc` shows the type but not the docstring that sits on `_myFunc`.
-  Flag a docstring that sits on the `_impl` function while its exported object
+- Put the docstring on the module's exported key, not on the underlying
+  declaration, when a non-exported declaration is defined in the same file as
+  the module object that exports it. TypeScript intellisense does not carry a
+  declaration's docstring across the assignment into a module object: hovering
+  `MyModule.myFunc` or `MyModule.MY_LIMIT` shows the type but not the docstring
+  that sits on `_myFunc` or `MY_LIMIT`. This covers every kind of key, not just
+  methods: constants and other values lose their docstring the same way, and a
+  shorthand key (`{ MY_LIMIT }`) hides it exactly as an explicit one does. Flag
+  a docstring that sits on the underlying declaration while its exported object
   key has none.
 
-  This is bad (the docstring is invisible when a caller hovers `MyModule.myFunc`):
+  This is bad (neither docstring is visible at the call site):
 
   ```ts
+  /** Smallest allowed value. */
+  const MY_LIMIT = 10;
+
   /** What myFunc does. */
   function _myFunc() {}
 
-  export const MyModule = { myFunc: _myFunc };
+  export const MyModule = { MY_LIMIT, myFunc: _myFunc };
   ```
 
   This is good:
 
   ```ts
+  const MY_LIMIT = 10;
+
   function _myFunc() {}
 
   export const MyModule = {
+    /** Smallest allowed value. */
+    MY_LIMIT,
+
     /** What myFunc does. */
     myFunc: _myFunc,
   };
@@ -145,7 +156,8 @@ TypeScript, TSX, JavaScript, JSX, and most C-family languages.
   Exception: when the object is annotated by an interface or type that already
   documents its members (`const Store: BlobStore = { ... }`), that interface is
   the intellisense source; the docstrings belong there, not on the object keys
-  or the functions. Do not flag missing key docstrings in that case.
+  or the underlying declarations. Do not flag missing key docstrings in that
+  case.
 
 - Comments must describe the present, never the past. Flag any comment that
   narrates what the code *used to* do: a former implementation, a rename, a
