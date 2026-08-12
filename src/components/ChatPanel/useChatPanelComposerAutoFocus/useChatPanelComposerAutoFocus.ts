@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import { shouldAutoFocusFloatingPanelOnOpen } from "@/components/FloatingPanel/shouldAutoFocusFloatingPanelOnOpen";
+import { shouldAutoFocusPanelOnOpen } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/shouldAutoFocusPanelOnOpen";
 import { AnimationTheme } from "@/config/Theme";
 import type { RefObject } from "react";
 
@@ -27,7 +27,7 @@ function _focusComposer(
     return;
   }
   const focusScope = panel.closest("aside") ?? panel;
-  if (!shouldAutoFocusFloatingPanelOnOpen(focusScope)) {
+  if (!shouldAutoFocusPanelOnOpen(focusScope)) {
     hasAutoFocusedThisOpenRef.current = true;
     return;
   }

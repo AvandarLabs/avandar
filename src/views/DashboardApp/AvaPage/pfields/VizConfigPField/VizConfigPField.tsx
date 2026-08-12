@@ -5,7 +5,7 @@ import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
-import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
+import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";

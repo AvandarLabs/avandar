@@ -458,7 +458,7 @@ After completing the review, run the narrowest relevant tests you can identify.
 E2E test handling is repo-specific (test runner, script names, and
 fixture conventions vary). When the repo under review has an E2E
 suite, see its `docs/code-reviews/extra-checklist.md` for the local
-phase that covers both how to run E2E specs and how to review E2E
+phase that covers both how to run E2E tests and how to review E2E
 test code. If the extra-checklist.md does not contain E2E-specific
 instructions, then follow the same guidelines applied to Vitest and Unit
 tests, such as only narrowly running the relevant tests instead of the
@@ -644,7 +644,7 @@ SKILL file.
   or renamed and stays green through any behavioral break), tests that assert
   implementation structure instead of observable behavior, placeholder tests,
   runtime assertions that only restate what the type system already
-  guarantees, and — for **e2e specs only** — direct database writes that
+  guarantees, and — for **e2e tests only** — direct database writes that
   perform the behavior under test instead of driving it through the UI (direct
   writes are for seeding preconditions before page load, teardown, bypassing
   slow/external systems, or read-only oracles).

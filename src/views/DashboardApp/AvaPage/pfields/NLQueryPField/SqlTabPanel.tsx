@@ -11,15 +11,18 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
+import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { ReactElement } from "react";
 
 type Props = {
   rawSql: string;
   isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly string[];
+  sqlSyncWarnings: readonly SqlFailedMappingReason[];
   onSubmitSql: (nextSql: string) => void;
 };
 
@@ -52,7 +55,11 @@ export function SqlTabPanel({
           </Text>
           <List size="xs" spacing={2}>
             {sqlSyncWarnings.map((reason) => {
-              return <List.Item key={reason}>{reason}</List.Item>;
+              return (
+                <List.Item key={sqlFailedMappingReasonKey(reason)}>
+                  {sqlFailedMappingReasonLabel(reason)}
+                </List.Item>
+              );
             })}
           </List>
         </Alert>

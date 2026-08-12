@@ -1,0 +1,51 @@
+/*
+ * Hairlines between columns come from a 1px grid gap over the border color:
+ * the grid paints the border color, each column paints the surface on top, and
+ * the gaps left over read as dividers. That works for any column count and any
+ * number of wrapped rows without nth-child math.
+ */
+.settingsColumnsGrid {
+  background: var(--ava-border-default);
+  display: grid;
+  gap: 1px;
+
+  /*
+   * `min(floor, 100%)` so a host narrower than the floor still gets one column
+   * that fits, instead of a floor-width track overflowing it. Without it a
+   * cramped host (a small modal, a collapsed side panel) scrolls sideways.
+   */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(var(--settings-columns-min-width), 100%), 1fr)
+  );
+}
+
+.settingsColumnsColumn {
+  background: var(--ava-surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  min-width: 0;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm)
+    var(--mantine-spacing-sm);
+}
+
+/*
+ * `Fieldset variant="unstyled"` keeps the real fieldset/legend semantics but
+ * drops the border, because the grid divider already separates the group.
+ */
+.columnFieldset {
+  min-width: 0;
+  padding: 0;
+}
+
+.columnLegend {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  padding: 0 0 var(--mantine-spacing-xs);
+}
+
+:global([data-mantine-color-scheme="dark"]) .columnLegend {
+  color: var(--mantine-color-neutral-3);
+}

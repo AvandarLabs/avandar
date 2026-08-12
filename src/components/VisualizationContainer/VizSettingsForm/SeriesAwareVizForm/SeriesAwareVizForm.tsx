@@ -5,21 +5,29 @@ import {
   setValue,
 } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Fieldset, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig";
+import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
@@ -30,6 +38,9 @@ type Props<TConfig extends HostConfig> = {
   fields: readonly QueryResultColumn[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
@@ -50,6 +61,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   fields,
   config,
   onConfigChange,
+  layout = "stacked",
 }: Props<TConfig>): ReactNode {
   const { t } = useLingui();
   const isRadar = config.vizType === "radar";
@@ -145,7 +157,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
-  const axisLegend = isRadar ? t`Category axis` : t`X axis`;
+  const axisGroup: VizSettingGroup = isRadar ? "Category axis" : "X axis";
+  const axisLegend = vizSettingGroupLabel(axisGroup);
 
   const groupedChartDescriptors = useMemo(() => {
     return makeBucketMap(chartDescriptors, {
@@ -155,16 +168,18 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     });
   }, [chartDescriptors]);
 
-  const axisGroupDescriptors = groupedChartDescriptors.get(axisLegend) ?? [];
+  const axisGroupDescriptors = groupedChartDescriptors.get(axisGroup) ?? [];
   const otherGroupedDescriptors = Array.from(
     groupedChartDescriptors.entries(),
   ).filter(([group]) => {
-    return group !== axisLegend;
+    return group !== axisGroup;
   });
 
-  return (
-    <Stack gap="md">
-      <Fieldset legend={t`Series`}>
+  const groups: SettingsColumnGroup[] = [
+    {
+      id: "series",
+      title: t`Series`,
+      content: (
         <Stack gap="sm">
           <Group justify="space-between">
             <Group gap={6} align="center">
@@ -228,9 +243,12 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             );
           })}
         </Stack>
-      </Fieldset>
-
-      <Fieldset legend={axisLegend}>
+      ),
+    },
+    {
+      id: "axis",
+      title: axisLegend,
+      content: (
         <Stack gap="xs">
           <Control
             label={axisLegend}
@@ -243,44 +261,48 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             }}
             fields={fields}
           />
-          {axisGroupDescriptors.map((desc) => {
+          {axisGroupDescriptors.map((descriptor) => {
             return (
               <Control
-                key={desc.key}
-                label={desc.label}
-                spec={desc.control}
-                value={readSetting(config, desc.key)}
+                key={descriptor.key}
+                label={vizSettingControlLabel(descriptor.label)}
+                spec={descriptor.control}
+                value={readSetting(config, descriptor.key)}
                 onChange={(nextValue) => {
-                  updateChartPath(desc.key, nextValue);
+                  updateChartPath(descriptor.key, nextValue);
                 }}
               />
             );
           })}
         </Stack>
-      </Fieldset>
+      ),
+    },
+    ...otherGroupedDescriptors.map(([group, groupDescriptors]) => {
+      return {
+        // The descriptor group is the stable identity; the title is display
+        // copy, so keying on it would remount every column on a locale change.
+        id: group === "" ? "chart-settings" : group,
+        title: group === "" ? t`Chart settings` : vizSettingGroupLabel(group),
+        content: (
+          <Stack gap="xs">
+            {groupDescriptors.map((descriptor) => {
+              return (
+                <Control
+                  key={descriptor.key}
+                  label={vizSettingControlLabel(descriptor.label)}
+                  spec={descriptor.control}
+                  value={readSetting(config, descriptor.key)}
+                  onChange={(nextValue) => {
+                    updateChartPath(descriptor.key, nextValue);
+                  }}
+                />
+              );
+            })}
+          </Stack>
+        ),
+      };
+    }),
+  ];
 
-      {otherGroupedDescriptors.map(([group, descs]) => {
-        const legend = group === "" ? t`Chart settings` : group;
-        return (
-          <Fieldset key={legend} legend={legend}>
-            <Stack gap="xs">
-              {descs.map((desc) => {
-                return (
-                  <Control
-                    key={desc.key}
-                    label={desc.label}
-                    spec={desc.control}
-                    value={readSetting(config, desc.key)}
-                    onChange={(nextValue) => {
-                      updateChartPath(desc.key, nextValue);
-                    }}
-                  />
-                );
-              })}
-            </Stack>
-          </Fieldset>
-        );
-      })}
-    </Stack>
-  );
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

@@ -8,7 +8,7 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type {
   CsvFileDatasetId,
   CsvFileDatasetModel,

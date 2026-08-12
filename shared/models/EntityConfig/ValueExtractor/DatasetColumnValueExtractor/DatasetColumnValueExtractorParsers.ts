@@ -10,7 +10,7 @@ import {
 import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";

@@ -3,7 +3,7 @@ import { Model } from "@avandar/models";
 import { camelCaseKeysDeep, pipe, snakeCaseKeysDeep } from "@avandar/utils";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   GoogleSheetsDatasetId,

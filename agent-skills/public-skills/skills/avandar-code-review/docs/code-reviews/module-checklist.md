@@ -81,6 +81,53 @@ Use this checklist only when the diff includes TypeScript or TSX files.
 
   Each printed stem is a split unit that should be moved into its own `<stem>/`
   directory (unless it already is one).
+- **Flag a `<Name>/` directory whose only content is `<Name>.<ext>`.** This is
+  the converse of the rule above, and it is a violation in its own right, not
+  merely the absence of one: a directory groups siblings, so a directory with a
+  single child groups nothing while costing a redundant segment on every import
+  (`.../MyHook/MyHook`). Collapse it, leaving the file beside its parent, and
+  recreate the directory when a second co-named file actually appears. Applies
+  to components, hooks, and plain `.ts` modules alike.
+
+  Exceptions: 1) the directory also contains subdirectories, so it is a real
+  grouping node; 2) a framework assigns the directory meaning (a route segment,
+  for example), so the path is not free to change.
+
+  This is bad:
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize/
+      useDrawerResize.ts
+  ```
+
+  This is good:
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize.ts
+  ```
+
+  **Find candidates** (directories touched by the diff holding no subdirectory
+  and exactly one file, whose stem matches the directory name):
+
+  ```bash
+  git diff --name-only <base> | xargs -n1 dirname | sort -u |
+    while read -r dir; do
+      [ -d "$dir" ] || continue
+      [ -n "$(find "$dir" -maxdepth 1 -mindepth 1 -type d)" ] && continue
+      files=$(find "$dir" -maxdepth 1 -type f)
+      [ "$(printf '%s\n' "$files" | wc -l | tr -d ' ')" = 1 ] || continue
+      stem=$(basename "$files"); stem=${stem%%.*}
+      [ "$stem" = "$(basename "$dir")" ] && echo "$dir"
+    done
+  ```
+
+  The stem comparison is what keeps a category directory (`auth/useAuth.ts`)
+  out of the results: those group by topic, not by unit, and their single child
+  is not named after them. Each printed directory should be collapsed.
 - For multi-file modules, prefer a directory module whose directory name and
   primary file name both match the module or component name.
 - Keep directory and file casing aligned with the module naming rules. For

@@ -1,6 +1,7 @@
 {
-  "__comment": "Local Deno/VS Code config only. Supabase edge bundler also reads this file: shared/ resolves here, so npm imports must match supabase/functions/*/deno.json. Do not add a workspace array — it breaks Supabase Preview.",
+  "__comment": "Local Deno/VS Code config only. Supabase edge bundler also reads this file: shared/ resolves here, so npm imports must match supabase/functions/*/deno.json. Do not add a workspace array \u2014 it breaks Supabase Preview.",
   "imports": {
+    "$/": "./shared/",
     "@avandar/clients": "./packages/shared/clients/src/index.ts",
     "@avandar/logger": "./packages/shared/logger/src/index.ts",
     "@avandar/models": "./packages/shared/models/src/index.ts",
@@ -17,11 +18,11 @@
     "@react-email/components": "npm:@react-email/components@0",
     "@react-email/render": "npm:@react-email/render@1",
     "@sbfn/": "./supabase/functions/",
+    "@supabase/postgrest-js": "npm:@supabase/postgrest-js@2",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
     "@upstash/redis": "npm:@upstash/redis@1",
     "@utils/": "./packages/shared/utils/src/",
-    "$/": "./shared/",
     "google-auth-library": "npm:google-auth-library@10",
     "googleapis": "npm:googleapis@154",
     "jose": "jsr:@panva/jose@6",

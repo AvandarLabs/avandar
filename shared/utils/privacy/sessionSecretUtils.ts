@@ -1,4 +1,4 @@
-import { base64ToUint8, uint8ToBase64 } from "@avandar/utils/encoding";
+import { base64ToUint8, uint8ToBase64 } from "@utils/encoding/index.ts";
 
 const TEXT_ENCODER = new TextEncoder();
 
