@@ -6,6 +6,11 @@ import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types"
 /**
  * Applies the declarative spec to the map whenever the spec changes or a new
  * style finishes loading.
+ *
+ * Identity of `spec` is what gates the work, so callers must pass a memoized
+ * spec: an equal-valued but freshly built object re-runs `syncMap`, which
+ * removes and re-adds layers and re-uploads their GeoJSON. That is why
+ * `useLayerMapSpec` memoizes every value it hands to the canvas.
  */
 export function useMapSpecSync({
   mapInstance,
