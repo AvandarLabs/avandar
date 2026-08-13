@@ -5,9 +5,10 @@
 -- an external analytics vendor.
 -- Rows are intentionally not editable. The only valid operation is INSERT
 -- by an authenticated workspace member, scoped to a workspace they belong
--- to. Reads are restricted to workspace owners + global admins via RLS so
--- we can build admin dashboards on top of this table later without
--- exposing one user's session to another.
+-- to. Reads are restricted to workspace owners via RLS. There is no
+-- platform-admin concept: account-level rows (where `workspace_id` is null)
+-- are readable only with the service role, which is how the reporting views
+-- in the `analytics` schema are queried.
 create table public.usage_analytics_events (
   id uuid primary key default gen_random_uuid(),
   -- The workspace the event is scoped to. Most events have a workspace. A
@@ -28,7 +29,23 @@ create table public.usage_analytics_events (
   -- PII. RLS allows anything that lands here to be readable by workspace
   -- owners.
   payload jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- Funnel stage this event belongs to. Never set by callers: the
+  -- `tr__usage_analytics_events__set_category` trigger overwrites whatever was
+  -- passed with `util__analytics_event_category(event_name)`, so reporting can
+  -- trust that this column always agrees with `event_name`. The default exists
+  -- for two reasons: adding a NOT NULL column to a table with existing rows
+  -- needs one, and an insert still succeeds if the trigger is ever dropped.
+  event_category public.usage_analytics_events__category not null default 'other',
+  -- Which runtime emitted the row. Every writer sets this explicitly:
+  -- `AnalyticsClient` sends `web` or `desktop`, the edge helper sends
+  -- `server`, and `util__log_analytics_event` sends `db`. The `web` default
+  -- correctly backfills every row written before this column existed, all of
+  -- which came from the browser client (the only writer at the time).
+  client public.usage_analytics_events__client not null default 'web',
+  -- Build version of the emitting app, for correlating a regression with a
+  -- release. Null for `db` and `server` rows, which have no build version.
+  app_version text
 );
 
 create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (
@@ -38,6 +55,11 @@ create index usage_analytics_events__workspace_id__created_at_idx on public.usag
 
 create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (
   event_name,
+  created_at desc
+);
+
+create index usage_analytics_events__event_category__created_at_idx on public.usage_analytics_events (
+  event_category,
   created_at desc
 );
 

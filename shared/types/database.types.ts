@@ -1023,7 +1023,10 @@ export type Database = {
       usage_analytics_events: {
         Row: {
           app: Database["public"]["Enums"]["app_type"] | null
+          app_version: string | null
+          client: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at: string
+          event_category: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id: string
           payload: Json | null
@@ -1032,7 +1035,10 @@ export type Database = {
         }
         Insert: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id?: string
           payload?: Json | null
@@ -1041,7 +1047,10 @@ export type Database = {
         }
         Update: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name?: string
           id?: string
           payload?: Json | null
@@ -1792,6 +1801,14 @@ export type Database = {
         | "canceled"
         | "unpaid"
       subscriptions__update_status: "pending" | "completed"
+      usage_analytics_events__category:
+        | "acquisition"
+        | "activation"
+        | "engagement"
+        | "expansion"
+        | "revenue"
+        | "other"
+      usage_analytics_events__client: "web" | "desktop" | "server" | "db"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -2015,6 +2032,15 @@ export const Constants = {
         "unpaid",
       ],
       subscriptions__update_status: ["pending", "completed"],
+      usage_analytics_events__category: [
+        "acquisition",
+        "activation",
+        "engagement",
+        "expansion",
+        "revenue",
+        "other",
+      ],
+      usage_analytics_events__client: ["web", "desktop", "server", "db"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",
