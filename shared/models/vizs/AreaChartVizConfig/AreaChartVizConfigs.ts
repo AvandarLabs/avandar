@@ -259,7 +259,7 @@ export const AreaChartVizConfigs = {
           xAxisKey !== undefined && firstSeries !== undefined ?
             [{ xKey: xAxisKey, key: firstSeries.key }]
           : [];
-        return { vizType, series: scatterSeries };
+        return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -284,14 +284,14 @@ export const AreaChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries };
+        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
           xAxisKey !== undefined && firstSeries !== undefined ?
             [{ xKey: xAxisKey, key: firstSeries.key, sizeKey: firstSeries.key }]
           : [];
-        return { vizType, series: bubbleSeries };
+        return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

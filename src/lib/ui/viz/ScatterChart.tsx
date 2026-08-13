@@ -1,9 +1,14 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
+import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
+import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
@@ -11,6 +16,7 @@ type Props = {
   /** One entry per independent (X, Y) cloud of points. */
   series: readonly ScatterSeries[];
   height?: number | string;
+  chartStyle?: ChartStyle;
 };
 
 /**
@@ -21,6 +27,7 @@ export function ScatterChart({
   data,
   series,
   height = 500,
+  chartStyle,
 }: Props): JSX.Element {
   const scatterSeries: ScatterChartSeries[] = useMemo(() => {
     return series.map((s, idx) => {
@@ -45,12 +52,63 @@ export function ScatterChart({
     });
   }, [data, series]);
 
+  // Both axes are value axes here, so the X extent comes from each
+  // series' own `xKey` column rather than from a single category key.
+  const xExtent = useMemo(() => {
+    if (!needsValueExtent(chartStyle?.xAxis)) {
+      return undefined;
+    }
+    return computeValueExtent(
+      data,
+      series.map((s) => {
+        return { key: s.xKey };
+      }),
+    );
+  }, [data, series, chartStyle?.xAxis]);
+
+  const yExtent = useMemo(() => {
+    if (!needsValueExtent(chartStyle?.yAxis)) {
+      return undefined;
+    }
+    return computeValueExtent(
+      data,
+      series.map((s) => {
+        return { key: s.key };
+      }),
+    );
+  }, [data, series, chartStyle?.yAxis]);
+
+  // A multi-series scatter draws X values from several columns, so the
+  // tick labels come from the already-transformed point arrays instead
+  // of from one keyed column.
+  const xTickLabels = useMemo(() => {
+    if (chartStyle?.xAxis?.tickAngle === undefined) {
+      return undefined;
+    }
+    return scatterSeries.flatMap((s) => {
+      return s.data.map((point) => {
+        return formatChartNumber(point.x);
+      });
+    });
+  }, [scatterSeries, chartStyle?.xAxis?.tickAngle]);
+
+  const styleProps = useMemo(() => {
+    return applyChartStyle(chartStyle, {
+      xExtent,
+      yExtent,
+      xTickLabels,
+      axisRoles: getAxisRoles("scatter"),
+    });
+  }, [chartStyle, xExtent, yExtent, xTickLabels]);
+
   const isSingleSeries = series.length === 1;
   const firstSeries = series[0];
-  const xLabel =
+  const derivedXLabel =
     isSingleSeries && firstSeries !== undefined ? firstSeries.xKey : undefined;
-  const yLabel =
+  const derivedYLabel =
     isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
+  const xLabel = chartStyle?.xAxis?.label ?? derivedXLabel;
+  const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
 
   return (
     <MantineScatterChart
@@ -59,32 +117,20 @@ export function ScatterChart({
       dataKey={{ x: "x", y: "y" }}
       withLegend
       valueFormatter={formatChartNumber}
-      xAxisProps={
-        xLabel !== undefined ?
-          {
-            label: {
-              value: xLabel,
-              position: "insideBottom",
-              offset: -15,
-              fontSize: 12,
-            },
-          }
-        : undefined
-      }
-      yAxisProps={
-        yLabel !== undefined ?
-          {
-            width: 80,
-            label: {
-              value: yLabel,
-              angle: -90,
-              position: "insideLeft",
-              offset: -15,
-              fontSize: 12,
-            },
-          }
-        : undefined
-      }
+      {...styleProps}
+      // `applyChartStyle` only knows the *configured* label; scatter also
+      // falls back to the column name when none is set, so these go
+      // after the spread. Recharts renders both an axis `label` prop and
+      // any `<Label>` child, so the label must come from exactly one
+      // mechanism: Mantine's, which is also what carries `labelColor`
+      // through `styles.axisLabel`.
+      xAxisLabel={xLabel}
+      yAxisLabel={yLabel}
+      yAxisProps={{
+        ...styleProps.yAxisProps,
+        // Widen to fit the rotated Y label.
+        ...(yLabel !== undefined ? { width: 80 } : {}),
+      }}
       scatterChartProps={
         xLabel !== undefined || yLabel !== undefined ?
           {

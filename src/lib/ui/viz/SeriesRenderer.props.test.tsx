@@ -13,8 +13,10 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { render } from "@/test-utils";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 
@@ -22,6 +24,7 @@ const mantineBarChartMock = vi.fn();
 const mantineLineChartMock = vi.fn();
 const mantineRadarChartMock = vi.fn();
 const mantineCompositeChartMock = vi.fn();
+const mantineScatterChartMock = vi.fn();
 
 vi.mock("@mantine/charts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/charts")>();
@@ -42,6 +45,10 @@ vi.mock("@mantine/charts", async (importOriginal) => {
     CompositeChart: (props: unknown) => {
       mantineCompositeChartMock(props);
       return <div data-testid="mantine-composite" />;
+    },
+    ScatterChart: (props: unknown) => {
+      mantineScatterChartMock(props);
+      return <div data-testid="mantine-scatter" />;
     },
   };
 });
@@ -65,6 +72,7 @@ beforeEach(() => {
   mantineLineChartMock.mockClear();
   mantineRadarChartMock.mockClear();
   mantineCompositeChartMock.mockClear();
+  mantineScatterChartMock.mockClear();
 });
 
 function renderBar(config: BarChartVizConfig): void {
@@ -524,6 +532,89 @@ describe("LineChart — axis scale and rotation", () => {
     }>(mantineLineChartMock);
     expect(props.xAxisProps?.tick?.angle).toBe(45);
     expect(props.xAxisProps?.tick?.textAnchor).toBe("start");
+  });
+});
+
+function renderScatter(chartStyle?: ChartStyle): void {
+  render(
+    <AvandarAppProvider>
+      <ScatterChart
+        data={DATA}
+        series={[{ key: "w", xKey: "v" }]}
+        chartStyle={chartStyle}
+      />
+    </AvandarAppProvider>,
+  );
+}
+
+describe("ScatterChart — both axes are value axes", () => {
+  it("bounds the X axis", () => {
+    renderScatter({ xAxis: { min: 0, max: 4, tickInterval: 1 } });
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; ticks?: number[] };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.domain).toEqual([0, 4]);
+    expect(props.xAxisProps?.ticks).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it("bounds the Y axis", () => {
+    renderScatter({ yAxis: { min: 0, max: 40, tickInterval: 20 } });
+    const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
+      mantineScatterChartMock,
+    );
+    expect(props.yAxisProps?.ticks).toEqual([0, 20, 40]);
+  });
+
+  it("derives the X extent from the xKey column, not the Y column", () => {
+    renderScatter({ xAxis: { tickInterval: 1 } });
+    const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
+      mantineScatterChartMock,
+    );
+    // `v` runs 1 to 3, so the derived domain is 0 to 3. Reading `w`
+    // instead would give 0 to 5, which is what this case rules out.
+    expect(props.xAxisProps?.domain).toEqual([0, 3]);
+  });
+
+  it("prefers a configured axis label over the derived column name", () => {
+    renderScatter({ xAxis: { label: "Spend" } });
+    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
+    expect(props.xAxisLabel).toBe("Spend");
+  });
+
+  it("still derives the axis label from the column when unset", () => {
+    renderScatter(undefined);
+    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
+    expect(props.xAxisLabel).toBe("v");
+  });
+
+  it("labels each axis exactly once", () => {
+    renderScatter({ xAxis: { label: "Spend" } });
+    const props = lastProps<{
+      xAxisLabel?: string;
+      xAxisProps?: { label?: unknown };
+    }>(mantineScatterChartMock);
+    // Recharts renders both an axis `label` prop and any `<Label>`
+    // child, so exactly one of these two may be set.
+    expect(props.xAxisLabel).toBe("Spend");
+    expect(props.xAxisProps?.label).toBeUndefined();
+  });
+
+  it("rotates X tick labels", () => {
+    renderScatter({ xAxis: { tickAngle: -90 } });
+    const props = lastProps<{
+      xAxisProps?: { tick?: { angle?: number }; interval?: number };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.tick?.angle).toBe(-90);
+    expect(props.xAxisProps?.interval).toBe(0);
+  });
+
+  it("adds no domain or ticks when nothing is configured", () => {
+    renderScatter(undefined);
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; ticks?: unknown };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.domain).toBeUndefined();
+    expect(props.xAxisProps?.ticks).toBeUndefined();
   });
 });
 

@@ -68,6 +68,7 @@ export const ScatterPlotVizConfigs = {
     const firstSeries = vizConfig.series[0];
     const xAxisKey = firstSeries?.xKey;
     const yAxisKey = firstSeries?.key;
+    const { chartStyle } = vizConfig;
 
     const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
       if (yAxisKey === undefined) {
@@ -90,6 +91,7 @@ export const ScatterPlotVizConfigs = {
           series: xySeries("bar"),
           layout: "group",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("line", (vizType): LineChartVizConfig => {
@@ -98,6 +100,7 @@ export const ScatterPlotVizConfigs = {
           xAxisKey,
           series: xySeries("line"),
           withLegend: true,
+          chartStyle,
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
@@ -107,6 +110,7 @@ export const ScatterPlotVizConfigs = {
           series: xySeries("area"),
           layout: "default",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("scatter", (): ScatterPlotVizConfig => {
@@ -133,6 +137,7 @@ export const ScatterPlotVizConfigs = {
           nameKey: xAxisKey,
           series: radarSeries,
           withLegend: true,
+          chartStyle,
         };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
@@ -145,7 +150,7 @@ export const ScatterPlotVizConfigs = {
             color: s.color,
           };
         });
-        return { vizType, series: bubbleSeries };
+        return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

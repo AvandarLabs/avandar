@@ -68,6 +68,7 @@ export const BubbleChartVizConfigs = {
     const firstSeries = vizConfig.series[0];
     const xAxisKey = firstSeries?.xKey;
     const yAxisKey = firstSeries?.key;
+    const { chartStyle } = vizConfig;
 
     const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
       if (yAxisKey === undefined) {
@@ -90,6 +91,7 @@ export const BubbleChartVizConfigs = {
           series: xySeries("bar"),
           layout: "group",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("line", (vizType): LineChartVizConfig => {
@@ -98,6 +100,7 @@ export const BubbleChartVizConfigs = {
           xAxisKey,
           series: xySeries("line"),
           withLegend: true,
+          chartStyle,
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
@@ -107,6 +110,7 @@ export const BubbleChartVizConfigs = {
           series: xySeries("area"),
           layout: "default",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
@@ -114,7 +118,7 @@ export const BubbleChartVizConfigs = {
         const scatterSeries: ScatterSeries[] = vizConfig.series.map((s) => {
           return { xKey: s.xKey, key: s.key, label: s.label, color: s.color };
         });
-        return { vizType, series: scatterSeries };
+        return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -137,6 +141,7 @@ export const BubbleChartVizConfigs = {
           nameKey: xAxisKey,
           series: radarSeries,
           withLegend: true,
+          chartStyle,
         };
       })
       .with("bubble", (): BubbleChartVizConfig => {
