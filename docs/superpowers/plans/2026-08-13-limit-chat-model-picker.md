@@ -1765,6 +1765,28 @@ git commit -m "refactor(chat): delete the OpenRouter model curation pipeline"
 **Files:**
 - Modify: `src/i18n/locales/*/messages.po` (regenerated, not hand-edited)
 
+- [ ] **Step 0: Fix the last stale doc comment**
+
+Task 5's review found one survivor of the architecture change. `shared/models/chat/ChatModelOption/ChatModelOption.types.ts:7` still reads:
+
+```ts
+/** A chat-capable model returned from OpenRouter via our edge function. */
+```
+
+Both halves are now false: the curation fetch is gone, and so is the `/models` route. Change it to:
+
+```ts
+/** A chat-capable cloud model from our hardcoded catalog. */
+```
+
+Then sweep for any other survivor of the same kind:
+
+```bash
+rg -n -i "openrouter" src/ shared/ supabase/ tests/ scripts/ --glob '!*.po' --glob '!*.gen.*'
+```
+
+Every remaining hit should be about *sending* a chat completion (`sendOpenRouterRequest`, `parseOpenRouterResponse`, the `OPEN_ROUTER_API_KEY` env var, the allowlist's doc comment about OpenRouter billing us). Nothing should describe fetching or curating a model catalog. Fix any that do.
+
 - [ ] **Step 1: Extract and compile the message catalogs**
 
 Run:
