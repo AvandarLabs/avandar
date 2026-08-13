@@ -60,7 +60,7 @@ values (
   true
 );
 
-select plan(11);
+select plan(12);
 
 set local role authenticated;
 
@@ -203,6 +203,33 @@ select throws_ok(
   '42501',
   'insufficient_privilege',
   'a plain member cannot transfer ownership'
+);
+
+-- The acting admin (a8000002) IS this workspace's owner, so to test the widened
+-- policy we need a settings admin who is not. Promote the target user.
+set local role postgres;
+
+update public.workspace_memberships
+   set role_group_id = 'a800cf01-0000-4000-8000-000000000001'::uuid
+ where workspace_id = 'a8001001-0000-4000-8000-000000000001'::uuid
+   and user_id = 'a8000003-0000-4000-8000-000000000003'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"a8000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select isnt(
+  (
+    select count(*)::int
+    from public.usage_analytics_events
+    where event_name = 'resource.ownership_transferred'
+  ),
+  0,
+  'a settings admin who is not the workspace owner can read the audit log'
 );
 
 select * from finish();

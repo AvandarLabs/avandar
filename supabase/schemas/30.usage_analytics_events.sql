@@ -70,22 +70,17 @@ with
     )
   );
 
--- SELECT: workspace owners can read events for their workspaces. This
--- powers the future "workspace usage" admin panel without needing a
--- service-role round trip.
+-- SELECT: workspace owners and Settings Admins can read events for their
+-- workspaces. This powers the workspace usage admin panel and the private
+-- resource ownership-transfer audit trail: a Settings Admin who is not the
+-- workspace owner performs transfers and must be able to read the record.
 create policy "
-  Workspace owners can SELECT analytics events for their workspaces
+  Workspace managers can SELECT analytics events for their workspaces
 " on public.usage_analytics_events for
 select
   to authenticated using (
     workspace_id is not null and
-    exists (
-      select
-        1
-      from
-        public.workspaces w
-      where
-        w.id = usage_analytics_events.workspace_id and
-        w.owner_id = auth.uid ()
+    public.util__can_manage_workspace_settings (
+      public.usage_analytics_events.workspace_id
     )
   );
