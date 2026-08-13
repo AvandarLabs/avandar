@@ -129,7 +129,10 @@ $$;
  *
  * Short-circuits (no merge with shares):
  * - Resource owner → admin.
- * - Settings (global) admin in the workspace → admin.
+ * - Settings (global) admin in the workspace → admin, UNLESS the resource is
+ *   private to its owner (restricted with zero non-owner shares) and not a
+ *   public dashboard. See the P1 spec at
+ *   docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
  *
  * Examples (non-owner, non-settings-admin):
  * - Workspace share viewer + app role editor → editor.
@@ -156,6 +159,7 @@ declare
   v_workspace_id uuid;
   v_owner_id uuid;
   v_is_restricted boolean;
+  v_is_public boolean := false;
   v_app public.app_type;
   v_uid uuid := auth.uid ();
   v_max_rank int := 0;
@@ -170,8 +174,9 @@ begin
     select
       d.workspace_id,
       d.owner_id,
-      coalesce(d.is_restricted, false)
-    into v_workspace_id, v_owner_id, v_is_restricted
+      coalesce(d.is_restricted, false),
+      coalesce(d.is_public, false)
+    into v_workspace_id, v_owner_id, v_is_restricted, v_is_public
     from public.dashboards d
     where
       d.id = p_resource_id;
@@ -198,7 +203,28 @@ begin
     return 'admin';
   end if;
 
-  if public.util__is_settings_admin (v_workspace_id) then
+  -- Settings Admins are admin on everything in this workspace EXCEPT resources
+  -- their owner has kept private (restricted, zero non-owner shares). Mirrors
+  -- Google Drive: an org admin cannot read an employee's private document.
+  --
+  -- Public dashboards are never private however `is_restricted` is set, because
+  -- the anon policy already exposes them; excluding them here keeps an admin's
+  -- edit rights on a dashboard the whole internet can read.
+  --
+  -- Composed inline from values already in scope rather than calling
+  -- util__is_resource_private_to_owner, which would re-fetch the row. RLS calls
+  -- this function per row.
+  if public.util__is_settings_admin (v_workspace_id) and (
+    v_is_public or
+    not (
+      v_is_restricted and
+      not public.util__has_non_owner_share (
+        p_resource_type,
+        p_resource_id,
+        v_owner_id
+      )
+    )
+  ) then
     return 'admin';
   end if;
 
