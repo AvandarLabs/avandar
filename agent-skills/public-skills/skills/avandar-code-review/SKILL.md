@@ -377,14 +377,18 @@ repo-local phases into a single `extra-checklist` agent: the repo's own rules
 get the same accuracy treatment as the built-ins, and they count toward the
 fan-out threshold in "When To Fan Out".
 
-The TypeScript rule family is deliberately split across three lanes
-(`typescript`, `functional-style`, `comments-and-module`) rather than run
-as one agent. `typescript` and `functional-style` are each large enough to
-saturate a single agent's attention, so keeping them apart is the
-highest-value accuracy split in the review. **Do not merge those two into
-one agent.** `comments` and `module` are small and mechanical, so they
-share one lane. Each lane reads its full file slice as context but applies
-only its own rule lens.
+The TypeScript rule family is deliberately split across four lanes
+(`typescript`, `types`, `functional-style`, `comments-and-module`) rather
+than run as one agent. `typescript`, `types`, and `functional-style` are
+each large enough to saturate a single agent's attention, so keeping them
+apart is the highest-value accuracy split in the review. **Do not merge
+those three into one agent.** `types` carries a distinct lens from
+`typescript`: the type system itself (declarations, assertions and escape
+hatches, absence, literal unions, readonly contracts) rather than naming,
+module and file structure, function shape, and import/export form.
+`comments` and `module` are small and mechanical, so they share one lane.
+Each lane reads its full file slice as context but applies only its own
+rule lens.
 
 #### Stage 2: Verify (parallel, adversarial)
 
