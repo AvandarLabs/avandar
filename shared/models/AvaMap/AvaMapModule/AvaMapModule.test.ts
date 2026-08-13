@@ -7,7 +7,7 @@ describe("AvaMap.makeEmpty", () => {
     expect(avaMap.layers).toEqual([]);
     expect(avaMap.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(avaMap.name).toBe("Cholera cases");
-    expect(avaMap.version).toBe(1);
+    expect(avaMap.view).toEqual(AvaMap.defaultViewState);
   });
 
   it("gives each map a distinct id", () => {

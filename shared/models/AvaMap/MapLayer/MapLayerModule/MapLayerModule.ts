@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
@@ -10,12 +11,30 @@ import type {
 import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 
 /** Fallback symbol color when the author has not picked one. */
-export const DEFAULT_SYMBOL_COLOR = "#3b82f6";
+const DEFAULT_SYMBOL_COLOR = "#3b82f6";
 
 /** Fallback circle radius, in pixels. */
-export const DEFAULT_SYMBOL_RADIUS = 6;
+const DEFAULT_SYMBOL_RADIUS = 6;
+
+/** Fallback smallest radius of a proportional symbol, in pixels. */
+const DEFAULT_MIN_SYMBOL_RADIUS = 4;
+
+/** Fallback largest radius of a proportional symbol, in pixels. */
+const DEFAULT_MAX_SYMBOL_RADIUS = 24;
 
 export const MapLayerModule = {
+  /** Fallback symbol color when the author has not picked one. */
+  defaultSymbolColor: DEFAULT_SYMBOL_COLOR,
+
+  /** Fallback circle radius, in pixels. */
+  defaultSymbolRadius: DEFAULT_SYMBOL_RADIUS,
+
+  /** Fallback smallest radius of a proportional symbol, in pixels. */
+  defaultMinSymbolRadius: DEFAULT_MIN_SYMBOL_RADIUS,
+
+  /** Fallback largest radius of a proportional symbol, in pixels. */
+  defaultMaxSymbolRadius: DEFAULT_MAX_SYMBOL_RADIUS,
+
   /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
    * geometry columns picked yet.
@@ -58,9 +77,7 @@ export const MapLayerModule = {
       return undefined;
     }
     const findColumnName = (columnId: QueryColumnId): string | undefined => {
-      const column = source.queryColumns.find((candidate) => {
-        return candidate.id === columnId;
-      });
+      const column = source.queryColumns.find(propEq("id", columnId));
       return column ? QueryColumn.getDerivedColumnName(column) : undefined;
     };
 

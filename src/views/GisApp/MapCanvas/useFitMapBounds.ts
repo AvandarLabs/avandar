@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { MapBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 /**
  * Compares two bounds by value rather than by reference, so a background
@@ -37,7 +37,7 @@ export function useFitMapBounds({
   const appliedFitBoundsRef = useRef<MapBounds | undefined>(undefined);
 
   useEffect(
-    function flyToFitBounds() {
+    function flyCameraToFitBounds() {
       const map = mapRef.current;
       if (!map || !fitBounds) {
         return;

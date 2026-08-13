@@ -1,20 +1,18 @@
+import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { describe, expect, it } from "vitest";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type {
-  DatasetColumnId,
-  DatasetColumnRead,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
-function createNumericColumn(name: string): DatasetColumnRead {
+/** An honest `DatasetColumn`, built through `Model.make` with no cast. */
+function _createNumericColumn(name: string): DatasetColumn.T {
   const now = new Date().toISOString();
-  return {
-    __type: "DatasetColumn",
-    id: uuid<DatasetColumnId>(),
-    datasetId: uuid<DatasetId>(),
+  return Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: uuid<Dataset.Id>(),
     workspaceId: uuid<Workspace.Id>(),
     createdAt: now,
     updatedAt: now,
@@ -25,7 +23,7 @@ function createNumericColumn(name: string): DatasetColumnRead {
     detectedDataType: "DOUBLE",
     description: undefined,
     columnIdx: 0,
-  };
+  });
 }
 
 describe("MapLayer.makeEmpty", () => {
@@ -46,10 +44,10 @@ describe("MapLayer.resolveGeoBinding", () => {
 
   it("maps column ids to the names rows are keyed by", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lat"),
+      _createNumericColumn("lat"),
     );
     const longitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lon"),
+      _createNumericColumn("lon"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -73,7 +71,7 @@ describe("MapLayer.resolveGeoBinding", () => {
 
   it("returns undefined when a bound column is not in the query", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lat"),
+      _createNumericColumn("lat"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -88,7 +86,7 @@ describe("MapLayer.resolveGeoBinding", () => {
 
   it("returns undefined when only latitude is set", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lat"),
+      _createNumericColumn("lat"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -107,7 +105,7 @@ describe("MapLayer.resolveGeoBinding", () => {
 
   it("returns undefined when only longitude is set", () => {
     const longitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lon"),
+      _createNumericColumn("lon"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -124,26 +122,37 @@ describe("MapLayer.resolveGeoBinding", () => {
     expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
   });
 
-  it("resolves once both axes are set", () => {
+  it("starts resolving only once the second axis is added", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lat"),
+      _createNumericColumn("lat"),
     );
     const longitude = QueryColumn.makeFromDatasetColumn(
-      createNumericColumn("lon"),
+      _createNumericColumn("lon"),
     );
-    const layer = {
-      ...MapLayer.makeEmpty("Cases"),
-      source: {
-        ...MapLayer.makeEmpty("Cases").source,
-        queryColumns: [latitude, longitude],
-      },
+    const emptyLayer = MapLayer.makeEmpty("Cases");
+    const withLatitudeOnly = {
+      ...emptyLayer,
+      source: { ...emptyLayer.source, queryColumns: [latitude] },
       geoBinding: {
         type: "latLngColumns" as const,
         latitude: latitude.id,
+        longitude: undefined,
+      },
+    };
+    expect(MapLayer.resolveGeoBinding(withLatitudeOnly)).toBeUndefined();
+
+    const withBothAxes = {
+      ...withLatitudeOnly,
+      source: {
+        ...withLatitudeOnly.source,
+        queryColumns: [latitude, longitude],
+      },
+      geoBinding: {
+        ...withLatitudeOnly.geoBinding,
         longitude: longitude.id,
       },
     };
-    expect(MapLayer.resolveGeoBinding(layer)).toEqual({
+    expect(MapLayer.resolveGeoBinding(withBothAxes)).toEqual({
       type: "latLngColumns",
       latitudeColumnName: "lat",
       longitudeColumnName: "lon",

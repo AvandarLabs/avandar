@@ -575,7 +575,7 @@ msgstr "{0} Meneja"
 msgid "The sheet has a header row"
 msgstr "Karatasi ina safu ya kichwa"
 
-#: src/views/GISApp/MapCanvas/MapCanvas.tsx
+#: src/views/GisApp/MapCanvas/MapCanvas.tsx
 msgid "Map"
 msgstr ""
 
@@ -638,7 +638,7 @@ msgstr "Seti hii ya data haina maelezo."
 msgid "Password reset requires an internet connection."
 msgstr "Kurekebisha nenosiri kunahitaji muunganisho wa intaneti."
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size"
 msgstr "Ukubwa wa alama"
 
@@ -1120,7 +1120,7 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
 "watumiaji wengi)."
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
 msgstr ""
@@ -1433,7 +1433,7 @@ msgstr "Toka"
 msgid "Section"
 msgstr "Sehemu"
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No rows could be mapped"
 msgstr ""
 
@@ -1685,7 +1685,7 @@ msgstr "Futa"
 msgid "Failed to save dataset: {0}"
 msgstr "Imeshindikana kuhifadhi dataset: {0}"
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Query form"
 msgstr "Fomu ya uchunguzi"
 
@@ -1833,7 +1833,7 @@ msgstr "Ingiza maelezo ya dataset hii"
 msgid "Fields to be manually entered"
 msgstr "Sehemu za kuingizwa kwa mikono"
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Loading map data"
 msgstr ""
 
@@ -2101,7 +2101,7 @@ msgstr "Safu wima ya 11"
 msgid "Column 7"
 msgstr "Safu wima ya 7"
 
-#: src/views/GISApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "Feature"
 msgstr ""
 
@@ -2228,7 +2228,7 @@ msgid "Padding"
 msgstr "Pengo la ndani"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/GISApp/basemap/MapStylePicker.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme"
 msgstr "Mandhari"
 
@@ -2253,7 +2253,7 @@ msgstr "Thamani ya kawaida zaidi: <0>{0}</0> ({1} safu, {2}%)."
 msgid "Dashboard saved successfully!"
 msgstr "Dashibodi imehifadhiwa kwa mafanikio!"
 
-#: src/views/GISApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "N/A"
 msgstr "S/H"
 
@@ -2282,7 +2282,7 @@ msgstr "Hakuna thamani"
 msgid "Clarification {turnNumber} of 3"
 msgstr "Ufafanuzi {turnNumber} wa 3"
 
-#: src/components/GISApp/DataMap/GeometryDrawer.tsx
+#: src/components/GisApp/DataMap/GeometryDrawer.tsx
 #~ msgid "Data Point"
 #~ msgstr "Pointi za Data"
 
@@ -2398,7 +2398,7 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 "chenye orodha isiyo ya literal."
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
 msgstr ""
@@ -2630,9 +2630,9 @@ msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 msgstr "Subquery iliyopachikwa katika FROM haikuweza kusawiriwa tena; uchoraji "
 "ramani umehifadhiwa kama kishikilia nafasi."
 
-#: src/views/GISApp/GISApp.tsx
-msgid "Untitled map"
-msgstr ""
+#: src/views/GisApp/GisApp.tsx
+#~ msgid "Untitled map"
+#~ msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -2664,7 +2664,7 @@ msgstr "Haipatikani bila mtandao"
 msgid "Back to the login page"
 msgstr "Rudi kwenye ukurasa wa kuingia"
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr ""
 
@@ -2773,7 +2773,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "Je, una uhakika unataka kufuta seti hii ya data? Kitendo hiki hakiwezi "
 "kubadilishwa."
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size column must be numeric."
 msgstr "Safu ya ukubwa wa alama lazima iwe ya nambari."
 
@@ -3321,7 +3321,7 @@ msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
 msgstr "Safu ya latitudo"
 
@@ -3419,7 +3419,7 @@ msgstr "Dataset imeongezwa"
 msgid "Optional"
 msgstr "Hiari"
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Some rows could not be mapped"
 msgstr ""
 
@@ -3455,7 +3455,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 "Thamani zimepangwa kwa axis ya kategoria (\"{axisKeyValue}\")."
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select longitude column"
 msgstr "Chagua safu ya longitudo"
 
@@ -3577,7 +3577,7 @@ msgstr "Metadata ya ghafi (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select symbol size column"
 msgstr "Chagua safu ya ukubwa wa alama"
 
@@ -3597,7 +3597,7 @@ msgstr "URL ya kawaida"
 msgid "Ask about your data..."
 msgstr "Uliza kuhusu data yako..."
 
-#: src/views/GISApp/basemap/MapStylePicker.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme picker"
 msgstr "Chaguo la mandhari"
 
@@ -3733,9 +3733,9 @@ msgstr "Geuza"
 msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
 
-#: src/views/GISApp/GISApp.tsx
-msgid "Layer 1"
-msgstr ""
+#: src/views/GisApp/GisApp.tsx
+#~ msgid "Layer 1"
+#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -4007,7 +4007,7 @@ msgid "Export as PDF"
 msgstr "Export as PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Filter"
 msgstr "Filter"
 
@@ -4081,7 +4081,7 @@ msgstr "Zilizopangwa kwa tabaka"
 msgid "Share this {resourceLabel}"
 msgstr "Shiriki hii {resourceLabel}"
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select latitude column"
 msgstr "Chagua safu ya latitudo"
 
@@ -4093,6 +4093,10 @@ msgstr "Hii {resource} inashirikiwa na: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Pakia"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Something went wrong while loading this layer's data."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4517,11 +4521,11 @@ msgstr "Jukumu la {displayName}"
 msgid "Review before sending"
 msgstr "Kagua kabla ya kutuma"
 
-#: src/views/DataExplorerApp/useDataQuery.tsx
-#~ msgid "Public queries are not supported for structured queries. Use raw SQL "
-#~ "instead."
-#~ msgstr "Maswali ya umma hayakubaliwi kwa maswali yaliyo na muundo. Tumia SQL ya "
-#~ "kawaida badala yake."
+#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
+msgid "Public queries are not supported for structured queries. Use raw SQL "
+"instead."
+msgstr "Maswali ya umma hayakubaliwi kwa maswali yaliyo na muundo. Tumia SQL ya "
+"kawaida badala yake."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "CSV file"
@@ -4854,7 +4858,7 @@ msgstr "Hakuna safu za nambari"
 msgid "Service"
 msgstr "Huduma"
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Could not load map data"
 msgstr ""
 
@@ -5456,7 +5460,7 @@ msgstr "Dashibodi"
 msgid "integer"
 msgstr "nambari kamili"
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol color"
 msgstr "Rangi ya alama"
 
@@ -5569,7 +5573,7 @@ msgstr "Kwa sasa umejiandikisha kwa mpango huu."
 msgid "Upload a dataset"
 msgstr "Pakia seti ya data"
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Invalid column type"
 msgstr "Aina ya safu isiyo sahihi"
 
@@ -5902,7 +5906,7 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 "wa AI atazipokea na anaweza kuandika ombi hilo."
 
-#: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No mappable rows in this data source."
 msgstr ""
 
@@ -5997,7 +6001,7 @@ msgstr "Mahali pako pa kazi umekamilisha {currentSeatUsage} ya {totalSeats} "
 msgid "Shared with you"
 msgstr "Imeshirikiwa nawe"
 
-#: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Longitude column"
 msgstr "Safu ya longitude"
 

@@ -1,19 +1,30 @@
+import { Model } from "@avandar/models";
+import { prop, sortObjList } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
-import { describe, expect, it, vi } from "vitest";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
-import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
-import type { UserId } from "$/models/User/User.types";
+import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-const runQueryMock = vi.fn();
-const getAllEntityFieldValuesMock = vi.fn();
+const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
+  vi.hoisted(() => {
+    return {
+      runQueryMock: vi.fn(),
+      publicRunQueryMock: vi.fn(),
+      getAllEntityFieldValuesMock: vi.fn(),
+    };
+  });
 
 vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
   return { WorkspaceQetlClient: { runQuery: runQueryMock } };
 });
 vi.mock("@/clients/qetl/PublicQetlClient", () => {
-  return { PublicQetlClient: { runQuery: vi.fn() } };
+  return { PublicQetlClient: { runQuery: publicRunQueryMock } };
 });
 vi.mock(
   "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient",
@@ -26,38 +37,29 @@ vi.mock(
   },
 );
 
-const { runStructuredQuery } =
-  await import("@/clients/queries/runStructuredQuery/runStructuredQuery");
-const { StructuredQuery } =
-  await import("$/models/queries/StructuredQuery/StructuredQuery");
-const { QueryColumn } =
-  await import("$/models/queries/QueryColumn/QueryColumn");
-
-/** An honest `EntityConfig.T`, built with no cast. */
-function createEntityConfig(): EntityConfig.T {
+/** An honest `EntityConfig.T`, built through `Model.make` with no cast. */
+function _createEntityConfig(): EntityConfig.T {
   const now = new Date().toISOString();
-  return {
-    __type: "EntityConfig",
-    id: uuid<EntityConfigId>(),
+  return Model.make("EntityConfig", {
+    id: uuid<EntityConfig.Id>(),
     workspaceId: uuid<Workspace.Id>(),
-    ownerId: uuid<UserId>(),
+    ownerId: uuid<User.Id>(),
     name: "Cases",
     description: undefined,
     createdAt: now,
     updatedAt: now,
     allowManualCreation: false,
-  };
+  });
 }
 
-/** An honest `EntityFieldConfig.T`, built with no cast. */
-function createEntityFieldConfig(
-  entityConfigId: EntityConfigId,
+/** An honest `EntityFieldConfig.T`, built through `Model.make` with no cast. */
+function _createEntityFieldConfig(
+  entityConfigId: EntityConfig.Id,
   name: string,
 ): EntityFieldConfig.T {
   const now = new Date().toISOString();
-  return {
-    __type: "EntityFieldConfig",
-    id: uuid(),
+  return Model.make("EntityFieldConfig", {
+    id: uuid<EntityFieldConfig.Id>(),
     entityConfigId,
     workspaceId: uuid<Workspace.Id>(),
     name,
@@ -70,34 +72,41 @@ function createEntityFieldConfig(
     isIdField: false,
     allowManualEdit: true,
     isArray: false,
-  };
+  });
 }
 
 describe("runStructuredQuery", () => {
+  const workspaceId = uuid<Workspace.Id>();
+
+  beforeEach(() => {
+    runQueryMock.mockReset();
+    publicRunQueryMock.mockReset();
+    getAllEntityFieldValuesMock.mockReset();
+  });
+
   it("runs caller-supplied raw SQL verbatim", async () => {
     runQueryMock.mockResolvedValue({
-      id: "r1",
+      id: uuid(),
       data: [],
       columns: [],
       numRows: 0,
     });
     await runStructuredQuery({
       auth: "workspace",
-      workspaceId: "workspace-1" as never,
+      workspaceId,
       query: StructuredQuery.makeEmpty(),
       rawSql: "SELECT 1 AS one",
     });
     expect(runQueryMock).toHaveBeenCalledWith({
       rawSql: "SELECT 1 AS one",
-      workspaceId: "workspace-1",
+      workspaceId,
     });
   });
 
   it("returns an empty result when there is nothing to run", async () => {
-    runQueryMock.mockClear();
     const result = await runStructuredQuery({
       auth: "workspace",
-      workspaceId: "workspace-1" as never,
+      workspaceId,
       query: StructuredQuery.makeEmpty(),
       rawSql: undefined,
     });
@@ -110,7 +119,7 @@ describe("runStructuredQuery", () => {
     await expect(
       runStructuredQuery({
         auth: "public",
-        publicAvaPageId: "page-1" as never,
+        publicAvaPageId: uuid<Dashboard.Id>(),
         query: StructuredQuery.makeEmpty(),
         rawSql: undefined,
       }),
@@ -118,9 +127,9 @@ describe("runStructuredQuery", () => {
   });
 
   it("remaps entity field values from field ids to field names", async () => {
-    const entityConfig = createEntityConfig();
-    const nameField = createEntityFieldConfig(entityConfig.id, "name");
-    const ageField = createEntityFieldConfig(entityConfig.id, "age");
+    const entityConfig = _createEntityConfig();
+    const nameField = _createEntityFieldConfig(entityConfig.id, "name");
+    const ageField = _createEntityFieldConfig(entityConfig.id, "age");
     const nameColumn = QueryColumn.makeFromEntityFieldConfig(nameField);
     const ageColumn = QueryColumn.makeFromEntityFieldConfig(ageField);
 
@@ -131,7 +140,7 @@ describe("runStructuredQuery", () => {
 
     const result = await runStructuredQuery({
       auth: "workspace",
-      workspaceId: "workspace-1" as never,
+      workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
         dataSource: entityConfig,
@@ -143,9 +152,7 @@ describe("runStructuredQuery", () => {
 
     // `sortedQueryColumns` orders columns by query-column id (a random uuid),
     // not by name, so compare the returned columns order-independently.
-    const columnsByName = [...result.columns].sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
+    const columnsByName = sortObjList(result.columns, { sortBy: prop("name") });
     expect(columnsByName).toEqual([
       { name: "age", dataType: "varchar" },
       { name: "name", dataType: "varchar" },

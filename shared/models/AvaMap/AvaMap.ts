@@ -7,7 +7,7 @@ import type {
   MapViewState,
 } from "$/models/AvaMap/AvaMap.types.ts";
 
-export { AvaMapModule as AvaMap } from "$/models/AvaMap/AvaMapModule.ts";
+export { AvaMapModule as AvaMap } from "$/models/AvaMap/AvaMapModule/AvaMapModule.ts";
 
 export namespace AvaMap {
   export type T = AvaMapRead;

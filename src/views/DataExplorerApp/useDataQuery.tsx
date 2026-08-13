@@ -66,6 +66,10 @@ export function useDataQuery(
       isStructuredQueryInSync,
     ],
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+      // Branching rather than spreading a precomputed params object: the
+      // queryKey lint rule tracks the identifiers this callback reads, and
+      // only the if/else form lets it see the two ids as mutually exclusive.
+      // Both are already carried in the key as `workspaceId` above.
       if (auth === "workspace") {
         return await runStructuredQuery({
           auth: "workspace",

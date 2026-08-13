@@ -12,7 +12,7 @@ export type AvaMapId = UUID<ModelType>;
  * order.
  */
 export type MapViewState = {
-  center: readonly [longitude: number, latitude: number];
+  center: [longitude: number, latitude: number];
   zoom: number;
 };
 
