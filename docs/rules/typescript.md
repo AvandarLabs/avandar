@@ -298,6 +298,45 @@
   };
   ```
 
+- Declare local helper functions above the exported function that uses them. A
+  file reads helpers first and its public entry point last, so anyone reading
+  from the top meets a helper before the call that depends on it and never has
+  to jump downward to find out what a call does. Types, constants, and a
+  component's `Props` alias still come first, above the helpers.
+
+  Function declarations hoist, so for `function` helpers this is a readability
+  rule rather than a correctness one. For `const` arrow helpers it is also a
+  correctness rule: using one above its declaration is a runtime TDZ error.
+
+  Three cases are allowed to break the order: a file with several exports and
+  no single entry point (keep each helper beside the export it serves), a
+  helper shared by several exports (put it above the first of them), and
+  mutual recursion (no order satisfies the rule).
+
+  Examples:
+
+  ```ts
+  // Bad - the reader hits `_formatTotal` before it is declared
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+  ```
+
+  ```ts
+  // Good - helpers first, the exported entry point last
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+  ```
+
 ### Import/export declarations
 
 - Type imports/exports always use the `type` keyword.

@@ -109,6 +109,63 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - Non-exported top-level helper functions should be prefixed with `_`.
+- Declare local helper functions above the exported function that uses them,
+  so a file reads helpers first and its public entry point last. A reader
+  scrolling from the top meets each helper before the call that depends on
+  it, and a reviewer never has to jump downward to learn what a call does.
+  Function declarations hoist, so this is about readability rather than
+  correctness, except for `const` arrow helpers where a use before the
+  declaration is a runtime TDZ error.
+
+  Applies only to helpers defined in the same file as their caller. Types,
+  constants, and a file's `Props` alias stay at the top, above the helpers.
+
+  Exceptions: 1) a file with several exports and no single entry point, where
+  each helper belongs beside the export it serves; 2) a helper used by more
+  than one export, which may sit above the first of them; 3) mutual
+  recursion, where no order satisfies the rule.
+
+  This is bad:
+
+  ```ts
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+  ```
+
+  **Find candidates** (files whose first exported function is declared before
+  a later non-exported top-level function):
+
+  ```bash
+  for f in <files-under-review-ending-in-.ts-or-.tsx>; do
+    exp="$(grep -nE '^export (async )?function ' "$f" | head -1 | cut -d: -f1)"
+    helper="$(grep -nE '^(async )?function _' "$f" | tail -1 | cut -d: -f1)"
+    if [ -n "$exp" ] && [ -n "$helper" ] && [ "$exp" -lt "$helper" ]; then
+      printf '%s exports at line %s, helper still below at %s\n' \
+        "$f" "$exp" "$helper"
+    fi
+  done
+  ```
+
+  Confirm each hit by checking that the trailing helper is actually called by
+  the earlier export; an unrelated helper serving a second export is one of
+  the exceptions above.
 - React component prop types should always be named `Props`.
 
   **Find candidates** (prop type aliases whose name is not literally

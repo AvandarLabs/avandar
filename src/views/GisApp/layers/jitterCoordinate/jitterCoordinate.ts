@@ -15,6 +15,24 @@ function _buildSeedHash(seed: string): number {
 }
 
 /**
+ * Wraps a longitude into the valid `[-180, 180]` range, so a displacement
+ * that crosses the antimeridian lands at the correct position on the other
+ * side instead of producing an out-of-range value.
+ */
+function _wrapLongitude(longitude: number): number {
+  return ((((longitude + 180) % 360) + 360) % 360) - 180;
+}
+
+/**
+ * Clamps a latitude into the valid `[-90, 90]` range. A displacement large
+ * enough to overshoot a pole has nowhere further to go, so it is capped at
+ * the pole rather than producing an out-of-range value.
+ */
+function _clampLatitude(latitude: number): number {
+  return Math.min(90, Math.max(-90, latitude));
+}
+
+/**
  * Displaces a coordinate by a stable pseudo-random offset inside
  * `radiusMeters`, so an approximate location can be shown without revealing
  * the exact one.
@@ -64,22 +82,4 @@ export function jitterCoordinate({
     longitude: _wrapLongitude(longitude + deltaLongitude),
     latitude: _clampLatitude(latitude + deltaLatitude),
   };
-}
-
-/**
- * Wraps a longitude into the valid `[-180, 180]` range, so a displacement
- * that crosses the antimeridian lands at the correct position on the other
- * side instead of producing an out-of-range value.
- */
-function _wrapLongitude(longitude: number): number {
-  return ((((longitude + 180) % 360) + 360) % 360) - 180;
-}
-
-/**
- * Clamps a latitude into the valid `[-90, 90]` range. A displacement large
- * enough to overshoot a pole has nowhere further to go, so it is capped at
- * the pole rather than producing an out-of-range value.
- */
-function _clampLatitude(latitude: number): number {
-  return Math.min(90, Math.max(-90, latitude));
 }
