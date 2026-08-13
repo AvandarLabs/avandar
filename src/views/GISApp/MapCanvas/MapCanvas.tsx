@@ -186,6 +186,14 @@ export function MapCanvas({
   // Style changes swap the style in place. `style.load` resets the applied
   // spec, and the sync effect below re-adds everything. The key check skips
   // the redundant swap on mount, where the constructor already applied it.
+  //
+  // Resetting `isStyleReady` here is a setState in response to a prop change,
+  // which static analysis flags. It is deliberate and cannot be derived during
+  // render: the flag tracks MapLibre's asynchronous `style.load` event, and
+  // only MapLibre knows when the new style has finished loading. Deriving it,
+  // or keying this component on the basemap, would rebuild the map on every
+  // style change, which is the behavior this canvas exists to avoid. The key
+  // check above keeps the reset from firing on unrelated re-renders.
   useEffect(() => {
     const map = mapRef.current;
     const nextStyleKey = _buildStyleKey(basemap);
