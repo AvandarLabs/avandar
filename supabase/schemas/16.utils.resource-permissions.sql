@@ -57,6 +57,67 @@ set
 $$;
 
 /**
+ * Whether a resource is private to its owner: restricted, with no share
+ * granting any principal other than the owner.
+ *
+ * Resource-type generic, so it knows nothing about publication. A dashboard can
+ * be `is_public` while restricted with no shares, which is world-readable and
+ * emphatically not private; callers that care must compose this with their own
+ * visibility condition. See the P1 spec section 4.2.
+ *
+ * Prefer `util__has_non_owner_share` directly when you already hold the row's
+ * `owner_id` and `is_restricted`, to avoid this function's extra lookup.
+ *
+ * @returns True when only the owner has been granted access. False when the
+ *   resource does not exist.
+ */
+create or replace function public.util__is_resource_private_to_owner (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns boolean language plpgsql security definer stable
+set
+  search_path = public as $$
+declare
+  v_owner_id uuid;
+  v_is_restricted boolean;
+begin
+  if p_resource_type = 'dashboard' then
+    select
+      d.owner_id,
+      coalesce(d.is_restricted, false)
+    into v_owner_id, v_is_restricted
+    from public.dashboards d
+    where
+      d.id = p_resource_id;
+  elsif p_resource_type = 'dataset' then
+    select
+      ds.owner_id,
+      coalesce(ds.is_restricted, false)
+    into v_owner_id, v_is_restricted
+    from public.datasets ds
+    where
+      ds.id = p_resource_id;
+  else
+    return false;
+  end if;
+
+  if v_owner_id is null then
+    return false;
+  end if;
+
+  if not v_is_restricted then
+    return false;
+  end if;
+
+  return not public.util__has_non_owner_share (
+    p_resource_type,
+    p_resource_id,
+    v_owner_id
+  );
+end;
+$$;
+
+/**
  * Effective role for auth.uid() on a dashboard or dataset row.
  *
  * Most paths merge several independent grants (direct/group/workspace shares,
