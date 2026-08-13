@@ -69,6 +69,39 @@ vi.mock(
   },
 );
 
+vi.mock("@/clients/permissions/PrivateResourceAdminClient", () => {
+  return {
+    PrivateResourceAdminClient: {
+      useGetPrivateResourceCounts: () => {
+        return [[], false];
+      },
+      useTransferAllOwnedResources: () => {
+        return [vi.fn(), false];
+      },
+      QueryKeys: {
+        getPrivateResourceCounts: () => {
+          return ["private-resource-counts"];
+        },
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/WorkspaceClient", () => {
+  return {
+    WorkspaceClient: {
+      useGetUsersForWorkspace: () => {
+        return [[], false];
+      },
+      QueryKeys: {
+        getUsersForWorkspace: () => {
+          return ["users"];
+        },
+      },
+    },
+  };
+});
+
 vi.mock("@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv", () => {
   return {
     buildConsentAuditCsv: buildConsentAuditCsvMock,
