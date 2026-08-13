@@ -10,10 +10,7 @@ import {
   SegmentedControlItem,
   Tooltip,
 } from "@ui";
-import {
-  MapStyleKey,
-  MapStyleKeys,
-} from "@/components/GISApp/DataMap/mapStyles";
+import { MapStyleKey, MapStyleKeys } from "@/views/GISApp/DataMap/mapStyles";
 
 type MapStyle = {
   url: string;

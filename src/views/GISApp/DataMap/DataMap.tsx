@@ -2,12 +2,12 @@ import { Box, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import { applyMapStyles } from "@/components/GISApp/DataMap/applyMapStyles";
-import { GeometryDrawer } from "@/components/GISApp/DataMap/GeometryDrawer";
-import { MapStylePicker } from "@/components/GISApp/DataMap/MapStylePicker";
-import { MapStyleKey, mapStyles } from "@/components/GISApp/DataMap/mapStyles";
-import { QueryFormContainer } from "@/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer";
-import { useSelectedMapDataSource } from "@/components/GISApp/DataMap/useSelectedMapDataSource";
+import { applyMapStyles } from "@/views/GISApp/DataMap/applyMapStyles";
+import { GeometryDrawer } from "@/views/GISApp/DataMap/GeometryDrawer";
+import { MapStylePicker } from "@/views/GISApp/DataMap/MapStylePicker";
+import { MapStyleKey, mapStyles } from "@/views/GISApp/DataMap/mapStyles";
+import { QueryFormContainer } from "@/views/GISApp/DataMap/QueryFormContainer/QueryFormContainer";
+import { useSelectedMapDataSource } from "@/views/GISApp/DataMap/useSelectedMapDataSource";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 

@@ -1,6 +1,6 @@
 import { Box } from "@mantine/core";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { DataMap } from "@/components/GISApp/DataMap/DataMap";
+import { DataMap } from "@/views/GISApp/DataMap/DataMap";
 
 export function GISApp(): JSX.Element {
   return (
