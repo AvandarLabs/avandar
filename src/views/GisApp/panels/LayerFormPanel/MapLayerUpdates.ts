@@ -10,7 +10,7 @@ function _hasQueryColumn(layer: MapLayer.T, column: QueryColumn.T): boolean {
 
 /**
  * Adds `column` to the layer's query if it is not already selected. Columns a
- * layer binds to must be part of its query, or the binding cannot resolve.
+ * layer binds to must be part of its query, or it yields no column names.
  */
 function _withQueryColumn(
   layer: MapLayer.T,
@@ -102,8 +102,9 @@ export const MapLayerUpdates = {
   ): MapLayer.T => {
     const { symbology } = layer;
     if (!column) {
-      return symbology.type === "circle" ? layer : (
-          {
+      return symbology.type === "circle" ?
+          layer
+        : {
             ...layer,
             symbology: {
               type: "circle",
@@ -111,8 +112,7 @@ export const MapLayerUpdates = {
               color: symbology.color,
               stroke: symbology.stroke,
             },
-          }
-        );
+          };
     }
     const isUnchanged =
       symbology.type === "proportionalSymbol" &&

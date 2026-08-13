@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { getFiniteNumberFromValue } from "@utils/numbers/getFiniteNumberFromValue/getFiniteNumberFromValue.ts";
+import { describe, expect, it } from "vitest";
 
 describe("getFiniteNumberFromValue", () => {
   it("returns finite numbers unchanged", () => {

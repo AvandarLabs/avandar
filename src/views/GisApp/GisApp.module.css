@@ -1,6 +1,10 @@
 .gisAppControlPanel {
   backdrop-filter: blur(12px);
-  background-color: color-mix(in srgb, var(--mantine-color-body) 70%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-body) 70%,
+    transparent
+  );
   border: 1px solid var(--mantine-color-default-border);
   border-radius: var(--mantine-radius-md);
   box-shadow: var(--mantine-shadow-md);

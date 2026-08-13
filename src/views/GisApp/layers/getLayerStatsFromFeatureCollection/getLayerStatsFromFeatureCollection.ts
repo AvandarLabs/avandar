@@ -1,4 +1,4 @@
-import { isDefined, getFiniteNumberFromValue } from "@avandar/utils";
+import { getFiniteNumberFromValue, isDefined } from "@avandar/utils";
 
 /** Summary statistics a layer's paint expressions need. */
 export type LayerStats = {

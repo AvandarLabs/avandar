@@ -1,17 +1,17 @@
 import { propEq } from "@avandar/utils";
-import { useMemo } from "react";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { useMemo } from "react";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
-import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
-import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
+import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
+import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 // The QueryResult namespace entry publishes a non-generic `T`, so the row type
 // can only be expressed through the underlying generic in the types module.
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
@@ -64,7 +64,7 @@ export function useLayerMapSpec({
   const { geoBinding, symbology, id: layerId, sensitivity } = layer;
   const { queryColumns } = layer.source;
 
-  const resolvedBinding = useMemo(() => {
+  const boundColumns = useMemo(() => {
     return MapLayer.toGeoBinding(layer);
     // Resolution reads only the binding and the query's columns, so a change
     // to symbology or legend must not invalidate it.
@@ -72,16 +72,16 @@ export function useLayerMapSpec({
   }, [geoBinding, queryColumns]);
 
   const { featureCollection, drops } = useMemo(() => {
-    if (!resolvedBinding || !queryResult) {
+    if (!boundColumns || !queryResult) {
       return { featureCollection: EMPTY_FEATURE_COLLECTION, drops: [] };
     }
     return makeFeatureCollectionFromRows({
       rows: queryResult.data,
-      binding: resolvedBinding,
+      binding: boundColumns,
       sensitivity,
       layerId,
     });
-  }, [resolvedBinding, queryResult, sensitivity, layerId]);
+  }, [boundColumns, queryResult, sensitivity, layerId]);
 
   const valueColumn =
     symbology.type === "proportionalSymbol" ?
@@ -95,7 +95,10 @@ export function useLayerMapSpec({
       makeLayerSpecFromMapLayer({
         layer,
         featureCollection,
-        stats: getLayerStatsFromFeatureCollection({ featureCollection, valueColumnName }),
+        stats: getLayerStatsFromFeatureCollection({
+          featureCollection,
+          valueColumnName,
+        }),
         valueColumnName,
       }),
     ]);
@@ -114,7 +117,7 @@ export function useLayerMapSpec({
     fitBounds,
     interactiveLayerIds,
     featureCount: featureCollection.features.length,
-    hasBinding: resolvedBinding !== undefined,
+    hasBinding: boundColumns !== undefined,
     drops,
   };
 }

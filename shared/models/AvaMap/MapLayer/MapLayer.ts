@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
+  GeoBindingColumnNames as GeoBindingColumnNamesType,
   GeoBinding as GeoBindingType,
-  ResolvedGeoBinding as ResolvedGeoBindingType,
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type { LayerSymbology } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type { LegendConfig } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
@@ -18,7 +18,7 @@ export namespace MapLayer {
   export type T = MapLayerRead;
   export type Id = MapLayerId;
   export type GeoBinding = GeoBindingType;
-  export type ResolvedGeoBinding = ResolvedGeoBindingType;
+  export type GeoBindingColumnNames = GeoBindingColumnNamesType;
   export type Symbology = LayerSymbology;
   export type Sensitivity = SensitivityPolicy;
   export type Legend = LegendConfig;

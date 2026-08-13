@@ -166,10 +166,10 @@
   A method on a module gets the missing half from its receiver, so it never
   repeats it: `MapLayer.toGeoBinding(layer)`, not
   `MapLayer.mapLayerToGeoBinding(layer)` and not
-  `MapLayer.toGeoBinding(layer)`. Free functions have no receiver, so
-  they must spell out both halves, and they never use `To`: write
+  `MapLayer.resolveGeoBinding(layer)`. Free functions have no receiver, so they
+  must spell out both halves, and they never use `To`: write
   `makeFeatureCollectionFromRows(rows)`, not `rowsToFeatureCollection(rows)`
-  and not `makeFeatureCollectionFromRows(rows)`.
+  and not `toFeatureCollection(rows)`.
 
   Choose between `make` and `get` by what comes back:
   - `make` constructs a new object or a value of a new type out of the source.
@@ -187,13 +187,13 @@
   This is bad:
 
   ```ts
-  // Says nothing about the source, and `undefined` is invisible either way.
-  MapLayer.toGeoBinding(layer);
+  // Names neither side: what goes in, and what comes back?
+  MapLayer.resolveGeoBinding(layer);
   // Free function using `To`, and the source is unnamed.
-  makeFeatureCollectionFromRows({ rows, binding });
+  toFeatureCollection({ rows, binding });
   // Near-synonym prefixes for the same kind of work.
-  getBoundsFromFeatureCollection(featureCollection);
-  makeMapSpecFromLayerSpecs(layerSpecs);
+  computeBounds(featureCollection);
+  createMapSpec(layerSpecs);
   ```
 
   This is good:

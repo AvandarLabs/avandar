@@ -21,7 +21,9 @@ export function isMapLayerQueryable(layer: MapLayer.T): boolean {
  * Cache key for a layer's rows. Deliberately excludes symbology, legend, and
  * popup config so restyling a layer repaints from cache instead of refetching.
  */
-export function makeQueryKeyFromMapLayer(layer: MapLayer.T): readonly unknown[] {
+export function makeQueryKeyFromMapLayer(
+  layer: MapLayer.T,
+): readonly unknown[] {
   return ["mapLayerData", layer.id, layer.source, layer.geoBinding];
 }
 

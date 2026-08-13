@@ -1,7 +1,7 @@
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
+import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
@@ -66,11 +66,14 @@ export function useMapInstance({
   // and is deliberately not synced afterwards, so the user's pan and zoom are
   // never yanked back by a re-render.
   const viewRef = useRef(view);
-  useEffect(function syncLatestValueRefs() {
-    interactiveLayerIdsRef.current = interactiveLayerIds;
-    onFeatureClickRef.current = onFeatureClick;
-    basemapRef.current = basemap;
-  }, [interactiveLayerIds, onFeatureClick, basemap]);
+  useEffect(
+    function syncLatestValueRefs() {
+      interactiveLayerIdsRef.current = interactiveLayerIds;
+      onFeatureClickRef.current = onFeatureClick;
+      basemapRef.current = basemap;
+    },
+    [interactiveLayerIds, onFeatureClick, basemap],
+  );
 
   useEffect(function constructMapInstance() {
     const container = containerRef.current;

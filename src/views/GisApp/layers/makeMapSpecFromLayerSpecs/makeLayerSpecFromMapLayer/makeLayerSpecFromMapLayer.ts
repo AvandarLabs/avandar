@@ -86,7 +86,7 @@ function _buildCircleRadius({
  * query rows.
  * @param params.stats Value domain used by data-driven paint expressions.
  * @param params.valueColumnName Result column backing a proportional symbol,
- * resolved by the caller from the symbology's column id.
+ * looked up by the caller from the symbology's column id.
  * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
  * it as individual symbols.

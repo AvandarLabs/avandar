@@ -1,8 +1,8 @@
 import {
+  getFiniteNumberFromValue,
   isDefined,
   makeBucketMap,
   prop,
-  getFiniteNumberFromValue,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
@@ -115,7 +115,7 @@ function _placeRow({
 }: {
   row: UnknownRow;
   rowIndex: number;
-  binding: MapLayer.ResolvedGeoBinding;
+  binding: MapLayer.GeoBindingColumnNames;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
 }): RowPlacement {
@@ -186,7 +186,7 @@ function _buildDropReports(
  *
  * @param params The rows to convert and how to read geometry out of them.
  * @param params.rows Query result rows, one candidate feature each.
- * @param params.binding Which columns carry geometry, already resolved.
+ * @param params.binding Which columns carry geometry, named not id'd.
  * @param params.sensitivity Spatial privacy policy applied to each geometry.
  * @param params.layerId Used with the row index to seed jitter.
  * @returns The converted features and a report for every row that was dropped.
@@ -200,7 +200,7 @@ export function makeFeatureCollectionFromRows({
   layerId,
 }: {
   rows: readonly UnknownRow[];
-  binding: MapLayer.ResolvedGeoBinding;
+  binding: MapLayer.GeoBindingColumnNames;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
 }): {

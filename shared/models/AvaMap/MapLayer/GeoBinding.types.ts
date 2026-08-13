@@ -9,9 +9,9 @@ import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.typ
  * as further members of this union.
  *
  * `latitude` and `longitude` are independently optional so that picking one
- * axis alone never produces a binding that resolves: a half-picked binding
- * that resolved would plot points on the diagonal where latitude equals
- * longitude, which looks like a real result and is not.
+ * axis alone never yields usable column names: a half-picked binding that
+ * still produced geometry would plot points on the diagonal where latitude
+ * equals longitude, which looks like a real result and is not.
  */
 export type GeoBinding = {
   type: "latLngColumns";
@@ -20,10 +20,10 @@ export type GeoBinding = {
 };
 
 /**
- * A {@link GeoBinding} whose column ids have been resolved to the column names
- * that query result rows are actually keyed by.
+ * A {@link GeoBinding} whose column ids have been replaced with the column
+ * names that query result rows are actually keyed by.
  */
-export type ResolvedGeoBinding = {
+export type GeoBindingColumnNames = {
   type: "latLngColumns";
   latitudeColumnName: string;
   longitudeColumnName: string;

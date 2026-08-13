@@ -12,7 +12,10 @@ function createPoint(longitude: number, latitude: number): GeoJSON.Feature {
 describe("getBoundsFromFeatureCollection", () => {
   it("returns undefined for an empty collection", () => {
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [],
+      }),
     ).toBeUndefined();
   });
 
@@ -58,7 +61,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [polygon] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [polygon],
+      }),
     ).toEqual([
       [0, 0],
       [10, 5],
@@ -78,7 +84,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [line] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [line],
+      }),
     ).toEqual([
       [-3, 40],
       [2, 48],
@@ -98,7 +107,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [collection] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [collection],
+      }),
     ).toEqual([
       [1, 1],
       [4, 9],
@@ -135,7 +147,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [multiPoint] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [multiPoint],
+      }),
     ).toEqual([
       [-5, 20],
       [10, 35],
@@ -161,7 +176,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [multiLine] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [multiLine],
+      }),
     ).toEqual([
       [0, -10],
       [25, 1],
@@ -220,7 +238,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [line] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [line],
+      }),
     ).toEqual([
       [10, 20],
       [12, 22],
@@ -234,7 +255,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [emptyLine] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [emptyLine],
+      }),
     ).toBeUndefined();
   });
 
@@ -268,7 +292,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [nested] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [nested],
+      }),
     ).toEqual([
       [-6, 3],
       [3, 12],

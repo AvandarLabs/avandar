@@ -3,7 +3,7 @@ import { propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
-import type { ResolvedGeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
+import type { GeoBindingColumnNames } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
   MapLayerId,
   MapLayerRead,
@@ -66,12 +66,13 @@ export const MapLayerModule = {
   },
 
   /**
-   * Resolves a layer's geo binding from column ids to the column names its
-   * result rows are keyed by.
-   * @returns The resolved binding, or `undefined` when the layer has no
+   * The layer's geo binding restated in the column names its result rows are
+   * keyed by, rather than the column ids the layer persists.
+   * @param layer The layer whose binding and query columns are read.
+   * @returns The binding's column names, or `undefined` when the layer has no
    * binding or a bound column is absent from the layer's query.
    */
-  toGeoBinding: (layer: MapLayerRead): ResolvedGeoBinding | undefined => {
+  toGeoBinding: (layer: MapLayerRead): GeoBindingColumnNames | undefined => {
     const { geoBinding, source } = layer;
     if (!geoBinding || !geoBinding.latitude || !geoBinding.longitude) {
       return undefined;

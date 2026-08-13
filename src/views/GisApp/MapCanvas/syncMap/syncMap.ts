@@ -20,9 +20,8 @@ function _syncPaint(
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
   Object.entries(layerSpec.paint).forEach(([property, value]) => {
-    const previousValue = previousLayerSpec?.paint[
-      property as keyof MapLayerSpec["paint"]
-    ];
+    const previousValue =
+      previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
     if (JSON.stringify(previousValue) === JSON.stringify(value)) {
       return;
     }
