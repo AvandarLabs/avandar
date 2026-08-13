@@ -35,60 +35,6 @@ export const MAX_FREE_PLAN_SEATS = 2;
  * `WebAppConfig` (`src/config/WebAppConfig.ts`) instead.
  */
 export const GlobalAppConfig = {
-  chat: {
-    /** Default OpenRouter model when the client does not send a selection. */
-    defaultModelId: "openai/gpt-4o-mini",
-
-    /**
-     * Model class tokens matched against OpenRouter id, canonical_slug, and
-     * display name. A model must match at least one token to appear in the
-     * picker (in addition to tool-support and stability filters).
-     */
-    allowedModelClasses: [
-      "gpt-4o-mini",
-      "gpt-4o",
-      "gpt-5",
-      "o1",
-      "o3",
-      "o4",
-      "claude",
-      "gemini",
-      "llama",
-      "kimi",
-      "deepseek",
-      "mistral",
-      "qwen",
-    ],
-
-    /**
-     * Class tokens for proprietary-hosted models (OpenAI, Anthropic, Google).
-     * Checked before `openModelClasses` when assigning a license tier.
-     */
-    proprietaryModelClasses: [
-      "openai",
-      "gpt",
-      "o1",
-      "o3",
-      "o4",
-      "anthropic",
-      "claude",
-      "google",
-      "gemini",
-    ],
-
-    /** Class tokens for open-weights / open-model families. */
-    openModelClasses: [
-      "meta-llama",
-      "llama",
-      "kimi",
-      "moonshot",
-      "qwen",
-      "deepseek",
-      "mistral",
-      "gemma",
-    ],
-  },
-
   /** Limits for dataset ingest and preview in the data manager app. */
   dataManagerApp: {
     /** Maximum length of dataset name */
