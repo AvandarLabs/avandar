@@ -37,6 +37,12 @@ src/
     ├── control.rs     local POST /comparison endpoint for retargeting the comparison while the review is still being prepared
     ├── draw.rs        two-half layout, main-view tab strip + log/test-plan/guide routing, palette overlay
     ├── draw_palette.rs  the command-palette modal renderer
+    ├── start_review/   the "no diff review found, start one?" modal
+    │   ├── modal.rs    pure state + wording (Choice, Outcome, StartReviewModal)
+    │   ├── control.rs  the `impl App` surface that answers it
+    │   ├── keys.rs     its key map (pure key -> intent) + handler
+    │   └── draw.rs     its renderer (Yes / No buttons)
+    ├── modal_layout.rs  shared centred-rect geometry for every modal overlay
     ├── palette.rs     command registry (PALETTE_COMMANDS) + PaletteState
     ├── main_diff_view.rs  the MainDiffView cycle (log view ↔ test plan ↔ diff guide)
     ├── guide.rs       markdown view state: styled markdown (re-read on change) + a cursor overlay (cursor is source of truth; scroll derived to keep it visible)
@@ -53,8 +59,10 @@ No file exceeds 400 lines; modules are single-purpose. The main diff pane shows
 one `MainDiffView` at a time: the **log view** (difit's `vt100` screen, or a
 waiting status before difit starts), the **test plan view**, or the **diff guide
 view** (`guide.rs` markdown rendered by `markdown/`). `dif` starts focused on
-this pane (in the log view), with the LLM pane already working from its
-auto-submitted initial prompt (see [integrations.md](integrations.md)).
+this pane (in the log view). The LLM pane starts **idle**: nothing is typed into
+it at launch. When no prepared review exists, the start-review modal asks whether
+to generate one, and only an explicit Yes injects `/diff-review [comparison]`
+(see [integrations.md](integrations.md)).
 
 ## Markdown navigation
 
@@ -136,7 +144,11 @@ only git — and a second flow runs *alongside* it while the LLM catches up:
 transcript created as []  →  difit + browser shell + poller start, browser opens
         │
         ▼
-LLM pane starts with /diff-review [comparison]
+LLM pane starts idle  →  "No diff review found — start one?" modal
+        │                         │
+        │                         └── No → nothing runs; the diff stays open
+        ▼
+Yes → /diff-review [comparison] injected into the LLM pane
         │
         ▼
 diff-review skill may POST selected comparison to control.rs
@@ -200,8 +212,10 @@ for the hint, per the shortcut-label rule in `AGENTS.md`). "Regenerate diff
 guide" types a minimal request into the LLM pane; the skill writes the guide
 file and the diff guide view picks it up on its next refresh. "New LLM
 session" is an interrupt: it kills the running LLM child and respawns the
-pane on a fresh session (via `startup::fresh_llm_command`, shared with the
-pane's first launch) that auto-submits the review prompt. This is chosen over
+pane on a fresh session (via `startup::fresh_llm_command`) that auto-submits the
+review-orientation prompt. That is the one place a prompt is submitted on a
+session's startup: the pane's *own* first launch deliberately submits nothing
+(see [integrations.md](integrations.md)). This is chosen over
 typing `/new` so it takes effect immediately even when the LLM is mid-thought. The
 palette is a
 pure registry + filter/selection state, so it is unit-tested without a terminal.
