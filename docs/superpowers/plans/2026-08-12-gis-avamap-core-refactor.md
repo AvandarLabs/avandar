@@ -22,6 +22,7 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 - **Models**: import `$/models/.../MyModel.ts` (the namespace entry), never `MyModel.types.ts`, except from inside the model's own folder.
 - **Styling**: CSS Modules, never inline `style={}` unless the value is computed at runtime. Never Tailwind.
 - **i18n**: user-facing strings go through Lingui (`const { t } = useLingui()` in components). Model code takes strings as parameters instead of translating.
+- **Line length is capped at 80 characters** by ESLint `max-len`, comments included. Some code blocks in this plan exceed it, usually in a docstring. Rewrap to fit; do not change the wording, and do not add an eslint-disable. Run `npx prettier --write <files>` and `npx eslint <files>` before committing each task.
 
 ## Commands
 
