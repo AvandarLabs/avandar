@@ -55,11 +55,14 @@ as a prepared one does. Two things differ:
    (`transcript::ensure_exists`), so the review has its canonical file from the
    first moment and the poller has somewhere to mirror. An existing transcript
    is never touched.
-2. The LLM pane starts with the minimal slash command that prepares the review:
-   `/diff-review` plus the comparison argument the user explicitly passed to the
-   TUI. Examples: `dif .` seeds `/diff-review .`, `dif develop` seeds
-   `/diff-review develop`, and bare `dif` seeds `/diff-review`. Flags such as
-   `--codex` / `-cx` are never included in that prompt.
+2. The LLM pane starts idle and the TUI asks, in a modal, whether to start a
+   review. Nothing is injected unless the reviewer answers Yes; a No closes the
+   modal and starts nothing. A Yes types the minimal slash command that prepares
+   the review: `/diff-review` plus the comparison argument the user explicitly
+   passed to the TUI. Examples: `dif .` runs `/diff-review .`, `dif develop` runs
+   `/diff-review develop`, and bare `dif` runs `/diff-review`. Flags such as
+   `--codex` / `-cx` are never included in that prompt. If the pane has died by
+   then, the answer respawns it on a fresh session seeded with that command.
 
 Nothing blocks on difit answering, either: the shell binds and serves its page
 immediately and its iframe silently retries the proxied difit document (see
@@ -202,14 +205,19 @@ cd <repo> && <codex_cmd> [prompt]
 cd <repo> && <codex_cmd> resume <id> [prompt]
 ```
 
-A **fresh** session is launched with a prompt appended as a final argument so the
-frontend submits it on startup and stays interactive (the `prompt` parameter of
-`session::build_llm_command`). Prepared reviews use the normal orientation
-message from `session::initial_prompt`: it states the conversation is about the
-current diff review and to load the `/diff-review` skill. Unprepared reviews use
-the minimal `/diff-review [comparison]` preparation command described above. A
-**resumed** session gets no such message because that orientation is already in
-the resumed conversation's context, so re-injecting it would just repeat work.
+A session *can* be launched with a prompt appended as a final argument, which the
+frontend submits on startup while staying interactive (the `prompt` parameter of
+`session::build_llm_command`). **Launching `dif` never uses it**: the pane comes
+up idle, fresh or resumed, because a launch is a request to see the diff, not to
+commission a review. Two paths still pass a prompt:
+
+- **The start-review modal answered Yes**, when the LLM pane has already died. It
+  respawns on a fresh session seeded with `/diff-review [comparison]`. While the
+  pane is alive, the same answer is typed into it instead.
+- **`Ctrl+N` / "New LLM session"**, which mints a fresh session seeded with the
+  orientation message from `session::initial_prompt` (it states the conversation
+  is about the current diff review and to load the `/diff-review` skill). That is
+  an explicit user action, not a launch.
 
 For Claude, the session id is remembered in
 `.difit/.claude-session-<branch>-<scope>`; a relaunch resumes it when its

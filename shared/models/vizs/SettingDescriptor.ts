@@ -29,7 +29,13 @@
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { Paths } from "type-fest";
 
-/** Stable identifiers for groups rendered by visualization settings forms. */
+/**
+ * The groups a setting can be clustered under in a settings form.
+ *
+ * These are stable identifiers, not display copy: forms group and compare on
+ * them, so they must not change with the active locale. Render them through
+ * `vizSettingGroupLabel` from `$/copy/vizSettingGroupLabel.ts`.
+ */
 export type VizSettingGroup =
   | "X axis"
   | "Y axis"

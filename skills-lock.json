@@ -1,12 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "attach-db": {
-      "source": "duckdb/duckdb-skills",
-      "sourceType": "github",
-      "skillPath": "skills/attach-db/SKILL.md",
-      "computedHash": "db6a105a312536b75a58616dfd38b46909253c88fcb1ffd58bfc506ffa3065d6"
-    },
     "brainstorming": {
       "source": "obra/superpowers",
       "sourceType": "github",
@@ -55,12 +49,6 @@
       "skillPath": ".agents/skills/impeccable/SKILL.md",
       "computedHash": "79e7b12409d169bc2f11ac39ad9eaede31bd8a061517809173ca6325363c350c"
     },
-    "install-duckdb": {
-      "source": "duckdb/duckdb-skills",
-      "sourceType": "github",
-      "skillPath": "skills/install-duckdb/SKILL.md",
-      "computedHash": "ce264b48e369a23adbda39804fc65c7e9fdffe182f6dfbc9f4e2fdf88b027b9e"
-    },
     "mantine-combobox": {
       "source": "mantinedev/skills",
       "sourceType": "github",
@@ -91,12 +79,6 @@
       "skillPath": "skills/oauth/SKILL.md",
       "computedHash": "cf0ec2396dbf94504eb74ac7191c7b7b082dba3ef080a42688e79ca5c856eddc"
     },
-    "octocat": {
-      "source": "mcollina/skills",
-      "sourceType": "github",
-      "skillPath": "skills/octocat/SKILL.md",
-      "computedHash": "b5e546eedcde6ff050435f9e7e3b6ffa66cc37f3ab0443d0030d96f05fcdd7b1"
-    },
     "playwright-best-practices": {
       "source": "currents-dev/playwright-best-practices-skill",
       "sourceType": "github",
@@ -108,24 +90,6 @@
       "sourceType": "github",
       "skillPath": "skills/playwright-skill/SKILL.md",
       "computedHash": "3a284d9eee004bcbcf17f58a08550146021d43efb02c9f411d65cacca889fb25"
-    },
-    "query": {
-      "source": "duckdb/duckdb-skills",
-      "sourceType": "github",
-      "skillPath": "skills/query/SKILL.md",
-      "computedHash": "4ef826c2a588b8629aef536a797ea67f31f8f5a04f88acadbc5ba84f6778887d"
-    },
-    "read-file": {
-      "source": "duckdb/duckdb-skills",
-      "sourceType": "github",
-      "skillPath": "skills/read-file/SKILL.md",
-      "computedHash": "16607eb0d4dc7e2ff8d92e2bdba6bedb67aedb1189f66249a46ed672ca1782c4"
-    },
-    "receiving-code-review": {
-      "source": "obra/superpowers",
-      "sourceType": "github",
-      "skillPath": "skills/receiving-code-review/SKILL.md",
-      "computedHash": "3f56080356c62e4f74a183d7371686babc661e41a952dc67a97c2c76fe8a9329"
     },
     "requesting-code-review": {
       "source": "obra/superpowers",

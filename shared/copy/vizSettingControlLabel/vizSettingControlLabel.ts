@@ -1,5 +1,16 @@
 import { t } from "@lingui/core/macro";
 
+/**
+ * Display labels for the viz setting controls, keyed by the untranslated label
+ * the descriptor registries carry.
+ *
+ * The registries hold static English strings because a descriptor literal is
+ * evaluated once at module load, which would freeze a translation for the
+ * session. Those strings are therefore the stable message ids, and this map is
+ * resolved at render time so labels follow the active locale.
+ * `vizSettingControlLabel.test.ts` fails if a registry gains a label with no
+ * entry here.
+ */
 function _labelMessages(): Record<string, string> {
   return {
     "100% stacked": t`100% stacked`,
@@ -48,12 +59,15 @@ function _labelMessages(): Record<string, string> {
   };
 }
 
-/** Returns the translated display label for a viz setting control. */
+/**
+ * Returns the human-readable label for a viz setting control, falling back to
+ * the registry's own string so an unmapped label still renders.
+ */
 export function vizSettingControlLabel(label: string): string {
   return _labelMessages()[label] ?? label;
 }
 
 /** The registry labels this module knows how to translate. */
-export function knownVizSettingControlLabels(): string[] {
+export function knownVizSettingControlLabels(): readonly string[] {
   return Object.keys(_labelMessages());
 }

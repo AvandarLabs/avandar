@@ -1,23 +1,30 @@
 import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Fieldset, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
-import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig";
+import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
@@ -28,17 +35,23 @@ type Props<TConfig extends HostConfig> = {
   fields: readonly QueryResultColumn[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
  *
- * Renders the Series fieldset first (matching the natural user flow:
- * pick what to plot, then how to bucket it), followed by the axis
- * fieldset (X axis or Category axis), followed by one Mantine
- * `<Fieldset>` per chart-level descriptor group ("Y axis", "Legend",
- * "Layout", "Grid", etc.). Descriptors whose group matches the axis
- * legend merge into the axis fieldset alongside the column picker so
- * all X-axis settings live in one visual unit.
+ * Builds the Series group first (matching the natural user flow: pick
+ * what to plot, then how to bucket it), followed by the axis group (X
+ * axis or Category axis), followed by one group per chart-level
+ * descriptor group ("Y axis", "Legend", "Layout", "Grid", etc.).
+ * Descriptors whose group matches the axis group merge into it
+ * alongside the column picker so all X-axis settings live in one
+ * visual unit.
+ *
+ * All of them go to a single {@link SettingsColumns}, so `layout`
+ * either stacks them or reflows them as one grid.
  *
  * Single source of truth for the form layout. Each chart type only
  * differs by its descriptor registry; the surrounding structure
@@ -48,6 +61,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   fields,
   config,
   onConfigChange,
+  layout = "stacked",
 }: Props<TConfig>): ReactNode {
   const { t } = useLingui();
   const isRadar = config.vizType === "radar";
@@ -133,19 +147,27 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
-  // Axis descriptor groups are stable identifiers, not display copy.
-  const axisGroupKey = isRadar ? "Category axis" : "X axis";
+  const axisGroup: VizSettingGroup = isRadar ? "Category axis" : "X axis";
+  const axisLegend = vizSettingGroupLabel(axisGroup);
 
-  // Display text for the axis fieldset is translated separately.
-  const axisLegend = isRadar ? t`Category axis` : t`X axis`;
-
+  // The axis group is rendered here, alongside the axis column picker, so that
+  // all of its settings live in one visual unit.
   const axisGroupDescriptors = chartDescriptors.filter(
-    propEq("group", axisGroupKey),
+    propEq("group", axisGroup),
   );
 
-  return (
-    <Stack gap="md">
-      <Fieldset legend={t`Series`}>
+  const otherChartSettingGroups = useChartSettingGroups({
+    descriptors: chartDescriptors,
+    config,
+    onSettingChange: updateChartPath,
+    excludeGroup: axisGroup,
+  });
+
+  const groups: SettingsColumnGroup[] = [
+    {
+      id: "series",
+      title: t`Series`,
+      content: (
         <Stack gap="sm">
           <Group justify="space-between">
             <Group gap={6} align="center">
@@ -209,9 +231,12 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             );
           })}
         </Stack>
-      </Fieldset>
-
-      <Fieldset legend={axisLegend}>
+      ),
+    },
+    {
+      id: "axis",
+      title: axisLegend,
+      content: (
         <Stack gap="xs">
           <Control
             label={axisLegend}
@@ -238,14 +263,10 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             );
           })}
         </Stack>
-      </Fieldset>
+      ),
+    },
+    ...otherChartSettingGroups,
+  ];
 
-      <ChartSettingsFieldsets
-        descriptors={chartDescriptors}
-        config={config}
-        onSettingChange={updateChartPath}
-        excludeGroup={axisGroupKey}
-      />
-    </Stack>
-  );
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

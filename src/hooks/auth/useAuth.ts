@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
+import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
 import type { User } from "$/models/User/User";
@@ -46,7 +46,7 @@ export function useAuth(router: AnyRouter): { user: User.T | undefined } {
             return;
           }
           // Clear the guard so the AI panel auto-opens again on next login
-          sessionStorage.removeItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY);
+          sessionStorage.removeItem(DataExplorerSessionKeys.aiPanelAutoOpened);
         }
 
         if (newSession?.user) {

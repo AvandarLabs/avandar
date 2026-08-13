@@ -185,11 +185,11 @@ export function SeriesCard({
         {Array.from(groupedDescriptors.entries()).map(([group, descs]) => {
           return (
             <Box key={group}>
-              {group !== "" ?
+              {group === "" ? null : (
                 <Text fw={500} size="xs" c="dimmed" mt="xs" mb={4}>
                   {vizSettingGroupLabel(group)}
                 </Text>
-              : null}
+              )}
               <Stack gap="xs">
                 {descs.map((desc) => {
                   return (

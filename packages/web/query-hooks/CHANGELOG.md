@@ -1,5 +1,13 @@
 # @avandar/query-hooks
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`622af13`](https://github.com/AvandarLabs/avandar/commit/622af13dcf5410ff1da158750b19581c33793b69)]:
+  - @avandar/clients@0.1.2
+  - @avandar/utils@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

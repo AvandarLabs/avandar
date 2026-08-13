@@ -12,6 +12,7 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Paragraph},
 };
 
+use super::modal_layout::centered_rect;
 use super::palette::PaletteState;
 
 /// Render the command palette centered over `area`.
@@ -146,18 +147,4 @@ fn render_list(
         })
         .collect();
     f.render_widget(Paragraph::new(lines), area);
-}
-
-/// A `width`×`height` rect centered within `area` (both clamped to `area`).
-fn centered_rect(width: u16, height: u16, area: Rect) -> Rect {
-    let w = width.min(area.width);
-    let h = height.min(area.height);
-    let x = area.x + (area.width.saturating_sub(w)) / 2;
-    let y = area.y + (area.height.saturating_sub(h)) / 2;
-    Rect {
-        x,
-        y,
-        width: w,
-        height: h,
-    }
 }

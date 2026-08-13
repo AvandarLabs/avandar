@@ -1,0 +1,4 @@
+.emptyState {
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
+}

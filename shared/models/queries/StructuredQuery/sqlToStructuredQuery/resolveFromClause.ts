@@ -8,6 +8,7 @@ import type {
   QueryJoinKind,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
 
 export type FromResolution = {
@@ -53,7 +54,7 @@ function _joinKindFromKeyword(keyword: string): QueryJoinKind {
 
 function _parseJoinOn(
   onNode: unknown,
-  unmappedReasons: string[],
+  unmappedReasons: SqlFailedMappingReason[],
 ):
   | { predicates: QueryJoinOnEquality[]; combinator: QueryFilterCombinator }
   | undefined {
@@ -77,9 +78,7 @@ function _parseJoinOn(
     };
   }
   if (operator !== "=") {
-    unmappedReasons.push(
-      `JOIN ON clause uses "${operator}": only equality joins are mapped.`,
-    );
+    unmappedReasons.push({ code: "joinNonEqualityOperator", operator });
     return undefined;
   }
   const leftCol = columnRefName(obj.left);
@@ -87,9 +86,7 @@ function _parseJoinOn(
   const leftTable = (obj.left as { table?: string | null } | null)?.table;
   const rightTable = (obj.right as { table?: string | null } | null)?.table;
   if (!leftCol || !rightCol) {
-    unmappedReasons.push(
-      "JOIN ON clause uses a non-column reference; the form will keep it via raw SQL.",
-    );
+    unmappedReasons.push({ code: "joinNonColumnReference" });
     return undefined;
   }
   return {
@@ -126,10 +123,10 @@ function _stringifyNodeSqlParserSelect(node: unknown): string {
 export function resolveFrom(
   fromList: unknown,
   datasets: readonly DatasetWithColumns[],
-  unmappedReasons: string[],
+  unmappedReasons: SqlFailedMappingReason[],
 ): FromResolution | undefined {
   if (!Array.isArray(fromList) || fromList.length === 0) {
-    unmappedReasons.push("Could not determine a base table from FROM clause.");
+    unmappedReasons.push({ code: "fromNoBaseTable" });
     return undefined;
   }
 
@@ -167,29 +164,23 @@ export function resolveFrom(
         };
         if (!sql) {
           nestedSubquery.parseFailed = true;
-          unmappedReasons.push(
-            "Nested subquery in FROM could not be re-serialised; mapping kept as a placeholder.",
-          );
+          unmappedReasons.push({ code: "fromNestedSubqueryUnserializable" });
         }
       } else if (tableName) {
         base = _resolveDataset(tableName, datasets);
         baseAlias = alias;
         if (!base) {
-          unmappedReasons.push(
-            `Could not find a known dataset matching "${tableName}".`,
-          );
+          unmappedReasons.push({ code: "fromUnknownDataset", tableName });
         }
       } else {
-        unmappedReasons.push("FROM clause is not a plain table reference.");
+        unmappedReasons.push({ code: "fromNotPlainTable" });
       }
       return;
     }
 
     // Subsequent entries: either a JOIN or a comma-separated cross product
     if (!joinKeyword) {
-      unmappedReasons.push(
-        "Comma-joined tables are not mapped; treat them as INNER JOIN with ON true.",
-      );
+      unmappedReasons.push({ code: "fromCommaJoin" });
       return;
     }
 
@@ -210,16 +201,15 @@ export function resolveFrom(
         combinator: onParsed?.combinator ?? "AND",
       });
       if (!sql) {
-        unmappedReasons.push(
-          `JOIN subquery at position ${idx} could not be re-serialised.`,
-        );
+        unmappedReasons.push({
+          code: "joinSubqueryUnserializable",
+          index: idx,
+        });
       }
       return;
     }
     if (!tableName) {
-      unmappedReasons.push(
-        `JOIN entry at position ${idx} is not a plain table reference.`,
-      );
+      unmappedReasons.push({ code: "joinNotPlainTable", index: idx });
       return;
     }
     joins.push({

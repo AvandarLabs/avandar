@@ -1,5 +1,6 @@
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 /** Outcome of parsing a SQL string into a partial structured query. */
@@ -12,7 +13,7 @@ export type SqlMappingResult = {
    */
   isFullyMapped: boolean;
   /** Human-readable reasons why the mapping is partial. */
-  unmappedReasons: readonly string[];
+  unmappedReasons: readonly SqlFailedMappingReason[];
 };
 
 /** Inputs required to parse a SQL string into a structured query. */

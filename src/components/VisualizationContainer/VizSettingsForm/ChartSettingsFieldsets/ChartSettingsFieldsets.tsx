@@ -1,10 +1,6 @@
-import { makeBucketMap } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Fieldset, Stack } from "@mantine/core";
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
-import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type {
   AnyChartSettingDescriptor,
   VizSettingGroup,
@@ -14,67 +10,44 @@ import type { ReactNode } from "react";
 type Props = {
   /** Chart-level descriptors to render, in registry order. */
   descriptors: readonly AnyChartSettingDescriptor[];
+
   /** The config the descriptors read their current values from. */
   config: object;
+
   /** Called with the descriptor's dotted path and the new value. */
   onSettingChange: (
     options: Readonly<{ path: string; value: unknown }>,
   ) => void;
-  /**
-   * A single group the caller renders itself, skipped here.
-   * `SeriesAwareVizForm` excludes its axis group because it merges those
-   * controls into the axis fieldset alongside the column picker.
-   */
+
+  /** A single group the caller renders itself, skipped here. */
   excludeGroup?: VizSettingGroup;
+
+  /** How the setting groups are arranged. Defaults to a vertical stack. */
+  layout?: SettingsColumnsLayout;
 };
 
 /**
- * Renders one Mantine `<Fieldset>` per chart-level descriptor group
- * ("Y axis", "Legend", "Grid", "Layout", etc.), in registry order, with
- * one {@link Control} per descriptor inside it. Descriptors carrying no
- * `group` collect into a trailing "Chart settings" fieldset.
+ * Renders one group per chart-level descriptor group ("Y axis", "Legend",
+ * "Grid", "Layout", etc.), in registry order, through {@link SettingsColumns}
+ * so the caller's `layout` decides whether they stack or reflow into columns.
+ *
+ * For a form that also contributes groups of its own, call
+ * {@link useChartSettingGroups} directly and render one `SettingsColumns` over
+ * the combined list instead; that keeps the `columns` layout a single grid.
  */
 export function ChartSettingsFieldsets({
   descriptors,
   config,
   onSettingChange,
   excludeGroup,
+  layout = "stacked",
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
-
-  const groupedDescriptors = makeBucketMap(descriptors, {
-    keyFn: (descriptor) => {
-      return descriptor.group ?? "";
-    },
+  const groups = useChartSettingGroups({
+    descriptors,
+    config,
+    onSettingChange,
+    excludeGroup,
   });
 
-  const includedGroups = Array.from(groupedDescriptors.entries()).filter(
-    ([group]) => {
-      return group !== excludeGroup;
-    },
-  );
-
-  return includedGroups.map(([group, groupDescriptors]) => {
-    const legend =
-      group === "" ? t`Chart settings` : vizSettingGroupLabel(group);
-    return (
-      <Fieldset key={group === "" ? "chart-settings" : group} legend={legend}>
-        <Stack gap="xs">
-          {groupDescriptors.map((descriptor) => {
-            return (
-              <Control
-                key={descriptor.key}
-                label={vizSettingControlLabel(descriptor.label)}
-                spec={descriptor.control}
-                value={readSetting(config, descriptor.key)}
-                onChange={(nextValue) => {
-                  onSettingChange({ path: descriptor.key, value: nextValue });
-                }}
-              />
-            );
-          })}
-        </Stack>
-      </Fieldset>
-    );
-  });
+  return <SettingsColumns groups={groups} layout={layout} />;
 }

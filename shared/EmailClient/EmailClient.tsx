@@ -9,7 +9,7 @@ import {
 } from "$/EmailClient/sendTransactionalEmail.ts";
 import { WaitlistSignupCodeEmail } from "$/emails/WaitlistSignupCodeEmail.tsx";
 import WorkspaceInviteEmail from "$/emails/WorkspaceInviteEmail.tsx";
-import { getResendAPIKey } from "$/env/getResendAPIKey.ts";
+import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
 import { AvaHTTPError } from "$/utils/http/AvaHTTPError.ts";
 import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes.ts";
 import {
@@ -20,10 +20,7 @@ import { match } from "ts-pattern";
 import type { IEmailClient } from "$/EmailClient/EmailClient.types.ts";
 
 function createEmailClient(): IEmailClient {
-  // make sure the RESEND_API_KEY is set otherwise throw an error.
-  if (!getResendAPIKey()) {
-    throw new Error("RESEND_API_KEY is not set");
-  }
+  getResendSendingAPIKey();
 
   const emailClient: IEmailClient = {
     sendNotificationEmail: async (
