@@ -18,6 +18,7 @@
  */
 import { formatDate, propEq } from "@avandar/utils";
 import { Box } from "@mantine/core";
+import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { Fragment, useId, useMemo } from "react";
 import {
   Area,
@@ -30,9 +31,15 @@ import {
   YAxis,
 } from "recharts";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
+import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
+import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
+import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
+import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { AreaSeries } from "$/models/vizs/SeriesConfig";
 
@@ -48,7 +55,7 @@ type Props = XYChartProps & {
    * them; "percent" 100% stacks; "split" stacks positive and negative
    * values separately.
    */
-  layout?: "default" | "stacked" | "percent" | "split";
+  layout?: AreaLayout;
 };
 
 const STACK_OFFSET_FOR_LAYOUT: Record<
@@ -80,17 +87,6 @@ export function AreaChart({
     return { padding: X_AXIS_PADDING };
   }, []);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, { baseXAxisProps });
-  }, [chartStyle, baseXAxisProps]);
-
-  const xLabelText = chartStyle?.xAxis?.label;
-  const yLabelText = chartStyle?.yAxis?.label;
-  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
-  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
-
-  const allAreas = series.every(propEq("renderAs", "area"));
-
   const tickFormatter = useMemo(() => {
     if (!isDateAxis) {
       return undefined;
@@ -99,6 +95,50 @@ export function AreaChart({
       return formatDate(value, { format: dateFormat, zone: timezone });
     };
   }, [isDateAxis, dateFormat, timezone]);
+
+  const allAreas = series.every(propEq("renderAs", "area"));
+
+  const yExtent = useMemo(() => {
+    if (!needsValueExtent(chartStyle?.yAxis)) {
+      return undefined;
+    }
+    const { isPercent, sharedStackId } = getAreaStacking(layout);
+    if (allAreas && isPercent) {
+      return { min: 0, max: 1 };
+    }
+    return computeValueExtent(
+      data,
+      // The composite renderer always groups, so a layout-implied stack
+      // only applies when every series really is an area.
+      toExtentSeries(
+        series.map((s) => {
+          return { key: s.key };
+        }),
+        allAreas ? sharedStackId : undefined,
+      ),
+    );
+  }, [data, series, layout, allAreas, chartStyle?.yAxis]);
+
+  const xTickLabels = useXTickLabels(
+    data,
+    xAxisKey,
+    chartStyle?.xAxis?.tickAngle,
+    tickFormatter,
+  );
+
+  const styleProps = useMemo(() => {
+    return applyChartStyle(chartStyle, {
+      baseXAxisProps,
+      yExtent,
+      xTickLabels,
+      axisRoles: getAxisRoles("area"),
+    });
+  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+
+  const xLabelText = chartStyle?.xAxis?.label;
+  const yLabelText = chartStyle?.yAxis?.label;
+  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
+  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
 
   const labelFormatter = useMemo(() => {
     if (!isDateAxis) {
@@ -123,7 +163,9 @@ export function AreaChart({
   }
 
   const areaSeries = series as readonly AreaSeries[];
-  const isStacked = layout !== "default";
+  // Same value the extent calculation bucketed by, so the drawn stacks
+  // and the resolved domain can never disagree.
+  const { sharedStackId } = getAreaStacking(layout);
   const stackOffset = STACK_OFFSET_FOR_LAYOUT[layout];
 
   return (
@@ -228,7 +270,7 @@ export function AreaChart({
                   stroke={color}
                   strokeWidth={strokeWidth}
                   fill={`url(#${id})`}
-                  stackId={isStacked ? "1" : undefined}
+                  stackId={sharedStackId}
                   dot={
                     showDots ?
                       {
