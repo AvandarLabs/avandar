@@ -1828,6 +1828,8 @@ pnpm i18n:check
 
 Expected: exit 0. This is the CI gate; it re-extracts and fails if `src/i18n/locales` is dirty afterwards.
 
+**Stage the catalogs first.** The script ends in `git diff --exit-code src/i18n/locales`, which compares against the *index*, not HEAD. Run `git add src/i18n/locales` before this check or it exits 1 on your own freshly-generated output.
+
 - [ ] **Step 4: Full lint and type-check**
 
 Run:
@@ -1843,7 +1845,7 @@ Expected: no errors. `pnpm lint` also runs `react-doctor` on the changed files a
 Run:
 
 ```bash
-pnpm test -- --quick
+pnpm test --quick
 ```
 
 Expected: every workspace suite passes. `--quick` skips Playwright.
@@ -1891,7 +1893,7 @@ git commit -m "chore(i18n): refresh catalogs after chat model picker trim"
 | Stale stored model ids fall back safely | `pnpm vitest run src/components/ChatPanel/ChatModelStorage` |
 | Nothing references the deleted pipeline | `pnpm type-check` |
 | Message catalogs are in sync | `pnpm i18n:check` |
-| Nothing else regressed | `pnpm test -- --quick` then `pnpm test:e2e` |
+| Nothing else regressed | `pnpm test --quick` then `pnpm test:e2e` |
 
 ## Findings for separate triage, surfaced by Task 3's review
 
