@@ -163,20 +163,36 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type {
+  DatasetColumnId,
+  DatasetColumnRead,
+} from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
+/**
+ * An honest `DatasetColumnRead`, built with no cast. A cast here would hide
+ * exactly the drift it looks like it is saving you from: `dataType` takes an
+ * `AvaDataType` ("double"), not a loose "number", and `columnIdx` is not
+ * `columnIndex`.
+ */
 function createNumericColumn(name: string): DatasetColumnRead {
+  const now = new Date().toISOString();
   return {
     __type: "DatasetColumn",
-    id: uuid(),
-    datasetId: uuid(),
+    id: uuid<DatasetColumnId>(),
+    datasetId: uuid<DatasetId>(),
+    workspaceId: uuid<Workspace.Id>(),
+    createdAt: now,
+    updatedAt: now,
     name,
     originalName: name,
-    dataType: "number",
+    originalDataType: "DOUBLE",
+    dataType: "double",
     detectedDataType: "DOUBLE",
     description: undefined,
-    columnIndex: 0,
-  } as unknown as DatasetColumnRead;
+    columnIdx: 0,
+  };
 }
 
 describe("MapLayer.makeEmpty", () => {
@@ -2628,17 +2644,25 @@ describe("compiled SQL for a lat/lng layer", () => {
     );
     const { uuid } = await import("$/lib/uuid.ts");
 
+    // Same honest fixture as the MapLayer model tests: no cast, real
+    // AvaDataType, real field names.
     const createColumn = (name: string) => {
+      const now = new Date().toISOString();
       return QueryColumn.makeFromDatasetColumn({
         __type: "DatasetColumn",
         id: uuid(),
         datasetId: uuid(),
+        workspaceId: uuid(),
+        createdAt: now,
+        updatedAt: now,
         name,
         originalName: name,
-        dataType: "number",
+        originalDataType: "DOUBLE",
+        dataType: "double",
         detectedDataType: "DOUBLE",
-        columnIndex: 0,
-      } as never);
+        description: undefined,
+        columnIdx: 0,
+      });
     };
 
     const latitude = createColumn("lat");
