@@ -1,7 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps/useBarChartStyleProps";
+import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";

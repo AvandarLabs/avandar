@@ -1,7 +1,7 @@
 import { Stack } from "@mantine/core";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset";
-import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets";
+import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

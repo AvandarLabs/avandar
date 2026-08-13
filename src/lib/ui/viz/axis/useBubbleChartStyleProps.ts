@@ -1,7 +1,7 @@
 import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
+import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";

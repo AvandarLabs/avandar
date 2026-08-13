@@ -18,7 +18,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import { useBubbleChartStyleProps } from "@/lib/ui/viz/axis/useBubbleChartStyleProps/useBubbleChartStyleProps";
+import { useBubbleChartStyleProps } from "@/lib/ui/viz/axis/useBubbleChartStyleProps";
 import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,

@@ -1,6 +1,6 @@
 import { Stack } from "@mantine/core";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets";
+import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
 import { PairSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";

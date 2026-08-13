@@ -1,7 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps/useLineChartStyleProps";
+import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";

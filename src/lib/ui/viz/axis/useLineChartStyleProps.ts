@@ -1,8 +1,8 @@
 import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
-import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
+import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
+import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,

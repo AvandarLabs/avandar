@@ -30,7 +30,7 @@ import {
   YAxis,
 } from "recharts";
 import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
-import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps/useAreaChartStyleProps";
+import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
