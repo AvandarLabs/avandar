@@ -17,53 +17,46 @@ type Props = {
 
 /**
  * Compact model picker for the chat composer. Shows a small "Model" control;
- * the active model name appears in a tooltip. Clicking opens a searchable,
- * grouped catalog.
+ * the active model name appears in a tooltip. Clicking opens the grouped
+ * catalog.
+ *
+ * The catalog is a synchronous six-model constant, so there is no loading
+ * state, no error state, and no search field.
  */
-export function ChatModelPicker({
-  disabled = false,
-}: Props): JSX.Element | null {
-  const { groups, models, isLoading, isError, hasDownloadedOfflineModels } =
-    useChatModelCatalog();
+export function ChatModelPicker({ disabled = false }: Props): JSX.Element {
+  const { groups, models } = useChatModelCatalog();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>(
     () => {
       return ChatModelStorage.readStoredChatModelId();
     },
   );
-  const [search, setSearch] = useState("");
   const { t } = useLingui();
   const assistantClient = useAui();
 
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();
-      setSearch("");
     },
     onDropdownOpen: () => {
-      combobox.selectFirstOption();
-      combobox.focusSearchInput();
+      // `onDropdownOpen` fires synchronously inside `openDropdown`, before
+      // React re-renders, and the dropdown below is rendered conditionally.
+      // Selecting here without deferring finds no `[data-combobox-option]`
+      // elements and silently does nothing, leaving the list unhighlighted.
+      requestAnimationFrame(() => {
+        combobox.selectActiveOption();
+      });
     },
   });
 
   const resolvedModelId = useMemo(() => {
-    if (models.length === 0) {
-      return selectedModelId;
-    }
-    const storedMissingFromCatalog =
-      selectedModelId !== undefined &&
-      !models.some(propEq("id", selectedModelId));
     return ChatModelStorage.resolveChatModelId({
       availableModels: models,
       selectedModelId,
-      honorStoredWhenMissing: isLoading && storedMissingFromCatalog,
     });
-  }, [models, selectedModelId, isLoading]);
+  }, [models, selectedModelId]);
 
   useEffect(
     function persistSelectedOfflineModel() {
-      if (!resolvedModelId) {
-        return;
-      }
       const localModelId =
         OfflineChatPickerModels.parseModelId(resolvedModelId);
       if (localModelId) {
@@ -75,82 +68,40 @@ export function ChatModelPicker({
 
   useEffect(
     function writeResolvedModelIdToStorage() {
-      if (!resolvedModelId) {
-        return;
-      }
-      const storedModelId = ChatModelStorage.readStoredChatModelId();
-      if (
-        isLoading &&
-        storedModelId &&
-        !models.some(propEq("id", storedModelId))
-      ) {
-        return;
-      }
-      if (storedModelId === resolvedModelId) {
+      if (ChatModelStorage.readStoredChatModelId() === resolvedModelId) {
         return;
       }
       ChatModelStorage.writeStoredChatModelId(resolvedModelId);
     },
-    [resolvedModelId, models, isLoading],
+    [resolvedModelId],
   );
 
   // Register the resolved model id with assistant-ui's ModelContext so the
   // chat adapter can read `context.config.modelName` on each run.
   useEffect(
     function registerResolvedModelIdWithAssistantUi() {
-      if (resolvedModelId) {
-        assistantClient.modelContext().register({
-          getModelContext: () => {
-            return {
-              config: {
-                modelName: resolvedModelId,
-              },
-            };
-          },
-        });
-      }
+      // `register` returns an unsubscribe; returning it as the effect cleanup
+      // is what assistant-ui's own `makeAssistantVisible` does. Without it,
+      // every model switch and every remount permanently appends a provider
+      // to the registry. Behavior stays correct (the last registration wins)
+      // but the list grows without bound.
+      return assistantClient.modelContext().register({
+        getModelContext: () => {
+          return {
+            config: {
+              modelName: resolvedModelId,
+            },
+          };
+        },
+      });
     },
     [assistantClient, resolvedModelId],
   );
 
-  const selectedModel =
-    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
-
-  const filteredGroups = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) {
-      return groups;
-    }
-    return groups
-      .map((entry) => {
-        const groupMatches = entry.group.toLowerCase().includes(query);
-        const matchingModels = entry.models.filter((model) => {
-          if (groupMatches) {
-            return true;
-          }
-          return (
-            model.name.toLowerCase().includes(query) ||
-            model.id.toLowerCase().includes(query)
-          );
-        });
-        return { ...entry, models: matchingModels };
-      })
-      .filter((entry) => {
-        return entry.models.length > 0;
-      });
-  }, [groups, search]);
+  const selectedModel = models.find(propEq("id", resolvedModelId));
 
   const tooltipLabel =
-    isLoading ? t`Loading models...`
-    : selectedModel ? t`Using ${selectedModel.name}`
-    : t`Choose a model`;
-
-  const isTriggerDisabled =
-    disabled || (isLoading && !hasDownloadedOfflineModels) || !resolvedModelId;
-
-  if (isError && !hasDownloadedOfflineModels) {
-    return null;
-  }
+    selectedModel ? t`Using ${selectedModel.name}` : t`Choose a model`;
 
   return (
     <Combobox
@@ -165,14 +116,21 @@ export function ChatModelPicker({
       }}
     >
       <Tooltip label={tooltipLabel} disabled={combobox.dropdownOpened}>
-        <Combobox.Target>
+        {/*
+          `targetType="button"` matters now that the search input is gone and
+          the trigger is the focused element. Mantine's default `"input"`
+          gives the button `aria-activedescendant` without `role="combobox"`
+          or `aria-expanded`, which screen readers do not announce, and it
+          skips the Space/Enter handling that a button target expects.
+        */}
+        <Combobox.Target targetType="button" withExpandedAttribute>
           <Button
             type="button"
             variant="light"
             color="neutral"
             size="compact-sm"
             className={css.trigger}
-            disabled={isTriggerDisabled}
+            disabled={disabled}
             aria-label={t`Choose chat model`}
             onClick={() => {
               combobox.toggleDropdown();
@@ -185,47 +143,36 @@ export function ChatModelPicker({
 
       {combobox.dropdownOpened ?
         <Combobox.Dropdown className={css.dropdown}>
-          <Combobox.Search
-            value={search}
-            onChange={(event) => {
-              setSearch(event.currentTarget.value);
-              combobox.updateSelectedOptionIndex();
-            }}
-            placeholder={t`Search models`}
-            aria-label={t`Search models`}
-          />
           <Combobox.Options className={css.options}>
-            {filteredGroups.length > 0 ?
-              filteredGroups.map((entry) => {
-                return (
-                  <Combobox.Group label={entry.group} key={entry.group}>
-                    {entry.models.map((model) => {
-                      const isSelected = model.id === resolvedModelId;
-                      return (
-                        <Combobox.Option
-                          value={model.id}
-                          key={model.id}
-                          active={isSelected}
-                        >
-                          <Group gap="xs" wrap="nowrap" justify="space-between">
-                            <Text size="sm" className={css.optionLabel}>
-                              {model.name}
-                            </Text>
-                            {isSelected ?
-                              <IconCheck
-                                size={14}
-                                className={css.selectedIcon}
-                                aria-hidden
-                              />
-                            : null}
-                          </Group>
-                        </Combobox.Option>
-                      );
-                    })}
-                  </Combobox.Group>
-                );
-              })
-            : <Combobox.Empty>{t`No models match your search`}</Combobox.Empty>}
+            {groups.map((entry) => {
+              return (
+                <Combobox.Group label={entry.group} key={entry.group}>
+                  {entry.models.map((model) => {
+                    const isSelected = model.id === resolvedModelId;
+                    return (
+                      <Combobox.Option
+                        value={model.id}
+                        key={model.id}
+                        active={isSelected}
+                      >
+                        <Group gap="xs" wrap="nowrap" justify="space-between">
+                          <Text size="sm" className={css.optionLabel}>
+                            {model.name}
+                          </Text>
+                          {isSelected ?
+                            <IconCheck
+                              size={14}
+                              className={css.selectedIcon}
+                              aria-hidden
+                            />
+                          : null}
+                        </Group>
+                      </Combobox.Option>
+                    );
+                  })}
+                </Combobox.Group>
+              );
+            })}
           </Combobox.Options>
         </Combobox.Dropdown>
       : null}

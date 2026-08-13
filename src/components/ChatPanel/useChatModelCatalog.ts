@@ -1,9 +1,7 @@
-import { useQuery } from "@avandar/query-hooks";
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useMemo } from "react";
-import { APIClient } from "@/clients/APIClient";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/useChatModelCatalog/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
@@ -11,31 +9,37 @@ import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModel
 type UseChatModelCatalogResult = {
   groups: ChatModelOption.OptionGroup[];
   models: ChatModelOption.T[];
-  isLoading: boolean;
-  isError: boolean;
-  hasDownloadedOfflineModels: boolean;
 };
 
 /**
- * Cloud OpenRouter catalog plus downloaded offline models in an "Offline
- * models" group at the top of the picker.
+ * The curated cloud catalog plus any downloaded offline models, as picker
+ * groups.
+ *
+ * The cloud catalog is a compile-time constant, so there is nothing to fetch
+ * and no loading or error state. Group labels live here rather than in the
+ * shared catalog module because only the client can translate them, and the
+ * shared module also has to run under Deno where Lingui is unavailable.
  */
 export function useChatModelCatalog(): UseChatModelCatalogResult {
   const { t } = useLingui();
   const getLocalChatModelCopy = useLocalChatModelCopy();
-  const [cloudGroups = [], isLoading, queryResult] = useQuery({
-    queryKey: ["chat", "models"],
-    queryFn: async () => {
-      const response = await APIClient.get({
-        route: "chat/models",
-        queryParams: { useCache: true },
-      });
-      return response.groups;
-    },
-    staleTime: 60 * 60 * 1000, // 1 hour
-  });
-
   const downloadedOfflineIds = useDownloadedLocalChatModelIds();
+
+  const cloudGroups = useMemo(() => {
+    const modelsInTier = (
+      licenseTier: ChatModelOption.LicenseTier,
+    ): ChatModelOption.T[] => {
+      return ChatModelOption.Catalog.values.filter((model) => {
+        return model.licenseTier === licenseTier;
+      });
+    };
+    return [
+      { group: t`Frontier models`, models: modelsInTier("proprietary") },
+      { group: t`Open models`, models: modelsInTier("open") },
+    ].filter((entry) => {
+      return entry.models.length > 0;
+    });
+  }, [t]);
 
   const offlineGroup = useMemo(() => {
     return OfflineChatPickerModels.buildGroup(
@@ -56,8 +60,5 @@ export function useChatModelCatalog(): UseChatModelCatalogResult {
   return {
     groups,
     models,
-    isLoading,
-    isError: queryResult.isError,
-    hasDownloadedOfflineModels: downloadedOfflineIds.length > 0,
   };
 }

@@ -1,9 +1,11 @@
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   CHAT_MODEL_LOCAL_STORAGE_KEY,
   ChatModelStorage,
 } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
+
+const DEFAULT_MODEL_ID = ChatModelOption.Catalog.defaultId;
 
 describe("chatModelStorage", () => {
   beforeEach(() => {
@@ -11,45 +13,47 @@ describe("chatModelStorage", () => {
   });
 
   it("round-trips the selected model id", () => {
-    ChatModelStorage.writeStoredChatModelId("anthropic/claude-3.5-sonnet");
+    ChatModelStorage.writeStoredChatModelId("z-ai/glm-5.2");
     expect(window.localStorage.getItem(CHAT_MODEL_LOCAL_STORAGE_KEY)).toBe(
-      "anthropic/claude-3.5-sonnet",
+      "z-ai/glm-5.2",
     );
   });
 
   it("uses the stored model when it is still available", () => {
     const modelId = ChatModelStorage.resolveChatModelId({
-      availableModels: [
-        { id: GlobalAppConfig.chat.defaultModelId },
-        { id: "anthropic/claude-3.5-sonnet" },
-      ],
-      selectedModelId: "anthropic/claude-3.5-sonnet",
+      availableModels: [{ id: DEFAULT_MODEL_ID }, { id: "z-ai/glm-5.2" }],
+      selectedModelId: "z-ai/glm-5.2",
     });
-    expect(modelId).toBe("anthropic/claude-3.5-sonnet");
+    expect(modelId).toBe("z-ai/glm-5.2");
   });
 
-  it("honors a stored id that is not in the catalog yet when requested", () => {
-    const modelId = ChatModelStorage.resolveChatModelId({
-      availableModels: [{ id: "offline:qwen-1.5b" }],
-      storedModelId: "anthropic/claude-3.5-sonnet",
-      honorStoredWhenMissing: true,
-    });
-    expect(modelId).toBe("anthropic/claude-3.5-sonnet");
-  });
-
-  it("falls back to the default when storage is empty or stale", () => {
+  it("falls back to the default when the stored id is stale", () => {
+    // A user who picked openai/gpt-5.4 before the catalog shrank lands here.
     expect(
       ChatModelStorage.resolveChatModelId({
-        availableModels: [{ id: GlobalAppConfig.chat.defaultModelId }],
-        selectedModelId: "removed/vendor-model",
+        availableModels: [{ id: DEFAULT_MODEL_ID }],
+        selectedModelId: "openai/gpt-5.4",
       }),
-    ).toBe(GlobalAppConfig.chat.defaultModelId);
+    ).toBe(DEFAULT_MODEL_ID);
+  });
 
+  it("falls back to the default when storage is empty", () => {
     expect(
       ChatModelStorage.resolveChatModelId({
-        availableModels: [{ id: "vendor/only-model" }],
+        availableModels: [{ id: DEFAULT_MODEL_ID }],
         selectedModelId: undefined,
       }),
-    ).toBe("vendor/only-model");
+    ).toBe(DEFAULT_MODEL_ID);
+  });
+
+  it("falls back to the first available model when the default is missing", () => {
+    // The offline-only case: the user has a downloaded local model and no
+    // cloud default in the list.
+    expect(
+      ChatModelStorage.resolveChatModelId({
+        availableModels: [{ id: "offline:qwen-1.5b" }],
+        selectedModelId: undefined,
+      }),
+    ).toBe("offline:qwen-1.5b");
   });
 });

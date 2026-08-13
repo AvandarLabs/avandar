@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 export const CHAT_MODEL_LOCAL_STORAGE_KEY = "ava.chat.selectedModel" as const;
 
@@ -32,36 +32,35 @@ export const ChatModelStorage = {
 
   /**
    * Resolves the preferred usable model id from the available catalog.
+   *
+   * This answers "which of the models we are currently showing should be
+   * selected", which is a presentation question. The security question, "may we
+   * spend money on this model", is answered server-side by
+   * `enforceChatModelAllowlist`. Both reference `Catalog.defaultId`, but the
+   * two must stay separate: this one legitimately consults a client-supplied
+   * `availableModels` list, which is exactly why it cannot be the enforcement
+   * point.
    */
   resolveChatModelId: ({
     availableModels,
     selectedModelId,
-    storedModelId,
-    honorStoredWhenMissing = false,
   }: Readonly<{
     availableModels: ReadonlyArray<{ id: string }>;
     selectedModelId?: string;
-    storedModelId?: string;
-    honorStoredWhenMissing?: boolean;
   }>): string => {
-    const resolvedStoredModelId =
-      storedModelId !== undefined ? storedModelId : _readStoredChatModelId();
-    const candidateModelId = selectedModelId ?? resolvedStoredModelId;
+    const candidateModelId = selectedModelId ?? _readStoredChatModelId();
     const isCandidateAvailable =
       candidateModelId !== undefined &&
       availableModels.some(propEq("id", candidateModelId));
+    const defaultModelId = ChatModelOption.Catalog.defaultId;
     const isDefaultAvailable = availableModels.some(
-      propEq("id", GlobalAppConfig.chat.defaultModelId),
+      propEq("id", defaultModelId),
     );
 
     return (
-      (
-        isCandidateAvailable ||
-          (honorStoredWhenMissing && candidateModelId !== undefined)
-      ) ?
-        candidateModelId
-      : isDefaultAvailable ? GlobalAppConfig.chat.defaultModelId
-      : (availableModels[0]?.id ?? GlobalAppConfig.chat.defaultModelId)
+      isCandidateAvailable ? candidateModelId
+      : isDefaultAvailable ? defaultModelId
+      : (availableModels[0]?.id ?? defaultModelId)
     );
   },
 };
