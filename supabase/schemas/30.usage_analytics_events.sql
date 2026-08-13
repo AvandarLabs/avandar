@@ -111,3 +111,76 @@ select
         w.owner_id = auth.uid ()
     )
   );
+
+-- Maps a stable event name to its funnel stage. This is the single source of
+-- truth for `usage_analytics_events.event_category`, and
+-- `tr__usage_analytics_events__set_category` is its only caller.
+--
+-- The mapping lives in SQL rather than in the TypeScript event registry
+-- because Postgres triggers emit many of these events and cannot read
+-- TypeScript. `shared/analytics/analyticsEvents.ts` mirrors it for developer
+-- reference, and a Vitest drift guard fails if the two disagree.
+--
+-- An unknown name returns `other` rather than raising: recording analytics
+-- must never reject a user action.
+--
+-- @param p_event_name: the event's stable name
+-- @returns: the event's funnel stage
+create or replace function public.util__analytics_event_category (
+  p_event_name text
+) returns public.usage_analytics_events__category as $$
+  select (
+    case p_event_name
+      -- acquisition
+      when 'waitlist.code_verified' then 'acquisition'
+      when 'waitlist.code_claimed' then 'acquisition'
+      when 'user.registered' then 'acquisition'
+      when 'user.email_confirmed' then 'acquisition'
+      -- activation
+      when 'workspace.created' then 'activation'
+      when 'dataset.imported' then 'activation'
+      when 'query.ran' then 'activation'
+      when 'dashboard.published' then 'activation'
+      -- engagement
+      when 'user.signed_in' then 'engagement'
+      when 'chat.message_sent' then 'engagement'
+      when 'chat.sql_generated' then 'engagement'
+      when 'chat.turn_completed' then 'engagement'
+      when 'chat.turn_failed' then 'engagement'
+      when 'dashboard.block_added_via_chat' then 'engagement'
+      when 'dashboard.filter_changed' then 'engagement'
+      when 'dashboard.share_settings_updated' then 'engagement'
+      when 'dashboard.pdf_export_opened' then 'engagement'
+      when 'dashboard.pdf_exported' then 'engagement'
+      when 'query.failed' then 'engagement'
+      -- expansion
+      when 'workspace.invite_sent' then 'expansion'
+      when 'workspace.invite_accepted' then 'expansion'
+      when 'member.removed' then 'expansion'
+      when 'dashboard.public_viewed' then 'expansion'
+      -- revenue
+      when 'subscription.created' then 'revenue'
+      when 'subscription.plan_changed' then 'revenue'
+      when 'subscription.status_changed' then 'revenue'
+      else 'other'
+    end
+  )::public.usage_analytics_events__category;
+$$ language sql immutable;
+
+-- Forces `event_category` to agree with `event_name`.
+--
+-- Runs BEFORE INSERT for two reasons: it satisfies the column's NOT NULL
+-- constraint when a caller omits the value, and it deliberately overwrites a
+-- caller-supplied value. Reporting groups by this column, so it must never
+-- disagree with the event name, and no client is trusted to get it right.
+--
+-- @returns: trigger
+create or replace function public.usage_analytics_events__set_category () returns trigger as $$
+begin
+  new.event_category := public.util__analytics_event_category(new.event_name);
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger tr__usage_analytics_events__set_category before insert on public.usage_analytics_events for each row
+execute function public.usage_analytics_events__set_category ();
