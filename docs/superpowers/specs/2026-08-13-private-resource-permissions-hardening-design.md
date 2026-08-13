@@ -223,12 +223,67 @@ existing per-type `select`. `v_is_public` is new and must be added to that
 Composing inline rather than calling `util__is_resource_private_to_owner` avoids
 a second row fetch in a function that RLS calls per row.
 
-### 4.1 What deliberately does not change
+### 4.1 Closing the `resource_shares` self-grant bypass
+
+Narrowing `util__resource_effective_role` is sufficient for the *read* helpers
+(parent §4.3), but not on its own. `17.rls.resource_shares.sql` grants
+`util__is_settings_admin` **unconditionally**, as a disjunct that does not
+consult `util__auth_user_can_access_resource`:
+
+```sql
+create policy "Resource admins can insert resource_shares" ... with check (
+    public.util__is_settings_admin (resource_shares.workspace_id) or
+    public.util__auth_user_can_access_resource (..., 'admin')
+);
+```
+
+A Settings Admin could therefore insert a share row granting **themselves**
+`admin` on a resource private to someone else. That row makes
+`util__has_non_owner_share` true, the resource stops being private, and the
+narrowed short-circuit hands them `admin`. Two statements, full read access, no
+audit trail.
+
+UPDATE is the same hole reached differently: repoint an existing share row's
+`resource_id` at a private resource, which the `with check` permits for the same
+reason.
+
+Both policies must gate the admin disjunct:
+
+```sql
+  (
+    public.util__is_settings_admin (resource_shares.workspace_id) and
+    not public.util__is_resource_private_to_owner (
+      resource_shares.resource_type,
+      resource_shares.resource_id
+    )
+  ) or
+  public.util__auth_user_can_access_resource (
+    resource_shares.resource_type,
+    resource_shares.resource_id,
+    'admin'
+  )
+```
+
+The second disjunct still lets the **owner** share their own private resource,
+which is exactly how a resource stops being private. That is intended.
+
+**DELETE stays unchanged.** Removing a share row can only reduce access, so it
+cannot escalate. An admin deleting the last non-owner share makes a resource
+private and locks themselves out, which is correct and only the owner can
+reverse.
+
+Like §5.3, these are policy rewrites, so `supabase db diff` will not capture
+them reliably; they need hand-written `drop policy` / `create policy` migrations.
+
+### 4.2 What deliberately does not change
 
 - The **resource-owner** short-circuit above it. An owner is always admin on
   their own resource.
 - Both `util__can_manage_workspace_settings` bypasses in
   `util__auth_user_may_select_dashboard` and `_dataset` (parent §4.3).
+- The `resource_shares` SELECT and DELETE policies (§4.1). SELECT lets any
+  member read share rows workspace-wide, but a private resource has no share
+  rows by definition, so nothing about it leaks.
 - The editor-block logic in both `may_select_*` helpers.
 - `util__is_settings_admin` and `util__can_manage_workspace_settings`
   themselves. They are used for genuine settings management across
@@ -417,11 +472,16 @@ Per the mandatory declarative-schema workflow:
    select).
 2. Add `supabase/schemas/70.rpc_workspaces__private_resource_counts.sql` and
    `supabase/schemas/70.rpc_resources__transfer_ownership.sql`, one RPC each.
-3. Edit `supabase/schemas/30.usage_analytics_events.sql` for the widened policy.
-4. `supabase stop`, then `supabase db diff -f private_resource_permissions`.
-5. Hand-write the policy drop/create migration (§5.3), since diff misses
-   `ALTER POLICY`.
-6. Review the generated migration for unintended destructive changes.
+3. Edit `supabase/schemas/17.rls.resource_shares.sql` for the INSERT and UPDATE
+   narrowing (§4.1).
+4. Edit `supabase/schemas/30.usage_analytics_events.sql` for the widened policy.
+5. `supabase stop`, then `supabase db diff -f <name>` per logical group.
+6. Hand-write the policy drop/create migrations for steps 3 and 4, since diff
+   does not reliably capture policy changes.
+7. Review every generated migration for unintended destructive changes.
+
+Granular migrations are the established pattern here; see the three separate
+`harden_datasets_dashboards_*_rls` migrations from 2026-05-13.
 
 No table or column changes, so `apps/desktop/migrations` needs no regeneration.
 Confirm with `apps/desktop/scripts/check-sqlite-migrations`.
@@ -544,6 +604,20 @@ only `util__resource_effective_role`. Parent §4.3 relies on those helpers
 bailing at their `can_access_resource` gate before reaching their own bypass; if
 that call order ever changes, only a test at this level catches it.
 
+New file `resource_shares_private_resource_guard.test.sql`, covering §4.1:
+
+- A Settings Admin cannot insert a share row on a resource private to another
+  member, for dashboards and datasets.
+- A Settings Admin cannot update an existing share row's `resource_id` to point
+  at a private resource.
+- A Settings Admin **can** still insert and update shares on non-private
+  resources, so the narrowing did not break legitimate admin sharing.
+- The resource **owner** can insert a share on their own private resource, which
+  is how it stops being private.
+- Deleting shares still works for admins, and deleting the last non-owner share
+  makes the resource private (asserted via
+  `util__is_resource_private_to_owner`).
+
 New file `rpc_resources__transfer_ownership.test.sql`:
 
 - Settings Admin can transfer; `owner_id` **and** `owner_profile_id` both move,
@@ -586,8 +660,31 @@ member, then reassign it and confirm the count moves.
 | An admin workflow silently depended on reading members' restricted resources. | The pre-deploy count query in §6.2 sizes the exposure. Nothing in-repo depends on it, but a support or ops habit might. |
 | `owner_profile_id` forgotten in the transfer RPC, leaving the offboarding deadlock unresolved while the RPC reports success. Applies to both tables. | Called out in §5.2 step 5 and asserted in pgTAP for dashboards and datasets. |
 | Someone later adds a super-user bypass to a `may_select_*` helper above its `can_access_resource` gate, silently reopening the hole. | The §7.1 requirement to assert through the `may_select_*` helpers, not only `effective_role`. |
+| Another unconditional super-user disjunct exists somewhere that grants a write which in turn grants a read, as the `resource_shares` policies did (§4.1). | Audited during design; see §8.1. Re-audit whenever a new policy references `util__is_settings_admin` or `util__can_manage_workspace_settings`. |
 | Performance regression: `effective_role` runs per row under RLS and now sometimes runs an extra `exists` on `resource_shares`. | The composed predicate short-circuits on `v_is_restricted`, so unrestricted resources (the common case) never run the subquery. The restricted path uses the existing `idx_resource_shares__resource`. |
 | Security-definer functions with a wrong `search_path` become an injection vector. | All new functions set `search_path = public`, matching every existing helper. |
+
+---
+
+### 8.1 Escalation audit
+
+Every other site referencing `util__is_settings_admin` or
+`util__can_manage_workspace_settings` was checked for the §4.1 shape, a write
+permitted unconditionally that in turn manufactures a read. All are closed.
+
+| Site | Grants | Why it cannot reach a private resource |
+| --- | --- | --- |
+| `07.role_groups.rls.sql`, `07.role_group_app_roles.rls.sql` | Edit the per-app role matrix | A private resource is `is_restricted`, so the app-role default never applies to it. Raising your own app role changes nothing. |
+| `07.rls.user_groups.sql`, `10.user_groups__memberships.sql` | Create groups, add yourself to one | A private resource has no `user_group` share to match. |
+| `18.user_workspace_policies.sql` (`workspaces` UPDATE) | Reassign `owner_id`, so an admin can make themselves workspace owner | Workspace owners are **not** short-circuited in `util__resource_effective_role`, and the `may_select_*` `can_manage_workspace_settings` bypass sits behind the `can_access_resource` gate (parent §4.3). Becoming owner grants nothing here. |
+| `18.user_workspace_policies.sql` (`workspace_memberships` DELETE) | Remove another member | `util__resource_effective_role` keys on the **caller's** membership, not the owner's, so removing the owner grants the admin nothing. It does strand the resource, since the `dashboards` UPDATE policy requires `owner_id` to still be a workspace member; that is an argument for the transfer RPC, not a read hole. |
+| `18.user_workspace_policies.sql` (`user_profiles` DELETE) | Delete a member's profile | `owner_profile_id` is `on delete no action` on both resource tables, so the delete is refused. |
+| `60.rpc_datasets__add_dataset.sql` | Create a dataset | Creating a new resource says nothing about an existing one. |
+
+Post-fix, an admin also cannot flip `is_restricted` on a private resource:
+`dashboards` and `datasets` UPDATE route through
+`util__auth_user_can_update_resource` to `can_access_resource(editor)` to the
+narrowed `effective_role`, which returns `null`.
 
 ---
 
