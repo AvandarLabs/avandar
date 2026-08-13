@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
 import { ANALYTICS_EVENT_NAMES } from "$/analytics/analyticsEvents/analyticsEvents.ts";
+import { describe, expect, it } from "vitest";
 
 /**
  * The database owns the name-to-category mapping because Postgres triggers

@@ -1,5 +1,4 @@
 set check_function_bodies = off;
-
 CREATE OR REPLACE FUNCTION public.usage_analytics_events__set_category()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -56,5 +55,4 @@ $function$
 ;
 
 CREATE TRIGGER tr__usage_analytics_events__set_category BEFORE INSERT ON public.usage_analytics_events FOR EACH ROW EXECUTE FUNCTION public.usage_analytics_events__set_category();
-
 

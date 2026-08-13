@@ -237,12 +237,19 @@ exception
   when others then
     null;
 end;
-$$ language plpgsql security definer set search_path = '';
+$$ language plpgsql security definer
+set
+  search_path = '';
 
-revoke execute on function public.util__log_analytics_event (
+revoke
+execute on function public.util__log_analytics_event (
   text,
   uuid,
   uuid,
   public.app_type,
   jsonb
-) from public, anon, authenticated;
+)
+from
+  public,
+  anon,
+  authenticated;

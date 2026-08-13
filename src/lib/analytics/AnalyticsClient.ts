@@ -56,7 +56,7 @@ function createAnalyticsClient(): WithLogger<
             throw sessionResult.error;
           }
 
-          const userId = sessionResult.data.session?.user.id ?? null;
+          const userId = sessionResult.data.session?.user.id ?? undefined;
 
           if (!userId) {
             return;
