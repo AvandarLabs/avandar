@@ -1,5 +1,6 @@
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -56,54 +57,10 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       group: "Legend",
       control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
     },
-    {
-      key: "chartStyle.xAxis.label",
-      label: "X axis label",
-      group: "X axis",
-      control: { kind: "text" },
-    },
-    {
-      key: "chartStyle.xAxis.labelColor",
-      label: "X axis label color",
-      group: "X axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.xAxis.tickColor",
-      label: "X axis tick color",
-      group: "X axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.xAxis.hide",
-      label: "Hide X axis",
-      group: "X axis",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.yAxis.label",
-      label: "Y axis label",
-      group: "Y axis",
-      control: { kind: "text" },
-    },
-    {
-      key: "chartStyle.yAxis.labelColor",
-      label: "Y axis label color",
-      group: "Y axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.yAxis.tickColor",
-      label: "Y axis tick color",
-      group: "Y axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.yAxis.hide",
-      label: "Hide Y axis",
-      group: "Y axis",
-      control: { kind: "switch" },
-    },
+    ...makeAxisDescriptors<LineChartVizConfig>("xAxis", "category", {
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<LineChartVizConfig>("yAxis", "value"),
     {
       key: "chartStyle.grid.color",
       label: "Gridline color",
