@@ -173,7 +173,7 @@ the visibility condition it needs (§4.2).
 
 | Consumer | Condition |
 | --- | --- |
-| Phase 1 (§7.F) | Gates the three super-user bypasses on `not private_to_owner`. |
+| Phase 1 (§7.F) | Gates the Settings-Admin short-circuit in `util__resource_effective_role` on `not private_to_owner`. That single edit is sufficient; see §4.3. |
 | Phase 1 (§7.I) | Counts, per `owner_id`: `private_to_owner and visibility <> 'public'` for dashboards; `private_to_owner` for datasets. |
 | Phase 4 (§7.H) | Counts dashboards where `visibility <> 'draft' and (visibility = 'public' or not private_to_owner)`. |
 
@@ -218,6 +218,39 @@ add `and not is_public` when gating the Settings-Admin bypass. The consequence
 there is defensible and intended: an admin retains public *read* access through
 the anon policy while losing *edit* rights on a public-but-restricted dashboard
 its owner never shared with them.
+
+### 4.3 One short-circuit, not three
+
+An earlier draft of this document called for narrowing three super-user
+bypasses. Reading the call order shows that only one edit is needed, because the
+other two are already gated by the first.
+
+In both `util__auth_user_may_select_dashboard` and
+`util__auth_user_may_select_dataset`, the call sequence is:
+
+```
+if not util__auth_user_can_access_resource(<type>, <id>, 'viewer')  -- line 487
+  then return false
+if util__can_manage_workspace_settings(v_ws) then return true       -- line 495
+```
+
+`util__auth_user_can_access_resource` resolves through
+`util__resource_effective_role`, which is precisely where the Settings-Admin
+short-circuit lives. Narrow that short-circuit and `effective_role` returns
+`null` for a private resource, so `can_access_resource` returns false and both
+helpers bail at line 487, never reaching their own bypass.
+
+The two `util__can_manage_workspace_settings` lines therefore stay **untouched**.
+They remain reachable only for resources that are *not* private to their owner,
+where letting an admin through (specifically, past the editor-block that
+follows) is the existing and correct behavior.
+
+A related note on workspace owners: they are not short-circuited in
+`util__resource_effective_role` at all, so they already cannot read a
+restricted-with-no-shares resource unless they are also a Settings Admin. In
+practice they always are, because `rpc_workspaces__create_with_owner` assigns
+the built-in Global Admin role group at workspace creation. The single edit
+therefore covers both super-user paths.
 
 ---
 
@@ -483,9 +516,8 @@ and let RLS decide; `DashboardCard` badges for yours / shared with you /
 published to workspace / public (defect §1.2.3).
 
 **F. Permissions hardening.** `util__is_resource_private_to_owner`; narrow the
-three super-user bypasses in `16.utils.resource-permissions.sql`
-(`util__resource_effective_role`, `util__auth_user_may_select_dashboard`,
-`util__auth_user_may_select_dataset`); pgTAP truth-table updates across
+Settings-Admin short-circuit in `util__resource_effective_role`, which is
+sufficient on its own (§4.3); pgTAP truth-table updates across
 `resource_rls_role_matrix.test.sql`,
 `rls_datasets_dashboards_manager_writes.test.sql`, and
 `rls_phase3_policies.test.sql`; update `docs/permissions-architecture.md`,
@@ -552,9 +584,12 @@ not a follow-up.
 - The §4.2 case explicitly: a dashboard with `visibility = 'public'` and
   `is_restricted = true` and no shares must count against the plan limit and
   must **not** appear in the admin private-resource counts.
-- Each of the three narrowed bypasses: Settings Admin and workspace owner can
-  still read unrestricted and explicitly-shared resources, and cannot read
-  `private_to_owner` ones, for dashboards **and** datasets.
+- The narrowed short-circuit: Settings Admin and workspace owner can still read
+  unrestricted and explicitly-shared resources, and cannot read
+  `private_to_owner` ones, for dashboards **and** datasets. Assert through
+  `util__auth_user_may_select_dashboard` / `_dataset` as well as
+  `util__resource_effective_role`, since §4.3 relies on the former bailing
+  before its own bypass.
 - Both entitlement-crossing paths from §5.3, across free / paid / inactive /
   missing subscription.
 - `rpc_resources__transfer_ownership`: admin may reassign, non-admin may not,
