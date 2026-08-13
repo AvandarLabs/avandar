@@ -66,7 +66,7 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 | `src/views/GISApp/layers/toFeatureCollection/toFeatureCollection.ts` | rows -> GeoJSON + drop report |
 | `src/views/GISApp/layers/computeBounds/computeBounds.ts` | bounds for every geometry type |
 | `src/views/GISApp/layers/computeLayerStats/computeLayerStats.ts` | value domain for data-driven paint |
-| `src/views/GISApp/layers/createMapSpec/createLayerSpec.ts` | one layer -> MapLibre JSON |
+| `src/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec.ts` | one layer -> MapLibre JSON |
 | `src/views/GISApp/layers/createMapSpec/createMapSpec.ts` | ordered layers -> merged `MapSpec` |
 | `src/views/GISApp/layers/createMapSpec/MapSpec.types.ts` | `MapSpec`, `MapSourceSpec`, `MapLayerSpec` |
 | `src/views/GISApp/layers/useMapLayerData/useMapLayerData.ts` | per-layer cached query |
@@ -1557,8 +1557,8 @@ This is where the three duplicated paint blocks collapse into one pure function.
 
 **Files:**
 - Create: `src/views/GISApp/layers/createMapSpec/MapSpec.types.ts`
-- Create: `src/views/GISApp/layers/createMapSpec/createLayerSpec.ts`
-- Test: `src/views/GISApp/layers/createMapSpec/createLayerSpec.test.ts`
+- Create: `src/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec.ts`
+- Test: `src/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec.test.ts`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1566,7 +1566,7 @@ This is where the three duplicated paint blocks collapse into one pure function.
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec";
+import { createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
@@ -3182,7 +3182,7 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { computeBounds } from "@/views/GISApp/layers/computeBounds/computeBounds";
 import { computeLayerStats } from "@/views/GISApp/layers/computeLayerStats/computeLayerStats";
-import { buildLayerId, createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec";
+import { buildLayerId, createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec";
 import { createMapSpec } from "@/views/GISApp/layers/createMapSpec/createMapSpec";
 import { toFeatureCollection } from "@/views/GISApp/layers/toFeatureCollection/toFeatureCollection";
 import { useMapLayerData } from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
