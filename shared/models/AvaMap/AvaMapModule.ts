@@ -17,7 +17,7 @@ export const AvaMapModule = {
    * A new, empty map with the default basemap and camera and no layers.
    * @param name The map's display name, already localized by the caller.
    */
-  makeEmpty: ({ name }: { name: string }): AvaMapRead => {
+  makeEmpty: (name: string): AvaMapRead => {
     return Model.make("AvaMap", {
       id: uuid<AvaMapId>(),
       version: 1,
