@@ -69,13 +69,30 @@ the workspace-wide default (applying the user’s normal app role to every
 resource of that app) does **not** grant access; explicit shares (and owner /
 Settings Admin paths) still do.
 
-**Workspace owner** - `workspaces.owner_id`; always effective `admin`
-everywhere in that workspace; cannot be revoked by shares or role edits.
+**Private to owner** - A resource with `is_restricted = true` and no
+`resource_shares` row whose principal is anyone other than the owner. Readable
+by its owner alone: not by Settings Admins, not by the workspace owner.
+Computed by `util__is_resource_private_to_owner`, or by
+`util__has_non_owner_share` when the caller already holds the row. A public
+dashboard is never private however `is_restricted` is set.
+
+**Workspace owner** - `workspaces.owner_id`; effective `admin` on workspace
+settings and, for resources, via `util__can_manage_workspace_settings` in the
+`util__auth_user_may_select_*` helpers (not via a short-circuit inside
+`util__resource_effective_role`; see §4 step 1). Like Settings Admins, this
+does not reach resources **private to their owner**, because `may_select_*`
+gates on `util__auth_user_can_access_resource` before its own
+`util__can_manage_workspace_settings` bypass.
 
 **Settings Admin (Global Admin)** - A user whose effective `settings` app role
 (from their membership’s `role_group_app_roles` row for `settings`) is
 `admin`; treated as `admin` across apps for enforcement shortcuts in the
-resolution algorithm (see §4).
+resolution algorithm (see §4). This short-circuit does **not** apply to
+resources that are **private to their owner**: `is_restricted = true` with no
+`resource_shares` row granting any principal other than the owner. Public
+dashboards are exempt from that exclusion, since the anon policy already
+exposes them. Mirrors Google Drive: an organisation admin cannot read an
+employee’s private document.
 
 ---
 
@@ -83,12 +100,18 @@ resolution algorithm (see §4).
 
 Think of candidates contributing an effective role like CSS cascade layers: **all
 qualified candidates are combined by `max(rank)`**, not “first match wins,”
-except where a path **short-circuits** (owner, Settings Admin).
+except where a path **short-circuits** (resource owner, Settings Admin).
 
 **Intuitive precedence (strongest signal first):**
 
-1. Workspace owner → always `admin` (short-circuit).
-2. Settings Admin → always `admin` (short-circuit).
+1. **Resource owner** (`owner_id`) → always `admin` (short-circuit). The
+   *workspace* owner is not short-circuited here; they reach resources via
+   `util__can_manage_workspace_settings` in the `may_select_*` helpers (see §4
+   step 1), and that path is also excluded from resources **private to their
+   owner**.
+2. Settings Admin → `admin` (short-circuit), **unless** the resource is
+   **private to its owner** (see §2). Public dashboards are exempt from that
+   exclusion.
 3. Direct **user** share on the resource → strong grant; still merged with
    others via `max` (the “inline style” that almost always dominates).
 4. **User group** share where the user is in that group (filtered by
@@ -100,9 +123,9 @@ except where a path **short-circuits** (owner, Settings Admin).
 
 ```mermaid
 flowchart TD
-  start([user + resource]) --> owner{workspace owner?}
+  start([user + resource]) --> owner{resource owner?}
   owner -->|yes| admin1[return admin]
-  owner -->|no| settings{Settings Admin?}
+  owner -->|no| settings{Settings Admin AND not private-to-owner?}
   settings -->|yes| admin2[return admin]
   settings -->|no| shares[collect share candidates]
   shares --> restricted{is_restricted?}
@@ -121,8 +144,20 @@ This is the intended behavior for `util__resource_effective_role(p_resource_type
 p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 `admin (3) > editor (2) > viewer (1)`. Compute `effective_role := max(candidates)`.
 
-1. If the user is **owner** of the workspace → `admin` (short-circuit).
-2. If the user is **Settings Admin** (Global Admin) → `admin` (short-circuit).
+1. If the user is the **resource owner** (`owner_id`) → `admin` (short-circuit).
+   Note: the **workspace** owner is *not* short-circuited here. They reach
+   resources via `util__can_manage_workspace_settings` in the
+   `util__auth_user_may_select_*` helpers, and via
+   `util__auth_user_meets_min_app_role` for INSERT. Because the `may_select_*`
+   helpers gate on `util__auth_user_can_access_resource` (this function)
+   before applying that bypass, the workspace owner is also excluded from
+   resources **private to their owner**, same as Settings Admins.
+2. If the user is **Settings Admin** (Global Admin) → `admin` (short-circuit),
+   **unless** the resource is **private to its owner**: `is_restricted = true`
+   with no `resource_shares` row granting any principal other than the owner.
+   Public dashboards are exempt from that exclusion, since the anon policy
+   already exposes them. Mirrors Google Drive: an organisation admin cannot
+   read an employee’s private document.
 3. If a **direct user** share exists for this resource → include its `role`.
    This row is the strongest share signal but is still combined with other
    candidates by `max`.
@@ -187,6 +222,19 @@ flowchart LR
 
 - `user_roles` kept temporarily for product semantics (`admin` / `member`); may
   diverge from the role-group matrix until the final cleanup phase.
+
+**Functions (permission helpers, `supabase/schemas/16.utils.resource-permissions.sql`
+unless noted)**
+
+| Function                                        | Purpose                                                                                                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `util__resource_effective_role`                  | The resolution algorithm in §4; owner and Settings-Admin short-circuits, then merged shares/app-role.                    |
+| `util__auth_user_can_access_resource`             | Effective role at or above a minimum, used by RLS policies.                                                              |
+| `util__has_non_owner_share`                       | True when any `resource_shares` row grants a principal other than the owner passed in. No row lookup; RLS-hot.          |
+| `util__is_resource_private_to_owner`              | True when a resource is restricted with no non-owner share. Looks the row up by id; not for RLS-hot paths.               |
+| `rpc_workspaces__private_resource_counts`         | Per-member counts of private resources for a workspace, for Settings Admins (`supabase/schemas/70.rpc_workspaces__private_resource_counts.sql`). |
+| `rpc_resources__transfer_ownership`               | Reassigns one resource's `owner_id` (`supabase/schemas/70.rpc_resources__transfer_ownership.sql`).                       |
+| `rpc_workspaces__transfer_all_owned_resources`     | Bulk wrapper over the above, by owner (`supabase/schemas/71.rpc_workspaces__transfer_all_owned_resources.sql`).          |
 
 ```mermaid
 erDiagram
@@ -305,6 +353,11 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
   `is_restricted` suppresses the workspace-wide app-role default and the user
   receives no role.
 
+  As of the private-resource hardening this is a real guarantee: Settings
+  Admins and the workspace owner are excluded too. An admin can see a *count*
+  of your private resources in Workspace settings → Privacy log, and can
+  reassign ownership, but can never read them.
+
 **Whole workspace viewer on one resource**
 
 - Add a **workspace** principal share at `viewer`; combine with stronger per-user
@@ -321,6 +374,8 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 - No arbitrary SQL predicates inside shares - only typed principals and
   `role_level`.
 - Role groups are presets, not runtime-evaluated formulas.
+- No admin read access to resources private to their owner, and no break-glass
+  path. Admins get counts and ownership transfer only.
 
 ---
 
@@ -334,6 +389,8 @@ rg 'util__(get_auth_user_app_role|get_auth_user_user_group_ids|resource_effectiv
 rg 'useHasPermission|useUserAppRoles|useResourceRole|useIsGlobalAdmin' src
 rg 'ShareResourceModal|WorkspaceUserPermissions|workspace_invites' src
 rg "WorkspaceRole|'admin'\\s*\\|\\s*'member'" shared/models src
+rg 'util__(has_non_owner_share|is_resource_private_to_owner)' supabase/schemas src
+rg 'rpc_(workspaces__private_resource_counts|resources__transfer_ownership)' supabase src
 ```
 
 ---
