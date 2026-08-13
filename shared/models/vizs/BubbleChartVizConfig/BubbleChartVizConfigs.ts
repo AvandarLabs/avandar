@@ -29,20 +29,25 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
-const descriptors: VizSettingDescriptors<BubbleChartVizConfig, BubbleSeries> = {
+const DESCRIPTORS = {
   chart: [
-    ...makeAxisDescriptors<BubbleChartVizConfig>("xAxis", "value", {
+    ...makeAxisDescriptors<BubbleChartVizConfig>({
+      axis: "xAxis",
+      role: "value",
       rotation: true,
     }),
-    ...makeAxisDescriptors<BubbleChartVizConfig>("yAxis", "value"),
+    ...makeAxisDescriptors<BubbleChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
   ],
   series: [],
-};
+} as const satisfies VizSettingDescriptors<BubbleChartVizConfig, BubbleSeries>;
 
 export const BubbleChartVizConfigs = {
   vizType: "bubble",
   displayName: "Bubble Chart",
-  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
+  descriptors: DESCRIPTORS as unknown as AnyVizSettingDescriptors,
 
   /** Create an empty bubble chart config. */
   makeEmptyConfig: (): BubbleChartVizConfig => {

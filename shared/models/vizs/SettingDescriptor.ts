@@ -29,6 +29,17 @@
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { Paths } from "type-fest";
 
+/** Stable identifiers for groups rendered by visualization settings forms. */
+export type VizSettingGroup =
+  | "X axis"
+  | "Y axis"
+  | "Category axis"
+  | "Legend"
+  | "Style"
+  | "Layout"
+  | "Grid"
+  | "Identity";
+
 // ---------------------------------------------------------------------
 // Control specifications
 // ---------------------------------------------------------------------
@@ -108,8 +119,8 @@ export type ChartSettingDescriptor<TConfig> = {
   key: Paths<TConfig> & string;
   /** Label shown next to the control in the form. */
   label: string;
-  /** Optional group header used to cluster related settings. */
-  group?: string;
+  /** Optional group used to cluster related settings. */
+  group?: VizSettingGroup;
   /** Which UI widget renders this setting. */
   control: ControlSpec;
 };
@@ -125,8 +136,8 @@ export type SeriesSettingDescriptor<TSeries> = {
   key: Paths<TSeries> & string;
   /** Label shown next to the control in the form. */
   label: string;
-  /** Optional group header used to cluster related settings. */
-  group?: string;
+  /** Optional group used to cluster related settings. */
+  group?: VizSettingGroup;
   /** Which UI widget renders this setting. */
   control: ControlSpec;
   /**
@@ -166,14 +177,14 @@ export type VizSettingDescriptors<TConfig, TSeries> = {
 export type AnyChartSettingDescriptor = {
   key: string;
   label: string;
-  group?: string;
+  group?: VizSettingGroup;
   control: ControlSpec;
 };
 
 export type AnySeriesSettingDescriptor = {
   key: string;
   label: string;
-  group?: string;
+  group?: VizSettingGroup;
   control: ControlSpec;
   composable: boolean;
   appliesTo: RenderAs | "radar";
@@ -184,12 +195,7 @@ export type AnyVizSettingDescriptors = {
   series: readonly AnySeriesSettingDescriptor[];
 };
 
-/**
- * Empty descriptor registry. Used by viz modules that have not yet
- * been refactored to use the descriptor-driven form (pie, funnel, and
- * table). Their forms remain hand-coded for now and can be migrated
- * later.
- */
+/** Empty descriptor registry for pie, funnel, and table modules. */
 export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],
   series: [],

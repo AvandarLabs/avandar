@@ -44,8 +44,7 @@ export type AxisStyle = {
 
   /**
    * Tick label rotation in degrees, -90 to 90. Unset or `0` means
-   * horizontal. Only wired for the X axis; the field lives on the
-   * shared axis type so adding Y rotation later needs no type change.
+   * horizontal. The X axis uses this field; other axes ignore it.
    */
   tickAngle?: number;
 };

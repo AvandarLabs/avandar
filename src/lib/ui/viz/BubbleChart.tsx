@@ -6,7 +6,6 @@
  * can compare multiple independent clouds of bubbles on the same canvas.
  */
 import { Box } from "@mantine/core";
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import {
   CartesianGrid,
@@ -19,8 +18,7 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
+import { useBubbleChartStyleProps } from "@/lib/ui/viz/axis/useBubbleChartStyleProps/useBubbleChartStyleProps";
 import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
@@ -71,33 +69,12 @@ export function BubbleChart({
     });
   }, [data, series]);
 
-  // Both axes are value axes here, so the X extent comes from each
-  // series' own `xKey` column rather than from a single category key.
-  const xExtent = useAxisValueExtent(data, chartStyle?.xAxis, series, "xKey");
-  const yExtent = useAxisValueExtent(data, chartStyle?.yAxis, series, "key");
-
-  // A multi-series bubble chart draws X values from several columns, so
-  // the tick labels come from the already-transformed point arrays
-  // instead of from one keyed column.
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    return seriesData.flatMap((entry) => {
-      return entry.points.map((point) => {
-        return formatChartNumber(point.x, { compact: true });
-      });
-    });
-  }, [seriesData, chartStyle?.xAxis?.tickAngle]);
-
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      xExtent,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("bubble"),
-    });
-  }, [chartStyle, xExtent, yExtent, xTickLabels]);
+  const styleProps = useBubbleChartStyleProps({
+    data,
+    series,
+    seriesData,
+    chartStyle,
+  });
 
   const showLegend = series.length > 1;
 

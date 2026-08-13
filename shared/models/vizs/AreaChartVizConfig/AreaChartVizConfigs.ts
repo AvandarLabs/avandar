@@ -70,10 +70,15 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
       group: "Legend",
       control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
     },
-    ...makeAxisDescriptors<AreaChartVizConfig>("xAxis", "category", {
+    ...makeAxisDescriptors<AreaChartVizConfig>({
+      axis: "xAxis",
+      role: "category",
       rotation: true,
     }),
-    ...makeAxisDescriptors<AreaChartVizConfig>("yAxis", "value"),
+    ...makeAxisDescriptors<AreaChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
     {
       key: "chartStyle.grid.color",
       label: "Gridline color",

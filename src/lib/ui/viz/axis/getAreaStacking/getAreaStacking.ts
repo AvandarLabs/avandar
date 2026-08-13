@@ -1,3 +1,4 @@
+import { matchLiteral } from "@avandar/utils";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 
 /**
@@ -18,19 +19,12 @@ export type AreaStacking = {
   sharedStackId: string | undefined;
 };
 
-/**
- * How an area layout stacks, for extent purposes.
- *
- * `split` counts as stacked: it sets `stackOffset: "sign"`, which stacks
- * positives upward and negatives downward, and `computeValueExtent`
- * already sums the two signs separately within a bucket. `percent` sets
- * `stackOffset: "expand"`, which normalizes each column to sum to 1 and
- * only formats the ticks as percentages, so its real domain is 0 to 1
- * rather than 0 to 100.
- */
+/** Returns the percentage mode and shared stack identifier for a layout. */
 export function getAreaStacking(layout: AreaLayout): AreaStacking {
-  return {
-    isPercent: layout === "percent",
-    sharedStackId: layout === "default" ? undefined : AREA_STACK_ID,
-  };
+  return matchLiteral(layout, {
+    default: { isPercent: false, sharedStackId: undefined },
+    stacked: { isPercent: false, sharedStackId: AREA_STACK_ID },
+    percent: { isPercent: true, sharedStackId: AREA_STACK_ID },
+    split: { isPercent: false, sharedStackId: AREA_STACK_ID },
+  });
 }

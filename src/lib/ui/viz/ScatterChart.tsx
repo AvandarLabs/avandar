@@ -1,8 +1,6 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
+import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { UnknownDataFrame } from "@avandar/utils";
@@ -51,33 +49,12 @@ export function ScatterChart({
     });
   }, [data, series]);
 
-  // Both axes are value axes here, so the X extent comes from each
-  // series' own `xKey` column rather than from a single category key.
-  const xExtent = useAxisValueExtent(data, chartStyle?.xAxis, series, "xKey");
-  const yExtent = useAxisValueExtent(data, chartStyle?.yAxis, series, "key");
-
-  // A multi-series scatter draws X values from several columns, so the
-  // tick labels come from the already-transformed point arrays instead
-  // of from one keyed column.
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    return scatterSeries.flatMap((s) => {
-      return s.data.map((point) => {
-        return formatChartNumber(point.x);
-      });
-    });
-  }, [scatterSeries, chartStyle?.xAxis?.tickAngle]);
-
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      xExtent,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("scatter"),
-    });
-  }, [chartStyle, xExtent, yExtent, xTickLabels]);
+  const styleProps = useScatterChartStyleProps({
+    data,
+    series,
+    scatterSeries,
+    chartStyle,
+  });
 
   const isSingleSeries = series.length === 1;
   const firstSeries = series[0];

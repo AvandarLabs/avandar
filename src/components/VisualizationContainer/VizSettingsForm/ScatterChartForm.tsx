@@ -13,18 +13,13 @@ type Props = {
   onConfigChange: (newConfig: ScatterPlotVizConfig) => void;
 };
 
-/**
- * Settings form for the multi-series scatter plot. Delegates series
- * management to `PairSeriesFieldset` (which owns the per-series `xKey`
- * that the shared descriptor-driven series editor cannot express) and
- * the chart-level settings to `ChartSettingsFieldsets`.
- */
+/** Renders settings for a multi-series scatter plot. */
 export function ScatterChartForm({
   fields,
   config,
   onConfigChange,
 }: Props): JSX.Element {
-  const updateChartPath = useUpdateSettingPath(config, onConfigChange);
+  const updateChartPath = useUpdateSettingPath({ config, onConfigChange });
 
   return (
     <Stack gap="sm">

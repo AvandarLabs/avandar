@@ -175,8 +175,8 @@ msgstr " {chartName} haiwezi kuonyeshwa."
 msgid "Allow online syncing"
 msgstr "Ruhusu usawazishaji mtandaoni"
 
+#: src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
 
@@ -243,6 +243,10 @@ msgstr "Panua"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "Wito wa kuzingatia"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Style"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -334,6 +338,10 @@ msgstr "Kosa lisilojulikana"
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {datasetName} kwa "
 "muda"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show legend"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
@@ -595,6 +603,10 @@ msgstr "Kurekebisha nenosiri kunahitaji muunganisho wa intaneti."
 msgid "Symbol size"
 msgstr "Ukubwa wa alama"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr ""
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -764,6 +776,10 @@ msgstr "Muktadha"
 msgid "Enter email"
 msgstr "Ingiza barua pepe"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -839,6 +855,10 @@ msgstr "Funga mazungumzo (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Kuunda kumeshindikana"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Natural"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -948,6 +968,10 @@ msgstr "Kawaida"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Wakati"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1193,6 +1217,10 @@ msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
 msgstr "Anwani ya barua pepe"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Smooth"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Enter a name for the field"
@@ -1447,6 +1475,10 @@ msgstr "Inaelewa swali lako…"
 msgid "The workspace ID cannot be empty"
 msgstr "Kitambulisho cha workspace hakiwezi kuwa tupu"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide Y axis"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
 msgstr "au"
@@ -1472,6 +1504,10 @@ msgstr "Majukumu & Ruhusa"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
 msgstr "Unganisha na Google Sheets"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "100% stacked"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1517,6 +1553,10 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
 "wa mapema."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Step"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -1531,6 +1571,7 @@ msgstr "Ingiza data"
 msgid "Descending"
 msgstr "Kushuka"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "Mhimili wa jamii"
@@ -1613,6 +1654,7 @@ msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 msgid "Show SQL"
 msgstr "Onyesha SQL"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "Gridi"
@@ -1747,6 +1789,10 @@ msgstr "Muktadha wa data"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Mapitio ya data"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Gridline color"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -1940,6 +1986,10 @@ msgstr "Safu wima ya 11"
 msgid "Column 7"
 msgstr "Safu wima ya 7"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show dots"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
@@ -1955,6 +2005,10 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "SQL haikutekelezwa. Kubali thamani za vichujio zilizokadiriwa ili "
 "kuendesha swali hili."
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Identity"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1989,6 +2043,10 @@ msgstr "Filita za ndani (zinazoweza kuhaririwa na mtazamaji, chati hii pekee)"
 msgid "Invalid X axis selected"
 msgstr "X axis isiyo sahihi imechaguliwa"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "mfano. cholera-outbreak-2024"
@@ -2022,6 +2080,10 @@ msgstr "{0} safu zimebainishwa. Angalia taarifa za safu hapa chini ili "
 msgid "text"
 msgstr "maandishi"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Split (+/-)"
+msgstr ""
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "Hai"
@@ -2037,6 +2099,10 @@ msgstr "Thibitisha Kitendo"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "Mapitio ya Data"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2117,6 +2183,10 @@ msgstr "Rudi kwa mhariri"
 msgid "about a minute"
 msgstr "takriban dakika moja"
 
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Y axis"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
 msgstr "Safu wima ya 9"
@@ -2150,6 +2220,10 @@ msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "Inanasa dashibodi…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2185,6 +2259,10 @@ msgstr "Safu ya ukubwa"
 msgid "Values"
 msgstr "Thamani"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label color"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
@@ -2198,6 +2276,10 @@ msgstr "Ongeza block ya Kichujio kwenye dashibodi ili kuwezesha uchujaji wa "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "Kamili"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Legend position"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2299,6 +2381,10 @@ msgstr "Malipo Yamefanikiwa!"
 msgid "Answered"
 msgstr "Jibu"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Straight"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
 msgid "Loading datasets..."
@@ -2383,6 +2469,10 @@ msgstr "Imepakuliwa kwenye kivinjari hiki"
 msgid "Pay monthly"
 msgstr "Lipa kila mwezi"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Vertical gridlines"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Chagua mfano"
@@ -2419,6 +2509,10 @@ msgstr "Pakia CSV"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "Picha"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide X axis"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2528,6 +2622,10 @@ msgstr "Hapa ndipo unachagua ni safu zipi kutoka kwenye seti zipi za data "
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
 msgstr "Unda"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stroke width"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -2693,6 +2791,10 @@ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 msgid "Generating SQL…"
 msgstr "Inazalisha SQL…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Kupakua mfano wa mtandaoni kumeshindikana"
@@ -2737,6 +2839,10 @@ msgstr "Tutongeza picha hii kwenye dashibodi yako mpya."
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "Inarekebisha hoja…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Horizontal gridlines"
+msgstr ""
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
@@ -2816,6 +2922,10 @@ msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya 
 msgid "View"
 msgstr "Tazama"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Area layout"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "Haipatikani"
@@ -2876,12 +2986,17 @@ msgstr "Kuna karatasi moja tu katika karatasi hii ya excel."
 msgid "Make dataset offline-only?"
 msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "Rangi"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label"
+msgstr ""
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -2903,6 +3018,10 @@ msgstr "Jina la Safu"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "Kubwa"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Line width"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3324,6 +3443,10 @@ msgstr "Chaguo la mandhari"
 msgid "Title"
 msgstr "Kichwa"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Curve"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "Safu wima ya 4"
@@ -3347,6 +3470,10 @@ msgstr "Wakati wa kujibu"
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Could not remove offline chat model"
 msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Legend"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -3408,6 +3535,10 @@ msgstr "Tarehe"
 msgid "recently"
 msgstr "hivi karibuni"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Overlapping"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "Pakua"
@@ -3436,6 +3567,10 @@ msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 msgid "Turn"
 msgstr "Geuza"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
 msgstr "Isiyo na mpangilio"
@@ -3458,6 +3593,7 @@ msgstr "{fieldName} lazima iwe na urefu wa angalau {minLength} wahusika"
 msgid "System sans"
 msgstr "Mfumo sans"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3575,6 +3711,7 @@ msgstr "katika"
 msgid "Inactive"
 msgstr "Haifanyi kazi"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Kulia"
@@ -3682,6 +3819,10 @@ msgstr "Inatafuta thamani katika {column}…"
 msgid "Email"
 msgstr "Barua pepe"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick color"
+msgstr ""
+
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -3766,6 +3907,10 @@ msgstr "Data hii inaonekana ina taarifa za afya au za mgonjwa. Kutuma kwa mtoa "
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Anza kwa kuchunguza eneo lako la kazi au kupakia dataset yako ya "
 "kwanza."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stacked"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
@@ -4177,6 +4322,7 @@ msgstr "Seti hii ya data ni ya mtandaoni pekee. Bonyeza kuruhusu usawazishaji "
 msgid "Global filters"
 msgstr "Vichujio vya kimataifa"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
 msgstr "Mpangilio"
@@ -4350,6 +4496,10 @@ msgstr "Idadi ya viti vya kuongeza"
 msgid "Pay What You Want"
 msgstr "Lipa Unachotaka"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar layout"
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
 msgstr "Tafadhali chagua dataset kutoka kwenye sidebar ya kushoto, au unda "
@@ -4395,6 +4545,7 @@ msgstr "Onyesha lebo"
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr "Qwen 2.5 1.5B (nje ya mtandao)"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "Msingi wa X"
@@ -4601,6 +4752,10 @@ msgstr "Hakuna safu za nambari zinazopatikana kuongezwa kwenye mfululizo huu."
 msgid "You haven't chosen a name column"
 msgstr "Hujachagua safu ya jina"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Grouped"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "You need admin access on this resource to manage sharing."
 msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
@@ -4610,6 +4765,10 @@ msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stack group"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -4810,6 +4969,7 @@ msgstr "Hakuna safu zilizosomeka kwa mafanikio"
 msgid "New user group"
 msgstr "Kikundi kipya cha mtumiaji"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Kushoto"
@@ -5211,6 +5371,10 @@ msgid "This removes the user group from members and resources that use it."
 msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 "zinazotumia hiyo."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Top"
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "Kutoka kwa kichocheo chako:"
@@ -5291,6 +5455,10 @@ msgstr "Hifadhi Dataset"
 msgid "Sidebar position"
 msgstr "Msimamo wa upau wa pembeni"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick color"
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Tafuta dashibodi"
@@ -5331,6 +5499,10 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 msgstr "{0} safu zimegundulika. Angalia taarifa za safu hapa chini ili "
 "kuhakikisha ni sahihi. Ikiwa si sahihi, badilisha chaguzi za kuagiza "
 "hapo juu na bonyeza Pakia tena."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label color"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
@@ -5529,6 +5701,10 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa "
 "chini pia kunarudisha hapa."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Fill opacity"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
@@ -5673,6 +5849,10 @@ msgstr "Hatua zinazopendekezwa zifuatazo"
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "Kutoka safu: <0>{columnName}</0>"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bottom"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"

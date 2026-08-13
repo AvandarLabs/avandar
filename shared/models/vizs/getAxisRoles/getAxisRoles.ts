@@ -1,4 +1,4 @@
-import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
 /**
  * Which kind of scale an axis uses. Minimum, maximum, and tick interval
@@ -7,17 +7,27 @@ import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
  */
 export type AxisRole = "category" | "value";
 
+/** The scale roles assigned to the X and Y axes. */
 export type AxisRoles = { x: AxisRole; y: AxisRole };
 
-const CATEGORY_X: AxisRoles = { x: "category", y: "value" };
-const BOTH_VALUE: AxisRoles = { x: "value", y: "value" };
-const NEITHER: AxisRoles = { x: "category", y: "category" };
+const CATEGORY_X = {
+  x: "category",
+  y: "value",
+} as const satisfies AxisRoles;
+const BOTH_VALUE = {
+  x: "value",
+  y: "value",
+} as const satisfies AxisRoles;
+const NEITHER = {
+  x: "category",
+  y: "category",
+} as const satisfies AxisRoles;
 
 /**
  * Exhaustive so that adding a viz type is a compile error here rather
  * than a silently wrong axis form.
  */
-const AXIS_ROLES_BY_VIZ_TYPE: Record<VizType, AxisRoles> = {
+const AXIS_ROLES_BY_VIZ_TYPE = {
   bar: CATEGORY_X,
   line: CATEGORY_X,
   area: CATEGORY_X,
@@ -27,17 +37,9 @@ const AXIS_ROLES_BY_VIZ_TYPE: Record<VizType, AxisRoles> = {
   pie: NEITHER,
   funnel: NEITHER,
   table: NEITHER,
-};
+} as const satisfies Record<VizConfig.Type, AxisRoles>;
 
-/**
- * The axis roles for a viz type. Read by descriptor authoring (which
- * controls exist) and by `applyChartStyle` (whether to resolve a
- * numeric domain for an axis).
- *
- * Horizontal bar orientation will need bar's roles swapped to
- * `{ x: "value", y: "category" }`, which is why this is a lookup rather
- * than a hardcoded constant at each call site.
- */
-export function getAxisRoles(vizType: VizType): AxisRoles {
-  return AXIS_ROLES_BY_VIZ_TYPE[vizType];
+/** Returns the X and Y axis roles for a visualization type. */
+export function getAxisRoles(vizType: VizConfig.Type): AxisRoles {
+  return { ...AXIS_ROLES_BY_VIZ_TYPE[vizType] };
 }

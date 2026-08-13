@@ -178,8 +178,8 @@ msgstr "O {chartName} não pode ser exibido."
 msgid "Allow online syncing"
 msgstr "Permitir sincronização online"
 
+#: src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "Configurações do gráfico"
 
@@ -246,6 +246,10 @@ msgstr "Expandir"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "Destaque"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Style"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -337,6 +341,10 @@ msgstr "Erro desconhecido"
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "Adicione um gráfico de linhas mostrando tendências em {datasetName} ao "
 "longo do tempo"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show legend"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
@@ -599,6 +607,10 @@ msgstr "A redefinição de senha requer uma conexão com a internet."
 msgid "Symbol size"
 msgstr "Tamanho do símbolo"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr ""
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -767,6 +779,10 @@ msgstr "Intervalo"
 msgid "Enter email"
 msgstr "Digite o e-mail"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -843,6 +859,10 @@ msgstr "Fechar chat (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Falha ao criar"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Natural"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -952,6 +972,10 @@ msgstr "Personalizado"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Carimbo de data/hora"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1196,6 +1220,10 @@ msgstr "O URL personalizado pode conter apenas letras minúsculas, números e "
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
 msgstr "Endereço de e-mail"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Smooth"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Enter a name for the field"
@@ -1454,6 +1482,10 @@ msgstr "Entendendo sua pergunta…"
 msgid "The workspace ID cannot be empty"
 msgstr "O ID do workspace não pode estar vazio"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide Y axis"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
 msgstr "ou"
@@ -1479,6 +1511,10 @@ msgstr "Funções e Permissões"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
 msgstr "Conectar ao Google Sheets"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "100% stacked"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1524,6 +1560,10 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "Por favor, <0>nos envie um e-mail</0> se você gostaria de acesso "
 "antecipado."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Step"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -1538,6 +1578,7 @@ msgstr "Importar dados"
 msgid "Descending"
 msgstr "Decrescente"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "Eixo de categoria"
@@ -1620,6 +1661,7 @@ msgstr "Cada série é uma coluna numérica plotada no eixo Y. Os valores são "
 msgid "Show SQL"
 msgstr "Mostrar SQL"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "Grade"
@@ -1754,6 +1796,10 @@ msgstr "Escopo de dados"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Pré-visualização de dados"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Gridline color"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -1946,6 +1992,10 @@ msgstr "Coluna 11"
 msgid "Column 7"
 msgstr "Coluna 7"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show dots"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
@@ -1961,6 +2011,10 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "O SQL não foi aplicado. Aprove as condições de filtro presumidas para "
 "executar esta consulta."
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Identity"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1995,6 +2049,10 @@ msgstr "Filtros locais (editáveis pelo visualizador, apenas este gráfico)"
 msgid "Invalid X axis selected"
 msgstr "Eixo X inválido selecionado"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "ex. surto-de-colera-2024"
@@ -2027,6 +2085,10 @@ msgstr "{0} colunas foram detectadas. Revise as informações das colunas abaixo
 msgid "text"
 msgstr "texto"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Split (+/-)"
+msgstr ""
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "Ativo"
@@ -2042,6 +2104,10 @@ msgstr "Confirmar Ação"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "Pré-visualização de Dados"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2122,6 +2188,10 @@ msgstr "Voltar para o editor"
 msgid "about a minute"
 msgstr "cerca de um minuto"
 
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Y axis"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
 msgstr "Coluna 9"
@@ -2154,6 +2224,10 @@ msgstr "Modelo de chat offline pronto. Clique para mudar ou baixar novamente."
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "Capturando painel…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2189,6 +2263,10 @@ msgstr "Coluna de tamanho"
 msgid "Values"
 msgstr "Valores"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label color"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Sobre seu espaço de trabalho"
@@ -2202,6 +2280,10 @@ msgstr "Adicione um bloco de Filtro ao painel para habilitar filtragem global "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "Completo"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Legend position"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2303,6 +2385,10 @@ msgstr "Checkout bem-sucedido!"
 msgid "Answered"
 msgstr "Respondido"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Straight"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
 msgid "Loading datasets..."
@@ -2387,6 +2473,10 @@ msgstr "Baixado neste navegador"
 msgid "Pay monthly"
 msgstr "Pagar mensalmente"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Vertical gridlines"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Escolha um modelo"
@@ -2423,6 +2513,10 @@ msgstr "Carregar CSV"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "Imagem"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide X axis"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2532,6 +2626,10 @@ msgstr "É aqui que você seleciona quais colunas de quais conjuntos de dados "
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
 msgstr "Criar"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stroke width"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -2699,6 +2797,10 @@ msgstr "Conte quantas linhas existem em {datasetName}"
 msgid "Generating SQL…"
 msgstr "Gerando SQL…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Falha ao baixar o modelo offline"
@@ -2742,6 +2844,10 @@ msgstr "Adicionaremos esta visualização ao seu novo painel."
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "Reparando a consulta…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Horizontal gridlines"
+msgstr ""
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
@@ -2821,6 +2927,10 @@ msgstr "Modelo instruct 7B de alta qualidade. Ideal para esquemas difíceis e "
 msgid "View"
 msgstr "Ver"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Area layout"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "Indisponível"
@@ -2882,12 +2992,17 @@ msgstr "Há apenas uma planilha neste arquivo do Excel."
 msgid "Make dataset offline-only?"
 msgstr "Tornar o conjunto de dados apenas offline?"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "Cor"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label"
+msgstr ""
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -2909,6 +3024,10 @@ msgstr "Nome da coluna"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "Grande"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Line width"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3333,6 +3452,10 @@ msgstr "Seletor de tema"
 msgid "Title"
 msgstr "Título"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Curve"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "Coluna 4"
@@ -3356,6 +3479,10 @@ msgstr "Tempo de resposta"
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Could not remove offline chat model"
 msgstr "Não foi possível remover o modelo de chat offline"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Legend"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -3417,6 +3544,10 @@ msgstr "Data"
 msgid "recently"
 msgstr "recentemente"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Overlapping"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "Baixar"
@@ -3445,6 +3576,10 @@ msgstr "Sem filtros de linha. A fatia incluirá todas as linhas no conjunto de "
 msgid "Turn"
 msgstr "Virar"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
 msgstr "Não ordenada"
@@ -3467,6 +3602,7 @@ msgstr "{fieldName} deve ter pelo menos {minLength} caracteres"
 msgid "System sans"
 msgstr "Sistema sans"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3584,6 +3720,7 @@ msgstr "entre"
 msgid "Inactive"
 msgstr "Inativo"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "Direita"
@@ -3692,6 +3829,10 @@ msgstr "Buscando valores em {column}…"
 msgid "Email"
 msgstr "E-mail"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick color"
+msgstr ""
+
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -3776,6 +3917,10 @@ msgstr "Esses dados parecem conter informações de saúde ou do paciente. "
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Comece explorando seu espaço de trabalho ou carregando seu primeiro "
 "conjunto de dados."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stacked"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
@@ -4188,6 +4333,7 @@ msgstr "Este conjunto de dados é apenas offline. Clique para permitir "
 msgid "Global filters"
 msgstr "Filtros globais"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
 msgstr "Layout"
@@ -4360,6 +4506,10 @@ msgstr "Número de assentos a adicionar"
 msgid "Pay What You Want"
 msgstr "Pague o que quiser"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar layout"
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
 msgstr "Por favor, selecione um conjunto de dados na barra lateral esquerda ou "
@@ -4404,6 +4554,7 @@ msgstr "Mostrar rótulos"
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr "Qwen 2.5 1.5B (offline)"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "Eixo X"
@@ -4611,6 +4762,10 @@ msgstr "Nenhuma coluna numérica disponível para adicionar a esta série."
 msgid "You haven't chosen a name column"
 msgstr "Você não escolheu uma coluna de nome"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Grouped"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "You need admin access on this resource to manage sharing."
 msgstr "Você precisa de acesso de administrador a este recurso para gerenciar o "
@@ -4620,6 +4775,10 @@ msgstr "Você precisa de acesso de administrador a este recurso para gerenciar o
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Se houver múltiplos valores de {fieldName} para um {0}, então..."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stack group"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -4820,6 +4979,7 @@ msgstr "Nenhuma linha foi lida com sucesso"
 msgid "New user group"
 msgstr "Novo grupo de usuários"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "Esquerda"
@@ -5221,6 +5381,10 @@ msgstr "Remover filtro local"
 msgid "This removes the user group from members and resources that use it."
 msgstr "Isso remove o grupo de usuários de membros e recursos que o utilizam."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Top"
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "Do seu prompt:"
@@ -5302,6 +5466,10 @@ msgstr "Salvar Conjunto de Dados"
 msgid "Sidebar position"
 msgstr "Posição da barra lateral"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick color"
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "Pesquisar painéis"
@@ -5342,6 +5510,10 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 msgstr "{0} colunas foram detectadas. Revise as informações das colunas abaixo "
 "para garantir que estão corretas. Se não estiverem, altere as opções de "
 "importação acima e clique em Carregar novamente."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label color"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
@@ -5541,6 +5713,10 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "Melhor para compartilhamento boca a boca. Visitar o link permanente "
 "abaixo também redireciona para cá."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Fill opacity"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Para confirmar, digite <0>{confirmationTarget}</0> abaixo:"
@@ -5686,6 +5862,10 @@ msgstr "Próximos passos recomendados"
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "Da coluna: <0>{columnName}</0>"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bottom"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"

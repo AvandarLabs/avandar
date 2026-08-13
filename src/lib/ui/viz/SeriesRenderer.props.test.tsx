@@ -394,7 +394,7 @@ describe("RadarChart — series settings reach Mantine", () => {
   });
 });
 
-describe("BarChart — axis scale and rotation", () => {
+describe("BarChart: axis scale and rotation", () => {
   it("passes an explicit Y domain and generated ticks", () => {
     renderBar({
       ...BAR_BASELINE,
@@ -493,7 +493,7 @@ describe("BarChart — axis scale and rotation", () => {
   });
 });
 
-describe("LineChart — axis scale and rotation", () => {
+describe("LineChart: axis scale and rotation", () => {
   it("passes an explicit Y domain and generated ticks", () => {
     renderLine({
       ...LINE_BASELINE,
@@ -535,7 +535,7 @@ describe("LineChart — axis scale and rotation", () => {
   });
 });
 
-function renderScatter(chartStyle?: ChartStyle): void {
+function _renderScatter(chartStyle?: ChartStyle): void {
   render(
     <AvandarAppProvider>
       <ScatterChart
@@ -547,9 +547,9 @@ function renderScatter(chartStyle?: ChartStyle): void {
   );
 }
 
-describe("ScatterChart — both axes are value axes", () => {
+describe("ScatterChart: both axes are value axes", () => {
   it("bounds the X axis", () => {
-    renderScatter({ xAxis: { min: 0, max: 4, tickInterval: 1 } });
+    _renderScatter({ xAxis: { min: 0, max: 4, tickInterval: 1 } });
     const props = lastProps<{
       xAxisProps?: { domain?: unknown; ticks?: number[] };
     }>(mantineScatterChartMock);
@@ -558,7 +558,7 @@ describe("ScatterChart — both axes are value axes", () => {
   });
 
   it("bounds the Y axis", () => {
-    renderScatter({ yAxis: { min: 0, max: 40, tickInterval: 20 } });
+    _renderScatter({ yAxis: { min: 0, max: 40, tickInterval: 20 } });
     const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
       mantineScatterChartMock,
     );
@@ -566,7 +566,7 @@ describe("ScatterChart — both axes are value axes", () => {
   });
 
   it("derives the X extent from the xKey column, not the Y column", () => {
-    renderScatter({ xAxis: { tickInterval: 1 } });
+    _renderScatter({ xAxis: { tickInterval: 1 } });
     const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
       mantineScatterChartMock,
     );
@@ -576,19 +576,19 @@ describe("ScatterChart — both axes are value axes", () => {
   });
 
   it("prefers a configured axis label over the derived column name", () => {
-    renderScatter({ xAxis: { label: "Spend" } });
+    _renderScatter({ xAxis: { label: "Spend" } });
     const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
     expect(props.xAxisLabel).toBe("Spend");
   });
 
-  it("still derives the axis label from the column when unset", () => {
-    renderScatter(undefined);
+  it("derives the axis label from the column when unset", () => {
+    _renderScatter(undefined);
     const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
     expect(props.xAxisLabel).toBe("v");
   });
 
   it("labels each axis exactly once", () => {
-    renderScatter({ xAxis: { label: "Spend" } });
+    _renderScatter({ xAxis: { label: "Spend" } });
     const props = lastProps<{
       xAxisLabel?: string;
       xAxisProps?: { label?: unknown };
@@ -600,7 +600,7 @@ describe("ScatterChart — both axes are value axes", () => {
   });
 
   it("rotates X tick labels", () => {
-    renderScatter({ xAxis: { tickAngle: -90 } });
+    _renderScatter({ xAxis: { tickAngle: -90 } });
     const props = lastProps<{
       xAxisProps?: { tick?: { angle?: number }; interval?: number };
     }>(mantineScatterChartMock);
@@ -609,7 +609,7 @@ describe("ScatterChart — both axes are value axes", () => {
   });
 
   it("adds no domain or ticks when nothing is configured", () => {
-    renderScatter(undefined);
+    _renderScatter(undefined);
     const props = lastProps<{
       xAxisProps?: { domain?: unknown; ticks?: unknown };
     }>(mantineScatterChartMock);

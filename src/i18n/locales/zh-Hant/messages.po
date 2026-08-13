@@ -170,8 +170,8 @@ msgstr "無法顯示 {chartName}。"
 msgid "Allow online syncing"
 msgstr "允許在線同步"
 
+#: src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
 msgstr "圖表設定"
 
@@ -236,6 +236,10 @@ msgstr "展開"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "標註框"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Style"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -324,6 +328,10 @@ msgstr "未知錯誤"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show legend"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
@@ -577,6 +585,10 @@ msgstr "重設密碼需要連接到互聯網。"
 msgid "Symbol size"
 msgstr "符號大小"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr ""
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -735,6 +747,10 @@ msgstr "範圍"
 msgid "Enter email"
 msgstr "輸入電子郵件"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -807,6 +823,10 @@ msgstr "關閉聊天 (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "創建失敗"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Natural"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -916,6 +936,10 @@ msgstr "自定義"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "時間戳"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1155,6 +1179,10 @@ msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
 msgid "Email address"
 msgstr "電子郵件地址"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Smooth"
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Enter a name for the field"
 msgstr "為該欄位輸入名稱"
@@ -1392,6 +1420,10 @@ msgstr "正在了解您的問題…"
 msgid "The workspace ID cannot be empty"
 msgstr "工作區 ID 不得為空"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide Y axis"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
 msgstr "或"
@@ -1416,6 +1448,10 @@ msgstr "角色與權限"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
 msgstr "連接到 Google Sheets"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "100% stacked"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1457,6 +1493,10 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 msgid "Please <0>email us</0> if you would like early access."
 msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Step"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -1471,6 +1511,7 @@ msgstr "匯入數據"
 msgid "Descending"
 msgstr "降序"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Category axis"
 msgstr "類別軸"
@@ -1551,6 +1592,7 @@ msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axi
 msgid "Show SQL"
 msgstr "顯示 SQL"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "網格"
@@ -1682,6 +1724,10 @@ msgstr "數據範圍"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "數據預覽"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Gridline color"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -1867,6 +1913,10 @@ msgstr "第 11 欄"
 msgid "Column 7"
 msgstr "第 7 欄"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show dots"
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
@@ -1880,6 +1930,10 @@ msgstr "編輯"
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "尚未套用 SQL。請核准假設的篩選值，以執行此查詢。"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Identity"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1914,6 +1968,10 @@ msgstr "本地過濾器（可由查看者編輯，僅此圖表）"
 msgid "Invalid X axis selected"
 msgstr "選擇了無效的 X 軸"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
@@ -1945,6 +2003,10 @@ msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確�
 msgid "text"
 msgstr "文本"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Split (+/-)"
+msgstr ""
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "活躍"
@@ -1960,6 +2022,10 @@ msgstr "確認操作"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "數據預覽"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2038,6 +2104,10 @@ msgstr "返回編輯器"
 msgid "about a minute"
 msgstr "約一分鐘"
 
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Y axis"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
 msgstr "第 9 欄"
@@ -2069,6 +2139,10 @@ msgstr "離線聊天模型已準備好。點擊以切換或重新下載。"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "捕捉儀表板中…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2104,6 +2178,10 @@ msgstr "大小列"
 msgid "Values"
 msgstr "值"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label color"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "關於您的工作區"
@@ -2116,6 +2194,10 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "完整"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Legend position"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
@@ -2216,6 +2298,10 @@ msgstr "結帳成功！"
 msgid "Answered"
 msgstr "已回答"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Straight"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
 msgid "Loading datasets..."
@@ -2295,6 +2381,10 @@ msgstr "在此瀏覽器上下載"
 msgid "Pay monthly"
 msgstr "每月付款"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Vertical gridlines"
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "選擇模型"
@@ -2331,6 +2421,10 @@ msgstr "上傳 CSV"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "圖片"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide X axis"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2437,6 +2531,10 @@ msgstr "這是您選擇應該添加到此 {entityConfigName} 的數據集中的�
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
 msgstr "創建"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stroke width"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -2600,6 +2698,10 @@ msgstr "計算 {datasetName} 中有多少行"
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "離線模型下載失敗"
@@ -2643,6 +2745,10 @@ msgstr "我們將把這個視覺化添加到您的新儀表板。"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "正在修復查詢…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Horizontal gridlines"
+msgstr ""
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
@@ -2720,6 +2826,10 @@ msgstr "高品質 7B 指令模型。最適合處理困難的結構描述，以�
 msgid "View"
 msgstr "查看"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Area layout"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "不可用"
@@ -2780,12 +2890,17 @@ msgstr "此 Excel 工作表中只有一個工作表。"
 msgid "Make dataset offline-only?"
 msgstr "將資料集設為離線專用？"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "顏色"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label"
+msgstr ""
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -2807,6 +2922,10 @@ msgstr "列名稱"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "大"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Line width"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
@@ -3214,6 +3333,10 @@ msgstr "主題選擇器"
 msgid "Title"
 msgstr "標題"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Curve"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "第 4 欄"
@@ -3237,6 +3360,10 @@ msgstr "回答時間"
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Could not remove offline chat model"
 msgstr "無法移除離線聊天模型"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Legend"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Create a new account"
@@ -3296,6 +3423,10 @@ msgstr "日期"
 msgid "recently"
 msgstr "最近"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Overlapping"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "下載"
@@ -3322,6 +3453,10 @@ msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選
 msgid "Turn"
 msgstr "轉換"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
 msgstr "無序"
@@ -3344,6 +3479,7 @@ msgstr "{fieldName} 必須至少 {minLength} 個字符長"
 msgid "System sans"
 msgstr "系統無襯線"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
@@ -3458,6 +3594,7 @@ msgstr "之間"
 msgid "Inactive"
 msgstr "不活躍"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "右"
@@ -3562,6 +3699,10 @@ msgstr "正在查找 {column} 中的值…"
 msgid "Email"
 msgstr "電子郵件"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick color"
+msgstr ""
+
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -3643,6 +3784,10 @@ msgstr "這些數據似乎包含健康或病人信息。將其發送給 AI 提�
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "通過探索您的工作區或上傳您的第一個數據集開始。"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stacked"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
@@ -4042,6 +4187,7 @@ msgstr "此資料集僅限離線使用。點擊以允許在線同步。"
 msgid "Global filters"
 msgstr "全域篩選"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
 msgstr "版面配置"
@@ -4207,6 +4353,10 @@ msgstr "要新增的座位數"
 msgid "Pay What You Want"
 msgstr "隨意支付"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar layout"
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
 msgstr "請從左側邊欄選擇一個數據集，或創建一個新的。"
@@ -4249,6 +4399,7 @@ msgstr "顯示標籤"
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr "Qwen 2.5 1.5B（離線）"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "X axis"
 msgstr "X 軸"
@@ -4451,6 +4602,10 @@ msgstr "沒有可添加到此系列的數值欄位。"
 msgid "You haven't chosen a name column"
 msgstr "您尚未選擇名稱欄位"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Grouped"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "You need admin access on this resource to manage sharing."
 msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
@@ -4459,6 +4614,10 @@ msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stack group"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -4652,6 +4811,7 @@ msgstr "未成功讀取任何行"
 msgid "New user group"
 msgstr "新使用者群組"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "靠左"
@@ -5042,6 +5202,10 @@ msgstr "移除本地篩選器"
 msgid "This removes the user group from members and resources that use it."
 msgstr "這將從使用該用戶群組的成員和資源中移除該用戶群組。"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Top"
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "來自您的提示："
@@ -5119,6 +5283,10 @@ msgstr "儲存資料集"
 msgid "Sidebar position"
 msgstr "側邊欄位置"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick color"
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "搜尋儀表板"
@@ -5157,6 +5325,10 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
 "click Upload again."
 msgstr "{0} 列已被檢測到。請檢查下面的列資訊以確保其正確。如果不正確，請更改上面的匯入選項並再次點擊上傳。"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label color"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
@@ -5348,6 +5520,10 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Fill opacity"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
@@ -5491,6 +5667,10 @@ msgstr "推薦的下一步"
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "來自欄位：<0>{columnName}</0>"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bottom"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"

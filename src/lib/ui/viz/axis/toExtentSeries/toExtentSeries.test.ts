@@ -3,14 +3,24 @@ import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries"
 
 describe("toExtentSeries", () => {
   it("leaves every series unstacked when there is no shared stack", () => {
-    expect(toExtentSeries([{ key: "v" }, { key: "w" }], undefined)).toEqual([
+    expect(
+      toExtentSeries({
+        series: [{ key: "v" }, { key: "w" }],
+        sharedStackId: undefined,
+      }),
+    ).toEqual([
       { key: "v", stackId: undefined },
       { key: "w", stackId: undefined },
     ]);
   });
 
   it("puts every series in the shared stack when there is one", () => {
-    expect(toExtentSeries([{ key: "v" }, { key: "w" }], "stack")).toEqual([
+    expect(
+      toExtentSeries({
+        series: [{ key: "v" }, { key: "w" }],
+        sharedStackId: "stack",
+      }),
+    ).toEqual([
       { key: "v", stackId: "stack" },
       { key: "w", stackId: "stack" },
     ]);
@@ -18,7 +28,10 @@ describe("toExtentSeries", () => {
 
   it("lets a per-series stack id win over the shared one", () => {
     expect(
-      toExtentSeries([{ key: "v", stackId: "g1" }, { key: "w" }], "stack"),
+      toExtentSeries({
+        series: [{ key: "v", stackId: "g1" }, { key: "w" }],
+        sharedStackId: "stack",
+      }),
     ).toEqual([
       { key: "v", stackId: "g1" },
       { key: "w", stackId: "stack" },
@@ -27,14 +40,14 @@ describe("toExtentSeries", () => {
 
   it("keeps per-series stack ids when there is no shared stack", () => {
     expect(
-      toExtentSeries(
-        [
+      toExtentSeries({
+        series: [
           { key: "v", stackId: "g1" },
           { key: "w", stackId: "g1" },
           { key: "z" },
         ],
-        undefined,
-      ),
+        sharedStackId: undefined,
+      }),
     ).toEqual([
       { key: "v", stackId: "g1" },
       { key: "w", stackId: "g1" },

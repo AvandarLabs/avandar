@@ -1,7 +1,8 @@
-import { propPasses, removeAtIndex } from "@avandar/utils";
+import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Fieldset, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
@@ -56,7 +57,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
 
-  const updateChartPath = useUpdateSettingPath(config, onConfigChange);
+  const updateChartPath = useUpdateSettingPath({ config, onConfigChange });
 
   const updateAxisKey = useCallback(
     (nextKey: string | undefined) => {
@@ -132,20 +133,15 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
-  /**
-   * The `group` string axis descriptors actually carry. It is an
-   * untranslated identifier, not display text (`makeAxisDescriptors`
-   * emits it), so the lookup must not go through Lingui or it would
-   * only match in English.
-   */
+  // Axis descriptor groups are stable identifiers, not display copy.
   const axisGroupKey = isRadar ? "Category axis" : "X axis";
 
-  /** Display text for the axis fieldset. Translated. */
+  // Display text for the axis fieldset is translated separately.
   const axisLegend = isRadar ? t`Category axis` : t`X axis`;
 
-  const axisGroupDescriptors = chartDescriptors.filter((descriptor) => {
-    return descriptor.group === axisGroupKey;
-  });
+  const axisGroupDescriptors = chartDescriptors.filter(
+    propEq("group", axisGroupKey),
+  );
 
   return (
     <Stack gap="md">
@@ -228,15 +224,15 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             }}
             fields={fields}
           />
-          {axisGroupDescriptors.map((desc) => {
+          {axisGroupDescriptors.map((descriptor) => {
             return (
               <Control
-                key={desc.key}
-                label={desc.label}
-                spec={desc.control}
-                value={readSetting(config, desc.key)}
+                key={descriptor.key}
+                label={vizSettingControlLabel(descriptor.label)}
+                spec={descriptor.control}
+                value={readSetting(config, descriptor.key)}
                 onChange={(nextValue) => {
-                  updateChartPath(desc.key, nextValue);
+                  updateChartPath({ path: descriptor.key, value: nextValue });
                 }}
               />
             );

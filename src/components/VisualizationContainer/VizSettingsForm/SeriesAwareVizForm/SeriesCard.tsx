@@ -10,6 +10,8 @@ import {
   Text,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
@@ -185,7 +187,7 @@ export function SeriesCard({
             <Box key={group}>
               {group !== "" ?
                 <Text fw={500} size="xs" c="dimmed" mt="xs" mb={4}>
-                  {group}
+                  {vizSettingGroupLabel(group)}
                 </Text>
               : null}
               <Stack gap="xs">
@@ -193,7 +195,7 @@ export function SeriesCard({
                   return (
                     <Control
                       key={desc.key}
-                      label={desc.label}
+                      label={vizSettingControlLabel(desc.label)}
                       spec={desc.control}
                       value={readSetting(series, desc.key)}
                       onChange={(nextValue) => {

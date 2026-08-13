@@ -29,21 +29,25 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
-const descriptors: VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries> =
-  {
-    chart: [
-      ...makeAxisDescriptors<ScatterPlotVizConfig>("xAxis", "value", {
-        rotation: true,
-      }),
-      ...makeAxisDescriptors<ScatterPlotVizConfig>("yAxis", "value"),
-    ],
-    series: [],
-  };
+const DESCRIPTORS = {
+  chart: [
+    ...makeAxisDescriptors<ScatterPlotVizConfig>({
+      axis: "xAxis",
+      role: "value",
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<ScatterPlotVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
+  ],
+  series: [],
+} as const satisfies VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries>;
 
 export const ScatterPlotVizConfigs = {
   vizType: "scatter",
   displayName: "Scatter Plot",
-  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
+  descriptors: DESCRIPTORS as unknown as AnyVizSettingDescriptors,
 
   /** Create an empty scatter plot config. */
   makeEmptyConfig: (): ScatterPlotVizConfig => {

@@ -9,33 +9,33 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { fireEvent, render, screen } from "@/test-utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 
-const COLUMNS: readonly QueryResultColumn[] = [
+const COLUMNS: readonly QueryResult.Column[] = [
   { name: "spend", dataType: "double" },
   { name: "revenue", dataType: "double" },
   { name: "weight", dataType: "double" },
 ];
 
-const scatterConfig: ScatterPlotVizConfig = {
+const SCATTER_CONFIG: ScatterPlotVizConfig = {
   vizType: "scatter",
   series: [{ key: "revenue", xKey: "spend" }],
 };
 
-const bubbleConfig: BubbleChartVizConfig = {
+const BUBBLE_CONFIG: BubbleChartVizConfig = {
   vizType: "bubble",
   series: [{ key: "revenue", xKey: "spend", sizeKey: "weight" }],
 };
 
-describe("ScatterChartForm — axis settings", () => {
+describe("ScatterChartForm: axis settings", () => {
   it("renders a minimum control for each value axis", () => {
     render(
       <AvandarAppProvider>
         <ScatterChartForm
           fields={COLUMNS}
-          config={scatterConfig}
+          config={SCATTER_CONFIG}
           onConfigChange={vi.fn()}
         />
       </AvandarAppProvider>,
@@ -50,7 +50,7 @@ describe("ScatterChartForm — axis settings", () => {
       <AvandarAppProvider>
         <ScatterChartForm
           fields={COLUMNS}
-          config={scatterConfig}
+          config={SCATTER_CONFIG}
           onConfigChange={onConfigChange}
         />
       </AvandarAppProvider>,
@@ -72,7 +72,7 @@ describe("ScatterChartForm — axis settings", () => {
       <AvandarAppProvider>
         <ScatterChartForm
           fields={COLUMNS}
-          config={scatterConfig}
+          config={SCATTER_CONFIG}
           onConfigChange={vi.fn()}
         />
       </AvandarAppProvider>,
@@ -86,13 +86,13 @@ describe("ScatterChartForm — axis settings", () => {
   });
 });
 
-describe("BubbleChartForm — axis settings", () => {
+describe("BubbleChartForm: axis settings", () => {
   it("renders the axis controls", () => {
     render(
       <AvandarAppProvider>
         <BubbleChartForm
           fields={COLUMNS}
-          config={bubbleConfig}
+          config={BUBBLE_CONFIG}
           onConfigChange={vi.fn()}
         />
       </AvandarAppProvider>,
@@ -107,7 +107,7 @@ describe("BubbleChartForm — axis settings", () => {
       <AvandarAppProvider>
         <BubbleChartForm
           fields={COLUMNS}
-          config={bubbleConfig}
+          config={BUBBLE_CONFIG}
           onConfigChange={onConfigChange}
         />
       </AvandarAppProvider>,

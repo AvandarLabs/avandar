@@ -57,10 +57,15 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       group: "Legend",
       control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
     },
-    ...makeAxisDescriptors<LineChartVizConfig>("xAxis", "category", {
+    ...makeAxisDescriptors<LineChartVizConfig>({
+      axis: "xAxis",
+      role: "category",
       rotation: true,
     }),
-    ...makeAxisDescriptors<LineChartVizConfig>("yAxis", "value"),
+    ...makeAxisDescriptors<LineChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
     {
       key: "chartStyle.grid.color",
       label: "Gridline color",

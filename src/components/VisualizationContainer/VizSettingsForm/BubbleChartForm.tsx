@@ -13,18 +13,13 @@ type Props = {
   onConfigChange: (newConfig: BubbleChartVizConfig) => void;
 };
 
-/**
- * Settings form for the multi-series bubble chart. Delegates series
- * management to `BubbleSeriesFieldset` (which owns the per-series `xKey`
- * and `sizeKey` that the shared descriptor-driven series editor cannot
- * express) and the chart-level settings to `ChartSettingsFieldsets`.
- */
+/** Renders settings for a multi-series bubble chart. */
 export function BubbleChartForm({
   fields,
   config,
   onConfigChange,
 }: Props): JSX.Element {
-  const updateChartPath = useUpdateSettingPath(config, onConfigChange);
+  const updateChartPath = useUpdateSettingPath({ config, onConfigChange });
 
   return (
     <Stack gap="sm">

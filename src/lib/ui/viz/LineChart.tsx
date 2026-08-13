@@ -1,10 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
-import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
+import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps/useLineChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -51,23 +48,14 @@ export function LineChart({
     };
   }, [isDateAxis, dateFormat, timezone]);
 
-  const yExtent = useAxisValueExtent(data, chartStyle?.yAxis, series, "key");
-
-  const xTickLabels = useXTickLabels(
+  const styleProps = useLineChartStyleProps({
     data,
+    series,
+    chartStyle,
     xAxisKey,
-    chartStyle?.xAxis?.tickAngle,
-    baseXAxisProps.tickFormatter,
-  );
-
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("line"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+    tickFormatter: baseXAxisProps.tickFormatter,
+    baseXAxisProps,
+  });
 
   const allLines = series.every(propEq("renderAs", "line"));
 

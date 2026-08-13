@@ -1,10 +1,14 @@
 import { makeBucketMap } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack } from "@mantine/core";
-import { useMemo } from "react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
-import type { AnyChartSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+import type {
+  AnyChartSettingDescriptor,
+  VizSettingGroup,
+} from "$/models/vizs/SettingDescriptor";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,13 +17,15 @@ type Props = {
   /** The config the descriptors read their current values from. */
   config: object;
   /** Called with the descriptor's dotted path and the new value. */
-  onSettingChange: (path: string, value: unknown) => void;
+  onSettingChange: (
+    options: Readonly<{ path: string; value: unknown }>,
+  ) => void;
   /**
    * A single group the caller renders itself, skipped here.
    * `SeriesAwareVizForm` excludes its axis group because it merges those
    * controls into the axis fieldset alongside the column picker.
    */
-  excludeGroup?: string;
+  excludeGroup?: VizSettingGroup;
 };
 
 /**
@@ -27,26 +33,20 @@ type Props = {
  * ("Y axis", "Legend", "Grid", "Layout", etc.), in registry order, with
  * one {@link Control} per descriptor inside it. Descriptors carrying no
  * `group` collect into a trailing "Chart settings" fieldset.
- *
- * Shared by every descriptor-driven settings form. `SeriesAwareVizForm`
- * uses it for the groups it does not lay out itself; the scatter and
- * bubble forms use it for all of their chart-level settings.
  */
 export function ChartSettingsFieldsets({
   descriptors,
   config,
   onSettingChange,
   excludeGroup,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
 
-  const groupedDescriptors = useMemo(() => {
-    return makeBucketMap(descriptors, {
-      keyFn: (descriptor) => {
-        return descriptor.group ?? "";
-      },
-    });
-  }, [descriptors]);
+  const groupedDescriptors = makeBucketMap(descriptors, {
+    keyFn: (descriptor) => {
+      return descriptor.group ?? "";
+    },
+  });
 
   const includedGroups = Array.from(groupedDescriptors.entries()).filter(
     ([group]) => {
@@ -55,19 +55,20 @@ export function ChartSettingsFieldsets({
   );
 
   return includedGroups.map(([group, groupDescriptors]) => {
-    const legend = group === "" ? t`Chart settings` : group;
+    const legend =
+      group === "" ? t`Chart settings` : vizSettingGroupLabel(group);
     return (
-      <Fieldset key={legend} legend={legend}>
+      <Fieldset key={group === "" ? "chart-settings" : group} legend={legend}>
         <Stack gap="xs">
           {groupDescriptors.map((descriptor) => {
             return (
               <Control
                 key={descriptor.key}
-                label={descriptor.label}
+                label={vizSettingControlLabel(descriptor.label)}
                 spec={descriptor.control}
                 value={readSetting(config, descriptor.key)}
                 onChange={(nextValue) => {
-                  onSettingChange(descriptor.key, nextValue);
+                  onSettingChange({ path: descriptor.key, value: nextValue });
                 }}
               />
             );

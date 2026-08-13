@@ -62,10 +62,15 @@ const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
       group: "Legend",
       control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
     },
-    ...makeAxisDescriptors<BarChartVizConfig>("xAxis", "category", {
+    ...makeAxisDescriptors<BarChartVizConfig>({
+      axis: "xAxis",
+      role: "category",
       rotation: true,
     }),
-    ...makeAxisDescriptors<BarChartVizConfig>("yAxis", "value"),
+    ...makeAxisDescriptors<BarChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
     {
       key: "chartStyle.grid.color",
       label: "Gridline color",

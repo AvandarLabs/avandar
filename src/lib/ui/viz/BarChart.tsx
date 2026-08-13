@@ -1,12 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
-import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
-import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
+import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -72,49 +67,16 @@ export function BarChart({
 
   const allBars = series.every(propEq("renderAs", "bar"));
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    // Percent layout sets Recharts `stackOffset: "expand"`, which
-    // normalizes each column to sum to 1 and only formats the ticks as
-    // percentages. The real domain is 0 to 1.
-    if (allBars && layout === "percent") {
-      return { min: 0, max: 1 };
-    }
-    // The composite renderer always groups, so a layout-implied stack
-    // only applies when every series really is a bar.
-    const layoutStacks = allBars && layout === "stack";
-    return computeValueExtent(
-      data,
-      toExtentSeries(
-        series.map((s) => {
-          // `stackId` only exists on bar series, and `series` is a union.
-          return {
-            key: s.key,
-            stackId: "stackId" in s ? s.stackId : undefined,
-          };
-        }),
-        layoutStacks ? "stack" : undefined,
-      ),
-    );
-  }, [data, series, layout, allBars, chartStyle?.yAxis]);
-
-  const xTickLabels = useXTickLabels(
+  const styleProps = useBarChartStyleProps({
     data,
+    series,
+    chartStyle,
     xAxisKey,
-    chartStyle?.xAxis?.tickAngle,
-    baseXAxisProps.tickFormatter,
-  );
-
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("bar"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+    tickFormatter: baseXAxisProps.tickFormatter,
+    baseXAxisProps,
+    layout,
+    allBars,
+  });
 
   if (!allBars) {
     return renderXYComposite({

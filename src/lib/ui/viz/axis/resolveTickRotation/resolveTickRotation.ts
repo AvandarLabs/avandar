@@ -13,7 +13,7 @@ const AXIS_HEIGHT_PADDING = 12;
 /**
  * The subset of Recharts axis props that express a rotated tick label.
  * Every field is optional: an unrotated axis yields an empty object and
- * renders exactly as it does today.
+ * leaves the renderer's default tick layout unchanged.
  */
 export type TickRotation = {
   tick?: { angle: number; textAnchor: "start" | "end" };
@@ -21,32 +21,31 @@ export type TickRotation = {
   height?: number;
 };
 
-function _clamp(value: number, low: number, high: number): number {
+function _clamp({
+  value,
+  low,
+  high,
+}: Readonly<{ value: number; low: number; high: number }>): number {
   return Math.max(low, Math.min(high, value));
 }
 
 /**
- * Translate a tick label rotation into Recharts props.
- *
- * Recharts rotates via the `tick` object but does not grow the plot to
- * fit the result, so labels clip past roughly thirty degrees unless the
- * axis `height` grows with them. Height is estimated from the longest
- * label because measuring real text would mean rendering it first.
- *
- * `interval: 0` matters as much as the angle: Mantine defaults to
- * `preserveStartEnd`, so a user who rotates specifically to fit every
- * label would otherwise still see only some of them.
+ * Returns axis props for a rotated tick label, including its required height.
  */
-export function resolveTickRotation(
-  angle: number | undefined,
-  tickLabels: readonly string[],
-  fontSize: number,
-): TickRotation {
+export function resolveTickRotation({
+  angle,
+  tickLabels,
+  fontSize,
+}: Readonly<{
+  angle: number | undefined;
+  tickLabels: readonly string[];
+  fontSize: number;
+}>): TickRotation {
   if (angle === undefined || !Number.isFinite(angle) || angle === 0) {
     return {};
   }
 
-  const clampedAngle = _clamp(angle, -90, 90);
+  const clampedAngle = _clamp({ value: angle, low: -90, high: 90 });
   const radians = (Math.abs(clampedAngle) * Math.PI) / 180;
 
   const longestLabelChars = tickLabels.reduce((longest, label) => {
@@ -66,7 +65,11 @@ export function resolveTickRotation(
     },
     interval: 0,
     height: Math.round(
-      _clamp(estimatedHeight, MIN_AXIS_HEIGHT, MAX_AXIS_HEIGHT),
+      _clamp({
+        value: estimatedHeight,
+        low: MIN_AXIS_HEIGHT,
+        high: MAX_AXIS_HEIGHT,
+      }),
     ),
   };
 }

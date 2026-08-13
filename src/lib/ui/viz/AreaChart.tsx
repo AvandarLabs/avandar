@@ -18,7 +18,6 @@
  */
 import { formatDate, propEq } from "@avandar/utils";
 import { Box } from "@mantine/core";
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { Fragment, useId, useMemo } from "react";
 import {
   Area,
@@ -30,12 +29,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
 import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
-import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
-import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
+import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -98,42 +93,16 @@ export function AreaChart({
 
   const allAreas = series.every(propEq("renderAs", "area"));
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    const { isPercent, sharedStackId } = getAreaStacking(layout);
-    if (allAreas && isPercent) {
-      return { min: 0, max: 1 };
-    }
-    return computeValueExtent(
-      data,
-      // The composite renderer always groups, so a layout-implied stack
-      // only applies when every series really is an area.
-      toExtentSeries(
-        series.map((s) => {
-          return { key: s.key };
-        }),
-        allAreas ? sharedStackId : undefined,
-      ),
-    );
-  }, [data, series, layout, allAreas, chartStyle?.yAxis]);
-
-  const xTickLabels = useXTickLabels(
+  const styleProps = useAreaChartStyleProps({
     data,
+    series,
+    chartStyle,
     xAxisKey,
-    chartStyle?.xAxis?.tickAngle,
     tickFormatter,
-  );
-
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("area"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+    baseXAxisProps,
+    layout,
+    allAreas,
+  });
 
   const xLabelText = chartStyle?.xAxis?.label;
   const yLabelText = chartStyle?.yAxis?.label;
