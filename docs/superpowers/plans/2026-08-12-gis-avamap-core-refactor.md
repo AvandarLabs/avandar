@@ -141,7 +141,7 @@ import { AvaMap } from "$/models/AvaMap/AvaMap.ts";
 
 describe("AvaMap.makeEmpty", () => {
   it("starts with no layers and the avandar basemap", () => {
-    const avaMap = AvaMap.makeEmpty({ name: "Cholera cases" });
+    const avaMap = AvaMap.makeEmpty("Cholera cases");
     expect(avaMap.layers).toEqual([]);
     expect(avaMap.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(avaMap.name).toBe("Cholera cases");
@@ -149,8 +149,8 @@ describe("AvaMap.makeEmpty", () => {
   });
 
   it("gives each map a distinct id", () => {
-    const first = AvaMap.makeEmpty({ name: "A" });
-    const second = AvaMap.makeEmpty({ name: "B" });
+    const first = AvaMap.makeEmpty("A");
+    const second = AvaMap.makeEmpty("B");
     expect(first.id).not.toBe(second.id);
   });
 });
@@ -181,7 +181,7 @@ function createNumericColumn(name: string): DatasetColumnRead {
 
 describe("MapLayer.makeEmpty", () => {
   it("is visible, unbound, and exact by default", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     expect(layer.isVisible).toBe(true);
     expect(layer.geoBinding).toBeUndefined();
     expect(layer.sensitivity).toEqual({ mode: "exact" });
@@ -194,9 +194,9 @@ describe("MapLayer.resolveGeoBinding", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lat"));
     const longitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lon"));
     const layer = {
-      ...MapLayer.makeEmpty({ name: "Cases" }),
+      ...MapLayer.makeEmpty("Cases"),
       source: {
-        ...MapLayer.makeEmpty({ name: "Cases" }).source,
+        ...MapLayer.makeEmpty("Cases").source,
         queryColumns: [latitude, longitude],
       },
       geoBinding: {
@@ -216,7 +216,7 @@ describe("MapLayer.resolveGeoBinding", () => {
   it("returns undefined when a bound column is not in the query", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lat"));
     const layer = {
-      ...MapLayer.makeEmpty({ name: "Cases" }),
+      ...MapLayer.makeEmpty("Cases"),
       geoBinding: {
         type: "latLngColumns" as const,
         latitude: latitude.id,
@@ -419,7 +419,7 @@ export const MapLayerModule = {
    * geometry columns picked yet.
    * @param name The layer's display name, already localized by the caller.
    */
-  makeEmpty: ({ name }: { name: string }): MapLayerRead => {
+  makeEmpty: (name: string): MapLayerRead => {
     return Model.make("MapLayer", {
       id: uuid<MapLayerId>(),
       version: 1,
@@ -566,7 +566,7 @@ export const AvaMapModule = {
    * A new, empty map with the default basemap and camera and no layers.
    * @param name The map's display name, already localized by the caller.
    */
-  makeEmpty: ({ name }: { name: string }): AvaMapRead => {
+  makeEmpty: (name: string): AvaMapRead => {
     return Model.make("AvaMap", {
       id: uuid<AvaMapId>(),
       version: 1,
@@ -1548,7 +1548,7 @@ const featureCollection: GeoJSON.FeatureCollection = {
 
 describe("createLayerSpec", () => {
   it("names its source and layer after the layer id", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const spec = createLayerSpec({
       layer,
       featureCollection,
@@ -1561,7 +1561,7 @@ describe("createLayerSpec", () => {
   });
 
   it("paints a flat circle with the configured radius and color", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const spec = createLayerSpec({
       layer,
       featureCollection,
@@ -1572,7 +1572,7 @@ describe("createLayerSpec", () => {
   });
 
   it("selects features through feature-state, not a duplicate layer", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const spec = createLayerSpec({
       layer,
       featureCollection,
@@ -1588,7 +1588,7 @@ describe("createLayerSpec", () => {
   });
 
   it("scales proportional symbols by square root of the value", () => {
-    const base = MapLayer.makeEmpty({ name: "Cases" });
+    const base = MapLayer.makeEmpty("Cases");
     const layer = {
       ...base,
       symbology: {
@@ -1619,7 +1619,7 @@ describe("createLayerSpec", () => {
   });
 
   it("falls back to the minimum radius when there is no value domain", () => {
-    const base = MapLayer.makeEmpty({ name: "Cases" });
+    const base = MapLayer.makeEmpty("Cases");
     const layer = {
       ...base,
       symbology: {
@@ -1642,7 +1642,7 @@ describe("createLayerSpec", () => {
   });
 
   it("hides a layer that is not visible", () => {
-    const layer = { ...MapLayer.makeEmpty({ name: "Cases" }), isVisible: false };
+    const layer = { ...MapLayer.makeEmpty("Cases"), isVisible: false };
     const spec = createLayerSpec({
       layer,
       featureCollection,
@@ -1653,7 +1653,7 @@ describe("createLayerSpec", () => {
 
   it("refuses to draw an aggregate-only layer as symbols", () => {
     const layer = {
-      ...MapLayer.makeEmpty({ name: "Protection cases" }),
+      ...MapLayer.makeEmpty("Protection cases"),
       sensitivity: {
         mode: "aggregateOnly" as const,
         minCellCount: 5,
@@ -2507,11 +2507,11 @@ import { buildMapLayerQueryKey, isMapLayerQueryable } from "@/views/GISApp/layer
 
 describe("isMapLayerQueryable", () => {
   it("is false until the layer has a data source", () => {
-    expect(isMapLayerQueryable(MapLayer.makeEmpty({ name: "Cases" }))).toBe(false);
+    expect(isMapLayerQueryable(MapLayer.makeEmpty("Cases"))).toBe(false);
   });
 
   it("is false when the layer has a source but no resolvable geo binding", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const withSource = {
       ...layer,
       source: { ...layer.source, dataSource: { __type: "Dataset", id: "d1" } },
@@ -2522,7 +2522,7 @@ describe("isMapLayerQueryable", () => {
 
 describe("buildMapLayerQueryKey", () => {
   it("changes when the source changes", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
     expect(buildMapLayerQueryKey(layer)).not.toEqual(
       buildMapLayerQueryKey(withLimit),
@@ -2530,7 +2530,7 @@ describe("buildMapLayerQueryKey", () => {
   });
 
   it("does not change when only symbology changes, so repaint skips refetch", () => {
-    const layer = MapLayer.makeEmpty({ name: "Cases" });
+    const layer = MapLayer.makeEmpty("Cases");
     const recolored = {
       ...layer,
       symbology: {
@@ -3158,10 +3158,10 @@ type Props = { workspaceId: Workspace.Id };
 export function GISApp({ workspaceId }: Props): JSX.Element {
   const { t } = useLingui();
   const [avaMap, setAvaMap] = useState(() => {
-    const emptyMap = AvaMap.makeEmpty({ name: t`Untitled map` });
+    const emptyMap = AvaMap.makeEmpty(t`Untitled map`);
     return {
       ...emptyMap,
-      layers: [MapLayer.makeEmpty({ name: t`Layer 1` })],
+      layers: [MapLayer.makeEmpty(t`Layer 1`)],
     };
   });
   const [selectedFeature, setSelectedFeature] = useState<GeoJSON.Feature | null>(
