@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
 import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
+import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -63,18 +64,12 @@ export function LineChart({
     );
   }, [data, series, chartStyle?.yAxis]);
 
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    const format = baseXAxisProps.tickFormatter;
-    return data.map((row) => {
-      const value = row[xAxisKey];
-      // `baseXAxisProps.tickFormatter` is locally typed as
-      // `(value: unknown) => string` — one parameter, no cast needed.
-      return format !== undefined ? format(value) : String(value ?? "");
-    });
-  }, [data, xAxisKey, baseXAxisProps, chartStyle?.xAxis?.tickAngle]);
+  const xTickLabels = useXTickLabels(
+    data,
+    xAxisKey,
+    chartStyle?.xAxis?.tickAngle,
+    baseXAxisProps.tickFormatter,
+  );
 
   const styleProps = useMemo(() => {
     return applyChartStyle(chartStyle, {
