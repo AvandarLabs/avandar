@@ -85,6 +85,7 @@ contracts. Naming, module structure, comments, and function shape live in
   ```
 
 - Use `as const` for literals that never change.
+
 - Prefer `type` over `interface`, except for class-style OOP interfaces.
 
   **Find candidates:**
@@ -142,61 +143,66 @@ contracts. Naming, module structure, comments, and function shape live in
   This is good (normalize at the boundary; every signature we own uses
   `undefined`):
 
-    --include="*.ts" --include="*.tsx" . \
-    | grep -v '^[^:]*:import type '
+  ```ts
+  async function refreshSession(): Promise<Session | undefined> {
+    const { data } = await client.auth.refreshSession();
+    return data.session ?? undefined;
+  }
+
+  let onExpired: (() => void) | undefined = undefined;
   ```
 
-  Heuristic only; still scan import lists manually for type-only names
-  this regex doesn't anticipate.
+  The `null` that is genuinely forced stays. If a library types a callback
+  parameter as `Session | null`, a handler written against that signature
+  keeps `null`, because the position is not one you own:
 
-- Do not add barrel files, except in repo-approved directories documented
-  by the repo-local checklist.
+  ```ts
+  client.auth.onAuthStateChange((_event, session: Session | null) => {
+    // ...
+  });
+  ```
 
-  **Find candidates** (new `index.ts` files):
+- Prefer string literal unions over enums.
+
+  **Find candidates:**
 
   ```bash
-  find . -name "index.ts" \
-    -not -path "*/node_modules/*"
+  grep -rEn '^(export )?enum ' --include="*.ts" --include="*.tsx" .
   ```
 
-  Compare each hit against the repo-local allow-list, if one exists. If no
-  repo-local allow-list exists, treat newly added barrel files as findings.
+- Reuse composite types when they are genuinely shared.
 
-  common offenders):
+- Avoid extracting one-off type aliases unless the type is reused. `Props` is
+  the explicit exception.
+
+- If an object shape has 4 or more properties, extract it to a named type for
+  readability.
+
+- Add explicit types at module boundaries, top-level declarations, and function
+  parameters. Avoid unnecessary annotations for local variables and inline
+  callbacks.
+
+- Follow input contravariance and output covariance: readonly at module
+  boundaries for inputs, mutable outputs for callers.
+
+- Apply readonly wrappers to function parameters, not to local variables,
+  internal helpers, or return types.
+
+  **Find candidates** (`Readonly<...>` applied to local vars or return
+  types; heuristic):
 
   ```bash
-  # Identifiers
-  grep -rEn '\b[a-zA-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)[a-zA-Z_]*\b' \
-    --include="*.ts" --include="*.tsx" .
-  # File names
-  find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
-    -not -path "*/node_modules/*" \
-    | grep -E '(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)'
+  grep -rEn '\bReadonly<' --include="*.ts" --include="*.tsx" .
   ```
 
-  Allow-list: `ID` and `DB` may stay as written. Hits that are already
-  in PascalCase (`Url`, `Sql`, etc.) will not match.
+  Filter hits: only flag the ones applied to local variable
+  declarations, internal helper return types, or shared type aliases,
+  not to function parameters (which are correct).
 
-- Files that export only types should use the `.types.ts` filename suffix.
-  This makes the file's contents self-evident from the import path and
-  lets readers immediately distinguish runtime-bearing modules from
-  type-only modules. Rename a file to `.types.ts` if you delete its last
-  runtime export, and remove the suffix if you later add runtime code.
+- Prefer mutable local variables and intermediate values.
 
-  **Find candidates** (`.ts` files in the diff that contain only
-  `export type` / `export interface` and no runtime exports):
-
-  ```bash
-  for f in <files-in-diff-ending-in-.ts>; do
-    case "$f" in
-      *.types.ts) continue ;;
-    esac
-    if ! grep -Eq '^export (const|let|var|function|class|enum|default|\{)' "$f" \
-       && grep -Eq '^export (type|interface)' "$f"; then
-      echo "type-only candidate: $f"
-    fi
-  done
-  ```
+- If a function intentionally mutates its input, the name should make the
+  mutation obvious, and returning `void` is usually the clearest contract.
 
 - For string-literal unions that are referenced at runtime (for parsing,
   validation, dropdown options, or `zod` enums), derive the type from an

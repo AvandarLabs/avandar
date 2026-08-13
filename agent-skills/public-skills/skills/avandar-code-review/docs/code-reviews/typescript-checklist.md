@@ -40,7 +40,9 @@ repo) so the output stays small and tied to the diff.
   file path; only flag the latter.
 
 - Use JSDoc for public classes and methods.
+
 - Prefer functional and declarative programming.
+
 - Avoid classes and imperative patterns unless a real constraint requires them.
 
   **Find candidates:**
@@ -79,6 +81,7 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - If a docstring fits on one line within 80 characters, keep it single-line.
+
 - Never use single-line `if` statements: always keep braces.
 
   **Find candidates** (heuristic; non-exhaustive):
@@ -102,8 +105,11 @@ repo) so the output stays small and tied to the diff.
 
 - Use PascalCase for React components, classes, singleton instances, and module
   objects.
+
 - Use camelCase for variables, functions, and methods.
+
 - Use UPPERCASE for environment variables and hard-coded constants.
+
 - Event handlers should be named `on...`, not `handle...`.
 
   **Find candidates:**
@@ -113,6 +119,7 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - Non-exported top-level helper functions should be prefixed with `_`.
+
 - Declare local helper functions above the exported function that uses them,
   so a file reads helpers first and its public entry point last. A reader
   scrolling from the top meets each helper before the call that depends on
@@ -170,6 +177,7 @@ repo) so the output stays small and tied to the diff.
   Confirm each hit by checking that the trailing helper is actually called by
   the earlier export; an unrelated helper serving a second export is one of
   the exceptions above.
+
 - Name a function that turns one value into another with one of exactly four
   shapes, so the name states both the source and the target:
   `[Receiver].to{Target}` when the receiver names the source,
@@ -247,6 +255,7 @@ repo) so the output stays small and tied to the diff.
   `_build...` hit and a predicate hit are expected, a `_resolve...` hit is a
   finding, and a method whose receiver supplies the other half is already
   correct.
+
 - Name a function that returns user-facing copy after the copy itself, with no
   prefix: `appLabel(app)`, `vizTypeLabel(vizType)`. This is the one conversion
   exempt from the naming rule above, so flag `getAppLabelFromAppType` or
@@ -281,6 +290,7 @@ repo) so the output stays small and tied to the diff.
 
   Confirm a hit really returns only copy: a function returning a structured
   object that happens to contain a label is a conversion, not a copy function.
+
 - React component prop types should always be named `Props`.
 
   **Find candidates** (prop type aliases whose name is not literally
@@ -299,48 +309,17 @@ repo) so the output stays small and tied to the diff.
   grep -rEn '\b(E2e|e2E|E_2e|e_2E)\b' --include="*.ts" --include="*.tsx" .
   ```
 
-
-  ```ts
-  async function refreshSession(): Promise<Session | undefined> {
-    const { data } = await client.auth.refreshSession();
-    return data.session ?? undefined;
-  }
-
-  let onExpired: (() => void) | undefined = undefined;
-  ```
-
-  The `null` that is genuinely forced stays. If a library types a callback
-  parameter as `Session | null`, a handler written against that signature
-  keeps `null`, because the position is not one you own:
-
-  ```ts
-  client.auth.onAuthStateChange((_event, session: Session | null) => {
-    // ...
-  });
-  ```
-
-- Prefer string literal unions over enums.
-
-  **Find candidates:**
-
-  ```bash
-  grep -rEn '^(export )?enum ' --include="*.ts" --include="*.tsx" .
-  ```
-
-- Reuse composite types when they are genuinely shared.
-- Avoid extracting one-off type aliases unless the type is reused. `Props` is
-  the explicit exception.
-- If an object shape has 4 or more properties, extract it to a named type for
-  readability.
-- Add explicit types at module boundaries, top-level declarations, and function
-  parameters. Avoid unnecessary annotations for local variables and inline
-  callbacks.
 - Prefer default parameter values over nullish guard logic.
+
 - Use RO-RO for multiple parameters and multiple return values.
+
 - If a function takes only one parameter, do not wrap it in an object.
+
 - When using an object parameter, prefer the name `options` unless `params` or
   `config` is more accurate.
+
 - Keep small object parameter types inline. Only extract them when reused.
+
 - Top-level functions should use the `function` keyword.
 
   **Find candidates** (top-level arrow-function consts; heuristic):
@@ -354,6 +333,7 @@ repo) so the output stays small and tied to the diff.
   flag only ones that are real top-level function declarations.
 
 - Nested functions and object methods should use arrow functions.
+
 - Type imports and type exports should always use the `type` keyword.
 
   **Find candidates** (imports/exports of clearly type-only names, by
@@ -362,6 +342,25 @@ repo) so the output stays small and tied to the diff.
 
   ```bash
   grep -rEn '^import \{[^}]*\b([A-Z][a-zA-Z]*Props|[A-Z][a-zA-Z]*Type|[A-Z][a-zA-Z]*Id|[A-Z][a-zA-Z]*Config)\b' \
+    --include="*.ts" --include="*.tsx" . \
+    | grep -v '^[^:]*:import type '
+  ```
+
+  Heuristic only; still scan import lists manually for type-only names
+  this regex doesn't anticipate.
+
+- Do not add barrel files, except in repo-approved directories documented
+  by the repo-local checklist.
+
+  **Find candidates** (new `index.ts` files):
+
+  ```bash
+  find . -name "index.ts" \
+    -not -path "*/node_modules/*"
+  ```
+
+  Compare each hit against the repo-local allow-list, if one exists. If no
+  repo-local allow-list exists, treat newly added barrel files as findings.
 
 - Do not use namespace exports such as `export * from`.
 
@@ -372,32 +371,16 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - All exported classes, objects, and functions need docstrings.
+
 - If an exported object defines top-level methods inline, those methods need
   docstrings too.
+
 - Function docstrings should explain the function's purpose and output, not
   its interior implementation details. Use `//` comments inside the function
   body for how the function works. Exception: mention complex or unconventional
   architectural/design decisions in the docstring only when developers using
   the function need that context.
-- Follow input contravariance and output covariance: readonly at module
-  boundaries for inputs, mutable outputs for callers.
-- Apply readonly wrappers to function parameters, not to local variables,
-  internal helpers, or return types.
 
-  **Find candidates** (`Readonly<...>` applied to local vars or return
-  types; heuristic):
-
-  ```bash
-  grep -rEn '\bReadonly<' --include="*.ts" --include="*.tsx" .
-  ```
-
-  Filter hits: only flag the ones applied to local variable
-  declarations, internal helper return types, or shared type aliases,
-  not to function parameters (which are correct).
-
-- Prefer mutable local variables and intermediate values.
-- If a function intentionally mutates its input, the name should make the
-  mutation obvious, and returning `void` is usually the clearest contract.
 - Acronyms longer than two letters in identifiers, type names, and file
   names use PascalCase, not all-caps. Treat them as words: `Url`, `Sql`,
   `Json`, `Http`, `Api`, `Css`, `Html`. Two-letter forms like `Id` and
@@ -407,3 +390,38 @@ repo) so the output stays small and tied to the diff.
   `DataExplorerUrlState.ts`.
 
   **Find candidates** (identifiers and file names containing the
+  common offenders):
+
+  ```bash
+  # Identifiers
+  grep -rEn '\b[a-zA-Z_]*(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)[a-zA-Z_]*\b' \
+    --include="*.ts" --include="*.tsx" .
+  # File names
+  find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
+    -not -path "*/node_modules/*" \
+    | grep -E '(URL|SQL|JSON|HTTP|API|CSS|HTML|UUID|XML|YAML)'
+  ```
+
+  Allow-list: `ID` and `DB` may stay as written. Hits that are already
+  in PascalCase (`Url`, `Sql`, etc.) will not match.
+
+- Files that export only types should use the `.types.ts` filename suffix.
+  This makes the file's contents self-evident from the import path and
+  lets readers immediately distinguish runtime-bearing modules from
+  type-only modules. Rename a file to `.types.ts` if you delete its last
+  runtime export, and remove the suffix if you later add runtime code.
+
+  **Find candidates** (`.ts` files in the diff that contain only
+  `export type` / `export interface` and no runtime exports):
+
+  ```bash
+  for f in <files-in-diff-ending-in-.ts>; do
+    case "$f" in
+      *.types.ts) continue ;;
+    esac
+    if ! grep -Eq '^export (const|let|var|function|class|enum|default|\{)' "$f" \
+       && grep -Eq '^export (type|interface)' "$f"; then
+      echo "type-only candidate: $f"
+    fi
+  done
+  ```
