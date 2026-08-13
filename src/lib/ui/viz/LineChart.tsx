@@ -1,7 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -49,7 +49,7 @@ export function LineChart({
   }, [isDateAxis, dateFormat, timezone]);
 
   const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, baseXAxisProps);
+    return applyChartStyle(chartStyle, { baseXAxisProps });
   }, [chartStyle, baseXAxisProps]);
 
   const allLines = series.every(propEq("renderAs", "line"));

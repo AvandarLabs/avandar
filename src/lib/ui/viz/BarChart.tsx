@@ -1,7 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -66,7 +66,7 @@ export function BarChart({
   const valueFormatter = formatChartNumber;
 
   const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, baseXAxisProps);
+    return applyChartStyle(chartStyle, { baseXAxisProps });
   }, [chartStyle, baseXAxisProps]);
 
   const allBars = series.every(propEq("renderAs", "bar"));

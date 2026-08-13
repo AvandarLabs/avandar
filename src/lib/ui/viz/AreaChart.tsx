@@ -29,7 +29,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
@@ -81,7 +81,7 @@ export function AreaChart({
   }, []);
 
   const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, baseXAxisProps);
+    return applyChartStyle(chartStyle, { baseXAxisProps });
   }, [chartStyle, baseXAxisProps]);
 
   const xLabelText = chartStyle?.xAxis?.label;
