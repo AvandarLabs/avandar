@@ -20,8 +20,7 @@ import {
   ZAxis,
 } from "recharts";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
+import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
 import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
@@ -74,29 +73,8 @@ export function BubbleChart({
 
   // Both axes are value axes here, so the X extent comes from each
   // series' own `xKey` column rather than from a single category key.
-  const xExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.xAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.xKey };
-      }),
-    );
-  }, [data, series, chartStyle?.xAxis]);
-
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.key };
-      }),
-    );
-  }, [data, series, chartStyle?.yAxis]);
+  const xExtent = useAxisValueExtent(data, chartStyle?.xAxis, series, "xKey");
+  const yExtent = useAxisValueExtent(data, chartStyle?.yAxis, series, "key");
 
   // A multi-series bubble chart draws X values from several columns, so
   // the tick labels come from the already-transformed point arrays

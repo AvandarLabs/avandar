@@ -3,8 +3,7 @@ import { LineChart as MantineLineChart } from "@mantine/charts";
 import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
+import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent/useAxisValueExtent";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels/useXTickLabels";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
@@ -52,17 +51,7 @@ export function LineChart({
     };
   }, [isDateAxis, dateFormat, timezone]);
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.key };
-      }),
-    );
-  }, [data, series, chartStyle?.yAxis]);
+  const yExtent = useAxisValueExtent(data, chartStyle?.yAxis, series, "key");
 
   const xTickLabels = useXTickLabels(
     data,
