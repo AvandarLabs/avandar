@@ -1,17 +1,22 @@
 import { useLingui } from "@lingui/react/macro";
 import { Drawer, Flex, Stack, Text } from "@mantine/core";
+import type { ReactNode } from "react";
 
 type Props = {
   opened: boolean;
   onClose: () => void;
-  feature: GeoJSON.Feature | null;
+  feature: GeoJSON.Feature | undefined;
 };
 
-export function GeometryDrawer({
+/**
+ * Side drawer listing every property of the map feature the user clicked.
+ * Renders an empty list when no feature is selected.
+ */
+export function FeatureInspector({
   opened,
   onClose,
   feature,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const properties = feature?.properties ?? {};
 
@@ -19,7 +24,7 @@ export function GeometryDrawer({
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={t`Data Point`}
+      title={t`Feature`}
       position="right"
       withOverlay={false}
       closeOnClickOutside={false}

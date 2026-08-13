@@ -10,10 +10,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import {
-  MapStyleKey,
-  MapStyleKeys,
-} from "@/components/GISApp/DataMap/mapStyles";
+import { MapStyleKeys } from "@/views/GisApp/basemap/MapStyles";
+import type { MapStyleKey } from "@/views/GisApp/basemap/MapStyles";
 
 type MapStyle = {
   url: string;

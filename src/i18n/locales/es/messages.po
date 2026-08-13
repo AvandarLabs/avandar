@@ -577,6 +577,10 @@ msgstr "{0} Administrador"
 msgid "The sheet has a header row"
 msgstr "La hoja tiene una fila de encabezado"
 
+#: src/views/GisApp/MapCanvas/MapCanvas.tsx
+msgid "Map"
+msgstr "Mapa"
+
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
@@ -636,7 +640,7 @@ msgstr "Este conjunto de datos no tiene descripción."
 msgid "Password reset requires an internet connection."
 msgstr "El restablecimiento de contraseña requiere una conexión a internet."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size"
 msgstr "Tamaño del símbolo"
 
@@ -1122,6 +1126,12 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Recomendado si tiene aproximadamente 8 GB de RAM (opción predeterminada "
 "para la mayoría de los usuarios)."
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
+"coordinates were missing or out of range."
+msgstr "Se omitieron {droppedRowCount} de {totalRowCount} filas porque sus "
+"coordenadas faltaban o estaban fuera de rango."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "Permisos guardados"
@@ -1434,6 +1444,10 @@ msgstr "Cerrar sesión"
 msgid "Section"
 msgstr "Sección"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "No rows could be mapped"
+msgstr "No se pudo ubicar ninguna fila en el mapa"
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1683,7 +1697,7 @@ msgstr "Eliminar"
 msgid "Failed to save dataset: {0}"
 msgstr "Error al guardar el conjunto de datos: {0}"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Query form"
 msgstr "Formulario de consulta"
 
@@ -1830,6 +1844,10 @@ msgstr "Ingrese una descripción para este conjunto de datos"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "Campos a ingresar manualmente"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Loading map data"
+msgstr "Cargando datos del mapa"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2097,6 +2115,10 @@ msgstr "Columna 11"
 msgid "Column 7"
 msgstr "Columna 7"
 
+#: src/views/GisApp/panels/FeatureInspector.tsx
+msgid "Feature"
+msgstr "Función"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "Mostrar puntos"
@@ -2218,8 +2240,8 @@ msgstr "Crear panel y guardar"
 msgid "Padding"
 msgstr "Relleno"
 
-#: src/components/GISApp/DataMap/MapStylePicker.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme"
 msgstr "Tema"
 
@@ -2244,7 +2266,7 @@ msgstr "Valor más común: <0>{0}</0> ({1} filas, {2}%)."
 msgid "Dashboard saved successfully!"
 msgstr "¡Panel guardado exitosamente!"
 
-#: src/components/GISApp/DataMap/GeometryDrawer.tsx
+#: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "N/A"
 msgstr "N/A"
 
@@ -2272,10 +2294,6 @@ msgstr "No hay valores"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Aclaración {turnNumber} de 3"
-
-#: src/components/GISApp/DataMap/GeometryDrawer.tsx
-msgid "Data Point"
-msgstr "Punto de datos"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
@@ -2388,6 +2406,12 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "La cláusula WHERE usa \"{operator}\" en \"{columnName}\" con una lista "
 "no literal."
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "None of the {totalRowCount} rows could be mapped because their "
+"coordinates were missing or out of range."
+msgstr "No se pudo ubicar ninguna de las {totalRowCount} filas en el mapa "
+"porque sus coordenadas faltaban o estaban fuera de rango."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2647,6 +2671,11 @@ msgstr "No disponible sin conexión"
 msgid "Back to the login page"
 msgstr "Volver a la página de inicio de sesión"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Pick a data source and its latitude and longitude columns to plot it."
+msgstr "Seleccione una fuente de datos y sus columnas de latitud y longitud "
+"para graficarla."
+
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Controls the default for the rest of the workspace. People without app "
 "access still need a direct share above."
@@ -2753,7 +2782,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "¿Está seguro de que desea eliminar este conjunto de datos? Esta acción "
 "no se puede deshacer."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size column must be numeric."
 msgstr "La columna de tamaño de símbolo debe ser numérica."
 
@@ -3304,7 +3333,7 @@ msgstr "Seleccionar columnas"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "No puedes publicar mientras haya cambios no guardados. Guarda primero."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
 msgstr "Columna de latitud"
 
@@ -3402,6 +3431,10 @@ msgstr "Conjunto de datos agregado"
 msgid "Optional"
 msgstr "Opcional"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Some rows could not be mapped"
+msgstr "No se pudieron ubicar algunas filas en el mapa"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
 msgstr "Aplicación"
@@ -3434,7 +3467,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "Cada serie es una columna numérica trazada en el valor radial. Los "
 "valores se agrupan por el eje de categoría (\"{axisKeyValue}\")."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select longitude column"
 msgstr "Seleccionar columna de longitud"
 
@@ -3558,7 +3591,7 @@ msgstr "Metadatos en bruto (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "Estas son las primeras {0} filas de tu conjunto de datos."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select symbol size column"
 msgstr "Seleccionar columna de tamaño de símbolo"
 
@@ -3578,7 +3611,7 @@ msgstr "URL personalizada"
 msgid "Ask about your data..."
 msgstr "Pregunta sobre tus datos..."
 
-#: src/components/GISApp/DataMap/MapStylePicker.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme picker"
 msgstr "Selector de tema"
 
@@ -3986,8 +4019,8 @@ msgstr "Procesar datos nuevamente"
 msgid "Export as PDF"
 msgstr "Exportar como PDF"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Filter"
 msgstr "Filtrar"
 
@@ -4061,7 +4094,7 @@ msgstr "Apilado"
 msgid "Share this {resourceLabel}"
 msgstr "Compartir este {resourceLabel}"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select latitude column"
 msgstr "Seleccionar columna de latitud"
 
@@ -4073,6 +4106,10 @@ msgstr "Este {resource} está compartido con: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Subir"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Something went wrong while loading this layer's data."
+msgstr "Ocurrió un error al cargar los datos de esta capa."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4500,7 +4537,7 @@ msgstr "Rol para {displayName}"
 msgid "Review before sending"
 msgstr "Revise antes de enviar"
 
-#: src/views/DataExplorerApp/useDataQuery.tsx
+#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
 msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "Las consultas públicas no son compatibles con las consultas "
@@ -4837,6 +4874,10 @@ msgstr "Sin columnas numéricas"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "Servicio"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Could not load map data"
+msgstr "No se pudieron cargar los datos del mapa"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -5441,7 +5482,7 @@ msgstr "Tableros"
 msgid "integer"
 msgstr "entero"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol color"
 msgstr "Color del símbolo"
 
@@ -5553,7 +5594,7 @@ msgstr "Actualmente estás suscrito a este plan."
 msgid "Upload a dataset"
 msgstr "Subir un conjunto de datos"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Invalid column type"
 msgstr "Tipo de columna inválido"
 
@@ -5888,6 +5929,10 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Los valores que seleccionaste pueden contener información personal. El "
 "proveedor de IA los recibirá y puede registrar la solicitud."
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "No mappable rows in this data source."
+msgstr "No hay filas que se puedan ubicar en el mapa en esta fuente de datos."
+
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "Archivo CSV o Excel"
@@ -5979,7 +6024,7 @@ msgstr "Tu espacio de trabajo ha utilizado todos {currentSeatUsage} de sus "
 msgid "Shared with you"
 msgstr "Compartido contigo"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Longitude column"
 msgstr "Columna de longitud"
 

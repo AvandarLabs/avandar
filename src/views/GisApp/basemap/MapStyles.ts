@@ -1,6 +1,8 @@
 import { registry } from "@avandar/utils";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
-export const mapStyles = {
+/** Basemap style URLs, keyed by the model's basemap style union. */
+export const MapStyles = {
   positron: {
     url: "https://tiles.openfreemap.org/styles/positron",
     name: "Positron",
@@ -25,9 +27,10 @@ export const mapStyles = {
     url: "https://tiles.openfreemap.org/styles/bright",
     name: "Avandar",
   },
-} as const;
+} as const satisfies Record<AvaMap.BasemapStyle, { url: string; name: string }>;
 
-export type MapStyleKey = keyof typeof mapStyles;
+/** The key of a built-in basemap style, aliased from the AvaMap model. */
+export type MapStyleKey = AvaMap.BasemapStyle;
 
 export const MapStyleKeys = registry<MapStyleKey>().keys(
   "avandar",

@@ -569,6 +569,10 @@ msgstr "{0} مدير"
 msgid "The sheet has a header row"
 msgstr "تحتوي الورقة على صف رأس"
 
+#: src/views/GisApp/MapCanvas/MapCanvas.tsx
+msgid "Map"
+msgstr "الخريطة"
+
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
@@ -628,7 +632,7 @@ msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 msgid "Password reset requires an internet connection."
 msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً بالإنترنت."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size"
 msgstr "حجم الرمز"
 
@@ -1104,6 +1108,12 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
 "الافتراضي لمعظم المستخدمين)."
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
+"coordinates were missing or out of range."
+msgstr "تم تخطي {droppedRowCount} من أصل {totalRowCount} صفًا لأن إحداثياتها "
+"مفقودة أو خارج النطاق."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "تم حفظ الأذونات"
@@ -1410,6 +1420,10 @@ msgstr "تسجيل الخروج"
 msgid "Section"
 msgstr "قسم"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "No rows could be mapped"
+msgstr "تعذّر تحديد مواقع أي صفوف على الخريطة"
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1652,7 +1666,7 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Query form"
 msgstr "نموذج الاستعلام"
 
@@ -1796,6 +1810,10 @@ msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "حقول يجب إدخالها يدويًا"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Loading map data"
+msgstr "جارٍ تحميل بيانات الخريطة"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2057,6 +2075,10 @@ msgstr "العمود 11"
 msgid "Column 7"
 msgstr "العمود 7"
 
+#: src/views/GisApp/panels/FeatureInspector.tsx
+msgid "Feature"
+msgstr "ميزة"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "إظهار النقاط"
@@ -2177,8 +2199,8 @@ msgstr "إنشاء لوحة & حفظ"
 msgid "Padding"
 msgstr "حشوة"
 
-#: src/components/GISApp/DataMap/MapStylePicker.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme"
 msgstr "السمة"
 
@@ -2203,7 +2225,7 @@ msgstr "القيمة الأكثر شيوعًا: <0>{0}</0> ({1} صفوف، {2}%)
 msgid "Dashboard saved successfully!"
 msgstr "تم حفظ اللوحة بنجاح!"
 
-#: src/components/GISApp/DataMap/GeometryDrawer.tsx
+#: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "N/A"
 msgstr "غير متوفر"
 
@@ -2230,10 +2252,6 @@ msgstr "لا توجد قيم"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "توضيح {turnNumber} من 3"
-
-#: src/components/GISApp/DataMap/GeometryDrawer.tsx
-msgid "Data Point"
-msgstr "نقطة البيانات"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
@@ -2343,6 +2361,12 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{columnName}\" مع قائمة "
 "غير حرفية."
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "None of the {totalRowCount} rows could be mapped because their "
+"coordinates were missing or out of range."
+msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ عددها {totalRowCount} على الخريطة "
+"لأن إحداثياتها مفقودة أو خارج النطاق."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2599,6 +2623,10 @@ msgstr "غير متاح دون اتصال"
 msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Pick a data source and its latitude and longitude columns to plot it."
+msgstr "اختر مصدر بيانات وعمودي خط العرض وخط الطول لرسم بياناته."
+
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Controls the default for the rest of the workspace. People without app "
 "access still need a direct share above."
@@ -2704,7 +2732,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا "
 "الإجراء."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol size column must be numeric."
 msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
 
@@ -3244,7 +3272,7 @@ msgstr "اختر الأعمدة"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
 msgstr "عمود خط العرض"
 
@@ -3342,6 +3370,10 @@ msgstr "تمت إضافة مجموعة البيانات"
 msgid "Optional"
 msgstr "اختياري"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Some rows could not be mapped"
+msgstr "تعذّر تحديد مواقع بعض الصفوف على الخريطة"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
 msgstr "تطبيق"
@@ -3374,7 +3406,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select longitude column"
 msgstr "اختر عمود خط الطول"
 
@@ -3494,7 +3526,7 @@ msgstr "البيانات الوصفية الخام (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيانات الخاصة بك."
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select symbol size column"
 msgstr "اختر عمود حجم الرمز"
 
@@ -3514,7 +3546,7 @@ msgstr "عنوان URL مخصص"
 msgid "Ask about your data..."
 msgstr "اسأل عن بياناتك..."
 
-#: src/components/GISApp/DataMap/MapStylePicker.tsx
+#: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme picker"
 msgstr "اختيار السمة"
 
@@ -3915,8 +3947,8 @@ msgstr "معالجة البيانات مرة أخرى"
 msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Filter"
 msgstr "تصفية"
 
@@ -3989,7 +4021,7 @@ msgstr "متراص"
 msgid "Share this {resourceLabel}"
 msgstr "شارك هذا {resourceLabel}"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select latitude column"
 msgstr "حدد عمود خط العرض"
 
@@ -4001,6 +4033,10 @@ msgstr "هذا {resource} مشترك مع: "
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Something went wrong while loading this layer's data."
+msgstr "حدث خطأ ما أثناء تحميل بيانات هذه الطبقة."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4419,7 +4455,7 @@ msgstr "الدور لـ {displayName}"
 msgid "Review before sending"
 msgstr "راجع قبل الإرسال"
 
-#: src/views/DataExplorerApp/useDataQuery.tsx
+#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
 msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "لا تدعم الاستعلامات العامة الاستعلامات المنظمة. استخدم SQL الخام بدلاً "
@@ -4750,6 +4786,10 @@ msgstr "لا توجد أعمدة رقمية"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "الخدمة"
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "Could not load map data"
+msgstr "تعذّر تحميل بيانات الخريطة"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -5344,7 +5384,7 @@ msgstr "لوحات المعلومات"
 msgid "integer"
 msgstr "عدد صحيح"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Symbol color"
 msgstr "لون الرمز"
 
@@ -5456,7 +5496,7 @@ msgstr "أنت مشترك حاليًا في هذه الخطة."
 msgid "Upload a dataset"
 msgstr "تحميل مجموعة بيانات"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Invalid column type"
 msgstr "نوع العمود غير صالح"
 
@@ -5786,6 +5826,10 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+msgid "No mappable rows in this data source."
+msgstr "لا توجد صفوف قابلة للتحديد على الخريطة في مصدر البيانات هذا."
+
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "ملف CSV أو Excel"
@@ -5876,7 +5920,7 @@ msgstr "لقد استخدم مساحة العمل الخاصة بك كل {curren
 msgid "Shared with you"
 msgstr "مشارك معك"
 
-#: src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Longitude column"
 msgstr "عمود الطول"
 
