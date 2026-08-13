@@ -8,35 +8,6 @@ type Props = {
   onClose: () => void;
 };
 
-type ModalActionsProps = {
-  isDisabled: boolean;
-  isTransferring: boolean;
-  onClose: () => void;
-  onTransfer: () => void;
-};
-
-function _ModalActions({
-  isDisabled,
-  isTransferring,
-  onClose,
-  onTransfer,
-}: Readonly<ModalActionsProps>): React.ReactNode {
-  return (
-    <Group justify="flex-end">
-      <Button variant="default" onClick={onClose}>
-        <Trans>Cancel</Trans>
-      </Button>
-      <Button
-        disabled={isDisabled}
-        loading={isTransferring}
-        onClick={onTransfer}
-      >
-        <Trans>Reassign</Trans>
-      </Button>
-    </Group>
-  );
-}
-
 /** Picks a successor for all private resources owned by one member. */
 export function ReassignOwnerModal({
   fromUserId,
@@ -69,12 +40,18 @@ export function ReassignOwnerModal({
           disabled={isFetchingMembers}
           searchable
         />
-        <_ModalActions
-          isDisabled={!toUserId || isFetchingMembers}
-          isTransferring={isTransferring}
-          onClose={onClose}
-          onTransfer={onTransfer}
-        />
+        <Group justify="flex-end">
+          <Button variant="default" onClick={onClose}>
+            <Trans>Cancel</Trans>
+          </Button>
+          <Button
+            disabled={!toUserId || isFetchingMembers}
+            loading={isTransferring}
+            onClick={onTransfer}
+          >
+            <Trans>Reassign</Trans>
+          </Button>
+        </Group>
       </Stack>
     </Modal>
   );

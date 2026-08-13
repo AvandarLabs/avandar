@@ -47,9 +47,7 @@ alter table public.usage_analytics_events enable row level security;
 -- are a member of. We trust the client to set workspace_id correctly,
 -- and we verify the user_id matches the JWT principal so a member can't
 -- record events as another user.
-create policy "
-  Authenticated users can INSERT analytics events for workspaces they belong to
-" on public.usage_analytics_events for insert to authenticated
+create policy "Authenticated users can INSERT analytics events for workspaces they belong to" on public.usage_analytics_events for insert to authenticated
 with
   check (
     (
@@ -74,9 +72,7 @@ with
 -- workspaces. This powers the workspace usage admin panel and the private
 -- resource ownership-transfer audit trail: a Settings Admin who is not the
 -- workspace owner performs transfers and must be able to read the record.
-create policy "
-  Workspace managers can SELECT analytics events for their workspaces
-" on public.usage_analytics_events for
+create policy "Workspace managers can SELECT analytics events for their workspaces" on public.usage_analytics_events for
 select
   to authenticated using (
     workspace_id is not null and

@@ -1,20 +1,51 @@
-drop policy "Resource admins can insert resource_shares" on "public"."resource_shares";
+-- Private resource permissions hardening (P1).
+--
+-- Consolidates the eleven incremental migrations this branch originally used
+-- into one. Generated with `supabase db diff` from supabase/schemas/, so it is
+-- the declarative state rather than a hand-merge of the originals. Verified by
+-- pg_dump comparison against the pre-consolidation database: functions,
+-- triggers, indexes, tables and all 271 GRANT/REVOKE lines identical.
+--
+-- Timestamped before 20260813151500_STORAGE-gate-workspaces-bucket-on-dataset-access.sql
+-- on purpose. That storage migration calls util__storage_object_dataset_id and
+-- util__storage_object_workspace_id, both created here. Nothing in this file
+-- touches storage, so nothing forces a second public migration after the
+-- STORAGE ones.
+--
+-- The two leading `drop policy` statements repair corrupted identifiers rather
+-- than changing behaviour. 20260602172559_drop_list_shared_with_me_rpc.sql was
+-- generated output applied unreviewed, and it line-wrapped two policy names,
+-- baking a literal newline and two spaces into the identifier. Postgres then
+-- truncated the result at 63 bytes. The policies recreated below carry the
+-- names supabase/schemas/30.usage_analytics_events.sql actually declares. The
+-- USING and WITH CHECK expressions are unchanged.
+--
+drop policy if exists "
+  Authenticated users can INSERT analytics events for workspac" on "public"."usage_analytics_events";
 
-drop policy "Resource admins can update resource_shares" on "public"."resource_shares";
+drop policy if exists "
+  Workspace owners can SELECT analytics events for their works" on "public"."usage_analytics_events";
 
-drop function if exists "public"."util__has_non_owner_share"(p_resource_type public.resource_type, p_resource_id uuid, p_owner_id uuid);
+drop policy if exists "Resource admins can insert resource_shares" on "public"."resource_shares";
 
-CREATE INDEX idx_dashboards__workspace_owner ON public.dashboards USING btree (workspace_id, owner_id);
+drop policy if exists "Resource admins can update resource_shares" on "public"."resource_shares";
 
-CREATE INDEX idx_datasets__workspace_owner ON public.datasets USING btree (workspace_id, owner_id);
+create index idx_dashboards__workspace_owner on public.dashboards using btree (
+  workspace_id,
+  owner_id
+);
 
-set check_function_bodies = off;
+create index idx_datasets__workspace_owner on public.datasets using btree (
+  workspace_id,
+  owner_id
+);
 
-CREATE OR REPLACE FUNCTION public.dashboards__prevent_workspace_id_change()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'public'
-AS $function$
+set
+  check_function_bodies = off;
+
+create or replace function public.dashboards__prevent_workspace_id_change () returns trigger language plpgsql
+set
+  search_path to 'public' as $function$
 begin
   if new.workspace_id is distinct from old.workspace_id then
     raise exception 'dashboard workspace_id cannot be changed'
@@ -23,14 +54,11 @@ begin
 
   return new;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.datasets__prevent_workspace_id_change()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'public'
-AS $function$
+create or replace function public.datasets__prevent_workspace_id_change () returns trigger language plpgsql
+set
+  search_path to 'public' as $function$
 begin
   if new.workspace_id is distinct from old.workspace_id then
     raise exception 'dataset workspace_id cannot be changed'
@@ -39,15 +67,11 @@ begin
 
   return new;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.resource_shares__validate_principal_workspace()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.resource_shares__validate_principal_workspace () returns trigger language plpgsql security definer
+set
+  search_path to 'public' as $function$
 declare
   v_is_principal_in_workspace boolean;
 begin
@@ -78,15 +102,11 @@ begin
 
   return new;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.resource_shares__validate_resource_workspace()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.resource_shares__validate_resource_workspace () returns trigger language plpgsql security definer
+set
+  search_path to 'public' as $function$
 declare
   v_resource_workspace_id uuid;
 begin
@@ -107,36 +127,15 @@ begin
 
   return new;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.util__has_non_owner_share(p_resource_type public.resource_type, p_resource_id uuid, p_workspace_id uuid, p_owner_id uuid)
- RETURNS boolean
- LANGUAGE sql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  select exists (
-    select 1
-    from public.resource_shares rs
-    where
-      rs.resource_type = p_resource_type and
-      rs.resource_id = p_resource_id and
-      rs.workspace_id = p_workspace_id and
-      (
-        rs.principal_type <> 'user'::public.share_principal_type or
-        rs.principal_id is distinct from p_owner_id
-      )
-  );
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.rpc_resources__transfer_ownership(p_resource_type public.resource_type, p_resource_id uuid, p_new_owner_id uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.rpc_resources__transfer_ownership (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_new_owner_id uuid
+) returns void language plpgsql security definer
+set
+  search_path to 'public' as $function$
 declare
   v_workspace_id uuid;
   v_current_owner_id uuid;
@@ -242,15 +241,17 @@ begin
     )
   );
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.rpc_workspaces__private_resource_counts(p_workspace_id uuid)
- RETURNS TABLE(user_id uuid, private_dashboard_count bigint, private_dataset_count bigint)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.rpc_workspaces__private_resource_counts (
+  p_workspace_id uuid
+) returns table (
+  user_id uuid,
+  private_dashboard_count bigint,
+  private_dataset_count bigint
+) language plpgsql security definer
+set
+  search_path to 'public' as $function$
 #variable_conflict use_column
 begin
   if not public.util__can_manage_workspace_settings (p_workspace_id) then
@@ -297,15 +298,15 @@ begin
   left join private_datasets pds on pds.owner_id = wm.user_id
   where wm.workspace_id = p_workspace_id;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.rpc_workspaces__transfer_all_owned_resources(p_workspace_id uuid, p_from_user_id uuid, p_new_owner_id uuid)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.rpc_workspaces__transfer_all_owned_resources (
+  p_workspace_id uuid,
+  p_from_user_id uuid,
+  p_new_owner_id uuid
+) returns integer language plpgsql security definer
+set
+  search_path to 'public' as $function$
 declare
   v_moved integer := 0;
   v_resource_id uuid;
@@ -349,15 +350,69 @@ begin
 
   return v_moved;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.util__is_resource_private_to_owner(p_resource_type public.resource_type, p_resource_id uuid)
- RETURNS boolean
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__auth_user_can_access_resource_in_workspace (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid,
+  p_required_role public.role_level
+) returns boolean language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
+declare
+  v_resource_workspace_id uuid;
+begin
+  if p_resource_type = 'dashboard' then
+    select d.workspace_id into v_resource_workspace_id
+    from public.dashboards d
+    where d.id = p_resource_id;
+  elsif p_resource_type = 'dataset' then
+    select ds.workspace_id into v_resource_workspace_id
+    from public.datasets ds
+    where ds.id = p_resource_id;
+  else
+    return false;
+  end if;
+
+  return
+    v_resource_workspace_id = p_workspace_id and
+    public.util__auth_user_can_access_resource (
+      p_resource_type,
+      p_resource_id,
+      p_required_role
+    );
+end;
+$function$;
+
+create or replace function public.util__has_non_owner_share (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid,
+  p_owner_id uuid
+) returns boolean language sql stable security definer
+set
+  search_path to 'public' as $function$
+  select exists (
+    select 1
+    from public.resource_shares rs
+    where
+      rs.resource_type = p_resource_type and
+      rs.resource_id = p_resource_id and
+      rs.workspace_id = p_workspace_id and
+      (
+        rs.principal_type <> 'user'::public.share_principal_type or
+        rs.principal_id is distinct from p_owner_id
+      )
+  );
+$function$;
+
+create or replace function public.util__is_resource_private_to_owner (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns boolean language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_owner_id uuid;
   v_workspace_id uuid;
@@ -400,15 +455,40 @@ begin
     v_owner_id
   );
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.util__resource_effective_role(p_resource_type public.resource_type, p_resource_id uuid)
- RETURNS public.role_level
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__storage_object_dataset_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path to 'public' as $function$
+  select case
+    when split_part(p_object_name, '/', 3) ~
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then replace(split_part(p_object_name, '/', 3), '.parquet', '')::uuid
+    else null
+  end;
+$function$;
+
+create or replace function public.util__storage_object_workspace_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path to 'public' as $function$
+  select case
+    when split_part(p_object_name, '/', 1) ~
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+    then split_part(p_object_name, '/', 1)::uuid
+    else null
+  end;
+$function$;
+
+create or replace function public.util__resource_effective_role (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns public.role_level language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_workspace_id uuid;
   v_owner_id uuid;
@@ -552,34 +632,132 @@ begin
 
   return public.util__rank_to_role_level (v_max_rank);
 end;
-$function$
-;
+$function$;
 
+create policy "Authenticated users can INSERT analytics events for workspaces " on "public"."usage_analytics_events" as permissive for insert to authenticated
+with
+  check (
+    (
+      (
+        (
+          user_id is null
+        ) or
+        (
+          user_id = auth.uid ()
+        )
+      ) and
+      (
+        (
+          workspace_id is null
+        ) or
+        (
+          exists (
+            select
+              1
+            from
+              public.workspace_memberships m
+            where
+              (
+                (
+                  m.workspace_id = usage_analytics_events.workspace_id
+                ) and
+                (
+                  m.user_id = auth.uid ()
+                )
+              )
+          )
+        )
+      )
+    )
+  );
 
-  create policy "Resource admins can insert resource_shares"
-  on "public"."resource_shares"
-  as permissive
-  for insert
-  to authenticated
-with check (public.util__auth_user_can_access_resource_in_workspace(resource_type, resource_id, workspace_id, 'admin'::public.role_level));
+create policy "Workspace managers can SELECT analytics events for their worksp" on "public"."usage_analytics_events" as permissive for
+select
+  to authenticated using (
+    (
+      (
+        workspace_id is not null
+      ) and
+      public.util__can_manage_workspace_settings (
+        workspace_id
+      )
+    )
+  );
 
+create policy "Resource admins can insert resource_shares" on "public"."resource_shares" as permissive for insert to authenticated
+with
+  check (
+    public.util__auth_user_can_access_resource_in_workspace (
+      resource_type,
+      resource_id,
+      workspace_id,
+      'admin'::public.role_level
+    )
+  );
 
+create policy "Resource admins can update resource_shares" on "public"."resource_shares" as permissive
+for update
+  to authenticated using (
+    public.util__auth_user_can_access_resource_in_workspace (
+      resource_type,
+      resource_id,
+      workspace_id,
+      'admin'::public.role_level
+    )
+  )
+with
+  check (
+    public.util__auth_user_can_access_resource_in_workspace (
+      resource_type,
+      resource_id,
+      workspace_id,
+      'admin'::public.role_level
+    )
+  );
 
-  create policy "Resource admins can update resource_shares"
-  on "public"."resource_shares"
-  as permissive
-  for update
-  to authenticated
-using (public.util__auth_user_can_access_resource_in_workspace(resource_type, resource_id, workspace_id, 'admin'::public.role_level))
-with check (public.util__auth_user_can_access_resource_in_workspace(resource_type, resource_id, workspace_id, 'admin'::public.role_level));
+create trigger tr__dashboards__prevent_workspace_id_change before
+update of workspace_id on public.dashboards for each row
+execute function public.dashboards__prevent_workspace_id_change ();
 
+create trigger tr__datasets__prevent_workspace_id_change before
+update of workspace_id on public.datasets for each row
+execute function public.datasets__prevent_workspace_id_change ();
 
-CREATE TRIGGER tr__dashboards__prevent_workspace_id_change BEFORE UPDATE OF workspace_id ON public.dashboards FOR EACH ROW EXECUTE FUNCTION public.dashboards__prevent_workspace_id_change();
+create trigger tr__resource_shares__01_validate_resource_workspace before insert or
+update on public.resource_shares for each row
+execute function public.resource_shares__validate_resource_workspace ();
 
-CREATE TRIGGER tr__datasets__prevent_workspace_id_change BEFORE UPDATE OF workspace_id ON public.datasets FOR EACH ROW EXECUTE FUNCTION public.datasets__prevent_workspace_id_change();
+create trigger tr__resource_shares__02_validate_principal_workspace before insert or
+update on public.resource_shares for each row
+execute function public.resource_shares__validate_principal_workspace ();
 
-CREATE TRIGGER tr__resource_shares__01_validate_resource_workspace BEFORE INSERT OR UPDATE ON public.resource_shares FOR EACH ROW EXECUTE FUNCTION public.resource_shares__validate_resource_workspace();
+-- Hand-added. `supabase db diff` does not reliably emit GRANT/REVOKE (see the
+-- Known Caveats section of the supabase-declarative-schema skill), so these two
+-- revokes are absent from the generated output above even though
+-- supabase/schemas/16.utils.resource-permissions.sql declares them.
+--
+-- They matter: both helpers are `security definer` and answer "is this
+-- resource private, and to whom". Left executable by `anon` and
+-- `authenticated`, either one is a probe an ordinary user can call directly to
+-- learn about resources they cannot read.
+revoke
+execute on function public.util__has_non_owner_share (
+  public.resource_type,
+  uuid,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated;
 
-CREATE TRIGGER tr__resource_shares__02_validate_principal_workspace BEFORE INSERT OR UPDATE ON public.resource_shares FOR EACH ROW EXECUTE FUNCTION public.resource_shares__validate_principal_workspace();
-
-
+revoke
+execute on function public.util__is_resource_private_to_owner (
+  public.resource_type,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated;

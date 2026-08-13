@@ -1,8 +1,10 @@
+import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
+import { PrivateResourceAdminClient } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useTransferAllOwnedResources } from "./useTransferAllOwnedResources";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 
 type OwnerOption = { value: string; label: string };
 
@@ -43,6 +45,7 @@ export function useReassignOwnerModal(
   options: Readonly<{ fromUserId: string; onClose: () => void }>,
 ): ReassignOwnerModalState {
   const workspace = useCurrentWorkspace();
+  const { t } = useLingui();
   const [toUserId, setToUserId] = useState<string | undefined>(undefined);
   const [members = [], , membersQuery] =
     WorkspaceClient.useGetUsersForWorkspace({
@@ -50,9 +53,19 @@ export function useReassignOwnerModal(
       useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
   const [transferAllOwnedResources, isTransferring] =
-    useTransferAllOwnedResources({
-      workspaceId: workspace.id,
-      onClose: options.onClose,
+    PrivateResourceAdminClient.useTransferAllOwnedResources({
+      queriesToInvalidate: [
+        PrivateResourceAdminClient.QueryKeys.getPrivateResourceCounts({
+          workspaceId: workspace.id,
+        }),
+      ],
+      onSuccess: () => {
+        notifySuccess(t`Ownership reassigned.`);
+        options.onClose();
+      },
+      onError: (error: Error) => {
+        notifyError({ title: t`Reassign failed`, message: error.message });
+      },
     });
   const onTransfer = () => {
     if (toUserId) {
