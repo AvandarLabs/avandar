@@ -1611,6 +1611,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_resources__transfer_ownership: {
+        Args: {
+          p_new_owner_id: string
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: undefined
+      }
       rpc_workspaces__create_with_owner: {
         Args: {
           p_display_name: string
@@ -1632,6 +1640,22 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      rpc_workspaces__private_resource_counts: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          private_dashboard_count: number
+          private_dataset_count: number
+          user_id: string
+        }[]
+      }
+      rpc_workspaces__transfer_all_owned_resources: {
+        Args: {
+          p_from_user_id: string
+          p_new_owner_id: string
+          p_workspace_id: string
+        }
+        Returns: number
       }
       util__auth_user_can_access_resource: {
         Args: {
@@ -1700,6 +1724,21 @@ export type Database = {
       util__get_workspace_members: {
         Args: { workspace_id: string }
         Returns: string[]
+      }
+      util__has_non_owner_share: {
+        Args: {
+          p_owner_id: string
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__is_resource_private_to_owner: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
       }
       util__is_settings_admin: {
         Args: { p_workspace_id: string }
