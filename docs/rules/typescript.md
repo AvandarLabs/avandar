@@ -179,6 +179,22 @@
   | `to`      | Converts one representation into another              |
   | `select`  | Chooses among candidates that are all already present |
 
+- A `resolve...` name says what you get, not what you started from, so name
+  the source as well whenever the receiver does not already supply it. On a
+  module named after the source type the call site reads it out loud, and
+  repeating it stutters: prefer `MapLayer.resolveGeoBinding(layer)` over
+  `MapLayer.mapLayerToGeoBinding(layer)`. A free-floating function has no such
+  receiver, so it should carry the source: `resolveGeoBindingFromLayer`, not a
+  bare `resolveGeoBinding`.
+- Prefer `xToY` over `resolve...` when the conversion is total: every input
+  has an output, the output is a re-representation of the input rather than
+  something looked up, and no context beyond the input is consulted. Reserve
+  `resolve...` for the partial case, where the answer can be absent.
+  `structuredQueryToSql` and `sqlToStructuredQuery` are conversions;
+  `resolveColumnKey` is a lookup that can fail. The distinction carries real
+  information: an `xToY` name that can return `undefined` misleads the caller
+  into skipping the empty case.
+
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
     Examples: `e2eCreds` or `MyE2ETest`
