@@ -121,4 +121,157 @@ describe("computeBounds", () => {
       [7, 7],
     ]);
   });
+
+  it("spans a multi point", () => {
+    const multiPoint: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "MultiPoint",
+        coordinates: [
+          [10, 20],
+          [-5, 35],
+        ],
+      },
+      properties: {},
+    };
+    expect(
+      computeBounds({ type: "FeatureCollection", features: [multiPoint] }),
+    ).toEqual([
+      [-5, 20],
+      [10, 35],
+    ]);
+  });
+
+  it("spans a multi line string", () => {
+    const multiLine: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "MultiLineString",
+        coordinates: [
+          [
+            [0, 0],
+            [1, 1],
+          ],
+          [
+            [20, -10],
+            [25, -8],
+          ],
+        ],
+      },
+      properties: {},
+    };
+    expect(
+      computeBounds({ type: "FeatureCollection", features: [multiLine] }),
+    ).toEqual([
+      [0, -10],
+      [25, 1],
+    ]);
+  });
+
+  it("spans a multi polygon", () => {
+    const multiPolygon: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "MultiPolygon",
+        coordinates: [
+          [
+            [
+              [0, 0],
+              [2, 0],
+              [2, 2],
+              [0, 2],
+              [0, 0],
+            ],
+          ],
+          [
+            [
+              [30, 30],
+              [32, 30],
+              [32, 32],
+              [30, 32],
+              [30, 30],
+            ],
+          ],
+        ],
+      },
+      properties: {},
+    };
+    expect(
+      computeBounds({
+        type: "FeatureCollection",
+        features: [multiPolygon],
+      }),
+    ).toEqual([
+      [0, 0],
+      [32, 32],
+    ]);
+  });
+
+  it("ignores an altitude component nested in a line string", () => {
+    const line: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [10, 20, 500],
+          [12, 22, 900],
+        ],
+      },
+      properties: {},
+    };
+    expect(
+      computeBounds({ type: "FeatureCollection", features: [line] }),
+    ).toEqual([
+      [10, 20],
+      [12, 22],
+    ]);
+  });
+
+  it("returns undefined for an empty coordinates array", () => {
+    const emptyLine: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: { type: "LineString", coordinates: [] },
+      properties: {},
+    };
+    expect(
+      computeBounds({ type: "FeatureCollection", features: [emptyLine] }),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined for an empty geometry collection", () => {
+    const emptyCollection: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: { type: "GeometryCollection", geometries: [] },
+      properties: {},
+    };
+    expect(
+      computeBounds({
+        type: "FeatureCollection",
+        features: [emptyCollection],
+      }),
+    ).toBeUndefined();
+  });
+
+  it("walks a geometry collection nested inside another", () => {
+    const nested: GeoJSON.Feature = {
+      type: "Feature",
+      geometry: {
+        type: "GeometryCollection",
+        geometries: [
+          {
+            type: "GeometryCollection",
+            geometries: [{ type: "Point", coordinates: [3, 3] }],
+          },
+          { type: "Point", coordinates: [-6, 12] },
+        ],
+      },
+      properties: {},
+    };
+    expect(
+      computeBounds({ type: "FeatureCollection", features: [nested] }),
+    ).toEqual([
+      [-6, 3],
+      [3, 12],
+    ]);
+  });
 });

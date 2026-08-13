@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { computeLayerStats } from "@/views/GISApp/layers/computeLayerStats/computeLayerStats";
 
 function createCollection(
-  values: ReadonlyArray<number | string | null>,
+  values: ReadonlyArray<number | string | boolean | null>,
 ): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
@@ -61,5 +61,40 @@ describe("computeLayerStats", () => {
         valueColumnName: "cases",
       }),
     ).toEqual({ valueDomain: [5, 5] });
+  });
+
+  it("ignores booleans, NaN, and Infinity", () => {
+    expect(
+      computeLayerStats({
+        featureCollection: createCollection([
+          3,
+          true,
+          false,
+          NaN,
+          Infinity,
+          -Infinity,
+          11,
+        ]),
+        valueColumnName: "cases",
+      }),
+    ).toEqual({ valueDomain: [3, 11] });
+  });
+
+  it("ignores a whitespace-only string instead of reading it as zero", () => {
+    expect(
+      computeLayerStats({
+        featureCollection: createCollection([4, "   ", 8]),
+        valueColumnName: "cases",
+      }),
+    ).toEqual({ valueDomain: [4, 8] });
+  });
+
+  it("does not assume the domain is non-negative", () => {
+    expect(
+      computeLayerStats({
+        featureCollection: createCollection([-12, -3, -20]),
+        valueColumnName: "cases",
+      }),
+    ).toEqual({ valueDomain: [-20, -3] });
   });
 });
