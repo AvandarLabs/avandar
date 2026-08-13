@@ -1712,8 +1712,8 @@ msgid "Grid"
 msgstr "شبكة"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "بحث عن النماذج"
+#~ msgid "Search models"
+#~ msgstr "بحث عن النماذج"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
@@ -2377,6 +2377,10 @@ msgstr "الدور"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "فارغ"
+
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Open models"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3824,8 +3828,8 @@ msgid "Description"
 msgstr "الوصف"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "جارٍ تحميل النماذج..."
+#~ msgid "Loading models..."
+#~ msgstr "جارٍ تحميل النماذج..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5926,6 +5930,10 @@ msgstr "مخطط مساحي"
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "عنوان الصفحة"
@@ -5986,8 +5994,8 @@ msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "تعبير SELECT من النوع \"{exprType}\" غير مدعوم من النموذج."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "لا توجد نماذج تطابق بحثك"
+#~ msgid "No models match your search"
+#~ msgstr "لا توجد نماذج تطابق بحثك"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

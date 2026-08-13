@@ -1711,8 +1711,8 @@ msgid "Grid"
 msgstr "Grid"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "Search models"
+#~ msgid "Search models"
+#~ msgstr "Search models"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
@@ -2382,6 +2382,10 @@ msgstr "Role"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "is null"
+
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "Open models"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3834,8 +3838,8 @@ msgid "Description"
 msgstr "Description"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "Loading models..."
+#~ msgid "Loading models..."
+#~ msgstr "Loading models..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5941,6 +5945,10 @@ msgstr "Area Chart"
 msgid "Invalid date"
 msgstr "Invalid date"
 
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "Frontier models"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Page title"
@@ -6002,8 +6010,8 @@ msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "SELECT expression of type \"{exprType}\" is not supported by the form."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "No models match your search"
+#~ msgid "No models match your search"
+#~ msgstr "No models match your search"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

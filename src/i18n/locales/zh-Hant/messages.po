@@ -1665,8 +1665,8 @@ msgid "Grid"
 msgstr "網格"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "搜尋模型"
+#~ msgid "Search models"
+#~ msgstr "搜尋模型"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
@@ -2317,6 +2317,10 @@ msgstr "角色"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "為空"
+
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Open models"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3739,8 +3743,8 @@ msgid "Description"
 msgstr "描述"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "加載模型中..."
+#~ msgid "Loading models..."
+#~ msgstr "加載模型中..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5794,6 +5798,10 @@ msgstr "面積圖"
 msgid "Invalid date"
 msgstr "無效的日期"
 
+#: src/components/ChatPanel/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "頁面標題"
@@ -5854,8 +5862,8 @@ msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "沒有模型符合您的搜尋"
+#~ msgid "No models match your search"
+#~ msgstr "沒有模型符合您的搜尋"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
