@@ -1,5 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+type SeedDashboardOptions = {
+  admin: SupabaseClient;
+  workspaceId: string;
+  ownerEmail: string;
+  name: string;
+  /** Sets `is_restricted`; defaults to `false`. */
+  isRestricted?: boolean;
+};
+
 /**
  * Inserts a blank dashboard owned by the given user. Returns the new dashboard
  * id so the test can assert against it later. Lighter than
@@ -7,13 +16,16 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * for tests that exercise the "save to dashboard" flow against pre-existing
  * empty dashboards.
  */
-export async function seedDashboard(options: {
-  admin: SupabaseClient;
-  workspaceId: string;
-  ownerEmail: string;
-  name: string;
-}): Promise<string> {
-  const { admin, workspaceId, ownerEmail, name } = options;
+export async function seedDashboard(
+  options: Readonly<SeedDashboardOptions>,
+): Promise<string> {
+  const {
+    admin,
+    workspaceId,
+    ownerEmail,
+    name,
+    isRestricted = false,
+  } = options;
 
   const { data: ownerUserIdRaw, error: ownerLookupError } = await admin.rpc(
     "util__get_user_id_by_email",
@@ -71,7 +83,7 @@ export async function seedDashboard(options: {
       name,
       slug: `e2e-seed-${crypto.randomUUID().slice(0, 8)}`,
       is_public: false,
-      is_restricted: false,
+      is_restricted: isRestricted,
       config,
       created_at: now,
       updated_at: now,
