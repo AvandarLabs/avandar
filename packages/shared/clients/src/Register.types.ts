@@ -12,16 +12,7 @@
  * The augmenting file must itself be a module, i.e. contain at least one
  * top-level `import` or `export`.
  *
- * @example
- * ```ts
- * import type { Database } from "./types/database.types.ts";
- *
- * declare module "@avandar/clients" {
- *   interface Register {
- *     supabaseDatabase: Database;
- *   }
- * }
- * ```
+ * See the package README for a complete declaration-merging example.
  */
 
 import type { UnknownObject } from "@avandar/utils";
