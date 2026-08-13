@@ -22,6 +22,7 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 - **Models**: import `$/models/.../MyModel.ts` (the namespace entry), never `MyModel.types.ts`, except from inside the model's own folder.
 - **Styling**: CSS Modules, never inline `style={}` unless the value is computed at runtime. Never Tailwind.
 - **i18n**: user-facing strings go through Lingui (`const { t } = useLingui()` in components). Model code takes strings as parameters instead of translating.
+- **Import extensions are location-dependent.** Code under `shared/**` writes explicit `.ts` suffixes (it has to run under Deno), and code under `src/**` must not: `import-x/extensions` rejects them there. So the same model is imported as `"$/models/AvaMap/AvaMap.ts"` from `shared/` and `"$/models/AvaMap/AvaMap"` from `src/`. Task 2's code blocks are `shared/`; Tasks 4 onward are `src/`.
 - **Line length is capped at 80 characters** by ESLint `max-len`, comments included. Some code blocks in this plan exceed it, usually in a docstring. Rewrap to fit; do not change the wording, and do not add an eslint-disable. Run `npx prettier --write <files>` and `npx eslint <files>` before committing each task.
 
 ## Commands
@@ -806,7 +807,7 @@ Replaces the inline row loop and the silent `WHERE ... IS NOT NULL` filter. Ever
 ```ts
 import { describe, expect, it } from "vitest";
 import { toFeatureCollection } from "@/views/GISApp/layers/toFeatureCollection/toFeatureCollection";
-import type { ResolvedGeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
+import type { ResolvedGeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types";
 
 const binding: ResolvedGeoBinding = {
   type: "latLngColumns",
@@ -970,8 +971,8 @@ Expected: FAIL, cannot resolve `toFeatureCollection`.
 
 ```ts
 import { jitterCoordinate } from "@/views/GISApp/layers/jitterCoordinate/jitterCoordinate";
-import type { ResolvedGeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
-import type { SensitivityPolicy } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
+import type { ResolvedGeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types";
+import type { SensitivityPolicy } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 /** Why a source row produced no feature. */
@@ -1556,10 +1557,10 @@ This is where the three duplicated paint blocks collapse into one pure function.
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { uuid } from "$/lib/uuid.ts";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
  * The symbology's `value` is a QueryColumnId, not the layer id: a layer id
@@ -1745,7 +1746,7 @@ export type MapSpec = {
 
 ```ts
 import { SensitivityViolationError } from "@/views/GISApp/layers/toFeatureCollection/toFeatureCollection";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerStats } from "@/views/GISApp/layers/computeLayerStats/computeLayerStats";
 import type {
   MapLayerSpec,
@@ -2535,7 +2536,7 @@ Caches per layer, keyed on source and binding only, so editing symbology repaint
 
 ```ts
 import { describe, expect, it, vi } from "vitest";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { buildMapLayerQueryKey, isMapLayerQueryable } from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
 
 describe("isMapLayerQueryable", () => {
