@@ -21,8 +21,9 @@ export function buildLayerId(layerId: string): string {
 
 /**
  * Builds the `circle-radius` value. A flat circle is a constant; a
- * proportional symbol interpolates on the square root of the value so that
- * symbol area, not radius, tracks the number.
+ * proportional symbol interpolates on the square root of the value, which
+ * approximates area-proportional scaling (the `minRadius` floor keeps the
+ * relationship from being exact).
  */
 function _buildCircleRadius({
   symbology,

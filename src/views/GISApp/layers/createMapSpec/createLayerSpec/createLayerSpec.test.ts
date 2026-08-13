@@ -1,7 +1,7 @@
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
-import { createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec";
+import { createLayerSpec } from "@/views/GISApp/layers/createMapSpec/createLayerSpec/createLayerSpec";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
@@ -94,6 +94,91 @@ describe("createLayerSpec", () => {
       10,
       24,
     ]);
+  });
+
+  it("interpolates linearly, unscaled, when the scale is linear", () => {
+    const base = MapLayer.makeEmpty("Cases");
+    const layer = {
+      ...base,
+      symbology: {
+        type: "proportionalSymbol" as const,
+        value: valueColumnId,
+        minRadius: 4,
+        maxRadius: 24,
+        scale: "linear" as const,
+        color: { type: "single" as const, color: "#ef4444" },
+        stroke: { width: 1, color: "#ffffff" },
+      },
+    };
+    const spec = createLayerSpec({
+      layer,
+      featureCollection,
+      stats: { valueDomain: [0, 100] },
+      valueColumnName: "cases",
+    });
+    expect(spec.layers[0]?.paint["circle-radius"]).toEqual([
+      "interpolate",
+      ["linear"],
+      ["max", 0, ["-", ["to-number", ["get", "cases"], 0], 0]],
+      0,
+      4,
+      100,
+      24,
+    ]);
+  });
+
+  it("shifts normalization correctly for a negative domain minimum", () => {
+    const base = MapLayer.makeEmpty("Cases");
+    const layer = {
+      ...base,
+      symbology: {
+        type: "proportionalSymbol" as const,
+        value: valueColumnId,
+        minRadius: 4,
+        maxRadius: 24,
+        scale: "sqrt" as const,
+        color: { type: "single" as const, color: "#ef4444" },
+        stroke: { width: 1, color: "#ffffff" },
+      },
+    };
+    const spec = createLayerSpec({
+      layer,
+      featureCollection,
+      stats: { valueDomain: [-50, 50] },
+      valueColumnName: "cases",
+    });
+    expect(spec.layers[0]?.paint["circle-radius"]).toEqual([
+      "interpolate",
+      ["linear"],
+      ["sqrt", ["max", 0, ["-", ["to-number", ["get", "cases"], 0], -50]]],
+      0,
+      4,
+      10,
+      24,
+    ]);
+  });
+
+  it("falls back to the minimum radius when the domain is degenerate", () => {
+    const base = MapLayer.makeEmpty("Cases");
+    const layer = {
+      ...base,
+      symbology: {
+        type: "proportionalSymbol" as const,
+        value: valueColumnId,
+        minRadius: 4,
+        maxRadius: 24,
+        scale: "sqrt" as const,
+        color: { type: "single" as const, color: "#ef4444" },
+        stroke: { width: 1, color: "#ffffff" },
+      },
+    };
+    const spec = createLayerSpec({
+      layer,
+      featureCollection,
+      stats: { valueDomain: [50, 50] },
+      valueColumnName: "cases",
+    });
+    expect(spec.layers[0]?.paint["circle-radius"]).toBe(4);
   });
 
   it("falls back to the minimum radius when there is no value domain", () => {
