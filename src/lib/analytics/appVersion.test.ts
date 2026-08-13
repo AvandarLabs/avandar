@@ -4,10 +4,10 @@ import { describe, expect, it } from "vitest";
 
 describe("VITE_APP_VERSION", () => {
   it("matches the version in package.json", () => {
-    const pkg = JSON.parse(
+    const packageJson = JSON.parse(
       readFileSync(path.resolve(process.cwd(), "package.json"), "utf-8"),
     ) as { version: string };
 
-    expect(import.meta.env.VITE_APP_VERSION).toBe(pkg.version);
+    expect(import.meta.env.VITE_APP_VERSION).toBe(packageJson.version);
   });
 });

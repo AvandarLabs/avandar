@@ -118,8 +118,9 @@ select
 --
 -- The mapping lives in SQL rather than in the TypeScript event registry
 -- because Postgres triggers emit many of these events and cannot read
--- TypeScript. `shared/analytics/analyticsEvents.ts` mirrors it for developer
--- reference, and a Vitest drift guard fails if the two disagree.
+-- TypeScript. The registry at
+-- `shared/analytics/analyticsEvents/analyticsEvents.ts` mirrors it for
+-- developer reference, and a Vitest drift guard fails if the two disagree.
 --
 -- An unknown name returns `other` rather than raising: recording analytics
 -- must never reject a user action.

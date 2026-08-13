@@ -7,12 +7,10 @@ import { isDesktop } from "$/platform/isDesktop";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
-// The shared analytics registry requires Deno-compatible import syntax.
 import type {
   AnalyticsApp,
   ClientAnalyticsEvent,
-  // eslint-disable-next-line import-x/extensions
-} from "$/analytics/analyticsEvents/analyticsEvents.ts";
+} from "$/analytics/analyticsEvents/analyticsEvents";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
