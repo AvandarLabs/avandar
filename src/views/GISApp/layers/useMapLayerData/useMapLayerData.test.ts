@@ -1,18 +1,34 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { describe, expect, it } from "vitest";
-import {
-  buildMapLayerQueryKey,
-  isMapLayerQueryable,
-} from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
+import { createElement } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderHook, waitFor } from "@/test-utils";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   DatasetColumnId,
   DatasetColumnRead,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type {
+  QueryResult,
+  QueryResultId,
+} from "$/models/queries/QueryResult/QueryResult.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
+
+const { runStructuredQueryMock } = vi.hoisted(() => {
+  return { runStructuredQueryMock: vi.fn() };
+});
+
+vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
+  return { runStructuredQuery: runStructuredQueryMock };
+});
+
+const { useMapLayerData, buildMapLayerQueryKey, isMapLayerQueryable } =
+  await import("@/views/GISApp/layers/useMapLayerData/useMapLayerData");
 
 /**
  * An honest `DatasetColumnRead`, built with no cast. Mirrors the fixture in
@@ -37,6 +53,114 @@ function createNumericColumn(name: string): DatasetColumnRead {
     columnIdx: 0,
   };
 }
+
+/** A layer with a data source and a geo binding that resolves. */
+function createQueryableLayer(): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Cases");
+  const latitude = QueryColumn.makeFromDatasetColumn(
+    createNumericColumn("lat"),
+  );
+  const longitude = QueryColumn.makeFromDatasetColumn(
+    createNumericColumn("lon"),
+  );
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      dataSource: { __type: "Dataset", id: "dataset-1" },
+      queryColumns: [latitude, longitude],
+    },
+    geoBinding: {
+      type: "latLngColumns",
+      latitude: latitude.id,
+      longitude: longitude.id,
+    },
+  } as never;
+}
+
+/** Wraps a hook under test with the `QueryClient` it needs. */
+function _wrapperForHook(options: { children: ReactNode }): JSX.Element {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return createElement(QueryClientProvider, { client }, options.children);
+}
+
+describe("useMapLayerData", () => {
+  const workspaceId = uuid<Workspace.Id>();
+
+  beforeEach(() => {
+    runStructuredQueryMock.mockReset();
+  });
+
+  it("queries with the layer's source when the layer is queryable", async () => {
+    const layer = createQueryableLayer();
+    const queryResult: QueryResult<UnknownRow> = {
+      id: uuid<QueryResultId>(),
+      data: [{ cases: 1 }],
+      columns: [{ name: "cases", dataType: "double" }],
+      numRows: 1,
+    };
+    runStructuredQueryMock.mockResolvedValue(queryResult);
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayerData({ layer, workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current[0]).toEqual(queryResult);
+    });
+
+    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
+    expect(runStructuredQueryMock.mock.calls[0]?.[0]).toMatchObject({
+      query: layer.source,
+    });
+  });
+
+  it("does not query a layer with no data source", async () => {
+    const layer = MapLayer.makeEmpty("Cases");
+
+    renderHook(
+      () => {
+        return useMapLayerData({ layer, workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 0);
+    });
+
+    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("does not query a layer whose geo binding does not resolve", async () => {
+    const layer = {
+      ...createQueryableLayer(),
+      geoBinding: {
+        type: "latLngColumns" as const,
+        latitude: uuid(),
+        longitude: uuid(),
+      },
+    } as never as MapLayer.T;
+
+    renderHook(
+      () => {
+        return useMapLayerData({ layer, workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 0);
+    });
+
+    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+  });
+});
 
 describe("isMapLayerQueryable", () => {
   it("is false until the layer has a data source", () => {
