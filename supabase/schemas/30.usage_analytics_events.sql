@@ -184,3 +184,64 @@ $$ language plpgsql;
 
 create trigger tr__usage_analytics_events__set_category before insert on public.usage_analytics_events for each row
 execute function public.usage_analytics_events__set_category ();
+
+-- Records an analytics event from a Postgres trigger. Triggers must call this
+-- rather than inserting directly.
+--
+-- `client` is always `db` and `app_version` is always null, set here rather
+-- than accepted as parameters so no caller can get them wrong. The
+-- `event_category` is set by `tr__usage_analytics_events__set_category`.
+--
+-- The body swallows every error. Recording analytics must never roll back the
+-- write that triggered it (a signup, an invite, a subscription change), so this
+-- returns cleanly even when the insert fails. The `exception` block runs in a
+-- subtransaction, so a failure here rolls back only the failed insert.
+--
+-- SECURITY DEFINER is required to insert past RLS from a trigger, so EXECUTE is
+-- revoked from every client-reachable role. Without that revoke, any
+-- authenticated user could forge events for another user or workspace through
+-- PostgREST. `search_path` is pinned empty, so every reference is fully
+-- qualified.
+--
+-- @param p_event_name: stable event name; see util__analytics_event_category
+-- @param p_workspace_id: workspace the event belongs to, or null
+-- @param p_user_id: user who triggered the event, or null
+-- @param p_app: app surface, or null when the event is not bound to one
+-- @param p_payload: small, PII-free JSON payload, or null
+-- @returns: void
+create or replace function public.util__log_analytics_event (
+  p_event_name text,
+  p_workspace_id uuid default null,
+  p_user_id uuid default null,
+  p_app public.app_type default null,
+  p_payload jsonb default null
+) returns void as $$
+begin
+  insert into public.usage_analytics_events (
+    event_name,
+    workspace_id,
+    user_id,
+    app,
+    payload,
+    client
+  ) values (
+    p_event_name,
+    p_workspace_id,
+    p_user_id,
+    p_app,
+    p_payload,
+    'db'
+  );
+exception
+  when others then
+    null;
+end;
+$$ language plpgsql security definer set search_path = '';
+
+revoke execute on function public.util__log_analytics_event (
+  text,
+  uuid,
+  uuid,
+  public.app_type,
+  jsonb
+) from public, anon, authenticated;
