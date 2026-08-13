@@ -498,17 +498,15 @@ describe("ChatModelOption.Catalog", () => {
   });
 
   it("orders every proprietary model ahead of every open model", () => {
+    // Count-agnostic on purpose: adding a fourth frontier model is a
+    // legitimate catalog edit and should not break the ordering test as well
+    // as the count test above.
     const tiers = Catalog.values.map((model) => {
       return model.licenseTier;
     });
-    expect(tiers).toEqual([
-      "proprietary",
-      "proprietary",
-      "proprietary",
-      "open",
-      "open",
-      "open",
-    ]);
+    const firstOpenIndex = tiers.indexOf("open");
+    expect(firstOpenIndex).toBeGreaterThan(-1);
+    expect(tiers.lastIndexOf("proprietary")).toBeLessThan(firstOpenIndex);
   });
 
   it("uses unique model ids", () => {
@@ -516,6 +514,22 @@ describe("ChatModelOption.Catalog", () => {
       return model.id;
     });
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("uses OpenRouter's vendor/model id shape, with provider matching the id prefix", () => {
+    // Each row hand-repeats the vendor three times (id prefix, name prefix,
+    // provider) and the model name twice. These two tests guard the
+    // copy-paste edit that is most likely to go wrong.
+    Catalog.values.forEach((model) => {
+      expect(model.id).toMatch(/^[a-z0-9.-]+\/[a-z0-9.-]+$/);
+      expect(model.id.split("/")[0]).toBe(model.provider);
+    });
+  });
+
+  it("keeps nameWithoutProvider consistent with name", () => {
+    Catalog.values.forEach((model) => {
+      expect(model.name.endsWith(model.nameWithoutProvider)).toBe(true);
+    });
   });
 
   it("gives every model a non-empty name and nameWithoutProvider", () => {
@@ -570,6 +584,8 @@ Create `shared/models/chat/ChatModelOption/ChatModelOptionModule/ChatModelOption
 ```ts
 import { Model } from "@avandar/models";
 import { prop } from "@avandar/utils";
+// This import must stay `import type`. `ChatModelOption.ts` value-re-exports
+// this module, so a value import here would close a real runtime cycle.
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 /**
@@ -577,17 +593,20 @@ import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOpt
  * picker renders "Frontier models" above "Open models".
  *
  * Deliberately tiny: one model per frontier lab, plus the three most-used
- * open-weights families. Verified against the OpenRouter catalog on
- * 2026-08-12. Every id is an undated alias, so a provider shipping a dated
- * revision needs no edit here.
+ * open-weights families. Every id is an undated alias, so a provider shipping
+ * a dated revision needs no edit here.
+ *
+ * Verified against the OpenRouter catalog on 2026-08-12. To re-verify an id:
+ * `curl -s https://openrouter.ai/api/v1/models | jq '.data[] | select(.id == "z-ai/glm-5.2")'`
  *
  * `nameWithoutProvider` is authored by hand rather than derived from `name`.
- * OpenRouter is inconsistent about the "Vendor: " prefix (`claude-opus-5` is
- * named "Claude Opus 5", `claude-sonnet-5` is "Anthropic: Claude Sonnet 5"),
- * and deriving the short name produced an empty string for the unprefixed
- * ones.
+ * OpenRouter is inconsistent about the "Vendor: " prefix: its
+ * `anthropic/claude-opus-5` (not in this catalog) is named plain "Claude Opus
+ * 5", while `claude-sonnet-5` is "Anthropic: Claude Sonnet 5". Deriving the
+ * short name by splitting on ":" produced an empty string for the unprefixed
+ * ones, which rendered a blank picker button.
  */
-const CHAT_MODEL_OPTIONS: readonly ChatModelOption.T[] = [
+const CHAT_MODEL_OPTIONS = [
   Model.make("ChatModelOption", {
     id: "anthropic/claude-sonnet-5",
     name: "Anthropic: Claude Sonnet 5",
@@ -636,14 +655,17 @@ const CHAT_MODEL_OPTIONS: readonly ChatModelOption.T[] = [
     licenseTier: "open",
     provider: "deepseek",
   }),
-];
+] as const satisfies readonly ChatModelOption.T[];
+
+/** Union of the six catalog ids, derived so it cannot drift from the list. */
+type ChatModelCatalogId = (typeof CHAT_MODEL_OPTIONS)[number]["id"];
 
 /**
  * Model used when the client sends no selection, or sends one that is not in
  * the catalog. Tool-calling into the Data Explorer is the chat panel's core
  * job, so the default favors reliability there over per-token price.
  */
-const DEFAULT_CHAT_MODEL_ID = "anthropic/claude-sonnet-5";
+const DEFAULT_CHAT_MODEL_ID: ChatModelCatalogId = "anthropic/claude-sonnet-5";
 
 const CHAT_MODEL_ID_SET = new Set<string>(CHAT_MODEL_OPTIONS.map(prop("id")));
 
@@ -668,6 +690,15 @@ export const ChatModelOptionModule = {
   },
 };
 ```
+
+Why `as const satisfies` rather than a `readonly ChatModelOption.T[]` annotation:
+
+- `Model.make` declares `const MProps` (`packages/shared/models/src/Model/ModelModule/ModelModule.ts:15`), so each entry's `id` is already inferred as a literal. An explicit `readonly ChatModelOption.T[]` annotation throws that away and widens `defaultId` to `string`.
+- `satisfies` still enforces conformance to `ChatModelOption.T`, so nothing is lost.
+- Keeping the literals lets `ChatModelCatalogId` be derived, which turns "the default must be in the catalog" into a **compile error** rather than only a test failure. The test stays as a second net.
+- It matches the house style for literal config objects: `shared/config/GlobalVizConfig.ts:29`, `shared/config/FeaturePlansConfig.ts:23`, `src/config/FeatureFlagConfig.ts:82`.
+
+Note for Task 4: `Catalog.values` is now a readonly tuple. The `.filter(...)` in `useChatModelCatalog` returns a fresh mutable array, so the planned code is unaffected. `as const` does not make the element objects deeply readonly, because they come from a function call rather than an object literal.
 
 - [ ] **Step 4: Wire the module into the `ChatModelOption` namespace**
 
@@ -724,7 +755,7 @@ Run:
 pnpm vitest run shared/models/chat/ChatModelOption/ChatModelOptionModule/ChatModelOptionModule.test.ts
 ```
 
-Expected: PASS, 7 tests.
+Expected: PASS, 9 tests.
 
 - [ ] **Step 6: Type-check and lint**
 
@@ -1502,14 +1533,23 @@ In `shared/models/chat/ChatModelOption/ChatModelOption.ts`, delete this line fro
   export type Catalog = { groups: ChatModelOptionGroup[] };
 ```
 
-`ChatModelOptionGroup` is still imported and still used by `export type OptionGroup`, so leave the import alone. The finished file:
+`ChatModelOptionGroup` is still imported and still used by `export type OptionGroup`, so leave that import alone.
+
+**Also delete the dead `Id` type in the same pass.** `ChatModelOption.Id` is declared as `UUID<"ChatModelOption">` (`ChatModelOption.types.ts:8`), but `ChatModelOptionRead` overrides `id` to a plain `string` holding an OpenRouter slug like `z-ai/glm-5.2`. The type is therefore both unreferenced and actively wrong, and it is a trap for the next person who adds a `find(id: ChatModelOption.Id)`. First confirm it is unused:
+
+```bash
+grep -rn "ChatModelOption.Id\|ChatModelOptionId" src/ shared/ supabase/ tests/ | grep -v node_modules
+```
+
+Expected: only the declaration in `ChatModelOption.types.ts` and the re-export in `ChatModelOption.ts`. If so, delete from `ChatModelOption.ts` its `export type Id = ChatModelOptionId;` line and the now-unused `ChatModelOptionId` entry in the `import type` block, and delete from `ChatModelOption.types.ts` the `ChatModelOptionId` declaration plus the `UUID` import if nothing else in that file uses it.
+
+The finished `ChatModelOption.ts`:
 
 ```ts
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
   ChatModelLicenseTier,
   ChatModelOptionGroup,
-  ChatModelOptionId,
   ChatModelOptionModel,
 } from "$/models/chat/ChatModelOption/ChatModelOption.types.ts";
 
@@ -1518,7 +1558,6 @@ export { ChatModelOptionModule as ChatModelOption } from "$/models/chat/ChatMode
 export namespace ChatModelOption {
   export type T<K extends keyof ChatModelOptionModel = "Read"> =
     ChatModelOptionModel[K];
-  export type Id = ChatModelOptionId;
   export type LicenseTier = ChatModelLicenseTier;
   export type OptionGroup = ChatModelOptionGroup;
 }
