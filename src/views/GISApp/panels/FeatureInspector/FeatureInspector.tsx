@@ -7,7 +7,7 @@ type Props = {
   feature: GeoJSON.Feature | null;
 };
 
-export function GeometryDrawer({
+export function FeatureInspector({
   opened,
   onClose,
   feature,
@@ -19,7 +19,7 @@ export function GeometryDrawer({
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={t`Data Point`}
+      title={t`Feature`}
       position="right"
       withOverlay={false}
       closeOnClickOutside={false}
