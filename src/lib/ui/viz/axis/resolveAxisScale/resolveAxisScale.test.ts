@@ -136,6 +136,42 @@ describe("resolveAxisScale — tick interval", () => {
     );
     expect(result.ticks).toHaveLength(4);
   });
+
+  it("ignores an interval wider than the data when the high bound is derived", () => {
+    // The lattice would otherwise extend a full interval past the data
+    // and squash every mark into a sliver.
+    expect(
+      resolveAxisScale({ tickInterval: 1_000_000 }, { min: 0, max: 100 }),
+    ).toEqual({ domain: [0, 100] });
+  });
+
+  it("ignores a data-unit interval typed onto a percent axis", () => {
+    // A percent-stacked chart's real domain is 0-to-1 while its ticks
+    // read as percentages, so a user may enter 20 meaning 20%.
+    expect(resolveAxisScale({ tickInterval: 20 }, { min: 0, max: 1 })).toEqual({
+      domain: [0, 1],
+    });
+  });
+
+  it("still builds a lattice when the interval equals the data range", () => {
+    expect(
+      resolveAxisScale({ tickInterval: 100 }, { min: 0, max: 100 }),
+    ).toEqual({ domain: [0, 100], ticks: [0, 100] });
+  });
+
+  it("honours an oversized interval when the user set the maximum", () => {
+    // Both bounds explicit means the domain is the user's choice.
+    expect(
+      resolveAxisScale(
+        { min: 0, max: 1_000_000, tickInterval: 1_000_000 },
+        { min: 0, max: 100 },
+      ),
+    ).toEqual({
+      domain: [0, 1_000_000],
+      ticks: [0, 1_000_000],
+      allowDataOverflow: true,
+    });
+  });
 });
 
 describe("resolveAxisScale — guards", () => {

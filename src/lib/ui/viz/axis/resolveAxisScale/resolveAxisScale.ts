@@ -134,6 +134,17 @@ export function resolveAxisScale(
     return { domain: [low, high], ...overflow };
   }
 
+  // An interval wider than the data cannot produce a useful lattice: the
+  // derived high would extend a full interval past the data and squash
+  // every mark into a sliver. This is easy to hit on a percent-stacked
+  // axis, whose real domain is 0-to-1 while its ticks read as
+  // percentages, so "a tick every 20%" invites entering `20` rather
+  // than `0.2`. An explicit `max` is always honoured: the user setting
+  // both bounds knows what they are asking for.
+  if (explicitMax === undefined && interval > high - low) {
+    return { domain: [low, high], ...overflow };
+  }
+
   // A derived high is extended outward onto the tick lattice so the
   // domain ends on a tick; an explicit high is never moved, so it may
   // truncate the last tick.
