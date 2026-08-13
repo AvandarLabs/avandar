@@ -17,7 +17,7 @@ import {
   getWorkspaceIdBySlug,
   isDatasetParquetInStorage,
 } from "./helpers/supabaseAdminClient";
-import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
   test("uploads a CSV dataset, verifies preview, offline/online cycle, parquet, toggle", async ({
@@ -54,12 +54,10 @@ test.describe("CSV manual upload", () => {
       SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
     );
     await expect(
-      page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
+      page.getByText(`These are the first ${formattedPreviewRowCount} rows`, {
+        exact: false,
+      }),
     ).toBeVisible({ timeout: LONG_WAIT });
-
-    await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
-      timeout: MEDIUM_WAIT,
-    });
 
     await Promise.all(
       EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
