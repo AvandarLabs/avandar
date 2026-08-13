@@ -1,5 +1,12 @@
 import { Model } from "@avandar/models";
-import { makeObjectFromEntries, prop, sortObjList } from "@avandar/utils";
+import {
+  makeObjectFromEntries,
+  pickProps,
+  prop,
+  sortObjList,
+} from "@avandar/utils";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { uuid } from "$/lib/uuid";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
@@ -19,6 +26,11 @@ import type {
   QueryResultId,
 } from "$/models/queries/QueryResult/QueryResult.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+/** A structured query's columns, in the stable order execution expects. */
+type SortedQueryColumns = ReadonlyArray<
+  StructuredQuery.Partial["queryColumns"][number]
+>;
 
 /** Who is asking, which decides which QETL client answers. */
 export type StructuredQueryAuth =
@@ -40,42 +52,6 @@ export type RunStructuredQueryParams = StructuredQueryAuth & {
    */
   isStructuredQueryInSync?: boolean;
 };
-
-/**
- * Runs a structured query (or caller-supplied raw SQL) against the right QETL
- * client, resolving dataset and entity sources.
- *
- * This is the single execution path shared by the Data Explorer and the GIS
- * app. Callers wrap it in their own caching hook rather than duplicating the
- * source-resolution branches.
- */
-export async function runStructuredQuery(
-  params: RunStructuredQueryParams,
-): Promise<QueryResult<UnknownRow>> {
-  const { query } = params;
-  const { dataSource, queryColumns } = query;
-  const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
-
-  const { sqlToRun, executionQuery } = await _selectSqlForExecution(params);
-
-  if (sqlToRun) {
-    return await _runRawSql(params, sqlToRun);
-  }
-
-  if (params.auth === "public") {
-    throw new Error(
-      "Public queries are not supported for structured queries. " +
-        "Use raw SQL instead.",
-    );
-  }
-
-  return await _runSourceQuery(
-    params.workspaceId,
-    dataSource,
-    executionQuery,
-    sortedQueryColumns,
-  );
-}
 
 /**
  * Resolves the SQL that should actually run: caller-supplied raw SQL takes
@@ -112,31 +88,29 @@ async function _runRawSql(
   params: RunStructuredQueryParams,
   sqlToRun: string,
 ): Promise<QueryResult<UnknownRow>> {
-  if (params.auth === "public") {
-    return await PublicQetlClient.runQuery({
-      rawSql: sqlToRun,
-      dashboardId: params.publicAvaPageId,
-    });
-  }
-  return await WorkspaceQetlClient.runQuery({
-    rawSql: sqlToRun,
-    workspaceId: params.workspaceId,
-  });
+  return params.auth === "public" ?
+      await PublicQetlClient.runQuery({
+        rawSql: sqlToRun,
+        dashboardId: params.publicAvaPageId,
+      })
+    : await WorkspaceQetlClient.runQuery({
+        rawSql: sqlToRun,
+        workspaceId: params.workspaceId,
+      });
 }
 
-/**
- * Runs a structured query against its data source: a `Dataset` is compiled
- * straight to DuckDB SQL, while an `EntityConfig` resolves through
- * `EntityFieldValueClient`, which may in turn query many datasets.
- */
-async function _runSourceQuery(
-  workspaceId: Workspace.Id,
-  dataSource: QueryDataSource | undefined,
-  executionQuery: StructuredQuery.Partial,
-  sortedQueryColumns: ReadonlyArray<
-    StructuredQuery.Partial["queryColumns"][number]
-  >,
-): Promise<QueryResult<UnknownRow>> {
+/** Runs a structured query against its data source. */
+async function _runSourceQuery({
+  workspaceId,
+  dataSource,
+  executionQuery,
+  sortedQueryColumns,
+}: {
+  workspaceId: Workspace.Id;
+  dataSource: QueryDataSource | undefined;
+  executionQuery: StructuredQuery.Partial;
+  sortedQueryColumns: SortedQueryColumns;
+}): Promise<QueryResult<UnknownRow>> {
   if (!dataSource || sortedQueryColumns.length === 0) {
     return QueryResultFns.makeEmpty();
   }
@@ -157,27 +131,29 @@ async function _runSourceQuery(
     // Entity sources resolve through EntityFieldValueClient, which may in
     // turn query many datasets.
     EntityConfig: async (entityConfig): Promise<QueryResult<UnknownRow>> => {
-      return await _runEntityConfigQuery(
+      return await _runEntityConfigQuery({
         entityConfig,
         sortedQueryColumns,
         workspaceId,
-      );
+      });
     },
   });
 }
 
 /**
- * Runs an entity-source query: resolves the requested fields' values through
- * `EntityFieldValueClient` and remaps the resulting rows into a
- * {@link QueryResult}.
+ * Runs an entity-source query.
+ *
+ * @returns The requested fields' values, keyed by field name.
  */
-async function _runEntityConfigQuery(
-  entityConfig: EntityConfig.T,
-  sortedQueryColumns: ReadonlyArray<
-    StructuredQuery.Partial["queryColumns"][number]
-  >,
-  workspaceId: Workspace.Id,
-): Promise<QueryResult<UnknownRow>> {
+async function _runEntityConfigQuery({
+  entityConfig,
+  sortedQueryColumns,
+  workspaceId,
+}: {
+  entityConfig: EntityConfig.T;
+  sortedQueryColumns: SortedQueryColumns;
+  workspaceId: Workspace.Id;
+}): Promise<QueryResult<UnknownRow>> {
   // TODO(jpsyx): optimize this by using a progressive
   // table-materialization approach
   const fields = sortedQueryColumns
@@ -205,23 +181,62 @@ function _buildEntityConfigResult(
   fields: readonly EntityFieldConfig.T[],
   rows: ReadonlyArray<Record<EntityFieldConfig.Id, unknown>>,
 ): QueryResult<UnknownRow> {
-  const queryResultColumns: QueryResultColumn[] = fields.map((field) => {
-    return { name: field.name, dataType: field.dataType };
-  });
+  const queryResultColumns: QueryResultColumn[] = fields.map(
+    pickProps(["name", "dataType"]),
+  );
 
   return {
-    id: uuid() as QueryResultId,
+    id: uuid<QueryResultId>(),
+    // Mapping over `fields` rather than over the derived columns keeps each
+    // field's id in hand, so no per-row lookup back into `fields` is needed.
     data: rows.map((row) => {
       return makeObjectFromEntries(
-        queryResultColumns.map((column) => {
-          const field = fields.find((candidate) => {
-            return candidate.name === column.name;
-          });
-          return [column.name, row[field!.id]!];
+        fields.map((field) => {
+          return [field.name, row[field.id]];
         }),
       );
     }),
     columns: queryResultColumns,
     numRows: rows.length,
   };
+}
+
+/**
+ * Runs a structured query (or caller-supplied raw SQL) against the right QETL
+ * client, resolving dataset and entity sources.
+ *
+ * This is the single execution path shared by the Data Explorer and the GIS
+ * app. Callers wrap it in their own caching hook rather than duplicating the
+ * source-resolution branches.
+ */
+export async function runStructuredQuery(
+  params: RunStructuredQueryParams,
+): Promise<QueryResult<UnknownRow>> {
+  const { query } = params;
+  const { dataSource, queryColumns } = query;
+  const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
+
+  const { sqlToRun, executionQuery } = await _selectSqlForExecution(params);
+
+  if (sqlToRun) {
+    return await _runRawSql(params, sqlToRun);
+  }
+
+  if (params.auth === "public") {
+    // This message reaches the user through the Data Explorer's error banner
+    // and the map's status overlay, so it is translated here rather than left
+    // as an English literal.
+    throw new Error(
+      i18n._(
+        msg`Public queries are not supported for structured queries. Use raw SQL instead.`,
+      ),
+    );
+  }
+
+  return await _runSourceQuery({
+    workspaceId: params.workspaceId,
+    dataSource,
+    executionQuery,
+    sortedQueryColumns,
+  });
 }
