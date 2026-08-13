@@ -180,16 +180,27 @@ repo) so the output stays small and tied to the diff.
   free function has no receiver, so it spells out both halves and never uses
   `To`.
 
-  Flag `resolve...` on any function covered by this rule. Also flag
-  `compute...`, `build...`, and `create...` when the function is really one of
-  the four shapes: a smaller prefix vocabulary where each prefix carries
+  Flag `resolve...` on **any** function, exported or not, including a
+  `_resolve...` helper: the word carries no information inside a file either,
+  and `_build...` says the same thing better. The one `resolve` that is not a
+  finding is the promise sense, where the function settles a pending promise
+  (`_resolveCompletionWaiters`, a `resolve` callback), because there it names a
+  real action rather than a conversion. Also flag `compute...`,
+  `build...`, and `create...` on an exported function that is really one of the
+  four shapes: a smaller prefix vocabulary where each prefix carries
   information beats a wide set of near-synonyms.
+
+  The four shapes are required only for exported functions. A non-exported
+  `_`-prefixed helper has callers in its own file that can see its source, so
+  `_build...` is the right name for one that assembles a piece of a value
+  (`_buildCircleRadius`, `_buildDropReports`), and the verbose form is not
+  wanted there.
 
   Exceptions: 1) an action (`syncMap`, `applyMapStyles`); 2) a predicate
   (`isMapLayerQueryable`); 3) a constructor with no source (`makeEmpty`,
-  `createClient`); 4) an internal `_`-prefixed helper assembling one piece of a
-  value its caller is building (`_buildCircleRadius`); 5) a name fixed by an
-  external contract (`toJSON`, `toString`).
+  `createClient`); 4) a non-exported `_build...` helper as described above;
+  5) a name fixed by an external contract (`toJSON`, `toString`); 6) a copy
+  function, see the separate rule below.
 
   This is bad:
 
@@ -209,20 +220,63 @@ repo) so the output stays small and tied to the diff.
   makeMapSpecFromLayerSpecs(layerSpecs);
   ```
 
-  **Find candidates** (declared functions and module methods whose name starts
-  with a retired prefix, or a free `to...` function with no `From` in it):
+  **Find candidates** (`resolve` at any visibility, then exported functions and
+  module methods using a retired prefix or a sourceless free `to...`):
 
   ```bash
-  grep -rEn '^(export )?(async )?function (resolve|compute|build|create)[A-Z]|^ +(resolve|compute|build|create)[A-Z][a-zA-Z]*: ' \
+  # `resolve` is banned exported or not, including a private `_resolve...`:
+  grep -rEn '^(export )?(async )?function _?resolve[A-Z]|^ +resolve[A-Z][a-zA-Z]*: ' \
     --include="*.ts" --include="*.tsx" .
-  grep -rEn '^(export )?(async )?function to[A-Z][a-zA-Z]*\(' \
+  # retired prefixes on exported functions and module methods:
+  grep -rEn '^export (async )?function (compute|build|create)[A-Z]|^ +(compute|build|create)[A-Z][a-zA-Z]*: ' \
+    --include="*.ts" --include="*.tsx" .
+  # exported `to...` free functions that never name their source:
+  grep -rEn '^export (async )?function to[A-Z][a-zA-Z]*\(' \
     --include="*.ts" --include="*.tsx" . \
     | grep -v 'From'
   ```
 
-  Check each hit against the exception list before flagging: the `_`-prefixed
-  and predicate hits are expected, and a method whose receiver supplies the
-  other half is already correct.
+  Copy functions are the one conversion exempted here, so do not flag them, and
+  do flag a prefix that has crept onto one. See the copy-function rule below.
+
+  Check each hit against the exception list before flagging: a non-exported
+  `_build...` hit and a predicate hit are expected, a `_resolve...` hit is a
+  finding, and a method whose receiver supplies the other half is already
+  correct.
+- Name a function that returns user-facing copy after the copy itself, with no
+  prefix: `appLabel(app)`, `vizTypeLabel(vizType)`. This is the one conversion
+  exempt from the naming rule above, so flag `getAppLabelFromAppType` or
+  `makeAppLabel` rather than accepting them. A prefix announces a data
+  conversion, when the function is really naming a string of translated text,
+  and the call site is usually inline in JSX where the extra words only add
+  noise. The missing prefix is what tells a reader this returns copy.
+
+  The exemption is only for a function that returns copy and nothing else. One
+  that takes copy as an input among several and returns data still follows the
+  four shapes. Repos that keep copy in a dedicated module should say where in
+  their repo-local checklist.
+
+  This is bad:
+
+  ```tsx
+  <Text>{getAppLabelFromAppType(app)}</Text>
+  ```
+
+  This is good:
+
+  ```tsx
+  <Text>{appLabel(app)}</Text>
+  ```
+
+  **Find candidates** (prefixed functions that return a label or other copy):
+
+  ```bash
+  grep -rEn '^(export )?function (get|make)[A-Z][a-zA-Z]*(Label|Copy|Text|Title|Message)[a-zA-Z]*\(' \
+    --include="*.ts" --include="*.tsx" .
+  ```
+
+  Confirm a hit really returns only copy: a function returning a structured
+  object that happens to contain a label is a conversion, not a copy function.
 - React component prop types should always be named `Props`.
 
   **Find candidates** (prop type aliases whose name is not literally

@@ -205,11 +205,47 @@
   makeMapSpecFromLayerSpecs(layerSpecs);
   ```
 
-  This rule covers functions that convert, derive, or look up a value. It does
-  not rename an action (`syncMap`, `applyMapStyles`), a predicate
-  (`isMapLayerQueryable`), a constructor with no source (`makeEmpty`), or an
-  internal `_`-prefixed helper that assembles one piece of a value its caller
-  is building (`_buildCircleRadius`).
+  This rule covers exported functions that convert, derive, or look up a value.
+  It does not rename an action (`syncMap`, `applyMapStyles`), a predicate
+  (`isMapLayerQueryable`), or a constructor with no source (`makeEmpty`).
+
+  Non-exported `_`-prefixed helpers do not need the verbose form, because their
+  only callers are in the same file and can see the source: `_build...` is the
+  right name for one that assembles a piece of a value (`_buildCircleRadius`,
+  `_buildDropReports`). `_resolve...` is still never allowed. The ban on
+  `resolve` is about the word carrying no information, which is just as true
+  inside a file as across one, and `_build` says the same thing better. The
+  exception is the promise sense of the word, where a function settles a
+  pending promise (`_resolveCompletionWaiters`): that names an action, not a
+  conversion.
+
+- User-facing copy is the one conversion excluded from the four shapes. A
+  function whose whole job is to produce a piece of copy is named after the
+  copy it returns, with no prefix: `appLabel(app)`, `vizTypeLabel(vizType)`,
+  `resourceTypeLabel(type)`. These live in `shared/copy/`.
+
+  The absence of a prefix is the signal. A prefix would tell the reader that
+  data is being converted, when what is really happening is that a string of
+  translated text is being named, and the call site should read as that text
+  where it is used. It also keeps copy call sites short in JSX, where they are
+  usually inline inside other markup.
+
+  This is bad:
+
+  ```ts
+  // Verbose, and reads like a data conversion rather than a label.
+  <Text>{getAppLabelFromAppType(app)}</Text>
+  ```
+
+  This is good:
+
+  ```ts
+  <Text>{appLabel(app)}</Text>
+  ```
+
+  The exception is only for functions that return copy and nothing else. A
+  function that takes copy as one input among several and returns data still
+  follows the four shapes.
 
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
