@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
+import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
 
-describe("toExtentSeries", () => {
+describe("applySharedStackId", () => {
   it("leaves every series unstacked when there is no shared stack", () => {
     expect(
-      toExtentSeries({
+      applySharedStackId({
         series: [{ key: "v" }, { key: "w" }],
         sharedStackId: undefined,
       }),
@@ -16,7 +16,7 @@ describe("toExtentSeries", () => {
 
   it("puts every series in the shared stack when there is one", () => {
     expect(
-      toExtentSeries({
+      applySharedStackId({
         series: [{ key: "v" }, { key: "w" }],
         sharedStackId: "stack",
       }),
@@ -28,7 +28,7 @@ describe("toExtentSeries", () => {
 
   it("lets a per-series stack id win over the shared one", () => {
     expect(
-      toExtentSeries({
+      applySharedStackId({
         series: [{ key: "v", stackId: "g1" }, { key: "w" }],
         sharedStackId: "stack",
       }),
@@ -40,7 +40,7 @@ describe("toExtentSeries", () => {
 
   it("keeps per-series stack ids when there is no shared stack", () => {
     expect(
-      toExtentSeries({
+      applySharedStackId({
         series: [
           { key: "v", stackId: "g1" },
           { key: "w", stackId: "g1" },

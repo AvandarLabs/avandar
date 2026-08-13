@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { resolveAxisScale } from "@/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale";
+import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 import type { AxisStyle } from "$/models/vizs/ChartStyle.types";
 
 const EXTENT = { min: 0, max: 100 };
 
-describe("resolveAxisScale: no configuration", () => {
+describe("makeAxisScalePropsFromBounds: no configuration", () => {
   it("returns nothing when the axis is undefined", () => {
-    expect(resolveAxisScale({ axis: undefined, extent: EXTENT })).toEqual({});
+    expect(
+      makeAxisScalePropsFromBounds({ axis: undefined, extent: EXTENT }),
+    ).toEqual({});
   });
 
   it("returns nothing when only cosmetic settings are present", () => {
@@ -14,16 +16,19 @@ describe("resolveAxisScale: no configuration", () => {
     // the scale resolver only reads the scale fields, but the object it
     // receives carries the cosmetic ones too.
     const cosmeticOnly: AxisStyle = { label: "Revenue" };
-    expect(resolveAxisScale({ axis: cosmeticOnly, extent: EXTENT })).toEqual(
-      {},
-    );
+    expect(
+      makeAxisScalePropsFromBounds({ axis: cosmeticOnly, extent: EXTENT }),
+    ).toEqual({});
   });
 });
 
-describe("resolveAxisScale: bounds without an interval", () => {
+describe("makeAxisScalePropsFromBounds: bounds without an interval", () => {
   it("uses both explicit bounds and clips data to them", () => {
     expect(
-      resolveAxisScale({ axis: { min: 10, max: 90 }, extent: EXTENT }),
+      makeAxisScalePropsFromBounds({
+        axis: { min: 10, max: 90 },
+        extent: EXTENT,
+      }),
     ).toEqual({
       domain: [10, 90],
       allowDataOverflow: true,
@@ -32,7 +37,7 @@ describe("resolveAxisScale: bounds without an interval", () => {
 
   it("zero-anchors a derived minimum for non-negative data", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { max: 90 },
         extent: { min: 20, max: 100 },
       }),
@@ -44,7 +49,7 @@ describe("resolveAxisScale: bounds without an interval", () => {
 
   it("uses the data minimum when the data goes negative", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { max: 90 },
         extent: { min: -30, max: 100 },
       }),
@@ -55,24 +60,28 @@ describe("resolveAxisScale: bounds without an interval", () => {
   });
 
   it("derives the maximum from the data when only a minimum is set", () => {
-    expect(resolveAxisScale({ axis: { min: 10 }, extent: EXTENT })).toEqual({
+    expect(
+      makeAxisScalePropsFromBounds({ axis: { min: 10 }, extent: EXTENT }),
+    ).toEqual({
       domain: [10, 100],
       allowDataOverflow: true,
     });
   });
 
   it("falls back to auto when there is no extent to derive from", () => {
-    expect(resolveAxisScale({ axis: { min: 10 }, extent: undefined })).toEqual({
+    expect(
+      makeAxisScalePropsFromBounds({ axis: { min: 10 }, extent: undefined }),
+    ).toEqual({
       domain: [10, "auto"],
       allowDataOverflow: true,
     });
   });
 });
 
-describe("resolveAxisScale: tick interval", () => {
+describe("makeAxisScalePropsFromBounds: tick interval", () => {
   it("generates ticks across an explicit domain", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: 0, max: 120000, tickInterval: 24000 },
         extent: { min: 0, max: 118000 },
       }),
@@ -84,7 +93,7 @@ describe("resolveAxisScale: tick interval", () => {
   });
 
   it("works from the interval alone by deriving both bounds", () => {
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { tickInterval: 25 },
       extent: { min: 0, max: 90 },
     });
@@ -96,7 +105,7 @@ describe("resolveAxisScale: tick interval", () => {
 
   it("anchors the tick lattice at an explicit non-aligned minimum", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: 1000, tickInterval: 24000 },
         extent: { min: 0, max: 50000 },
       }),
@@ -109,7 +118,7 @@ describe("resolveAxisScale: tick interval", () => {
 
   it("truncates the last tick when an explicit maximum falls between ticks", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: 0, max: 100000, tickInterval: 24000 },
         extent: { min: 0, max: 100000 },
       }),
@@ -121,7 +130,7 @@ describe("resolveAxisScale: tick interval", () => {
   });
 
   it("does not set allowDataOverflow when both bounds are derived", () => {
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { tickInterval: 25 },
       extent: { min: 0, max: 90 },
     });
@@ -129,7 +138,7 @@ describe("resolveAxisScale: tick interval", () => {
   });
 
   it("drops ticks but keeps the domain when the count exceeds the cap", () => {
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { min: 0, max: 1_000_000, tickInterval: 1 },
       extent: { min: 0, max: 1_000_000 },
     });
@@ -138,7 +147,7 @@ describe("resolveAxisScale: tick interval", () => {
   });
 
   it("survives a fractional interval without floating point drift", () => {
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { min: 0, max: 1, tickInterval: 0.1 },
       extent: { min: 0, max: 1 },
     });
@@ -152,7 +161,7 @@ describe("resolveAxisScale: tick interval", () => {
     // TICK_COUNT_EPSILON this lattice silently loses its endpoint.
     // The 0-to-1 case above does not exercise the epsilon: `1 / 0.1` is
     // exactly `10` in IEEE754.
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { min: 0, max: 0.3, tickInterval: 0.1 },
       extent: { min: 0, max: 0.3 },
     });
@@ -163,7 +172,7 @@ describe("resolveAxisScale: tick interval", () => {
     // The lattice would otherwise extend a full interval past the data
     // and squash every mark into a sliver.
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { tickInterval: 1_000_000 },
         extent: { min: 0, max: 100 },
       }),
@@ -174,7 +183,7 @@ describe("resolveAxisScale: tick interval", () => {
     // A percent-stacked chart's real domain is 0-to-1 while its ticks
     // read as percentages, so a user may enter 20 meaning 20%.
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { tickInterval: 20 },
         extent: { min: 0, max: 1 },
       }),
@@ -183,7 +192,7 @@ describe("resolveAxisScale: tick interval", () => {
 
   it("builds a lattice when the interval equals the data range", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { tickInterval: 100 },
         extent: { min: 0, max: 100 },
       }),
@@ -193,7 +202,7 @@ describe("resolveAxisScale: tick interval", () => {
   it("honours an oversized interval when the user set the maximum", () => {
     // Both bounds explicit means the domain is the user's choice.
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: 0, max: 1_000_000, tickInterval: 1_000_000 },
         extent: { min: 0, max: 100 },
       }),
@@ -207,7 +216,7 @@ describe("resolveAxisScale: tick interval", () => {
   it("drops a lattice that would hold a single tick", () => {
     // An explicit maximum closer to the minimum than one interval step
     // yields just the origin. Recharts picks better ticks than that.
-    const result = resolveAxisScale({
+    const result = makeAxisScalePropsFromBounds({
       axis: { min: 0, max: 100, tickInterval: 1_000_000 },
       extent: { min: 0, max: 100 },
     });
@@ -216,28 +225,37 @@ describe("resolveAxisScale: tick interval", () => {
   });
 });
 
-describe("resolveAxisScale: guards", () => {
+describe("makeAxisScalePropsFromBounds: guards", () => {
   it("ignores an inverted explicit range", () => {
     expect(
-      resolveAxisScale({ axis: { min: 100, max: 10 }, extent: EXTENT }),
+      makeAxisScalePropsFromBounds({
+        axis: { min: 100, max: 10 },
+        extent: EXTENT,
+      }),
     ).toEqual({});
   });
 
   it("ignores an equal explicit range", () => {
     expect(
-      resolveAxisScale({ axis: { min: 50, max: 50 }, extent: EXTENT }),
+      makeAxisScalePropsFromBounds({
+        axis: { min: 50, max: 50 },
+        extent: EXTENT,
+      }),
     ).toEqual({});
   });
 
   it("ignores a zero interval", () => {
     expect(
-      resolveAxisScale({ axis: { tickInterval: 0 }, extent: EXTENT }),
+      makeAxisScalePropsFromBounds({
+        axis: { tickInterval: 0 },
+        extent: EXTENT,
+      }),
     ).toEqual({});
   });
 
   it("ignores a negative interval but honors the bounds beside it", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: 0, max: 50, tickInterval: -5 },
         extent: EXTENT,
       }),
@@ -246,7 +264,7 @@ describe("resolveAxisScale: guards", () => {
 
   it("ignores non-finite values", () => {
     expect(
-      resolveAxisScale({
+      makeAxisScalePropsFromBounds({
         axis: { min: Number.NaN, max: Number.POSITIVE_INFINITY },
         extent: EXTENT,
       }),

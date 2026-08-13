@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { resolveTickRotation } from "@/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation";
+import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 
 const LABELS = ["1/2014", "2/2014", "3/2014"];
 const FONT_SIZE = 12;
 
-describe("resolveTickRotation", () => {
+describe("makeTickRotationFromAngle", () => {
   it("returns nothing for an undefined angle", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: undefined,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
@@ -17,7 +17,7 @@ describe("resolveTickRotation", () => {
 
   it("returns nothing for a zero angle", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: 0,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
@@ -27,7 +27,7 @@ describe("resolveTickRotation", () => {
 
   it("returns nothing for a non-finite angle", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: Number.NaN,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
@@ -36,7 +36,7 @@ describe("resolveTickRotation", () => {
   });
 
   it("anchors negative angles at the end of the label", () => {
-    const result = resolveTickRotation({
+    const result = makeTickRotationFromAngle({
       angle: -45,
       tickLabels: LABELS,
       fontSize: FONT_SIZE,
@@ -45,7 +45,7 @@ describe("resolveTickRotation", () => {
   });
 
   it("anchors positive angles at the start of the label", () => {
-    const result = resolveTickRotation({
+    const result = makeTickRotationFromAngle({
       angle: 45,
       tickLabels: LABELS,
       fontSize: FONT_SIZE,
@@ -55,14 +55,14 @@ describe("resolveTickRotation", () => {
 
   it("clamps beyond ninety degrees", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: 200,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
       }).tick?.angle,
     ).toBe(90);
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -200,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
@@ -72,7 +72,7 @@ describe("resolveTickRotation", () => {
 
   it("forces every label to render", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -90,
         tickLabels: LABELS,
         fontSize: FONT_SIZE,
@@ -87,13 +87,13 @@ describe("resolveTickRotation", () => {
     // growth term were deleted, so the bounds assertions keep this test
     // honest if the constants ever change.
     const short =
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -90,
         tickLabels: ["abc"],
         fontSize: FONT_SIZE,
       }).height ?? 0;
     const long =
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -90,
         tickLabels: ["abcdefghij"],
         fontSize: FONT_SIZE,
@@ -105,7 +105,7 @@ describe("resolveTickRotation", () => {
 
   it("never goes below the default axis height", () => {
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -5,
         tickLabels: ["a"],
         fontSize: FONT_SIZE,
@@ -116,7 +116,7 @@ describe("resolveTickRotation", () => {
   it("never exceeds the ceiling", () => {
     const label = "x".repeat(200);
     expect(
-      resolveTickRotation({
+      makeTickRotationFromAngle({
         angle: -90,
         tickLabels: [label],
         fontSize: FONT_SIZE,
@@ -125,7 +125,7 @@ describe("resolveTickRotation", () => {
   });
 
   it("handles an empty label list without producing NaN", () => {
-    const height = resolveTickRotation({
+    const height = makeTickRotationFromAngle({
       angle: -90,
       tickLabels: [],
       fontSize: FONT_SIZE,

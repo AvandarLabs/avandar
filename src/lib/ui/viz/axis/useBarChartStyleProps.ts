@@ -1,15 +1,15 @@
 import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
-import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
+import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
+import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
+import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,
 } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import type { ValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
@@ -27,15 +27,15 @@ function _computeBarValueExtent({
   layout: "group" | "stack" | "percent";
   allBars: boolean;
 }>): ValueExtent | undefined {
-  if (!needsValueExtent(axisStyle)) {
+  if (!doesAxisNeedValueExtent(axisStyle)) {
     return undefined;
   }
   if (allBars && layout === "percent") {
     return { min: 0, max: 1 };
   }
-  return computeValueExtent({
+  return getValueExtentFromSeries({
     data,
-    series: toExtentSeries({
+    series: applySharedStackId({
       series: series.map((seriesConfig) => {
         return {
           key: seriesConfig.key,

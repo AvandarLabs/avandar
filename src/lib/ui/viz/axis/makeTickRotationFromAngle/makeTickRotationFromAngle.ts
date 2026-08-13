@@ -32,7 +32,7 @@ function _clamp({
 /**
  * Returns axis props for a rotated tick label, including its required height.
  */
-export function resolveTickRotation({
+export function makeTickRotationFromAngle({
   angle,
   tickLabels,
   fontSize,

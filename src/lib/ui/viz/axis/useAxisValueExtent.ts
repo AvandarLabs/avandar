@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
-import type { ValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
+import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { AxisStyle } from "$/models/vizs/ChartStyle.types";
 
@@ -23,10 +23,10 @@ export function useAxisValueExtent<K extends string>({
   seriesKey: K;
 }>): ValueExtent | undefined {
   return useMemo(() => {
-    if (!needsValueExtent(axisStyle)) {
+    if (!doesAxisNeedValueExtent(axisStyle)) {
       return undefined;
     }
-    return computeValueExtent({
+    return getValueExtentFromSeries({
       data,
       series: series.map((seriesEntry) => {
         return { key: seriesEntry[seriesKey] };

@@ -1,8 +1,8 @@
 import { matchLiteral } from "@avandar/utils";
-import { resolveAxisScale } from "@/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale";
-import { resolveTickRotation } from "@/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation";
+import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
+import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { ValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
   AxisRole,
@@ -31,7 +31,7 @@ function _formatYAxisTick(value: unknown): string {
   return formatChartNumber(value, { compact: true });
 }
 
-function _resolveXAxisProps({
+function _buildXAxisProps({
   xAxisStyle,
   baseXAxisProps,
   xExtent,
@@ -44,7 +44,7 @@ function _resolveXAxisProps({
   xTickLabels: readonly string[];
   role: AxisRole;
 }>): Omit<XAxisProps, "ref"> {
-  const rotation = resolveTickRotation({
+  const rotation = makeTickRotationFromAngle({
     angle: xAxisStyle?.tickAngle,
     tickLabels: xTickLabels,
     fontSize: DEFAULT_TICK_FONT_SIZE,
@@ -52,7 +52,10 @@ function _resolveXAxisProps({
   const scale = matchLiteral(role, {
     category: {},
     value: () => {
-      return resolveAxisScale({ axis: xAxisStyle, extent: xExtent });
+      return makeAxisScalePropsFromBounds({
+        axis: xAxisStyle,
+        extent: xExtent,
+      });
     },
   });
   const hasTickColor = xAxisStyle?.tickColor !== undefined;
@@ -75,7 +78,7 @@ function _resolveXAxisProps({
   };
 }
 
-function _resolveYAxisProps({
+function _buildYAxisProps({
   yAxisStyle,
   yExtent,
   role,
@@ -87,7 +90,10 @@ function _resolveYAxisProps({
   const scale = matchLiteral(role, {
     category: {},
     value: () => {
-      return resolveAxisScale({ axis: yAxisStyle, extent: yExtent });
+      return makeAxisScalePropsFromBounds({
+        axis: yAxisStyle,
+        extent: yExtent,
+      });
     },
   });
   const tick =
@@ -127,7 +133,7 @@ export type ApplyChartStyleOptions = {
   axisRoles?: Readonly<AxisRoles>;
 };
 
-function _resolveGridProps(
+function _buildGridProps(
   gridStyle: Readonly<NonNullable<ChartStyle["grid"]>> | undefined,
 ): Pick<ChartStyleProps, "gridProps" | "gridColor"> {
   const gridProps: Omit<CartesianGridProps, "ref"> = {
@@ -139,7 +145,7 @@ function _resolveGridProps(
   return { gridProps, gridColor: gridStyle?.color };
 }
 
-function _resolveLegendProps(
+function _buildLegendProps(
   legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
 ): Pick<ChartStyleProps, "legendProps"> {
   const legendPosition = legendStyle?.position ?? "top";
@@ -161,7 +167,7 @@ function _resolveLegendProps(
   };
 }
 
-function _resolveAxisLabels({
+function _buildAxisLabels({
   xAxisStyle,
   yAxisStyle,
 }: Readonly<{
@@ -184,7 +190,17 @@ function _resolveAxisLabels({
   return { xAxisLabel, yAxisLabel, styles };
 }
 
-/** Translates chart styling into Mantine and Recharts props. */
+/**
+ * Translates a {@link ChartStyle} into the Mantine and Recharts props for
+ * the five cartesian charts: bar, line, area, scatter, and bubble. Each one
+ * reaches this through its own `use*ChartStyleProps` hook, which supplies the
+ * value extents and tick labels this cannot derive on its own.
+ *
+ * Not for radar, pie, or funnel. Every field it produces (`withXAxis`,
+ * `xAxisProps`, `yAxisProps`, grid, axis labels) describes an x/y plot, and
+ * those three have no cartesian axes. Radar takes the one piece that does
+ * apply to it, `chartStyle.legend.position`, straight from the config.
+ */
 export function applyChartStyle(
   options: Readonly<ApplyChartStyleOptions> = {},
 ): ChartStyleProps {
@@ -202,20 +218,20 @@ export function applyChartStyle(
   return {
     withXAxis: !(xAxisStyle?.hide ?? false),
     withYAxis: !(yAxisStyle?.hide ?? false),
-    xAxisProps: _resolveXAxisProps({
+    xAxisProps: _buildXAxisProps({
       xAxisStyle,
       baseXAxisProps,
       xExtent,
       xTickLabels,
       role: axisRoles.x,
     }),
-    yAxisProps: _resolveYAxisProps({
+    yAxisProps: _buildYAxisProps({
       yAxisStyle,
       yExtent,
       role: axisRoles.y,
     }),
-    ..._resolveGridProps(style?.grid),
-    ..._resolveLegendProps(style?.legend),
-    ..._resolveAxisLabels({ xAxisStyle, yAxisStyle }),
+    ..._buildGridProps(style?.grid),
+    ..._buildLegendProps(style?.legend),
+    ..._buildAxisLabels({ xAxisStyle, yAxisStyle }),
   };
 }

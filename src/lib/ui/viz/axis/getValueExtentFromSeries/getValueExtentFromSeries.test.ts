@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 
 const DATA = [
   { x: "a", v: 10, w: 5 },
@@ -7,10 +7,10 @@ const DATA = [
   { x: "c", v: 30, w: 3 },
 ];
 
-describe("computeValueExtent", () => {
+describe("getValueExtentFromSeries", () => {
   it("takes the plain min and max when every series is its own bucket", () => {
     expect(
-      computeValueExtent({
+      getValueExtentFromSeries({
         data: DATA,
         series: [{ key: "v" }, { key: "w" }],
       }),
@@ -19,7 +19,7 @@ describe("computeValueExtent", () => {
 
   it("sums row-wise when series share a stack", () => {
     expect(
-      computeValueExtent({
+      getValueExtentFromSeries({
         data: DATA,
         series: [
           { key: "v", stackId: "s" },
@@ -32,7 +32,7 @@ describe("computeValueExtent", () => {
   it("treats separate stack ids as independent stacks", () => {
     const data = [{ a: 1, b: 2, c: 10, d: 20 }];
     expect(
-      computeValueExtent({
+      getValueExtentFromSeries({
         data,
         series: [
           { key: "a", stackId: "left" },
@@ -47,7 +47,7 @@ describe("computeValueExtent", () => {
   it("sums positives and negatives separately within a stack", () => {
     const data = [{ up: 10, down: -4, alsoDown: -6 }];
     expect(
-      computeValueExtent({
+      getValueExtentFromSeries({
         data,
         series: [
           { key: "up", stackId: "s" },
@@ -60,7 +60,7 @@ describe("computeValueExtent", () => {
 
   it("handles all-negative data", () => {
     const data = [{ v: -5 }, { v: -1 }];
-    expect(computeValueExtent({ data, series: [{ key: "v" }] })).toEqual({
+    expect(getValueExtentFromSeries({ data, series: [{ key: "v" }] })).toEqual({
       min: -5,
       max: -1,
     });
@@ -68,7 +68,7 @@ describe("computeValueExtent", () => {
 
   it("ignores non-numeric and null cells", () => {
     const data = [{ v: 5 }, { v: null }, { v: "not a number" }, { v: 9 }];
-    expect(computeValueExtent({ data, series: [{ key: "v" }] })).toEqual({
+    expect(getValueExtentFromSeries({ data, series: [{ key: "v" }] })).toEqual({
       min: 5,
       max: 9,
     });
@@ -76,24 +76,26 @@ describe("computeValueExtent", () => {
 
   it("returns undefined for empty data", () => {
     expect(
-      computeValueExtent({ data: [], series: [{ key: "v" }] }),
+      getValueExtentFromSeries({ data: [], series: [{ key: "v" }] }),
     ).toBeUndefined();
   });
 
   it("returns undefined when no series are given", () => {
-    expect(computeValueExtent({ data: DATA, series: [] })).toBeUndefined();
+    expect(
+      getValueExtentFromSeries({ data: DATA, series: [] }),
+    ).toBeUndefined();
   });
 
   it("returns undefined when the column holds no finite values", () => {
     const data = [{ v: null }, { v: undefined }];
     expect(
-      computeValueExtent({ data, series: [{ key: "v" }] }),
+      getValueExtentFromSeries({ data, series: [{ key: "v" }] }),
     ).toBeUndefined();
   });
 
   it("returns undefined when the column is missing entirely", () => {
     expect(
-      computeValueExtent({ data: DATA, series: [{ key: "nope" }] }),
+      getValueExtentFromSeries({ data: DATA, series: [{ key: "nope" }] }),
     ).toBeUndefined();
   });
 
@@ -101,7 +103,7 @@ describe("computeValueExtent", () => {
     // `Number("")`, `Number([])`, and `Number(false)` are all `0`. Left
     // unguarded they would drag the extent down to zero.
     const data = [{ v: 5 }, { v: "" }, { v: [] }, { v: false }, { v: 9 }];
-    expect(computeValueExtent({ data, series: [{ key: "v" }] })).toEqual({
+    expect(getValueExtentFromSeries({ data, series: [{ key: "v" }] })).toEqual({
       min: 5,
       max: 9,
     });
@@ -109,7 +111,7 @@ describe("computeValueExtent", () => {
 
   it("reads numeric strings", () => {
     const data = [{ v: "5" }, { v: "9.5" }];
-    expect(computeValueExtent({ data, series: [{ key: "v" }] })).toEqual({
+    expect(getValueExtentFromSeries({ data, series: [{ key: "v" }] })).toEqual({
       min: 5,
       max: 9.5,
     });
@@ -117,7 +119,7 @@ describe("computeValueExtent", () => {
 
   it("reads bigint values, which DuckDB returns for bigint columns", () => {
     const data = [{ v: 5n }, { v: 9n }];
-    expect(computeValueExtent({ data, series: [{ key: "v" }] })).toEqual({
+    expect(getValueExtentFromSeries({ data, series: [{ key: "v" }] })).toEqual({
       min: 5,
       max: 9,
     });
@@ -128,7 +130,7 @@ describe("computeValueExtent", () => {
     // named "1"; they must stay separate buckets.
     const data = [{ a: 100, b: 1 }];
     expect(
-      computeValueExtent({
+      getValueExtentFromSeries({
         data,
         series: [{ key: "a", stackId: "1" }, { key: "b" }],
       }),

@@ -48,7 +48,7 @@ function _toFiniteNumber(cell: unknown): number {
  * Returns the finite value extent for the series, including row-wise stack
  * totals, or `undefined` when there is nothing finite to measure.
  */
-export function computeValueExtent({
+export function getValueExtentFromSeries({
   data,
   series,
 }: Readonly<{

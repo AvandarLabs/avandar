@@ -1,4 +1,4 @@
-import type { ValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle } from "$/models/vizs/ChartStyle.types";
 
 /** Maximum number of ticks generated for an explicit interval. */
@@ -92,7 +92,7 @@ function _hasInvalidExplicitDomain({
   );
 }
 
-function _resolveDomain({
+function _buildDomain({
   axis,
   extent,
 }: Readonly<{
@@ -133,7 +133,7 @@ function _resolveDomain({
     : { kind: "concrete", low, high, explicitMax, interval, overflow };
 }
 
-function _resolveConcreteDomain({
+function _buildConcreteDomain({
   low,
   high,
   explicitMax,
@@ -163,15 +163,15 @@ function _resolveConcreteDomain({
 }
 
 /** Translates value-axis bounds and a tick interval into Recharts props. */
-export function resolveAxisScale({
+export function makeAxisScalePropsFromBounds({
   axis,
   extent,
 }: Readonly<{
   axis: Readonly<Pick<AxisStyle, "min" | "max" | "tickInterval">> | undefined;
   extent: Readonly<ValueExtent> | undefined;
 }>): AxisScaleProps {
-  const resolution = _resolveDomain({ axis, extent });
+  const resolution = _buildDomain({ axis, extent });
   return resolution.kind === "props" ?
       resolution.props
-    : _resolveConcreteDomain(resolution);
+    : _buildConcreteDomain(resolution);
 }

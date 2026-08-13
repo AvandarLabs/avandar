@@ -1,7 +1,7 @@
-import type { ExtentSeries } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import type { ExtentSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 
 /** Assigns a shared stack id while preserving per-series overrides. */
-export function toExtentSeries({
+export function applySharedStackId({
   series,
   sharedStackId,
 }: Readonly<{

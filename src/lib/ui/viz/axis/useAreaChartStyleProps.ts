@@ -1,16 +1,16 @@
 import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { computeValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
+import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
 import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
-import { needsValueExtent } from "@/lib/ui/viz/axis/needsValueExtent/needsValueExtent";
-import { toExtentSeries } from "@/lib/ui/viz/axis/toExtentSeries/toExtentSeries";
+import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type {
   ApplyChartStyleOptions,
   ChartStyleProps,
 } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import type { ValueExtent } from "@/lib/ui/viz/axis/computeValueExtent/computeValueExtent";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
@@ -29,16 +29,16 @@ function _computeAreaValueExtent({
   layout: AreaLayout;
   allAreas: boolean;
 }>): ValueExtent | undefined {
-  if (!needsValueExtent(axisStyle)) {
+  if (!doesAxisNeedValueExtent(axisStyle)) {
     return undefined;
   }
   const { isPercent, sharedStackId } = getAreaStacking(layout);
   if (allAreas && isPercent) {
     return { min: 0, max: 1 };
   }
-  return computeValueExtent({
+  return getValueExtentFromSeries({
     data,
-    series: toExtentSeries({
+    series: applySharedStackId({
       series: series.map((seriesConfig) => {
         return { key: seriesConfig.key };
       }),
