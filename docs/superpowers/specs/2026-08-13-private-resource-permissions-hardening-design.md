@@ -270,7 +270,33 @@ which is exactly how a resource stops being private. That is intended.
 **DELETE stays unchanged.** Removing a share row can only reduce access, so it
 cannot escalate. An admin deleting the last non-owner share makes a resource
 private and locks themselves out, which is correct and only the owner can
-reverse.
+reverse. Verified live during implementation: after such a delete, the admin's
+own re-share is refused. That is a deliberate one-way door and worth a product
+callout, since an admin doing routine share cleanup could strand themselves with
+no RLS path back in.
+
+**Follow-up: the gated disjunct is now nearly dead code.** Measured after
+implementation, the first disjunct adds nothing for any resource that exists.
+For a settings admin on a non-private resource,
+`util__auth_user_can_access_resource(..., 'admin')` is already true, because
+`util__resource_effective_role` short-circuits to `admin` for them; this holds
+even when the admin has no app role on the resource's app. The only input where
+the two disjuncts diverge is a **nonexistent** `resource_id`, where
+`not is_resource_private_to_owner` is true and `can_access_resource` is false,
+so the first disjunct uniquely permits share rows pointing at resources that do
+not exist (inert rows, not a security issue).
+
+The policy could therefore be simplified to just the
+`util__auth_user_can_access_resource(..., 'admin')` term, which would be equally
+secure and would additionally reject shares on nonexistent resources. Not done
+in this phase: the implemented form is correct and verified, and churning a
+security control mid-flight for a dead-code cleanup is the wrong trade. Do it as
+a standalone follow-up with its own tests.
+
+A consequence worth knowing when reading the tests: no assertion can isolate the
+first disjunct for a real resource, precisely because it is redundant there. The
+guard test's third assertion documents this inline so it is not mistaken for
+stronger coverage than it provides.
 
 Like §5.3, these are policy rewrites, so `supabase db diff` will not capture
 them reliably; they need hand-written `drop policy` / `create policy` migrations.

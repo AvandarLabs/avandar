@@ -94,6 +94,16 @@ select throws_ok(
 );
 
 -- Legitimate admin sharing must keep working.
+--
+-- Note on what this assertion does and does NOT prove. It cannot isolate the
+-- policy's `is_settings_admin and not is_private` disjunct, because for any
+-- resource that actually exists and is not private, the OTHER disjunct
+-- (util__auth_user_can_access_resource(..., 'admin')) is already true for a
+-- settings admin: util__resource_effective_role short-circuits to 'admin' for
+-- them. Stripping the admin's dashboards app role does not change that.
+-- So this assertion is a regression test for "legitimate sharing still works",
+-- not proof of the gated disjunct. Assertions 1 and 2 are what prove the
+-- escalation is closed; both were confirmed to fail against the pre-fix policy.
 select lives_ok(
   $$insert into public.resource_shares (
       workspace_id, resource_type, resource_id, principal_type, principal_id, role
