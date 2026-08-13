@@ -8,14 +8,17 @@ import {
   Flex,
   Group,
   LoadingOverlay,
+  Stack,
   Table,
   Text,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
-import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
+import { PrivateResourceAdminClient } from "@/clients/permissions/PrivateResourceAdminClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
@@ -35,6 +38,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   const { t } = useLingui();
   const isAdmin = useIsGlobalAdmin();
   const workspace = useCurrentWorkspace();
+  const navigate = useNavigate();
   const [drawerMember, setDrawerMember] =
     useState<WorkspaceMemberProfile | null>(null);
 
@@ -51,6 +55,20 @@ export function WorkspaceUsersTab(): JSX.Element | null {
     PermissionsClient.useGetRoleGroupsWithMatrices({
       workspaceId: workspace.id,
     });
+  const [privateCounts = []] =
+    PrivateResourceAdminClient.useGetPrivateResourceCounts({
+      workspaceId: workspace.id,
+    });
+
+  const privateResourceTotalByUserId = useMemo((): Record<string, number> => {
+    const entries = privateCounts.map((row): [string, number] => {
+      return [
+        row.userId,
+        row.privateDashboardCount + row.privateDatasetCount,
+      ];
+    });
+    return Object.fromEntries(entries);
+  }, [privateCounts]);
 
   const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
     onSuccess: () => {
@@ -129,6 +147,48 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                     style={{ cursor: "pointer" }}
                     aria-label={t`Remove member`}
                     onClick={() => {
+                      const privateTotal =
+                        privateResourceTotalByUserId[user.userId] ?? 0;
+
+                      // A member who still owns resources cannot be removed:
+                      // owner_id is ON DELETE NO ACTION. Admins cannot see
+                      // private ones, so explain it and point at the fix
+                      // rather than surfacing a foreign-key error.
+                      if (privateTotal > 0) {
+                        modals.open({
+                          title: t`Reassign private resources first`,
+                          children: (
+                            <Stack gap="sm">
+                              <Text size="sm">
+                                <Trans>
+                                  This member owns {privateTotal} private
+                                  resources. They cannot be removed until
+                                  someone else owns them. Private content is
+                                  not visible to workspace admins, so reassign
+                                  ownership from the Privacy log.
+                                </Trans>
+                              </Text>
+                              <Button
+                                leftSection={<IconLock size={16} />}
+                                onClick={() => {
+                                  modals.closeAll();
+                                  navigate({
+                                    to: "/$workspaceSlug/settings/$tabName",
+                                    params: {
+                                      workspaceSlug: workspace.slug,
+                                      tabName: "privacy",
+                                    },
+                                  });
+                                }}
+                              >
+                                <Trans>Go to Privacy log</Trans>
+                              </Button>
+                            </Stack>
+                          ),
+                        });
+                        return;
+                      }
+
                       modals.openConfirmModal({
                         title: t`Remove User`,
                         children: t`Are you sure you want to remove this user from the workspace?`,
