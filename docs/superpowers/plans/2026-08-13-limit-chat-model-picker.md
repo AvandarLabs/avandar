@@ -72,8 +72,8 @@ Vitest picks up tests under `shared/`, `src/`, and `supabase/functions/` from th
 | --- | --- |
 | `shared/models/chat/ChatModelOption/ChatModelOptionModule/ChatModelOptionModule.ts` | The six-model constant, the default id, and `isValidId`. Runtime-agnostic: no React, no Lingui, no Deno globals. |
 | `shared/models/chat/ChatModelOption/ChatModelOptionModule/ChatModelOptionModule.test.ts` | Catalog invariants, including the default-id-is-in-catalog guard. |
-| `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.ts` | Coerces a client-supplied model id to an allowlisted one. Extracted from `PostChatMessages.ts` so it is testable. |
-| `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.test.ts` | Allowlist coercion cases. |
+| `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts` | Coerces a client-supplied model id to an allowlisted one. Extracted from `PostChatMessages.ts` so it is testable. |
+| `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.test.ts` | Allowlist coercion cases. |
 | `src/components/ChatPanel/useChatModelCatalog.test.ts` | Group shape, ordering, and offline-group prepending. |
 
 **Renamed**
@@ -96,7 +96,7 @@ Vitest picks up tests under `shared/`, `src/`, and `supabase/functions/` from th
 | `src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx` | Drop loading/error branches and the search field. |
 | `src/components/ChatPanel/ChatModelStorage/ChatModelStorage.ts` | Point at `Catalog.defaultId`; drop `honorStoredWhenMissing`. |
 | `src/components/ChatPanel/ChatModelStorage/ChatModelStorage.test.ts` | Follow both changes. |
-| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts` | Delegate to `resolveChatModel`. |
+| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts` | Delegate to `enforceChatModelAllowlist`. |
 | `supabase/functions/chat/ChatRoutes.ts` | Remove the `/models` route. |
 | `supabase/functions/chat/ChatRoutes.types.ts` | Remove `/models` from the path tuple *and* the body. |
 | `package.json:55` | Remove `chat:regenerate-models`. |
@@ -779,28 +779,28 @@ git commit -m "feat(chat): add hardcoded six-model chat catalog"
 ## Task 3: Allowlist the model on the send path
 
 **Files:**
-- Create: `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.ts`
-- Create: `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.test.ts`
+- Create: `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts`
+- Create: `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.test.ts`
 - Modify: `supabase/functions/chat/PostChatMessages/PostChatMessages.ts:34-42,116`
 
 `PostChatMessages.ts:35` currently validates the incoming model with `OPENROUTER_MODEL_ID_PATTERN`, a shape check that accepts any `vendor/model-name` string. Any client can therefore bill us for a model that is not in the picker. We replace the shape check with a real allowlist. The logic moves into its own directory so it is testable, matching the sibling pattern of `PostChatMessages/parsing/parseClarify.ts` + `parseClarify.test.ts`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.test.ts`:
+Create `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.test.ts`:
 
 ```ts
-import { resolveChatModel } from "@sbfn/chat/PostChatMessages/resolveChatModel/resolveChatModel.ts";
+import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import { describe, expect, it } from "vitest";
 
-describe("resolveChatModel", () => {
+describe("enforceChatModelAllowlist", () => {
   it("keeps a model that is in the catalog", () => {
-    expect(resolveChatModel("z-ai/glm-5.2")).toBe("z-ai/glm-5.2");
+    expect(enforceChatModelAllowlist("z-ai/glm-5.2")).toBe("z-ai/glm-5.2");
   });
 
   it("falls back to the default when no model is sent", () => {
-    expect(resolveChatModel(undefined)).toBe(
+    expect(enforceChatModelAllowlist(undefined)).toBe(
       ChatModelOption.Catalog.defaultId,
     );
   });
@@ -808,22 +808,62 @@ describe("resolveChatModel", () => {
   it("rejects a well-formed model id that is not in the catalog", () => {
     // Shape-only validation used to let this through, which meant a crafted
     // request could bill us for a model the picker never offers.
-    expect(resolveChatModel("openai/gpt-5.5-pro")).toBe(
+    expect(enforceChatModelAllowlist("openai/gpt-5.5-pro")).toBe(
       ChatModelOption.Catalog.defaultId,
     );
   });
 
-  it("rejects a retired model id left over in a client's local storage", () => {
-    expect(resolveChatModel("openai/gpt-4o-mini")).toBe(
+  it("keeps a non-default catalog model", () => {
+    // Guards against a future bug where the function always returns the
+    // default and every other test still passes.
+    expect(enforceChatModelAllowlist("openai/gpt-5.6-terra")).toBe(
+      "openai/gpt-5.6-terra",
+    );
+  });
+
+  it("rejects a model id that is no longer in the catalog", () => {
+    // Still the pre-Task-4 client default, so at this point in the branch this
+    // is the mainline path for any user who never touched the picker.
+    expect(enforceChatModelAllowlist("openai/gpt-4o-mini")).toBe(
       ChatModelOption.Catalog.defaultId,
     );
   });
 
   it("rejects malformed input", () => {
-    expect(resolveChatModel("")).toBe(ChatModelOption.Catalog.defaultId);
-    expect(resolveChatModel("garbage")).toBe(
+    expect(enforceChatModelAllowlist("")).toBe(
       ChatModelOption.Catalog.defaultId,
     );
+    expect(enforceChatModelAllowlist("garbage")).toBe(
+      ChatModelOption.Catalog.defaultId,
+    );
+  });
+
+  it("never returns a value outside the catalog", () => {
+    // The security contract, stated once. Also the only place the repo
+    // records the deliberate verdicts on case, whitespace, and OpenRouter's
+    // `:free` / `:batch` variant suffixes: all of them coerce. Accepting
+    // `:free` would route to endpoints whose rate limits and data-retention
+    // terms we never vetted; accepting `:batch` would change the latency SLA
+    // under a synchronous handler. Suffix-stripping would be worse still,
+    // silently upgrading a `:free` request to paid billing.
+    const adversarialInputs = [
+      "",
+      " ",
+      "garbage",
+      "Z-AI/GLM-5.2",
+      " z-ai/glm-5.2 ",
+      "z-ai/glm-5.2:free",
+      "z-ai/glm-5.2:batch",
+      "openai/gpt-5.5-pro",
+      "../../etc/passwd",
+      "z-ai/glm-5.2\n",
+      "z-ai/glm-5.2​",
+    ];
+    adversarialInputs.forEach((input) => {
+      expect(
+        ChatModelOption.Catalog.isValidId(enforceChatModelAllowlist(input)),
+      ).toBe(true);
+    });
   });
 });
 ```
@@ -833,14 +873,14 @@ describe("resolveChatModel", () => {
 Run:
 
 ```bash
-pnpm vitest run supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.test.ts
+pnpm vitest run supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.test.ts
 ```
 
-Expected: FAIL with a module-resolution error, because `resolveChatModel.ts` does not exist yet.
+Expected: FAIL with a module-resolution error, because `enforceChatModelAllowlist.ts` does not exist yet.
 
 - [ ] **Step 3: Create the helper**
 
-Create `supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.ts`:
+Create `supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts`:
 
 ```ts
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
@@ -851,11 +891,31 @@ import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.t
  * The picker is a fixed six-model catalog, so anything else is either a stale
  * value in a client's local storage or a crafted request. Both cases fall back
  * to the default rather than erroring, so the chat keeps working.
+ *
+ * This is a spend control, not just input validation. OpenRouter will happily
+ * accept any real model id and bill us at that model's rate, so a passed-
+ * through off-catalog id is a live cost lever for any authenticated client.
+ *
+ * Named `enforce…` rather than `resolve…` to keep it distinct from the
+ * client-side `ChatModelStorage.resolveChatModelId`, which answers a different
+ * question: which of the models the picker is currently *showing* should be
+ * selected. Only this function is a trust boundary.
  */
-export function resolveChatModel(model: string | undefined): string {
-  if (model !== undefined && ChatModelOption.Catalog.isValidId(model)) {
+export function enforceChatModelAllowlist(model: string | undefined): string {
+  if (model === undefined) {
+    return ChatModelOption.Catalog.defaultId;
+  }
+  if (ChatModelOption.Catalog.isValidId(model)) {
     return model;
   }
+  // Nothing in this edge function has a logger, so `console` is the only
+  // signal available; it lands in the Supabase edge function logs. Without
+  // this, a stale client and a deliberate off-catalog probe are
+  // indistinguishable: both produce a silent, successful, correctly-billed
+  // request.
+  console.warn(
+    `Rejected off-catalog chat model "${model}"; falling back to ${ChatModelOption.Catalog.defaultId}`,
+  );
   return ChatModelOption.Catalog.defaultId;
 }
 ```
@@ -865,10 +925,10 @@ export function resolveChatModel(model: string | undefined): string {
 Run:
 
 ```bash
-pnpm vitest run supabase/functions/chat/PostChatMessages/resolveChatModel/resolveChatModel.test.ts
+pnpm vitest run supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.test.ts
 ```
 
-Expected: PASS, 5 tests.
+Expected: PASS, 7 tests.
 
 - [ ] **Step 5: Use the helper in `PostChatMessages.ts`**
 
@@ -889,7 +949,7 @@ function _resolveChatModel(model: string | undefined): string {
 Add this import alongside the other `@sbfn/chat/PostChatMessages/...` imports:
 
 ```ts
-import { resolveChatModel } from "@sbfn/chat/PostChatMessages/resolveChatModel/resolveChatModel.ts";
+import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 ```
 
 Change line 116 from:
@@ -901,7 +961,7 @@ Change line 116 from:
 to:
 
 ```ts
-    const model = resolveChatModel(requestedModel);
+    const model = enforceChatModelAllowlist(requestedModel);
 ```
 
 `GlobalAppConfig` is now unused in this file. Delete its import (line 22):
@@ -928,7 +988,7 @@ Run:
 pnpm lint:ts:fix-changed && pnpm type-check && pnpm vitest run supabase/functions/chat
 ```
 
-Expected: type-check clean; all existing chat tests plus the new one pass.
+Expected: type-check clean; all existing chat tests plus the new seven pass.
 
 - [ ] **Step 8: Commit**
 
@@ -936,6 +996,14 @@ Expected: type-check clean; all existing chat tests plus the new one pass.
 git add supabase/functions/chat/PostChatMessages/
 git commit -m "fix(chat): allowlist the requested model instead of shape-checking it"
 ```
+
+### Deploy-sequencing constraint: Tasks 3 and 4 must ship together
+
+Between this task and Task 4 the two layers disagree, silently and almost completely. The picker is still served by `GetChatModels.ts`, filtered by `GlobalAppConfig.chat.allowedModelClasses`, whose tokens do not include `glm` at all; so `z-ai/glm-5.2` cannot even appear in the picker while the send path already restricts to the six. And `GlobalAppConfig.chat.defaultModelId` is still `openai/gpt-4o-mini`, which is off-catalog, so even the client's own default gets coerced.
+
+Concretely, at the Task 3 commit: a user picks Mistral Large, the request returns HTTP 200, and the answer comes from Claude Sonnet 5 with nothing saying so. The model picker is a decorative control.
+
+This repo deploys the edge functions and the frontend independently, so **do not deploy the edge function from a commit between Task 3 and Task 4.** The branch is only coherent from Task 4 onward. Merging the whole branch at once, which is the plan, avoids this entirely. Task 6 Step 7 is where you confirm the two layers agree in a running app.
 
 ---
 
@@ -1761,12 +1829,35 @@ git commit -m "chore(i18n): refresh catalogs after chat model picker trim"
 | --- | --- |
 | No bare `AppConfig` symbol remains | `grep -rn "AppConfig" src/ shared/ supabase/ \| grep -v node_modules \| grep -v src/i18n/locales \| grep -vE "GlobalAppConfig\|WebAppConfig"` |
 | Catalog holds six models with a valid default | `pnpm vitest run shared/models/chat/ChatModelOption` |
-| Off-catalog models cannot be billed | `pnpm vitest run supabase/functions/chat/PostChatMessages/resolveChatModel` |
+| Off-catalog models cannot be billed | `pnpm vitest run supabase/functions/chat/PostChatMessages/enforceChatModelAllowlist` |
 | Picker groups are correct and translated | `pnpm vitest run src/components/ChatPanel/useChatModelCatalog.test.ts` |
 | Stale stored model ids fall back safely | `pnpm vitest run src/components/ChatPanel/ChatModelStorage` |
 | Nothing references the deleted pipeline | `pnpm type-check` |
 | Message catalogs are in sync | `pnpm i18n:check` |
 | Nothing else regressed | `pnpm test -- --quick` then `pnpm test:e2e` |
+
+## Findings for separate triage, surfaced by Task 3's review
+
+Locking the model down caps price *per token*. It does not cap tokens, and the review of Task 3 traced `PostChatMessages.ts`'s `bodySchema` and found the larger levers still open. None of these are defects in this branch, and none are fixed here. They want their own ticket.
+
+| Field | Cap today | Reaches OpenRouter |
+| --- | --- | --- |
+| `messages[].content` | none | yes, verbatim, up to 3 attempts |
+| `messages` array length | none | yes |
+| `context.lastSql` | none | yes, and twice when `lastError` is also set |
+| `context.lastError` | none | yes |
+| `context.lastResultColumns` | none (unbounded array, unbounded strings) | yes, fully rendered into the prompt |
+| `consentAcks` | none | no, but see below |
+| `retryContext.*` | 2000 / 8000 / 400 / 40 | yes |
+
+`retryContext` is the only capped object, and there is no `max_tokens` on the request at all, so output length is unbounded too and the retry-on-empty ladder can fire the whole thing three times. An authenticated client can therefore still drive one request to arbitrary input and output token count on the priciest allowlisted model. Model choice was a bounded ~10x lever; unbounded `messages` is not bounded at all.
+
+Two adjacent non-cost findings from the same trace:
+
+- **Client-supplied system-role messages.** `messages[].role` accepts `"system"`, and client messages are spread in *after* our own system message. A client can append its own system turn, which is a guardrail-bypass lever.
+- **Unbounded `consentAcks` with per-element crypto.** `verifyChatConsentAcks` does an async hash plus an HMAC verify per element in a serial loop, before any LLM call. That is a cheap CPU-exhaustion path against the isolate.
+
+Suggested minimum for that ticket: `.max()` on `messages` content and array length, on `context.lastSql` / `lastError`, on `lastResultColumns` length, and on `consentAcks` length; plus an explicit `max_tokens` in the request body; plus rejecting a client-supplied `"system"` role.
 
 ## Out of scope
 
