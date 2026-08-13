@@ -18,6 +18,45 @@ set
 $$;
 
 /**
+ * Whether any share on this resource grants a principal other than its owner.
+ *
+ * `principal_type <> 'user'` is what catches workspace and user_group
+ * principals: workspace shares carry a NULL `principal_id` by convention, so
+ * comparing `principal_id` alone would miss them. `is distinct from` keeps a
+ * NULL `principal_id` on a user-type row from evaluating to NULL and silently
+ * dropping that row.
+ *
+ * Deliberately ignores `requires_app_access`. A group share that currently
+ * reaches nobody is still an expressed intent to share, so the resource is not
+ * private.
+ *
+ * Takes the owner id from the caller rather than looking it up, because the
+ * RLS-hot callers already hold it and this runs per row.
+ *
+ * @param p_owner_id The resource's owner, supplied by the caller.
+ * @returns True when at least one non-owner share row exists.
+ */
+create or replace function public.util__has_non_owner_share (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_owner_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = public as $$
+  select exists (
+    select 1
+    from public.resource_shares rs
+    where
+      rs.resource_type = p_resource_type and
+      rs.resource_id = p_resource_id and
+      (
+        rs.principal_type <> 'user'::public.share_principal_type or
+        rs.principal_id is distinct from p_owner_id
+      )
+  );
+$$;
+
+/**
  * Effective role for auth.uid() on a dashboard or dataset row.
  *
  * Most paths merge several independent grants (direct/group/workspace shares,
