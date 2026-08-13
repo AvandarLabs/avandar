@@ -2226,11 +2226,35 @@ export function syncMap({
     map.addSource(sourceId, { type: "geojson", data: sourceSpec.data });
   });
 
-  const isReordered =
-    previousSpec.layers.length === nextSpec.layers.length &&
-    nextSpec.layers.some((layerSpec, index) => {
-      return previousSpec.layers[index]?.id !== layerSpec.id;
+  // Whether the stack needs reordering is decided against the order the map
+  // will actually hold after the adds and removes above, not against the
+  // previous spec. Gating on equal lengths would skip the reorder pass on any
+  // sync that changed both membership and order, and since `addLayer` always
+  // appends to the top, a layer inserted at the bottom would silently render
+  // on top instead.
+  const previousLayerIds = new Set(
+    previousSpec.layers.map((layerSpec) => {
+      return layerSpec.id;
+    }),
+  );
+  const survivingIds = previousSpec.layers
+    .filter((layerSpec) => {
+      return nextLayerIds.has(layerSpec.id);
+    })
+    .map((layerSpec) => {
+      return layerSpec.id;
     });
+  const addedIds = nextSpec.layers
+    .map((layerSpec) => {
+      return layerSpec.id;
+    })
+    .filter((layerId) => {
+      return !previousLayerIds.has(layerId);
+    });
+  const effectiveOrder = [...survivingIds, ...addedIds];
+  const needsReorder = effectiveOrder.some((layerId, index) => {
+    return layerId !== nextSpec.layers[index]?.id;
+  });
 
   nextSpec.layers.forEach((layerSpec) => {
     const previousLayerSpec = findLayerSpec(previousSpec, layerSpec.id);
@@ -2240,9 +2264,10 @@ export function syncMap({
     }
     syncPaint(map, layerSpec, previousLayerSpec);
     syncLayout(map, layerSpec, previousLayerSpec);
-    if (isReordered) {
-      // Moving each layer to the top in order leaves them in the requested
-      // bottom-to-top sequence.
+    if (needsReorder) {
+      // Moving each layer to the top in requested order leaves them in the
+      // correct bottom-to-top stack, whether it was just added or already
+      // present.
       map.moveLayer(layerSpec.id);
     }
   });
@@ -2260,6 +2285,22 @@ Expected: PASS, 6 tests.
 git add src/views/GISApp/MapCanvas/syncMap.ts src/views/GISApp/MapCanvas/syncMap.test.ts
 git commit -m "feat(gis): sync MapLibre from a declarative map spec"
 ```
+
+### Shipped structure
+
+The body above is factored into `_removeStaleLayersAndSources`, `_syncSources`,
+`_needsReorder`, and `_applyLayers` so each stays inside the 45-line limit, and
+`_syncSources` carries a docstring recording the `setData` contract: a source's
+`data` must be a **fresh object** when the data changes, because change
+detection is a reference comparison. The upstream pipeline is pure so this holds
+today; mutating a `FeatureCollection` in place would leave the map showing stale
+data with no error.
+
+Three reorder cases are covered by tests, and the first two failed against the
+equal-length gate this section originally specified: a new layer inserted at the
+bottom of a stack, a layer removed while the survivors are reordered in the same
+sync, and a layer appended at the top (which must produce **no** `moveLayer`
+calls, guarding against overcorrecting into an unconditional reorder).
 
 ---
 
