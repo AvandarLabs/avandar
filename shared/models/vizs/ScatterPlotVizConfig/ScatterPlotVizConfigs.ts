@@ -18,10 +18,7 @@ import type {
   ScatterSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
-import type {
-  AnyVizSettingDescriptors,
-  VizSettingDescriptors,
-} from "$/models/vizs/SettingDescriptor.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -47,7 +44,7 @@ const DESCRIPTORS = {
 export const ScatterPlotVizConfigs = {
   vizType: "scatter",
   displayName: "Scatter Plot",
-  descriptors: DESCRIPTORS as unknown as AnyVizSettingDescriptors,
+  descriptors: DESCRIPTORS,
 
   /** Create an empty scatter plot config. */
   makeEmptyConfig: (): ScatterPlotVizConfig => {

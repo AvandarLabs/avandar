@@ -254,6 +254,37 @@
 ## Types
 
 - **Never** use `any`.
+- **Never use `as unknown as T` unless the compiler genuinely cannot resolve
+  the relationship.** Routing a value through `unknown` disables every
+  assignability check between the two types, so the cast keeps compiling after
+  the shapes drift apart and the mismatch surfaces at runtime instead.
+
+  When you encounter an `as unknown as T`, remove it and see what the compiler
+  says:
+  - No error: leave it removed. The cast was noise.
+  - An error: fix the underlying type *without* casting. Usually the real
+    problem is upstream, such as a parameter or field typed `unknown` that
+    should carry a real type.
+  - Only when no fix is possible because the code is already well-structured,
+    fall back to a cast, and prefer the narrowest one that compiles (a single
+    `as T` over `as unknown as T`). Add a comment saying why it is needed.
+
+  The legitimate case is a type too complex for TypeScript to resolve safely,
+  which in practice means complicated generics: a typed dotted path such as
+  `Paths<TConfig>` cannot be satisfied by a runtime `string`.
+
+  ```ts
+  // Bad - the prop is typed `unknown`, so every use needs a cast
+  type Props = { tooltipProps?: unknown };
+  <Chart tooltipProps={tooltipProps as never} />;
+
+  // Good - type the prop, and no cast is needed anywhere
+  type Props = {
+    tooltipProps?: ComponentProps<typeof Chart>["tooltipProps"];
+  };
+  <Chart tooltipProps={tooltipProps} />;
+  ```
+
 - Use `as const` for literals that never change.
 - Use `type` instead of `interface`. **Only** use `interface` for OOP-style
   interfaces implemented by a class.

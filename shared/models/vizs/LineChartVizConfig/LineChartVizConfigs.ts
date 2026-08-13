@@ -18,10 +18,7 @@ import type {
   RadarSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
-import type {
-  AnyVizSettingDescriptors,
-  VizSettingDescriptors,
-} from "$/models/vizs/SettingDescriptor.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -132,7 +129,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
 export const LineChartVizConfigs = {
   vizType: "line",
   displayName: "Line Chart",
-  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
+  descriptors,
 
   makeEmptyConfig: (): LineChartVizConfig => {
     return {

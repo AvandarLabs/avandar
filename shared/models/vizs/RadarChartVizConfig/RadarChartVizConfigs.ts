@@ -12,10 +12,7 @@ import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChart
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
-import type {
-  AnyVizSettingDescriptors,
-  VizSettingDescriptors,
-} from "$/models/vizs/SettingDescriptor.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -84,7 +81,7 @@ const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
 export const RadarChartVizConfigs = {
   vizType: "radar",
   displayName: "Radar Chart",
-  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
+  descriptors,
 
   makeEmptyConfig: (): RadarChartVizConfig => {
     return {

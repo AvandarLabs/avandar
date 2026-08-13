@@ -4,6 +4,7 @@ import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartSty
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
+import type { ComponentProps } from "react";
 
 type Props = {
   data: UnknownDataFrame;
@@ -11,7 +12,7 @@ type Props = {
   series: readonly XYSeries[];
   height: number | string;
   withLegend: boolean;
-  tooltipProps?: unknown;
+  tooltipProps?: ComponentProps<typeof MantineCompositeChart>["tooltipProps"];
   styleProps: ReturnType<typeof applyChartStyle>;
   valueFormatter?: (value: number) => string;
 };
@@ -44,7 +45,7 @@ export function renderXYComposite({
       dataKey={xAxisKey}
       series={compositeSeries}
       withLegend={withLegend}
-      tooltipProps={tooltipProps as never}
+      tooltipProps={tooltipProps}
       valueFormatter={valueFormatter}
       barProps={(s) => {
         const found = series.find(propEq("key", s.name));
