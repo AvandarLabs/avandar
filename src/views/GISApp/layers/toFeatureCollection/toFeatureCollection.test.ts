@@ -119,6 +119,54 @@ describe("toFeatureCollection", () => {
     ]);
   });
 
+  it("does not call a swap when swapping would still be invalid", () => {
+    const result = toFeatureCollection({
+      rows: [{ lat: 200, lon: 45 }],
+      binding,
+      sensitivity: exact,
+      layerId: "layer-1",
+    });
+    expect(result.drops).toEqual([
+      { reason: "outOfRange", count: 1, sampleRowIndexes: [0] },
+    ]);
+  });
+
+  it("still calls a swap when swapping would be genuinely valid", () => {
+    const result = toFeatureCollection({
+      rows: [{ lat: 120.5, lon: 45.1 }],
+      binding,
+      sensitivity: exact,
+      layerId: "layer-1",
+    });
+    expect(result.drops).toEqual([
+      { reason: "suspectedLatLngSwap", count: 1, sampleRowIndexes: [0] },
+    ]);
+  });
+
+  it("pins the inclusive swap boundary at (180, 90)", () => {
+    const result = toFeatureCollection({
+      rows: [{ lat: 180, lon: 90 }],
+      binding,
+      sensitivity: exact,
+      layerId: "layer-1",
+    });
+    expect(result.drops).toEqual([
+      { reason: "suspectedLatLngSwap", count: 1, sampleRowIndexes: [0] },
+    ]);
+  });
+
+  it("pins just past the swap boundary as out of range", () => {
+    const result = toFeatureCollection({
+      rows: [{ lat: 180.0001, lon: 90.0001 }],
+      binding,
+      sensitivity: exact,
+      layerId: "layer-1",
+    });
+    expect(result.drops).toEqual([
+      { reason: "outOfRange", count: 1, sampleRowIndexes: [0] },
+    ]);
+  });
+
   it("caps the sampled row indexes it reports", () => {
     const rows = Array.from({ length: 30 }, () => {
       return { lat: null, lon: null };

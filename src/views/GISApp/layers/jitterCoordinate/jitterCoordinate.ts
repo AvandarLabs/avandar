@@ -5,7 +5,7 @@ const METERS_PER_DEGREE_LATITUDE = 111_320;
  * stable pseudo-random displacement from a row's identity, so a jittered
  * point lands in the same place on every repaint.
  */
-function buildSeedHash(seed: string): number {
+function _buildSeedHash(seed: string): number {
   let hash = 0x811c9dc5;
   for (let index = 0; index < seed.length; index += 1) {
     hash ^= seed.charCodeAt(index);
@@ -40,7 +40,7 @@ export function jitterCoordinate({
   if (radiusMeters <= 0) {
     return { longitude, latitude };
   }
-  const seedHash = buildSeedHash(seed);
+  const seedHash = _buildSeedHash(seed);
   // Split the hash into two independent unit fractions: one for the bearing,
   // one for the radius. Square-rooting the radius fraction spreads points
   // uniformly over the disc instead of clustering them at the center.
@@ -61,8 +61,8 @@ export function jitterCoordinate({
     (distanceMeters * Math.cos(angleRadians)) / metersPerDegreeLongitude;
 
   return {
-    longitude: wrapLongitude(longitude + deltaLongitude),
-    latitude: clampLatitude(latitude + deltaLatitude),
+    longitude: _wrapLongitude(longitude + deltaLongitude),
+    latitude: _clampLatitude(latitude + deltaLatitude),
   };
 }
 
@@ -71,7 +71,7 @@ export function jitterCoordinate({
  * that crosses the antimeridian lands at the correct position on the other
  * side instead of producing an out-of-range value.
  */
-function wrapLongitude(longitude: number): number {
+function _wrapLongitude(longitude: number): number {
   return ((((longitude + 180) % 360) + 360) % 360) - 180;
 }
 
@@ -80,6 +80,6 @@ function wrapLongitude(longitude: number): number {
  * enough to overshoot a pole has nowhere further to go, so it is capped at
  * the pole rather than producing an out-of-range value.
  */
-function clampLatitude(latitude: number): number {
+function _clampLatitude(latitude: number): number {
   return Math.min(90, Math.max(-90, latitude));
 }

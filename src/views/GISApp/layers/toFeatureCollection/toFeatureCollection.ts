@@ -32,7 +32,7 @@ export class SensitivityViolationError extends Error {
   }
 }
 
-function toFiniteNumber(value: unknown): number | undefined {
+function _toFiniteNumber(value: unknown): number | undefined {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : undefined;
   }
@@ -43,7 +43,7 @@ function toFiniteNumber(value: unknown): number | undefined {
   return undefined;
 }
 
-function classifyCoordinate(
+function _classifyCoordinate(
   latitude: number,
   longitude: number,
 ): DropReason | undefined {
@@ -55,13 +55,95 @@ function classifyCoordinate(
   if (isLatitudeInRange && isLongitudeInRange) {
     return undefined;
   }
-  // A latitude that would be a valid longitude, paired with a longitude that
-  // would be a valid latitude, is almost always a swapped pair rather than
-  // genuinely bad data.
-  if (!isLatitudeInRange && isLongitudeInRange && Math.abs(longitude) <= 90) {
+  // A swap is only worth suggesting when swapping would actually produce a
+  // valid pair: the out-of-range latitude must itself fit as a longitude,
+  // and the longitude must fit as a latitude. Otherwise this is genuinely
+  // bad data, and telling the user "these look swapped" sends them chasing
+  // a fix that does not exist.
+  if (
+    !isLatitudeInRange &&
+    Math.abs(latitude) <= 180 &&
+    Math.abs(longitude) <= 90
+  ) {
     return "suspectedLatLngSwap";
   }
   return "outOfRange";
+}
+
+/**
+ * Converts one source row into either a GeoJSON feature or the reason it
+ * could not become one.
+ */
+function _placeRow({
+  row,
+  rowIndex,
+  binding,
+  sensitivity,
+  layerId,
+}: {
+  row: UnknownRow;
+  rowIndex: number;
+  binding: ResolvedGeoBinding;
+  sensitivity: SensitivityPolicy;
+  layerId: string;
+}): { feature: GeoJSON.Feature } | { dropReason: DropReason } {
+  const { latitudeColumnName, longitudeColumnName } = binding;
+  const rawLatitude = row[latitudeColumnName];
+  const rawLongitude = row[longitudeColumnName];
+  if (rawLatitude == null || rawLongitude == null) {
+    return { dropReason: "nullCoordinate" };
+  }
+  const latitude = _toFiniteNumber(rawLatitude);
+  const longitude = _toFiniteNumber(rawLongitude);
+  if (latitude === undefined || longitude === undefined) {
+    return { dropReason: "nonNumericCoordinate" };
+  }
+  const invalidReason = _classifyCoordinate(latitude, longitude);
+  if (invalidReason) {
+    return { dropReason: invalidReason };
+  }
+
+  const placed =
+    sensitivity.mode === "jitter" ?
+      jitterCoordinate({
+        longitude,
+        latitude,
+        radiusMeters: sensitivity.radiusMeters,
+        seed: `${layerId}:${rowIndex}`,
+      })
+    : { longitude, latitude };
+
+  const properties: GeoJSON.GeoJsonProperties = { ...row };
+  delete properties[latitudeColumnName];
+  delete properties[longitudeColumnName];
+
+  return {
+    feature: {
+      type: "Feature",
+      id: rowIndex,
+      geometry: {
+        type: "Point",
+        coordinates: [placed.longitude, placed.latitude],
+      },
+      properties,
+    },
+  };
+}
+
+/**
+ * Turns accumulated drop-reason row indexes into the reports callers see,
+ * capping the sample each report carries.
+ */
+function _buildDropReports(
+  dropsByReason: ReadonlyMap<DropReason, readonly number[]>,
+): GeometryDropReport[] {
+  return [...dropsByReason.entries()].map(([reason, rowIndexes]) => {
+    return {
+      reason,
+      count: rowIndexes.length,
+      sampleRowIndexes: rowIndexes.slice(0, MAX_SAMPLE_ROW_INDEXES),
+    };
+  });
 }
 
 /**
@@ -96,73 +178,31 @@ export function toFeatureCollection({
     );
   }
 
-  const { latitudeColumnName, longitudeColumnName } = binding;
   const features: GeoJSON.Feature[] = [];
   const dropsByReason = new Map<DropReason, number[]>();
 
-  const recordDrop = (reason: DropReason, rowIndex: number): void => {
-    const existing = dropsByReason.get(reason);
-    if (existing) {
-      existing.push(rowIndex);
-      return;
-    }
-    dropsByReason.set(reason, [rowIndex]);
-  };
-
   rows.forEach((row, rowIndex) => {
-    const rawLatitude = row[latitudeColumnName];
-    const rawLongitude = row[longitudeColumnName];
-    if (rawLatitude == null || rawLongitude == null) {
-      recordDrop("nullCoordinate", rowIndex);
-      return;
-    }
-    const latitude = toFiniteNumber(rawLatitude);
-    const longitude = toFiniteNumber(rawLongitude);
-    if (latitude === undefined || longitude === undefined) {
-      recordDrop("nonNumericCoordinate", rowIndex);
-      return;
-    }
-    const invalidReason = classifyCoordinate(latitude, longitude);
-    if (invalidReason) {
-      recordDrop(invalidReason, rowIndex);
-      return;
-    }
-
-    const placed =
-      sensitivity.mode === "jitter" ?
-        jitterCoordinate({
-          longitude,
-          latitude,
-          radiusMeters: sensitivity.radiusMeters,
-          seed: `${layerId}:${rowIndex}`,
-        })
-      : { longitude, latitude };
-
-    const properties: GeoJSON.GeoJsonProperties = { ...row };
-    delete properties[latitudeColumnName];
-    delete properties[longitudeColumnName];
-
-    features.push({
-      type: "Feature",
-      id: rowIndex,
-      geometry: {
-        type: "Point",
-        coordinates: [placed.longitude, placed.latitude],
-      },
-      properties,
+    const placement = _placeRow({
+      row,
+      rowIndex,
+      binding,
+      sensitivity,
+      layerId,
     });
-  });
-
-  const drops = [...dropsByReason.entries()].map(([reason, rowIndexes]) => {
-    return {
-      reason,
-      count: rowIndexes.length,
-      sampleRowIndexes: rowIndexes.slice(0, MAX_SAMPLE_ROW_INDEXES),
-    };
+    if ("dropReason" in placement) {
+      const existing = dropsByReason.get(placement.dropReason);
+      if (existing) {
+        existing.push(rowIndex);
+      } else {
+        dropsByReason.set(placement.dropReason, [rowIndex]);
+      }
+      return;
+    }
+    features.push(placement.feature);
   });
 
   return {
     featureCollection: { type: "FeatureCollection", features },
-    drops,
+    drops: _buildDropReports(dropsByReason),
   };
 }
