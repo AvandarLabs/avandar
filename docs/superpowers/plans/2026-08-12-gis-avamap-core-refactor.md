@@ -774,6 +774,23 @@ git add src/views/GISApp/layers/jitterCoordinate
 git commit -m "feat(gis): add deterministic coordinate jitter"
 ```
 
+### Shipped behavior beyond the code above
+
+Code review added two things, and later tasks can rely on them:
+
+1. **The returned coordinate is always valid WGS84.** Longitude is wrapped into
+   `[-180, 180]` and latitude clamped into `[-90, 90]`. A large longitude delta
+   near a pole is correct geometry (500 m east-west really is ~101° of longitude
+   at 89.999° latitude), but an out-of-range coordinate is not, and
+   `toFeatureCollection` would classify one as bad data and drop the row. So a
+   jittered layer can never silently discard its own points.
+2. **A distribution test guards the `Math.sqrt(radiusFraction)` line.** The
+   radius-bound assertion alone still passes if that sqrt is deleted, because
+   center-clustered points are still inside the radius. The added test samples
+   500 seeds and asserts the share landing within half the radius sits between
+   15% and 35%, against the 25% that uniform-over-area predicts and the ~50% a
+   uniform-radius-fraction bug would give. Measured: 27.4%.
+
 ---
 
 ## Task 4: `toFeatureCollection`
