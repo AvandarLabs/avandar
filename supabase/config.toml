@@ -56,14 +56,30 @@ enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
 # sql_paths = ["./seed.sql"]
+# Storage replay. Anything listed here re-runs AFTER the migration pass, so it
+# is the last word on the storage schema for a local database.
+#
+# Entries must be `_STORAGE`-prefixed migrations, and must be IDEMPOTENT:
+# `insert ... on conflict do nothing` for buckets, `drop policy if exists`
+# before every `create policy`. They execute a second time on a database that
+# already ran them as migrations, so a bare `create policy` aborts the reset
+# with SQLSTATE 42710.
+#
+# That is why the three original bucket migrations are NOT listed. They use
+# bare `create policy` and predate this rule, and editing migrations already
+# applied to production to satisfy a local replay is not worth the risk. The
+# single entry below supersedes them: it recreates all three buckets and all
+# ten policies from scratch.
+#
+# Measured on CLI v2.98.2: `db reset` does NOT wipe the storage schema, so with
+# the migration timeline repaired this replay is belt-and-braces rather than
+# load-bearing. It is kept because the failure it guards against is silent, and
+# because a path that matches no file is only a WARNING. A typo here leaves a
+# bucket with zero policies and nothing says so. Verify with:
+#   select policyname from pg_policies
+#   where schemaname = 'storage' and tablename = 'objects';
 sql_paths = [
-  "./migrations/20260119164300_STORAGE-workspaces-bucket.sql",
-  "./migrations/20260122161802_STORAGE-public-bucket.sql",
-  "./migrations/20260329000000-STORAGE-opendata-bucket.sql",
-  # Must stay LAST: overrides the workspaces-bucket policies created above with
-  # dataset-access-gated versions. See the header of that file for why the gate
-  # cannot live in the January STORAGE migration directly.
-  "./seeds/10_gate_workspace_dataset_storage.sql",
+  "./migrations/20260813214231_STORAGE-restore-dropped-object-policies.sql",
 ]
 
 [realtime]

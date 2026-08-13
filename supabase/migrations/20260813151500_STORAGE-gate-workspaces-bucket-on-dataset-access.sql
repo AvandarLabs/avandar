@@ -33,6 +33,40 @@
 -- defence in depth, so a bug in id extraction cannot widen access beyond the
 -- workspace.
 --
+--
+-- WHY THIS FILE IS `_STORAGE`-PREFIXED AND LISTED IN config.toml
+--
+-- It does double duty, which is the convention for every storage migration
+-- here (see the supabase-declarative-schema skill):
+--
+--   1. MIGRATION pass. Applies to remote databases in timestamp order, which
+--      is the only way a deployed environment ever gets these policies.
+--   2. SEED pass. `supabase db reset` resets the storage schema AFTER running
+--      migrations, so locally every storage.objects policy created during the
+--      migration pass is wiped. `[db.seed] sql_paths` in supabase/config.toml
+--      re-runs the `_STORAGE` migrations afterwards to put them back.
+--
+-- Serving both passes is why the file must contain storage statements and
+-- nothing else: the seed pass re-executes it wholesale on an already-migrated
+-- database, so any non-storage statement would run a second time out of order.
+-- It is also why every statement is `drop policy if exists` followed by
+-- `create policy`, making re-execution idempotent.
+--
+-- Ordering matters in two directions:
+--   * within config.toml, this file must come AFTER
+--     20260119164300_STORAGE-workspaces-bucket.sql, whose ungated policies it
+--     replaces;
+--   * within the migration timeline, it must come after
+--     20260813151414_add_util_storage_object_dataset_id.sql, which creates the
+--     helper the policies below call. That helper is deliberately NOT in this
+--     file, because a `public` function has no business running in the seed
+--     pass.
+--
+-- These policies are mirrored in supabase/schemas/100.storage.sql. Without
+-- that mirror, `supabase db diff` sees policies in the database that are
+-- absent from the declarative schema and generates a migration dropping them.
+-- That has already happened four times in this repo's history.
+--
 drop policy if exists "Users can SELECT workspace datasets" on storage.objects;
 
 create policy "Users can SELECT workspace datasets" on storage.objects for

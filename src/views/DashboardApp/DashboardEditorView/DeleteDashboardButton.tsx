@@ -5,7 +5,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactElement } from "react";
 

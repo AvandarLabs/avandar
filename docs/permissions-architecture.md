@@ -74,7 +74,72 @@ Settings Admin paths) still do.
 by its owner alone: not by Settings Admins, not by the workspace owner.
 Computed by `util__is_resource_private_to_owner`, or by
 `util__has_non_owner_share` when the caller already holds the row. A public
-dashboard is never private however `is_restricted` is set.
+dashboard is never private however `is_restricted` is set, though that is
+enforced by each caller rather than by the predicate itself: see §2.1.
+
+### 2.1 Audience nomenclature: private, internal, public
+
+Use these three words for a dashboard's **audience**, and only these. They are
+the product-facing names; the paragraphs above are the mechanisms behind them.
+
+| Term | Also called | Audience | Determined by |
+| --- | --- | --- | --- |
+| **Private** | "Only me" | The owner alone | `is_restricted = true` **and** no non-owner share, **and** not public |
+| **Internal** | "Workspace only" | Workspace members whose permissions reach it | Anything short of private that is not public |
+| **Public** | "Anyone with the link" | The general public, no account needed | `dashboards.is_public = true` |
+
+Three points this table exists to prevent people from getting wrong.
+
+**Private is derived, not stored.** There is no `is_private` column. Privacy is
+recomputed from the current share rows every time it is asked, so a dashboard
+stops being private the moment anyone adds one share to it, with no write to
+the dashboard row. `is_restricted` is the stored column, and it is *necessary
+but not sufficient*: a restricted dashboard shared with one colleague is
+internal, not private.
+
+**Internal is not one setting, it is the whole middle of the range.** It covers
+both "every member of the workspace can see this" (`is_restricted = false`) and
+"only the three people I shared it with can see this" (`is_restricted = true`
+plus shares). Both are internal because the audience is bounded by workspace
+membership. When precision matters, say *unrestricted internal* or *restricted
+internal* rather than stretching "private" to cover the second one.
+
+**Public is a different axis from the other two, and callers must compose
+them.** Private and internal are decided by restriction and shares; public is
+decided by `dashboards.is_public`, which the publish flow sets and the `anon`
+RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two axes can
+disagree, and at the product level **public wins**: a world-readable dashboard
+is public, never private, whatever its share rows say.
+
+That resolution is *not* built into `util__is_resource_private_to_owner`. That
+function is resource-type generic and knows nothing about publication, so for a
+restricted, unshared, `is_public` dashboard it returns **true**. Every caller
+that cares has to `and` in its own publication condition, and the two that
+exist both do:
+
+- `util__resource_effective_role` restores the Settings-Admin short-circuit
+  with `v_is_public or not (restricted and no non-owner share)`, so an admin
+  keeps edit rights on a dashboard the whole internet can already read.
+- `rpc_workspaces__private_resource_counts` filters on `not d.is_public`, so a
+  published dashboard is not counted against its owner as private.
+
+Treat this as a trap when adding a third caller: reading
+`util__is_resource_private_to_owner` alone and calling the answer "private"
+will hide public dashboards from admins.
+
+Datasets have no public state at all. `datasets` has `is_restricted` but no
+`is_public`, so a dataset is only ever private or internal.
+
+**"Internal" is currently a sharing state, not a publishing state.** Publishing
+today has exactly one outcome, `is_public = true`, so there is no way to
+publish a dashboard to the workspace only. An internal dashboard is reached
+through the app, not through a published URL. Closing that gap is the point of
+the `dashboard_visibility` enum (`draft` | `workspace` | `public`) in
+`docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1, which is
+designed but not implemented. When it lands, "internal" gains a second meaning
+worth disambiguating in review: *internal shared* (reachable in-app, today's
+meaning) versus *internal published* (`visibility = 'workspace'`, a snapshot in
+the `published-private` bucket behind a real URL).
 
 The guarantee covers **object storage as well as the Postgres row**. The four
 `workspaces` bucket policies on `storage.objects` gate on

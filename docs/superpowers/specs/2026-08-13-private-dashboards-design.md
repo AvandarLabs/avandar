@@ -10,7 +10,7 @@
 `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/`
 
 > **This is an umbrella design.** The work is too large for one implementation
-> plan, so §8 decomposes it into four phases. Each phase gets its own spec,
+> plan, so §8 decomposes it into five phases. Each phase gets its own spec,
 > plan, and implementation cycle. Phase 1 has one already:
 > `2026-08-13-private-resource-permissions-hardening-design.md`.
 
@@ -85,8 +85,10 @@ or acute.
 - A dashboard can be published so that only workspace members can view it,
   with per-person and per-group narrowing through the existing share model.
 - Publishing and sharing become **one** surface, reusing `ShareResourceModal`
-  and its existing logic. "Anyone with the link" joins "Restricted" and
-  "Anyone in Dashboards" as a third General access option.
+  and its existing logic. General access ends up with four options: "Only me",
+  "Restricted", "Anyone in Dashboards", and "Anyone with the link".
+- An owner can make a resource private in one action, rather than setting
+  Restricted and then remembering to remove every share by hand.
 - A published dashboard's URL does not change when its audience changes.
 - Private means private, including from workspace owners and Settings Admins,
   matching Google Drive: an org admin cannot read an employee's private
@@ -439,6 +441,7 @@ work.
 │  General access                                            │
 │  ────────────────────────────                             │
 │   🏢  [ Anyone in Dashboards ▾ ]        [ Viewer ▾ ]       │
+│        • Only me                                           │
 │        • Restricted                                        │
 │        • Anyone in Dashboards                              │
 │        • Anyone with the link          ← sets 'public'     │
@@ -538,6 +541,23 @@ private counts; `rpc_resources__transfer_ownership`; widen the
 `usage_analytics_events` SELECT policy to
 `util__can_manage_workspace_settings`; settings UI.
 
+**J. The "Only me" control.** A `ShareGeneralAccess` value derived as
+`is_restricted and no non-owner share`, rendered as the top option; the
+add-principal row and per-share role selects disabled while it is selected;
+`buildShareSummary` gains an "Only you have access" span; a confirmation step
+naming how many people lose access.
+
+Selecting it must be **one transaction, not a client-side loop**. Going private
+means clearing every non-owner share, and `ResourceShareClient` today exposes
+only single-row `deleteResourceShare`. N sequential deletes can fail halfway
+and leave a dashboard that reads as private in the UI while other people can
+still open it, which is precisely the class of bug P1 exists to remove. Add a
+security-definer RPC that sets `is_restricted` and deletes all non-owner shares
+atomically, with pgTAP covering the partial-failure case.
+
+Applies to datasets as well as dashboards: `ShareResourceModal` is shared, and
+`is_restricted` plus `resource_shares` are resource-type generic.
+
 ---
 
 ## 8. Phasing
@@ -545,11 +565,41 @@ private counts; `rpc_resources__transfer_ownership`; widen the
 | Phase | Contents | Ships independently because |
 | --- | --- | --- |
 | **P1** Permissions hardening | F, I | It is a self-contained correctness change with no new product surface, and it makes "private" true before anything invites users to rely on it. Also makes P4's predicate exact (§4). |
+| **P1.5** The "Only me" control | J | Gives users a way to *ask for* the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2. |
 | **P2** Private publishing core | A, B, D | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal. |
 | **P3** Merged share surface | C, E, G | Flips the flag on. The Drive-style modal is the only way to *set* workspace visibility, so it lands after P2. |
 | **P4** Entitlements | H | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
 
 Each phase gets its own spec, plan, and implementation cycle.
+
+### 8.0 Why "Only me" is its own phase
+
+P1 makes private-to-owner a real guarantee, and P1's admin surface (I) reports
+on it: Settings Admins can see per-member counts of private resources. But
+nothing in P1 through P4 as originally written gives an *owner* a control that
+says "make this private". Today the only route is to set Restricted and then
+remember to remove every share by hand, and nothing in the UI confirms you
+landed on private rather than restricted-with-one-share-left.
+
+That gap is worth its own phase rather than folding it into a neighbour:
+
+- **Not P1.** §8's whole argument for shipping P1 first is that it carries *no
+  new product surface*. Adding a destructive control and a new RPC to it
+  forfeits that property and reopens a finished review.
+- **Not P2.** P2 is explicitly the phase that ships machinery "without touching
+  the share modal". This is share-modal work.
+- **Not P3.** P3 is gated behind P2's enum, bucket, and routing work, so
+  deferring leaves P1's guarantee deliberately unusable for as long as that
+  takes. "Only me" depends on none of it: it reads and writes `is_restricted`
+  and `resource_shares`, both of which exist today.
+- **Not P4.** Unrelated.
+
+The rework cost of landing it early is close to zero. P3 rewrites
+`ShareGeneralAccess` regardless (C); with P1.5 in place, P3's edit becomes
+three options to four instead of two to three. The RPC below is untouched by
+P3.
+
+See item J in §7 for the contents.
 
 ### 8.1 How P2 is verified with no UI to set visibility
 
