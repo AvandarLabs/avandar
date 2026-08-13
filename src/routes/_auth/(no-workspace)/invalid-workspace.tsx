@@ -29,6 +29,15 @@ function InvalidWorkspacePage() {
     });
   }, [redirectReason]);
 
+  // Shared by the "not found / access revoked" case and the default case, so
+  // a copy edit only has to happen in one place.
+  const notFoundOrAccessRevokedMessage = (
+    <Trans>
+      This workspace no longer exists or your access has been revoked. If you
+      think this is a mistake, contact your workspace owner.
+    </Trans>
+  );
+
   return (
     <AppLayout>
       <Container ta="center" fluid py="xxxl">
@@ -39,13 +48,7 @@ function InvalidWorkspacePage() {
           <Text size="xl">
             {match(redirectReason)
               .with("NOT_FOUND_OR_ACCESS_REVOKED", () => {
-                return (
-                  <Trans>
-                    This workspace no longer exists or your access has been
-                    revoked. If you think this is a mistake, contact your
-                    workspace owner.
-                  </Trans>
-                );
+                return notFoundOrAccessRevokedMessage;
               })
               .with("NO_SUBSCRIPTION", () => {
                 return (
@@ -55,13 +58,7 @@ function InvalidWorkspacePage() {
                 );
               })
               .otherwise(() => {
-                return (
-                  <Trans>
-                    This workspace no longer exists or your access has been
-                    revoked. If you think this is a mistake, contact your
-                    workspace owner.
-                  </Trans>
-                );
+                return notFoundOrAccessRevokedMessage;
               })}
           </Text>
           <Group justify="center">

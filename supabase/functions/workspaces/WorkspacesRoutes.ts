@@ -1,16 +1,13 @@
-import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
-import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import {
   defineRoutes,
   GET,
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
+import { DeleteWorkspace } from "@sbfn/workspaces/[workspaceId].delete.ts";
 import { resolveRoleGroupIdForAcceptedInvite } from "@sbfn/workspaces/inviteRoleResolution.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
-import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 import type {
@@ -406,113 +403,6 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
   },
 
   "/:workspaceId/delete": {
-    POST: POST({
-      path: "/:workspaceId/delete",
-      schema: { workspaceId: z.uuid() },
-    }).action(
-      async ({
-        pathParams: { workspaceId },
-        supabaseClient,
-        supabaseAdminClient,
-        user,
-      }) => {
-        // Verify the caller is the workspace owner. Using supabaseClient
-        // (not admin) so RLS gets applied.
-        const { data: workspace } = await supabaseClient
-          .from("workspaces")
-          .select("id, owner_id")
-          .eq("id", workspaceId)
-          .single()
-          .throwOnError();
-
-        if (workspace.owner_id !== user.id) {
-          throw new AvaHTTPError(
-            "Only the workspace owner can delete a workspace.",
-            FORBIDDEN,
-          );
-        }
-
-        // subscriptions has ON DELETE RESTRICT, so it must be removed
-        // before the workspace row. Revoke any live Polar subscription
-        // first to stop billing, then delete the DB row.
-        const { data: subscription } = await supabaseAdminClient
-          .from("subscriptions")
-          .select("*")
-          .eq("workspace_id", workspaceId)
-          .maybeSingle()
-          .throwOnError();
-
-        if (subscription !== null) {
-          const subscriptionRead = Subscription.fromDbRowToRead(subscription);
-          if (subscriptionRead.polarSubscriptionId !== undefined) {
-            try {
-              await PolarClient.revokeSubscription({
-                subscriptionId: subscriptionRead.polarSubscriptionId,
-              });
-            } catch {
-              // intentional: Polar revocation is best-effort, workspace
-              // deletion must not be blocked by a Polar API error
-            }
-          }
-          await supabaseAdminClient
-            .from("subscriptions")
-            .delete()
-            .eq("id", subscription.id)
-            .throwOnError();
-        }
-
-        // Best-effort: recursively purge uploaded files from the workspace
-        // storage folder. A failure here must not block deletion - orphaned
-        // storage objects are benign, but a deleted workspace must not
-        // linger in the DB.
-        // NOTE: This handles two levels of depth (e.g. workspaceId/datasets/).
-        // If deeper nesting is added in future, this block will need to be
-        // made fully recursive.
-        try {
-          const prefix = workspaceId;
-          const { data: topLevel } = await supabaseAdminClient.storage
-            .from("workspaces")
-            .list(prefix);
-
-          await Promise.all(
-            (topLevel ?? []).map(async (entry) => {
-              // Supabase returns id === null for folders, a string for files
-              if (entry.id === null) {
-                const subPrefix = `${prefix}/${entry.name}`;
-                const { data: subFiles } = await supabaseAdminClient.storage
-                  .from("workspaces")
-                  .list(subPrefix);
-
-                if (subFiles && subFiles.length > 0) {
-                  await supabaseAdminClient.storage.from("workspaces").remove(
-                    subFiles.map((f) => {
-                      return `${subPrefix}/${f.name}`;
-                    }),
-                  );
-                }
-              } else {
-                await supabaseAdminClient.storage
-                  .from("workspaces")
-                  .remove([`${prefix}/${entry.name}`]);
-              }
-            }),
-          );
-        } catch {
-          // intentional: storage cleanup is best-effort
-        }
-
-        // Delete the workspace row. ON DELETE CASCADE propagates to:
-        // workspace_memberships, user_profiles, user_roles, datasets,
-        // dataset_columns, dashboards, role_groups, user_groups,
-        // workspace_invites, and all other workspace-scoped tables.
-        await supabaseAdminClient
-          .from("workspaces")
-          .delete()
-          .eq("id", workspaceId)
-          .throwOnError();
-
-        return { deleted: true as const };
-      },
-    ),
+    POST: DeleteWorkspace,
   },
 });
