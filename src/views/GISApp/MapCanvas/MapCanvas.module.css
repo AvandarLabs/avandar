@@ -1,0 +1,30 @@
+.canvas {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.controlPanel {
+  backdrop-filter: blur(12px);
+  background-color: rgb(255 255 255 / 70%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 12px;
+  box-shadow: var(--mantine-shadow-md);
+  left: 8px;
+  padding: 0 var(--mantine-spacing-xs) var(--mantine-spacing-xs);
+  position: absolute;
+  top: 16px;
+  z-index: 1;
+}
+
+.statusOverlay {
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
