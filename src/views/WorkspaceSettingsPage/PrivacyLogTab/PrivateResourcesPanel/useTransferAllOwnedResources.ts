@@ -9,9 +9,7 @@ export function useTransferAllOwnedResources(
     workspaceId: Workspace.Id;
     onClose: () => void;
   }>,
-): ReturnType<
-  typeof PrivateResourceAdminClient.useTransferAllOwnedResources
-> {
+): ReturnType<typeof PrivateResourceAdminClient.useTransferAllOwnedResources> {
   const { t } = useLingui();
   return PrivateResourceAdminClient.useTransferAllOwnedResources({
     queriesToInvalidate: [
