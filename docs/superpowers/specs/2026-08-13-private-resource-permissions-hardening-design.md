@@ -712,6 +712,76 @@ Post-fix, an admin also cannot flip `is_restricted` on a private resource:
 `util__auth_user_can_update_resource` to `can_access_resource(editor)` to the
 narrowed `effective_role`, which returns `null`.
 
+### 8.2 Supabase Storage was a second, ungated read path
+
+**Found by the final review, after the Postgres work was complete and green.**
+The audit above covered Postgres RLS call sites of the super-user helpers. It
+did not consider Storage, which turned out to be a separate read path to the
+same data, and the miss made this phase's guarantee false for datasets.
+
+`storage.objects` policies for the `workspaces` bucket checked workspace
+**membership** only:
+
+```sql
+bucket_id = 'workspaces'
+and (storage.foldername(name))[1] = any (util__get_auth_user_workspaces())
+and (storage.foldername(name))[2] = 'datasets'
+```
+
+Nothing referenced `datasets.owner_id`, `is_restricted`, `resource_shares`, or
+any effective-role helper. So **any** workspace member, not merely a Settings
+Admin, could call
+`.storage.from('workspaces').download('<workspaceId>/datasets/<datasetId>.parquet')`
+and read the bytes of a dataset private to its owner, or overwrite/destroy it
+via the UPDATE and DELETE policies. The Postgres row was correctly hidden; the
+file behind it was not.
+
+Not merely theoretical: `rpc_resources__transfer_ownership` writes the resource
+id into `usage_analytics_events`, which §5.3 of this spec makes readable by
+Settings Admins, so an admin following the documented reassignment workflow ends
+up holding exactly the dataset id needed. Dataset ids also travel inside
+dashboard `config` JSON that other members can already read.
+
+**Fixed in this phase** rather than deferred, because the whole reason datasets
+were brought into scope (§1.1) was that leaving them readable makes the dashboard
+restriction mostly theatre. All four `workspaces` bucket policies now additionally
+require `util__auth_user_can_access_resource('dataset', …)` at `viewer` for SELECT
+and `editor` for INSERT/UPDATE/DELETE.
+
+Mechanics worth knowing:
+
+- Object names are `<workspaceId>/datasets/<datasetId>.parquet`, so the dataset
+  id is in the **filename** and `storage.foldername()` cannot reach it. New
+  helper `util__storage_object_dataset_id(text)` extracts it with `split_part`,
+  returning `null` for any name not matching that shape so a policy can never
+  raise on an unexpected object. **Null is treated as deny.**
+- The membership and `foldername[2]` checks are retained as cheap defence in
+  depth, so an extraction bug cannot widen access beyond the workspace.
+- Storage policies have **no declarative source** in this repo (buckets and
+  their policies live only in migrations), so the migration is the source of
+  truth and there is no parity concern.
+- **Write-ordering dependency, verified before changing anything:** the parquet
+  upload runs in `useSaveDataset`'s `onSuccess`, after the dataset row exists;
+  and `DatasetClient.fullDelete` fetches the row, removes the object, then
+  deletes the row. Both therefore run while the row exists, which is what makes
+  gating INSERT and DELETE safe. A future change that moved a storage write
+  before the row's creation, or after its deletion, would break uploads or leave
+  undeletable orphans.
+- `storage.objects` is an ordinary RLS-protected table, so this is covered by
+  pgTAP (`storage_private_dataset_guard.test.sql`) rather than needing the
+  separate integration harness §7 anticipated. That test was confirmed to FAIL
+  against the old membership-only policy (a plain member and a Settings Admin
+  both saw the private parquet) before the fix landed.
+- Availability was verified with the real dataset flows: `csv-import`,
+  `excel-import` (both of which exercise parquet upload, download, and the
+  offline/online cycle) and all four `dataset-sharing` specs pass.
+
+**Still unaudited, and out of scope here:** the `published` and `opendata`
+buckets. `published` is world-readable by design and is P2's problem (the
+umbrella spec already plans a private bucket for it). `opendata` holds public
+reference data. Neither is a path to a private workspace dataset today, but
+both should be revisited in P2.
+
 ---
 
 ## 9. Open questions

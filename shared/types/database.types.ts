@@ -1767,6 +1767,10 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
+      util__storage_object_dataset_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
     }
     Enums: {
       app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"

@@ -686,3 +686,32 @@ begin
   return false;
 end;
 $$;
+
+/**
+ * Dataset id encoded in a `workspaces` storage bucket object name, or null.
+ *
+ * Object names are `<workspaceId>/datasets/<datasetId>.parquet` (see
+ * getDatasetParquetStoragePath in
+ * src/clients/storage/DatasetParquetStorageClient/utils.ts). The dataset id
+ * lives in the FILENAME, not a folder segment, so storage.foldername() cannot
+ * reach it and split_part is used instead.
+ *
+ * Returns null rather than raising when the name does not match that shape, so
+ * a storage policy referencing this can never error on an unexpected object
+ * name. Callers MUST treat null as "deny": an object whose dataset cannot be
+ * identified is not one we can prove the caller may read.
+ *
+ * @returns The dataset id, or null when the name is not a dataset parquet path.
+ */
+create or replace function public.util__storage_object_dataset_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when split_part(p_object_name, '/', 3) ~
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then replace(split_part(p_object_name, '/', 3), '.parquet', '')::uuid
+    else null
+  end;
+$$;

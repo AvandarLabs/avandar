@@ -16,6 +16,13 @@ members had kept private no longer appear in your lists and are not reachable
 by URL. They still exist, still belong to their owner, and are unaffected in
 every other way.
 
+**Dataset files are covered too.** A private dataset's underlying file in
+cloud storage is now gated by the same rule as its row. Previously any
+workspace member who knew a dataset's id could download that file directly,
+which meant the protection stopped at the database. It no longer does. Normal
+dataset use is unchanged: importing, syncing, going offline and back online,
+and every existing sharing arrangement all keep working exactly as before.
+
 **Where to look instead.** Workspace settings → Privacy log → Private
 resources shows how many private dashboards and datasets each member holds.
 You can reassign ownership from there without gaining access to the content.

@@ -76,6 +76,16 @@ Computed by `util__is_resource_private_to_owner`, or by
 `util__has_non_owner_share` when the caller already holds the row. A public
 dashboard is never private however `is_restricted` is set.
 
+The guarantee covers **object storage as well as the Postgres row**. The four
+`workspaces` bucket policies on `storage.objects` gate on
+`util__auth_user_can_access_resource('dataset', …)` (viewer to read, editor to
+write), resolving the dataset id from the object name via
+`util__storage_object_dataset_id`. Before that gate existed, any workspace
+member who knew a dataset id could download its parquet directly, so the
+protection stopped at the database. When adding a new bucket or a new object
+path, gate it the same way or the guarantee silently weakens again: Storage is a
+separate read path and RLS on `public` tables does not reach it.
+
 **Workspace owner** - `workspaces.owner_id`; effective `admin` on workspace
 settings and, for resources, via `util__can_manage_workspace_settings` in the
 `util__auth_user_may_select_*` helpers (not via a short-circuit inside
