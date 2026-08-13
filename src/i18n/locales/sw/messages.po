@@ -1732,10 +1732,6 @@ msgstr "Onyesha SQL"
 msgid "Grid"
 msgstr "Gridi"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Search models"
-#~ msgstr "Tafuta mifano"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Haiwezi kusawazisha hii kitu"
@@ -2413,7 +2409,7 @@ msgstr "ni tupu"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Open models"
-msgstr ""
+msgstr "Miundo huria"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3875,10 +3871,6 @@ msgstr "Omba kipengele"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Maelezo"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Loading models..."
-#~ msgstr "Inapakia mifano..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -6003,7 +5995,7 @@ msgstr "Tarehe isiyo sahihi"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr ""
+msgstr "Miundo ya Frontier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -6064,10 +6056,6 @@ msgstr "Kuinua mpango hadi {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "Usemi wa SELECT wa aina \"{exprType}\" hautumiki na fomu."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "No models match your search"
-#~ msgstr "Hakuna mifano inayolingana na utafutaji wako"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

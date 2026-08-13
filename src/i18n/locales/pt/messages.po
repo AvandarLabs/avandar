@@ -1741,10 +1741,6 @@ msgstr "Mostrar SQL"
 msgid "Grid"
 msgstr "Grade"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Search models"
-#~ msgstr "Pesquisar modelos"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Não é possível sincronizar esta entidade"
@@ -2419,7 +2415,7 @@ msgstr "é nulo"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Open models"
-msgstr ""
+msgstr "Modelos abertos"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3885,10 +3881,6 @@ msgstr "Solicitar um recurso"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Descrição"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Loading models..."
-#~ msgstr "Carregando modelos..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -6019,7 +6011,7 @@ msgstr "Data inválida"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr ""
+msgstr "Modelos de fronteira"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -6082,10 +6074,6 @@ msgstr "Atualizando plano para {newPlanName} ({newPlanSubType})"
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "A expressão SELECT do tipo \"{exprType}\" não é compatível com o "
 "formulário."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "No models match your search"
-#~ msgstr "Nenhum modelo corresponde à sua pesquisa"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

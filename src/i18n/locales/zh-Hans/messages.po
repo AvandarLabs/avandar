@@ -1662,10 +1662,6 @@ msgstr "显示 SQL"
 msgid "Grid"
 msgstr "网格"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Search models"
-#~ msgstr "搜索模型"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "无法同步此实体"
@@ -2318,7 +2314,7 @@ msgstr "为空"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Open models"
-msgstr ""
+msgstr "开放模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3739,10 +3735,6 @@ msgstr "请求功能"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "描述"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Loading models..."
-#~ msgstr "加载模型中..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5797,7 +5789,7 @@ msgstr "无效日期"
 
 #: src/components/ChatPanel/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr ""
+msgstr "前沿模型"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -5857,10 +5849,6 @@ msgstr "升级计划至 {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表单不支持类型为“{exprType}”的 SELECT 表达式。"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "No models match your search"
-#~ msgstr "没有模型匹配您的搜索"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

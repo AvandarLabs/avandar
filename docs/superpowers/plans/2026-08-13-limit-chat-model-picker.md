@@ -1787,13 +1787,19 @@ rg -n -i "openrouter" src/ shared/ supabase/ tests/ scripts/ --glob '!*.po' --gl
 
 Every remaining hit should be about *sending* a chat completion (`sendOpenRouterRequest`, `parseOpenRouterResponse`, the `OPEN_ROUTER_API_KEY` env var, the allowlist's doc comment about OpenRouter billing us). Nothing should describe fetching or curating a model catalog. Fix any that do.
 
-- [ ] **Step 1: Extract and compile the message catalogs**
+- [ ] **Step 1: Extract, translate, and compile the message catalogs**
 
 Run:
 
 ```bash
-pnpm i18n:extract && pnpm i18n:compile
+pnpm i18n:update-translations src/components/ChatPanel/useChatModelCatalog.ts
 ```
+
+**Use this, not `pnpm i18n:extract && pnpm i18n:compile`.** Extract-then-compile skips the middle step of the repo's three-stage pipeline (extract → LLM translate → compile), so the two new group labels would ship as empty `msgstr` entries in all seven non-English locales. An Arabic or Chinese user would then see two English headings in an otherwise localized picker, and **`pnpm i18n:check` would not catch it** — that gate only asserts the catalogs are not stale, never that they are filled.
+
+The path argument narrows the LLM step to entries referencing that file, so only the two new strings are sent for translation rather than re-translating the catalog. The step needs `OPENAI_API_KEY` in `.env.development`.
+
+Afterwards, confirm the summary table it prints shows `Missing: 0` for every locale.
 
 - [ ] **Step 2: Review the catalog diff**
 

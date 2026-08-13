@@ -9,7 +9,12 @@
 
 .options {
   max-height: 280px;
-  overflow: scroll;
+
+  /* `auto`, not `scroll`: with 139 models the list always overflowed so the
+     two were indistinguishable. Six models plus two group headings fit inside
+     the max-height, and `scroll` would force a permanently visible, inert
+     scrollbar wherever the platform reserves gutter space. */
+  overflow: auto;
 }
 
 .optionLabel {

@@ -12,7 +12,7 @@ type UseChatModelCatalogResult = {
 };
 
 /**
- * The curated cloud catalog plus any downloaded offline models, as picker
+ * The hardcoded cloud catalog plus any downloaded offline models, as picker
  * groups.
  *
  * The cloud catalog is a compile-time constant, so there is nothing to fetch
