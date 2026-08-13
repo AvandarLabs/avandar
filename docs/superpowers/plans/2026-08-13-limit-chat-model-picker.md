@@ -1065,6 +1065,25 @@ describe("useChatModelCatalog", () => {
     expect([...flattenedIds].sort()).toEqual([...catalogIds].sort());
   });
 
+  it("partitions models by license tier", () => {
+    // Without this, swapping the two `modelsInTier` arguments would ship
+    // Claude Sonnet 5 under "Open models" and every other test would pass:
+    // the label test only checks labels, and the coverage test sorts both
+    // sides before comparing.
+    const { result } = renderCatalog();
+
+    expect(
+      result.current.groups[0]?.models.every((model) => {
+        return model.licenseTier === "proprietary";
+      }),
+    ).toBe(true);
+    expect(
+      result.current.groups[1]?.models.every((model) => {
+        return model.licenseTier === "open";
+      }),
+    ).toBe(true);
+  });
+
   it("prepends an offline group when a local model is downloaded", () => {
     LocalChatModelStore.markDownloaded("qwen-1.5b");
 
@@ -1196,15 +1215,11 @@ Then replace the whole `resolveChatModelId` member with this version, which drop
   resolveChatModelId: ({
     availableModels,
     selectedModelId,
-    storedModelId,
   }: Readonly<{
     availableModels: ReadonlyArray<{ id: string }>;
     selectedModelId?: string;
-    storedModelId?: string;
   }>): string => {
-    const resolvedStoredModelId =
-      storedModelId !== undefined ? storedModelId : _readStoredChatModelId();
-    const candidateModelId = selectedModelId ?? resolvedStoredModelId;
+    const candidateModelId = selectedModelId ?? _readStoredChatModelId();
     const isCandidateAvailable =
       candidateModelId !== undefined &&
       availableModels.some(propEq("id", candidateModelId));
@@ -1334,7 +1349,13 @@ export function ChatModelPicker({ disabled = false }: Props): JSX.Element {
       combobox.resetSelectedOption();
     },
     onDropdownOpen: () => {
-      combobox.selectFirstOption();
+      // `onDropdownOpen` fires synchronously inside `openDropdown`, before
+      // React re-renders, and the dropdown below is rendered conditionally.
+      // Selecting here without deferring finds no `[data-combobox-option]`
+      // elements and silently does nothing, leaving the list unhighlighted.
+      requestAnimationFrame(() => {
+        combobox.selectActiveOption();
+      });
     },
   });
 
@@ -1370,7 +1391,12 @@ export function ChatModelPicker({ disabled = false }: Props): JSX.Element {
   // chat adapter can read `context.config.modelName` on each run.
   useEffect(
     function registerResolvedModelIdWithAssistantUi() {
-      assistantClient.modelContext().register({
+      // `register` returns an unsubscribe; returning it as the effect cleanup
+      // is what assistant-ui's own `makeAssistantVisible` does. Without it,
+      // every model switch and every remount permanently appends a provider
+      // to the registry. Behavior stays correct (the last registration wins)
+      // but the list grows without bound.
+      return assistantClient.modelContext().register({
         getModelContext: () => {
           return {
             config: {
@@ -1401,7 +1427,14 @@ export function ChatModelPicker({ disabled = false }: Props): JSX.Element {
       }}
     >
       <Tooltip label={tooltipLabel} disabled={combobox.dropdownOpened}>
-        <Combobox.Target>
+        {/*
+          `targetType="button"` matters now that the search input is gone and
+          the trigger is the focused element. Mantine's default `"input"`
+          gives the button `aria-activedescendant` without `role="combobox"`
+          or `aria-expanded`, which screen readers do not announce, and it
+          skips the Space/Enter handling that a button target expects.
+        */}
+        <Combobox.Target targetType="button" withExpandedAttribute>
           <Button
             type="button"
             variant="light"
@@ -1513,7 +1546,9 @@ grep -rn "chat/models\|GetChatModels\|curateOpenRouterModels\|chat-models-catalo
   | grep -v node_modules
 ```
 
-Expected: hits only inside the files this task deletes or modifies (`ChatRoutes.ts`, `ChatRoutes.types.ts`, `GetChatModels.ts`, `scripts/regenerateChatModels.ts`, `package.json`). If anything under `src/` still appears, stop: Task 4 was incomplete.
+Expected: hits only inside the files this task deletes or modifies (`ChatRoutes.ts`, `ChatRoutes.types.ts`, `GetChatModels.ts`, `scripts/regenerateChatModels.ts`, `package.json`), plus one decoy described next. If anything under `src/` still appears, stop: Task 4 was incomplete.
+
+**One expected decoy hit.** `shared/ServerApiClient/createBrowserServerApiClient.test.ts` uses `"chat/models"` as an arbitrary route string in a generic client test. Its `route` param is typed `string`, so deleting the endpoint does not break it. While you are here, rename that literal to something obviously synthetic such as `"fake/route"` so nobody greps `chat/models` later and concludes the endpoint survived. That file is otherwise out of scope; change only the route literal.
 
 - [ ] **Step 2: Delete the files**
 
