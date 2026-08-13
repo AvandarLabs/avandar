@@ -41,19 +41,24 @@ describe("ChatModelOption.Catalog", () => {
     });
   });
 
-  it("keeps nameWithoutProvider consistent with name", () => {
+  it("gives every model a non-empty name and pickerLabel", () => {
+    // Keep pickerLabel explicit: model names do not reliably contain a
+    // compact family name that can be derived.
     Catalog.values.forEach((model) => {
-      expect(model.name.endsWith(model.nameWithoutProvider)).toBe(true);
+      expect(model.name.length).toBeGreaterThan(0);
+      expect(model.pickerLabel.length).toBeGreaterThan(0);
     });
   });
 
-  it("gives every model a non-empty name and nameWithoutProvider", () => {
-    // Do not derive nameWithoutProvider by splitting name: models without a
-    // vendor prefix would produce an empty picker label.
-    Catalog.values.forEach((model) => {
-      expect(model.name.length).toBeGreaterThan(0);
-      expect(model.nameWithoutProvider.length).toBeGreaterThan(0);
-    });
+  it("uses compact picker labels for each model family", () => {
+    expect(Catalog.values).toMatchObject([
+      { id: "anthropic/claude-sonnet-5", pickerLabel: "Claude" },
+      { id: "openai/gpt-5.6-terra", pickerLabel: "ChatGPT" },
+      { id: "google/gemini-3.6-flash", pickerLabel: "Gemini" },
+      { id: "z-ai/glm-5.2", pickerLabel: "GLM" },
+      { id: "moonshotai/kimi-k2.6", pickerLabel: "Kimi" },
+      { id: "deepseek/deepseek-v4-pro", pickerLabel: "DeepSeek" },
+    ]);
   });
 
   it("declares tool support for every model", () => {

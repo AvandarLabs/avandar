@@ -542,9 +542,11 @@ Check these first because they are the most frequent review findings:
 - Avoid abbreviations unless the full word would create a naming collision.
   For example, prefer `value` over `val`.
 - Avoid vague placeholders like `next`, `prev`, or `n` without a business noun.
-- Builder functions should use `create{Type}` naming.
-- Functions that create a type from seed data should use `create{Type}From...`.
-- Conversion or cast helpers should use `to...` naming.
+- A function that turns one value into another must name both sides, using one
+  of four shapes: `[Receiver].to{Target}`, `[Receiver].from{Source}`,
+  `make{Target}From{Source}`, or `get{Target}From{Source}`. See the naming
+  rule in `docs/code-reviews/typescript-checklist.md` for the full rule,
+  including why `resolve...` is never one of them.
 - Prefer reusing existing repo-local helpers, first-party packages, or
   installed libraries over introducing bespoke local helpers when an
   equivalent shared abstraction already exists.

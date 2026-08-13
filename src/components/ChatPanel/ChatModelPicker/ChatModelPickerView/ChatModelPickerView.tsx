@@ -81,7 +81,7 @@ function _renderTrigger(
             options.combobox.toggleDropdown();
           }}
         >
-          {options.selectedModel?.nameWithoutProvider ?? options.buttonLabel}
+          {options.selectedModel?.pickerLabel ?? options.buttonLabel}
         </Button>
       </Combobox.Target>
     </Tooltip>

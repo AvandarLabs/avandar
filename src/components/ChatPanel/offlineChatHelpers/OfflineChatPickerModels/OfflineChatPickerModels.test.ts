@@ -36,6 +36,7 @@ describe("offlineChatPickerModels", () => {
     expect(group?.group).toBe(TRANSLATED_GROUP_LABEL);
     expect(group?.models[0]?.id).toBe("offline:qwen-1.5b");
     expect(group?.models[0]?.name).toBe("Qwen 2.5 1.5B");
+    expect(group?.models[0]?.pickerLabel).toBe("Qwen 2.5 1.5B");
     expect(group?.models[0]?.description).toContain("8 GB de RAM");
   });
 

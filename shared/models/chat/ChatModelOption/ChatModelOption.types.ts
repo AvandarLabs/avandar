@@ -10,7 +10,7 @@ export type ChatModelOptionRead = Model.Base<
   {
     id: string;
     name: string;
-    nameWithoutProvider: string;
+    pickerLabel: string;
     description?: string;
     supportsTools: boolean;
     licenseTier: ChatModelLicenseTier;
