@@ -19,7 +19,8 @@ import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
  * dashboard here. That gives us the two distinct roles the guarantee needs:
  * an owner who is not an admin, and an admin who is not the owner.
  *
- * Spec: docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
+ * Spec: docs/superpowers/specs/
+ *   2026-08-13-private-resource-permissions-hardening-design.md
  */
 test.describe("private resources are hidden from workspace admins", () => {
   test("admin sees a count, not the dashboard, and can reassign it", async ({
