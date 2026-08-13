@@ -14,8 +14,7 @@ describe("enforceChatModelAllowlist", () => {
   });
 
   it("rejects a well-formed model id that is not in the catalog", () => {
-    // Shape-only validation used to let this through, which meant a crafted
-    // request could bill us for a model the picker never offers.
+    // Shape-only validation permits this billable off-catalog model id.
     expect(enforceChatModelAllowlist("openai/gpt-5.5-pro")).toBe(
       ChatModelOption.Catalog.defaultId,
     );
@@ -30,8 +29,7 @@ describe("enforceChatModelAllowlist", () => {
   });
 
   it("rejects a model id that is no longer in the catalog", () => {
-    // Still the pre-Task-4 client default, so at this point in the branch this
-    // is the mainline path for any user who never touched the picker.
+    // A stale client default must be coerced to the current catalog default.
     expect(enforceChatModelAllowlist("openai/gpt-4o-mini")).toBe(
       ChatModelOption.Catalog.defaultId,
     );

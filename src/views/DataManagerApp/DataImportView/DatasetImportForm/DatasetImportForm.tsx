@@ -2,13 +2,13 @@ import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { notifyError } from "@/utils/notifications/notify";
 import {

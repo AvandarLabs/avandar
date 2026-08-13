@@ -1,7 +1,3 @@
-type WebAppConfigType = {
-  logoFilename: string;
-};
-
 /**
  * Configuration that only means something inside the browser bundle.
  *
@@ -17,4 +13,4 @@ export const WebAppConfig = {
   // TODO(jpsyx): move this to an environment variable so it does not get
   // bundled in every page of the app
   logoFilename: "logoWhite.png",
-} as const satisfies WebAppConfigType;
+} as const satisfies { logoFilename: string };

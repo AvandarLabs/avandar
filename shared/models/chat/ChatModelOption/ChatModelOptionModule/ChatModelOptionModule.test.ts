@@ -1,3 +1,4 @@
+import { prop, propEq } from "@avandar/utils";
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import { describe, expect, it } from "vitest";
 
@@ -7,12 +8,10 @@ describe("ChatModelOption.Catalog", () => {
   it("offers exactly six models, three per license tier", () => {
     expect(Catalog.values).toHaveLength(6);
 
-    const proprietary = Catalog.values.filter((model) => {
-      return model.licenseTier === "proprietary";
-    });
-    const open = Catalog.values.filter((model) => {
-      return model.licenseTier === "open";
-    });
+    const proprietary = Catalog.values.filter(
+      propEq("licenseTier", "proprietary"),
+    );
+    const open = Catalog.values.filter(propEq("licenseTier", "open"));
     expect(proprietary).toHaveLength(3);
     expect(open).toHaveLength(3);
   });
@@ -21,18 +20,14 @@ describe("ChatModelOption.Catalog", () => {
     // Count-agnostic on purpose: adding a fourth frontier model is a
     // legitimate catalog edit and should not break the ordering test as well
     // as the count test above.
-    const tiers = Catalog.values.map((model) => {
-      return model.licenseTier;
-    });
+    const tiers = Catalog.values.map(prop("licenseTier"));
     const firstOpenIndex = tiers.indexOf("open");
     expect(firstOpenIndex).toBeGreaterThan(-1);
     expect(tiers.lastIndexOf("proprietary")).toBeLessThan(firstOpenIndex);
   });
 
   it("uses unique model ids", () => {
-    const ids = Catalog.values.map((model) => {
-      return model.id;
-    });
+    const ids = Catalog.values.map(prop("id"));
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -53,9 +48,8 @@ describe("ChatModelOption.Catalog", () => {
   });
 
   it("gives every model a non-empty name and nameWithoutProvider", () => {
-    // Regression guard: nameWithoutProvider used to be derived by splitting
-    // OpenRouter's `name` on ":", which yielded "" for models that ship
-    // without a "Vendor: " prefix and rendered a blank picker button.
+    // Do not derive nameWithoutProvider by splitting name: models without a
+    // vendor prefix would produce an empty picker label.
     Catalog.values.forEach((model) => {
       expect(model.name.length).toBeGreaterThan(0);
       expect(model.nameWithoutProvider.length).toBeGreaterThan(0);
@@ -69,11 +63,8 @@ describe("ChatModelOption.Catalog", () => {
   });
 
   it("includes the default model id in the catalog", () => {
-    // This is the assertion that would have caught defaultModelId drifting
-    // to openai/gpt-4o-mini after that model left the curated catalog.
-    const ids = Catalog.values.map((model) => {
-      return model.id;
-    });
+    // Keeps the default model constrained to the current catalog.
+    const ids = Catalog.values.map(prop("id"));
     expect(ids).toContain(Catalog.defaultId);
   });
 

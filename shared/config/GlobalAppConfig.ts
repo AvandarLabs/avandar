@@ -1,6 +1,4 @@
-// ============================================================================
-// Core app configurations
-// ============================================================================
+/** Application display name. */
 export const APP_NAME = "Avandar";
 
 /** The email address to use for support inquiries */
@@ -15,16 +13,8 @@ export const INFO_EMAIL = "info@avandarlabs.com";
  */
 export const WAITLIST_URL = "https://avandarlabs.com/waitlist";
 
-// ============================================================================
-// Subscription plan configurations
-// ============================================================================
-
 /** The maximum number of seats allowed for the free plan. */
 export const MAX_FREE_PLAN_SEATS = 2;
-
-// ============================================================================
-// Global app configuration object
-// ============================================================================
 
 /**
  * Configuration that is meaningful in every runtime: the web app, the desktop

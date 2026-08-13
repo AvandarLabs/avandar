@@ -12,8 +12,8 @@ import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOpt
  * open-weights families. Every id is an undated alias, so a provider shipping
  * a dated revision needs no edit here.
  *
- * Verified against the OpenRouter catalog on 2026-08-12. To re-verify an id:
- * `curl -s https://openrouter.ai/api/v1/models | jq '.data[] | select(.id == "z-ai/glm-5.2")'`
+ * Verified against the OpenRouter catalog on 2026-08-12. To re-verify an id,
+ * query the OpenRouter `/api/v1/models` endpoint for the exact model id.
  *
  * `nameWithoutProvider` is authored by hand rather than derived from `name`.
  * OpenRouter is inconsistent about the "Vendor: " prefix: its
@@ -73,15 +73,13 @@ const CHAT_MODEL_OPTIONS = [
   }),
 ] as const satisfies readonly ChatModelOption.T[];
 
-/** Union of the six catalog ids, derived so it cannot drift from the list. */
-type ChatModelCatalogId = (typeof CHAT_MODEL_OPTIONS)[number]["id"];
-
 /**
  * Model used when the client sends no selection, or sends one that is not in
  * the catalog. Tool-calling into the Data Explorer is the chat panel's core
  * job, so the default favors reliability there over per-token price.
  */
-const DEFAULT_CHAT_MODEL_ID: ChatModelCatalogId = "anthropic/claude-sonnet-5";
+const DEFAULT_CHAT_MODEL_ID: (typeof CHAT_MODEL_OPTIONS)[number]["id"] =
+  "anthropic/claude-sonnet-5";
 
 const CHAT_MODEL_ID_SET = new Set<string>(CHAT_MODEL_OPTIONS.map(prop("id")));
 
@@ -100,8 +98,13 @@ function _isValidId(id: string): boolean {
 export const ChatModelOptionModule = {
   /** Catalog of cloud chat models offered in the chat model picker. */
   Catalog: {
+    /** Cloud models available to clients and edge-function validation. */
     values: CHAT_MODEL_OPTIONS,
+
+    /** Model used when a client has no valid catalog selection. */
     defaultId: DEFAULT_CHAT_MODEL_ID,
+
+    /** Returns whether an id belongs to the cloud model catalog. */
     isValidId: _isValidId,
   },
 };
