@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toFeatureCollection } from "@/views/GisApp/layers/toFeatureCollection/toFeatureCollection";
+import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const binding: MapLayer.ResolvedGeoBinding = {
@@ -10,9 +10,9 @@ const binding: MapLayer.ResolvedGeoBinding = {
 
 const exact = { mode: "exact" } as const;
 
-describe("toFeatureCollection", () => {
+describe("makeFeatureCollectionFromRows", () => {
   it("builds a point per row with the row index as the feature id", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: -4.44, lon: 15.27, cases: 12 }],
       binding,
       sensitivity: exact,
@@ -31,7 +31,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("keeps coordinate columns out of the feature properties", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 1, lon: 2, cases: 3 }],
       binding,
       sensitivity: exact,
@@ -43,7 +43,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("reports null coordinates instead of dropping them silently", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [
         { lat: null, lon: 2 },
         { lat: 1, lon: undefined },
@@ -59,7 +59,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("reports non-numeric coordinates", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: "not a number", lon: 2 }],
       binding,
       sensitivity: exact,
@@ -71,7 +71,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("parses numeric coordinates that arrive as strings", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: "-4.44", lon: "15.27" }],
       binding,
       sensitivity: exact,
@@ -84,7 +84,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("reports (0, 0) as null island rather than plotting the Atlantic", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 0, lon: 0 }],
       binding,
       sensitivity: exact,
@@ -96,7 +96,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("flags a likely latitude/longitude swap", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 120.5, lon: 45.1 }],
       binding,
       sensitivity: exact,
@@ -108,7 +108,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("reports out-of-range coordinates that are not a swap", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 120.5, lon: 200.1 }],
       binding,
       sensitivity: exact,
@@ -120,7 +120,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("does not call a swap when swapping would still be invalid", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 200, lon: 45 }],
       binding,
       sensitivity: exact,
@@ -135,7 +135,7 @@ describe("toFeatureCollection", () => {
     // 91 is only barely out of range as a latitude, and swapping yields the
     // valid pair (89, 91). This is the boundary the broader 120.5/45.1 case
     // above does not reach.
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 91, lon: 89 }],
       binding,
       sensitivity: exact,
@@ -147,7 +147,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("pins the inclusive swap boundary at (180, 90)", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 180, lon: 90 }],
       binding,
       sensitivity: exact,
@@ -159,7 +159,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("pins just past the swap boundary as out of range", () => {
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 180.0001, lon: 90.0001 }],
       binding,
       sensitivity: exact,
@@ -174,7 +174,7 @@ describe("toFeatureCollection", () => {
     const rows = Array.from({ length: 30 }, () => {
       return { lat: null, lon: null };
     });
-    const result = toFeatureCollection({
+    const result = makeFeatureCollectionFromRows({
       rows,
       binding,
       sensitivity: exact,
@@ -185,7 +185,7 @@ describe("toFeatureCollection", () => {
   });
 
   it("displaces points when the layer is jittered", () => {
-    const jittered = toFeatureCollection({
+    const jittered = makeFeatureCollectionFromRows({
       rows: [{ lat: -4.44, lon: 15.27 }],
       binding,
       sensitivity: { mode: "jitter", radiusMeters: 500 },
@@ -200,7 +200,7 @@ describe("toFeatureCollection", () => {
 
   it("refuses to build exact points for an aggregate-only layer", () => {
     expect(() => {
-      return toFeatureCollection({
+      return makeFeatureCollectionFromRows({
         rows: [{ lat: -4.44, lon: 15.27 }],
         binding,
         sensitivity: {

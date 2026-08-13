@@ -2,16 +2,16 @@ import { propEq } from "@avandar/utils";
 import { useMemo } from "react";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { computeBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
-import { computeLayerStats } from "@/views/GisApp/layers/computeLayerStats/computeLayerStats";
-import { createMapSpec } from "@/views/GisApp/layers/createMapSpec/createMapSpec";
-import { createLayerSpec } from "@/views/GisApp/layers/createMapSpec/createLayerSpec/createLayerSpec";
+import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
+import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { toFeatureCollection } from "@/views/GisApp/layers/toFeatureCollection/toFeatureCollection";
+import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { MapBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
-import type { GeometryDropReport } from "@/views/GisApp/layers/toFeatureCollection/toFeatureCollection";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 // The QueryResult namespace entry publishes a non-generic `T`, so the row type
 // can only be expressed through the underlying generic in the types module.
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
@@ -36,7 +36,7 @@ export type LayerMapSpec = {
  * renders.
  *
  * Every step is memoized on the narrowest inputs that actually affect it.
- * That matters because `MapLayer.resolveGeoBinding` builds a fresh object on
+ * That matters because `MapLayer.toGeoBinding` builds a fresh object on
  * each call: memoizing on its result directly would miss on every render and
  * re-upload the whole GeoJSON source for unrelated state changes.
  *
@@ -65,7 +65,7 @@ export function useLayerMapSpec({
   const { queryColumns } = layer.source;
 
   const resolvedBinding = useMemo(() => {
-    return MapLayer.resolveGeoBinding(layer);
+    return MapLayer.toGeoBinding(layer);
     // Resolution reads only the binding and the query's columns, so a change
     // to symbology or legend must not invalidate it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +75,7 @@ export function useLayerMapSpec({
     if (!resolvedBinding || !queryResult) {
       return { featureCollection: EMPTY_FEATURE_COLLECTION, drops: [] };
     }
-    return toFeatureCollection({
+    return makeFeatureCollectionFromRows({
       rows: queryResult.data,
       binding: resolvedBinding,
       sensitivity,
@@ -91,22 +91,22 @@ export function useLayerMapSpec({
     valueColumn ? QueryColumn.getDerivedColumnName(valueColumn) : undefined;
 
   const spec = useMemo(() => {
-    return createMapSpec([
-      createLayerSpec({
+    return makeMapSpecFromLayerSpecs([
+      makeLayerSpecFromMapLayer({
         layer,
         featureCollection,
-        stats: computeLayerStats({ featureCollection, valueColumnName }),
+        stats: getLayerStatsFromFeatureCollection({ featureCollection, valueColumnName }),
         valueColumnName,
       }),
     ]);
   }, [layer, featureCollection, valueColumnName]);
 
   const fitBounds = useMemo(() => {
-    return computeBounds(featureCollection);
+    return getBoundsFromFeatureCollection(featureCollection);
   }, [featureCollection]);
 
   const interactiveLayerIds = useMemo(() => {
-    return [MapLayerIds.buildLayerId(layerId)];
+    return [MapLayerIds.toLayerId(layerId)];
   }, [layerId]);
 
   return {

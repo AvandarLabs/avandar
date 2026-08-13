@@ -25,7 +25,7 @@ export function useMapStyleSync({
   useEffect(
     function swapBasemapStyle() {
       const map = mapRef.current;
-      const nextStyleKey = BasemapStyle.buildKey(basemap);
+      const nextStyleKey = BasemapStyle.toKey(basemap);
       // The key check skips the redundant swap on mount, where the constructor
       // already applied this style.
       if (!map || appliedStyleKeyRef.current === nextStyleKey) {
@@ -33,7 +33,7 @@ export function useMapStyleSync({
       }
       appliedStyleKeyRef.current = nextStyleKey;
       isStyleSwapPendingRef.current = true;
-      map.setStyle(BasemapStyle.build(basemap));
+      map.setStyle(BasemapStyle.fromBasemap(basemap));
     },
     [basemap, mapRef, appliedStyleKeyRef, isStyleSwapPendingRef],
   );

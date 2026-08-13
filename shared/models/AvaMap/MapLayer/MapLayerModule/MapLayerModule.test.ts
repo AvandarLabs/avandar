@@ -36,10 +36,10 @@ describe("MapLayer.makeEmpty", () => {
   });
 });
 
-describe("MapLayer.resolveGeoBinding", () => {
+describe("MapLayer.toGeoBinding", () => {
   it("returns undefined when the layer has no binding", () => {
     const layer = MapLayer.makeEmpty("Cases");
-    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+    expect(MapLayer.toGeoBinding(layer)).toBeUndefined();
   });
 
   it("maps column ids to the names rows are keyed by", () => {
@@ -62,7 +62,7 @@ describe("MapLayer.resolveGeoBinding", () => {
       },
     };
 
-    expect(MapLayer.resolveGeoBinding(layer)).toEqual({
+    expect(MapLayer.toGeoBinding(layer)).toEqual({
       type: "latLngColumns",
       latitudeColumnName: "lat",
       longitudeColumnName: "lon",
@@ -81,7 +81,7 @@ describe("MapLayer.resolveGeoBinding", () => {
         longitude: latitude.id,
       },
     };
-    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+    expect(MapLayer.toGeoBinding(layer)).toBeUndefined();
   });
 
   it("returns undefined when only latitude is set", () => {
@@ -100,7 +100,7 @@ describe("MapLayer.resolveGeoBinding", () => {
         longitude: undefined,
       },
     };
-    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+    expect(MapLayer.toGeoBinding(layer)).toBeUndefined();
   });
 
   it("returns undefined when only longitude is set", () => {
@@ -119,7 +119,7 @@ describe("MapLayer.resolveGeoBinding", () => {
         longitude: longitude.id,
       },
     };
-    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+    expect(MapLayer.toGeoBinding(layer)).toBeUndefined();
   });
 
   it("starts resolving only once the second axis is added", () => {
@@ -139,7 +139,7 @@ describe("MapLayer.resolveGeoBinding", () => {
         longitude: undefined,
       },
     };
-    expect(MapLayer.resolveGeoBinding(withLatitudeOnly)).toBeUndefined();
+    expect(MapLayer.toGeoBinding(withLatitudeOnly)).toBeUndefined();
 
     const withBothAxes = {
       ...withLatitudeOnly,
@@ -152,7 +152,7 @@ describe("MapLayer.resolveGeoBinding", () => {
         longitude: longitude.id,
       },
     };
-    expect(MapLayer.resolveGeoBinding(withBothAxes)).toEqual({
+    expect(MapLayer.toGeoBinding(withBothAxes)).toEqual({
       type: "latLngColumns",
       latitudeColumnName: "lat",
       longitudeColumnName: "lon",

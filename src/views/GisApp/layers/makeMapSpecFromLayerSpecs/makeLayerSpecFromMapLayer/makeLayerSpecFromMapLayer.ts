@@ -1,12 +1,12 @@
 import { matchLiteral } from "@avandar/utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
-import type { LayerStats } from "@/views/GisApp/layers/computeLayerStats/computeLayerStats";
+import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 import type {
   CircleRadiusValue,
   MapLayerSpec,
   MapSpec,
-} from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
 
@@ -91,7 +91,7 @@ function _buildCircleRadius({
  * @throws SensitivityViolationError when the layer's policy forbids drawing
  * it as individual symbols.
  */
-export function createLayerSpec({
+export function makeLayerSpecFromMapLayer({
   layer,
   featureCollection,
   stats,
@@ -109,10 +109,10 @@ export function createLayerSpec({
     );
   }
 
-  const sourceId = MapLayerIds.buildSourceId(layer.id);
+  const sourceId = MapLayerIds.toSourceId(layer.id);
   const { symbology } = layer;
   const layerSpec: MapLayerSpec = {
-    id: MapLayerIds.buildLayerId(layer.id),
+    id: MapLayerIds.toLayerId(layer.id),
     type: "circle",
     source: sourceId,
     paint: {

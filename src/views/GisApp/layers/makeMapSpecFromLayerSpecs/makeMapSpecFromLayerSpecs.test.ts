@@ -1,7 +1,7 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import { createMapSpec } from "@/views/GisApp/layers/createMapSpec/createMapSpec";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 function _createSingleLayerSpec(id: string): MapSpec {
   return {
@@ -17,9 +17,9 @@ function _createSingleLayerSpec(id: string): MapSpec {
   };
 }
 
-describe("createMapSpec", () => {
+describe("makeMapSpecFromLayerSpecs", () => {
   it("merges layer specs in the order given", () => {
-    const merged = createMapSpec([
+    const merged = makeMapSpecFromLayerSpecs([
       _createSingleLayerSpec("bottom"),
       _createSingleLayerSpec("top"),
     ]);
@@ -34,6 +34,6 @@ describe("createMapSpec", () => {
   });
 
   it("returns an empty spec for no layers", () => {
-    expect(createMapSpec([])).toEqual({ sources: {}, layers: [] });
+    expect(makeMapSpecFromLayerSpecs([])).toEqual({ sources: {}, layers: [] });
   });
 });

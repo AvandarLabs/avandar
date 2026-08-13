@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
+import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
 function createPoint(longitude: number, latitude: number): GeoJSON.Feature {
   return {
@@ -9,16 +9,16 @@ function createPoint(longitude: number, latitude: number): GeoJSON.Feature {
   };
 }
 
-describe("computeBounds", () => {
+describe("getBoundsFromFeatureCollection", () => {
   it("returns undefined for an empty collection", () => {
     expect(
-      computeBounds({ type: "FeatureCollection", features: [] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [] }),
     ).toBeUndefined();
   });
 
   it("spans every point", () => {
     expect(
-      computeBounds({
+      getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [createPoint(15, -4), createPoint(30, 10)],
       }),
@@ -30,7 +30,7 @@ describe("computeBounds", () => {
 
   it("collapses to a degenerate box for a single point", () => {
     expect(
-      computeBounds({
+      getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [createPoint(15, -4)],
       }),
@@ -58,7 +58,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [polygon] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [polygon] }),
     ).toEqual([
       [0, 0],
       [10, 5],
@@ -78,7 +78,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [line] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [line] }),
     ).toEqual([
       [-3, 40],
       [2, 48],
@@ -98,7 +98,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [collection] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [collection] }),
     ).toEqual([
       [1, 1],
       [4, 9],
@@ -112,7 +112,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({
+      getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [withoutGeometry, createPoint(7, 7)],
       }),
@@ -135,7 +135,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [multiPoint] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [multiPoint] }),
     ).toEqual([
       [-5, 20],
       [10, 35],
@@ -161,7 +161,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [multiLine] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [multiLine] }),
     ).toEqual([
       [0, -10],
       [25, 1],
@@ -197,7 +197,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({
+      getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [multiPolygon],
       }),
@@ -220,7 +220,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [line] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [line] }),
     ).toEqual([
       [10, 20],
       [12, 22],
@@ -234,7 +234,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [emptyLine] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [emptyLine] }),
     ).toBeUndefined();
   });
 
@@ -245,7 +245,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({
+      getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [emptyCollection],
       }),
@@ -268,7 +268,7 @@ describe("computeBounds", () => {
       properties: {},
     };
     expect(
-      computeBounds({ type: "FeatureCollection", features: [nested] }),
+      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [nested] }),
     ).toEqual([
       [-6, 3],
       [3, 12],

@@ -26,7 +26,7 @@ vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
   return { runStructuredQuery: runStructuredQueryMock };
 });
 
-const { useMapLayerData, buildMapLayerQueryKey, isMapLayerQueryable } =
+const { useMapLayerData, makeQueryKeyFromMapLayer, isMapLayerQueryable } =
   await import("@/views/GisApp/layers/useMapLayerData/useMapLayerData");
 
 /**
@@ -195,12 +195,12 @@ describe("isMapLayerQueryable", () => {
   });
 });
 
-describe("buildMapLayerQueryKey", () => {
+describe("makeQueryKeyFromMapLayer", () => {
   it("changes when the source changes", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(buildMapLayerQueryKey(layer)).not.toEqual(
-      buildMapLayerQueryKey(withLimit),
+    expect(makeQueryKeyFromMapLayer(layer)).not.toEqual(
+      makeQueryKeyFromMapLayer(withLimit),
     );
   });
 
@@ -213,8 +213,8 @@ describe("buildMapLayerQueryKey", () => {
         color: { type: "single" as const, color: "#ef4444" },
       },
     };
-    expect(buildMapLayerQueryKey(layer)).toEqual(
-      buildMapLayerQueryKey(recolored),
+    expect(makeQueryKeyFromMapLayer(layer)).toEqual(
+      makeQueryKeyFromMapLayer(recolored),
     );
   });
 });

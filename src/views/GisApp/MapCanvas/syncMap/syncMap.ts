@@ -2,7 +2,7 @@ import { prop, propEq } from "@avandar/utils";
 import type {
   MapLayerSpec,
   MapSpec,
-} from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 
 /** Finds the spec for a layer id within a `MapSpec`, if it is present. */

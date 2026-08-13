@@ -5,8 +5,8 @@ import { useFitMapBounds } from "@/views/GisApp/MapCanvas/useFitMapBounds";
 import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import { useMapSpecSync } from "@/views/GisApp/MapCanvas/useMapSpecSync";
 import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
-import type { MapBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
 

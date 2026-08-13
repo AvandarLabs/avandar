@@ -2,7 +2,7 @@ import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
@@ -81,11 +81,11 @@ export function useMapInstance({
     const initialView = viewRef.current;
     const map = new maplibregl.Map({
       container,
-      style: BasemapStyle.build(initialBasemap),
+      style: BasemapStyle.fromBasemap(initialBasemap),
       center: initialView.center,
       zoom: initialView.zoom,
     });
-    appliedStyleKeyRef.current = BasemapStyle.buildKey(initialBasemap);
+    appliedStyleKeyRef.current = BasemapStyle.toKey(initialBasemap);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.addControl(
       new maplibregl.ScaleControl({ unit: "metric" }),

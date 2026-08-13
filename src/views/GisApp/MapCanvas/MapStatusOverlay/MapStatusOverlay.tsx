@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Loader, Paper, Text } from "@mantine/core";
 import css from "@/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.module.css";
-import type { GeometryDropReport } from "@/views/GisApp/layers/toFeatureCollection/toFeatureCollection";
+import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { ReactNode } from "react";
 
 type Props = {

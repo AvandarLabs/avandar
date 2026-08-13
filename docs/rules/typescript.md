@@ -42,7 +42,7 @@
   same-kind exports with no single primary one (a `*.types.ts` type collection, a
   `*.constants.ts` bundle, or a group of sibling helpers).
 - Comments describe the present, never the past. Do not write what a file,
-  function, type, or module *used to* do, what it was renamed from, what an
+  function, type, or module _used to_ do, what it was renamed from, what an
   earlier implementation looked like, or why it was changed. Git history already
   records that. A reader gets no help from it and has to work out which half of
   the comment still applies, and the claim rots as soon as the next change
@@ -152,48 +152,64 @@
 
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
-- Name a function `resolve...` when it turns a reference, id, or otherwise
-  incomplete description of a thing into the concrete thing it denotes, using
-  surrounding context to do so. A reader should expect three things from the
-  name: the input is indirect (an id, a key, a partial config, an ambiguous
-  user input), the lookup can legitimately come up empty, and so the return
-  type is the concrete value or `undefined` (unless a documented default
-  always applies). Resolution is a pure read: a `resolve...` function must not
-  mutate its inputs or write to a store.
+- A function that turns one value into another must name both sides. There are
+  exactly four allowed shapes, and every conversion, derivation, or lookup uses
+  one of them:
 
-  Examples in the codebase: `MapLayer.resolveGeoBinding` turns bound column
-  ids into the column names a query result is actually keyed by, and returns
-  `undefined` when a bound column is missing from the query;
-  `resolveColumnKey` turns a persisted column key into the matching result
-  column, `undefined` when nothing matches; `resolveOfflineDataset` picks the
-  dataset a question refers to.
+  | Shape                      | Use when                                             |
+  | -------------------------- | ---------------------------------------------------- |
+  | `[Receiver].to[Target]`    | The receiver names the source                        |
+  | `[Receiver].from[Source]`  | The receiver names the target                        |
+  | `make[Target]From[Source]` | Free function, the target is a new value             |
+  | `get[Target]From[Source]`  | Free function, the target is contained in the source |
 
-  Use a different prefix when the work is not a lookup:
+  A method on a module gets the missing half from its receiver, so it never
+  repeats it: `MapLayer.toGeoBinding(layer)`, not
+  `MapLayer.mapLayerToGeoBinding(layer)` and not
+  `MapLayer.toGeoBinding(layer)`. Free functions have no receiver, so
+  they must spell out both halves, and they never use `To`: write
+  `makeFeatureCollectionFromRows(rows)`, not `rowsToFeatureCollection(rows)`
+  and not `makeFeatureCollectionFromRows(rows)`.
 
-  | Prefix    | Means                                                 |
-  | --------- | ----------------------------------------------------- |
-  | `resolve` | Reference plus context in, the concrete thing out     |
-  | `get`     | Direct accessor, the value is already in hand         |
-  | `make`    | Constructs a new value from scratch                   |
-  | `build`   | Assembles a composite value out of parts              |
-  | `to`      | Converts one representation into another              |
-  | `select`  | Chooses among candidates that are all already present |
+  Choose between `make` and `get` by what comes back:
+  - `make` constructs a new object or a value of a new type out of the source.
+    `makeMapSpecFromLayerSpecs`, `makeFeatureCollectionFromRows`.
+  - `get` returns something logically contained in the source, directly or
+    indirectly: a nested value, a display label, a derived property.
+    `getBoundsFromFeatureCollection`, `getFiniteNumberFromValue`.
 
-- A `resolve...` name says what you get, not what you started from, so name
-  the source as well whenever the receiver does not already supply it. On a
-  module named after the source type the call site reads it out loud, and
-  repeating it stutters: prefer `MapLayer.resolveGeoBinding(layer)` over
-  `MapLayer.mapLayerToGeoBinding(layer)`. A free-floating function has no such
-  receiver, so it should carry the source: `resolveGeoBindingFromLayer`, not a
-  bare `resolveGeoBinding`.
-- Prefer `xToY` over `resolve...` when the conversion is total: every input
-  has an output, the output is a re-representation of the input rather than
-  something looked up, and no context beyond the input is consulted. Reserve
-  `resolve...` for the partial case, where the answer can be absent.
-  `structuredQueryToSql` and `sqlToStructuredQuery` are conversions;
-  `resolveColumnKey` is a lookup that can fail. The distinction carries real
-  information: an `xToY` name that can return `undefined` misleads the caller
-  into skipping the empty case.
+  Never name a conversion `resolve...`. It names neither side, so the reader
+  learns nothing about what went in or what comes out. The same goes for
+  reaching for `compute...`, `build...`, or `create...` on a function that is
+  really one of the four shapes above: fewer prefixes, each carrying real
+  information, beats a wide vocabulary of near-synonyms.
+
+  This is bad:
+
+  ```ts
+  // Says nothing about the source, and `undefined` is invisible either way.
+  MapLayer.toGeoBinding(layer);
+  // Free function using `To`, and the source is unnamed.
+  makeFeatureCollectionFromRows({ rows, binding });
+  // Near-synonym prefixes for the same kind of work.
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  This is good:
+
+  ```ts
+  MapLayer.toGeoBinding(layer);
+  makeFeatureCollectionFromRows({ rows, binding });
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  This rule covers functions that convert, derive, or look up a value. It does
+  not rename an action (`syncMap`, `applyMapStyles`), a predicate
+  (`isMapLayerQueryable`), a constructor with no source (`makeEmpty`), or an
+  internal `_`-prefixed helper that assembles one piece of a value its caller
+  is building (`_buildCircleRadius`).
 
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
@@ -399,7 +415,7 @@
   export. Name the file after what a reader would consider the main export (the
   function or the module object). For example, a file that exports `detectBias`,
   a supporting `MAX_BIAS_SCORE` constant, and some exported types should still be
-  named `detectBias.ts`. (A file whose exports are *only* constants follows the
+  named `detectBias.ts`. (A file whose exports are _only_ constants follows the
   `*.constants.ts` rule below instead.)
 - If a file intentionally exports a collection of helper or utility functions,
   name the file after the collection's shared purpose and suffix it with either
@@ -428,6 +444,7 @@
     tracks state (and needs its generated getters/setters) or composes behavior
     via mixins. Do not reach for `createModule` merely to group stateless
     functions: a plain object is sufficient and lighter.
+
 - When a module can not be encapsulated in a single file, create a directory
   to represent the module. Some examples of when a module should be a directory
   are: when a module has a `.test` file, has tightly-coupled helper functions,
@@ -511,6 +528,7 @@
       DrawerHeight.ts
       DrawerHeight.test.ts
   ```
+
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.

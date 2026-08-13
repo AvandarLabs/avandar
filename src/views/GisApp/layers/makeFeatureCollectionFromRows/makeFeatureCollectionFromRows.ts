@@ -2,7 +2,7 @@ import {
   isDefined,
   makeBucketMap,
   prop,
-  toFiniteNumber,
+  getFiniteNumberFromValue,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
@@ -125,8 +125,8 @@ function _placeRow({
   if (rawLatitude == null || rawLongitude == null) {
     return { rowIndex, dropReason: "nullCoordinate" };
   }
-  const latitude = toFiniteNumber(rawLatitude);
-  const longitude = toFiniteNumber(rawLongitude);
+  const latitude = getFiniteNumberFromValue(rawLatitude);
+  const longitude = getFiniteNumberFromValue(rawLongitude);
   if (latitude === undefined || longitude === undefined) {
     return { rowIndex, dropReason: "nonNumericCoordinate" };
   }
@@ -193,7 +193,7 @@ function _buildDropReports(
  * @throws SensitivityViolationError when the policy is `aggregateOnly`, which
  * no geometry binding can satisfy yet.
  */
-export function toFeatureCollection({
+export function makeFeatureCollectionFromRows({
   rows,
   binding,
   sensitivity,

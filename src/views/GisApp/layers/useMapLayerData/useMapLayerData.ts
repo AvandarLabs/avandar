@@ -13,7 +13,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 export function isMapLayerQueryable(layer: MapLayer.T): boolean {
   return (
     layer.source.dataSource !== undefined &&
-    MapLayer.resolveGeoBinding(layer) !== undefined
+    MapLayer.toGeoBinding(layer) !== undefined
   );
 }
 
@@ -21,7 +21,7 @@ export function isMapLayerQueryable(layer: MapLayer.T): boolean {
  * Cache key for a layer's rows. Deliberately excludes symbology, legend, and
  * popup config so restyling a layer repaints from cache instead of refetching.
  */
-export function buildMapLayerQueryKey(layer: MapLayer.T): readonly unknown[] {
+export function makeQueryKeyFromMapLayer(layer: MapLayer.T): readonly unknown[] {
   return ["mapLayerData", layer.id, layer.source, layer.geoBinding];
 }
 
@@ -40,7 +40,7 @@ export function useMapLayerData({
 }): UseQueryResultTuple<QueryResult<UnknownRow>> {
   return useQuery({
     enabled: isMapLayerQueryable(layer),
-    queryKey: [workspaceId, ...buildMapLayerQueryKey(layer)],
+    queryKey: [workspaceId, ...makeQueryKeyFromMapLayer(layer)],
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       return await runStructuredQuery({
         auth: "workspace",

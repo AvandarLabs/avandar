@@ -71,7 +71,7 @@ export const MapLayerModule = {
    * @returns The resolved binding, or `undefined` when the layer has no
    * binding or a bound column is absent from the layer's query.
    */
-  resolveGeoBinding: (layer: MapLayerRead): ResolvedGeoBinding | undefined => {
+  toGeoBinding: (layer: MapLayerRead): ResolvedGeoBinding | undefined => {
     const { geoBinding, source } = layer;
     if (!geoBinding || !geoBinding.latitude || !geoBinding.longitude) {
       return undefined;

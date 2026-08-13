@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeLayerStats } from "@/views/GisApp/layers/computeLayerStats/computeLayerStats";
+import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 
 function _createCollection(
   values: ReadonlyArray<number | string | boolean | null>,
@@ -17,10 +17,10 @@ function _createCollection(
   };
 }
 
-describe("computeLayerStats", () => {
+describe("getLayerStatsFromFeatureCollection", () => {
   it("returns the numeric range of the requested property", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([4, 19, 7]),
         valueColumnName: "cases",
       }),
@@ -29,7 +29,7 @@ describe("computeLayerStats", () => {
 
   it("ignores null and non-numeric values", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([4, null, "n/a", 9]),
         valueColumnName: "cases",
       }),
@@ -38,7 +38,7 @@ describe("computeLayerStats", () => {
 
   it("parses numeric strings", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection(["12", "3"]),
         valueColumnName: "cases",
       }),
@@ -47,7 +47,7 @@ describe("computeLayerStats", () => {
 
   it("returns no domain when nothing is numeric", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([null, "n/a"]),
         valueColumnName: "cases",
       }),
@@ -56,7 +56,7 @@ describe("computeLayerStats", () => {
 
   it("returns a flat domain when every value is equal", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([5, 5, 5]),
         valueColumnName: "cases",
       }),
@@ -65,7 +65,7 @@ describe("computeLayerStats", () => {
 
   it("ignores booleans, NaN, and Infinity", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([
           3,
           true,
@@ -82,7 +82,7 @@ describe("computeLayerStats", () => {
 
   it("ignores a whitespace-only string instead of reading it as zero", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([4, "   ", 8]),
         valueColumnName: "cases",
       }),
@@ -91,7 +91,7 @@ describe("computeLayerStats", () => {
 
   it("does not assume the domain is non-negative", () => {
     expect(
-      computeLayerStats({
+      getLayerStatsFromFeatureCollection({
         featureCollection: _createCollection([-12, -3, -20]),
         valueColumnName: "cases",
       }),

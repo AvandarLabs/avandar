@@ -1,4 +1,4 @@
-import { isDefined, toFiniteNumber } from "@avandar/utils";
+import { isDefined, getFiniteNumberFromValue } from "@avandar/utils";
 
 /** Summary statistics a layer's paint expressions need. */
 export type LayerStats = {
@@ -18,7 +18,7 @@ export type LayerStats = {
  * when the symbology needs no value.
  * @returns The statistics the layer's paint expressions need.
  */
-export function computeLayerStats({
+export function getLayerStatsFromFeatureCollection({
   featureCollection,
   valueColumnName,
 }: {
@@ -31,7 +31,7 @@ export function computeLayerStats({
 
   const values = featureCollection.features
     .map((feature) => {
-      return toFiniteNumber(feature.properties?.[valueColumnName]);
+      return getFiniteNumberFromValue(feature.properties?.[valueColumnName]);
     })
     .filter(isDefined);
 

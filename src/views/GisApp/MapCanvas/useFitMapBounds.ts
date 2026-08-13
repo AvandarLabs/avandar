@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { MapBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 /**

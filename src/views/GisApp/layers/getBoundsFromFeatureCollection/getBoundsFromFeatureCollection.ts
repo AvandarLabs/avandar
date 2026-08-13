@@ -57,7 +57,7 @@ function _extendBoxWithGeometry(
  * coordinate (so callers can leave the camera where it is instead of flying
  * to an infinite box).
  */
-export function computeBounds(
+export function getBoundsFromFeatureCollection(
   featureCollection: GeoJSON.FeatureCollection,
 ): MapBounds | undefined {
   const box: MutableBox = {

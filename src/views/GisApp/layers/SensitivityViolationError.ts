@@ -2,11 +2,11 @@
  * Thrown when a layer's sensitivity policy forbids the geometry it was asked
  * to produce.
  *
- * A layer's sensitivity policy (`MapLayer.Sensitivity`, defined in
- * `shared/models/AvaMap/MapLayer/SensitivityPolicy.types.ts`) states what
+ * A layer's sensitivity policy (`MapLayer.Sensitivity`) states what
  * rendering its data permits, independent of what the map author picked:
- * `exact` draws coordinates as given, `jitter` displaces each point inside a
- * radius, and `aggregateOnly` forbids drawing individual points at all.
+ * - `exact` draws coordinates as given,
+ * - `jitter` displaces each point inside a radius
+ * - `aggregateOnly` forbids drawing individual points at all.
  *
  * A request is rejected when honoring it would expose more precise locations
  * than the policy allows. This is a hard failure rather than a silent
@@ -15,7 +15,7 @@
  *
  * For example, a layer of household survey responses carrying
  * `{ mode: "aggregateOnly", minCellCount: 5 }` may only ever be shown as
- * counts per boundary. Asking `toFeatureCollection` for one point per
+ * counts per boundary. Asking `makeFeatureCollectionFromRows` for one point per
  * respondent would reveal exactly the addresses the policy protects, so it
  * throws instead, and the map surfaces the error in its status overlay.
  */

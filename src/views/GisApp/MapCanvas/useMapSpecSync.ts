@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
 import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 /**
  * Applies the declarative spec to the map whenever the spec changes or a new

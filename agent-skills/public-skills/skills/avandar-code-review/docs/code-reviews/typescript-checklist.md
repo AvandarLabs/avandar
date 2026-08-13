@@ -166,6 +166,63 @@ repo) so the output stays small and tied to the diff.
   Confirm each hit by checking that the trailing helper is actually called by
   the earlier export; an unrelated helper serving a second export is one of
   the exceptions above.
+- Name a function that turns one value into another with one of exactly four
+  shapes, so the name states both the source and the target:
+  `[Receiver].to{Target}` when the receiver names the source,
+  `[Receiver].from{Source}` when the receiver names the target,
+  `make{Target}From{Source}` for a free function returning a new value, and
+  `get{Target}From{Source}` for a free function returning something logically
+  contained in the source (a nested value, a display label, a derived
+  property). A name that states only one side leaves the reader guessing what
+  goes in, which is the whole cost of `resolve...`: it names neither side.
+
+  A method takes the missing half from its receiver and must not repeat it. A
+  free function has no receiver, so it spells out both halves and never uses
+  `To`.
+
+  Flag `resolve...` on any function covered by this rule. Also flag
+  `compute...`, `build...`, and `create...` when the function is really one of
+  the four shapes: a smaller prefix vocabulary where each prefix carries
+  information beats a wide set of near-synonyms.
+
+  Exceptions: 1) an action (`syncMap`, `applyMapStyles`); 2) a predicate
+  (`isMapLayerQueryable`); 3) a constructor with no source (`makeEmpty`,
+  `createClient`); 4) an internal `_`-prefixed helper assembling one piece of a
+  value its caller is building (`_buildCircleRadius`); 5) a name fixed by an
+  external contract (`toJSON`, `toString`).
+
+  This is bad:
+
+  ```ts
+  MapLayer.resolveGeoBinding(layer);
+  toFeatureCollection({ rows, binding });
+  computeBounds(featureCollection);
+  createMapSpec(layerSpecs);
+  ```
+
+  This is good:
+
+  ```ts
+  MapLayer.toGeoBinding(layer);
+  makeFeatureCollectionFromRows({ rows, binding });
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  **Find candidates** (declared functions and module methods whose name starts
+  with a retired prefix, or a free `to...` function with no `From` in it):
+
+  ```bash
+  grep -rEn '^(export )?(async )?function (resolve|compute|build|create)[A-Z]|^ +(resolve|compute|build|create)[A-Z][a-zA-Z]*: ' \
+    --include="*.ts" --include="*.tsx" .
+  grep -rEn '^(export )?(async )?function to[A-Z][a-zA-Z]*\(' \
+    --include="*.ts" --include="*.tsx" . \
+    | grep -v 'From'
+  ```
+
+  Check each hit against the exception list before flagging: the `_`-prefixed
+  and predicate hits are expected, and a method whose receiver supplies the
+  other half is already correct.
 - React component prop types should always be named `Props`.
 
   **Find candidates** (prop type aliases whose name is not literally

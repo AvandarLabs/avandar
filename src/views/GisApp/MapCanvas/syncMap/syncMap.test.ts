@@ -1,7 +1,7 @@
 import { makeObject } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
 import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
-import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { Map as MapLibreMap } from "maplibre-gl";
 
 type FakeSource = { setData: ReturnType<typeof vi.fn> };

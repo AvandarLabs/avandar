@@ -2,7 +2,7 @@ import { prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
-import { createLayerSpec } from "@/views/GisApp/layers/createMapSpec/createLayerSpec/createLayerSpec";
+import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
@@ -23,10 +23,10 @@ const featureCollection: GeoJSON.FeatureCollection = {
   ],
 };
 
-describe("createLayerSpec", () => {
+describe("makeLayerSpecFromMapLayer", () => {
   it("names its source and layer after the layer id", () => {
     const layer = MapLayer.makeEmpty("Cases");
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: undefined },
@@ -37,7 +37,7 @@ describe("createLayerSpec", () => {
 
   it("paints a flat circle with the configured radius and color", () => {
     // Deliberately non-default values: asserting the defaults would pass even
-    // if createLayerSpec ignored the symbology and hardcoded them.
+    // if makeLayerSpecFromMapLayer ignored the symbology and hardcoded them.
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
       symbology: {
@@ -47,7 +47,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 3, color: "#abcdef" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: undefined },
@@ -59,7 +59,7 @@ describe("createLayerSpec", () => {
 
   it("selects features through feature-state, not a duplicate layer", () => {
     const layer = MapLayer.makeEmpty("Cases");
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: undefined },
@@ -87,7 +87,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 1, color: "#ffffff" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: [0, 100] },
@@ -118,7 +118,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 1, color: "#ffffff" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: [0, 100] },
@@ -149,7 +149,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 1, color: "#ffffff" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: [-50, 50] },
@@ -180,7 +180,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 1, color: "#ffffff" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: [50, 50] },
@@ -203,7 +203,7 @@ describe("createLayerSpec", () => {
         stroke: { width: 1, color: "#ffffff" },
       },
     };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: undefined },
@@ -214,7 +214,7 @@ describe("createLayerSpec", () => {
 
   it("hides a layer that is not visible", () => {
     const layer = { ...MapLayer.makeEmpty("Cases"), isVisible: false };
-    const spec = createLayerSpec({
+    const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection,
       stats: { valueDomain: undefined },
@@ -232,7 +232,7 @@ describe("createLayerSpec", () => {
       },
     };
     expect(() => {
-      return createLayerSpec({
+      return makeLayerSpecFromMapLayer({
         layer,
         featureCollection,
         stats: { valueDomain: undefined },

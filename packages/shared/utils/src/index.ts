@@ -23,7 +23,7 @@ export type {
   FormatNumberOptions,
   SignDisplay,
 } from "@utils/numbers/formatNumber/formatNumber.ts";
-export { toFiniteNumber } from "@utils/numbers/toFiniteNumber/toFiniteNumber.ts";
+export { getFiniteNumberFromValue } from "@utils/numbers/getFiniteNumberFromValue/getFiniteNumberFromValue.ts";
 
 // filters
 export { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows.ts";

@@ -278,8 +278,8 @@ which is the normal field condition, and it is the fallback the offline mode
 MapLayer.source (StructuredQuery)
    -> runStructuredQuery()            shared executor, TanStack-cached
    -> QueryResult<UnknownRow>
-   -> toFeatureCollection(rows, geoBinding)    pure; returns drops with reasons
-   -> computeLayerStats(fc, symbology)         pure; breaks, domains, extents
+   -> makeFeatureCollectionFromRows(rows, geoBinding)    pure; returns drops with reasons
+   -> getLayerStatsFromFeatureCollection(fc, symbology)         pure; breaks, domains, extents
    -> buildLayerSpec(layer, fc, stats)         pure; MapLibre sources + layers
    -> syncMap(map, prevSpec, nextSpec)         only place that touches MapLibre
 ```
@@ -303,7 +303,7 @@ paint construction guarded by two refs.
 ### 5.2 Geometry conversion
 
 ```ts
-function toFeatureCollection(
+function makeFeatureCollectionFromRows(
   rows: readonly UnknownRow[],
   binding: GeoBinding,
 ): {
@@ -322,7 +322,7 @@ Tier 4 coordinate-validation panel later, and it is why the panel costs almost
 nothing once Phase 1 is done. Features get real GeoJSON `id` values so
 highlighting uses feature-state.
 
-`computeBounds(featureCollection)` handles every geometry type, replacing the
+`getBoundsFromFeatureCollection(featureCollection)` handles every geometry type, replacing the
 `Point`-only `calculateBounds`.
 
 ### 5.3 Pure spec, thin sync
@@ -399,9 +399,9 @@ src/views/GISApp/                        (moved from src/components/GISApp)
   layers/
     useMapLayerData.ts
     buildLayerSpec/                      pure, one file per symbology kind
-    computeLayerStats/                   classification, domains, extents
-    toFeatureCollection/
-    computeBounds/
+    getLayerStatsFromFeatureCollection/                   classification, domains, extents
+    makeFeatureCollectionFromRows/
+    getBoundsFromFeatureCollection/
   panels/
     LayerPanel/                          list, reorder, visibility, match report
     LayerInspector/                      geo-binding + symbology editors
@@ -533,7 +533,7 @@ needs an external service.
    Wave A will persist.
 3. Extract `runStructuredQuery`; add `useMapLayerData`. Removes the
    Dataset-only gate.
-4. `toFeatureCollection` with drop reporting; `computeBounds` for all geometry
+4. `makeFeatureCollectionFromRows` with drop reporting; `getBoundsFromFeatureCollection` for all geometry
    types.
 5. `buildLayerSpec` and `syncMap`. Feature-state highlighting.
 6. Fix the map lifecycle: construct once, `setStyle` without remount, re-add
@@ -592,11 +592,11 @@ Following `docs/superpowers/specs/2026-05-14-testing-strategy.md`.
 **Unit (the bulk, and the point of the pure split)**
 
 - `buildLayerSpec` per symbology kind: snapshot the MapLibre JSON.
-- `computeLayerStats`: quantile, equal interval, Jenks, stdDev, manual breaks,
+- `getLayerStatsFromFeatureCollection`: quantile, equal interval, Jenks, stdDev, manual breaks,
   including degenerate inputs (all-equal values, single row, all nulls).
-- `toFeatureCollection`: every `DropReason`, plus lat/lng swap and null-island
+- `makeFeatureCollectionFromRows`: every `DropReason`, plus lat/lng swap and null-island
   detection.
-- `computeBounds`: point, line, polygon, multi-geometry, empty, single feature.
+- `getBoundsFromFeatureCollection`: point, line, polygon, multi-geometry, empty, single feature.
 - Normalization: per-capita and per-100,000 math, and division by zero or null.
 - **Sensitivity invariant:** no `aggregateOnly` input produces a `circle` or
   `symbol` layer, and `minCellCount` suppression renders as no-data rather than
