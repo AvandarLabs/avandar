@@ -1,4 +1,4 @@
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
@@ -46,7 +46,7 @@ export function useLineChartStyleProps({
       baseXAxisProps,
       yExtent,
       xTickLabels,
-      axisRoles: getAxisRoles("line"),
+      axisRoles: getAxisRolesFromVizType("line"),
     });
   }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 }

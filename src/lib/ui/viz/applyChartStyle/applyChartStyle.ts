@@ -7,7 +7,7 @@ import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
   AxisRole,
   AxisRoles,
-} from "$/models/vizs/getAxisRoles/getAxisRoles";
+} from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import type { CSSProperties } from "react";
 import type {
   CartesianGridProps,

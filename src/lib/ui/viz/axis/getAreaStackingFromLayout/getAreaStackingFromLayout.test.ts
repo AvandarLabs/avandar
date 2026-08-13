@@ -5,32 +5,32 @@
  * pattern in `SeriesRenderer.props.test.tsx`.
  */
 import { describe, expect, it } from "vitest";
-import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 
-describe("getAreaStacking", () => {
+describe("getAreaStackingFromLayout", () => {
   it("keeps series independent in the default layout", () => {
-    expect(getAreaStacking("default")).toEqual({
+    expect(getAreaStackingFromLayout("default")).toEqual({
       isPercent: false,
       sharedStackId: undefined,
     });
   });
 
   it("shares one stack when stacked", () => {
-    expect(getAreaStacking("stacked")).toEqual({
+    expect(getAreaStackingFromLayout("stacked")).toEqual({
       isPercent: false,
       sharedStackId: "1",
     });
   });
 
   it("treats split as stacked, because it stacks by sign", () => {
-    expect(getAreaStacking("split")).toEqual({
+    expect(getAreaStackingFromLayout("split")).toEqual({
       isPercent: false,
       sharedStackId: "1",
     });
   });
 
   it("flags percent, which Recharts normalizes to a 0-to-1 domain", () => {
-    expect(getAreaStacking("percent")).toEqual({
+    expect(getAreaStackingFromLayout("percent")).toEqual({
       isPercent: true,
       sharedStackId: "1",
     });

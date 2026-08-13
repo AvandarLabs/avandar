@@ -40,6 +40,6 @@ const AXIS_ROLES_BY_VIZ_TYPE = {
 } as const satisfies Record<VizConfig.Type, AxisRoles>;
 
 /** Returns the X and Y axis roles for a visualization type. */
-export function getAxisRoles(vizType: VizConfig.Type): AxisRoles {
+export function getAxisRolesFromVizType(vizType: VizConfig.Type): AxisRoles {
   return { ...AXIS_ROLES_BY_VIZ_TYPE[vizType] };
 }

@@ -1,4 +1,4 @@
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
@@ -89,7 +89,7 @@ export function useBarChartStyleProps({
       baseXAxisProps,
       yExtent,
       xTickLabels,
-      axisRoles: getAxisRoles("bar"),
+      axisRoles: getAxisRolesFromVizType("bar"),
     });
   }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 }

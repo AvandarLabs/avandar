@@ -1,9 +1,9 @@
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
-import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
 import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type {
@@ -11,7 +11,7 @@ import type {
   ChartStyleProps,
 } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
-import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
@@ -32,7 +32,7 @@ function _computeAreaValueExtent({
   if (!doesAxisNeedValueExtent(axisStyle)) {
     return undefined;
   }
-  const { isPercent, sharedStackId } = getAreaStacking(layout);
+  const { isPercent, sharedStackId } = getAreaStackingFromLayout(layout);
   if (allAreas && isPercent) {
     return { min: 0, max: 1 };
   }
@@ -89,7 +89,7 @@ export function useAreaChartStyleProps({
       baseXAxisProps,
       yExtent,
       xTickLabels,
-      axisRoles: getAxisRoles("area"),
+      axisRoles: getAxisRolesFromVizType("area"),
     });
   }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 }

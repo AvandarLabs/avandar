@@ -1,4 +1,4 @@
-import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
@@ -49,7 +49,7 @@ export function useScatterChartStyleProps({
       xExtent,
       yExtent,
       xTickLabels,
-      axisRoles: getAxisRoles("scatter"),
+      axisRoles: getAxisRolesFromVizType("scatter"),
     });
   }, [chartStyle, xExtent, yExtent, xTickLabels]);
 }

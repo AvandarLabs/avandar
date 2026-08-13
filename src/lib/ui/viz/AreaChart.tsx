@@ -29,12 +29,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { getAreaStacking } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStacking/getAreaStacking";
+import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { AreaSeries } from "$/models/vizs/SeriesConfig";
 
@@ -134,7 +134,7 @@ export function AreaChart({
   const areaSeries = series as readonly AreaSeries[];
   // Same value the extent calculation bucketed by, so the drawn stacks
   // and the resolved domain can never disagree.
-  const { sharedStackId } = getAreaStacking(layout);
+  const { sharedStackId } = getAreaStackingFromLayout(layout);
   const stackOffset = STACK_OFFSET_FOR_LAYOUT[layout];
 
   return (

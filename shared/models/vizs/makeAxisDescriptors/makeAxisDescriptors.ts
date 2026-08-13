@@ -1,6 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
-import type { AxisRole } from "$/models/vizs/getAxisRoles/getAxisRoles.ts";
+import type { AxisRole } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType.ts";
 import type {
   ChartSettingDescriptor,
   VizSettingGroup,

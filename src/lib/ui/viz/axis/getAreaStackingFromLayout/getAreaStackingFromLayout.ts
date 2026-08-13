@@ -20,7 +20,7 @@ export type AreaStacking = {
 };
 
 /** Returns the percentage mode and shared stack identifier for a layout. */
-export function getAreaStacking(layout: AreaLayout): AreaStacking {
+export function getAreaStackingFromLayout(layout: AreaLayout): AreaStacking {
   return matchLiteral(layout, {
     default: { isPercent: false, sharedStackId: undefined },
     stacked: { isPercent: false, sharedStackId: AREA_STACK_ID },
