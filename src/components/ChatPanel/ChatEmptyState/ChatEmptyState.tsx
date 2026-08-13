@@ -1,9 +1,9 @@
 import { useThreadRuntime } from "@assistant-ui/react";
+import { Link, TruncatedText } from "@avandar/ui";
+import { getRandomItem, matchLiteral, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, TruncatedText } from "@ui";
-import { getRandomItem, matchLiteral, where } from "@utils";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

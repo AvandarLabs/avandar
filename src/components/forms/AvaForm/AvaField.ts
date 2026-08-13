@@ -3,7 +3,7 @@ import {
   SelectFieldSchema,
   TextFieldSchema,
 } from "@/components/forms/AvaForm/AvaForm.types";
-import type { SelectData } from "@ui";
+import type { SelectData } from "@avandar/ui";
 
 export const AvaField = {
   text: <

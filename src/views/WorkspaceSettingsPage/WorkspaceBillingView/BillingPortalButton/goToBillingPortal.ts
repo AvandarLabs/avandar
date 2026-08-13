@@ -1,11 +1,11 @@
-import { getCurrentUrl, navigateToExternalUrl } from "@browser-utils";
+import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { notifyError } from "@/utils/notifications/notify";
 
 /**
  * Opens the Polar customer portal for a user, redirecting the browser. Shows

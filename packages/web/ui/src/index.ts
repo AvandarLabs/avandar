@@ -1,3 +1,10 @@
+// provider + i18n
+export { AvaUiProvider } from "@ui/UiProvider/AvaUiProvider";
+export { I18nAvaUiProvider } from "@ui/i18n/I18nAvaUiProvider";
+export { useI18nMessages } from "@ui/i18n/useI18nMessages";
+export { defaultI18nMessages } from "@ui/i18n/i18nMessages";
+export type { I18nMessages } from "@ui/i18n/i18nMessages";
+
 // ActionIcon
 export { ActionIcon } from "./ActionIcon/ActionIcon";
 
@@ -19,7 +26,7 @@ export { EditButton as EditIconButton } from "./buttons/EditButton";
 
 // Tabs
 export { Tabs } from "./Tabs/Tabs";
-export type { TabsIndicatorVariant } from "./Tabs/Tabs";
+export type { TabsIndicatorVariant, TabsSize } from "./Tabs/Tabs";
 
 // Tooltip
 export { Tooltip } from "./Tooltip/Tooltip";
@@ -27,14 +34,6 @@ export { Tooltip } from "./Tooltip/Tooltip";
 // ObjectDescriptionList
 export { ObjectDescriptionList } from "./ObjectDescriptionList/ObjectDescriptionList";
 export type { ObjectKeyRenderOptionsMap } from "./ObjectDescriptionList/ObjectDescriptionList.types";
-
-// notifications
-export { notifyError } from "./notifications/notify";
-export { notifySuccess } from "./notifications/notify";
-export { notifyWarning } from "./notifications/notify";
-export { notifyExpiredSession } from "./notifications/notifyExpiredSession";
-export { notifyNotImplemented } from "./notifications/notifyNotImplemented";
-export { notifyDevAlert } from "./notifications/notifyDevAlert";
 
 // text
 export { DangerText } from "./text/DangerText";

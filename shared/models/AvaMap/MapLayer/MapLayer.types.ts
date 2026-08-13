@@ -1,5 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { GeoBinding } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type { LayerSymbology } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type { LegendConfig } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";

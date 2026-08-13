@@ -1,4 +1,4 @@
-import { makeSet } from "@utils";
+import { makeSet } from "@avandar/utils";
 import {
   createSupabaseAdminClient,
   deleteWorkspaceTreeForE2EById,

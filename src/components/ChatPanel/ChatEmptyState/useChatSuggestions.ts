@@ -1,6 +1,6 @@
+import { isDefined } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { isDefined } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { ChatSuggestionColumnPicker } from "./ChatSuggestionColumnPicker/ChatSuggestionColumnPicker";

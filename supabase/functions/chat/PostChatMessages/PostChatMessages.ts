@@ -1,4 +1,4 @@
-import { Model } from "@models/Model/Model.ts";
+import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";

@@ -1,12 +1,13 @@
-import { useBoolean } from "@hooks";
+import { useBoolean } from "@avandar/hooks";
+import { Model } from "@avandar/models";
+import { mantineColorVar, mantineVar, Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
-import { Model } from "@models";
 import { IconFilter } from "@tabler/icons-react";
-import { mantineColorVar, mantineVar, notifyError, Tooltip } from "@ui";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
+import { notifyError } from "@/utils/notifications/notify";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { MapStylePicker } from "@/views/GISApp/basemap/MapStylePicker";

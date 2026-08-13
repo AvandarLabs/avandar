@@ -9,13 +9,13 @@ import {
   prop,
   sqlTemplate,
   where,
-} from "@utils";
+} from "@avandar/utils";
 import { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -165,7 +165,7 @@ async function _extractFieldValuesFromDataset({
   const primaryKeyColumnName = primaryKeyField.datasetColumn.name;
 
   // returns rows where each column is an entity field ID
-  const queryResult = await WorkspaceQETLClient.runQuery<
+  const queryResult = await WorkspaceQetlClient.runQuery<
     Record<EntityFieldConfigId, unknown>
   >({
     workspaceId,

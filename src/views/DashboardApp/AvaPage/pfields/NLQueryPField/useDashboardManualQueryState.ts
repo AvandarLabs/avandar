@@ -1,4 +1,4 @@
-import { makeObject, prop } from "@utils";
+import { makeObject, prop } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { useCallback, useMemo } from "react";
@@ -8,12 +8,13 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 export type DashboardManualQueryState = {
   query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
-  sqlSyncWarnings: readonly string[];
+  sqlSyncWarnings: readonly SqlFailedMappingReason[];
   /** Whether the SQL parser is ready (dataset metadata loaded). */
   isParserReady: boolean;
   handlers: ManualQueryFormHandlers;
@@ -40,7 +41,7 @@ export function useDashboardManualQueryState(
       return {
         query: StructuredQuery.makeEmpty(),
         isFullyMapped: true,
-        unmappedReasons: [] as readonly string[],
+        unmappedReasons: [] as readonly SqlFailedMappingReason[],
       };
     }
     return parseSql(rawSql);

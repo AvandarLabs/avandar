@@ -1,5 +1,5 @@
+import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import type { AppType } from "$/models/Permissions/Permissions.types.ts";
 
 /**

@@ -1,8 +1,10 @@
-import { useMutation, useToggleBoolean } from "@hooks";
+import { useToggleBoolean } from "@avandar/hooks";
+import { useMutation } from "@avandar/query-hooks";
+import { InputTextForm } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
-import { InputTextForm, notifyError, notifySuccess } from "@ui";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 
 type Props = {
   email: string;

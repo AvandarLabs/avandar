@@ -1,9 +1,9 @@
+import { prop } from "@avandar/utils";
 import {
   buildModelDedupeKey,
   curateOpenRouterModels,
   modelMatchesClass,
 } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
 import { describe, expect, it } from "vitest";
 import type { OpenRouterModelInput } from "@sbfn/chat/utils/curateOpenRouterModels/curateOpenRouterModels.ts";
 

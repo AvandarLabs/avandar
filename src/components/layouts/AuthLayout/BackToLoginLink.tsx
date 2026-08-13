@@ -1,7 +1,7 @@
+import { Link } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, Center } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { Link } from "@ui";
 
 export function BackToLoginLink(): JSX.Element {
   return (

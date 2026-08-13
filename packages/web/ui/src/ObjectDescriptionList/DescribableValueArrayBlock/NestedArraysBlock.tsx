@@ -1,5 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import { ValueItemContainer } from "../ValueItemContainer";
 import type {
@@ -27,7 +27,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
   itemRenderOptions,
   ...primitiveRenderValueOptions
 }: Props<T, RootData>): JSX.Element | null {
-  const { t } = useLingui();
+  const i18n = useI18nMessages();
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -41,9 +41,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
   const remainingCount = values.length - valuesToRender.length;
   const moreText =
     valuesToRender.length < values.length ?
-      <Text>
-        <Trans>... and {remainingCount} more</Trans>
-      </Text>
+      <Text>{i18n.andMore(remainingCount)}</Text>
     : null;
 
   const arrayItemRenderOptions = {
@@ -64,7 +62,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
         return (
           <Fieldset
             key={`${serializedValue}:${duplicateNumber}`}
-            title={t`Collection ${collectionNumber}`}
+            title={i18n.collectionLabel(collectionNumber)}
           >
             <ValueItemContainer
               type="array"

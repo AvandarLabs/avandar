@@ -1,6 +1,6 @@
 import { I18nProvider } from "@lingui/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { i18n } from "@/i18n/i18n";
 import { render, screen } from "@/test-utils";
 import { AppDropzone } from "./AppDropzone";
@@ -19,13 +19,13 @@ vi.mock("./openFileImportFlow", () => {
 describe("AppDropzone", () => {
   it("renders its children", () => {
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <I18nProvider i18n={i18n}>
           <AppDropzone>
             <div data-testid="dropzone-child">child content</div>
           </AppDropzone>
         </I18nProvider>
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
 
     expect(screen.getByTestId("dropzone-child")).toHaveTextContent(

@@ -1,4 +1,4 @@
-import { propEq } from "@utils";
+import { propEq } from "@avandar/utils";
 import { AppConfig } from "$/config/AppConfig";
 
 export const CHAT_MODEL_LOCAL_STORAGE_KEY = "ava.chat.selectedModel" as const;

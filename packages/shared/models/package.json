@@ -1,20 +1,35 @@
 {
   "name": "@avandar/models",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Core model primitives for typed, discriminated data objects",
-  "license": "CPAL-1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/shared/models"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/shared/models#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./zod": "./src/zod/index.ts"
   },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "type-fest": "^5.4.4"
+    "@avandar/utils": "workspace:*",
+    "type-fest": "catalog:"
   },
   "peerDependencies": {
     "zod": "^4.1.13"
@@ -25,10 +40,25 @@
     }
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vitest": "^3.2.4"
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod": "^4.1.13"
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./zod": {
+        "types": "./dist/zod.d.ts",
+        "default": "./dist/zod.js"
+      }
+    }
   }
 }

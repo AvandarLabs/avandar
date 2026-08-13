@@ -4,7 +4,7 @@ import { i18n } from "@/i18n/i18n";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { renderHook } from "@/test-utils";
 
-vi.mock("@ui", () => {
+vi.mock("@/utils/notifications/notify", () => {
   return {
     notifyError: vi.fn(),
   };

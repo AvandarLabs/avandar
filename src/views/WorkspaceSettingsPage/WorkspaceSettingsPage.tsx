@@ -1,13 +1,14 @@
+import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";

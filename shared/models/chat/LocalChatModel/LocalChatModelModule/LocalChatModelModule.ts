@@ -1,5 +1,4 @@
-import { prop } from "@utils/objects/hofs/prop/prop.ts";
-import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
+import { prop, propEq } from "@avandar/utils";
 import type { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 
 const LOCAL_CHAT_MODELS: readonly LocalChatModel.T[] = [

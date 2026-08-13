@@ -1,5 +1,5 @@
+import { propEq } from "@avandar/utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { propEq } from "@utils";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { RootLayout } from "@/components/layouts/RootLayout/RootLayout";

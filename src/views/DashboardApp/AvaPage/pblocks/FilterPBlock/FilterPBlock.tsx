@@ -1,6 +1,6 @@
+import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
-import { Paper } from "@ui";
 import { useEffect, useMemo } from "react";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";

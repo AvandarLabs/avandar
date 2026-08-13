@@ -1,4 +1,4 @@
-import { Model } from "@models/Model/Model.ts";
+import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";

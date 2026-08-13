@@ -1,4 +1,5 @@
-import { useMutation } from "@hooks";
+import { useMutation } from "@avandar/query-hooks";
+import { propEq, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -13,14 +14,13 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
-import { propEq, where } from "@utils";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";

@@ -1,10 +1,10 @@
-import { useQuery } from "@hooks";
-import { prop, sortObjList } from "@utils";
+import { useQuery } from "@avandar/query-hooks";
+import { prop, sortObjList } from "@avandar/utils";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { UseQueryResultTuple } from "@hooks";
+import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

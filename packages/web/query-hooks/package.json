@@ -1,0 +1,60 @@
+{
+  "name": "@avandar/query-hooks",
+  "version": "0.1.2",
+  "description": "Avandar conventions layered over TanStack Query: useQuery/useMutation wrappers and a withQueryHooks client augmenter",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/web/query-hooks"
+  },
+  "homepage": "https://github.com/AvandarLabs/avandar/tree/main/packages/web/query-hooks#readme",
+  "bugs": {
+    "url": "https://github.com/AvandarLabs/avandar/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@avandar/clients": "workspace:*",
+    "@avandar/utils": "workspace:*",
+    "type-fest": "catalog:"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.81.5",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "catalog:",
+    "@testing-library/react": "^16.3.0",
+    "jsdom": "^26.1.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  }
+}

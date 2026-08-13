@@ -1,7 +1,7 @@
+import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, CopyButton, Text } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
 import css from "./MarkdownCodeHeader.module.css";
 import type { CodeHeaderProps } from "@assistant-ui/react-markdown";
 

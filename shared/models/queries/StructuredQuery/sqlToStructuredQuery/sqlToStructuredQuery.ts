@@ -14,8 +14,8 @@
  * (FROM/JOIN), and `parseFilterClauses` (WHERE/HAVING), plus a few small
  * private column/result helpers below.
  */
-import { Model } from "@models/Model/Model.ts";
-import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
+import { Model } from "@avandar/models";
+import { propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import {
@@ -37,6 +37,7 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type {
   SqlMappingInput,
   SqlMappingResult,
@@ -55,7 +56,9 @@ export type {
  * Make the empty result for the case where we could not produce anything
  * useful from the SQL.
  */
-function _makeUnmappedResult(reasons: readonly string[]): SqlMappingResult {
+function _makeUnmappedResult(
+  reasons: readonly SqlFailedMappingReason[],
+): SqlMappingResult {
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
     version: 1,
@@ -103,10 +106,10 @@ function _makeQueryColumn(
  * was dropped.
  */
 export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
-  const unmappedReasons: string[] = [];
+  const unmappedReasons: SqlFailedMappingReason[] = [];
   const trimmed = input.sql.trim();
   if (trimmed.length === 0) {
-    return _makeUnmappedResult(["SQL is empty."]);
+    return _makeUnmappedResult([{ code: "sqlEmpty" }]);
   }
 
   let parsedAst: unknown;
@@ -115,27 +118,25 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     parsedAst = parser.astify(trimmed, { database: "postgresql" });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return _makeUnmappedResult([`Could not parse SQL: ${message}`]);
+    return _makeUnmappedResult([{ code: "sqlUnparseable", message }]);
   }
 
   // node-sql-parser returns either a single AST or an array. We only handle
   // a single SELECT.
   if (Array.isArray(parsedAst)) {
     if (parsedAst.length !== 1) {
-      unmappedReasons.push(
-        "SQL contains multiple statements; the form maps only the first.",
-      );
+      unmappedReasons.push({ code: "multipleStatements" });
     }
     parsedAst = parsedAst[0];
   }
 
   const ast = parsedAst as Record<string, unknown> | null;
   if (!ast || ast.type !== "select") {
-    return _makeUnmappedResult(["The form only supports SELECT queries."]);
+    return _makeUnmappedResult([{ code: "onlySelectSupported" }]);
   }
 
   if (ast.with) {
-    unmappedReasons.push("CTEs (WITH clauses) are not supported in the form.");
+    unmappedReasons.push({ code: "ctesUnsupported" });
   }
   const distinctType =
     (
@@ -146,12 +147,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
       (ast.distinct as { type: unknown }).type
     : ast.distinct;
   if (distinctType) {
-    unmappedReasons.push("DISTINCT is not supported in the form.");
+    unmappedReasons.push({ code: "distinctUnsupported" });
   }
   if (ast._next || ast.set_op) {
-    unmappedReasons.push(
-      "UNION/INTERSECT/EXCEPT is not supported in the form.",
-    );
+    unmappedReasons.push({ code: "setOperationUnsupported" });
   }
 
   // Resolve FROM clause (base + joins + optional nested subquery)
@@ -175,7 +174,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     columnsList.forEach((item) => {
       const expr = (item as { expr?: unknown }).expr;
       if (!expr || typeof expr !== "object") {
-        unmappedReasons.push("Unrecognised SELECT item; skipped.");
+        unmappedReasons.push({ code: "selectItemUnrecognised" });
         return;
       }
       const exprObj = expr as Record<string, unknown>;
@@ -198,14 +197,12 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
       if (exprType === "column_ref") {
         const columnName = identifierToString(exprObj.column);
         if (!columnName) {
-          unmappedReasons.push("Unnamed column expression in SELECT; skipped.");
+          unmappedReasons.push({ code: "selectUnnamedExpression" });
           return;
         }
         const matched = _matchColumn(columnName, dataset.columns);
         if (!matched) {
-          unmappedReasons.push(
-            `SELECT references column "${columnName}" not present in the dataset.`,
-          );
+          unmappedReasons.push({ code: "selectUnknownColumn", columnName });
           return;
         }
         queryColumns.push(_makeQueryColumn(matched, undefined));
@@ -220,22 +217,22 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         const inner = args?.expr;
         const colName = columnRefName(inner);
         if (!agg) {
-          unmappedReasons.push(
-            `Unsupported aggregate function "${funcName}" in SELECT; skipped.`,
-          );
+          unmappedReasons.push({
+            code: "selectUnsupportedAggregate",
+            funcName,
+          });
           return;
         }
         if (!colName) {
-          unmappedReasons.push(
-            `Aggregate function "${funcName}" uses a complex argument; skipped.`,
-          );
+          unmappedReasons.push({ code: "aggregateComplexArgument", funcName });
           return;
         }
         const matched = _matchColumn(colName, dataset.columns);
         if (!matched) {
-          unmappedReasons.push(
-            `Aggregate references column "${colName}" not present in the dataset.`,
-          );
+          unmappedReasons.push({
+            code: "aggregateUnknownColumn",
+            columnName: colName,
+          });
           return;
         }
         const queryColumn = _makeQueryColumn(matched, agg);
@@ -244,9 +241,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         return;
       }
 
-      unmappedReasons.push(
-        `SELECT expression of type "${String(exprType)}" is not supported by the form.`,
-      );
+      unmappedReasons.push({
+        code: "selectUnsupportedExpression",
+        exprType: String(exprType),
+      });
     });
   }
 
@@ -264,7 +262,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     groupbyColumns.forEach((node) => {
       const colName = columnRefName(node);
       if (!colName) {
-        unmappedReasons.push("GROUP BY uses a non-column expression.");
+        unmappedReasons.push({ code: "groupByNonColumn" });
         return;
       }
       const match = queryColumns.find(propEq("baseColumn.name", colName));
@@ -282,9 +280,7 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const orderbyClause = ast.orderby;
   if (Array.isArray(orderbyClause) && orderbyClause.length > 0) {
     if (orderbyClause.length > 1) {
-      unmappedReasons.push(
-        "ORDER BY references multiple columns; the form keeps only the first.",
-      );
+      unmappedReasons.push({ code: "orderByMultipleColumns" });
     }
     const first = orderbyClause[0] as { type?: string; expr?: unknown };
     const colName = columnRefName(first.expr);
@@ -295,9 +291,10 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
         const dir = String(first.type ?? "").toLowerCase();
         orderByDirection = dir === "desc" ? "desc" : "asc";
       } else {
-        unmappedReasons.push(
-          `ORDER BY references column "${colName}" not in the SELECT list.`,
-        );
+        unmappedReasons.push({
+          code: "orderByColumnNotSelected",
+          columnName: colName,
+        });
       }
     }
   }

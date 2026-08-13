@@ -1,5 +1,5 @@
+import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { isDefined } from "@utils";
 import { useCallback } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";

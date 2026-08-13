@@ -1,4 +1,4 @@
-import { clearOpfs } from "@browser-utils";
+import { clearOpfs } from "@avandar/browser-utils";
 import { modals } from "@mantine/modals";
 import {
   SpotlightActionData,
@@ -6,12 +6,12 @@ import {
 } from "@mantine/spotlight";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
-import { notifySuccess } from "@ui";
 import { useMemo } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { Logger } from "@/utils/Logger";
+import { notifySuccess } from "@/utils/notifications/notify";
 
 export function useSpotlightActions(
   workspaceSlug: string,
@@ -115,11 +115,11 @@ export function useSpotlightActions(
               description: "Show the schema of the DuckDB database",
               leftSection: <IconDatabase size={24} stroke={1.5} />,
               onClick: async () => {
-                const { DevDuckDBTableSchemaView } =
-                  await import("@/components/spotlight-modals/DevDuckDBTableSchemaView/DevDuckDBTableSchemaView");
+                const { DevDuckDbTableSchemaView } =
+                  await import("@/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView");
                 modals.open({
                   title: "Dev: Show DuckDB schemas",
-                  children: <DevDuckDBTableSchemaView />,
+                  children: <DevDuckDbTableSchemaView />,
                   size: "80%",
                 });
               },

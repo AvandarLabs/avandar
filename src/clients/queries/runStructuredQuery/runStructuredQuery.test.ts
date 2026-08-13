@@ -9,11 +9,11 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 const runQueryMock = vi.fn();
 const getAllEntityFieldValuesMock = vi.fn();
 
-vi.mock("@/clients/qetl/WorkspaceQETLClient", () => {
-  return { WorkspaceQETLClient: { runQuery: runQueryMock } };
+vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+  return { WorkspaceQetlClient: { runQuery: runQueryMock } };
 });
-vi.mock("@/clients/qetl/PublicQETLClient", () => {
-  return { PublicQETLClient: { runQuery: vi.fn() } };
+vi.mock("@/clients/qetl/PublicQetlClient", () => {
+  return { PublicQetlClient: { runQuery: vi.fn() } };
 });
 vi.mock(
   "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient",

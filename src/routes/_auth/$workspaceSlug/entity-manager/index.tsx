@@ -1,7 +1,7 @@
+import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { Callout } from "@ui";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/entity-manager/")({
   component: EntityManagerRootWithNoConfigSelected,

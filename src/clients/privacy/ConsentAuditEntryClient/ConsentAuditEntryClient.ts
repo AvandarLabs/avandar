@@ -1,4 +1,4 @@
-import { isDefined } from "@utils";
+import { isDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";

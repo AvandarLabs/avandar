@@ -14,7 +14,7 @@ import {
   EntityConfigFormValues,
   makeDefaultManualEntryField,
 } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
-import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
+import type { FormType } from "@avandar/ui/hooks";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {

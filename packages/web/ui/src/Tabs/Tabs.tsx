@@ -1,15 +1,22 @@
+import { makeObject } from "@avandar/utils";
 import {
   FloatingIndicator,
   Tabs as MantineTabs,
   TabsProps as MantineTabsProps,
   Text,
 } from "@mantine/core";
-import { makeObject } from "@utils";
 import clsx from "clsx";
 import { ReactNode, useState } from "react";
 import classes from "./Tabs.module.css";
 
 export type TabsIndicatorVariant = "underline" | "floating";
+
+/**
+ * Scale of the tab controls. `sm` tightens each tab's padding and label type,
+ * which also shrinks the floating indicator, since the indicator measures
+ * itself against the active tab.
+ */
+export type TabsSize = "sm" | "md";
 
 type Props<TabId extends string> = {
   /**
@@ -33,6 +40,9 @@ type Props<TabId extends string> = {
    */
   indicatorVariant?: TabsIndicatorVariant;
 
+  /** Scale of the tab controls. Defaults to `md`. */
+  size?: TabsSize;
+
   /**
    * Controlled active tab id. When provided together with `onTabChange`,
    * the parent owns selection state (used when the tab is mirrored to the
@@ -51,6 +61,37 @@ type Props<TabId extends string> = {
    * against the active tab (e.g. after a parent modal open animation).
    */
   indicatorRemountKey?: number;
+
+  /**
+   * Content rendered on the trailing edge of the tab list row, beside the
+   * tabs. For hosts whose tab strip doubles as a toolbar, such as a drawer
+   * rail that carries controls scoped to the active tab.
+   */
+  listRightSection?: ReactNode;
+
+  /**
+   * Whether to render the indicator that marks the active tab. Set false when
+   * no tab is currently showing its panel, so the strip does not advertise a
+   * selection visually.
+   *
+   * This is the visual affordance only: the active tab keeps `aria-selected`,
+   * so a host that hides its panels stays responsible for telling assistive
+   * tech, usually via `aria-expanded` and `aria-controls` on whatever control
+   * reveals them.
+   */
+  withActiveIndicator?: boolean;
+
+  /**
+   * Wraps the rendered panels in host chrome. The wrapper is rendered once
+   * around all panels rather than per panel, so a host can put a single
+   * long-lived element (a collapsible region, a scroll container) around them
+   * and keep it mounted across tab changes.
+   *
+   * Supply it either always or never for a given mounted instance: adding or
+   * removing it changes the children's shape and so remounts every panel,
+   * which is the outcome the single wrapper exists to avoid.
+   */
+  wrapPanels?: (panels: ReactNode) => ReactNode;
 } & Omit<MantineTabsProps, "variant" | "children" | "value" | "onChange">;
 
 /**
@@ -62,9 +103,13 @@ export function Tabs<TabId extends string>({
   renderTabHeader,
   renderTabPanel,
   indicatorVariant = "floating",
+  size = "md",
   value,
   onTabChange,
   indicatorRemountKey = 0,
+  listRightSection,
+  withActiveIndicator = true,
+  wrapPanels,
   classNames: tabsClassNames,
   ...props
 }: Props<TabId>): JSX.Element {
@@ -90,6 +135,18 @@ export function Tabs<TabId extends string>({
 
   const isFloating = indicatorVariant === "floating";
 
+  const isSmall = size === "sm";
+
+  const panels = tabIds.map((tabId) => {
+    return (
+      <MantineTabs.Panel key={tabId} value={tabId}>
+        {typeof renderTabPanel === "function" ?
+          renderTabPanel(tabId)
+        : renderTabPanel[tabId](tabId)}
+      </MantineTabs.Panel>
+    );
+  });
+
   return (
     <MantineTabs
       variant="none"
@@ -110,7 +167,11 @@ export function Tabs<TabId extends string>({
         mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        className={clsx(isFloating && classes.list, tabsClassNamesObj?.list)}
+        className={clsx(
+          isFloating && classes.list,
+          listRightSection !== undefined && classes.listWithRightSection,
+          tabsClassNamesObj?.list,
+        )}
         style={
           isFloating ? undefined : (
             {
@@ -126,9 +187,16 @@ export function Tabs<TabId extends string>({
               key={tabId}
               value={tabId}
               ref={tabItemRefCallback(tabId)}
-              className={isFloating ? classes.tab : undefined}
+              className={clsx(
+                isFloating && classes.tab,
+                isSmall && classes.tabSm,
+              )}
             >
-              <Text span fw={isActive ? 500 : 400}>
+              <Text
+                span
+                size={isSmall ? "xs" : undefined}
+                fw={isActive ? 500 : 400}
+              >
                 {typeof renderTabHeader === "function" ?
                   renderTabHeader(tabId)
                 : typeof renderTabHeader[tabId] === "function" ?
@@ -139,32 +207,31 @@ export function Tabs<TabId extends string>({
           );
         })}
 
-        <FloatingIndicator
-          key={indicatorRemountKey}
-          target={tabItemRefs[currentTab]}
-          parent={tabListRef}
-          className={isFloating ? classes.indicator : undefined}
-          style={
-            isFloating ? undefined : (
-              {
-                position: "absolute",
-                top: "2px",
-                borderBottom: "2px solid var(--mantine-color-primary-6)",
-              }
-            )
-          }
-        />
+        {withActiveIndicator ?
+          <FloatingIndicator
+            key={indicatorRemountKey}
+            target={tabItemRefs[currentTab]}
+            parent={tabListRef}
+            data-testid="tabs-active-indicator"
+            className={isFloating ? classes.indicator : undefined}
+            style={
+              isFloating ? undefined : (
+                {
+                  position: "absolute",
+                  top: "2px",
+                  borderBottom: "2px solid var(--mantine-color-primary-6)",
+                }
+              )
+            }
+          />
+        : null}
+
+        {listRightSection !== undefined ?
+          <div className={classes.listRightSection}>{listRightSection}</div>
+        : null}
       </MantineTabs.List>
 
-      {tabIds.map((tabId) => {
-        return (
-          <MantineTabs.Panel key={tabId} value={tabId}>
-            {typeof renderTabPanel === "function" ?
-              renderTabPanel(tabId)
-            : renderTabPanel[tabId](tabId)}
-          </MantineTabs.Panel>
-        );
-      })}
+      {wrapPanels !== undefined ? wrapPanels(panels) : panels}
     </MantineTabs>
   );
 }

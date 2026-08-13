@@ -1,4 +1,4 @@
-import { registry } from "@utils/objects/registry/registry.ts";
+import { registry } from "@avandar/utils";
 import { AreaChartVizConfigs } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfigs.ts";
 import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
 import { BubbleChartVizConfigs } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfigs.ts";

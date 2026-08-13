@@ -1,5 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";

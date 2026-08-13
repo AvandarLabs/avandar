@@ -4,6 +4,64 @@ packages:
   - "packages/web/*"
   - "packages/node/*"
 
+# Singleton runtime dependencies. These must resolve to exactly one copy across
+# the whole workspace: they carry React context or module-level identity, so a
+# second copy silently breaks hooks, context lookups, and `instanceof` checks.
+#
+# The split matters. `peerDependencies` in each package stay a broad range
+# (`^19.0.0`) because that is genuinely what a consumer needs. `devDependencies`
+# reference `catalog:` so local dev and tests all build against the single
+# version the app itself runs, instead of each package resolving its own.
+#
+# Without this, `packages/web/*` declaring `^19.0.0` while the root declares
+# `^19.2.0` forked React into 19.2.4 and 19.2.5, and any package whose
+# react-query bound to the second copy threw "Invalid hook call" in app tests.
+#
+# Pinned to exact versions on purpose. `react` and `react-dom` must always be
+# the same version as each other, and a caret range lets them drift apart: a
+# range re-resolved `react` to 19.2.5 while `react-dom` stayed at the 19.2.4
+# already in the lockfile. Bump both together, deliberately.
+#
+# `type-fest` is here for the same reason even though it is types-only: its
+# helper types are structural, so a value typed with `Paths` from 5.4.4 does
+# not satisfy a constraint written against `_Paths` from 5.6.0. Two copies
+# means cross-package generics stop type-checking. A range is fine here (no
+# sibling package has to match it); the point is that every importer shares
+# one specifier so pnpm resolves it exactly once.
+# Only `dependencies` and `devDependencies` reference `catalog:`.
+# `peerDependencies` must stay a broad range: on publish pnpm replaces
+# `catalog:` with the catalog value, so a catalogued peer would pin consumers
+# to our exact version.
+catalog:
+  # React must be pinned exactly: react and react-dom have to match each other,
+  # and a caret range let them drift apart (react 19.2.5 vs react-dom 19.2.4).
+  react: 19.2.5
+  react-dom: 19.2.5
+
+  # Structural types. A value typed with `Paths` from type-fest 5.4.4 does not
+  # satisfy a constraint written against `_Paths` from 5.6.0, and two zod copies
+  # make `ZodObject` fail to match `ObjectDBReadSchema`. Both broke the build.
+  type-fest: ^5.4.4
+  zod: ^4.1.13
+
+  # Runtime singletons: these carry React context or client identity, so a
+  # second copy fails at runtime rather than at compile time.
+  "@mantine/core": ^9.2.0
+  "@mantine/form": ^9.2.0
+  "@mantine/hooks": ^9.2.0
+  "@mantine/modals": ^9.2.0
+  "@mantine/notifications": ^9.2.0
+  "@supabase/supabase-js": ^2.98.0
+  "@tabler/icons-react": ^3.31.0
+  "@tanstack/react-query": ^5.81.5
+  "@tanstack/react-router": ^1.170.0
+
+  # Shared toolchain, kept uniform so every package compiles and tests the same.
+  ts-pattern: ^5.7.0
+  typescript: ~5.9.3
+  tsup: ^8.5.0
+  vitest: ^3.2.4
+
 # Supply-chain cooldown: refuse to resolve any version published less than
 # 3 days (4320 minutes) ago. Compromised releases are typically detected and
 # unpublished within hours, so waiting is the cheapest defense we have against
@@ -21,3 +79,12 @@ packages:
 # of silently falling back to a too-new version. To let one package skip the
 # wait, add its name to `minimumReleaseAgeExclude`.
 minimumReleaseAge: 4320
+
+# Our own packages are exempt. The cooldown exists to protect against a
+# compromised release from a third party we do not control; it makes no sense
+# to apply it to packages we publish ourselves, and leaving it on would make a
+# freshly published `@avandar/*` version unresolvable for three days. Any repo
+# that consumes these packages and sets `minimumReleaseAge` needs the same
+# entry.
+minimumReleaseAgeExclude:
+  - "@avandar/*"

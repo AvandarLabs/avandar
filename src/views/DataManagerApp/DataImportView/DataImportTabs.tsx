@@ -1,5 +1,5 @@
+import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Tabs } from "@ui";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";

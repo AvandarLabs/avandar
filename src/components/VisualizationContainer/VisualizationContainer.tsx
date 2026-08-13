@@ -1,7 +1,7 @@
+import { DangerText } from "@avandar/ui";
+import { prop, UnknownDataFrame } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex } from "@mantine/core";
-import { DangerText } from "@ui";
-import { prop, UnknownDataFrame } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";

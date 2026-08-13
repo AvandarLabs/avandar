@@ -215,6 +215,6 @@ describe("compiled SQL for a lat/lng layer", () => {
       queryColumns: [latitude, longitude],
     } as never;
 
-    expect(StructuredQuery.toRawDuckDBQuery(query)).not.toMatch(/ST_/i);
+    expect(StructuredQuery.toRawDuckDbQuery(query)).not.toMatch(/ST_/i);
   });
 });

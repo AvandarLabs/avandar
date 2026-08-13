@@ -1,11 +1,11 @@
-import { createServiceClient, withSupabaseClient } from "@clients";
-import { withQueryHooks } from "@hooks";
-import { withLogger } from "@logger";
-import { withNewMembers } from "@modules";
+import { createServiceClient, withSupabaseClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withNewMembers } from "@avandar/modules";
+import { withQueryHooks } from "@avandar/query-hooks";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import type { ILogger } from "@logger";
+import type { ILogger } from "@avandar/logger";
 import type {
   AppType,
   RoleLevel,

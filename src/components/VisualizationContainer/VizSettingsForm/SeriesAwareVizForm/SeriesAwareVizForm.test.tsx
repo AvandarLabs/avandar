@@ -2,7 +2,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
 import { describe, expect, it } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -19,13 +19,13 @@ const fields: readonly QueryResultColumn[] = [
 function renderForm(config: BarChartVizConfig): HTMLElement {
   const { container } = render(
     <I18nProvider i18n={i18n}>
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <SeriesAwareVizForm
           fields={fields}
           config={config}
           onConfigChange={() => {}}
         />
-      </AvandarUiProvider>
+      </AvandarAppProvider>
     </I18nProvider>,
   );
   return container as HTMLElement;

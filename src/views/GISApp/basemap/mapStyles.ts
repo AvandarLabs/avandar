@@ -1,4 +1,4 @@
-import { registry } from "@utils";
+import { registry } from "@avandar/utils";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
 /** Basemap style URLs, keyed by the model's basemap style union. */

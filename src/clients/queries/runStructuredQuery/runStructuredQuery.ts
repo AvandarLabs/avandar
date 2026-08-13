@@ -1,11 +1,11 @@
-import { Model } from "@models";
-import { makeObjectFromEntries, prop, sortObjList } from "@utils";
+import { Model } from "@avandar/models";
+import { makeObjectFromEntries, prop, sortObjList } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
-import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
@@ -113,12 +113,12 @@ async function _runRawSql(
   sqlToRun: string,
 ): Promise<QueryResult<UnknownRow>> {
   if (params.auth === "public") {
-    return await PublicQETLClient.runQuery({
+    return await PublicQetlClient.runQuery({
       rawSql: sqlToRun,
       dashboardId: params.publicAvaPageId,
     });
   }
-  return await WorkspaceQETLClient.runQuery({
+  return await WorkspaceQetlClient.runQuery({
     rawSql: sqlToRun,
     workspaceId: params.workspaceId,
   });
@@ -148,8 +148,8 @@ async function _runSourceQuery(
 
   return await Model.match(dataSource, {
     Dataset: async (): Promise<QueryResult<UnknownRow>> => {
-      return await WorkspaceQETLClient.runQuery({
-        rawSql: StructuredQuery.toRawDuckDBQuery(executionQueryWithSource),
+      return await WorkspaceQetlClient.runQuery({
+        rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
         workspaceId,
       });
     },

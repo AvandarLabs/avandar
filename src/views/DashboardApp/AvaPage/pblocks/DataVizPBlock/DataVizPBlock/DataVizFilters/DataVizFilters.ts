@@ -1,4 +1,4 @@
-import { matchLiteral, prop } from "@utils";
+import { matchLiteral, prop } from "@avandar/utils";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";

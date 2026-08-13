@@ -1,5 +1,5 @@
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import type { ExcludeNullsIn } from "@utils";
+import type { ExcludeNullsIn } from "@avandar/utils";
 import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types";
 import type { CompositeTypes, Json } from "$/types/database.types";
 import type { SetOptional } from "type-fest";
@@ -49,7 +49,7 @@ export function getColumnNamesFromOpenDataMetadata(
 /**
  * Builds RPC column inputs for open-data datasets using catalog column names.
  * Uses `VARCHAR` / `varchar` so Parquet loads without forced casts when types
- * match user expectations in QETL.
+ * match user expectations in Qetl.
  *
  * @param columnNames - Original column names from the catalog metadata.
  * @returns Rows for `rpc_datasets__add_open_data_dataset.p_columns`.

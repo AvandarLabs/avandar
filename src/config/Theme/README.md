@@ -4,7 +4,7 @@ Mantine theme overrides and design tokens for the web app. **All brand colors
 live here or in `shared/config/Theme.ts`.** Do not hardcode hex values in
 components; use Mantine props, `theme.other`, or CSS variables below.
 
-Wired in `AvandarUiProvider` via `Theme`, `cssVariablesResolver`, and types
+Wired in `AvandarAppProvider` via `Theme`, `cssVariablesResolver`, and types
 in `src/lib/types/mantine.d.ts`.
 
 ## Files
@@ -125,7 +125,8 @@ import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
 />;
 ```
 
-Reference: `FloatingPanel` + `useFloatingPanelMorphTransition`.
+These presets currently have no callers in the app. They remain available for
+any surface that should grow from the control that opened it.
 
 Overlay components (Menu, Combobox, Modal, etc.) get `transitionProps` from `MANTINE_TRANSITION_PROPS` in `AnimationTheme.ts`.
 

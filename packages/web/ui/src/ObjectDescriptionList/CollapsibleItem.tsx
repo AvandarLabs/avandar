@@ -1,4 +1,4 @@
-import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
+import { useToggleBoolean } from "@avandar/hooks";
 import { Box, Collapse, Group, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";

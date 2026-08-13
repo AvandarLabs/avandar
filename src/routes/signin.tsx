@@ -1,4 +1,5 @@
-import { useMutation } from "@hooks";
+import { useMutation } from "@avandar/query-hooks";
+import { Link } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -8,7 +9,6 @@ import {
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
-import { Link } from "@ui";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";

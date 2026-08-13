@@ -1,4 +1,4 @@
-import { assertIsDefined, objectKeys, objectValuesMap } from "@utils";
+import { assertIsDefined, objectKeys, objectValuesMap } from "@avandar/utils";
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 type GenericActionRegistry<State> = Record<

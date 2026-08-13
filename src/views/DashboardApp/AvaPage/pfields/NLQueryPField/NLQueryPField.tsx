@@ -1,6 +1,6 @@
+import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
-import { Tabs } from "@ui";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PromptTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel";
 import { SqlTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel";

@@ -1,4 +1,4 @@
-import { prop } from "@utils";
+import { prop } from "@avandar/utils";
 import { Parser } from "node-sql-parser";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";

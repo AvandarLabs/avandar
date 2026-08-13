@@ -1,4 +1,4 @@
-import { where } from "@utils";
+import { where } from "@avandar/utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";

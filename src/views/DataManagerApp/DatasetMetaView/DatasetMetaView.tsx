@@ -1,3 +1,5 @@
+import { EditableDisplayText, Paper, Tabs } from "@avandar/ui";
+import { prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -13,14 +15,6 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  EditableDisplayText,
-  notifyError,
-  notifySuccess,
-  Paper,
-  Tabs,
-} from "@ui";
-import { prop, where } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -31,6 +25,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";

@@ -1,4 +1,4 @@
-import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
+import { propEq } from "@avandar/utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 /**

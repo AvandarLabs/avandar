@@ -1,4 +1,4 @@
-import type { ObjectRegistry } from "@utils/types/utilities.types.ts";
+import type { ObjectRegistry } from "@avandar/utils";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts";

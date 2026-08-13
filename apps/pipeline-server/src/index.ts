@@ -1,4 +1,4 @@
-import "@pipeline-server/ensureETLPathsRoot";
+import "@pipeline-server/ensureEtlPathsRoot";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import Fastify from "fastify";
 

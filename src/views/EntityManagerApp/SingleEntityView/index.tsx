@@ -1,6 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { ObjectDescriptionList, Paper } from "@ui";
+import { ObjectDescriptionList, Paper } from "@avandar/ui";
 import {
   isNonNullish,
   makeIdLookupMap,
@@ -11,7 +9,9 @@ import {
   propEq,
   unknownToString,
   where,
-} from "@utils";
+} from "@avandar/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";

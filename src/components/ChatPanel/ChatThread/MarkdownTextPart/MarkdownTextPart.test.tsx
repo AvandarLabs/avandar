@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/providers/AvandarUiProvider";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { ChatSyntaxHighlighterRouter } from "./MarkdownTextPart";
 
@@ -41,13 +41,13 @@ const noopComponents = {
 describe("ChatSyntaxHighlighterRouter", () => {
   it("renders SQL code via AvaSqlBlock (no Prism fallback)", () => {
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <ChatSyntaxHighlighterRouter
           language="sql"
           code={`SELECT 1`}
           components={noopComponents}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(screen.queryByTestId("prism-fallback")).toBeNull();
     expect(screen.getByText("SELECT 1")).toBeInTheDocument();
@@ -55,13 +55,13 @@ describe("ChatSyntaxHighlighterRouter", () => {
 
   it("renders duckdb fences via AvaSqlBlock", () => {
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <ChatSyntaxHighlighterRouter
           language="duckdb"
           code={`SELECT 2`}
           components={noopComponents}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     expect(screen.queryByTestId("prism-fallback")).toBeNull();
     expect(screen.getByText("SELECT 2")).toBeInTheDocument();
@@ -69,13 +69,13 @@ describe("ChatSyntaxHighlighterRouter", () => {
 
   it("falls back to Prism for non-SQL languages", () => {
     render(
-      <AvandarUiProvider>
+      <AvandarAppProvider>
         <ChatSyntaxHighlighterRouter
           language="python"
           code={`print('hi')`}
           components={noopComponents}
         />
-      </AvandarUiProvider>,
+      </AvandarAppProvider>,
     );
     const fallback = screen.getByTestId("prism-fallback");
     expect(fallback).toBeInTheDocument();

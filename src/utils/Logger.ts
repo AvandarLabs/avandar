@@ -1,4 +1,4 @@
-import { createWebLogger } from "@logger";
+import { createWebLogger } from "@avandar/logger";
 
 export const Logger = createWebLogger({
   // do not show console.logs in production

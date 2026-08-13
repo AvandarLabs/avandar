@@ -1,3 +1,5 @@
+import { Callout } from "@avandar/ui";
+import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -13,8 +15,6 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { Callout, notifyError, notifySuccess } from "@ui";
-import { where } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
@@ -27,6 +27,7 @@ import {
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";

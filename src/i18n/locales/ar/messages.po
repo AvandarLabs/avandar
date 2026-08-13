@@ -103,6 +103,10 @@ msgstr "تحقق من بريدك الإلكتروني للحصول على راب
 msgid "Invite member"
 msgstr "دعوة عضو"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "JOIN entry at position {index} is not a plain table reference."
+msgstr "إدخال JOIN في الموضع {index} ليس مرجعًا لجدول عادي."
+
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
 msgid "Or {0} to be notified when our public launch is ready."
@@ -175,6 +179,14 @@ msgstr "لا يمكن عرض {chartName}."
 msgid "Allow online syncing"
 msgstr "السماح بالمزامنة عبر الإنترنت"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "HAVING compares \"{columnName}\" against a non-literal expression."
+msgstr "تقارن HAVING العمود \"{columnName}\" بتعبير غير حرفي."
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
+msgstr "لا يتم دعم UNION/INTERSECT/EXCEPT بهذا الشكل في النموذج."
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Chart settings"
@@ -207,7 +219,7 @@ msgstr "أدخل سؤالك أو تعليماتك بلغة طبيعية لإنش
 msgid "H4"
 msgstr "H4"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Query"
 msgstr "استعلام"
 
@@ -235,13 +247,17 @@ msgstr "أفاندار"
 msgid "Please check your email for a confirmation link."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
 msgstr "توسيع"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "مربع تنبيه"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Style"
+msgstr "النمط"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -295,10 +311,14 @@ msgstr "فتح"
 msgid "Aggregations"
 msgstr "التجميعات"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "No"
 msgstr "لا"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Could not determine a base table from FROM clause."
+msgstr "تعذّر تحديد جدول أساسي من عبارة FROM."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
@@ -332,6 +352,10 @@ msgstr "خطأ غير معروف"
 msgid "Add a line chart showing trends in {datasetName} over time"
 msgstr "أضف رسمًا بيانيًا خطيًا يوضح الاتجاهات في {datasetName} على مر الزمن"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show legend"
+msgstr "إظهار وسيلة الإيضاح"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
 msgstr "قائمة"
@@ -342,6 +366,10 @@ msgstr "قائمة"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "مصادر البيانات"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
+msgid "Expand drawer"
+msgstr "توسيع اللوحة الجانبية"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Export annotated PDF"
@@ -479,6 +507,10 @@ msgstr "أضف أعمدة إلى الاستعلام أعلاه لبدء تعري
 msgid "Only allow one value"
 msgstr "السماح بقيمة واحدة فقط"
 
+#: shared/copy/vizTypeLabel.ts
+msgid "Pie Chart"
+msgstr "مخطط دائري"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "متوسط"
@@ -507,6 +539,10 @@ msgstr "تسمية توضيحية"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Collapse at"
 msgstr "طي عند"
+
+#: shared/copy/vizTypeLabel.ts
+msgid "Bubble Chart"
+msgstr "مخطط فقاعي"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
 msgid "Something else…"
@@ -537,6 +573,7 @@ msgstr "تحتوي الورقة على صف رأس"
 msgid "Map"
 msgstr ""
 
+#: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Table"
 msgstr "جدول"
@@ -545,6 +582,11 @@ msgstr "جدول"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة "
 "العمل الخاصة بك."
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
+msgstr "تستخدم عبارة JOIN ON العامل \"{operator}\": تتم مطابقة عمليات الربط "
+"المتساوية فقط."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Chat is enabled in the Data Explorer and Dashboards. <0>Open Data "
@@ -564,7 +606,7 @@ msgstr "صغير"
 msgid "No matches"
 msgstr "لا توجد تطابقات"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Keep SQL as-is"
 msgstr "احتفظ بـ SQL كما هو"
 
@@ -621,6 +663,12 @@ msgstr "اختر مقدار كل مجموعة بيانات لنشرها. الا�
 msgid "I understand this data will be sent to the AI provider"
 msgstr "أفهم أن هذه البيانات ستُرسل إلى مزود الذكاء الاصطناعي"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
+"true."
+msgstr "لا تتم مطابقة الجداول المرتبطة بفواصل؛ تعامل معها كـ INNER JOIN مع ON "
+"true."
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
@@ -676,8 +724,7 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة بيانات
 "لم تكن صحيحة، فمن الممكن أن مجموعة بياناتك لا تبدأ في الصف الأول أو أن "
 "CSV يستخدم فاصلًا مختلفًا. حاول ضبط هذه الإعدادات هنا."
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
 msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
 
@@ -751,6 +798,10 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "البيانات الوصفية"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "JOIN subquery at position {index} could not be re-serialised."
+msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ JOIN في الموضع {index}."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -837,6 +888,10 @@ msgstr "إغلاق الدردشة (⌘/)"
 msgid "Create failed"
 msgstr "فشل الإنشاء"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Natural"
+msgstr "طبيعي"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
 msgstr "حذف مجموعة الأدوار"
@@ -880,8 +935,8 @@ msgstr "مجموعة أدوار جديدة"
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Confirm"
 msgstr "تأكيد"
@@ -907,6 +962,10 @@ msgstr "التسمية"
 msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "ORDER BY references multiple columns; the form keeps only the first."
+msgstr "تشير عبارة ORDER BY إلى أعمدة متعددة؛ يحتفظ النموذج بالعمود الأول فقط."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "missing"
 msgstr "مفقود"
@@ -914,6 +973,10 @@ msgstr "مفقود"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "One standard deviation around the mean"
 msgstr "انحراف معياري واحد حول المتوسط"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "SQL is empty."
+msgstr "عبارة SQL فارغة."
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -932,6 +995,10 @@ msgstr "العمود 12"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
 msgstr "يتم الافتراض على \"Y مقابل X\""
+
+#: shared/copy/vizTypeLabel.ts
+msgid "Funnel Chart"
+msgstr "مخطط قمعي"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1092,6 +1159,10 @@ msgstr "المحرر العالمي"
 msgid "Manage seats in billing portal →"
 msgstr "إدارة المقاعد في بوابة الفوترة →"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Table view has no chart settings."
+msgstr "لا يحتوي عرض الجدول على إعدادات للمخطط."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
 msgstr "أنت توفر {discount}% مقارنة بالفوترة الشهرية"
@@ -1172,6 +1243,10 @@ msgstr "اختر مصدر البيانات"
 msgid "Open Data"
 msgstr "البيانات المفتوحة"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Sort & limit"
+msgstr "الفرز والحد"
+
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
 msgstr "إضافة مجموعة بيانات جديدة"
@@ -1192,6 +1267,10 @@ msgstr "يمكن أن يحتوي عنوان URL المخصص على أحرف ص�
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
 msgstr "عنوان البريد الإلكتروني"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Smooth"
+msgstr "سلس"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Enter a name for the field"
@@ -1229,7 +1308,7 @@ msgstr "متوسط"
 msgid "Generating…"
 msgstr "يتم الإنشاء…"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا الإجراء؟ لا يمكن التراجع عن ذلك."
@@ -1261,7 +1340,7 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 msgstr "قم بتكوين هذا الفلتر: حدد معرفه، تسميته، واسم العمود في اللوحة "
 "الجانبية."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
@@ -1277,8 +1356,7 @@ msgstr "اختر الأعمدة التي تريدها في هذا {entityConfigN
 msgid "Formal"
 msgstr "رسمي"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "This field"
 msgstr "هذا الحقل"
 
@@ -1321,13 +1399,17 @@ msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspa
 msgid "Suggested:"
 msgstr "مقترح:"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "استبدال SQL بتغييرات النموذج"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset did not match the expected schema"
 msgstr "لم تتطابق مجموعة البيانات مع المخطط المتوقع"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "FROM clause is not a plain table reference."
+msgstr "عبارة FROM ليست مرجعًا لجدول عادي."
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign Out"
@@ -1409,6 +1491,10 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 msgstr "سجل محلي لكل مرة وافقت (أو ألغيت) إرسال البيانات إلى مزود الذكاء "
 "الاصطناعي في هذه المساحة. آخر 90 يومًا، مخزنة على هذا الجهاز فقط."
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
+msgstr "دالة التجميع \"{funcName}\" غير مدعومة في SELECT؛ تم تخطيها."
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "المسح إلى:"
@@ -1417,7 +1503,7 @@ msgstr "المسح إلى:"
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "اطلب مني إضافة مخطط إلى هذه اللوحة..."
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "لم يتم تنفيذه بعد"
 
@@ -1435,6 +1521,7 @@ msgid "\"{sourceFileName}\" finished processing and is ready to use."
 msgstr "\"{sourceFileName}\" انتهى من المعالجة وهو جاهز للاستخدام."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Manual"
 msgstr "يدوي"
 
@@ -1445,6 +1532,10 @@ msgstr "جارٍ فهم سؤالك…"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot be empty"
 msgstr "لا يمكن أن يكون معرّف مساحة العمل فارغًا"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide Y axis"
+msgstr "إخفاء المحور Y"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "or"
@@ -1471,6 +1562,14 @@ msgstr "الأدوار والأذونات"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connect to Google Sheets"
 msgstr "الاتصال بـ Google Sheets"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "100% stacked"
+msgstr "تكديس بنسبة 100%"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Could not find a known dataset matching \"{tableName}\"."
+msgstr "تعذّر العثور على مجموعة بيانات معروفة تطابق \"{tableName}\"."
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1515,6 +1614,10 @@ msgid "Please <0>email us</0> if you would like early access."
 msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
 "المبكر."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Step"
+msgstr "خطوة"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -1525,11 +1628,11 @@ msgstr "الأقصى"
 msgid "Import data"
 msgstr "استيراد البيانات"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Descending"
 msgstr "تنازلي"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
 msgstr "محور الفئة"
 
@@ -1542,7 +1645,7 @@ msgstr "نموذج متوازن يعمل دون اتصال لأسئلة SQL ال
 msgid "Nothing found..."
 msgstr "لم يتم العثور على شيء..."
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} للحفظ"
 
@@ -1565,6 +1668,11 @@ msgstr "فشل في حفظ مجموعة البيانات: {0}"
 #: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Query form"
 msgstr "نموذج الاستعلام"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause uses an expression on the left-hand side that is not a "
+"column reference."
+msgstr "تستخدم عبارة WHERE تعبيرًا في الجانب الأيسر ليس مرجعًا لعمود."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "PDF downloaded."
@@ -1611,6 +1719,7 @@ msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحو
 msgid "Show SQL"
 msgstr "عرض SQL"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "شبكة"
@@ -1637,9 +1746,19 @@ msgstr "اسم مجموعة البيانات مطلوب"
 msgid "Main"
 msgstr "رئيسي"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "HAVING clause uses a left-hand side the form cannot represent."
+msgstr "تستخدم عبارة HAVING جانبًا أيسر لا يمكن للنموذج تمثيله."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Allow new {pluralEntityConfigName} to be created manually"
 msgstr "السماح بإنشاء {pluralEntityConfigName} جديدة يدويًا"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
+"IS NULL / IS NOT NULL are mapped."
+msgstr "تستخدم عبارة WHERE العامل \"{operator}\" مع قيمة غير فارغة في الجانب "
+"الأيمن؛ تتم مطابقة IS NULL / IS NOT NULL فقط."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid ", and "
@@ -1699,15 +1818,11 @@ msgstr ""
 msgid "your dataset"
 msgstr "مجموعة البيانات الخاصة بك"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -1752,6 +1867,14 @@ msgstr "نطاق البيانات"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "معاينة البيانات"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Gridline color"
+msgstr "لون خطوط الشبكة"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Pick a chart type above to configure one."
+msgstr "اختر نوع مخطط أعلاه لتهيئته."
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -1817,13 +1940,19 @@ msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط 
 msgid "Delete entity"
 msgstr "حذف الكيان"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "نص فارغ"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "المحيط"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
+"represent."
+msgstr "تحتوي عبارة HAVING على عقدة من النوع \"{nodeType}\" لا يمكن للنموذج "
+"تمثيلها."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "You are about to change your subscription plan to:"
@@ -1858,6 +1987,10 @@ msgstr "اذهب إلى مستكشف البيانات"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "هذه اللوحة <0>عامة</0>. يمكن لأي شخص لديه الرابط أدناه مشاهدتها."
+
+#: shared/copy/vizTypeLabel.ts
+msgid "Radar Chart"
+msgstr "مخطط راداري"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Scroll up to the fields above, or use the list below."
@@ -1945,13 +2078,17 @@ msgstr "العمود 7"
 msgid "Feature"
 msgstr ""
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Show dots"
+msgstr "إظهار النقاط"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Microsoft's compact instruct model. Solid structure and instruction "
 "following for dashboards."
 msgstr "نموذج Microsoft المدمج للتعليمات. يتميز ببنية متينة واتباع جيد "
 "للتعليمات الخاصة بلوحات المعلومات."
 
-#: packages/web/ui/src/buttons/EditButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit"
 msgstr "تعديل"
 
@@ -1960,6 +2097,10 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "لم يتم تطبيق SQL. وافق على قيم عوامل التصفية المفترضة لتشغيل هذا "
 "الاستعلام."
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Identity"
+msgstr "الهوية"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
@@ -1998,7 +2139,7 @@ msgstr "تم اختيار محور X غير صالح"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "المجموعة {collectionNumber}"
 
@@ -2025,6 +2166,10 @@ msgstr "{0} أعمدة تم الكشف عنها. راجع معلومات الأ�
 msgid "text"
 msgstr "نص"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Split (+/-)"
+msgstr "تقسيم (+/-)"
+
 #: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
 msgid "Active"
 msgstr "نشط"
@@ -2033,7 +2178,7 @@ msgstr "نشط"
 msgid "Default values, comma-separated or JSON array"
 msgstr "القيم الافتراضية، مفصولة بفواصل أو مصفوفة JSON"
 
-#: packages/web/ui/src/buttons/DangerousActionButton/DangerousActionButton.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "تأكيد الإجراء"
 
@@ -2099,7 +2244,7 @@ msgstr "فاصلة (,)"
 msgid "Registration requires an internet connection."
 msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/index.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "There are no values"
 msgstr "لا توجد قيم"
 
@@ -2118,6 +2263,10 @@ msgstr "العودة إلى المحرر"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
 msgstr "حوالي دقيقة"
+
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Y axis"
+msgstr "المحور Y"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 9"
@@ -2185,6 +2334,10 @@ msgstr "عمود الحجم"
 msgid "Values"
 msgstr "القيم"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label color"
+msgstr "لون تسمية المحور Y"
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
@@ -2198,9 +2351,19 @@ msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية
 msgid "Full"
 msgstr "كامل"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Legend position"
+msgstr "موضع وسيلة الإيضاح"
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "CSVs"
 msgstr "CSV"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
+"list."
+msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{columnName}\" مع قائمة "
+"غير حرفية."
 
 #: src/views/GISApp/MapCanvas/MapStatusOverlay.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
@@ -2222,6 +2385,10 @@ msgstr "Qwen 2.5 7B (دون اتصال)"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "رمز الاستجابة السريعة"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "SQL contains multiple statements; the form maps only the first."
+msgstr "تحتوي SQL على عبارات متعددة؛ يطابق النموذج العبارة الأولى فقط."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
@@ -2302,6 +2469,10 @@ msgstr "تمت عملية الدفع بنجاح!"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
 msgstr "تم الرد"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Straight"
+msgstr "مستقيم"
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
 #: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
@@ -2385,6 +2556,10 @@ msgstr "تم التنزيل على هذا المتصفح"
 msgid "Pay monthly"
 msgstr "الدفع شهريًا"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Vertical gridlines"
+msgstr "خطوط الشبكة العمودية"
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "اختر نموذجًا"
@@ -2398,7 +2573,7 @@ msgstr "تم اكتشاف بيانات شخصية"
 msgid "Apply every global filter on the dashboard."
 msgstr "تطبيق كل فلتر عالمي على اللوحة."
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse"
 msgstr "طي"
 
@@ -2414,6 +2589,12 @@ msgstr "اذهب إلى بوابة الفوترة"
 msgid "Clear log"
 msgstr "مسح السجل"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
+"placeholder."
+msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي المتداخل في FROM؛ تم الإبقاء على "
+"الربط كعنصر نائب."
+
 #: src/views/GISApp/GISApp.tsx
 msgid "Untitled map"
 msgstr ""
@@ -2425,6 +2606,10 @@ msgstr "تحميل CSV"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image"
 msgstr "صورة"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Hide X axis"
+msgstr "إخفاء المحور X"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -2472,9 +2657,8 @@ msgstr "أضف رسمًا بيانيًا عموديًا لعدد الصفوف ف
 msgid "No file selected"
 msgstr "لا يوجد ملف محدد"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
 #: src/components/forms/AvaForm/AvaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "إرسال"
@@ -2518,10 +2702,6 @@ msgstr "إرسال الدعوة"
 msgid "Open {0}"
 msgstr "فتح {0}"
 
-#: src/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody.tsx
-msgid "Manual Query"
-msgstr "استعلام يدوي"
-
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
 msgstr "مجموعة البيانات الآن متاحة فقط في وضع عدم الاتصال"
@@ -2539,6 +2719,10 @@ msgstr "هنا تختار الأعمدة من مجموعات البيانات ا
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Create"
 msgstr "إنشاء"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stroke width"
+msgstr "عرض الحد"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create your first dashboard to track key metrics and insights."
@@ -2573,6 +2757,14 @@ msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
 msgstr "URL"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "GROUP BY uses a non-column expression."
+msgstr "يستخدم GROUP BY تعبيرًا غير معتمد على عمود."
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "The form only supports SELECT queries."
+msgstr "يدعم النموذج استعلامات SELECT فقط."
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -2633,7 +2825,7 @@ msgstr "إجابة توضيحية"
 msgid "Generated SQL"
 msgstr "SQL المُولد"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "الحد الأقصى لعدد الصفوف للعودة"
 
@@ -2720,6 +2912,10 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 msgid "Select file"
 msgstr "اختر ملف"
 
+#: src/components/providers/AvandarAppProvider.tsx
+msgid "Edit {name}"
+msgstr "تعديل {name}"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Column name (must match SQL)"
 msgstr "اسم العمود (يجب أن يتطابق مع SQL)"
@@ -2744,6 +2940,10 @@ msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديد
 msgid "Repairing query…"
 msgstr "جارٍ إصلاح الاستعلام…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Horizontal gridlines"
+msgstr "خطوط الشبكة الأفقية"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
 "the 8 GB tier."
@@ -2767,9 +2967,13 @@ msgstr "الأعمدة"
 msgid "Here is a query based on your workspace metadata."
 msgstr "إليك استعلامًا يستند إلى بيانات التعريف لمساحة العمل لديك."
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL?"
 msgstr "هل تريد الكتابة فوق SQL؟"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause compares \"{columnName}\" against a non-literal expression."
+msgstr "تقارن جملة WHERE ‏\"{columnName}\" بتعبير غير حرفي."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
@@ -2822,9 +3026,23 @@ msgstr "نموذج instruct عالي الجودة بحجم 7B. الأفضل لل
 msgid "View"
 msgstr "عرض"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Area layout"
+msgstr "تخطيط المساحة"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "CTEs (WITH clauses) are not supported in the form."
+msgstr "لا يدعم النموذج CTEs (جمل WITH)."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "غير متوفر"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
+"raw SQL."
+msgstr "تستخدم جملة JOIN ON مرجعًا غير معتمد على عمود؛ سيحتفظ النموذج به عبر "
+"SQL خام."
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
@@ -2870,6 +3088,12 @@ msgstr "لا توجد مجموعات بيانات تتطابق مع بحثك."
 msgid "in"
 msgstr "في"
 
+#: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
+msgid "Parts of this SQL could not be represented in the Manual form. The form "
+"shows a best-effort approximation; the SQL is what actually runs."
+msgstr "تعذّر تمثيل أجزاء من SQL في النموذج اليدوي. يعرض النموذج تقريبًا بأفضل "
+"جهد؛ أما SQL فهو ما يُنفَّذ فعليًا."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "تصدير PDF"
@@ -2882,12 +3106,17 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
 msgstr "لون"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis label"
+msgstr "تسمية المحور Y"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -2910,11 +3139,15 @@ msgstr "اسم العمود"
 msgid "Large"
 msgstr "كبير"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Line width"
+msgstr "عرض الخط"
+
 #: src/routes/forgot-password.tsx
 msgid "Sent password reset email"
 msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "اختر العمود للفرز حسبه"
 
@@ -3037,7 +3270,7 @@ msgstr "توضيحات"
 msgid "Entity deleted"
 msgstr "تم حذف الكيان"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
 msgstr "اختر الأعمدة"
 
@@ -3065,7 +3298,7 @@ msgstr "اكتب إجابتك..."
 msgid "Import"
 msgstr "استيراد"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Yes"
 msgstr "نعم"
@@ -3131,6 +3364,10 @@ msgstr "مشاركة الملخص"
 msgid "Time"
 msgstr "الوقت"
 
+#: shared/copy/vizTypeLabel.ts
+msgid "Bar Chart"
+msgstr "مخطط شريطي"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
 msgstr "تمت إضافة مجموعة البيانات"
@@ -3151,10 +3388,6 @@ msgstr "تطبيق"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "/month (paid yearly)"
 msgstr "/شهر (مدفوع سنويًا)"
-
-#: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Close {title}"
-msgstr "إغلاق {title}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
@@ -3327,6 +3560,10 @@ msgstr "اختيار السمة"
 msgid "Title"
 msgstr "العنوان"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Curve"
+msgstr "منحنى"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "العمود 4"
@@ -3351,11 +3588,15 @@ msgstr "وقت الرد"
 msgid "Could not remove offline chat model"
 msgstr "لم يتمكن من إزالة نموذج الدردشة غير المتصل"
 
+#: shared/copy/vizSettingGroupLabel.ts
+msgid "Legend"
+msgstr "وسيلة الإيضاح"
+
 #: src/routes/register.tsx
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "الاتجاه"
 
@@ -3410,6 +3651,10 @@ msgstr "التاريخ"
 msgid "recently"
 msgstr "مؤخرًا"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Overlapping"
+msgstr "متداخل"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Download"
 msgstr "تنزيل"
@@ -3438,6 +3683,10 @@ msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف
 msgid "Turn"
 msgstr "تحويل"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label"
+msgstr "تسمية المحور X"
+
 #: src/views/GISApp/GISApp.tsx
 msgid "Layer 1"
 msgstr ""
@@ -3446,7 +3695,7 @@ msgstr ""
 msgid "Unordered"
 msgstr "غير مرتّب"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty"
 msgstr "فارغ"
 
@@ -3456,8 +3705,7 @@ msgstr "فارغ"
 msgid "All"
 msgstr "الكل"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
-#: packages/web/ui/src/singleton-forms/TextareaForm/TextareaForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} حرفًا"
 
@@ -3465,15 +3713,11 @@ msgstr "{fieldName} يجب أن يكون طوله على الأقل {minLength} 
 msgid "System sans"
 msgstr "نظام بدون"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Series label"
 msgstr "تسمية السلسلة"
-
-#. placeholder {0}: props.name
-#: packages/web/ui/src/buttons/EditButton.tsx
-msgid "Edit {0}"
-msgstr "تعديل {0}"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -3518,6 +3762,10 @@ msgstr "لم يتم إضافة أي وصف بعد."
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B"
 msgstr "Qwen 2.5 3B"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
+msgid "Collapse drawer"
+msgstr "طي لوحة السحب"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
@@ -3586,6 +3834,7 @@ msgstr "بين"
 msgid "Inactive"
 msgstr "غير نشط"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
 msgstr "يمين"
@@ -3640,7 +3889,7 @@ msgstr "حدث خطأ ما"
 msgid "Allow syncing"
 msgstr "السماح بالمزامنة"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Ascending"
 msgstr "تصاعدي"
 
@@ -3670,7 +3919,6 @@ msgid "Change"
 msgstr "تغيير"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا "
@@ -3691,6 +3939,10 @@ msgstr "جارٍ البحث عن القيم في {column}…"
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick color"
+msgstr "لون تدريجات المحور Y"
+
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -3704,10 +3956,6 @@ msgstr "معالجة البيانات مرة أخرى"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
-
-#: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Collapse panel"
-msgstr "طي اللوحة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
@@ -3775,6 +4023,10 @@ msgstr "يبدو أن هذه البيانات تحتوي على معلومات �
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو رفع أول مجموعة بيانات لك."
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stacked"
+msgstr "متراص"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "Share this {resourceLabel}"
 msgstr "شارك هذا {resourceLabel}"
@@ -3787,17 +4039,21 @@ msgstr "حدد عمود خط العرض"
 msgid "This {resource} is shared with: "
 msgstr "هذا {resource} مشترك مع: "
 
-#: packages/web/ui/src/singleton-forms/FileUploadForm.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Unrecognised SELECT item; skipped."
+msgstr "عنصر SELECT غير معروف؛ تم تخطيه."
 
 #. placeholder {0}: eta.minutes
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about {0} minutes"
 msgstr "حوالي {0} دقائق"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns to query"
 msgstr "اختر الأعمدة للاستعلام"
 
@@ -3862,7 +4118,7 @@ msgid "Partially offline"
 msgstr "غير متصل جزئيًا"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
-#: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+#: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
 msgid "Edit query"
 msgstr "تحرير الاستعلام"
 
@@ -3898,8 +4154,12 @@ msgstr "تم مزامنة مجموعة البيانات الآن عبر الإن
 msgid "Height"
 msgstr "الارتفاع"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: shared/copy/vizTypeLabel.ts
+msgid "Line Chart"
+msgstr "مخطط خطي"
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "انتهت جلستك"
 
@@ -3955,6 +4215,10 @@ msgstr "عدّ الصفوف في {datasetName} حسب {secondGroupByColumn}"
 msgid "Your checkout was successful!"
 msgstr "تمت عملية الدفع بنجاح!"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
+msgid "Parts of the SQL cannot be represented in the manual form."
+msgstr "لا يمكن تمثيل أجزاء من SQL في النموذج اليدوي."
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
 "sources to start analyzing your information."
@@ -3975,7 +4239,12 @@ msgstr "هل تريد إرسال قيمة <0>{0}</0> {1} إلى الذكاء ا�
 msgid "Custom URL path"
 msgstr "مسار URL مخصص"
 
-#: packages/web/ui/src/notifications/notifyExpiredSession.ts
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause uses operator \"{operator}\" which the form does not "
+"support."
+msgstr "تستخدم جملة WHERE العامل \"{operator}\" الذي لا يدعمه النموذج."
+
+#: src/utils/notifications/notifyExpiredSession.ts
 msgid "Please log in again to continue."
 msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
 
@@ -3994,10 +4263,6 @@ msgstr "لقطة لوحة التحكم"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "جارٍ تسجيل دخولك مرة أخرى…"
-
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Query Details"
-msgstr "تفاصيل الاستعلام"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4088,13 +4353,16 @@ msgstr "فشل تحميل الملف"
 msgid "There was an error on update: {0}"
 msgstr "حدث خطأ أثناء التحديث: {0}"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Aggregate function \"{funcName}\" uses a complex argument; skipped."
+msgstr "تستخدم الدالة التجميعية \"{funcName}\" وسيطًا معقدًا؛ تم تخطيها."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Privacy log"
 msgstr "سجل الخصوصية"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Visualization Settings"
 msgstr "إعدادات التصويرية"
 
@@ -4106,7 +4374,7 @@ msgstr "Phi 3.5 Mini (دون اتصال)"
 msgid "Data processing failed"
 msgstr "فشل معالجة البيانات"
 
-#: packages/web/ui/src/notifications/notifyNotImplemented.ts
+#: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "لم يتم تنفيذ هذه الميزة بعد."
 
@@ -4129,7 +4397,7 @@ msgstr "الفوترة"
 msgid "Profile Name"
 msgstr "اسم الملف الشخصي"
 
-#: src/components/VisualizationContainer/VizSettingsForm/VizSettingsForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
 msgstr "نوع التصويرية"
@@ -4141,7 +4409,7 @@ msgstr "نوع التصويرية"
 msgid "Delete dataset"
 msgstr "حذف مجموعة البيانات"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "تحذير"
@@ -4180,6 +4448,7 @@ msgstr "هذه مجموعة البيانات متاحة فقط عند عدم ا�
 msgid "Global filters"
 msgstr "الفلاتر العالمية"
 
+#: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
 msgstr "التخطيط"
@@ -4223,6 +4492,10 @@ msgstr "نسخ رابط المشاركة"
 msgid "Canonical URLs"
 msgstr "عناوين URL القياسية"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Chart settings appear once the query returns some columns."
+msgstr "تظهر إعدادات المخطط بعد أن يعرض الاستعلام بعض الأعمدة."
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
 msgstr "عرض كـ"
@@ -4248,6 +4521,10 @@ msgstr "رابط مخصص متاح"
 #: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
 msgstr "عدد الصفوف"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
+msgid "Form is an approximation"
+msgstr "النموذج تقريبي"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Restricted"
@@ -4280,6 +4557,11 @@ msgstr "يجعل النشر هذه اللوحة مرئية لأي شخص لدي�
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
 msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
+"support."
+msgstr "تحتوي جملة WHERE على عقدة من النوع \"{nodeType}\" لا يدعمها النموذج."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "Dashboard published!"
@@ -4352,6 +4634,10 @@ msgstr "عدد المقاعد للإضافة"
 msgid "Pay What You Want"
 msgstr "ادفع ما تريد"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar layout"
+msgstr "تخطيط الأشرطة"
+
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "Please select a dataset from the left sidebar, or create a new one."
 msgstr "يرجى اختيار مجموعة بيانات من الشريط الجانبي الأيسر، أو إنشاء واحدة "
@@ -4396,9 +4682,14 @@ msgstr "عرض التسميات"
 msgid "Qwen 2.5 1.5B (offline)"
 msgstr "Qwen 2.5 1.5B (دون اتصال)"
 
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: shared/copy/vizSettingGroupLabel.ts
 msgid "X axis"
 msgstr "محور X"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Aggregate references column \"{columnName}\" not present in the dataset."
+msgstr "تشير الدالة التجميعية إلى العمود \"{columnName}\" غير الموجود في مجموعة "
+"البيانات."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "User group deleted"
@@ -4420,7 +4711,7 @@ msgstr "فشل تحميل مجموعة البيانات"
 msgid "Decimal"
 msgstr "عشري"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "خطأ"
 
@@ -4428,9 +4719,7 @@ msgstr "خطأ"
 msgid "Send answer"
 msgstr "إرسال الإجابة"
 
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
@@ -4569,8 +4858,7 @@ msgstr "رسالة الدردشة"
 msgid "Error saving dataset"
 msgstr "خطأ في حفظ مجموعة البيانات"
 
-#: packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx
-#: packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -4607,6 +4895,10 @@ msgstr "لا توجد أعمدة رقمية متاحة لإضافتها إلى �
 msgid "You haven't chosen a name column"
 msgstr "لم تختار عمود الاسم"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Grouped"
+msgstr "مجمّع"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 msgid "You need admin access on this resource to manage sharing."
 msgstr "تحتاج إلى وصول إداري على هذا المورد لإدارة المشاركة."
@@ -4615,6 +4907,10 @@ msgstr "تحتاج إلى وصول إداري على هذا المورد لإد�
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد {0}، فـ..."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Stack group"
+msgstr "مجموعة التكديس"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -4679,7 +4975,7 @@ msgstr "رابط دائم (استخدمه لرموز الاستجابة السر
 msgid "Settings"
 msgstr "الإعدادات"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"
 msgstr "التصورات"
 
@@ -4779,10 +5075,6 @@ msgstr "النص يحتوي على"
 msgid "Role for new share"
 msgstr "الدور للمشاركة الجديدة"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
-msgid "Expand panel"
-msgstr "توسيع اللوحة"
-
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
 msgstr "إرسال إلى الذكاء الاصطناعي؟"
@@ -4813,6 +5105,7 @@ msgstr "لم تتم قراءة أي صفوف بنجاح"
 msgid "New user group"
 msgstr "مجموعة مستخدمين جديدة"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
 msgstr "اليسار"
@@ -4887,6 +5180,10 @@ msgstr "يجب علينا دمج البيانات في نفس {entityConfigName}
 msgid "contains"
 msgstr "يحتوي على"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Unnamed column expression in SELECT; skipped."
+msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
 msgstr "إخفاء العنوان الفرعي"
@@ -4906,6 +5203,10 @@ msgstr "النماذج دون اتصال"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
 msgstr "إصدار المخطط"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
+msgid "Query editor mode"
+msgstr "وضع محرر الاستعلام"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 #: src/views/ProfileView/ProfileView.tsx
@@ -4936,6 +5237,10 @@ msgstr "معرف الفلتر (ثابت)"
 msgid "No columns available"
 msgstr "لا توجد أعمدة متاحة"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+msgid "Resize drawer"
+msgstr "تغيير حجم لوحة السحب"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "الحشو الأفقي"
@@ -4951,6 +5256,10 @@ msgstr "H2"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
 msgstr "أضف اقتباسًا بارزًا..."
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "DISTINCT is not supported in the form."
+msgstr "لا يدعم النموذج DISTINCT."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Unable to make dataset offline-only"
@@ -5017,6 +5326,10 @@ msgstr "تم إنشاء مجموعة الأدوار"
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
 msgstr "فشل في تحديث اسم العرض"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "Could not parse SQL: {message}"
+msgstr "تعذّر تحليل SQL: {message}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
@@ -5121,6 +5434,10 @@ msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل �
 msgid "Thank you for your interest!"
 msgstr "شكرًا لاهتمامك!"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Source"
+msgstr "المصدر"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "General"
 msgstr "عام"
@@ -5154,7 +5471,7 @@ msgstr "بلا عنوان"
 msgid "Previewing this dashboard"
 msgstr "معاينة لوحة المعلومات هذه"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "No value"
 msgstr "لا قيمة"
 
@@ -5198,7 +5515,7 @@ msgid "Add a series to choose which numeric column drives the chart."
 msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يقود الرسم البياني."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Column"
 msgstr "عمود"
 
@@ -5209,6 +5526,10 @@ msgstr "إزالة الفلتر المحلي"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "This removes the user group from members and resources that use it."
 msgstr "هذا يزيل مجموعة المستخدمين من الأعضاء والموارد التي تستخدمها."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Top"
+msgstr "الأعلى"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
@@ -5273,13 +5594,19 @@ msgstr "نص"
 msgid "Role group deleted"
 msgstr "تم حذف مجموعة الدور"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select sort order"
 msgstr "حدد ترتيب الفرز"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import this file?"
 msgstr "استيراد هذا الملف؟"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the "
+"predicate as a label."
+msgstr "يستخدم HAVING الدالة التجميعية {funcName} مع وسيطة معقدة؛ لذلك أبقت "
+"المطابقة الشرط كتسمية."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Save Dataset"
@@ -5289,12 +5616,16 @@ msgstr "حفظ مجموعة البيانات"
 msgid "Sidebar position"
 msgstr "موضع الشريط الجانبي"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick color"
+msgstr "لون علامات محور X"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
 msgstr "البحث في لوحات المعلومات"
 
-#: packages/web/ui/src/singleton-forms/InputTextForm.tsx
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
+#: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
 #: src/routes/register.tsx
 msgid "Invalid email address"
@@ -5329,6 +5660,10 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 msgstr "{0} أعمدة تم اكتشافها. راجع معلومات الأعمدة أدناه للتأكد من صحتها. إذا "
 "لم تكن صحيحة، قم بتغيير خيارات الاستيراد أعلاه وانقر على تحميل مرة "
 "أخرى."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label color"
+msgstr "لون تسمية محور X"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
@@ -5450,6 +5785,10 @@ msgstr "تم الوصول إلى حد مجموعة البيانات"
 msgid "Distinct values"
 msgstr "قيم مميزة"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "HAVING uses operator \"{operator}\" which the form does not support."
+msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه النموذج."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
 "Your subscription will be updated accordingly."
@@ -5501,6 +5840,10 @@ msgstr ""
 msgid "CSV or Excel file"
 msgstr "ملف CSV أو Excel"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "SELECT references column \"{columnName}\" not present in the dataset."
+msgstr "يشير SELECT إلى العمود \"{columnName}\" غير الموجود في مجموعة البيانات."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "لم يتم تحميل لوحة التحكم بعد."
@@ -5516,7 +5859,7 @@ msgstr "خط تحرير"
 msgid "Untitled dashboard"
 msgstr "لوحة معلومات بدون عنوان"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Limit"
 msgstr "حد"
 
@@ -5530,9 +5873,19 @@ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا "
 "أيضًا."
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/DateValueItem.tsx
-msgid "Hello DateValueItem"
-msgstr "مرحبًا DateValueItem"
+#: shared/copy/vizTypeLabel.ts
+msgid "Scatter Plot"
+msgstr "مخطط مبعثر"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form "
+"cannot represent."
+msgstr "يستخدم شرط WHERE العامل BETWEEN مع \"{columnName}\" وقيمة لا يمكن "
+"للنموذج تمثيلها."
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Fill opacity"
+msgstr "عتامة التعبئة"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -5559,7 +5912,6 @@ msgstr "الدور ومجموعات المستخدمين"
 msgid "Clear all"
 msgstr "مسح الكل"
 
-#: src/components/FloatingPanel/FloatingPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Close"
 msgstr "إغلاق"
@@ -5577,6 +5929,10 @@ msgstr "مشارك معك"
 #: src/views/GISApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Longitude column"
 msgstr "عمود الطول"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Run a query to configure a chart."
+msgstr "شغّل استعلامًا لتهيئة مخطط."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
@@ -5612,7 +5968,11 @@ msgstr "مشاركة"
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
-#: packages/web/ui/src/ObjectDescriptionList/PrimitiveValueItem/PrimitiveValueItem.tsx
+#: shared/copy/vizTypeLabel.ts
+msgid "Area Chart"
+msgstr "مخطط مساحي"
+
+#: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
@@ -5663,9 +6023,17 @@ msgstr "يتم المعالجة، {remainingLabel} المتبقية"
 msgid "Loose"
 msgstr "فضفاض"
 
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
+msgstr "يشير ORDER BY إلى العمود \"{columnName}\" غير الموجود في قائمة SELECT."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
 msgstr "ترقية الخطة إلى {newPlanName} ({newPlanSubType})"
+
+#: shared/copy/sqlFailedMappingReasonLabel.ts
+msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
+msgstr "تعبير SELECT من النوع \"{exprType}\" غير مدعوم من النموذج."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "No models match your search"
@@ -5678,6 +6046,10 @@ msgstr "الخطوات التالية الموصى بها"
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
 msgstr "من العمود: <0>{columnName}</0>"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bottom"
+msgstr "الأسفل"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 msgid "Offline ready"
@@ -5709,7 +6081,7 @@ msgstr "اختر القيمة الدنيا"
 msgid "Mode"
 msgstr "وضع"
 
-#: packages/web/ui/src/notifications/notify.ts
+#: src/utils/notifications/notify.ts
 msgid "Success"
 msgstr "نجاح"
 

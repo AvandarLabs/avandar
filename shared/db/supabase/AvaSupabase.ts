@@ -1,4 +1,4 @@
-import { createModule } from "@modules/createModule.ts";
+import { createModule } from "@avandar/modules";
 import { createClient } from "@supabase/supabase-js";
 import { getSupabaseApiKey } from "$/env/getSupabaseApiKey.ts";
 import { getSupabaseApiUrl } from "$/env/getSupabaseApiUrl.ts";

@@ -1,8 +1,8 @@
-import { useQuery } from "@hooks";
+import { useQuery } from "@avandar/query-hooks";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { UseQueryResultTuple } from "@hooks";
+import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

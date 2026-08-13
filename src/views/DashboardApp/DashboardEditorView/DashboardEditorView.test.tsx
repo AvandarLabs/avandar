@@ -193,20 +193,6 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
   };
 });
 
-vi.mock("@ui/notifications/notify", () => {
-  return {
-    notifySuccess: vi.fn(),
-    notifyError: vi.fn(),
-    notifyWarning: vi.fn(),
-  };
-});
-
-vi.mock("@ui/notifications/notifyDevAlert", () => {
-  return {
-    notifyDevAlert: vi.fn(),
-  };
-});
-
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("@tanstack/react-router")>();

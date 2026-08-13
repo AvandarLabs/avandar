@@ -1,5 +1,5 @@
-import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { MapLayerRead } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 
 type ModelType = "AvaMap";

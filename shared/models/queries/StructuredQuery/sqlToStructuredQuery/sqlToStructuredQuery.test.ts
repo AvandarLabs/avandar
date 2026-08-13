@@ -138,8 +138,8 @@ describe("sqlToStructuredQuery", () => {
     });
     expect(result.isFullyMapped).toBe(false);
     expect(
-      result.unmappedReasons.some((r) => {
-        return r.toLowerCase().includes("comma");
+      result.unmappedReasons.some((reason) => {
+        return reason.code === "fromCommaJoin";
       }),
     ).toBe(true);
   });
@@ -160,8 +160,8 @@ describe("sqlToStructuredQuery", () => {
     });
     expect(distinctResult.isFullyMapped).toBe(false);
     expect(
-      distinctResult.unmappedReasons.some((r) => {
-        return r.toUpperCase().includes("DISTINCT");
+      distinctResult.unmappedReasons.some((reason) => {
+        return reason.code === "distinctUnsupported";
       }),
     ).toBe(true);
   });
@@ -265,8 +265,8 @@ describe("sqlToStructuredQuery", () => {
     });
     expect(result.isFullyMapped).toBe(false);
     expect(
-      result.unmappedReasons.some((r) => {
-        return r.toLowerCase().includes("equality");
+      result.unmappedReasons.some((reason) => {
+        return reason.code === "joinNonEqualityOperator";
       }),
     ).toBe(true);
   });

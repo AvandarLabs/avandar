@@ -1,3 +1,4 @@
+import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
 import {
@@ -5,7 +6,6 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
-import { Callout } from "@ui";
 import { useEffect } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Logger } from "@/utils/Logger";
