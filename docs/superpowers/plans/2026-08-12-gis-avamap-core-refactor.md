@@ -22,6 +22,7 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 - **Models**: import `$/models/.../MyModel.ts` (the namespace entry), never `MyModel.types.ts`, except from inside the model's own folder.
 - **Styling**: CSS Modules, never inline `style={}` unless the value is computed at runtime. Never Tailwind.
 - **i18n**: user-facing strings go through Lingui (`const { t } = useLingui()` in components). Model code takes strings as parameters instead of translating.
+- **Non-exported top-level helper functions take an underscore prefix** (`_toFiniteNumber`), per `docs/rules/typescript.md:87`. The code blocks in this plan do not show the prefix; add it.
 - **Import extensions are location-dependent.** Code under `shared/**` writes explicit `.ts` suffixes (it has to run under Deno), and code under `src/**` must not: `import-x/extensions` rejects them there. So the same model is imported as `"$/models/AvaMap/AvaMap.ts"` from `shared/` and `"$/models/AvaMap/AvaMap"` from `src/`. Task 2's code blocks are `shared/`; Tasks 4 onward are `src/`.
 - **Line length is capped at 80 characters** by ESLint `max-len`, comments included. Some code blocks in this plan exceed it, usually in a docstring. Rewrap to fit; do not change the wording, and do not add an eslint-disable. Run `npx prettier --write <files>` and `npx eslint <files>` before committing each task.
 
@@ -1029,8 +1030,14 @@ function classifyCoordinate(
   }
   // A latitude that would be a valid longitude, paired with a longitude that
   // would be a valid latitude, is almost always a swapped pair rather than
-  // genuinely bad data.
-  if (!isLatitudeInRange && isLongitudeInRange && Math.abs(longitude) <= 90) {
+  // genuinely bad data. Both halves must hold: if the latitude is outside
+  // longitude range too, swapping cannot rescue the row and reporting a swap
+  // would send the user after a fix that does not exist.
+  if (
+    !isLatitudeInRange &&
+    Math.abs(latitude) <= 180 &&
+    Math.abs(longitude) <= 90
+  ) {
     return "suspectedLatLngSwap";
   }
   return "outOfRange";
