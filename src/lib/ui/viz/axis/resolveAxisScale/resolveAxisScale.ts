@@ -54,9 +54,13 @@ function _buildTickLattice(
   const tickCount =
     Math.floor((resolvedHigh - low) / interval + TICK_COUNT_EPSILON) + 1;
 
-  // Bail before allocating: a tiny interval over a huge range would
-  // otherwise build a giant array and lock up the tab.
-  if (tickCount > MAX_GENERATED_TICKS) {
+  // A lattice needs two ticks to express an interval at all. One tick
+  // is strictly worse than none, since Recharts picks sensible ticks
+  // when it is given no `ticks` array. Reachable when an explicit `max`
+  // sits closer to `low` than a single interval step. At the other
+  // extreme, bail before allocating: a tiny interval over a huge range
+  // would otherwise build a giant array and lock up the tab.
+  if (tickCount < 2 || tickCount > MAX_GENERATED_TICKS) {
     return undefined;
   }
 

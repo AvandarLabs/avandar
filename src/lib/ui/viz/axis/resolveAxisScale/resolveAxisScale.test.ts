@@ -172,6 +172,17 @@ describe("resolveAxisScale — tick interval", () => {
       allowDataOverflow: true,
     });
   });
+
+  it("drops a lattice that would hold a single tick", () => {
+    // An explicit maximum closer to the minimum than one interval step
+    // yields just the origin. Recharts picks better ticks than that.
+    const result = resolveAxisScale(
+      { min: 0, max: 100, tickInterval: 1_000_000 },
+      { min: 0, max: 100 },
+    );
+    expect(result.ticks).toBeUndefined();
+    expect(result.domain).toEqual([0, 100]);
+  });
 });
 
 describe("resolveAxisScale — guards", () => {
