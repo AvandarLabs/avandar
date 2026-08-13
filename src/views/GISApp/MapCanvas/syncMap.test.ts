@@ -131,6 +131,65 @@ describe("syncMap", () => {
     expect(map.calls).toEqual(["moveLayer:layer-b", "moveLayer:layer-a"]);
   });
 
+  it("reorders when a new layer is inserted at the bottom", () => {
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
+    syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: spec });
+    map.calls.length = 0;
+    const withNewBottomLayer = createSpec(["c", "a", "b"]);
+    syncMap({
+      map: map as never,
+      previousSpec: spec,
+      nextSpec: withNewBottomLayer,
+    });
+    expect(map.calls).toEqual([
+      "addSource:source-c",
+      "addLayer:layer-c",
+      "moveLayer:layer-c",
+      "moveLayer:layer-a",
+      "moveLayer:layer-b",
+    ]);
+  });
+
+  it("reorders survivors when a layer is removed in the same sync", () => {
+    const map = createFakeMap();
+    const full = createSpec(["a", "b", "c"]);
+    syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: full });
+    map.calls.length = 0;
+    const survivorsReordered: MapSpec = {
+      sources: {
+        "source-c": full.sources["source-c"]!,
+        "source-a": full.sources["source-a"]!,
+      },
+      layers: [full.layers[2]!, full.layers[0]!],
+    };
+    syncMap({
+      map: map as never,
+      previousSpec: full,
+      nextSpec: survivorsReordered,
+    });
+    expect(map.calls).toEqual([
+      "removeLayer:layer-b",
+      "removeSource:source-b",
+      "moveLayer:layer-c",
+      "moveLayer:layer-a",
+    ]);
+  });
+
+  it("does not reorder when a new layer is only appended at the top", () => {
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
+    syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: spec });
+    map.calls.length = 0;
+    const withNewTopLayer = createSpec(["a", "b", "c"]);
+    syncMap({
+      map: map as never,
+      previousSpec: spec,
+      nextSpec: withNewTopLayer,
+    });
+    expect(map.calls).toEqual(["addSource:source-c", "addLayer:layer-c"]);
+  });
+
   it("registers no event listeners", () => {
     const map = createFakeMap() as Record<string, unknown>;
     syncMap({

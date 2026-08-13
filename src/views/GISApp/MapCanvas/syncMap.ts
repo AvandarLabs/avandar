@@ -52,6 +52,132 @@ function _syncLayout(
 }
 
 /**
+ * Removes layers and sources that `nextSpec` no longer references.
+ *
+ * Layers are removed before their sources, because MapLibre refuses to
+ * remove a source that a layer still references.
+ */
+function _removeStaleLayersAndSources(
+  map: MapLibreMap,
+  previousSpec: MapSpec,
+  nextSpec: MapSpec,
+  nextLayerIds: ReadonlySet<string>,
+): void {
+  previousSpec.layers.forEach((layerSpec) => {
+    if (!nextLayerIds.has(layerSpec.id) && map.getLayer(layerSpec.id)) {
+      map.removeLayer(layerSpec.id);
+    }
+  });
+  Object.keys(previousSpec.sources).forEach((sourceId) => {
+    if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
+  });
+}
+
+/**
+ * Adds sources `nextSpec` introduces and refreshes the data of ones that
+ * already exist.
+ *
+ * A source's `data` is only pushed to the map with `setData` when it is a
+ * different object than what was last applied. This is sound because every
+ * function upstream of `syncMap` is pure and produces a fresh
+ * `FeatureCollection` on every call, so a changed reference always means
+ * changed data. Mutating a `FeatureCollection` in place instead of replacing
+ * it would defeat this check and leave the map showing stale data.
+ */
+function _syncSources(
+  map: MapLibreMap,
+  previousSpec: MapSpec,
+  nextSpec: MapSpec,
+): void {
+  Object.entries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
+    const existingSource = map.getSource(sourceId) as GeoJSONSource | undefined;
+    if (existingSource) {
+      if (previousSpec.sources[sourceId]?.data !== sourceSpec.data) {
+        existingSource.setData(sourceSpec.data);
+      }
+      return;
+    }
+    map.addSource(sourceId, { type: "geojson", data: sourceSpec.data });
+  });
+}
+
+/**
+ * Determines whether an explicit `moveLayer` pass is required to reach
+ * `nextSpec`'s draw order.
+ *
+ * MapLibre's `addLayer` always appends to the top, so the order the map ends
+ * up in after adding every new layer is the surviving layers from
+ * `previousSpec` (filtered to ids `nextSpec` keeps, in their previous order)
+ * followed by the newly introduced ids, in the order they appear in
+ * `nextSpec.layers`. A `moveLayer` pass is only needed when that effective
+ * order does not already match the requested order.
+ */
+function _needsReorder(
+  previousSpec: MapSpec,
+  nextSpec: MapSpec,
+  nextLayerIds: ReadonlySet<string>,
+): boolean {
+  const previousLayerIds = new Set(
+    previousSpec.layers.map((layer) => {
+      return layer.id;
+    }),
+  );
+  const survivingIds = previousSpec.layers
+    .filter((layer) => {
+      return nextLayerIds.has(layer.id);
+    })
+    .map((layer) => {
+      return layer.id;
+    });
+  const newIds = nextSpec.layers
+    .map((layer) => {
+      return layer.id;
+    })
+    .filter((id) => {
+      return !previousLayerIds.has(id);
+    });
+  const effectiveOrder = [...survivingIds, ...newIds];
+  const targetOrder = nextSpec.layers.map((layer) => {
+    return layer.id;
+  });
+  return effectiveOrder.some((id, index) => {
+    return id !== targetOrder[index];
+  });
+}
+
+/**
+ * Adds layers `nextSpec` introduces, repaints ones that already exist, and
+ * restores the requested draw order when it would not otherwise fall out of
+ * the add pass.
+ */
+function _applyLayers(
+  map: MapLibreMap,
+  previousSpec: MapSpec,
+  nextSpec: MapSpec,
+  nextLayerIds: ReadonlySet<string>,
+): void {
+  const needsReorder = _needsReorder(previousSpec, nextSpec, nextLayerIds);
+
+  nextSpec.layers.forEach((layerSpec) => {
+    const previousLayerSpec = _findLayerSpec(previousSpec, layerSpec.id);
+    if (!map.getLayer(layerSpec.id)) {
+      map.addLayer(layerSpec as unknown as AddLayerObject);
+    } else {
+      _syncPaint(map, layerSpec, previousLayerSpec);
+      _syncLayout(map, layerSpec, previousLayerSpec);
+    }
+    if (needsReorder) {
+      // Moving each layer to the top in requested order leaves them in the
+      // correct bottom-to-top stack, whether it was just added or already
+      // existed.
+      map.moveLayer(layerSpec.id);
+    }
+  });
+}
+
+/**
  * Brings a MapLibre map in line with `nextSpec`, doing the minimum work.
  *
  * This is the only function in the GIS app that calls MapLibre imperatively.
@@ -76,48 +202,7 @@ export function syncMap({
     }),
   );
 
-  // Layers first, then their sources: MapLibre refuses to remove a source
-  // that a layer still references.
-  previousSpec.layers.forEach((layerSpec) => {
-    if (!nextLayerIds.has(layerSpec.id) && map.getLayer(layerSpec.id)) {
-      map.removeLayer(layerSpec.id);
-    }
-  });
-  Object.keys(previousSpec.sources).forEach((sourceId) => {
-    if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
-      map.removeSource(sourceId);
-    }
-  });
-
-  Object.entries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
-    const existingSource = map.getSource(sourceId) as GeoJSONSource | undefined;
-    if (existingSource) {
-      if (previousSpec.sources[sourceId]?.data !== sourceSpec.data) {
-        existingSource.setData(sourceSpec.data);
-      }
-      return;
-    }
-    map.addSource(sourceId, { type: "geojson", data: sourceSpec.data });
-  });
-
-  const isReordered =
-    previousSpec.layers.length === nextSpec.layers.length &&
-    nextSpec.layers.some((layerSpec, index) => {
-      return previousSpec.layers[index]?.id !== layerSpec.id;
-    });
-
-  nextSpec.layers.forEach((layerSpec) => {
-    const previousLayerSpec = _findLayerSpec(previousSpec, layerSpec.id);
-    if (!map.getLayer(layerSpec.id)) {
-      map.addLayer(layerSpec as unknown as AddLayerObject);
-      return;
-    }
-    _syncPaint(map, layerSpec, previousLayerSpec);
-    _syncLayout(map, layerSpec, previousLayerSpec);
-    if (isReordered) {
-      // Moving each layer to the top in order leaves them in the requested
-      // bottom-to-top sequence.
-      map.moveLayer(layerSpec.id);
-    }
-  });
+  _removeStaleLayersAndSources(map, previousSpec, nextSpec, nextLayerIds);
+  _syncSources(map, previousSpec, nextSpec);
+  _applyLayers(map, previousSpec, nextSpec, nextLayerIds);
 }
