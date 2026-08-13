@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import { AppConfig } from "$/config/AppConfig.ts";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 /** Raw OpenRouter model row used when curating the picker catalog. */
@@ -80,7 +80,7 @@ function _supportsTools(model: OpenRouterModelInput): boolean {
 }
 
 function _isAllowedModel(model: OpenRouterModelInput): boolean {
-  return AppConfig.chat.allowedModelClasses.some((classToken) => {
+  return GlobalAppConfig.chat.allowedModelClasses.some((classToken) => {
     return modelMatchesClass(model, classToken);
   });
 }
@@ -88,7 +88,7 @@ function _isAllowedModel(model: OpenRouterModelInput): boolean {
 function _classifyLicenseTier(
   model: OpenRouterModelInput,
 ): ChatModelOption.LicenseTier | undefined {
-  const isProprietary = AppConfig.chat.proprietaryModelClasses.some(
+  const isProprietary = GlobalAppConfig.chat.proprietaryModelClasses.some(
     (classToken) => {
       return modelMatchesClass(model, classToken);
     },
@@ -96,7 +96,7 @@ function _classifyLicenseTier(
   if (isProprietary) {
     return "proprietary";
   }
-  const isOpen = AppConfig.chat.openModelClasses.some((classToken) => {
+  const isOpen = GlobalAppConfig.chat.openModelClasses.some((classToken) => {
     return modelMatchesClass(model, classToken);
   });
   return isOpen ? "open" : undefined;

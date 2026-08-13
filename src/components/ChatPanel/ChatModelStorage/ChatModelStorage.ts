@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { AppConfig } from "$/config/AppConfig";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 
 export const CHAT_MODEL_LOCAL_STORAGE_KEY = "ava.chat.selectedModel" as const;
 
@@ -51,7 +51,7 @@ export const ChatModelStorage = {
       candidateModelId !== undefined &&
       availableModels.some(propEq("id", candidateModelId));
     const isDefaultAvailable = availableModels.some(
-      propEq("id", AppConfig.chat.defaultModelId),
+      propEq("id", GlobalAppConfig.chat.defaultModelId),
     );
 
     return (
@@ -60,8 +60,8 @@ export const ChatModelStorage = {
           (honorStoredWhenMissing && candidateModelId !== undefined)
       ) ?
         candidateModelId
-      : isDefaultAvailable ? AppConfig.chat.defaultModelId
-      : (availableModels[0]?.id ?? AppConfig.chat.defaultModelId)
+      : isDefaultAvailable ? GlobalAppConfig.chat.defaultModelId
+      : (availableModels[0]?.id ?? GlobalAppConfig.chat.defaultModelId)
     );
   },
 };

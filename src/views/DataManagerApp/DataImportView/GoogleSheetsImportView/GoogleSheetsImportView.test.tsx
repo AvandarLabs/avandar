@@ -6,7 +6,7 @@ import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APIClient } from "@/clients/APIClient";
-import { AppConfig } from "@/config/AppConfig";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { act, render, RenderOptions, screen, waitFor } from "@/test-utils";
@@ -277,7 +277,7 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
   const result = Papa.parse<UnknownObject>(text, {
     dynamicTyping: true,
     header: true,
-    preview: AppConfig.dataManagerApp.maxPreviewRows,
+    preview: GlobalAppConfig.dataManagerApp.maxPreviewRows,
     skipEmptyLines: true,
   });
 

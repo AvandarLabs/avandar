@@ -19,7 +19,7 @@ import {
 } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
-import { AppConfig } from "$/config/AppConfig.ts";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { z } from "zod";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -38,7 +38,7 @@ function _resolveChatModel(model: string | undefined): string {
   if (model && OPENROUTER_MODEL_ID_PATTERN.test(model)) {
     return model;
   }
-  return AppConfig.chat.defaultModelId;
+  return GlobalAppConfig.chat.defaultModelId;
 }
 
 // Cheap heuristic for "this prompt is a refinement of the previous turn."

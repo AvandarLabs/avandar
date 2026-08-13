@@ -1,5 +1,5 @@
 import { PostgrestError } from "@supabase/supabase-js";
-import { SUPPORT_EMAIL } from "$/config/AppConfig.ts";
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig.ts";
 import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes.ts";
 import { z } from "zod";
 import type { ErrorResponse as ResendError } from "resend";

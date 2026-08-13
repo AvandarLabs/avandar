@@ -1,4 +1,4 @@
-import { AppConfig } from "$/config/AppConfig";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   CHAT_MODEL_LOCAL_STORAGE_KEY,
@@ -20,7 +20,7 @@ describe("chatModelStorage", () => {
   it("uses the stored model when it is still available", () => {
     const modelId = ChatModelStorage.resolveChatModelId({
       availableModels: [
-        { id: AppConfig.chat.defaultModelId },
+        { id: GlobalAppConfig.chat.defaultModelId },
         { id: "anthropic/claude-3.5-sonnet" },
       ],
       selectedModelId: "anthropic/claude-3.5-sonnet",
@@ -40,10 +40,10 @@ describe("chatModelStorage", () => {
   it("falls back to the default when storage is empty or stale", () => {
     expect(
       ChatModelStorage.resolveChatModelId({
-        availableModels: [{ id: AppConfig.chat.defaultModelId }],
+        availableModels: [{ id: GlobalAppConfig.chat.defaultModelId }],
         selectedModelId: "removed/vendor-model",
       }),
-    ).toBe(AppConfig.chat.defaultModelId);
+    ).toBe(GlobalAppConfig.chat.defaultModelId);
 
     expect(
       ChatModelStorage.resolveChatModelId({

@@ -284,6 +284,10 @@ git mv src/config/AppConfig.tsx src/config/WebAppConfig.ts
 Replace the entire contents of `src/config/WebAppConfig.ts` with:
 
 ```ts
+type WebAppConfigType = {
+  logoFilename: string;
+};
+
 /**
  * Configuration that only means something inside the browser bundle.
  *
@@ -291,20 +295,21 @@ Replace the entire contents of `src/config/WebAppConfig.ts` with:
  * functions, a server-side validator) belongs in `GlobalAppConfig`
  * (`shared/config/GlobalAppConfig.ts`) instead.
  */
-// TODO(jpsyx): move this to an environment variable so it does not get
-// bundled in every page of the app
-type WebAppConfigType = {
+export const WebAppConfig = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.
    * The logo must be in the `public` directory.
    */
-  logoFilename: string;
-};
-
-export const WebAppConfig = {
+  // TODO(jpsyx): move this to an environment variable so it does not get
+  // bundled in every page of the app
   logoFilename: "logoWhite.png",
-} satisfies WebAppConfigType;
+} as const satisfies WebAppConfigType;
 ```
+
+Two details that are easy to get wrong here:
+
+- **`as const satisfies`, not bare `satisfies`.** Every sibling config object in this repo uses the combined form: `shared/config/GlobalVizConfig.ts:29`, `shared/config/FeaturePlansConfig.ts:23`, `src/config/FeatureFlagConfig.ts:82`, `src/config/queryOptions.constants.ts:22`. Bare `satisfies` would leave `logoFilename` a mutable `string`.
+- **Docs go on the exported object, not the private type.** `WebAppConfigType` is unexported and used once, so JSDoc attached to it reaches nobody: hovering `WebAppConfig` at its call site would show nothing. Attaching the module doc and the `logoFilename` doc to the literal makes both surface at `Logo.tsx`.
 
 Note what disappeared: the `$/config/AppConfig` and `$/config/FeaturePlansConfig` imports (both only fed the three dead keys), the `WAITLIST_URL` const (moved to the shared file in Step 3), and the "split this up into individually exported consts" TODO (moot now that one key remains).
 
@@ -1552,6 +1557,8 @@ export const GlobalAppConfig = {
 Leave the standalone named exports above it (`APP_NAME`, `SUPPORT_EMAIL`, `INFO_EMAIL`, `WAITLIST_URL`, `MAX_FREE_PLAN_SEATS`) untouched.
 
 Chat model configuration now lives in `ChatModelOption.Catalog`, next to the model it describes and matching `LocalChatModel.Catalog`.
+
+This step also closes out a bundling concern that Task 1 inherited. The old `src/config/AppConfig.tsx` carried a TODO about not bundling the whole config object into every page. Task 1 pointed five `src/` route files at `GlobalAppConfig`, and because a single object literal is not tree-shakeable per key, those routes were temporarily pulling in the ~40 strings of `chat` token arrays. Deleting `chat` here removes them, so no TODO needs to be carried forward.
 
 - [ ] **Step 7: Verify `GlobalAppConfig.chat` has no readers**
 

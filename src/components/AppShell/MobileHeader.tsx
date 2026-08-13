@@ -1,5 +1,5 @@
 import { Burger, Group, Title } from "@mantine/core";
-import { APP_NAME } from "$/config/AppConfig";
+import { APP_NAME } from "$/config/GlobalAppConfig";
 import { Logo } from "@/components/AppShell/Logo";
 
 type Props = {

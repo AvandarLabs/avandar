@@ -23,7 +23,7 @@ import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
-import { AppConfig } from "@/config/AppConfig";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -90,7 +90,7 @@ export function GoogleSheetsImportView({
   >();
   const [previewRows] = DatasetQueryClient.useGetPreviewData({
     datasetId: dataSourceMetadata?.datasetLoadResult.datasetId,
-    numRows: AppConfig.dataManagerApp.maxPreviewRows,
+    numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
     workspaceId: workspace.id,
     useQueryOptions: {
       enabled: !!dataSourceMetadata?.datasetLoadResult,
