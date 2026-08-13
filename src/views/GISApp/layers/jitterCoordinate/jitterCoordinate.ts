@@ -52,13 +52,34 @@ export function jitterCoordinate({
   const deltaLatitude =
     (distanceMeters * Math.sin(angleRadians)) / METERS_PER_DEGREE_LATITUDE;
   const latitudeRadians = (latitude * Math.PI) / 180;
+  // Near the poles a fixed east-west distance genuinely spans a huge number
+  // of longitude degrees; that large delta is real geometry, not a bug. The
+  // `1e-6` floor only guards against dividing by exactly zero at the pole.
   const metersPerDegreeLongitude =
     METERS_PER_DEGREE_LATITUDE * Math.max(Math.cos(latitudeRadians), 1e-6);
   const deltaLongitude =
     (distanceMeters * Math.cos(angleRadians)) / metersPerDegreeLongitude;
 
   return {
-    longitude: longitude + deltaLongitude,
-    latitude: latitude + deltaLatitude,
+    longitude: wrapLongitude(longitude + deltaLongitude),
+    latitude: clampLatitude(latitude + deltaLatitude),
   };
+}
+
+/**
+ * Wraps a longitude into the valid `[-180, 180]` range, so a displacement
+ * that crosses the antimeridian lands at the correct position on the other
+ * side instead of producing an out-of-range value.
+ */
+function wrapLongitude(longitude: number): number {
+  return ((((longitude + 180) % 360) + 360) % 360) - 180;
+}
+
+/**
+ * Clamps a latitude into the valid `[-90, 90]` range. A displacement large
+ * enough to overshoot a pole has nowhere further to go, so it is capped at
+ * the pole rather than producing an out-of-range value.
+ */
+function clampLatitude(latitude: number): number {
+  return Math.min(90, Math.max(-90, latitude));
 }
