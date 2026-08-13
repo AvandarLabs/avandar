@@ -1,6 +1,6 @@
 import { hydrateBubbleSeriesFromQuery } from "$/models/vizs/hydrateBubbleSeriesFromQuery.ts";
 import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult/hydrateBubbleSeriesFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -13,10 +13,15 @@ import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChart
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type {
+  BubbleSeries,
   RadarSeries,
   ScatterSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  AnyVizSettingDescriptors,
+  VizSettingDescriptors,
+} from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -24,10 +29,20 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const descriptors: VizSettingDescriptors<BubbleChartVizConfig, BubbleSeries> = {
+  chart: [
+    ...makeAxisDescriptors<BubbleChartVizConfig>("xAxis", "value", {
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<BubbleChartVizConfig>("yAxis", "value"),
+  ],
+  series: [],
+};
+
 export const BubbleChartVizConfigs = {
   vizType: "bubble",
   displayName: "Bubble Chart",
-  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
+  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
 
   /** Create an empty bubble chart config. */
   makeEmptyConfig: (): BubbleChartVizConfig => {

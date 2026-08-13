@@ -186,9 +186,9 @@ export type AnyVizSettingDescriptors = {
 
 /**
  * Empty descriptor registry. Used by viz modules that have not yet
- * been refactored to use the descriptor-driven form (single-series
- * vizs like pie, funnel, scatter, bubble, table). Their forms remain
- * hand-coded for now and can be migrated later.
+ * been refactored to use the descriptor-driven form (pie, funnel, and
+ * table). Their forms remain hand-coded for now and can be migrated
+ * later.
  */
 export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],

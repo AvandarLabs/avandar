@@ -1,6 +1,6 @@
 import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrateScatterSeriesFromQuery.ts";
 import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -15,8 +15,13 @@ import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/Sc
 import type {
   BubbleSeries,
   RadarSeries,
+  ScatterSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
+import type {
+  AnyVizSettingDescriptors,
+  VizSettingDescriptors,
+} from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -24,10 +29,21 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const descriptors: VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries> =
+  {
+    chart: [
+      ...makeAxisDescriptors<ScatterPlotVizConfig>("xAxis", "value", {
+        rotation: true,
+      }),
+      ...makeAxisDescriptors<ScatterPlotVizConfig>("yAxis", "value"),
+    ],
+    series: [],
+  };
+
 export const ScatterPlotVizConfigs = {
   vizType: "scatter",
   displayName: "Scatter Plot",
-  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
+  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
 
   /** Create an empty scatter plot config. */
   makeEmptyConfig: (): ScatterPlotVizConfig => {
