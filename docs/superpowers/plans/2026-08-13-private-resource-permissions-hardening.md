@@ -1386,11 +1386,18 @@ git commit -m "fix(db): stop settings admins self-granting shares on private res
 
 ---
 
-## Task 6: Flip stale expectations in the existing RLS test suites
+## Task 6: Confirm the existing RLS suites still hold
 
-Three existing suites assert that a Settings Admin can read another member's
-restricted resource. Those assertions encode the bug. They must flip, with a
-comment so nobody "fixes" them back.
+> **Premise corrected during execution.** This task was written expecting three
+> suites to assert that a Settings Admin can read another member's restricted
+> resource, requiring expectation flips. **They do not.** After Task 3 landed,
+> the full suite stayed green at 18 files / 134 tests with zero collateral
+> failures, and inspection confirmed none of those suites ever asserted the
+> admin-reads-restricted case. So there is nothing to flip.
+>
+> The task is now a verification step, kept because "no flips were needed" is a
+> conclusion worth recording rather than assuming. Steps 2 and 3 below apply only
+> if Step 1 unexpectedly finds failures.
 
 **Files:**
 - Modify: `supabase/tests/database/permissions/resource_rls_role_matrix.test.sql`
