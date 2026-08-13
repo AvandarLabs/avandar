@@ -1652,8 +1652,8 @@ msgstr "您的数据集"
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1824,7 +1824,7 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "删除工作区失败"
 
@@ -2185,7 +2185,7 @@ msgstr "玫瑰"
 msgid "Are you sure you want to delete {0}?"
 msgstr "您确定要删除 {0} 吗？"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "输入工作区名称以确认"
 
@@ -2618,7 +2618,7 @@ msgstr "标签，例如：区域"
 msgid "Select file"
 msgstr "选择文件"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "删除此工作区"
 
@@ -2900,7 +2900,7 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "工作区 ID 只能包含字母、数字和连字符"
 
 #. placeholder {0}: workspace.name
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
 msgstr "这将永久删除 <0>{0}</0> 及其所有数据。此操作无法撤销。"
@@ -2953,7 +2953,7 @@ msgstr "选择列"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在存在未保存更改时无法发布。请先保存。"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "删除工作区"
 
@@ -3832,7 +3832,7 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "中性"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "永久删除此工作区及其所有数据。此操作无法撤销。"

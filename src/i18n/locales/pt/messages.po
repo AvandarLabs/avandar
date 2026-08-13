@@ -1725,8 +1725,8 @@ msgstr "seu conjunto de dados"
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1905,7 +1905,7 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Conte-nos de onde os dados do {singularEntityConfigName} devem vir..."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "Falha ao excluir o espaço de trabalho"
 
@@ -2274,7 +2274,7 @@ msgstr "Rosa"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Você tem certeza de que deseja excluir {0}?"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Digite o nome do espaço de trabalho para confirmar"
 
@@ -2718,7 +2718,7 @@ msgstr "Rótulo, por exemplo, Região"
 msgid "Select file"
 msgstr "Selecionar arquivo"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "Excluir este espaço de trabalho"
 
@@ -3007,7 +3007,7 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "O ID do workspace pode conter apenas letras, números e hífens"
 
 #. placeholder {0}: workspace.name
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
 msgstr "Isso excluirá permanentemente <0>{0}</0> e todos os seus dados. Esta "
@@ -3065,7 +3065,7 @@ msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Você não pode publicar enquanto houver alterações não salvas. Salve "
 "primeiro."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Excluir espaço de trabalho"
 
@@ -3970,7 +3970,7 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Neutro"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "Exclui permanentemente este espaço de trabalho e todos os seus dados. "

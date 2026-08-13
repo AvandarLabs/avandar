@@ -1700,8 +1700,8 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1877,7 +1877,7 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "فشل في حذف مساحة العمل"
 
@@ -2242,7 +2242,7 @@ msgstr "وردة"
 msgid "Are you sure you want to delete {0}?"
 msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "اكتب اسم مساحة العمل للتأكيد"
 
@@ -2682,7 +2682,7 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 msgid "Select file"
 msgstr "اختر ملف"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "احذف هذه المساحة"
 
@@ -2967,7 +2967,7 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "يمكن أن يحتوي معرّف مساحة العمل على أحرف وأرقام وواصلات فقط"
 
 #. placeholder {0}: workspace.name
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
 msgstr "سيؤدي ذلك إلى حذف <0>{0}</0> وجميع بياناته بشكل دائم. لا يمكن التراجع "
@@ -3022,7 +3022,7 @@ msgstr "اختر الأعمدة"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "احذف مساحة العمل"
 
@@ -3914,7 +3914,7 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "محايد"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "يحذف هذه المساحة وجميع بياناتها بشكل دائم. لا يمكن التراجع عن هذا "

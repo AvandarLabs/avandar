@@ -1699,8 +1699,8 @@ msgstr "your dataset"
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1879,7 +1879,7 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 msgstr "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "Failed to delete workspace"
 
@@ -2247,7 +2247,7 @@ msgstr "Rose"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Are you sure you want to delete {0}?"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Type the workspace name to confirm"
 
@@ -2687,7 +2687,7 @@ msgstr "Label, e.g. Region"
 msgid "Select file"
 msgstr "Select file"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "Delete this workspace"
 
@@ -2973,7 +2973,7 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "The workspace ID can only contain letters, numbers, and hyphens"
 
 #. placeholder {0}: workspace.name
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
 msgstr "This will permanently delete <0>{0}</0> and all of its data. This "
@@ -3029,7 +3029,7 @@ msgstr "Select columns"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "You cannot publish while there are unsaved changes. Save first."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Delete workspace"
 
@@ -3925,7 +3925,7 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Neutral"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "Permanently deletes this workspace and all of its data. This action "

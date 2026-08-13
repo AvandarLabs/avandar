@@ -1718,8 +1718,8 @@ msgstr "seti yako ya data"
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
@@ -1899,7 +1899,7 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} "
 "inapaswa kutokea..."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "Imeshindikana kufuta eneo la kazi"
 
@@ -2270,7 +2270,7 @@ msgstr "Rose"
 msgid "Are you sure you want to delete {0}?"
 msgstr "Je, uko tayari kufuta {0}?"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Andika jina la eneo la kazi ili kuthibitisha"
 
@@ -2713,7 +2713,7 @@ msgstr "Lebele, mfano. Mkoa"
 msgid "Select file"
 msgstr "Chagua faili"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "Futa eneo hili la kazi"
 
@@ -3001,7 +3001,7 @@ msgstr "Kitambulisho cha nafasi ya kazi kinaweza kuwa na herufi, nambari na "
 "vistari pekee"
 
 #. placeholder {0}: workspace.name
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
 msgstr "Hii itafuta kabisa <0>{0}</0> na data zake zote. Hatua hii haiwezi "
@@ -3059,7 +3059,7 @@ msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Futa eneo la kazi"
 
@@ -3960,7 +3960,7 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Yasiyoegemea upande wowote"
 
-#: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "Inafuta kabisa eneo hili la kazi na data zake zote. Hatua hii haiwezi "
