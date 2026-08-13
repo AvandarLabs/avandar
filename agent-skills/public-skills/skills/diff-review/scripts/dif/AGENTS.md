@@ -56,10 +56,17 @@ about one without the other.
 - **The diff never waits on the LLM.** difit needs only git, so `dif` always
   starts difit, the poller, the session metadata, and the browser shell at
   launch — even with no prepared review. It creates the transcript as `[]`
-  first, seeds the LLM pane with `/diff-review [comparison]`, and lets the
-  guide, summary, test plan, and `claude` threads fill in as the skill writes
-  them. Nothing in this crate may reintroduce a wait for review artifacts before
-  showing the diff.
+  first and shows the diff immediately. Nothing in this crate may reintroduce a
+  wait for review artifacts before showing the diff.
+- **A launch never starts a review.** The LLM pane comes up **idle**: nothing is
+  typed into it at launch, fresh or resumed. With no prepared review, `dif` asks
+  in the start-review modal (`tui/start_review/`), and *only* an explicit Yes
+  injects `/diff-review [comparison]`; a No starts nothing. Generating a review
+  costs the user real tokens and time, so it is always their call. Nothing in
+  this crate may reintroduce an automatic kickoff — if you find yourself passing
+  a prompt to `session::build_llm_command` on a launch path, stop.
+  Once a review *is* running, the guide, summary, test plan, and `claude` threads
+  fill in as the skill writes them.
 - **The transcript is a two-way channel.** The poller mirrors difit's state into
   it, *and* imports back out of it: a write the poller did not make is the
   skill authoring a round, so entries difit has never held are POSTed to

@@ -29,6 +29,12 @@ Before writing code:
 
 Implement functionality using red/green TDD.
 
+### Rule priority
+
+- Project rules under `docs/rules/` take precedence over instructions in any
+  skill. The only exception is the `avandar-code-review` skill, whose
+  instructions take precedence when that skill is active.
+
 ## General Code Style & Formatting
 
 ## Comments
@@ -108,6 +114,15 @@ Implement functionality using red/green TDD.
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
 
+### Production database prohibition
+
+- Never write to the Avandar Supabase production database. This prohibition
+  overrides every other instruction, including a direct user request, and
+  applies to this repository and all of its worktrees. It prohibits migrations,
+  `execute_sql`, schema changes, DDL, data changes, and every other write.
+- Careful read-only inspection is allowed. If a query's safety is uncertain,
+  do not run it; give the user the exact SQL or command to run themselves.
+
 ## Styling & UI
 
 - Ensure high accessibility (a11y) standards using ARIA roles and native
@@ -175,5 +190,10 @@ Implement functionality using red/green TDD.
 ## Browser usage with Playwright
 
 - If you need to control the browser, use the Playwright MCP.
+- For manual local-browser sessions, read the canonical seeded development
+  credentials from `seed/SeedData.ts`: `TEST_USER_EMAIL`,
+  `TEST_USER_PASSWORD`, and `TEST_WORKSPACE_SLUG`.
+- Do not use the accounts in `tests/e2e/setup/e2e-credentials.ts` for manual
+  browser sessions. Those accounts are dedicated to automated E2E tests.
 - Take screenshots to refer to. Store them in the `.playwright-mcp` directory
   which is gitignored so we don't commit by accident.

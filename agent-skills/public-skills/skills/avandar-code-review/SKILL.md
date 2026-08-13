@@ -458,7 +458,7 @@ After completing the review, run the narrowest relevant tests you can identify.
 E2E test handling is repo-specific (test runner, script names, and
 fixture conventions vary). When the repo under review has an E2E
 suite, see its `docs/code-reviews/extra-checklist.md` for the local
-phase that covers both how to run E2E specs and how to review E2E
+phase that covers both how to run E2E tests and how to review E2E
 test code. If the extra-checklist.md does not contain E2E-specific
 instructions, then follow the same guidelines applied to Vitest and Unit
 tests, such as only narrowly running the relevant tests instead of the
@@ -542,9 +542,11 @@ Check these first because they are the most frequent review findings:
 - Avoid abbreviations unless the full word would create a naming collision.
   For example, prefer `value` over `val`.
 - Avoid vague placeholders like `next`, `prev`, or `n` without a business noun.
-- Builder functions should use `create{Type}` naming.
-- Functions that create a type from seed data should use `create{Type}From...`.
-- Conversion or cast helpers should use `to...` naming.
+- A function that turns one value into another must name both sides, using one
+  of four shapes: `[Receiver].to{Target}`, `[Receiver].from{Source}`,
+  `make{Target}From{Source}`, or `get{Target}From{Source}`. See the naming
+  rule in `docs/code-reviews/typescript-checklist.md` for the full rule,
+  including why `resolve...` is never one of them.
 - Prefer reusing existing repo-local helpers, first-party packages, or
   installed libraries over introducing bespoke local helpers when an
   equivalent shared abstraction already exists.
@@ -644,7 +646,7 @@ SKILL file.
   or renamed and stays green through any behavioral break), tests that assert
   implementation structure instead of observable behavior, placeholder tests,
   runtime assertions that only restate what the type system already
-  guarantees, and — for **e2e specs only** — direct database writes that
+  guarantees, and — for **e2e tests only** — direct database writes that
   perform the behavior under test instead of driving it through the UI (direct
   writes are for seeding preconditions before page load, teardown, bypassing
   slow/external systems, or read-only oracles).

@@ -1,8 +1,6 @@
-import { Data, Puck } from "@puckeditor/core";
-import "@puckeditor/core/puck.css";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Flex, Text } from "@mantine/core";
-import { useCallback, useEffect, useMemo } from "react";
+import { Data, Puck } from "@puckeditor/core";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
@@ -24,6 +22,9 @@ import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/Vi
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import "@puckeditor/core/puck.css";
+import { useCallback, useEffect, useMemo } from "react";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "./DashboardEditorView.constants";
 import type { ReactElement } from "react";
 
 type Props = {
@@ -161,6 +162,7 @@ export function DashboardEditorView({
                       resourceName={dashboardTitle}
                       resourceType="dashboard"
                       resourceId={dashboard.id}
+                      size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
                     />
                     <ViewDashboardButton
                       workspaceSlug={workspaceSlug}

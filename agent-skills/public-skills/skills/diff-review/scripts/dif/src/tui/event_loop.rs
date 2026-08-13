@@ -19,6 +19,7 @@ use ratatui::backend::CrosstermBackend;
 use super::app::{App, Panel};
 use super::draw::draw;
 use super::keymap::key_to_bytes;
+use super::start_review::handle_start_review_key;
 
 /// Rows scrolled per wheel notch / arrow press in the read-only difit pane.
 const SCROLL_STEP: usize = 3;
@@ -66,6 +67,12 @@ pub fn run_event_loop(
 }
 
 fn handle_key(app: &mut App, k: &KeyEvent) {
+    // The start-review question is asked at launch and answered before anything
+    // else, so it captures all keys while open.
+    if app.start_review_open() {
+        handle_start_review_key(app, k);
+        return;
+    }
     // The help modal is a read-only overlay: while open it captures all keys and
     // only closes.
     if app.help_open {

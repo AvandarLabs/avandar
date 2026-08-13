@@ -42,7 +42,7 @@
   same-kind exports with no single primary one (a `*.types.ts` type collection, a
   `*.constants.ts` bundle, or a group of sibling helpers).
 - Comments describe the present, never the past. Do not write what a file,
-  function, type, or module *used to* do, what it was renamed from, what an
+  function, type, or module _used to_ do, what it was renamed from, what an
   earlier implementation looked like, or why it was changed. Git history already
   records that. A reader gets no help from it and has to work out which half of
   the comment still applies, and the claim rots as soon as the next change
@@ -152,6 +152,101 @@
 
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
+- A function that turns one value into another must name both sides. There are
+  exactly four allowed shapes, and every conversion, derivation, or lookup uses
+  one of them:
+
+  | Shape                      | Use when                                             |
+  | -------------------------- | ---------------------------------------------------- |
+  | `[Receiver].to[Target]`    | The receiver names the source                        |
+  | `[Receiver].from[Source]`  | The receiver names the target                        |
+  | `make[Target]From[Source]` | Free function, the target is a new value             |
+  | `get[Target]From[Source]`  | Free function, the target is contained in the source |
+
+  A method on a module gets the missing half from its receiver, so it never
+  repeats it: `MapLayer.toGeoBinding(layer)`, not
+  `MapLayer.mapLayerToGeoBinding(layer)` and not
+  `MapLayer.resolveGeoBinding(layer)`. Free functions have no receiver, so they
+  must spell out both halves, and they never use `To`: write
+  `makeFeatureCollectionFromRows(rows)`, not `rowsToFeatureCollection(rows)`
+  and not `toFeatureCollection(rows)`.
+
+  Choose between `make` and `get` by what comes back:
+  - `make` constructs a new object or a value of a new type out of the source.
+    `makeMapSpecFromLayerSpecs`, `makeFeatureCollectionFromRows`.
+  - `get` returns something logically contained in the source, directly or
+    indirectly: a nested value, a display label, a derived property.
+    `getBoundsFromFeatureCollection`, `getFiniteNumberFromValue`.
+
+  Never name a conversion `resolve...`. It names neither side, so the reader
+  learns nothing about what went in or what comes out. The same goes for
+  reaching for `compute...`, `build...`, or `create...` on a function that is
+  really one of the four shapes above: fewer prefixes, each carrying real
+  information, beats a wide vocabulary of near-synonyms.
+
+  This is bad:
+
+  ```ts
+  // Names neither side: what goes in, and what comes back?
+  MapLayer.resolveGeoBinding(layer);
+  // Free function using `To`, and the source is unnamed.
+  toFeatureCollection({ rows, binding });
+  // Near-synonym prefixes for the same kind of work.
+  computeBounds(featureCollection);
+  createMapSpec(layerSpecs);
+  ```
+
+  This is good:
+
+  ```ts
+  MapLayer.toGeoBinding(layer);
+  makeFeatureCollectionFromRows({ rows, binding });
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  This rule covers exported functions that convert, derive, or look up a value.
+  It does not rename an action (`syncMap`, `applyMapStyles`), a predicate
+  (`isMapLayerQueryable`), or a constructor with no source (`makeEmpty`).
+
+  Non-exported `_`-prefixed helpers do not need the verbose form, because their
+  only callers are in the same file and can see the source: `_build...` is the
+  right name for one that assembles a piece of a value (`_buildCircleRadius`,
+  `_buildDropReports`). `_resolve...` is still never allowed. The ban on
+  `resolve` is about the word carrying no information, which is just as true
+  inside a file as across one, and `_build` says the same thing better. The
+  exception is the promise sense of the word, where a function settles a
+  pending promise (`_resolveCompletionWaiters`): that names an action, not a
+  conversion.
+
+- User-facing copy is the one conversion excluded from the four shapes. A
+  function whose whole job is to produce a piece of copy is named after the
+  copy it returns, with no prefix: `appLabel(app)`, `vizTypeLabel(vizType)`,
+  `resourceTypeLabel(type)`. These live in `shared/copy/`.
+
+  The absence of a prefix is the signal. A prefix would tell the reader that
+  data is being converted, when what is really happening is that a string of
+  translated text is being named, and the call site should read as that text
+  where it is used. It also keeps copy call sites short in JSX, where they are
+  usually inline inside other markup.
+
+  This is bad:
+
+  ```ts
+  // Verbose, and reads like a data conversion rather than a label.
+  <Text>{getAppLabelFromAppType(app)}</Text>
+  ```
+
+  This is good:
+
+  ```ts
+  <Text>{appLabel(app)}</Text>
+  ```
+
+  The exception is only for functions that return copy and nothing else. A
+  function that takes copy as one input among several and returns data still
+  follows the four shapes.
+
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
     Examples: `e2eCreds` or `MyE2ETest`
@@ -298,6 +393,45 @@
   };
   ```
 
+- Declare local helper functions above the exported function that uses them. A
+  file reads helpers first and its public entry point last, so anyone reading
+  from the top meets a helper before the call that depends on it and never has
+  to jump downward to find out what a call does. Types, constants, and a
+  component's `Props` alias still come first, above the helpers.
+
+  Function declarations hoist, so for `function` helpers this is a readability
+  rule rather than a correctness one. For `const` arrow helpers it is also a
+  correctness rule: using one above its declaration is a runtime TDZ error.
+
+  Three cases are allowed to break the order: a file with several exports and
+  no single entry point (keep each helper beside the export it serves), a
+  helper shared by several exports (put it above the first of them), and
+  mutual recursion (no order satisfies the rule).
+
+  Examples:
+
+  ```ts
+  // Bad - the reader hits `_formatTotal` before it is declared
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+  ```
+
+  ```ts
+  // Good - helpers first, the exported entry point last
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+  ```
+
 ### Import/export declarations
 
 - Type imports/exports always use the `type` keyword.
@@ -317,7 +451,7 @@
   export. Name the file after what a reader would consider the main export (the
   function or the module object). For example, a file that exports `detectBias`,
   a supporting `MAX_BIAS_SCORE` constant, and some exported types should still be
-  named `detectBias.ts`. (A file whose exports are *only* constants follows the
+  named `detectBias.ts`. (A file whose exports are _only_ constants follows the
   `*.constants.ts` rule below instead.)
 - If a file intentionally exports a collection of helper or utility functions,
   name the file after the collection's shared purpose and suffix it with either
@@ -346,6 +480,7 @@
     tracks state (and needs its generated getters/setters) or composes behavior
     via mixins. Do not reach for `createModule` merely to group stateless
     functions: a plain object is sufficient and lighter.
+
 - When a module can not be encapsulated in a single file, create a directory
   to represent the module. Some examples of when a module should be a directory
   are: when a module has a `.test` file, has tightly-coupled helper functions,
@@ -397,6 +532,39 @@
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
   couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
+- The converse also holds: a module with no co-named sibling must NOT get a
+  directory of its own. A directory exists to group siblings, so
+  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
+  nothing, and it costs a redundant path segment on every import
+  (`.../MyFile/MyFile`). Leave the lone file next to its parent
+  (`.../MyFile.tsx`) and create the directory at the moment a second
+  co-named file appears. This applies to every kind of module: components,
+  hooks, and plain `.ts` modules alike.
+
+  This is bad (each directory holds exactly one file):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize/
+      useDrawerResize.ts
+    QueryTabPanel/
+      QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that
+  really has siblings keeps a directory):
+
+  ```text
+  DataExplorerDrawer/
+    DataExplorerDrawer.tsx
+    useDrawerResize.ts
+    QueryTabPanel.tsx
+    DrawerHeight/
+      DrawerHeight.ts
+      DrawerHeight.test.ts
+  ```
+
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.
@@ -431,33 +599,46 @@
   ```
 
 - Put the docstring on the module's exported key, not on the underlying
-  function, when a non-exported function is defined in the same file as the
-  module that exports it. TypeScript intellisense does not carry a function's
-  docstring across the assignment into a module object: it can see the type of
-  `MyModule.myFunc` but does not know it is the same function as `_myFunc`, so a
-  docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
+  declaration, when a non-exported declaration is defined in the same file as
+  the module that exports it. TypeScript intellisense does not carry a
+  declaration's docstring across the assignment into a module object: it can see
+  the type of `MyModule.myFunc` but does not know it is the same function as
+  `_myFunc`, so a docstring on `_myFunc` never surfaces on `MyModule.myFunc`.
 
-  This is bad (the docstring on `_myFunc` is invisible at the call site):
+  This covers every kind of key, not just methods. A constant loses its
+  docstring the same way, and a shorthand key (`{ MY_LIMIT }`) hides it exactly
+  as an explicit one does.
+
+  This is bad (neither docstring is visible at the call site):
 
   ```ts
+  /** Smallest allowed value. */
+  const MY_LIMIT = 10;
+
   /** What myFunc does. */
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    MY_LIMIT,
     myFunc: _myFunc,
   };
   ```
 
-  This is good (hovering `MyModule.myFunc` shows the docstring):
+  This is good (hovering either member shows its docstring):
 
   ```ts
+  const MY_LIMIT = 10;
+
   function _myFunc() {
     implementation();
   }
 
   export const MyModule = {
+    /** Smallest allowed value. */
+    MY_LIMIT,
+
     /** What myFunc does. */
     myFunc: _myFunc,
   };

@@ -13,75 +13,36 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import {
-  IconAdjustmentsHorizontal,
   IconChevronDown,
   IconDownload,
   IconFolderOpen,
   IconInfoCircle,
-  IconListDetails,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { FloatingPanel } from "@/components/FloatingPanel/FloatingPanel";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
-import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import {
-  DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
-  hasDataExplorerPanelPreferencesInSessionStorage,
-  readDataExplorerPanelPreferences,
-  writeDataExplorerPanelPreferences,
-} from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
+import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
+import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
-import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
-import type { DataExplorerPanelPreferences } from "@/views/DataExplorerApp/dataExplorerPanelPreferences/dataExplorerPanelPreferences";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ReactNode } from "react";
-
-const QUERY_DETAILS_WIDTH = 380;
-const VISUALIZATION_SETTINGS_WIDTH = 340;
-
-/**
- * Default stacked layout: Query Details near the top-left of the canvas
- * with Visualization Settings below it. Both anchor to the left edge so
- * they share the same column.
- */
-const QUERY_DETAILS_INITIAL_POSITION = { top: 140, left: 32 };
-const VISUALIZATION_SETTINGS_INITIAL_POSITION = { top: 540, left: 32 };
-
-/** Defaults applied when there is no saved per-tab preference. */
-const DEFAULT_QUERY_DETAILS_OPENED = true;
-const DEFAULT_VISUALIZATION_SETTINGS_OPENED = false;
-
-function _updatePanelPreferences(
-  preferences: DataExplorerPanelPreferences,
-  panel: "queryDetails" | "settings",
-  nextPreference: DataExplorerPanelPreferences["queryDetails"],
-): DataExplorerPanelPreferences {
-  return {
-    ...preferences,
-    [panel]: {
-      ...preferences[panel],
-      ...nextPreference,
-    },
-  };
-}
 
 type Props = {
   urlSearch: DataExplorerUrlSearch;
@@ -100,49 +61,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     isOpenDatasetModalOpen,
     { open: openOpenDatasetModal, close: closeOpenDatasetModal },
   ] = useDisclosure(false);
-  const [panelPreferences, setPanelPreferences] =
-    useState<DataExplorerPanelPreferences>(() => {
-      return readDataExplorerPanelPreferences();
-    });
-
-  const isQueryDetailsOpened =
-    panelPreferences.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
-  const isVisualizationSettingsOpened =
-    panelPreferences.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
-  const isQueryDetailsCollapsed =
-    panelPreferences.queryDetails?.collapsed ?? false;
-  const isVisualizationSettingsCollapsed =
-    panelPreferences.settings?.collapsed ?? false;
-
-  const setQueryDetailsOpened = useCallback(
-    (next: boolean | ((prev: boolean) => boolean)): void => {
-      setPanelPreferences((prev) => {
-        const current =
-          prev.queryDetails?.opened ?? DEFAULT_QUERY_DETAILS_OPENED;
-        const resolved = typeof next === "function" ? next(current) : next;
-        return _updatePanelPreferences(prev, "queryDetails", {
-          opened: resolved,
-        });
-      });
-    },
-    [],
-  );
-
-  const setVisualizationSettingsOpened = useCallback(
-    (next: boolean | ((prev: boolean) => boolean)): void => {
-      setPanelPreferences((prev) => {
-        const current =
-          prev.settings?.opened ?? DEFAULT_VISUALIZATION_SETTINGS_OPENED;
-        const resolved = typeof next === "function" ? next(current) : next;
-        return _updatePanelPreferences(prev, "settings", { opened: resolved });
-      });
-    },
-    [],
-  );
-
-  useEffect(() => {
-    writeDataExplorerPanelPreferences(panelPreferences);
-  }, [panelPreferences]);
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useDataExplorerUrlSync({ urlSearch, navigate });
 
@@ -248,40 +167,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     dispatch,
   ]);
 
-  const queryPanelButtonRef = useRef<HTMLButtonElement>(null);
-  const visualizationSettingsPanelButtonRef = useRef<HTMLButtonElement>(null);
-  const wasFetchingRef = useRef(false);
-  // Auto-open settings on the first successful query when session storage
-  // does not already contain panel preferences.
-  const hasAutoOpenedVisualizationSettingsRef = useRef(
-    hasDataExplorerPanelPreferencesInSessionStorage(),
-  );
-  useEffect(() => {
-    const justFinishedFetching =
-      wasFetchingRef.current && !dataQuery.isFetching;
-    if (
-      justFinishedFetching &&
-      dataQuery.isSuccess &&
-      !hasAutoOpenedVisualizationSettingsRef.current
-    ) {
-      setVisualizationSettingsOpened(true);
-      hasAutoOpenedVisualizationSettingsRef.current = true;
-    }
-    wasFetchingRef.current = dataQuery.isFetching;
-  }, [
-    dataQuery.isFetching,
-    dataQuery.isSuccess,
-    setVisualizationSettingsOpened,
-  ]);
-
   useEffect(
     function openChatPanelOnMount() {
       const alreadyOpened = sessionStorage.getItem(
-        DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY,
+        DataExplorerSessionKeys.aiPanelAutoOpened,
       );
       if (!alreadyOpened) {
         chatPanelDispatch.open();
-        sessionStorage.setItem(DATA_EXPLORER_AI_PANEL_AUTO_OPENED_KEY, "true");
+        sessionStorage.setItem(
+          DataExplorerSessionKeys.aiPanelAutoOpened,
+          "true",
+        );
       }
     },
     [chatPanelDispatch],
@@ -313,34 +209,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             }}
           >
             <Trans>Reset</Trans>
-          </Button>
-          <Button
-            ref={queryPanelButtonRef}
-            variant={isQueryDetailsOpened ? "filled" : "outline"}
-            color="neutral"
-            leftSection={<IconListDetails size={16} />}
-            size="compact-sm"
-            onClick={() => {
-              setQueryDetailsOpened((prev) => {
-                return !prev;
-              });
-            }}
-          >
-            <Trans>Query</Trans>
-          </Button>
-          <Button
-            ref={visualizationSettingsPanelButtonRef}
-            variant={isVisualizationSettingsOpened ? "filled" : "outline"}
-            color="neutral"
-            leftSection={<IconAdjustmentsHorizontal size={16} />}
-            size="compact-sm"
-            onClick={() => {
-              setVisualizationSettingsOpened((prev) => {
-                return !prev;
-              });
-            }}
-          >
-            <Trans>Visualizations</Trans>
           </Button>
           <Button
             variant="outline"
@@ -506,7 +374,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
-        <Box flex={1} pos="relative" w="100%" mih={0} bg="white">
+        <Box ref={chartRef} flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer
             columns={queryResultColumns}
@@ -515,85 +383,12 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             vizConfig={state.vizConfig}
           />
         </Box>
-      </Stack>
-      <FloatingPanel
-        title={t`Query Details`}
-        opened={isQueryDetailsOpened}
-        collapsed={isQueryDetailsCollapsed}
-        openOriginRef={queryPanelButtonRef}
-        onClose={() => {
-          setQueryDetailsOpened(false);
-        }}
-        onRequestClose={() => {
-          setQueryDetailsOpened(false);
-        }}
-        onToggleCollapse={() => {
-          setPanelPreferences((prev) => {
-            return _updatePanelPreferences(prev, "queryDetails", {
-              collapsed: !isQueryDetailsCollapsed,
-            });
-          });
-        }}
-        onPositionChange={(position) => {
-          setPanelPreferences((prev) => {
-            return _updatePanelPreferences(prev, "queryDetails", {
-              position: {
-                left: position.x,
-                top: position.y,
-              },
-            });
-          });
-        }}
-        initialPosition={
-          panelPreferences.queryDetails?.position ??
-          QUERY_DETAILS_INITIAL_POSITION
-        }
-        width={QUERY_DETAILS_WIDTH}
-      >
-        <QueryDetailsBody />
-      </FloatingPanel>
-      <FloatingPanel
-        title={t`Visualization Settings`}
-        opened={isVisualizationSettingsOpened}
-        collapsed={isVisualizationSettingsCollapsed}
-        openOriginRef={visualizationSettingsPanelButtonRef}
-        onClose={() => {
-          setVisualizationSettingsOpened(false);
-        }}
-        onRequestClose={() => {
-          setVisualizationSettingsOpened(false);
-        }}
-        onToggleCollapse={() => {
-          setPanelPreferences((prev) => {
-            return _updatePanelPreferences(prev, "settings", {
-              collapsed: !isVisualizationSettingsCollapsed,
-            });
-          });
-        }}
-        onPositionChange={(position) => {
-          setPanelPreferences((prev) => {
-            return _updatePanelPreferences(prev, "settings", {
-              position: {
-                left: position.x,
-                top: position.y,
-              },
-            });
-          });
-        }}
-        initialPosition={
-          panelPreferences.settings?.position ??
-          VISUALIZATION_SETTINGS_INITIAL_POSITION
-        }
-        width={VISUALIZATION_SETTINGS_WIDTH}
-      >
-        <VizSettingsForm
+        <DataExplorerDrawer
           columns={queryResultColumns}
           data={queryResultData}
-          vizConfig={state.vizConfig}
-          onVizConfigChange={dispatch.setVizConfig}
-          onVizTypeChange={dispatch.setActiveVizType}
+          chartRef={chartRef}
         />
-      </FloatingPanel>
+      </Stack>
       <OpenDatasetModal
         opened={isOpenDatasetModalOpen}
         onClose={closeOpenDatasetModal}

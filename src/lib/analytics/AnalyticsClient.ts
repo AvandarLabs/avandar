@@ -3,21 +3,25 @@ import { withLogger } from "@avandar/logger";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { objectKeys } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type {
-  AnalyticsApp,
-  AnalyticsEventName,
-  AnalyticsEventPayload,
-} from "@/lib/analytics/analyticsEventTypes";
+import { isDesktop } from "$/platform/isDesktop";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
+import type {
+  AnalyticsApp,
+  ClientAnalyticsEvent,
+} from "$/analytics/analyticsEvents/analyticsEvents";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-type LogEventOptions = {
-  event: AnalyticsEventName;
+/**
+ * A client-emitted event plus its optional scoping. `ClientAnalyticsEvent` is
+ * a discriminated union over event name, so passing one event's payload shape
+ * under a different event name is a compile error. Server-owned and
+ * trigger-owned events are deliberately not assignable here.
+ */
+type LogEventOptions = ClientAnalyticsEvent & {
   workspaceId?: Workspace.Id;
   app?: AnalyticsApp;
-  payload?: AnalyticsEventPayload;
 };
 
 type AnalyticsClientMutations = {
@@ -47,21 +51,36 @@ function createAnalyticsClient(): WithLogger<
         try {
           const db = AvaSupabase.db();
           const sessionResult = await db.auth.getSession();
-          const userId = sessionResult.data.session?.user.id ?? null;
+
+          if (sessionResult.error) {
+            throw sessionResult.error;
+          }
+
+          const userId = sessionResult.data.session?.user.id ?? undefined;
 
           if (!userId) {
             return;
           }
 
-          await db.from("usage_analytics_events").insert({
-            event_name: options.event,
-            workspace_id: options.workspaceId ?? null,
-            app: options.app ?? null,
-            payload: (options.payload as never) ?? null,
-            user_id: userId,
-          });
-        } catch {
-          // Analytics must never block a user action. Swallow.
+          // The database derives `event_category` from `event_name`.
+          await db
+            .from("usage_analytics_events")
+            .insert({
+              event_name: options.event,
+              workspace_id: options.workspaceId ?? null,
+              app: options.app ?? null,
+              payload: (options.payload as never) ?? null,
+              user_id: userId,
+              client: isDesktop() ? "desktop" : "web",
+              app_version: import.meta.env.VITE_APP_VERSION ?? null,
+            })
+            .throwOnError();
+        } catch (error) {
+          // Analytics must never block a user action, so this is swallowed.
+          // Development warnings expose defects while production stays silent.
+          if (import.meta.env.DEV) {
+            console.warn("[analytics] failed to log event", options, error);
+          }
         }
       },
     };
