@@ -586,7 +586,7 @@ msgstr "La feuille a une ligne d'en-tête"
 
 #: src/views/GisApp/MapCanvas/MapCanvas.tsx
 msgid "Map"
-msgstr ""
+msgstr "Carte"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -1138,7 +1138,8 @@ msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par dé
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "{droppedRowCount} lignes sur {totalRowCount} ont été ignorées, car "
+"leurs coordonnées étaient absentes ou hors limites."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1457,7 +1458,7 @@ msgstr "Section"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No rows could be mapped"
-msgstr ""
+msgstr "Aucune ligne n’a pu être cartographiée"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1861,7 +1862,7 @@ msgstr "Champs à saisir manuellement"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Loading map data"
-msgstr ""
+msgstr "Chargement des données cartographiques"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2131,7 +2132,7 @@ msgstr "Colonne 7"
 
 #: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "Feature"
-msgstr ""
+msgstr "Entité"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2311,10 +2312,6 @@ msgstr "Il n'y a pas de valeurs"
 msgid "Clarification {turnNumber} of 3"
 msgstr "Clarification {turnNumber} sur 3"
 
-#: src/components/GisApp/DataMap/GeometryDrawer.tsx
-#~ msgid "Data Point"
-#~ msgstr "Point de données"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
 msgstr "Retour à l'éditeur"
@@ -2431,7 +2428,8 @@ msgstr "La clause WHERE utilise « {operator} » sur « {columnName} » avec
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "Aucune des {totalRowCount} lignes n’a pu être cartographiée, car leurs "
+"coordonnées étaient absentes ou hors limites."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2663,10 +2661,6 @@ msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 msgstr "La sous-requête imbriquée dans FROM n’a pas pu être resérialisée ; le "
 "mappage est conservé comme espace réservé."
 
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Untitled map"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr "Télécharger CSV"
@@ -2699,7 +2693,8 @@ msgstr "Retour à la page de connexion"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
-msgstr ""
+msgstr "Sélectionnez une source de données ainsi que ses colonnes de latitude "
+"et de longitude pour l’afficher."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Controls the default for the rest of the workspace. People without app "
@@ -3462,7 +3457,7 @@ msgstr "Optionnel"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Some rows could not be mapped"
-msgstr ""
+msgstr "Certaines lignes n’ont pas pu être cartographiées"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -3778,10 +3773,6 @@ msgstr "Tourner"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "Libellé de l’axe X"
-
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Layer 1"
-#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -4144,7 +4135,7 @@ msgstr "Télécharger"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Something went wrong while loading this layer's data."
-msgstr ""
+msgstr "Un problème est survenu lors du chargement des données de cette couche."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4916,7 +4907,7 @@ msgstr "Service"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Could not load map data"
-msgstr ""
+msgstr "Impossible de charger les données cartographiques"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -5980,7 +5971,7 @@ msgstr "Les valeurs que vous avez sélectionnées peuvent contenir des "
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No mappable rows in this data source."
-msgstr ""
+msgstr "Aucune ligne cartographiable dans cette source de données."
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"

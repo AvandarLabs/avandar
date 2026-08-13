@@ -577,7 +577,7 @@ msgstr "Karatasi ina safu ya kichwa"
 
 #: src/views/GisApp/MapCanvas/MapCanvas.tsx
 msgid "Map"
-msgstr ""
+msgstr "Ramani"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -1123,7 +1123,8 @@ msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "Safu {droppedRowCount} kati ya safu {totalRowCount} zilirukwa kwa "
+"sababu viwianishi vyake havikuwepo au vilikuwa nje ya masafa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1435,7 +1436,7 @@ msgstr "Sehemu"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No rows could be mapped"
-msgstr ""
+msgstr "Hakuna safu iliyoweza kuwekwa kwenye ramani"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1835,7 +1836,7 @@ msgstr "Sehemu za kuingizwa kwa mikono"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Loading map data"
-msgstr ""
+msgstr "Inapakia data ya ramani"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2103,7 +2104,7 @@ msgstr "Safu wima ya 7"
 
 #: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "Feature"
-msgstr ""
+msgstr "Kipengele"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2282,10 +2283,6 @@ msgstr "Hakuna thamani"
 msgid "Clarification {turnNumber} of 3"
 msgstr "Ufafanuzi {turnNumber} wa 3"
 
-#: src/components/GisApp/DataMap/GeometryDrawer.tsx
-#~ msgid "Data Point"
-#~ msgstr "Pointi za Data"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
 msgstr "Rudi kwa mhariri"
@@ -2401,7 +2398,9 @@ msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "Hakuna hata safu moja kati ya safu {totalRowCount} iliyoweza kuwekwa "
+"kwenye ramani kwa sababu viwianishi vyake havikuwepo au vilikuwa nje ya "
+"masafa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2630,10 +2629,6 @@ msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 msgstr "Subquery iliyopachikwa katika FROM haikuweza kusawiriwa tena; uchoraji "
 "ramani umehifadhiwa kama kishikilia nafasi."
 
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Untitled map"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr "Pakia CSV"
@@ -2666,7 +2661,8 @@ msgstr "Rudi kwenye ukurasa wa kuingia"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
-msgstr ""
+msgstr "Chagua chanzo cha data na safu zake za latitudo na longitudo ili "
+"kuichora kwenye ramani."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Controls the default for the rest of the workspace. People without app "
@@ -3421,7 +3417,7 @@ msgstr "Hiari"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Some rows could not be mapped"
-msgstr ""
+msgstr "Baadhi ya safu hazikuweza kuwekwa kwenye ramani"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -3732,10 +3728,6 @@ msgstr "Geuza"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
-
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Layer 1"
-#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -4096,7 +4088,7 @@ msgstr "Pakia"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Something went wrong while loading this layer's data."
-msgstr ""
+msgstr "Hitilafu imetokea wakati wa kupakia data ya tabaka hili."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4860,7 +4852,7 @@ msgstr "Huduma"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Could not load map data"
-msgstr ""
+msgstr "Imeshindikana kupakia data ya ramani"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -5908,7 +5900,8 @@ msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No mappable rows in this data source."
-msgstr ""
+msgstr "Hakuna safu inayoweza kuwekwa kwenye ramani katika chanzo hiki cha "
+"data."
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"

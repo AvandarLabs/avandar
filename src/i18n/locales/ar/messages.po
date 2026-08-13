@@ -571,7 +571,7 @@ msgstr "تحتوي الورقة على صف رأس"
 
 #: src/views/GisApp/MapCanvas/MapCanvas.tsx
 msgid "Map"
-msgstr ""
+msgstr "الخريطة"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -1111,7 +1111,8 @@ msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيج�
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "تم تخطي {droppedRowCount} من أصل {totalRowCount} صفًا لأن إحداثياتها "
+"مفقودة أو خارج النطاق."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1421,7 +1422,7 @@ msgstr "قسم"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No rows could be mapped"
-msgstr ""
+msgstr "تعذّر تحديد مواقع أي صفوف على الخريطة"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
@@ -1812,7 +1813,7 @@ msgstr "حقول يجب إدخالها يدويًا"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Loading map data"
-msgstr ""
+msgstr "جارٍ تحميل بيانات الخريطة"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2076,7 +2077,7 @@ msgstr "العمود 7"
 
 #: src/views/GisApp/panels/FeatureInspector.tsx
 msgid "Feature"
-msgstr ""
+msgstr "ميزة"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2252,10 +2253,6 @@ msgstr "لا توجد قيم"
 msgid "Clarification {turnNumber} of 3"
 msgstr "توضيح {turnNumber} من 3"
 
-#: src/components/GisApp/DataMap/GeometryDrawer.tsx
-#~ msgid "Data Point"
-#~ msgstr "نقطة البيانات"
-
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
 msgstr "العودة إلى المحرر"
@@ -2368,7 +2365,8 @@ msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{colu
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
-msgstr ""
+msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ عددها {totalRowCount} على الخريطة "
+"لأن إحداثياتها مفقودة أو خارج النطاق."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -2595,10 +2593,6 @@ msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي المتداخل في FROM؛ تم الإبقاء على "
 "الربط كعنصر نائب."
 
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Untitled map"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
 msgstr "تحميل CSV"
@@ -2631,7 +2625,7 @@ msgstr "العودة إلى صفحة تسجيل الدخول"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
-msgstr ""
+msgstr "اختر مصدر بيانات وعمودي خط العرض وخط الطول لرسم بياناته."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Controls the default for the rest of the workspace. People without app "
@@ -3378,7 +3372,7 @@ msgstr "اختياري"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Some rows could not be mapped"
-msgstr ""
+msgstr "تعذّر تحديد مواقع بعض الصفوف على الخريطة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -3686,10 +3680,6 @@ msgstr "تحويل"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "تسمية المحور X"
-
-#: src/views/GisApp/GisApp.tsx
-#~ msgid "Layer 1"
-#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -4046,7 +4036,7 @@ msgstr "رفع"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Something went wrong while loading this layer's data."
-msgstr ""
+msgstr "حدث خطأ ما أثناء تحميل بيانات هذه الطبقة."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -4799,7 +4789,7 @@ msgstr "الخدمة"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "Could not load map data"
-msgstr ""
+msgstr "تعذّر تحميل بيانات الخريطة"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -5838,7 +5828,7 @@ msgstr "قد تحتوي القيم التي اخترتها على معلومات
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
 msgid "No mappable rows in this data source."
-msgstr ""
+msgstr "لا توجد صفوف قابلة للتحديد على الخريطة في مصدر البيانات هذا."
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
