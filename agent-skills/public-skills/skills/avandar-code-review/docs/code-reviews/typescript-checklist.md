@@ -1,6 +1,10 @@
 # TypeScript Checklist
 
 Use this checklist only when the diff includes TypeScript or TSX files.
+It covers naming, module and file structure, function shape, and
+import/export form. The type system itself (declarations, assertions and
+escape hatches, absence, literal unions, readonly contracts) lives in
+`types-checklist.md`.
 
 For every **Find candidates** block below, scope the grep to the files
 under review (pass them as arguments instead of recursing the whole

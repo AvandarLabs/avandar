@@ -358,6 +358,7 @@ recommendedFix }`. It must not modify code.
 | `common-and-general` | Most Common Mistakes + General Checks (this file) | always |
 | `comments-and-module` | comments + module hierarchy | diff has `.ts`/`.tsx` |
 | `typescript` | typescript-checklist | diff has `.ts`/`.tsx` |
+| `types` | types-checklist | diff has `.ts`/`.tsx` |
 | `functional-style` | functional-style-checklist | diff has `.ts`/`.tsx` |
 | `react` | react-checklist (plus `react-doctor` if available) | diff has a `.tsx` component |
 | `react-hooks` | react-hooks-checklist | diff uses hooks |
@@ -579,6 +580,17 @@ SKILL file.
 - **Gate:** the diff includes at least one `.ts` or `.tsx` file.
 - **Reference:**
   [`docs/code-reviews/typescript-checklist.md`](docs/code-reviews/typescript-checklist.md)
+- **Covers:** naming, module and file structure, function shape, and
+  import/export form. The type system itself is the `types` phase.
+
+### Phase: types
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/types-checklist.md`](docs/code-reviews/types-checklist.md)
+- **Covers:** type declarations, assertions and escape hatches (`any`,
+  `as unknown as T`), absence (`undefined` vs. `null`), literal unions, and
+  readonly/variance contracts.
 
 ### Phase: functional style
 

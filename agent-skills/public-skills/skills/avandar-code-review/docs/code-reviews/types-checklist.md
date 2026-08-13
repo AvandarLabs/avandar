@@ -23,13 +23,19 @@ contracts. Naming, module structure, comments, and function shape live in
   added defensively. Delete it, and if a type error appears, fix the
   underlying type rather than restoring the cast.
 
-  Exception: keep the cast only when TypeScript genuinely cannot resolve the
-  relationship safely, which in practice means a generic boundary where a
-  runtime value cannot be proven to match a computed type (a dotted path
-  string checked against `Paths<T>`, for example). Structure the code to
-  avoid it first; a cast is the fallback for code that is already
-  well-structured. When you keep one, comment which type cannot be proven
-  and why.
+  When a type error does appear, the real problem is usually upstream: a
+  parameter or field typed `unknown` that should carry a real type. Fixing it
+  there removes the cast at every call site instead of one.
+
+  Exceptions: 1) TypeScript genuinely cannot resolve the relationship safely,
+  which in practice means a generic boundary where a runtime value cannot be
+  proven to match a computed type (a dotted path string checked against
+  `Paths<T>`, for example); 2) an existing cast that a comment already
+  justifies on those grounds. A cast that merely saves the author from typing
+  a field properly is not an exception. Structure the code to avoid the cast
+  first; it is the fallback for code that is already well-structured. When one
+  is unavoidable, prefer the narrowest cast that compiles (`as T` over
+  `as unknown as T`) and comment which type cannot be proven and why.
 
   **Find candidates:**
 
@@ -61,21 +67,8 @@ contracts. Naming, module structure, comments, and function shape live in
   };
   ```
 
-- Avoid `as unknown as T`. Routing a value through `unknown` disables every
-  assignability check between the two types, so the cast keeps compiling after
-  the shapes drift apart and the mismatch surfaces at runtime. Flag the cast
-  and ask for the underlying type to be fixed instead; the real problem is
-  usually a parameter or field typed `unknown` that should carry a real type.
-
-  Exceptions: 1) the relationship is genuinely unresolvable by the compiler,
-  which in practice means complicated generics (a typed dotted path such as
-  `Paths<TConfig>` cannot be satisfied by a runtime `string`); 2) an existing
-  cast that a comment already justifies on those grounds. A cast that merely
-  saves the author from typing a field properly is not an exception. When a
-  cast is unavoidable, the narrowest one that compiles (`as T`) is preferred
-  over `as unknown as T`.
-
-  This is bad:
+  This is bad (the cast is forced by a field that should carry a real type,
+  so every use of it needs one):
 
   ```ts
   type Props = { tooltipProps?: unknown };
@@ -89,12 +82,6 @@ contracts. Naming, module structure, comments, and function shape live in
     tooltipProps?: ComponentProps<typeof Chart>["tooltipProps"];
   };
   <Chart tooltipProps={tooltipProps} />;
-  ```
-
-  **Find candidates:**
-
-  ```bash
-  grep -rEn '\bas unknown as\b' --include="*.ts" --include="*.tsx" .
   ```
 
 - Use `as const` for literals that never change.
