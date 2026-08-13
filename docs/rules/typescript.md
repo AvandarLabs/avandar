@@ -262,7 +262,7 @@
   When you encounter an `as unknown as T`, remove it and see what the compiler
   says:
   - No error: leave it removed. The cast was noise.
-  - An error: fix the underlying type *without* casting. Usually the real
+  - An error: fix the underlying type _without_ casting. Usually the real
     problem is upstream, such as a parameter or field typed `unknown` that
     should carry a real type.
   - Only when no fix is possible because the code is already well-structured,
