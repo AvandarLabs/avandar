@@ -60,6 +60,10 @@ sql_paths = [
   "./migrations/20260119164300_STORAGE-workspaces-bucket.sql",
   "./migrations/20260122161802_STORAGE-public-bucket.sql",
   "./migrations/20260329000000-STORAGE-opendata-bucket.sql",
+  # Must stay LAST: overrides the workspaces-bucket policies created above with
+  # dataset-access-gated versions. See the header of that file for why the gate
+  # cannot live in the January STORAGE migration directly.
+  "./seeds/10_gate_workspace_dataset_storage.sql",
 ]
 
 [realtime]

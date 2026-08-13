@@ -53,7 +53,7 @@ values (
   true
 );
 
-select plan(5);
+select plan(6);
 
 set local role authenticated;
 
@@ -113,6 +113,34 @@ select lives_ok(
      where workspace_id = 'a9001001-0000-4000-8000-000000000001'::uuid
        and user_id = 'a9000001-0000-4000-8000-000000000001'::uuid$$,
   'the leaver can now be removed from the workspace'
+);
+
+-- The outer gate must reject a non-manager on its own, independently of the
+-- per-resource RPC it delegates to.
+--
+-- Why this specific shape: by now the leaver owns nothing (everything was moved
+-- above), so the loop body never executes and the INNER gate inside
+-- rpc_resources__transfer_ownership never fires. If the outer
+-- util__can_manage_workspace_settings check were ever removed, this call would
+-- silently return 0 for an unauthorised caller and no other assertion in the
+-- suite would notice. a9000003 is a plain member, never promoted in this file.
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"a9000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select throws_ok(
+  $$select public.rpc_workspaces__transfer_all_owned_resources (
+      'a9001001-0000-4000-8000-000000000001'::uuid,
+      'a9000001-0000-4000-8000-000000000001'::uuid,
+      'a9000003-0000-4000-8000-000000000003'::uuid
+    )$$,
+  '42501',
+  'insufficient_privilege',
+  'the outer gate rejects a non-manager even when the loop would be empty'
 );
 
 select * from finish();

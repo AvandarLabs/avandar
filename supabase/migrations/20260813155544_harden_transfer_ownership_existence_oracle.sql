@@ -1,29 +1,11 @@
-/**
- * Reassigns a resource's owner without granting the caller any read access.
- *
- * Security definer so a Settings Admin can act on a row RLS hides from them
- * (P1 makes owner-private resources invisible to admins). Returns void
- * precisely so no private data can leak through a return value.
- *
- * Unblocks offboarding: `owner_id` on both resource tables is
- * ON DELETE NO ACTION, so a member who owns resources cannot otherwise be
- * removed from the workspace.
- *
- * Updates `owner_profile_id` as well as `owner_id`. Both tables declare
- * `owner_profile_id uuid not null` referencing `user_profiles` with
- * ON DELETE NO ACTION, so moving `owner_id` alone would leave that FK pointing
- * at the departing member and the removal would stay blocked while this
- * function appeared to succeed.
- *
- * @param p_new_owner_id Must already be a member of the resource's workspace.
- */
-create or replace function public.rpc_resources__transfer_ownership (
-  p_resource_type public.resource_type,
-  p_resource_id uuid,
-  p_new_owner_id uuid
-) returns void language plpgsql security definer
-set
-  search_path = public as $$
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.rpc_resources__transfer_ownership(p_resource_type public.resource_type, p_resource_id uuid, p_new_owner_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
 declare
   v_workspace_id uuid;
   v_current_owner_id uuid;
@@ -129,4 +111,15 @@ begin
     )
   );
 end;
-$$;
+$function$
+;
+
+drop policy "Users can DELETE workspace datasets" on "storage"."objects";
+
+drop policy "Users can SELECT workspace datasets" on "storage"."objects";
+
+drop policy "Users can UPDATE workspace datasets" on "storage"."objects";
+
+drop policy "Users can UPLOAD workspace datasets" on "storage"."objects";
+
+

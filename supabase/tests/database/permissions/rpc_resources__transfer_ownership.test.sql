@@ -60,7 +60,7 @@ values (
   true
 );
 
-select plan(12);
+select plan(13);
 
 set local role authenticated;
 
@@ -230,6 +230,27 @@ select isnt(
   ),
   0,
   'a settings admin who is not the workspace owner can read the audit log'
+);
+
+-- A nonexistent resource must be indistinguishable from an unauthorised one.
+-- Otherwise this security-definer function is an existence oracle: its lookup
+-- spans every workspace, so a distinct "not found" error would let any
+-- authenticated user probe arbitrary ids before authorisation runs.
+--
+-- By this point a8000003 has been promoted to Settings Admin above, which makes
+-- this the strongest form of the check: even a fully AUTHORISED admin gets
+-- insufficient_privilege for an id that does not exist, identical to what an
+-- unauthorised caller gets for one that does. That indistinguishability is the
+-- property being pinned.
+select throws_ok(
+  $$select public.rpc_resources__transfer_ownership (
+      'dashboard',
+      'a8009999-0000-4000-8000-000000009999'::uuid,
+      'a8000003-0000-4000-8000-000000000003'::uuid
+    )$$,
+  '42501',
+  'insufficient_privilege',
+  'a nonexistent resource raises the same error as an unauthorised one'
 );
 
 select * from finish();
