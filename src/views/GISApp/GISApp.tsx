@@ -81,16 +81,17 @@ export function GISApp({ workspaceId }: Props): JSX.Element {
     });
   }, [resolvedBinding, queryResult, layer.sensitivity, layer.id]);
 
+  const { symbology } = layer;
+  const { queryColumns } = layer.source;
   const valueColumnName = useMemo(() => {
-    const { symbology } = layer;
     if (symbology.type !== "proportionalSymbol") {
       return undefined;
     }
-    const column = layer.source.queryColumns.find((candidate) => {
+    const column = queryColumns.find((candidate) => {
       return candidate.id === symbology.value;
     });
     return column ? QueryColumn.getDerivedColumnName(column) : undefined;
-  }, [layer]);
+  }, [symbology, queryColumns]);
 
   const spec = useMemo(() => {
     return createMapSpec([

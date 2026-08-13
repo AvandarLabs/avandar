@@ -7,11 +7,16 @@ import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.typ
  * map keeps working when the optional `spatial` extension is unavailable.
  * Bindings that do need geometry functions (boundary joins, binning) are added
  * as further members of this union.
+ *
+ * `latitude` and `longitude` are independently optional so that picking one
+ * axis alone never produces a binding that resolves: a half-picked binding
+ * that resolved would plot points on the diagonal where latitude equals
+ * longitude, which looks like a real result and is not.
  */
 export type GeoBinding = {
   type: "latLngColumns";
-  latitude: QueryColumnId;
-  longitude: QueryColumnId;
+  latitude: QueryColumnId | undefined;
+  longitude: QueryColumnId | undefined;
 };
 
 /**

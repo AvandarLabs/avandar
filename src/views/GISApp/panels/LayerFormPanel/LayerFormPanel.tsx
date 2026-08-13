@@ -161,17 +161,14 @@ export function LayerFormPanel({
                 value={latitudeColumn ?? null}
                 onChange={(column) => {
                   onLayerChange((current) => {
-                    if (!column) {
-                      return { ...current, geoBinding: undefined };
-                    }
-                    const withColumn = _withQueryColumn(current, column);
+                    const withColumn =
+                      column ? _withQueryColumn(current, column) : current;
                     return {
                       ...withColumn,
                       geoBinding: {
                         type: "latLngColumns",
-                        latitude: column.id,
-                        longitude:
-                          withColumn.geoBinding?.longitude ?? column.id,
+                        latitude: column?.id,
+                        longitude: withColumn.geoBinding?.longitude,
                       },
                     };
                   });
@@ -189,16 +186,14 @@ export function LayerFormPanel({
                 value={longitudeColumn ?? null}
                 onChange={(column) => {
                   onLayerChange((current) => {
-                    if (!column) {
-                      return { ...current, geoBinding: undefined };
-                    }
-                    const withColumn = _withQueryColumn(current, column);
+                    const withColumn =
+                      column ? _withQueryColumn(current, column) : current;
                     return {
                       ...withColumn,
                       geoBinding: {
                         type: "latLngColumns",
-                        latitude: withColumn.geoBinding?.latitude ?? column.id,
-                        longitude: column.id,
+                        latitude: withColumn.geoBinding?.latitude,
+                        longitude: column?.id,
                       },
                     };
                   });

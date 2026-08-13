@@ -85,4 +85,68 @@ describe("MapLayer.resolveGeoBinding", () => {
     };
     expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
   });
+
+  it("returns undefined when only latitude is set", () => {
+    const latitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lat"),
+    );
+    const layer = {
+      ...MapLayer.makeEmpty("Cases"),
+      source: {
+        ...MapLayer.makeEmpty("Cases").source,
+        queryColumns: [latitude],
+      },
+      geoBinding: {
+        type: "latLngColumns" as const,
+        latitude: latitude.id,
+        longitude: undefined,
+      },
+    };
+    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+  });
+
+  it("returns undefined when only longitude is set", () => {
+    const longitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lon"),
+    );
+    const layer = {
+      ...MapLayer.makeEmpty("Cases"),
+      source: {
+        ...MapLayer.makeEmpty("Cases").source,
+        queryColumns: [longitude],
+      },
+      geoBinding: {
+        type: "latLngColumns" as const,
+        latitude: undefined,
+        longitude: longitude.id,
+      },
+    };
+    expect(MapLayer.resolveGeoBinding(layer)).toBeUndefined();
+  });
+
+  it("resolves once both axes are set", () => {
+    const latitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lat"),
+    );
+    const longitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lon"),
+    );
+    const layer = {
+      ...MapLayer.makeEmpty("Cases"),
+      source: {
+        ...MapLayer.makeEmpty("Cases").source,
+        queryColumns: [latitude, longitude],
+      },
+      geoBinding: {
+        type: "latLngColumns" as const,
+        latitude: latitude.id,
+        longitude: longitude.id,
+      },
+    };
+    expect(MapLayer.resolveGeoBinding(layer)).toEqual({
+      type: "latLngColumns",
+      latitudeColumnName: "lat",
+      longitudeColumnName: "lon",
+    });
+  });
 });

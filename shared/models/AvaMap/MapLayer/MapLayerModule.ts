@@ -54,7 +54,7 @@ export const MapLayerModule = {
    */
   resolveGeoBinding: (layer: MapLayerRead): ResolvedGeoBinding | undefined => {
     const { geoBinding, source } = layer;
-    if (!geoBinding) {
+    if (!geoBinding || !geoBinding.latitude || !geoBinding.longitude) {
       return undefined;
     }
     const findColumnName = (columnId: QueryColumnId): string | undefined => {
