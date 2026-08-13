@@ -31,7 +31,9 @@ export type AxisScaleProps = {
 type AxisScaleStyle = Pick<AxisStyle, "min" | "max" | "tickInterval">;
 
 function _finiteOrUndefined(value: number | undefined): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+  return typeof value === "number" && Number.isFinite(value) ?
+      value
+    : undefined;
 }
 
 /**
@@ -136,9 +138,9 @@ export function resolveAxisScale(
   // domain ends on a tick; an explicit high is never moved, so it may
   // truncate the last tick.
   const resolvedHigh =
-    explicitMax !== undefined ?
-      high
-    : low + Math.ceil((high - low) / interval) * interval;
+    explicitMax !== undefined ? high : (
+      low + Math.ceil((high - low) / interval) * interval
+    );
 
   const ticks = _buildTickLattice(low, resolvedHigh, interval);
 
