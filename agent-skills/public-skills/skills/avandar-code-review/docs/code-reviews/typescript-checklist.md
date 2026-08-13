@@ -109,6 +109,174 @@ repo) so the output stays small and tied to the diff.
   ```
 
 - Non-exported top-level helper functions should be prefixed with `_`.
+- Declare local helper functions above the exported function that uses them,
+  so a file reads helpers first and its public entry point last. A reader
+  scrolling from the top meets each helper before the call that depends on
+  it, and a reviewer never has to jump downward to learn what a call does.
+  Function declarations hoist, so this is about readability rather than
+  correctness, except for `const` arrow helpers where a use before the
+  declaration is a runtime TDZ error.
+
+  Applies only to helpers defined in the same file as their caller. Types,
+  constants, and a file's `Props` alias stay at the top, above the helpers.
+
+  Exceptions: 1) a file with several exports and no single entry point, where
+  each helper belongs beside the export it serves; 2) a helper used by more
+  than one export, which may sit above the first of them; 3) mutual
+  recursion, where no order satisfies the rule.
+
+  This is bad:
+
+  ```ts
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+  ```
+
+  **Find candidates** (files whose first exported function is declared before
+  a later non-exported top-level function):
+
+  ```bash
+  for f in <files-under-review-ending-in-.ts-or-.tsx>; do
+    exp="$(grep -nE '^export (async )?function ' "$f" | head -1 | cut -d: -f1)"
+    helper="$(grep -nE '^(async )?function _' "$f" | tail -1 | cut -d: -f1)"
+    if [ -n "$exp" ] && [ -n "$helper" ] && [ "$exp" -lt "$helper" ]; then
+      printf '%s exports at line %s, helper still below at %s\n' \
+        "$f" "$exp" "$helper"
+    fi
+  done
+  ```
+
+  Confirm each hit by checking that the trailing helper is actually called by
+  the earlier export; an unrelated helper serving a second export is one of
+  the exceptions above.
+- Name a function that turns one value into another with one of exactly four
+  shapes, so the name states both the source and the target:
+  `[Receiver].to{Target}` when the receiver names the source,
+  `[Receiver].from{Source}` when the receiver names the target,
+  `make{Target}From{Source}` for a free function returning a new value, and
+  `get{Target}From{Source}` for a free function returning something logically
+  contained in the source (a nested value, a display label, a derived
+  property). A name that states only one side leaves the reader guessing what
+  goes in, which is the whole cost of `resolve...`: it names neither side.
+
+  A method takes the missing half from its receiver and must not repeat it. A
+  free function has no receiver, so it spells out both halves and never uses
+  `To`.
+
+  Flag `resolve...` on **any** function, exported or not, including a
+  `_resolve...` helper: the word carries no information inside a file either,
+  and `_build...` says the same thing better. The one `resolve` that is not a
+  finding is the promise sense, where the function settles a pending promise
+  (`_resolveCompletionWaiters`, a `resolve` callback), because there it names a
+  real action rather than a conversion. Also flag `compute...`,
+  `build...`, and `create...` on an exported function that is really one of the
+  four shapes: a smaller prefix vocabulary where each prefix carries
+  information beats a wide set of near-synonyms.
+
+  The four shapes are required only for exported functions. A non-exported
+  `_`-prefixed helper has callers in its own file that can see its source, so
+  `_build...` is the right name for one that assembles a piece of a value
+  (`_buildCircleRadius`, `_buildDropReports`), and the verbose form is not
+  wanted there.
+
+  Exceptions: 1) an action (`syncMap`, `applyMapStyles`); 2) a predicate
+  (`isMapLayerQueryable`); 3) a constructor with no source (`makeEmpty`,
+  `createClient`); 4) a non-exported `_build...` helper as described above;
+  5) a name fixed by an external contract (`toJSON`, `toString`); 6) a copy
+  function, see the separate rule below.
+
+  This is bad:
+
+  ```ts
+  MapLayer.resolveGeoBinding(layer);
+  toFeatureCollection({ rows, binding });
+  computeBounds(featureCollection);
+  createMapSpec(layerSpecs);
+  ```
+
+  This is good:
+
+  ```ts
+  MapLayer.toGeoBinding(layer);
+  makeFeatureCollectionFromRows({ rows, binding });
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  **Find candidates** (`resolve` at any visibility, then exported functions and
+  module methods using a retired prefix or a sourceless free `to...`):
+
+  ```bash
+  # `resolve` is banned exported or not, including a private `_resolve...`:
+  grep -rEn '^(export )?(async )?function _?resolve[A-Z]|^ +resolve[A-Z][a-zA-Z]*: ' \
+    --include="*.ts" --include="*.tsx" .
+  # retired prefixes on exported functions and module methods:
+  grep -rEn '^export (async )?function (compute|build|create)[A-Z]|^ +(compute|build|create)[A-Z][a-zA-Z]*: ' \
+    --include="*.ts" --include="*.tsx" .
+  # exported `to...` free functions that never name their source:
+  grep -rEn '^export (async )?function to[A-Z][a-zA-Z]*\(' \
+    --include="*.ts" --include="*.tsx" . \
+    | grep -v 'From'
+  ```
+
+  Copy functions are the one conversion exempted here, so do not flag them, and
+  do flag a prefix that has crept onto one. See the copy-function rule below.
+
+  Check each hit against the exception list before flagging: a non-exported
+  `_build...` hit and a predicate hit are expected, a `_resolve...` hit is a
+  finding, and a method whose receiver supplies the other half is already
+  correct.
+- Name a function that returns user-facing copy after the copy itself, with no
+  prefix: `appLabel(app)`, `vizTypeLabel(vizType)`. This is the one conversion
+  exempt from the naming rule above, so flag `getAppLabelFromAppType` or
+  `makeAppLabel` rather than accepting them. A prefix announces a data
+  conversion, when the function is really naming a string of translated text,
+  and the call site is usually inline in JSX where the extra words only add
+  noise. The missing prefix is what tells a reader this returns copy.
+
+  The exemption is only for a function that returns copy and nothing else. One
+  that takes copy as an input among several and returns data still follows the
+  four shapes. Repos that keep copy in a dedicated module should say where in
+  their repo-local checklist.
+
+  This is bad:
+
+  ```tsx
+  <Text>{getAppLabelFromAppType(app)}</Text>
+  ```
+
+  This is good:
+
+  ```tsx
+  <Text>{appLabel(app)}</Text>
+  ```
+
+  **Find candidates** (prefixed functions that return a label or other copy):
+
+  ```bash
+  grep -rEn '^(export )?function (get|make)[A-Z][a-zA-Z]*(Label|Copy|Text|Title|Message)[a-zA-Z]*\(' \
+    --include="*.ts" --include="*.tsx" .
+  ```
+
+  Confirm a hit really returns only copy: a function returning a structured
+  object that happens to contain a label is a conversion, not a copy function.
 - React component prop types should always be named `Props`.
 
   **Find candidates** (prop type aliases whose name is not literally

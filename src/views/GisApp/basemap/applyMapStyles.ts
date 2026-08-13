@@ -1,5 +1,5 @@
 import { Map as MapLibreMap } from "maplibre-gl";
-import { mapSemanticColors } from "@/components/GISApp/DataMap/mapColors";
+import { mapSemanticColors } from "@/views/GisApp/basemap/mapColors";
 
 /**
  * Applies Avandar custom colors to a MapLibre map instance.

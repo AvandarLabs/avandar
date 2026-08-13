@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GISApp } from "@/components/GISApp/GISApp";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { GisApp } from "@/views/GisApp/GisApp";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/map")({
-  component: GISAppPage,
+  component: GisAppPage,
 });
 
-function GISAppPage() {
-  return <GISApp />;
+function GisAppPage() {
+  const workspace = useCurrentWorkspace();
+  return <GisApp workspaceId={workspace.id} />;
 }
