@@ -42,6 +42,29 @@ function _buildStyleKey(basemap: AvaMap.Basemap): string {
     : `none:${basemap.background}`;
 }
 
+/**
+ * Compares two bounds by value rather than by reference, so a background
+ * refetch that produces an identical bounding box in a new object does not
+ * re-fly the camera and undo the user's pan.
+ */
+function _areBoundsEqual(
+  first: MapBounds | undefined,
+  second: MapBounds | undefined,
+): boolean {
+  if (first === second) {
+    return true;
+  }
+  if (!first || !second) {
+    return false;
+  }
+  return (
+    first[0][0] === second[0][0] &&
+    first[0][1] === second[0][1] &&
+    first[1][0] === second[1][0] &&
+    first[1][1] === second[1][1]
+  );
+}
+
 type Props = {
   basemap: AvaMap.Basemap;
   view: AvaMap.ViewState;
@@ -74,6 +97,7 @@ export function MapCanvas({
   const mapRef = useRef<MapLibreMap | null>(null);
   const appliedSpecRef = useRef<MapSpec>(EMPTY_MAP_SPEC);
   const appliedStyleKeyRef = useRef<string | undefined>(undefined);
+  const appliedFitBoundsRef = useRef<MapBounds | undefined>(undefined);
   const [isStyleReady, setIsStyleReady] = useState(false);
 
   // Latest-value refs, declared before the one-shot construction effect that
@@ -151,6 +175,7 @@ export function MapCanvas({
       mapRef.current = null;
       appliedSpecRef.current = EMPTY_MAP_SPEC;
       appliedStyleKeyRef.current = undefined;
+      appliedFitBoundsRef.current = undefined;
       setIsStyleReady(false);
     };
     // Construction is intentionally one-shot: later prop changes are applied
@@ -187,6 +212,10 @@ export function MapCanvas({
     if (!map || !fitBounds) {
       return;
     }
+    if (_areBoundsEqual(appliedFitBoundsRef.current, fitBounds)) {
+      return;
+    }
+    appliedFitBoundsRef.current = fitBounds;
     map.fitBounds(fitBounds as [[number, number], [number, number]], {
       padding: 50,
       duration: 1000,

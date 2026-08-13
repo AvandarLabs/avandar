@@ -58,6 +58,13 @@ function _findQueryColumn(
   });
 }
 
+/** True when `column` is already in the layer's selected query columns. */
+function _hasQueryColumn(layer: MapLayer.T, column: QueryColumn.T): boolean {
+  return layer.source.queryColumns.some((candidate) => {
+    return candidate.id === column.id;
+  });
+}
+
 /**
  * The layer editing panel for the GIS app: picks the layer's data source,
  * its latitude and longitude columns, an optional symbol size column, its
@@ -137,6 +144,13 @@ export function LayerFormPanel({
                 onChange={(value) => {
                   const dataSource = value ?? undefined;
                   onLayerChange((current) => {
+                    const isUnchanged =
+                      current.source.dataSource === dataSource &&
+                      current.source.queryColumns.length === 0 &&
+                      current.geoBinding === undefined;
+                    if (isUnchanged) {
+                      return current;
+                    }
                     return {
                       ...current,
                       source: {
@@ -161,6 +175,12 @@ export function LayerFormPanel({
                 value={latitudeColumn ?? null}
                 onChange={(column) => {
                   onLayerChange((current) => {
+                    const isUnchanged =
+                      column?.id === current.geoBinding?.latitude &&
+                      (!column || _hasQueryColumn(current, column));
+                    if (isUnchanged) {
+                      return current;
+                    }
                     const withColumn =
                       column ? _withQueryColumn(current, column) : current;
                     return {
@@ -186,6 +206,12 @@ export function LayerFormPanel({
                 value={longitudeColumn ?? null}
                 onChange={(column) => {
                   onLayerChange((current) => {
+                    const isUnchanged =
+                      column?.id === current.geoBinding?.longitude &&
+                      (!column || _hasQueryColumn(current, column));
+                    if (isUnchanged) {
+                      return current;
+                    }
                     const withColumn =
                       column ? _withQueryColumn(current, column) : current;
                     return {
@@ -219,6 +245,9 @@ export function LayerFormPanel({
                   }
                   onLayerChange((current) => {
                     if (!column) {
+                      if (current.symbology.type === "circle") {
+                        return current;
+                      }
                       return {
                         ...current,
                         symbology: {
@@ -228,6 +257,13 @@ export function LayerFormPanel({
                           stroke: current.symbology.stroke,
                         },
                       };
+                    }
+                    const isUnchanged =
+                      current.symbology.type === "proportionalSymbol" &&
+                      current.symbology.value === column.id &&
+                      _hasQueryColumn(current, column);
+                    if (isUnchanged) {
+                      return current;
                     }
                     const withColumn = _withQueryColumn(current, column);
                     return {
@@ -251,6 +287,9 @@ export function LayerFormPanel({
                 value={symbolColor}
                 onChange={(color) => {
                   onLayerChange((current) => {
+                    if (current.symbology.color.color === color) {
+                      return current;
+                    }
                     return {
                       ...current,
                       symbology: {

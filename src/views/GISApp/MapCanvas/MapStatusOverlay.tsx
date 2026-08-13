@@ -56,24 +56,35 @@ export function MapStatusOverlay({
       </div>
     );
   }
+  if (droppedRowCount > 0) {
+    const totalRowCount = featureCount + droppedRowCount;
+    const isEverythingDropped = featureCount === 0;
+    return (
+      <div className={classes.statusOverlay}>
+        <Alert
+          color="warning"
+          title={
+            isEverythingDropped ?
+              t`No rows could be mapped`
+            : t`Some rows could not be mapped`
+          }
+        >
+          <Text size="sm">
+            {isEverythingDropped ?
+              t`None of the ${totalRowCount} rows could be mapped because their coordinates were missing or out of range.`
+            : t`${droppedRowCount} of ${totalRowCount} rows were skipped because their coordinates were missing or out of range.`
+            }
+          </Text>
+        </Alert>
+      </div>
+    );
+  }
   if (featureCount === 0) {
     return (
       <div className={classes.statusOverlay}>
         <Paper p="xs" radius="md" withBorder>
           <Text size="sm">{t`No mappable rows in this data source.`}</Text>
         </Paper>
-      </div>
-    );
-  }
-  if (droppedRowCount > 0) {
-    const totalRowCount = featureCount + droppedRowCount;
-    return (
-      <div className={classes.statusOverlay}>
-        <Alert color="warning" title={t`Some rows could not be mapped`}>
-          <Text size="sm">
-            {t`${droppedRowCount} of ${totalRowCount} rows were skipped because their coordinates were missing or out of range.`}
-          </Text>
-        </Alert>
       </div>
     );
   }

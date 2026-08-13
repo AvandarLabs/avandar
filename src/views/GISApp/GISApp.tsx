@@ -56,12 +56,16 @@ export function GISApp({ workspaceId }: Props): JSX.Element {
   const updateLayer = useCallback(
     (update: (current: MapLayer.T) => MapLayer.T) => {
       setAvaMap((current) => {
-        return {
-          ...current,
-          layers: current.layers.map((candidate, index) => {
-            return index === 0 ? update(candidate) : candidate;
-          }),
-        };
+        const currentLayer = current.layers[0]!;
+        const nextLayer = update(currentLayer);
+        // A handler that found nothing to change returns the same reference.
+        // Bailing out here (rather than always spreading a "new" but
+        // equal-valued layer) lets React skip the re-render, which stops an
+        // upstream effect that reruns on every render from looping forever.
+        if (nextLayer === currentLayer) {
+          return current;
+        }
+        return { ...current, layers: [nextLayer, ...current.layers.slice(1)] };
       });
     },
     [],
