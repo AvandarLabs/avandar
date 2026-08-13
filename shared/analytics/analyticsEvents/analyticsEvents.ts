@@ -1,13 +1,13 @@
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { Database } from "$/types/database.types.ts";
 
-/** App surface an event originated from, or null when not bound to one. */
+/** App surface an event originated from. */
 export type AnalyticsApp = Database["public"]["Enums"]["app_type"];
 
 // Types for the `usage_analytics_events__category` and
 // `usage_analytics_events__client` enums are deliberately not re-exported here.
-// Nothing in this phase consumes them: the category is never sent by a client,
-// and each emitter writes its own `client` literal. Phase 2 adds them when the
-// reporting helpers need them.
+// Nothing currently consumes them: the category is never sent by a client, and
+// each emitter writes its own `client` literal.
 
 /**
  * Events emitted from the browser or the desktop shell. These describe UI
@@ -81,9 +81,8 @@ export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
  * `AnalyticsEventName`, so adding a name to a list above without giving it a
  * payload is a compile error.
  *
- * `undefined` means the event carries no payload yet. Phase 1B replaces those
- * as it enriches each call site, and Phases 2 and 3 fill in the server and
- * database events.
+ * `undefined` means the event carries no payload yet. Each event gains one
+ * when its emitter has data to record.
  *
  * Payloads must never contain raw PII: no email addresses, no SQL text, no
  * chat content.
@@ -97,6 +96,7 @@ export type AnalyticsEventPayloads = {
     { blockKind: string; vizType?: string; dashboardId?: string }
   : K extends "dashboard.filter_changed" ? { filterId: string; mode: string }
   : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
+  : K extends "chat.message_sent" ? { app: ChatPageContext.ChatApp }
   : undefined;
 };
 

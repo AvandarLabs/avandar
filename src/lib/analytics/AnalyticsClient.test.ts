@@ -1,13 +1,16 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 
-const insertMock = vi.fn(async (_analyticsRow: unknown) => {
+const throwOnErrorMock = vi.fn(async () => {
   return { error: null };
+});
+const insertMock = vi.fn((_analyticsRow: unknown) => {
+  return { throwOnError: throwOnErrorMock };
 });
 const getSessionMock = vi.fn(
   async (): Promise<{
     data: { session: { user: { id: string } } | null };
-    error: null;
+    error: Error | null;
   }> => {
     return { data: { session: { user: { id: "user-1" } } }, error: null };
   },
@@ -42,11 +45,18 @@ vi.mock("$/platform/isDesktop", () => {
 describe("AnalyticsClient.logEvent", () => {
   beforeEach(() => {
     insertMock.mockClear();
+    throwOnErrorMock.mockClear();
+    throwOnErrorMock.mockResolvedValue({ error: null });
     isDesktopMock.mockReturnValue(false);
     getSessionMock.mockResolvedValue({
       data: { session: { user: { id: "user-1" } } },
       error: null,
     });
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("stamps the row with the web client and the build version", async () => {
@@ -99,10 +109,45 @@ describe("AnalyticsClient.logEvent", () => {
   });
 
   it("never throws when the insert fails", async () => {
-    insertMock.mockRejectedValueOnce(new Error("insert exploded"));
+    throwOnErrorMock.mockRejectedValueOnce(new Error("insert exploded"));
 
     await expect(
       AnalyticsClient.logEvent({ event: "chat.message_sent" }),
     ).resolves.toBeUndefined();
+  });
+
+  it("warns when Supabase returns an insert error", async () => {
+    const insertError = new Error("insert failed");
+    throwOnErrorMock.mockRejectedValueOnce(insertError);
+
+    await expect(
+      AnalyticsClient.logEvent({ event: "chat.message_sent" }),
+    ).resolves.toBeUndefined();
+
+    expect(throwOnErrorMock).toHaveBeenCalledOnce();
+    expect(console.warn).toHaveBeenCalledWith(
+      "[analytics] failed to log event",
+      { event: "chat.message_sent" },
+      insertError,
+    );
+  });
+
+  it("warns and records nothing when session lookup fails", async () => {
+    const sessionError = new Error("session failed");
+    getSessionMock.mockResolvedValue({
+      data: { session: { user: { id: "user-1" } } },
+      error: sessionError,
+    });
+
+    await expect(
+      AnalyticsClient.logEvent({ event: "chat.message_sent" }),
+    ).resolves.toBeUndefined();
+
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledWith(
+      "[analytics] failed to log event",
+      { event: "chat.message_sent" },
+      sessionError,
+    );
   });
 });

@@ -53,6 +53,11 @@ function createAnalyticsClient(): WithLogger<
         try {
           const db = AvaSupabase.db();
           const sessionResult = await db.auth.getSession();
+
+          if (sessionResult.error) {
+            throw sessionResult.error;
+          }
+
           const userId = sessionResult.data.session?.user.id ?? null;
 
           if (!userId) {
@@ -60,15 +65,18 @@ function createAnalyticsClient(): WithLogger<
           }
 
           // The database derives `event_category` from `event_name`.
-          await db.from("usage_analytics_events").insert({
-            event_name: options.event,
-            workspace_id: options.workspaceId ?? null,
-            app: options.app ?? null,
-            payload: (options.payload as never) ?? null,
-            user_id: userId,
-            client: isDesktop() ? "desktop" : "web",
-            app_version: import.meta.env.VITE_APP_VERSION ?? null,
-          });
+          await db
+            .from("usage_analytics_events")
+            .insert({
+              event_name: options.event,
+              workspace_id: options.workspaceId ?? null,
+              app: options.app ?? null,
+              payload: (options.payload as never) ?? null,
+              user_id: userId,
+              client: isDesktop() ? "desktop" : "web",
+              app_version: import.meta.env.VITE_APP_VERSION ?? null,
+            })
+            .throwOnError();
         } catch (error) {
           // Analytics must never block a user action, so this is swallowed.
           // Development warnings expose defects while production stays silent.

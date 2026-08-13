@@ -29,6 +29,12 @@ Before writing code:
 
 Implement functionality using red/green TDD.
 
+### Rule priority
+
+- Project rules under `docs/rules/` take precedence over instructions in any
+  skill. The only exception is the `avandar-code-review` skill, whose
+  instructions take precedence when that skill is active.
+
 ## General Code Style & Formatting
 
 ## Comments

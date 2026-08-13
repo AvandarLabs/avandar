@@ -1,6 +1,6 @@
 -- Backfill `event_category` for rows written before the column existed.
 --
--- Task 1 added the column with a `default 'other'`, which is what every
+-- An earlier migration added the column with a `default 'other'`, which is what every
 -- pre-existing row received. This recomputes them from the event name.
 --
 -- Scoped to `event_category = 'other'` so the statement is idempotent and so

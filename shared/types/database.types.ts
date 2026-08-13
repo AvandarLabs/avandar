@@ -1642,6 +1642,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
+      }
       util__auth_user_can_access_resource: {
         Args: {
           p_min_role: Database["public"]["Enums"]["role_level"]
@@ -1713,6 +1717,16 @@ export type Database = {
       util__is_settings_admin: {
         Args: { p_workspace_id: string }
         Returns: boolean
+      }
+      util__log_analytics_event: {
+        Args: {
+          p_app?: Database["public"]["Enums"]["app_type"]
+          p_event_name: string
+          p_payload?: Json
+          p_user_id?: string
+          p_workspace_id?: string
+        }
+        Returns: undefined
       }
       util__rank_to_role_level: {
         Args: { p_rank: number }
