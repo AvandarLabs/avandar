@@ -12,9 +12,8 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
   };
 });
 
-const { PrivateResourceAdminClient } = await import(
-  "@/clients/permissions/PrivateResourceAdminClient"
-);
+const { PrivateResourceAdminClient } =
+  await import("./PrivateResourceAdminClient");
 
 describe("PrivateResourceAdminClient", () => {
   it("maps count rows to camelCase", async () => {
@@ -74,11 +73,12 @@ describe("PrivateResourceAdminClient", () => {
   it("returns the moved count from a bulk transfer", async () => {
     rpcMock.mockResolvedValueOnce({ data: 3, error: null });
 
-    const moved = await PrivateResourceAdminClient.transferAllOwnedResources({
-      workspaceId: "ws-1" as never,
-      fromUserId: "user-1",
-      newOwnerId: "user-2",
-    });
+    const numMovedResources =
+      await PrivateResourceAdminClient.transferAllOwnedResources({
+        workspaceId: "ws-1" as never,
+        fromUserId: "user-1",
+        newOwnerId: "user-2",
+      });
 
     expect(rpcMock).toHaveBeenCalledWith(
       "rpc_workspaces__transfer_all_owned_resources",
@@ -88,18 +88,19 @@ describe("PrivateResourceAdminClient", () => {
         p_new_owner_id: "user-2",
       },
     );
-    expect(moved).toBe(3);
+    expect(numMovedResources).toBe(3);
   });
 
   it("treats a null bulk-transfer result as zero moved", async () => {
     rpcMock.mockResolvedValueOnce({ data: null, error: null });
 
-    const moved = await PrivateResourceAdminClient.transferAllOwnedResources({
-      workspaceId: "ws-1" as never,
-      fromUserId: "user-1",
-      newOwnerId: "user-2",
-    });
+    const numMovedResources =
+      await PrivateResourceAdminClient.transferAllOwnedResources({
+        workspaceId: "ws-1" as never,
+        fromUserId: "user-1",
+        newOwnerId: "user-2",
+      });
 
-    expect(moved).toBe(0);
+    expect(numMovedResources).toBe(0);
   });
 });

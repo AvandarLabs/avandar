@@ -780,7 +780,6 @@ msgstr "Não foi possível excluir o modelo de chat offline do cache."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Unknown user"
 msgstr "Usuário desconhecido"
 
@@ -1066,7 +1065,7 @@ msgstr "(Cobrança anual)"
 msgid "Remove member"
 msgstr "Remover membro"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
 msgstr ""
@@ -1523,7 +1522,7 @@ msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "A função de agregação \"{funcName}\" não é compatível no SELECT; "
 "ignorada."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr ""
 
@@ -2185,7 +2184,7 @@ msgstr "ex. surto-de-colera-2024"
 msgid "Collection {collectionNumber}"
 msgstr "Coleção {collectionNumber}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Ownership reassigned."
 msgstr ""
 
@@ -3587,7 +3586,7 @@ msgstr "Metadados brutos (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "Estas são as primeiras {0} linhas do seu conjunto de dados."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Reassign failed"
 msgstr ""
 
@@ -4100,7 +4099,7 @@ msgstr "Selecionar coluna de latitude"
 msgid "This {resource} is shared with: "
 msgstr "Este {resource} é compartilhado com: "
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private dashboards"
 msgstr ""
 
@@ -4126,7 +4125,7 @@ msgstr "Selecionar colunas para consulta"
 msgid "Donut style"
 msgstr "Estilo de donut"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr ""
 
@@ -4678,6 +4677,10 @@ msgstr "O proprietário sempre tem acesso de administrador. Para alterar o "
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
 msgstr "Carregando conjuntos de dados…"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+msgid "Loading private resources"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
@@ -5298,7 +5301,7 @@ msgstr "Modo do editor de consultas"
 msgid "Profile"
 msgstr "Perfil"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
 msgstr ""

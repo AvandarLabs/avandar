@@ -1665,6 +1665,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      util__auth_user_can_access_resource_in_workspace: {
+        Args: {
+          p_required_role: Database["public"]["Enums"]["role_level"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
       util__auth_user_can_delete_resource: {
         Args: {
           p_resource_id: string
@@ -1730,6 +1739,7 @@ export type Database = {
           p_owner_id: string
           p_resource_id: string
           p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
         }
         Returns: boolean
       }
@@ -1768,6 +1778,10 @@ export type Database = {
         Returns: undefined
       }
       util__storage_object_dataset_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
+      util__storage_object_workspace_id: {
         Args: { p_object_name: string }
         Returns: string
       }

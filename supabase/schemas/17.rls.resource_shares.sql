@@ -9,9 +9,8 @@
  *  resource NOT being private to its owner. Without that gate an admin could
  *  insert a share granting themselves admin on a private resource, which would
  *  make it non-private and readable: a two-statement self-escalation. The owner
- *  path (util__auth_user_can_access_resource) still lets the owner share their
- *  own private resource, which is how it stops being private. See the P1 spec
- *  section 4.1.
+ *  workspace-bound resource-admin path still lets the owner share their own
+ *  private resource, which is how it stops being private.
  *
  *  DELETE is deliberately not gated: removing a share can only reduce access.
  */
@@ -29,18 +28,10 @@ select
 create policy "Resource admins can insert resource_shares" on public.resource_shares for insert to authenticated
 with
   check (
-    (
-      public.util__is_settings_admin (
-        public.resource_shares.workspace_id
-      ) and
-      not public.util__is_resource_private_to_owner (
-        public.resource_shares.resource_type,
-        public.resource_shares.resource_id
-      )
-    ) or
-    public.util__auth_user_can_access_resource (
+    public.util__auth_user_can_access_resource_in_workspace (
       public.resource_shares.resource_type,
       public.resource_shares.resource_id,
+      public.resource_shares.workspace_id,
       'admin'
     )
   );
@@ -48,35 +39,19 @@ with
 create policy "Resource admins can update resource_shares" on public.resource_shares
 for update
   to authenticated using (
-    (
-      public.util__is_settings_admin (
-        public.resource_shares.workspace_id
-      ) and
-      not public.util__is_resource_private_to_owner (
-        public.resource_shares.resource_type,
-        public.resource_shares.resource_id
-      )
-    ) or
-    public.util__auth_user_can_access_resource (
+    public.util__auth_user_can_access_resource_in_workspace (
       public.resource_shares.resource_type,
       public.resource_shares.resource_id,
+      public.resource_shares.workspace_id,
       'admin'
     )
   )
 with
   check (
-    (
-      public.util__is_settings_admin (
-        public.resource_shares.workspace_id
-      ) and
-      not public.util__is_resource_private_to_owner (
-        public.resource_shares.resource_type,
-        public.resource_shares.resource_id
-      )
-    ) or
-    public.util__auth_user_can_access_resource (
+    public.util__auth_user_can_access_resource_in_workspace (
       public.resource_shares.resource_type,
       public.resource_shares.resource_id,
+      public.resource_shares.workspace_id,
       'admin'
     )
   );

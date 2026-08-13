@@ -8,15 +8,23 @@ insert into auth.users (id, email, aud, role)
 values
   ('a5000001-0000-4000-8000-000000000001'::uuid, 'a5_owner@test.dev', 'authenticated', 'authenticated'),
   ('a5000002-0000-4000-8000-000000000002'::uuid, 'a5_admin@test.dev', 'authenticated', 'authenticated'),
-  ('a5000003-0000-4000-8000-000000000003'::uuid, 'a5_third@test.dev', 'authenticated', 'authenticated');
+  ('a5000003-0000-4000-8000-000000000003'::uuid, 'a5_third@test.dev', 'authenticated', 'authenticated'),
+  ('a5000004-0000-4000-8000-000000000004'::uuid, 'a5_outsider@test.dev', 'authenticated', 'authenticated');
 
 insert into public.workspaces (id, owner_id, name, slug)
-values (
-  'a5001001-0000-4000-8000-000000000001'::uuid,
-  'a5000001-0000-4000-8000-000000000001'::uuid,
-  'a5 workspace',
-  'a5-shares-guard-ws'
-);
+values
+  (
+    'a5001001-0000-4000-8000-000000000001'::uuid,
+    'a5000001-0000-4000-8000-000000000001'::uuid,
+    'a5 workspace',
+    'a5-shares-guard-ws'
+  ),
+  (
+    'a5001002-0000-4000-8000-000000000002'::uuid,
+    'a5000001-0000-4000-8000-000000000001'::uuid,
+    'a5 other workspace',
+    'a5-shares-other-ws'
+  );
 
 insert into public.role_groups (id, workspace_id, name, is_builtin)
 values ('a500cf01-0000-4000-8000-000000000001'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5 admin group', false);
@@ -38,11 +46,30 @@ values
   ('a5003002-0000-4000-8000-000000000002'::uuid, 'a5000002-0000-4000-8000-000000000002'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5002002-0000-4000-8000-000000000002'::uuid, 'A5 Admin', 'A5 Admin'),
   ('a5003003-0000-4000-8000-000000000003'::uuid, 'a5000003-0000-4000-8000-000000000003'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5002003-0000-4000-8000-000000000003'::uuid, 'A5 Third', 'A5 Third');
 
+insert into public.user_groups (id, workspace_id, name, color)
+values (
+  'a5004001-0000-4000-8000-000000000001'::uuid,
+  'a5001002-0000-4000-8000-000000000002'::uuid,
+  'a5 other workspace group',
+  '#000000'
+);
+
 -- d_private is private to a5000001. d_open is unrestricted.
 insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
 values
   ('a5005001-0000-4000-8000-000000000001'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, false),
   ('a5005002-0000-4000-8000-000000000002'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'open', '{}'::jsonb, false, false);
+
+insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
+values (
+  'a5007001-0000-4000-8000-000000000001'::uuid,
+  'a5001001-0000-4000-8000-000000000001'::uuid,
+  'a5000001-0000-4000-8000-000000000001'::uuid,
+  'a5003001-0000-4000-8000-000000000001'::uuid,
+  'private dataset',
+  'virtual',
+  true
+);
 
 -- An existing share on the open dashboard, for the UPDATE-repoint test.
 insert into public.resource_shares (id, workspace_id, resource_type, resource_id, principal_type, principal_id, role)
@@ -56,7 +83,7 @@ values (
   'viewer'
 );
 
-select plan(4);
+select plan(10);
 
 set local role authenticated;
 
@@ -140,6 +167,82 @@ select lives_ok(
       'viewer'
     )$$,
   'the owner can share their own private resource'
+);
+
+select throws_ok(
+  $$insert into public.resource_shares (
+      workspace_id, resource_type, resource_id, principal_type, principal_id, role
+    ) values (
+      'a5001002-0000-4000-8000-000000000002'::uuid,
+      'dashboard',
+      'a5005001-0000-4000-8000-000000000001'::uuid,
+      'user',
+      'a5000003-0000-4000-8000-000000000003'::uuid,
+      'viewer'
+    )$$,
+  '23514',
+  'resource share workspace must match the resource workspace',
+  'a share cannot carry a workspace id from another workspace'
+);
+
+select throws_ok(
+  $$insert into public.resource_shares (
+      workspace_id, resource_type, resource_id, principal_type, principal_id, role
+    ) values (
+      'a5001001-0000-4000-8000-000000000001'::uuid,
+      'dashboard',
+      'a5005001-0000-4000-8000-000000000001'::uuid,
+      'user_group',
+      'a5004001-0000-4000-8000-000000000001'::uuid,
+      'viewer'
+    )$$,
+  '23514',
+  'resource share principal must belong to the resource workspace',
+  'a share cannot target a group from another workspace'
+);
+
+select throws_ok(
+  $$insert into public.resource_shares (
+      workspace_id, resource_type, resource_id, principal_type, principal_id, role
+    ) values (
+      'a5001001-0000-4000-8000-000000000001'::uuid,
+      'dashboard',
+      'a5005001-0000-4000-8000-000000000001'::uuid,
+      'user',
+      'a5000004-0000-4000-8000-000000000004'::uuid,
+      'viewer'
+    )$$,
+  '23514',
+  'resource share principal must belong to the resource workspace',
+  'a share cannot target a user outside the resource workspace'
+);
+
+select throws_ok(
+  $$update public.resource_shares
+       set principal_id = 'a5004001-0000-4000-8000-000000000001'::uuid,
+           principal_type = 'user_group'::public.share_principal_type
+     where id = 'a5006002-0000-4000-8000-000000000002'::uuid$$,
+  '23514',
+  'resource share principal must belong to the resource workspace',
+  'an existing share cannot be repointed to a cross-workspace group'
+);
+
+select throws_ok(
+  $$update public.dashboards
+       set workspace_id = 'a5001002-0000-4000-8000-000000000002'::uuid
+     where id = 'a5005001-0000-4000-8000-000000000001'::uuid$$,
+  '23514',
+  'dashboard workspace_id cannot be changed',
+  'a dashboard cannot move away from the workspace bound to its shares'
+);
+
+select throws_ok(
+  $$update public.datasets
+       set workspace_id = 'a5001002-0000-4000-8000-000000000002'::uuid
+     where id = 'a5007001-0000-4000-8000-000000000001'::uuid$$,
+  '23514',
+  'dataset workspace_id cannot be changed',
+  'a dataset cannot move away from its original workspace'
 );
 
 select * from finish();

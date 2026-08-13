@@ -54,7 +54,7 @@ values
   ('a2007001-0000-4000-8000-000000000001'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'private ds', 'virtual', true),
   ('a2007002-0000-4000-8000-000000000002'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'open ds', 'virtual', false);
 
-select plan(7);
+select plan(9);
 
 select is(
   public.util__is_resource_private_to_owner ('dashboard', 'a2005001-0000-4000-8000-000000000001'::uuid),
@@ -96,6 +96,36 @@ select is(
   public.util__is_resource_private_to_owner ('dataset', 'a2007002-0000-4000-8000-000000000002'::uuid),
   false,
   'unrestricted dataset is not private'
+);
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"a2000002-0000-4000-8000-000000000002"}',
+  true
+);
+
+select throws_ok(
+  $$select public.util__is_resource_private_to_owner (
+      'dashboard',
+      'a2005001-0000-4000-8000-000000000001'::uuid
+    )$$,
+  '42501',
+  'permission denied for function util__is_resource_private_to_owner',
+  'an authenticated caller cannot execute the metadata-sensitive predicate'
+);
+
+select throws_ok(
+  $$select public.util__has_non_owner_share (
+      'dashboard',
+      'a2005001-0000-4000-8000-000000000001'::uuid,
+      'a2001001-0000-4000-8000-000000000001'::uuid,
+      'a2000001-0000-4000-8000-000000000001'::uuid
+    )$$,
+  '42501',
+  'permission denied for function util__has_non_owner_share',
+  'an authenticated caller cannot execute the internal share predicate'
 );
 
 select * from finish();

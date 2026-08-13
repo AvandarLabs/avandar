@@ -69,29 +69,32 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/permissions/PrivateResourceAdminClient", () => {
-  return {
-    PrivateResourceAdminClient: {
-      useGetPrivateResourceCounts: () => {
-        return [[], false];
-      },
-      useTransferAllOwnedResources: () => {
-        return [vi.fn(), false];
-      },
-      QueryKeys: {
-        getPrivateResourceCounts: () => {
-          return ["private-resource-counts"];
+vi.mock(
+  "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient",
+  () => {
+    return {
+      PrivateResourceAdminClient: {
+        useGetPrivateResourceCounts: () => {
+          return [[], false, { isFetching: false }];
+        },
+        useTransferAllOwnedResources: () => {
+          return [vi.fn(), false];
+        },
+        QueryKeys: {
+          getPrivateResourceCounts: () => {
+            return ["private-resource-counts"];
+          },
         },
       },
-    },
-  };
-});
+    };
+  },
+);
 
 vi.mock("@/clients/WorkspaceClient", () => {
   return {
     WorkspaceClient: {
       useGetUsersForWorkspace: () => {
-        return [[], false];
+        return [[], false, { isFetching: false }];
       },
       QueryKeys: {
         getUsersForWorkspace: () => {

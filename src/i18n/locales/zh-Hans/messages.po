@@ -748,7 +748,6 @@ msgstr "无法从缓存中删除离线聊天模型。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Unknown user"
 msgstr "未知用户"
 
@@ -1024,7 +1023,7 @@ msgstr "(年度计费)"
 msgid "Remove member"
 msgstr "移除成员"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
 msgstr ""
@@ -1454,7 +1453,7 @@ msgstr "您批准（或取消）向此工作区的 AI 提供者发送数据的�
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "SELECT 中不支持聚合函数“{funcName}”；已跳过。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr ""
 
@@ -2091,7 +2090,7 @@ msgstr "例如 cholera-outbreak-2024"
 msgid "Collection {collectionNumber}"
 msgstr "集合 {collectionNumber}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Ownership reassigned."
 msgstr ""
 
@@ -3450,7 +3449,7 @@ msgstr "原始元数据（JSON）"
 msgid "These are the first {0} rows of your dataset."
 msgstr "这是您数据集的前 {0} 行。"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Reassign failed"
 msgstr ""
 
@@ -3949,7 +3948,7 @@ msgstr "选择纬度列"
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 与以下人员共享："
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private dashboards"
 msgstr ""
 
@@ -3975,7 +3974,7 @@ msgstr "选择要查询的列"
 msgid "Donut style"
 msgstr "甜甜圈样式"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr ""
 
@@ -4503,6 +4502,10 @@ msgstr "所有者始终具有管理员访问权限。要更改所有者，请使
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
 msgstr "正在加载数据集…"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+msgid "Loading private resources"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
@@ -5105,7 +5108,7 @@ msgstr "查询编辑器模式"
 msgid "Profile"
 msgstr "个人资料"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
 msgstr ""

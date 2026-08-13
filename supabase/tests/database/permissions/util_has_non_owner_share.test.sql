@@ -11,12 +11,19 @@ values
   ('a1000002-0000-4000-8000-000000000002'::uuid, 'a1_other@test.dev', 'authenticated', 'authenticated');
 
 insert into public.workspaces (id, owner_id, name, slug)
-values (
-  'a1001001-0000-4000-8000-000000000001'::uuid,
-  'a1000001-0000-4000-8000-000000000001'::uuid,
-  'a1 workspace',
-  'a1-non-owner-share-ws'
-);
+values
+  (
+    'a1001001-0000-4000-8000-000000000001'::uuid,
+    'a1000001-0000-4000-8000-000000000001'::uuid,
+    'a1 workspace',
+    'a1-non-owner-share-ws'
+  ),
+  (
+    'a1001002-0000-4000-8000-000000000002'::uuid,
+    'a1000001-0000-4000-8000-000000000001'::uuid,
+    'a1 other workspace',
+    'a1-other-ws'
+  );
 
 insert into public.workspace_memberships (id, workspace_id, user_id)
 values
@@ -40,6 +47,15 @@ values
   ('a1005004-0000-4000-8000-000000000004'::uuid, 'a1001001-0000-4000-8000-000000000001'::uuid, 'a1000001-0000-4000-8000-000000000001'::uuid, 'a1003001-0000-4000-8000-000000000001'::uuid, 'workspace share', '{}'::jsonb, true),
   ('a1005005-0000-4000-8000-000000000005'::uuid, 'a1001001-0000-4000-8000-000000000001'::uuid, 'a1000001-0000-4000-8000-000000000001'::uuid, 'a1003001-0000-4000-8000-000000000001'::uuid, 'group share', '{}'::jsonb, true);
 
+-- Preserve a malformed legacy row to verify the helper remains defensive even
+-- though the current trigger rejects this shape on new writes.
+set local session_replication_role = replica;
+
+insert into public.resource_shares (id, workspace_id, resource_type, resource_id, principal_type, principal_id, role)
+values ('a1006001-0000-4000-8000-000000000001'::uuid, 'a1001002-0000-4000-8000-000000000002'::uuid, 'dashboard', 'a1005001-0000-4000-8000-000000000001'::uuid, 'user', 'a1000002-0000-4000-8000-000000000002'::uuid, 'viewer');
+
+set local session_replication_role = origin;
+
 insert into public.resource_shares (id, workspace_id, resource_type, resource_id, principal_type, principal_id, role)
 values
   ('a1006002-0000-4000-8000-000000000002'::uuid, 'a1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'a1005002-0000-4000-8000-000000000002'::uuid, 'user', 'a1000002-0000-4000-8000-000000000002'::uuid, 'viewer'),
@@ -47,22 +63,35 @@ values
   ('a1006004-0000-4000-8000-000000000004'::uuid, 'a1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'a1005004-0000-4000-8000-000000000004'::uuid, 'workspace', null, 'viewer'),
   ('a1006005-0000-4000-8000-000000000005'::uuid, 'a1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'a1005005-0000-4000-8000-000000000005'::uuid, 'user_group', 'a1004001-0000-4000-8000-000000000001'::uuid, 'viewer');
 
-select plan(5);
+select plan(6);
 
 select is(
   public.util__has_non_owner_share (
     'dashboard'::public.resource_type,
     'a1005001-0000-4000-8000-000000000001'::uuid,
+    'a1001001-0000-4000-8000-000000000001'::uuid,
     'a1000001-0000-4000-8000-000000000001'::uuid
   ),
   false,
-  'no shares at all: no non-owner share'
+  'a share carrying another workspace id does not make the resource shared'
+);
+
+select is(
+  public.util__has_non_owner_share (
+    'dashboard'::public.resource_type,
+    'a1005001-0000-4000-8000-000000000001'::uuid,
+    'a1001002-0000-4000-8000-000000000002'::uuid,
+    'a1000001-0000-4000-8000-000000000001'::uuid
+  ),
+  true,
+  'a non-owner share counts only inside the workspace recorded on the share'
 );
 
 select is(
   public.util__has_non_owner_share (
     'dashboard'::public.resource_type,
     'a1005002-0000-4000-8000-000000000002'::uuid,
+    'a1001001-0000-4000-8000-000000000001'::uuid,
     'a1000001-0000-4000-8000-000000000001'::uuid
   ),
   true,
@@ -73,6 +102,7 @@ select is(
   public.util__has_non_owner_share (
     'dashboard'::public.resource_type,
     'a1005003-0000-4000-8000-000000000003'::uuid,
+    'a1001001-0000-4000-8000-000000000001'::uuid,
     'a1000001-0000-4000-8000-000000000001'::uuid
   ),
   false,
@@ -83,6 +113,7 @@ select is(
   public.util__has_non_owner_share (
     'dashboard'::public.resource_type,
     'a1005004-0000-4000-8000-000000000004'::uuid,
+    'a1001001-0000-4000-8000-000000000001'::uuid,
     'a1000001-0000-4000-8000-000000000001'::uuid
   ),
   true,
@@ -93,6 +124,7 @@ select is(
   public.util__has_non_owner_share (
     'dashboard'::public.resource_type,
     'a1005005-0000-4000-8000-000000000005'::uuid,
+    'a1001001-0000-4000-8000-000000000001'::uuid,
     'a1000001-0000-4000-8000-000000000001'::uuid
   ),
   true,

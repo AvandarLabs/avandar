@@ -1,18 +1,11 @@
 /**
- * Per-member counts of resources private to that member, for the workspace
- * settings privacy log.
+ * Per-member counts of owner-private resources for the workspace privacy log.
  *
- * Security definer because the caller is forbidden by design from reading the
- * underlying rows: that is the whole point of the private-resource hardening.
- * This function must therefore return counts ONLY. Never add resource names,
- * ids, or any other column.
- *
- * Dashboards additionally require `not is_public`: a public dashboard is
- * world-readable and must never be reported as private, however
- * `is_restricted` is set. See the P1 spec section 4.2.
+ * Security definer because callers cannot read the underlying private rows.
+ * This function returns counts only: never add resource names or ids.
  *
  * @param p_workspace_id Workspace to report on.
- * @returns One row per workspace member, including members with zero of each.
+ * @returns One row per workspace member, including zero-count members.
  */
 create or replace function public.rpc_workspaces__private_resource_counts (
   p_workspace_id uuid
@@ -31,33 +24,42 @@ begin
   end if;
 
   return query
+  with private_dashboards as (
+    select d.owner_id, count(*) as resource_count
+    from public.dashboards d
+    where
+      d.workspace_id = p_workspace_id and
+      d.is_restricted and
+      not d.is_public and
+      not public.util__has_non_owner_share (
+        'dashboard'::public.resource_type,
+        d.id,
+        d.workspace_id,
+        d.owner_id
+      )
+    group by d.owner_id
+  ),
+  private_datasets as (
+    select ds.owner_id, count(*) as resource_count
+    from public.datasets ds
+    where
+      ds.workspace_id = p_workspace_id and
+      ds.is_restricted and
+      not public.util__has_non_owner_share (
+        'dataset'::public.resource_type,
+        ds.id,
+        ds.workspace_id,
+        ds.owner_id
+      )
+    group by ds.owner_id
+  )
   select
     wm.user_id,
-    (
-      select count(*)
-      from public.dashboards d
-      where
-        d.workspace_id = p_workspace_id and
-        d.owner_id = wm.user_id and
-        not coalesce(d.is_public, false) and
-        public.util__is_resource_private_to_owner (
-          'dashboard'::public.resource_type,
-          d.id
-        )
-    ),
-    (
-      select count(*)
-      from public.datasets ds
-      where
-        ds.workspace_id = p_workspace_id and
-        ds.owner_id = wm.user_id and
-        public.util__is_resource_private_to_owner (
-          'dataset'::public.resource_type,
-          ds.id
-        )
-    )
+    coalesce(pd.resource_count, 0),
+    coalesce(pds.resource_count, 0)
   from public.workspace_memberships wm
-  where
-    wm.workspace_id = p_workspace_id;
+  left join private_dashboards pd on pd.owner_id = wm.user_id
+  left join private_datasets pds on pds.owner_id = wm.user_id
+  where wm.workspace_id = p_workspace_id;
 end;
 $$;

@@ -39,6 +39,7 @@ $$;
 create or replace function public.util__has_non_owner_share (
   p_resource_type public.resource_type,
   p_resource_id uuid,
+  p_workspace_id uuid,
   p_owner_id uuid
 ) returns boolean language sql security definer stable
 set
@@ -49,12 +50,25 @@ set
     where
       rs.resource_type = p_resource_type and
       rs.resource_id = p_resource_id and
+      rs.workspace_id = p_workspace_id and
       (
         rs.principal_type <> 'user'::public.share_principal_type or
         rs.principal_id is distinct from p_owner_id
       )
   );
 $$;
+
+revoke
+execute on function public.util__has_non_owner_share (
+  public.resource_type,
+  uuid,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated;
 
 /**
  * Whether a resource is private to its owner: restricted, with no share
@@ -63,7 +77,7 @@ $$;
  * Resource-type generic, so it knows nothing about publication. A dashboard can
  * be `is_public` while restricted with no shares, which is world-readable and
  * emphatically not private; callers that care must compose this with their own
- * visibility condition. See the P1 spec section 4.2.
+ * visibility condition.
  *
  * Prefer `util__has_non_owner_share` directly when you already hold the row's
  * `owner_id` and `is_restricted`, to avoid this function's extra lookup.
@@ -79,21 +93,24 @@ set
   search_path = public as $$
 declare
   v_owner_id uuid;
+  v_workspace_id uuid;
   v_is_restricted boolean;
 begin
   if p_resource_type = 'dashboard' then
     select
       d.owner_id,
+      d.workspace_id,
       coalesce(d.is_restricted, false)
-    into v_owner_id, v_is_restricted
+    into v_owner_id, v_workspace_id, v_is_restricted
     from public.dashboards d
     where
       d.id = p_resource_id;
   elsif p_resource_type = 'dataset' then
     select
       ds.owner_id,
+      ds.workspace_id,
       coalesce(ds.is_restricted, false)
-    into v_owner_id, v_is_restricted
+    into v_owner_id, v_workspace_id, v_is_restricted
     from public.datasets ds
     where
       ds.id = p_resource_id;
@@ -112,10 +129,21 @@ begin
   return not public.util__has_non_owner_share (
     p_resource_type,
     p_resource_id,
+    v_workspace_id,
     v_owner_id
   );
 end;
 $$;
+
+revoke
+execute on function public.util__is_resource_private_to_owner (
+  public.resource_type,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated;
 
 /**
  * Effective role for auth.uid() on a dashboard or dataset row.
@@ -131,8 +159,7 @@ $$;
  * - Resource owner → admin.
  * - Settings (global) admin in the workspace → admin, UNLESS the resource is
  *   private to its owner (restricted with zero non-owner shares) and not a
- *   public dashboard. See the P1 spec at
- *   docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
+ *   public dashboard.
  *
  * Examples (non-owner, non-settings-admin):
  * - Workspace share viewer + app role editor → editor.
@@ -221,6 +248,7 @@ begin
       not public.util__has_non_owner_share (
         p_resource_type,
         p_resource_id,
+        v_workspace_id,
         v_owner_id
       )
     )
@@ -325,6 +353,45 @@ begin
   v_eff_rank := public.util__role_level_rank (v_eff);
   v_min_rank := public.util__role_level_rank (p_min_role);
   return v_eff_rank >= v_min_rank;
+end;
+$$;
+
+/**
+ * Whether the auth user has the requested resource role in the given workspace.
+ *
+ * Binding the workspace to the resource prevents a caller from authorizing a
+ * share row with a workspace id that does not belong to the resource.
+ */
+create or replace function public.util__auth_user_can_access_resource_in_workspace (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid,
+  p_required_role public.role_level
+) returns boolean language plpgsql security definer stable
+set
+  search_path = public as $$
+declare
+  v_resource_workspace_id uuid;
+begin
+  if p_resource_type = 'dashboard' then
+    select d.workspace_id into v_resource_workspace_id
+    from public.dashboards d
+    where d.id = p_resource_id;
+  elsif p_resource_type = 'dataset' then
+    select ds.workspace_id into v_resource_workspace_id
+    from public.datasets ds
+    where ds.id = p_resource_id;
+  else
+    return false;
+  end if;
+
+  return
+    v_resource_workspace_id = p_workspace_id and
+    public.util__auth_user_can_access_resource (
+      p_resource_type,
+      p_resource_id,
+      p_required_role
+    );
 end;
 $$;
 
@@ -712,6 +779,24 @@ set
     when split_part(p_object_name, '/', 3) ~
       '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
     then replace(split_part(p_object_name, '/', 3), '.parquet', '')::uuid
+    else null
+  end;
+$$;
+
+/**
+ * Extracts a workspace UUID from the first segment of a storage object path.
+ *
+ * @returns The UUID, or NULL when the path segment is not a UUID.
+ */
+create or replace function public.util__storage_object_workspace_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when split_part(p_object_name, '/', 1) ~
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+    then split_part(p_object_name, '/', 1)::uuid
     else null
   end;
 $$;

@@ -18,8 +18,6 @@
 -- 20260813151500_gate_workspace_dataset_storage_on_resource_access.sql. Keep the
 -- two in sync; they are deliberately byte-identical below the header.
 --
--- See docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
-
 drop policy if exists "Users can SELECT workspace datasets" on storage.objects;
 
 create policy "Users can SELECT workspace datasets" on storage.objects for
@@ -40,9 +38,11 @@ select
       storage.foldername (name)
     ) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
-    public.util__auth_user_can_access_resource (
+    public.util__storage_object_workspace_id (name) is not null and
+    public.util__auth_user_can_access_resource_in_workspace (
       'dataset'::public.resource_type,
       public.util__storage_object_dataset_id (name),
+      public.util__storage_object_workspace_id (name),
       'viewer'::public.role_level
     )
   );
@@ -67,9 +67,11 @@ with
       storage.foldername (name)
     ) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
-    public.util__auth_user_can_access_resource (
+    public.util__storage_object_workspace_id (name) is not null and
+    public.util__auth_user_can_access_resource_in_workspace (
       'dataset'::public.resource_type,
       public.util__storage_object_dataset_id (name),
+      public.util__storage_object_workspace_id (name),
       'editor'::public.role_level
     )
   );
@@ -94,9 +96,11 @@ for update
       storage.foldername (name)
     ) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
-    public.util__auth_user_can_access_resource (
+    public.util__storage_object_workspace_id (name) is not null and
+    public.util__auth_user_can_access_resource_in_workspace (
       'dataset'::public.resource_type,
       public.util__storage_object_dataset_id (name),
+      public.util__storage_object_workspace_id (name),
       'editor'::public.role_level
     )
   )
@@ -117,9 +121,11 @@ with
       storage.foldername (name)
     ) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
-    public.util__auth_user_can_access_resource (
+    public.util__storage_object_workspace_id (name) is not null and
+    public.util__auth_user_can_access_resource_in_workspace (
       'dataset'::public.resource_type,
       public.util__storage_object_dataset_id (name),
+      public.util__storage_object_workspace_id (name),
       'editor'::public.role_level
     )
   );
@@ -142,9 +148,11 @@ create policy "Users can DELETE workspace datasets" on storage.objects for delet
     storage.foldername (name)
   ) [2] = 'datasets' and
   public.util__storage_object_dataset_id (name) is not null and
-  public.util__auth_user_can_access_resource (
+  public.util__storage_object_workspace_id (name) is not null and
+  public.util__auth_user_can_access_resource_in_workspace (
     'dataset'::public.resource_type,
     public.util__storage_object_dataset_id (name),
+    public.util__storage_object_workspace_id (name),
     'editor'::public.role_level
   )
 );

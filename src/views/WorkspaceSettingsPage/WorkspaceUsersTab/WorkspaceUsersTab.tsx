@@ -14,11 +14,10 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
+import { useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
-import { PrivateResourceAdminClient } from "@/clients/permissions/PrivateResourceAdminClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
@@ -29,6 +28,7 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
+import { usePrivateResourceRemovalState } from "./usePrivateResourceRemovalState/usePrivateResourceRemovalState";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 /**
@@ -55,20 +55,8 @@ export function WorkspaceUsersTab(): JSX.Element | null {
     PermissionsClient.useGetRoleGroupsWithMatrices({
       workspaceId: workspace.id,
     });
-  const [privateCounts = []] =
-    PrivateResourceAdminClient.useGetPrivateResourceCounts({
-      workspaceId: workspace.id,
-    });
-
-  const privateResourceTotalByUserId = useMemo((): Record<string, number> => {
-    const entries = privateCounts.map((row): [string, number] => {
-      return [
-        row.userId,
-        row.privateDashboardCount + row.privateDatasetCount,
-      ];
-    });
-    return Object.fromEntries(entries);
-  }, [privateCounts]);
+  const { isFetchingPrivateCounts, privateResourceTotalByUserId } =
+    usePrivateResourceRemovalState(workspace.id);
 
   const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
     onSuccess: () => {
@@ -163,8 +151,8 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                                 <Trans>
                                   This member owns {privateTotal} private
                                   resources. They cannot be removed until
-                                  someone else owns them. Private content is
-                                  not visible to workspace admins, so reassign
+                                  someone else owns them. Private content is not
+                                  visible to workspace admins, so reassign
                                   ownership from the Privacy log.
                                 </Trans>
                               </Text>
@@ -247,6 +235,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
       <LoadingOverlay
         visible={
           workspaceUsersLoading ||
+          isFetchingPrivateCounts ||
           isRemovingMember ||
           pendingInvitesLoading ||
           roleGroupsLoading

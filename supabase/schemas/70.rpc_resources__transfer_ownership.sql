@@ -2,7 +2,7 @@
  * Reassigns a resource's owner without granting the caller any read access.
  *
  * Security definer so a Settings Admin can act on a row RLS hides from them
- * (P1 makes owner-private resources invisible to admins). Returns void
+ * because owner-private resources are invisible to admins. Returns void
  * precisely so no private data can leak through a return value.
  *
  * Unblocks offboarding: `owner_id` on both resource tables is
@@ -34,15 +34,15 @@ begin
     select d.workspace_id, d.owner_id
     into v_workspace_id, v_current_owner_id
     from public.dashboards d
-    where
-      d.id = p_resource_id;
+    where d.id = p_resource_id
+    for update;
     v_app := 'dashboards';
   elsif p_resource_type = 'dataset' then
     select ds.workspace_id, ds.owner_id
     into v_workspace_id, v_current_owner_id
     from public.datasets ds
-    where
-      ds.id = p_resource_id;
+    where ds.id = p_resource_id
+    for update;
     v_app := 'data_sources';
   else
     raise exception 'unsupported resource type: %', p_resource_type;

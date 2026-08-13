@@ -777,7 +777,6 @@ msgstr "Haiwezekani kufuta mfano wa mazungumzo bila mtandao kutoka kwenye "
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Unknown user"
 msgstr "Mtumiaji asiyejulikana"
 
@@ -1062,7 +1061,7 @@ msgstr "(Malipo ya kila mwaka)"
 msgid "Remove member"
 msgstr "Ondoa mwanachama"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
 msgstr ""
@@ -1514,7 +1513,7 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Kazi ya jumlisha isiyotumika \"{funcName}\" katika SELECT; imerukwa."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr ""
 
@@ -2177,7 +2176,7 @@ msgstr "mfano. cholera-outbreak-2024"
 msgid "Collection {collectionNumber}"
 msgstr "Kukusanya {collectionNumber}"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Ownership reassigned."
 msgstr ""
 
@@ -3577,7 +3576,7 @@ msgstr "Metadata ya ghafi (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useTransferAllOwnedResources.ts
 msgid "Reassign failed"
 msgstr ""
 
@@ -4089,7 +4088,7 @@ msgstr "Chagua safu ya latitudo"
 msgid "This {resource} is shared with: "
 msgstr "Hii {resource} inashirikiwa na: "
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private dashboards"
 msgstr ""
 
@@ -4115,7 +4114,7 @@ msgstr "Chagua safu za kuuliza"
 msgid "Donut style"
 msgstr "Mtindo wa donut"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr ""
 
@@ -4664,6 +4663,10 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia "
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+msgid "Loading private resources"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
@@ -5285,7 +5288,7 @@ msgstr "Hali ya kihariri cha hoja"
 msgid "Profile"
 msgstr "Profaili"
 
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
 msgstr ""
