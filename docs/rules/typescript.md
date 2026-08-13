@@ -152,6 +152,33 @@
 
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
+- Name a function `resolve...` when it turns a reference, id, or otherwise
+  incomplete description of a thing into the concrete thing it denotes, using
+  surrounding context to do so. A reader should expect three things from the
+  name: the input is indirect (an id, a key, a partial config, an ambiguous
+  user input), the lookup can legitimately come up empty, and so the return
+  type is the concrete value or `undefined` (unless a documented default
+  always applies). Resolution is a pure read: a `resolve...` function must not
+  mutate its inputs or write to a store.
+
+  Examples in the codebase: `MapLayer.resolveGeoBinding` turns bound column
+  ids into the column names a query result is actually keyed by, and returns
+  `undefined` when a bound column is missing from the query;
+  `resolveColumnKey` turns a persisted column key into the matching result
+  column, `undefined` when nothing matches; `resolveOfflineDataset` picks the
+  dataset a question refers to.
+
+  Use a different prefix when the work is not a lookup:
+
+  | Prefix    | Means                                                 |
+  | --------- | ----------------------------------------------------- |
+  | `resolve` | Reference plus context in, the concrete thing out     |
+  | `get`     | Direct accessor, the value is already in hand         |
+  | `make`    | Constructs a new value from scratch                   |
+  | `build`   | Assembles a composite value out of parts              |
+  | `to`      | Converts one representation into another              |
+  | `select`  | Chooses among candidates that are all already present |
+
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
     Examples: `e2eCreds` or `MyE2ETest`
