@@ -15,7 +15,7 @@ import { MapLayerUpdates } from "@/views/GisApp/panels/LayerFormPanel/MapLayerUp
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ReactElement } from "react";
+import type { ReactNode } from "react";
 
 /** Palette offered by the symbol-color picker. */
 const SYMBOL_COLOR_SWATCHES = [
@@ -45,7 +45,7 @@ function LayerFields({
 }: {
   layer: MapLayer.T;
   onLayerChange: LayerChangeHandler;
-}): ReactElement {
+}): ReactNode {
   const { t } = useLingui();
   const selectedDataSource = layer.source.dataSource;
   const dataSourceId =
@@ -153,7 +153,7 @@ export function LayerFormPanel({
   basemap,
   onLayerChange,
   onBasemapChange,
-}: Props): ReactElement {
+}: Props): ReactNode {
   const { t } = useLingui();
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
 

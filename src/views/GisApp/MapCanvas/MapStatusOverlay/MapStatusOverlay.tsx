@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Loader, Paper, Text } from "@mantine/core";
 import css from "@/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.module.css";
 import type { GeometryDropReport } from "@/views/GisApp/layers/toFeatureCollection/toFeatureCollection";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   isLoading: boolean;
@@ -17,7 +17,7 @@ type Props = {
  * assistive technology, which is otherwise silent because this overlay is the
  * map's only status channel.
  */
-function StatusShell({ children }: { children: ReactNode }): ReactElement {
+function StatusShell({ children }: { children: ReactNode }): ReactNode {
   return (
     <div className={css.mapStatusOverlay} role="status" aria-live="polite">
       {children}
@@ -32,7 +32,7 @@ function DroppedRowsAlert({
 }: {
   featureCount: number;
   droppedRowCount: number;
-}): ReactElement {
+}): ReactNode {
   const { t } = useLingui();
   const totalRowCount = featureCount + droppedRowCount;
   const isEverythingDropped = featureCount === 0;
@@ -66,7 +66,7 @@ export function MapStatusOverlay({
   hasBinding,
   featureCount,
   drops,
-}: Props): ReactElement | null {
+}: Props): ReactNode {
   const { t } = useLingui();
   const droppedRowCount = drops.reduce((total, drop) => {
     return total + drop.count;

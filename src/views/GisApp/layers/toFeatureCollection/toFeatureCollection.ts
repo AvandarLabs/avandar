@@ -1,8 +1,12 @@
-import { isDefined, makeBucketMap, prop } from "@avandar/utils";
+import {
+  isDefined,
+  makeBucketMap,
+  prop,
+  toFiniteNumber,
+} from "@avandar/utils";
 import { match } from "ts-pattern";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
-import { toFiniteNumber } from "@/views/GisApp/layers/toFiniteNumber";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 

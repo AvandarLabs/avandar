@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Drawer, Flex, Stack, Text } from "@mantine/core";
-import type { ReactElement } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   opened: boolean;
@@ -16,7 +16,7 @@ export function FeatureInspector({
   opened,
   onClose,
   feature,
-}: Props): ReactElement {
+}: Props): ReactNode {
   const { t } = useLingui();
   const properties = feature?.properties ?? {};
 

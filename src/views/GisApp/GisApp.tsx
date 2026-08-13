@@ -12,7 +12,7 @@ import { MapStatusOverlay } from "@/views/GisApp/MapCanvas/MapStatusOverlay/MapS
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector";
 import { LayerFormPanel } from "@/views/GisApp/panels/LayerFormPanel/LayerFormPanel";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+import type { ReactNode } from "react";
 
 /**
  * Placeholder names for a map the author has not named yet. They are stored
@@ -28,7 +28,7 @@ type Props = { workspaceId: Workspace.Id };
  * The GIS app. Holds the map config in state, runs each layer's query, and
  * hands the resulting declarative spec to the canvas.
  */
-export function GisApp({ workspaceId }: Props): ReactElement {
+export function GisApp({ workspaceId }: Props): ReactNode {
   const [avaMap, setAvaMap] = useState(() => {
     const emptyMap = AvaMap.makeEmpty(DEFAULT_MAP_NAME);
     return {

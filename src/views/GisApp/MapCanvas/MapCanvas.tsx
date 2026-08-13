@@ -8,7 +8,7 @@ import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
 import type { MapBounds } from "@/views/GisApp/layers/computeBounds/computeBounds";
 import type { MapSpec } from "@/views/GisApp/layers/createMapSpec/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   basemap: AvaMap.Basemap;
@@ -39,7 +39,7 @@ export function MapCanvas({
   interactiveLayerIds,
   onFeatureClick,
   children,
-}: Props): ReactElement {
+}: Props): ReactNode {
   const { t } = useLingui();
   const containerRef = useRef<HTMLDivElement | null>(null);
 

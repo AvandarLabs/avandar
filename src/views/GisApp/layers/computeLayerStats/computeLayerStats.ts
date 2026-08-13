@@ -1,5 +1,4 @@
-import { isDefined } from "@avandar/utils";
-import { toFiniteNumber } from "@/views/GisApp/layers/toFiniteNumber";
+import { isDefined, toFiniteNumber } from "@avandar/utils";
 
 /** Summary statistics a layer's paint expressions need. */
 export type LayerStats = {

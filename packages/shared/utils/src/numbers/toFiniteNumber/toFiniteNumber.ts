@@ -1,6 +1,11 @@
 /**
- * Coerces a raw query-result cell to a finite number.
+ * Coerces an unknown value to a finite number.
  *
+ * Useful for values that arrive untyped, such as query result cells or user
+ * input, where `NaN` and `Infinity` are as unusable as a non-numeric string
+ * and should collapse to the same absent result.
+ *
+ * @param value The value to coerce.
  * @returns The number, or `undefined` when the value is neither a finite
  * number nor a string that parses to one.
  */
