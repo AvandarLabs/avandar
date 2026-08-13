@@ -386,6 +386,105 @@ describe("RadarChart — series settings reach Mantine", () => {
   });
 });
 
+describe("BarChart — axis scale and rotation", () => {
+  it("passes an explicit Y domain and generated ticks", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { yAxis: { min: 0, max: 120000, tickInterval: 24000 } },
+    });
+    const props = lastProps<{
+      yAxisProps?: { domain?: unknown; ticks?: number[] };
+    }>(mantineBarChartMock);
+    expect(props.yAxisProps?.domain).toEqual([0, 120000]);
+    expect(props.yAxisProps?.ticks).toEqual([
+      0, 24000, 48000, 72000, 96000, 120000,
+    ]);
+  });
+
+  it("derives the Y domain from the data when only an interval is set", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { yAxis: { tickInterval: 1 } },
+    });
+    const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
+      mantineBarChartMock,
+    );
+    expect(props.yAxisProps?.ticks).toEqual([0, 1, 2, 3]);
+  });
+
+  it("sums stacked series when deriving the Y extent", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      layout: "stack",
+      series: [
+        { renderAs: "bar", key: "v" },
+        { renderAs: "bar", key: "w" },
+      ],
+      chartStyle: { yAxis: { tickInterval: 6 } },
+    });
+    // Row sums are 6, 6, 6, so the derived high lands on the first tick
+    // past the data rather than on the largest single value (3).
+    const props = lastProps<{ yAxisProps?: { domain?: unknown } }>(
+      mantineBarChartMock,
+    );
+    expect(props.yAxisProps?.domain).toEqual([0, 6]);
+  });
+
+  it("ignores value settings on the category X axis", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { xAxis: { min: 0, max: 10 } },
+    });
+    const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
+      mantineBarChartMock,
+    );
+    expect(props.xAxisProps?.domain).toBeUndefined();
+  });
+
+  it("rotates X tick labels and grows the axis to fit them", () => {
+    // Axis height is estimated from the longest tick label, and the
+    // one-character categories in `DATA` stay under Recharts' 30px
+    // floor however they are rotated. These labels are long enough
+    // that a correctly sized axis has to grow past it.
+    render(
+      <AvandarAppProvider>
+        <BarChart
+          data={[
+            { x: "September 2024", v: 1 },
+            { x: "October 2024", v: 2 },
+          ]}
+          height={400}
+          xAxisKey="x"
+          series={BAR_BASELINE.series}
+          chartStyle={{ xAxis: { tickAngle: -90 } }}
+        />
+      </AvandarAppProvider>,
+    );
+    const props = lastProps<{
+      xAxisProps?: {
+        tick?: { angle?: number; textAnchor?: string };
+        interval?: number;
+        height?: number;
+      };
+    }>(mantineBarChartMock);
+    expect(props.xAxisProps?.tick?.angle).toBe(-90);
+    expect(props.xAxisProps?.tick?.textAnchor).toBe("end");
+    expect(props.xAxisProps?.interval).toBe(0);
+    expect(props.xAxisProps?.height).toBeGreaterThan(30);
+  });
+
+  it("adds no domain or ticks when no axis settings are configured", () => {
+    renderBar(BAR_BASELINE);
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; height?: unknown };
+      yAxisProps?: { domain?: unknown; ticks?: unknown };
+    }>(mantineBarChartMock);
+    expect(props.yAxisProps?.domain).toBeUndefined();
+    expect(props.yAxisProps?.ticks).toBeUndefined();
+    expect(props.xAxisProps?.height).toBeUndefined();
+  });
+});
+
 // AreaChart is intentionally exempt from this prop-mock pattern because it
 // uses Recharts primitives directly (documented Mantine wrapper bug). Its
 // per-series behavior is exercised end-to-end via the e2e visualization
