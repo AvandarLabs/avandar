@@ -3,21 +3,27 @@ import { withLogger } from "@avandar/logger";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { objectKeys } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type {
-  AnalyticsApp,
-  AnalyticsEventName,
-  AnalyticsEventPayload,
-} from "@/lib/analytics/analyticsEventTypes";
+import { isDesktop } from "$/platform/isDesktop";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
+// The shared analytics registry requires Deno-compatible import syntax.
+import type {
+  AnalyticsApp,
+  ClientAnalyticsEvent,
+  // eslint-disable-next-line import-x/extensions
+} from "$/analytics/analyticsEvents/analyticsEvents.ts";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-type LogEventOptions = {
-  event: AnalyticsEventName;
+/**
+ * A client-emitted event plus its optional scoping. `ClientAnalyticsEvent` is
+ * a discriminated union over event name, so passing one event's payload shape
+ * under a different event name is a compile error. Server-owned and
+ * trigger-owned events are deliberately not assignable here.
+ */
+type LogEventOptions = ClientAnalyticsEvent & {
   workspaceId?: Workspace.Id;
   app?: AnalyticsApp;
-  payload?: AnalyticsEventPayload;
 };
 
 type AnalyticsClientMutations = {
@@ -53,15 +59,22 @@ function createAnalyticsClient(): WithLogger<
             return;
           }
 
+          // The database derives `event_category` from `event_name`.
           await db.from("usage_analytics_events").insert({
             event_name: options.event,
             workspace_id: options.workspaceId ?? null,
             app: options.app ?? null,
             payload: (options.payload as never) ?? null,
             user_id: userId,
+            client: isDesktop() ? "desktop" : "web",
+            app_version: import.meta.env.VITE_APP_VERSION ?? null,
           });
-        } catch {
-          // Analytics must never block a user action. Swallow.
+        } catch (error) {
+          // Analytics must never block a user action, so this is swallowed.
+          // Development warnings expose defects while production stays silent.
+          if (import.meta.env.DEV) {
+            console.warn("[analytics] failed to log event", options, error);
+          }
         }
       },
     };
