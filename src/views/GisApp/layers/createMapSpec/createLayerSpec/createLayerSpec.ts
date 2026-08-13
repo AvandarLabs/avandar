@@ -80,8 +80,14 @@ function _buildCircleRadius({
  * Pure: the same inputs always produce the same JSON, which is what makes
  * paint decisions unit-testable.
  *
+ * @param params The layer to render and the data and statistics behind it.
+ * @param params.layer The persisted layer, carrying symbology and sensitivity.
+ * @param params.featureCollection The layer's features, already converted from
+ * query rows.
+ * @param params.stats Value domain used by data-driven paint expressions.
  * @param params.valueColumnName Result column backing a proportional symbol,
  * resolved by the caller from the symbology's column id.
+ * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
  * it as individual symbols.
  */

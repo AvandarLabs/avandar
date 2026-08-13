@@ -180,7 +180,12 @@ function _buildDropReports(
  * Row loss is returned rather than filtered away so callers can tell the user
  * how much data is missing and why.
  *
+ * @param params The rows to convert and how to read geometry out of them.
+ * @param params.rows Query result rows, one candidate feature each.
+ * @param params.binding Which columns carry geometry, already resolved.
+ * @param params.sensitivity Spatial privacy policy applied to each geometry.
  * @param params.layerId Used with the row index to seed jitter.
+ * @returns The converted features and a report for every row that was dropped.
  * @throws SensitivityViolationError when the policy is `aggregateOnly`, which
  * no geometry binding can satisfy yet.
  */

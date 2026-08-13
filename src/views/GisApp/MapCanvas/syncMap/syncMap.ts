@@ -171,8 +171,13 @@ function _applyLayers(
  * It deliberately registers no event listeners: interaction handlers are
  * attached once by the canvas, so repeated syncs cannot accumulate them.
  *
+ * @param params The map to update and the specs to diff.
+ * @param params.map The live MapLibre map to mutate.
  * @param params.previousSpec What was last applied, used to diff. Pass an
  * empty spec after a style reload, when the map has dropped everything.
+ * @param params.nextSpec The desired state: sources and layers, ordered
+ * bottom to top.
+ * @returns void
  */
 export function syncMap({
   map,

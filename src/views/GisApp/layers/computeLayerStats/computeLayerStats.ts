@@ -12,8 +12,12 @@ export type LayerStats = {
 
 /**
  * Summarizes a feature collection for data-driven paint.
+ *
+ * @param params The features to summarize and which property to read.
+ * @param params.featureCollection Features already converted from query rows.
  * @param params.valueColumnName Feature property to summarize, or `undefined`
  * when the symbology needs no value.
+ * @returns The statistics the layer's paint expressions need.
  */
 export function computeLayerStats({
   featureCollection,

@@ -40,6 +40,11 @@ function _clampLatitude(latitude: number): number {
  * The offset is a function of `seed` alone, so repeated renders of the same
  * row do not make the point wander.
  *
+ * @param params The coordinate to displace and how far to displace it.
+ * @param params.longitude The exact longitude, in degrees.
+ * @param params.latitude The exact latitude, in degrees.
+ * @param params.radiusMeters Largest displacement allowed; zero disables
+ * jitter.
  * @param params.seed Stable per-row identity, for example
  * `${layerId}:${rowIndex}`.
  * @returns The displaced coordinate, unchanged when `radiusMeters` is zero.
