@@ -12,8 +12,11 @@ export async function seedDashboard(options: {
   workspaceId: string;
   ownerEmail: string;
   name: string;
+  /** Sets `is_restricted`. Defaults to `false` (the pre-existing behavior). */
+  isRestricted?: boolean;
 }): Promise<string> {
-  const { admin, workspaceId, ownerEmail, name } = options;
+  const { admin, workspaceId, ownerEmail, name, isRestricted = false } =
+    options;
 
   const { data: ownerUserIdRaw, error: ownerLookupError } = await admin.rpc(
     "util__get_user_id_by_email",
@@ -71,7 +74,7 @@ export async function seedDashboard(options: {
       name,
       slug: `e2e-seed-${crypto.randomUUID().slice(0, 8)}`,
       is_public: false,
-      is_restricted: false,
+      is_restricted: isRestricted,
       config,
       created_at: now,
       updated_at: now,
