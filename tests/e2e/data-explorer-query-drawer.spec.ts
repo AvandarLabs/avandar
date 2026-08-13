@@ -1,7 +1,11 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
-import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import {
+  dataExplorerDrawerToggle,
+  dismissBlockingOverlays,
+  openDataExplorerDrawerTab,
+} from "./helpers/dataExplorerFlow";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
@@ -30,31 +34,22 @@ async function _goToDataExplorerWithSeededSQL(options: {
 }
 
 /**
- * Opens the drawer on the Query tab by clicking that tab's label.
+ * Opens the drawer on the Query tab from a confirmed-shut starting state, so
+ * the tests below observe a real open rather than an already-open drawer.
  *
- * Waits for the shut drawer first, via the chevron rather than the panel: the
- * panel locator matches nothing both while shut and before the drawer has
- * rendered at all, so asserting on it cannot tell a collapsed drawer from an
- * absent one.
- *
- * Query is already the selected tab, so this exercises Mantine re-firing
- * `onChange` for the active tab, which the drawer treats as a request to open.
+ * Query is the tab the drawer selects on load, so this also covers opening via
+ * the already-selected tab.
  */
 async function _openQueryTab(
   page: import("@playwright/test").Page,
 ): Promise<void> {
-  const drawerToggle = page.getByRole("button", { name: /drawer$/i });
-  await expect(drawerToggle).toHaveAttribute("aria-expanded", "false", {
-    timeout: MEDIUM_WAIT,
-  });
+  await expect(dataExplorerDrawerToggle(page)).toHaveAttribute(
+    "aria-expanded",
+    "false",
+    { timeout: MEDIUM_WAIT },
+  );
 
-  await page.getByRole("tab", { name: /^query$/i }).click();
-  await expect(drawerToggle).toHaveAttribute("aria-expanded", "true", {
-    timeout: SHORT_WAIT,
-  });
-  await expect(page.getByRole("tabpanel", { name: /^query$/i })).toBeVisible({
-    timeout: SHORT_WAIT,
-  });
+  await openDataExplorerDrawerTab({ page, tab: "query" });
 }
 
 /**

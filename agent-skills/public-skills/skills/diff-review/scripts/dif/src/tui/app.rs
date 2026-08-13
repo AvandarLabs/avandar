@@ -27,9 +27,8 @@ use super::main_diff_view::MainDiffView;
 use super::open_target;
 use super::palette::{PaletteAction, PaletteState};
 use super::session_meta::{self, SessionMeta};
-use super::startup::{
-    comparison_label, fresh_llm_command, fresh_llm_command_with_prompt, review_files_ready,
-};
+use super::start_review::StartReviewModal;
+use super::startup::{comparison_label, fresh_llm_command, review_files_ready};
 use super::vim::{VimMotion, VimState};
 
 /// How long the git diff signature must hold steady after diverging from what
@@ -147,8 +146,10 @@ pub struct App {
     pub branch: String,
     /// Current worktree name used in browser shell metadata.
     pub worktree: String,
-    /// First prompt for fresh LLM sessions in this launch mode.
-    pub fresh_llm_prompt: Option<String>,
+    /// The "no diff review found, start one?" modal, open when `Some`.
+    /// Raised at launch when no review is prepared; nothing starts a review
+    /// unless the reviewer answers Yes here.
+    pub start_review: Option<StartReviewModal>,
     /// Set when the user asks to quit.
     pub should_quit: bool,
 }
@@ -410,15 +411,6 @@ impl App {
             self.agent_kind,
             &self.llm_cmd,
         );
-        let command = self.fresh_llm_prompt.as_deref().map_or(command, |prompt| {
-            fresh_llm_command_with_prompt(
-                &self.repo_root,
-                &self.session_id_path,
-                self.agent_kind,
-                &self.llm_cmd,
-                Some(prompt),
-            )
-        });
         if let Err(e) = llm.respawn_shell_command_with_env(&command, &[], &self.repo_root) {
             llm.write_to_screen(&format!(
                 "\x1b[31m[dif] Failed to start a new {label} session: {e}\x1b[0m\r\n"

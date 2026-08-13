@@ -37,6 +37,11 @@ pub fn draw(f: &mut Frame, app: &mut App) {
     if app.help_open {
         super::draw_help::draw_help(f, f.area());
     }
+    // The start-review question owns the screen while it is open: it is asked at
+    // launch and captures every key, so it draws above the other overlays.
+    if let Some(modal) = app.start_review.as_ref() {
+        super::start_review::draw_start_review(f, modal, f.area());
+    }
 }
 
 /// The bottom keyboard-shortcut statusline: the curated command chips on the
