@@ -608,6 +608,10 @@ msgstr "Kikundi cha jukumu kimeboreshwa"
 msgid "Small"
 msgstr "Ndogo"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Go to Privacy log"
+msgstr "Nenda kwenye kumbukumbu ya faragha"
+
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "No matches"
 msgstr "Hakuna mechi"
@@ -1001,6 +1005,10 @@ msgstr "SQL iko tupu."
 msgid "Name column"
 msgstr "Safu ya jina"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+msgid "Reassign private resources"
+msgstr "Hamishia umiliki wa rasilimali za faragha"
+
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "Kipindi chako kimekwisha. Unapelekwa kwenye ukurasa wa kuingia."
@@ -1068,6 +1076,11 @@ msgstr "(Malipo ya kila mwaka)"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
 msgstr "Ondoa mwanachama"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+msgid "Reassign"
+msgstr "Hamishia umiliki"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
@@ -1526,6 +1539,10 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Kazi ya jumlisha isiyotumika \"{funcName}\" katika SELECT; imerukwa."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Private datasets"
+msgstr "Seti za data za faragha"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "Inasoma hadi:"
@@ -1873,6 +1890,7 @@ msgstr "seti yako ya data"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1947,6 +1965,12 @@ msgstr "Maandishi ya maelezo:"
 msgid "You haven't chosen an X axis"
 msgstr "Hujachagua mhimili wa X"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Publishing makes this dashboard viewable by anyone with the link, no "
+"Avandar account required."
+msgstr "Kuchapisha hufanya dashibodi hii ionekane kwa mtu yeyote aliye na "
+"kiungo, bila kuhitaji akaunti ya Avandar."
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "na pia ni sawa na..."
@@ -2009,6 +2033,10 @@ msgid "We will use those columns to merge datasets into a single "
 "{entityConfigName}."
 msgstr "Tutatumia safu hizo kuunganisha seti za data kuwa {entityConfigName} "
 "moja."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "Reassign private resources first"
+msgstr "Hamishia umiliki wa rasilimali za faragha kwanza"
 
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -2118,6 +2146,12 @@ msgstr "Safu wima ya 7"
 msgid "Feature"
 msgstr "Kipengele"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+msgid "Choose who should own this member’s private dashboards and datasets. You "
+"will not gain access to them."
+msgstr "Chagua anayepaswa kumiliki dashibodi na seti za data za faragha za "
+"mwanachama huyu. Hutapata ufikiaji wa rasilimali hizo."
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "Onyesha nukta"
@@ -2186,6 +2220,10 @@ msgstr "mfano. cholera-outbreak-2024"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "Kukusanya {collectionNumber}"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
+msgid "Ownership reassigned."
+msgstr "Umiliki umehamishwa."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
@@ -2617,6 +2655,15 @@ msgstr "Lipa kila mwezi"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
 msgstr "Mistari wima ya gridi"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
+msgid "This member owns {privateTotal} private resources. They cannot be "
+"removed until someone else owns them. Private content is not visible to "
+"workspace admins, so reassign ownership from the Privacy log."
+msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. "
+"Hawawezi kuondolewa hadi mtu mwingine azimiliki. Maudhui ya faragha "
+"hayaonekani kwa wasimamizi wa nafasi ya kazi, kwa hivyo hamishia "
+"umiliki kutoka kwenye kumbukumbu ya faragha."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -3601,6 +3648,10 @@ msgstr "Metadata ya ghafi (JSON)"
 msgid "These are the first {0} rows of your dataset."
 msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
+msgid "Reassign failed"
+msgstr "Uhamishaji wa umiliki umeshindikana"
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Select symbol size column"
 msgstr "Chagua safu ya ukubwa wa alama"
@@ -4109,6 +4160,10 @@ msgstr "Chagua safu ya latitudo"
 msgid "This {resource} is shared with: "
 msgstr "Hii {resource} inashirikiwa na: "
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Private dashboards"
+msgstr "Dashibodi za faragha"
+
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
@@ -4134,6 +4189,10 @@ msgstr "Chagua safu za kuuliza"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Donut style"
 msgstr "Mtindo wa donut"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Member"
+msgstr "Mwanachama"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
@@ -4441,6 +4500,10 @@ msgstr "Jukumu la jumlisha \"{funcName}\" linatumia hoja changamano; lumerukwa."
 msgid "Privacy log"
 msgstr "Kumbukumbu ya faragha"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
+msgid "Private resources"
+msgstr "Rasilimali za faragha"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "Mipangilio ya Uonyeshaji"
@@ -4626,15 +4689,6 @@ msgstr "Inapakia seti za data za dashibodi"
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-"Avandar account required. Datasets referenced by the dashboard are "
-"copied to public storage at publish time."
-msgstr "Kuchapisha kunafanya dashibodi hii iweze kuonekana na mtu yeyote mwenye "
-"kiungo, hakuna akaunti ya Avandar inahitajika. Seti za data "
-"zinazorejelewa na dashibodi zinakopishwa kwenye hifadhi ya umma wakati "
-"wa kuchapisha."
-
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
 msgstr "Tafadhali chagua nenosiri kukamilisha usajili wako"
@@ -4676,6 +4730,10 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia "
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
+msgid "Loading private resources"
+msgstr "Inapakia rasilimali za faragha"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
@@ -5301,6 +5359,12 @@ msgstr "Hali ya kihariri cha hoja"
 msgid "Profile"
 msgstr "Profaili"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
+msgid "Counts only. Private content is never visible to workspace admins. You "
+"can reassign ownership without gaining access."
+msgstr "Ni hesabu pekee. Maudhui ya faragha hayaonekani kamwe kwa wasimamizi wa "
+"nafasi ya kazi. Unaweza kuhamisha umiliki bila kupata ufikiaji."
+
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
@@ -5434,6 +5498,10 @@ msgstr "Funga paneli (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "URL ya picha"
+
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
+msgid "New owner"
+msgstr "Mmiliki mpya"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"

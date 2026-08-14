@@ -6,7 +6,7 @@ import { IconWorld } from "@tabler/icons-react";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { notifyError } from "@/utils/notifications/notify";
-import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactElement } from "react";
@@ -45,7 +45,7 @@ export function PublishDashboardButton({
       >
         <Button
           size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
-          variant={dashboard?.isPublic ? "filled" : "outline"}
+          variant={dashboard?.isPublic ? "filled" : "default"}
           color={dashboard?.isPublic ? "teal" : undefined}
           leftSection={<IconWorld size={16} />}
           data-disabled={isDisabled || undefined}
