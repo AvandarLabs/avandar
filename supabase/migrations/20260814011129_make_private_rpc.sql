@@ -67,8 +67,9 @@ begin
   -- Repeats util__has_non_owner_share's predicate rather than calling it.
   -- Execute on that helper is revoked from `authenticated` precisely so it
   -- cannot be used as a "does this resource have shares" probe, and this
-  -- function is SECURITY INVOKER, so it could only call the helper if that
-  -- revoke were undone for every caller. Reading through the caller's own RLS
+  -- function is SECURITY INVOKER, so it could not call the helper unless
+  -- execute were granted back to `authenticated`, which would re-open exactly
+  -- the probe the revoke exists to close. Reading through the caller's own RLS
   -- loses nothing here: the resource_shares SELECT policy shows a workspace
   -- member every share row in their workspace, so no surviving share on their
   -- own resource can hide from this check.
