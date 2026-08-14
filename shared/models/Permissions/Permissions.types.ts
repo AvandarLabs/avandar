@@ -5,6 +5,7 @@ export type AppType =
   | "data_sources"
   | "data_explorer"
   | "dashboards"
+  | "gis"
   | "settings";
 
 /**
@@ -25,23 +26,25 @@ export type PermissionKey = `${AppType}__${string}`;
  * Each `app_type` can differ; `undefined` means no row for that app in the
  * member’s role group matrix.
  *
- * @example Global Admin (four `role_group_app_roles` rows, all `admin`):
+ * @example Global Admin (five `role_group_app_roles` rows, all `admin`):
  * ```ts
  * {
  *   data_sources: "admin",
  *   data_explorer: "admin",
  *   dashboards: "admin",
+ *   gis: "admin",
  *   settings: "admin",
  * }
  * ```
  *
- * @example Global Viewer (three rows, no `settings` app;
+ * @example Global Viewer (four rows, no `settings` app;
  * `useIsGlobalAdmin()` is false):
  * ```ts
  * {
  *   data_sources: "viewer",
  *   data_explorer: "viewer",
  *   dashboards: "viewer",
+ *   gis: "viewer",
  *   settings: undefined,
  * }
  * ```
@@ -52,6 +55,7 @@ export type PermissionKey = `${AppType}__${string}`;
  *   data_sources: "editor",
  *   data_explorer: "viewer",
  *   dashboards: "viewer",
+ *   gis: "viewer",
  *   settings: undefined,
  * }
  * ```
@@ -70,6 +74,7 @@ export type UserAppRolesMatrix = Record<AppType, RoleLevel | undefined>;
  *   { app: "data_sources", role: "editor" },
  *   { app: "data_explorer", role: "viewer" },
  *   { app: "dashboards", role: "viewer" },
+ *   { app: "gis", role: "viewer" },
  *   { app: "settings", role: "admin" },
  * ]
  * ```

@@ -4,7 +4,10 @@ import {
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
-import { resolveRoleGroupIdForAcceptedInvite } from "@sbfn/workspaces/inviteRoleResolution.ts";
+import {
+  resolveRoleGroupIdForAcceptedInvite,
+  WorkspaceInviteRoleOverrideSchema,
+} from "@sbfn/workspaces/inviteRoleResolution.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
@@ -93,19 +96,7 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
         z.object({
           emailToInvite: z.string(),
           roleGroupId: z.uuid(),
-          roleOverrides: z
-            .array(
-              z.object({
-                app: z.enum([
-                  "data_sources",
-                  "data_explorer",
-                  "dashboards",
-                  "settings",
-                ]),
-                role: z.enum(["viewer", "editor", "admin"]),
-              }),
-            )
-            .optional(),
+          roleOverrides: z.array(WorkspaceInviteRoleOverrideSchema).optional(),
           userGroupIds: z.array(z.uuid()).optional(),
         }),
       )

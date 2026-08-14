@@ -1,25 +1,14 @@
-import { propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useMemo } from "react";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
-import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
-import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import { useLayerFeatureCollection } from "@/views/GisApp/layers/useLayerFeatureCollection";
+import { useRenderedLayerSpec } from "@/views/GisApp/layers/useRenderedLayerSpec";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-// The QueryResult namespace entry publishes a non-generic `T`, so the row type
-// can only be expressed through the underlying generic in the types module.
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
-
-const EMPTY_FEATURE_COLLECTION: GeoJSON.FeatureCollection = {
-  type: "FeatureCollection",
-  features: [],
-};
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 /** Everything the canvas and the status overlay need for one layer. */
 export type LayerMapSpec = {
@@ -59,9 +48,9 @@ export function useLayerMapSpec({
   queryResult,
 }: {
   layer: MapLayer.T;
-  queryResult: QueryResult<UnknownRow> | undefined;
+  queryResult: QueryResult.T<UnknownRow> | undefined;
 }): LayerMapSpec {
-  const { geoBinding, symbology, id: layerId, sensitivity } = layer;
+  const { geoBinding, id: layerId, sensitivity } = layer;
   const { queryColumns } = layer.source;
 
   const boundColumns = useMemo(() => {
@@ -71,38 +60,13 @@ export function useLayerMapSpec({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geoBinding, queryColumns]);
 
-  const { featureCollection, drops } = useMemo(() => {
-    if (!boundColumns || !queryResult) {
-      return { featureCollection: EMPTY_FEATURE_COLLECTION, drops: [] };
-    }
-    return makeFeatureCollectionFromRows({
-      rows: queryResult.data,
-      binding: boundColumns,
-      sensitivity,
-      layerId,
-    });
-  }, [boundColumns, queryResult, sensitivity, layerId]);
-
-  const valueColumn =
-    symbology.type === "proportionalSymbol" ?
-      queryColumns.find(propEq("id", symbology.value))
-    : undefined;
-  const valueColumnName =
-    valueColumn ? QueryColumn.getDerivedColumnName(valueColumn) : undefined;
-
-  const spec = useMemo(() => {
-    return makeMapSpecFromLayerSpecs([
-      makeLayerSpecFromMapLayer({
-        layer,
-        featureCollection,
-        stats: getLayerStatsFromFeatureCollection({
-          featureCollection,
-          valueColumnName,
-        }),
-        valueColumnName,
-      }),
-    ]);
-  }, [layer, featureCollection, valueColumnName]);
+  const { featureCollection, drops } = useLayerFeatureCollection({
+    binding: boundColumns,
+    queryResult,
+    sensitivity,
+    layerId,
+  });
+  const spec = useRenderedLayerSpec({ layer, featureCollection });
 
   const fitBounds = useMemo(() => {
     return getBoundsFromFeatureCollection(featureCollection);
