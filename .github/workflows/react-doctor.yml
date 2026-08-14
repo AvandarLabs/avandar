@@ -43,19 +43,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Unpinned: tracks the action's default ("latest"). The old 0.7.1 pin was
-      # a probe for the upstream "exited with status 0 before producing a JSON
-      # report" bug (millionco/react-doctor#1242); the 0.9.x line no longer
-      # reproduces it, so CI follows the same major line as the `react-doctor`
-      # devDependency in package.json rather than lagging behind it.
+      # Pinned to 0.7.1: the 0.9.x line hits the upstream "exited with status 0
+      # before producing a JSON report" bug (millionco/react-doctor#1242) on
+      # large diffs, which fails the check with "unable to create the JSON
+      # file". 0.7.1 is the last version that reliably produces the report.
       - uses: millionco/react-doctor@v1
-        # Common configuration knobs — uncomment any to override the default.
-        # Full reference: https://www.react.doctor/ci
-        # with:
-        #   non-blocking: true       # Report findings but always exit 0 (won't fail the PR check)
-        #   fail-on: warning         # Gate level: "error" (default) | "warning" | "none"
-        #   comment: false           # Disable the sticky PR summary comment
-        #   annotations: false       # Disable inline GitHub Actions annotations on changed files
-        #   version: "0.2.18"        # Pin to a specific react-doctor version instead of "latest"
-        #   directory: apps/web      # Scan a sub-directory (default: ".")
-        #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
+        with:
+          version: "0.7.1"
+          # Common configuration knobs — uncomment any to override the default.
+          # Full reference: https://www.react.doctor/ci
+          # non-blocking: true       # Report findings but always exit 0 (won't fail the PR check)
+          # fail-on: warning         # Gate level: "error" (default) | "warning" | "none"
+          # comment: false           # Disable the sticky PR summary comment
+          # annotations: false       # Disable inline GitHub Actions annotations on changed files
+          # directory: apps/web      # Scan a sub-directory (default: ".")
+          # project: "web,admin"     # In a monorepo, scan specific workspace project(s)
