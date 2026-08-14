@@ -613,7 +613,7 @@ msgstr "Pequeno"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Go to Privacy log"
-msgstr ""
+msgstr "Ir para o registro de privacidade"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "No matches"
@@ -1011,7 +1011,7 @@ msgstr "Coluna de nome"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign private resources"
-msgstr ""
+msgstr "Reatribuir recursos privados"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
@@ -1083,7 +1083,7 @@ msgstr "Remover membro"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
-msgstr ""
+msgstr "Reatribuir"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
@@ -1549,7 +1549,7 @@ msgstr "A função de agregação \"{funcName}\" não é compatível no SELECT; 
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
-msgstr ""
+msgstr "Conjuntos de dados privados"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Scans to:"
@@ -1783,10 +1783,6 @@ msgstr "Mostrar SQL"
 msgid "Grid"
 msgstr "Grade"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Search models"
-#~ msgstr "Pesquisar modelos"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Não é possível sincronizar esta entidade"
@@ -1976,7 +1972,8 @@ msgstr "Você não escolheu um eixo X"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
-msgstr ""
+msgstr "A publicação torna este painel visível para qualquer pessoa com o link, "
+"sem necessidade de uma conta Avandar."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2043,7 +2040,7 @@ msgstr "Usaremos essas colunas para mesclar conjuntos de dados em um único "
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
-msgstr ""
+msgstr "Reatribua os recursos privados primeiro"
 
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -2155,7 +2152,8 @@ msgstr "Recurso"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
-msgstr ""
+msgstr "Escolha quem deve ser o proprietário dos painéis e conjuntos de dados "
+"privados deste membro. Você não terá acesso a eles."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2228,7 +2226,7 @@ msgstr "Coleção {collectionNumber}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Ownership reassigned."
-msgstr ""
+msgstr "Propriedade reatribuída."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
@@ -2502,7 +2500,7 @@ msgstr "é nulo"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
-msgstr ""
+msgstr "Modelos Open"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -2666,7 +2664,10 @@ msgstr "Linhas de grade verticais"
 msgid "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
-msgstr ""
+msgstr "Este membro é proprietário de {privateTotal} recursos privados. Eles "
+"não poderão ser removidos até que outra pessoa seja proprietária deles. "
+"O conteúdo privado não é visível para administradores do workspace, "
+"portanto, reatribua a propriedade no registro de privacidade."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -3657,7 +3658,7 @@ msgstr "Estas são as primeiras {0} linhas do seu conjunto de dados."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
-msgstr ""
+msgstr "Falha ao reatribuir"
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
@@ -3992,10 +3993,6 @@ msgstr "Solicitar um recurso"
 msgid "Description"
 msgstr "Descrição"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Loading models..."
-#~ msgstr "Carregando modelos..."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
 msgstr "Frequência de atualização"
@@ -4170,7 +4167,7 @@ msgstr "Este {resource} é compartilhado com: "
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private dashboards"
-msgstr ""
+msgstr "Painéis privados"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -4200,7 +4197,7 @@ msgstr "Estilo de donut"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
-msgstr ""
+msgstr "Membro"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " over 1000 rows were rejected"
@@ -4515,7 +4512,7 @@ msgstr "Registro de privacidade"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Private resources"
-msgstr ""
+msgstr "Recursos privados"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
@@ -4703,15 +4700,6 @@ msgstr "Carregando conjuntos de dados do painel"
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Selecione um arquivo Excel ou CSV do seu computador para importar"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-#~ "Avandar account required. Datasets referenced by the dashboard are "
-#~ "copied to public storage at publish time."
-#~ msgstr "Publicar torna este painel visível para qualquer pessoa com o link, sem "
-#~ "necessidade de conta Avandar. Os conjuntos de dados referenciados pelo "
-#~ "painel são copiados para o armazenamento público no momento da "
-#~ "publicação."
-
 #: src/routes/register.tsx
 msgid "Please choose a password to complete your registration"
 msgstr "Por favor, escolha uma senha para completar seu registro"
@@ -4756,7 +4744,7 @@ msgstr "Carregando conjuntos de dados…"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
-msgstr ""
+msgstr "Carregando recursos privados"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the first value we see"
@@ -5383,7 +5371,9 @@ msgstr "Perfil"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
-msgstr ""
+msgstr "Apenas contagens. O conteúdo privado nunca é visível para "
+"administradores do workspace. Você pode reatribuir a propriedade sem "
+"obter acesso."
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -5522,7 +5512,7 @@ msgstr "URL da imagem"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"
-msgstr ""
+msgstr "Novo proprietário"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -6163,7 +6153,7 @@ msgstr "Data inválida"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr ""
+msgstr "Modelos Frontier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -6226,10 +6216,6 @@ msgstr "Atualizando plano para {newPlanName} ({newPlanSubType})"
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "A expressão SELECT do tipo \"{exprType}\" não é compatível com o "
 "formulário."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "No models match your search"
-#~ msgstr "Nenhum modelo corresponde à sua pesquisa"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
