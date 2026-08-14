@@ -628,7 +628,7 @@ msgstr "符號大小"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
-msgstr ""
+msgstr "Y 軸最小值"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -799,7 +799,7 @@ msgstr "輸入電子郵件"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
-msgstr ""
+msgstr "X 軸最小值"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1005,7 +1005,7 @@ msgstr "時間戳"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick interval"
-msgstr ""
+msgstr "Y 軸刻度間隔"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -2120,7 +2120,7 @@ msgstr "選擇了無效的 X 軸"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
-msgstr ""
+msgstr "X 軸最大值"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -2179,7 +2179,7 @@ msgstr "數據預覽"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
-msgstr ""
+msgstr "Y 軸最大值"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2292,7 +2292,7 @@ msgstr "捕捉儀表板中…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
-msgstr ""
+msgstr "X 軸刻度間隔"
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2888,7 +2888,7 @@ msgstr "正在產生 SQL…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
-msgstr ""
+msgstr "X 軸標籤旋轉"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"

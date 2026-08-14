@@ -657,7 +657,7 @@ msgstr "Taille du symbole"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
-msgstr ""
+msgstr "Minimum de l’axe Y"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -843,7 +843,7 @@ msgstr "Entrez l'email"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
-msgstr ""
+msgstr "Minimum de l’axe X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1054,7 +1054,7 @@ msgstr "Horodatage"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick interval"
-msgstr ""
+msgstr "Intervalle des graduations de l’axe Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -2235,7 +2235,7 @@ msgstr "Axe X invalide sélectionné"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
-msgstr ""
+msgstr "Maximum de l’axe X"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -2296,7 +2296,7 @@ msgstr "Aperçu des données"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
-msgstr ""
+msgstr "Maximum de l’axe Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2415,7 +2415,7 @@ msgstr "Capture du tableau de bord…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
-msgstr ""
+msgstr "Intervalle des graduations de l’axe X"
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -3038,7 +3038,7 @@ msgstr "Génération de SQL…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
-msgstr ""
+msgstr "Rotation des libellés de l’axe X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"

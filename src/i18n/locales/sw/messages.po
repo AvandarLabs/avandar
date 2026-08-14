@@ -648,7 +648,7 @@ msgstr "Ukubwa wa alama"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
-msgstr ""
+msgstr "Kima cha chini cha mhimili wa Y"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -832,7 +832,7 @@ msgstr "Ingiza barua pepe"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
-msgstr ""
+msgstr "Kima cha chini cha mhimili wa X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1041,7 +1041,7 @@ msgstr "Wakati"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick interval"
-msgstr ""
+msgstr "Muda wa alama za mhimili wa Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -2207,7 +2207,7 @@ msgstr "X axis isiyo sahihi imechaguliwa"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
-msgstr ""
+msgstr "Kima cha juu cha mhimili wa X"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -2268,7 +2268,7 @@ msgstr "Mapitio ya Data"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
-msgstr ""
+msgstr "Kima cha juu cha mhimili wa Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2385,7 +2385,7 @@ msgstr "Inanasa dashibodi…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
-msgstr ""
+msgstr "Muda wa alama za mhimili wa X"
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -3000,7 +3000,7 @@ msgstr "Inazalisha SQL…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
-msgstr ""
+msgstr "Mzunguko wa lebo ya mhimili wa X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"

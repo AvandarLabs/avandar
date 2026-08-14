@@ -642,7 +642,7 @@ msgstr "حجم الرمز"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
-msgstr ""
+msgstr "الحد الأدنى للمحور Y"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -821,7 +821,7 @@ msgstr "أدخل البريد الإلكتروني"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
-msgstr ""
+msgstr "الحد الأدنى للمحور X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1031,7 +1031,7 @@ msgstr "الطابع الزمني"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick interval"
-msgstr ""
+msgstr "الفاصل بين تدريجات المحور Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -2180,7 +2180,7 @@ msgstr "تم اختيار محور X غير صالح"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis maximum"
-msgstr ""
+msgstr "الحد الأقصى للمحور X"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -2239,7 +2239,7 @@ msgstr "معاينة البيانات"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
-msgstr ""
+msgstr "الحد الأقصى للمحور Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2353,7 +2353,7 @@ msgstr "جارٍ التقاط اللوحة…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
-msgstr ""
+msgstr "الفاصل بين تدريجات المحور X"
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2962,7 +2962,7 @@ msgstr "جارٍ إنشاء SQL…"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
-msgstr ""
+msgstr "تدوير تسمية المحور X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
