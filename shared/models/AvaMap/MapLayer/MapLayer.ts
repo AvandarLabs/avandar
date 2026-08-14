@@ -12,6 +12,7 @@ import type {
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type { SensitivityPolicy } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 
+/** Public model namespace for map layers, related types, and constructors. */
 export { MapLayerModule as MapLayer } from "$/models/AvaMap/MapLayer/MapLayerModule/MapLayerModule.ts";
 
 export namespace MapLayer {

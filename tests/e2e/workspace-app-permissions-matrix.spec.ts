@@ -27,6 +27,7 @@ function _appRouteForType(app: AppType): WorkspaceAppRouteCase | undefined {
     data_sources: WORKSPACE_APP_ROUTES.dataSources,
     data_explorer: WORKSPACE_APP_ROUTES.dataExplorer,
     dashboards: WORKSPACE_APP_ROUTES.dashboards,
+    gis: WORKSPACE_APP_ROUTES.gis,
     settings: undefined,
   };
   return routes[app];

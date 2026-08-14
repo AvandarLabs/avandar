@@ -21,7 +21,7 @@ create table public.usage_analytics_events (
   -- can group by `event_name` over time.
   event_name text not null,
   -- Optional app surface where the event originated (data_sources,
-  -- data_explorer, dashboards, settings). Null for events that aren't
+  -- data_explorer, dashboards, gis, settings). Null for events that aren't
   -- bound to a specific app surface.
   app public.app_type,
   -- Optional free-form JSON payload. Keep payloads small and scrubbed of

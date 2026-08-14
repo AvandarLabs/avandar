@@ -4377,6 +4377,11 @@ msgstr "Esa consulta falló. Por favor, corrige el SQL y vuelve a intentarlo."
 msgid "An error occurred while saving the dataset"
 msgstr "Ocurrió un error al guardar el conjunto de datos"
 
+#: shared/copy/appLabel.ts
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Maps"
+msgstr "Mapas"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Importar conjunto de datos"

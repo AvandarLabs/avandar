@@ -4404,6 +4404,11 @@ msgstr "Cette requête a échoué. Veuillez corriger le SQL et réessayer."
 msgid "An error occurred while saving the dataset"
 msgstr "Une erreur est survenue lors de la sauvegarde du jeu de données"
 
+#: shared/copy/appLabel.ts
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Maps"
+msgstr "Cartes"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Importer le jeu de données"

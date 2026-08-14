@@ -4208,6 +4208,11 @@ msgstr "該查詢失敗。請修正 SQL 並重試。"
 msgid "An error occurred while saving the dataset"
 msgstr "儲存資料集時發生錯誤"
 
+#: shared/copy/appLabel.ts
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Maps"
+msgstr "地圖"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "匯入資料集"

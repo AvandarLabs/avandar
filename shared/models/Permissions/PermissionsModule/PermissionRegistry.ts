@@ -65,6 +65,20 @@ export const PermissionRegistry = {
       "dashboards__can_manage_dashboards",
     ] as const,
   },
+  gis: {
+    viewer: ["gis__can_view_map"] as const,
+    editor: [
+      "gis__can_view_map",
+      "gis__can_edit_map",
+      "gis__can_create_map",
+    ] as const,
+    admin: [
+      "gis__can_view_map",
+      "gis__can_edit_map",
+      "gis__can_create_map",
+      "gis__can_manage_maps",
+    ] as const,
+  },
   settings: {
     viewer: [] as const,
     editor: [] as const,

@@ -35,6 +35,11 @@ export const WORKSPACE_APP_ROUTES = {
     path: "/dashboards",
     allowedUrlPattern: /\/dashboards/,
   },
+  gis: {
+    label: "Maps",
+    path: "/map",
+    allowedUrlPattern: /\/map/,
+  },
   settings: {
     label: "Workspace Settings",
     path: "/settings",

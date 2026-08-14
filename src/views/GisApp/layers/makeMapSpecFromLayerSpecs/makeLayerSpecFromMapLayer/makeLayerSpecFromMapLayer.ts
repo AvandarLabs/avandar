@@ -13,6 +13,51 @@ import type { ExpressionSpecification } from "maplibre-gl";
 /** Highlight applied to the feature the user has selected. */
 const SELECTED_STROKE_COLOR = "#ffd700";
 
+type ProportionalSymbol = Extract<
+  MapLayer.Symbology,
+  { type: "proportionalSymbol" }
+>;
+
+/** Applies the selected scale to a numeric span. */
+function _getScaledSpan(
+  scale: ProportionalSymbol["scale"],
+  span: number,
+): number {
+  return matchLiteral(scale, {
+    sqrt: () => {
+      return Math.sqrt(span);
+    },
+    linear: () => {
+      return span;
+    },
+  });
+}
+
+/** Builds the MapLibre expression that scales a source value from zero. */
+function _buildScaledValueExpression({
+  scale,
+  valueColumnName,
+  minimum,
+}: {
+  scale: ProportionalSymbol["scale"];
+  valueColumnName: string;
+  minimum: number;
+}): ExpressionSpecification {
+  const normalized: ExpressionSpecification = [
+    "max",
+    0,
+    ["-", ["to-number", ["get", valueColumnName], 0], minimum],
+  ];
+  return matchLiteral(scale, {
+    sqrt: (): ExpressionSpecification => {
+      return ["sqrt", normalized];
+    },
+    linear: (): ExpressionSpecification => {
+      return normalized;
+    },
+  });
+}
+
 /**
  * Builds the `circle-radius` value. A flat circle is a constant; a
  * proportional symbol interpolates on the square root of the value, which
@@ -36,42 +81,57 @@ function _buildCircleRadius({
     return symbology.minRadius;
   }
   const [minimum, maximum] = valueDomain;
-  // matchLiteral rather than a ternary so a new scale mode cannot silently
-  // fall through to linear.
-  const scaleSpan = matchLiteral(symbology.scale, {
-    sqrt: () => {
-      return (span: number): number => {
-        return Math.sqrt(span);
-      };
-    },
-    linear: () => {
-      return (span: number): number => {
-        return span;
-      };
-    },
-  });
-  const normalized: ExpressionSpecification = [
-    "max",
-    0,
-    ["-", ["to-number", ["get", valueColumnName], 0], minimum],
-  ];
-  const scaled = matchLiteral(symbology.scale, {
-    sqrt: (): ExpressionSpecification => {
-      return ["sqrt", normalized];
-    },
-    linear: (): ExpressionSpecification => {
-      return normalized;
-    },
+  const scaledValue = _buildScaledValueExpression({
+    scale: symbology.scale,
+    valueColumnName,
+    minimum,
   });
   return [
     "interpolate",
     ["linear"],
-    scaled,
+    scaledValue,
     0,
     symbology.minRadius,
-    scaleSpan(maximum - minimum),
+    _getScaledSpan(symbology.scale, maximum - minimum),
     symbology.maxRadius,
   ];
+}
+
+/** Creates the MapLibre circle layer for one persisted map layer. */
+function _createMapLayerSpec({
+  layer,
+  stats,
+  valueColumnName,
+  sourceId,
+}: {
+  layer: MapLayer.T;
+  stats: LayerStats;
+  valueColumnName: string | undefined;
+  sourceId: string;
+}): MapLayerSpec {
+  const { symbology } = layer;
+  return {
+    id: MapLayerIds.toLayerId(layer.id),
+    type: "circle",
+    source: sourceId,
+    paint: {
+      "circle-radius": _buildCircleRadius({
+        symbology,
+        stats,
+        valueColumnName,
+      }),
+      "circle-color": symbology.color.color,
+      "circle-opacity": 0.8,
+      "circle-stroke-width": symbology.stroke.width,
+      "circle-stroke-color": [
+        "case",
+        ["boolean", ["feature-state", "isSelected"], false],
+        SELECTED_STROKE_COLOR,
+        symbology.stroke.color,
+      ],
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
 }
 
 /**
@@ -104,35 +164,17 @@ export function makeLayerSpecFromMapLayer({
 }): MapSpec {
   if (layer.sensitivity.mode === "aggregateOnly") {
     throw new SensitivityViolationError(
-      `Layer "${layer.name}" is aggregate-only and cannot be drawn as ` +
-        "individual symbols.",
+      `Layer "${layer.name}" is aggregate-only and cannot be drawn as individual symbols.`,
     );
   }
 
   const sourceId = MapLayerIds.toSourceId(layer.id);
-  const { symbology } = layer;
-  const layerSpec: MapLayerSpec = {
-    id: MapLayerIds.toLayerId(layer.id),
-    type: "circle",
-    source: sourceId,
-    paint: {
-      "circle-radius": _buildCircleRadius({
-        symbology,
-        stats,
-        valueColumnName,
-      }),
-      "circle-color": symbology.color.color,
-      "circle-opacity": 0.8,
-      "circle-stroke-width": symbology.stroke.width,
-      "circle-stroke-color": [
-        "case",
-        ["boolean", ["feature-state", "isSelected"], false],
-        SELECTED_STROKE_COLOR,
-        symbology.stroke.color,
-      ],
-    },
-    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
-  };
+  const layerSpec = _createMapLayerSpec({
+    layer,
+    stats,
+    valueColumnName,
+    sourceId,
+  });
 
   return {
     sources: { [sourceId]: { type: "geojson", data: featureCollection } },

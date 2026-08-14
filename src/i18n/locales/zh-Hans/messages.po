@@ -4206,6 +4206,11 @@ msgstr "该查询失败。请修复 SQL 并重试。"
 msgid "An error occurred while saving the dataset"
 msgstr "保存数据集时发生错误"
 
+#: shared/copy/appLabel.ts
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Maps"
+msgstr "地图"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "导入数据集"

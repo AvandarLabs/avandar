@@ -1,4 +1,4 @@
-.gisAppControlPanel {
+.gisMapCanvasControlPanel {
   backdrop-filter: blur(12px);
   background-color: color-mix(
     in srgb,

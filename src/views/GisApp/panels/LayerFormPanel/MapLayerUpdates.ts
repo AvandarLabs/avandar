@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 /** True when `column` is already in the layer's selected query columns. */
 function _hasQueryColumn(layer: MapLayer.T, column: QueryColumn.T): boolean {
@@ -49,7 +49,7 @@ export const MapLayerUpdates = {
   /** Points the layer at a new data source, clearing what no longer applies. */
   withDataSource: (
     layer: MapLayer.T,
-    dataSource: QueryDataSource | undefined,
+    dataSource: QueryDataSource.T | undefined,
   ): MapLayer.T => {
     const isUnchanged =
       layer.source.dataSource === dataSource &&

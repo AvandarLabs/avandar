@@ -4312,6 +4312,11 @@ msgstr "That query failed. Please fix the SQL and try again."
 msgid "An error occurred while saving the dataset"
 msgstr "An error occurred while saving the dataset"
 
+#: shared/copy/appLabel.ts
+#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
+msgid "Maps"
+msgstr "Maps"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Import dataset"

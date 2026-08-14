@@ -1,4 +1,10 @@
-import { prop, propEq } from "@avandar/utils";
+import {
+  objectEntries,
+  objectKeys,
+  prop,
+  propEq,
+  propPasses,
+} from "@avandar/utils";
 import type {
   MapLayerSpec,
   MapSpec,
@@ -19,7 +25,7 @@ function _syncPaint(
   layerSpec: MapLayerSpec,
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
-  Object.entries(layerSpec.paint).forEach(([property, value]) => {
+  objectEntries(layerSpec.paint).forEach(([property, value]) => {
     const previousValue =
       previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
     if (JSON.stringify(previousValue) === JSON.stringify(value)) {
@@ -39,7 +45,7 @@ function _syncLayout(
   const previousLayout = previousLayerSpec?.layout ?? {
     visibility: "visible",
   };
-  Object.entries(nextLayout).forEach(([property, value]) => {
+  objectEntries(nextLayout).forEach(([property, value]) => {
     const previousValue =
       previousLayout[property as keyof typeof previousLayout];
     if (JSON.stringify(previousValue) === JSON.stringify(value)) {
@@ -66,7 +72,7 @@ function _removeStaleLayersAndSources(
       map.removeLayer(layerSpec.id);
     }
   });
-  Object.keys(previousSpec.sources).forEach((sourceId) => {
+  objectKeys(previousSpec.sources).forEach((sourceId) => {
     if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
       map.removeSource(sourceId);
     }
@@ -89,7 +95,7 @@ function _syncSources(
   previousSpec: MapSpec,
   nextSpec: MapSpec,
 ): void {
-  Object.entries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
+  objectEntries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
     const existingSource = map.getSource(sourceId) as GeoJSONSource | undefined;
     if (existingSource) {
       if (previousSpec.sources[sourceId]?.data !== sourceSpec.data) {
@@ -119,17 +125,19 @@ function _needsReorder(
 ): boolean {
   const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
   const survivingIds = previousSpec.layers
-    .filter((layer) => {
-      return nextLayerIds.has(layer.id);
-    })
+    .filter(
+      propPasses("id", (layerId) => {
+        return nextLayerIds.has(layerId);
+      }),
+    )
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {
     return !previousLayerIds.has(layerId);
   });
   const effectiveOrder = [...survivingIds, ...newIds];
   const targetOrder = nextSpec.layers.map(prop("id"));
-  return effectiveOrder.some((layerId, idx) => {
-    return layerId !== targetOrder[idx];
+  return effectiveOrder.some((layerId, layerIndex) => {
+    return layerId !== targetOrder[layerIndex];
   });
 }
 

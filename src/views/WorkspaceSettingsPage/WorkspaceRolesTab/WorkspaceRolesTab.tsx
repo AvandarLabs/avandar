@@ -42,6 +42,7 @@ export function WorkspaceRolesTab(): JSX.Element {
     data_sources: undefined,
     data_explorer: undefined,
     dashboards: undefined,
+    gis: undefined,
     settings: undefined,
   });
   const [builtinPresetType, setBuiltinPresetType] =
